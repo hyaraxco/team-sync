@@ -343,32 +343,814 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
     public function getWorkforceAnalytics(string $period, ?string $department): array
     {
-        // TODO: Implement workforce analytics (headcount trends, turnover, hiring pipeline)
-        return [];
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'workforce_' . md5(json_encode([$period, $department])) . '_' . now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $start = $parsed['start'];
+            $end = $parsed['end'];
+
+            // ── Headcount Trend (monthly) ───────────────────────────────────
+            $headcountTrend = [];
+            $cursor = $start->copy()->startOfMonth();
+            while ($cursor->lte($end)) {
+                $monthEnd = $cursor->copy()->endOfMonth();
+                $count = DB::table('employee_profiles')
+                    ->where('created_at', '<=', $monthEnd)
+                    ->where(function ($q) use ($monthEnd) {
+                        $q->whereNull('deleted_at')->orWhere('deleted_at', '>', $monthEnd);
+                    })
+                    ->when($department, function ($q) use ($department) {
+                        $q->join('job_information as ji', 'ji.employee_id', '=', 'employee_profiles.id')
+                            ->join('teams as t', 't.id', '=', 'ji.team_id')
+                            ->where('t.department', $department);
+                    })
+                    ->count(DB::raw('DISTINCT employee_profiles.id'));
+
+                $headcountTrend[] = [
+                    'month' => $cursor->format('M Y'),
+                    'count' => $count,
+                ];
+                $cursor->addMonth();
+            }
+
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+
+            // ── Gender Distribution ─────────────────────────────────────────
+            $genderDistribution = DB::table('employee_profiles')
+                ->whereIn('id', $filteredEmployeeIds)
+                ->whereNotNull('gender')
+                ->selectRaw("gender, COUNT(*) as count")
+                ->groupBy('gender')
+                ->get()
+                ->map(fn ($r) => ['gender' => $r->gender, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Employment Type Breakdown ────────────────────────────────────
+            $employmentTypes = DB::table('job_information')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereNotNull('employment_type')
+                ->selectRaw("employment_type, COUNT(*) as count")
+                ->groupBy('employment_type')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['type' => $r->employment_type, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Work Location Distribution ──────────────────────────────────
+            $workLocations = DB::table('job_information')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereNotNull('work_location')
+                ->selectRaw("work_location, COUNT(*) as count")
+                ->groupBy('work_location')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['location' => $r->work_location, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Department Headcount ─────────────────────────────────────────
+            $departmentHeadcount = DB::table('teams')
+                ->join('team_members', function ($join) {
+                    $join->on('team_members.team_id', '=', 'teams.id')->whereNull('team_members.left_at');
+                })
+                ->whereIn('team_members.employee_id', $filteredEmployeeIds)
+                ->whereNotNull('teams.department')
+                ->selectRaw("teams.department, COUNT(DISTINCT team_members.employee_id) as count")
+                ->groupBy('teams.department')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['department' => $r->department, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Skill Level Distribution ────────────────────────────────────
+            $skillLevels = DB::table('job_information')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereNotNull('skill_level')
+                ->selectRaw("skill_level, COUNT(*) as count")
+                ->groupBy('skill_level')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['level' => $r->skill_level, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Age Distribution ────────────────────────────────────────────
+            $ageDistribution = DB::table('employee_profiles')
+                ->whereIn('id', $filteredEmployeeIds)
+                ->whereNotNull('date_of_birth')
+                ->selectRaw("
+                    CASE
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) < 25 THEN '<25'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 25 AND 30 THEN '25-30'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 31 AND 35 THEN '31-35'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 36 AND 40 THEN '36-40'
+                        WHEN TIMESTAMPDIFF(YEAR, date_of_birth, CURDATE()) BETWEEN 41 AND 50 THEN '41-50'
+                        ELSE '50+'
+                    END as age_range,
+                    COUNT(*) as count
+                ")
+                ->groupBy('age_range')
+                ->orderByRaw("FIELD(age_range, '<25', '25-30', '31-35', '36-40', '41-50', '50+')")
+                ->get()
+                ->map(fn ($r) => ['range' => $r->age_range, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Tenure Distribution ─────────────────────────────────────────
+            $tenureDistribution = DB::table('job_information')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereNotNull('start_date')
+                ->selectRaw("
+                    CASE
+                        WHEN TIMESTAMPDIFF(MONTH, start_date, CURDATE()) < 6 THEN '<6 months'
+                        WHEN TIMESTAMPDIFF(MONTH, start_date, CURDATE()) BETWEEN 6 AND 12 THEN '6-12 months'
+                        WHEN TIMESTAMPDIFF(YEAR, start_date, CURDATE()) BETWEEN 1 AND 2 THEN '1-2 years'
+                        WHEN TIMESTAMPDIFF(YEAR, start_date, CURDATE()) BETWEEN 3 AND 5 THEN '3-5 years'
+                        ELSE '5+ years'
+                    END as tenure_range,
+                    COUNT(*) as count
+                ")
+                ->groupBy('tenure_range')
+                ->orderByRaw("FIELD(tenure_range, '<6 months', '6-12 months', '1-2 years', '3-5 years', '5+ years')")
+                ->get()
+                ->map(fn ($r) => ['range' => $r->tenure_range, 'count' => (int) $r->count])
+                ->values()->all();
+
+            return [
+                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => $parsed['label']],
+                'headcount_trend' => $headcountTrend,
+                'gender_distribution' => $genderDistribution,
+                'employment_types' => $employmentTypes,
+                'work_locations' => $workLocations,
+                'department_headcount' => $departmentHeadcount,
+                'skill_levels' => $skillLevels,
+                'age_distribution' => $ageDistribution,
+                'tenure_distribution' => $tenureDistribution,
+            ];
+        });
     }
 
     public function getAttendanceAnalytics(string $period, ?string $department, ?int $teamId): array
     {
-        // TODO: Implement attendance analytics (daily patterns, late trends, absence reasons)
-        return [];
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'attendance_' . md5(json_encode([$period, $department, $teamId])) . '_' . now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department, $teamId) {
+            $start = $parsed['start'];
+            $end = $parsed['end'];
+
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, $teamId);
+
+            // ── Monthly Attendance Rate Trend ────────────────────────────────
+            $monthlyTrend = DB::table('attendances')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    DATE_FORMAT(date, '%Y-%m') as month_key,
+                    COUNT(*) as total_records,
+                    COUNT(CASE WHEN status = 'present' THEN 1 END) as present_count,
+                    COUNT(CASE WHEN status = 'late' THEN 1 END) as late_count,
+                    COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_count,
+                    COUNT(CASE WHEN status = 'half_day' THEN 1 END) as half_day_count,
+                    COUNT(CASE WHEN status = 'sick_leave' THEN 1 END) as sick_leave_count,
+                    COUNT(CASE WHEN status = 'annual_leave' THEN 1 END) as annual_leave_count,
+                    COALESCE(AVG(worked_minutes), 0) as avg_worked_minutes
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get();
+
+            $monthlyAttendanceRate = $monthlyTrend->map(function ($row) {
+                $attended = $row->present_count + $row->late_count + $row->half_day_count;
+                $rate = $row->total_records > 0 ? round(($attended / $row->total_records) * 100, 1) : 0;
+
+                return [
+                    'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                    'attendance_rate' => $rate,
+                    'present' => (int) $row->present_count,
+                    'late' => (int) $row->late_count,
+                    'absent' => (int) $row->absent_count,
+                    'half_day' => (int) $row->half_day_count,
+                    'sick_leave' => (int) $row->sick_leave_count,
+                    'annual_leave' => (int) $row->annual_leave_count,
+                    'avg_hours' => round((float) $row->avg_worked_minutes / 60, 1),
+                ];
+            })->values()->all();
+
+            // ── Status Distribution (current period) ────────────────────────
+            $statusDistribution = DB::table('attendances')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    status,
+                    COUNT(*) as count
+                ")
+                ->groupBy('status')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($row) => [
+                    'status' => $row->status,
+                    'count' => (int) $row->count,
+                ])
+                ->values()
+                ->all();
+
+            // ── Weekly Lateness Trend ────────────────────────────────────────
+            $latenessTrend = DB::table('attendances')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->where('status', 'late')
+                ->selectRaw("
+                    YEARWEEK(date, 1) as week_key,
+                    MIN(date) as week_start,
+                    COUNT(*) as late_count
+                ")
+                ->groupBy('week_key')
+                ->orderBy('week_key')
+                ->get()
+                ->map(fn ($row) => [
+                    'week' => Carbon::parse($row->week_start)->format('d M'),
+                    'late_count' => (int) $row->late_count,
+                ])
+                ->values()
+                ->all();
+
+            // ── Average Hours Worked per Day ────────────────────────────────
+            $avgHoursTrend = DB::table('attendances')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereNotNull('worked_minutes')
+                ->where('worked_minutes', '>', 0)
+                ->selectRaw("
+                    DATE_FORMAT(date, '%Y-%m') as month_key,
+                    ROUND(AVG(worked_minutes) / 60, 1) as avg_hours
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($row) => [
+                    'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                    'avg_hours' => (float) $row->avg_hours,
+                ])
+                ->values()
+                ->all();
+
+            // ── Work Mode Distribution (monthly stacked) ────────────────────
+            $workModeTrend = DB::table('attendances')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereNotNull('actual_work_mode')
+                ->selectRaw("
+                    DATE_FORMAT(date, '%Y-%m') as month_key,
+                    actual_work_mode,
+                    COUNT(*) as count
+                ")
+                ->groupBy('month_key', 'actual_work_mode')
+                ->orderBy('month_key')
+                ->get();
+
+            // Pivot work mode data by month
+            $workModeByMonth = [];
+            foreach ($workModeTrend as $row) {
+                $label = Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y');
+                if (! isset($workModeByMonth[$label])) {
+                    $workModeByMonth[$label] = ['month' => $label, 'office' => 0, 'remote' => 0, 'hybrid' => 0];
+                }
+                $mode = strtolower($row->actual_work_mode);
+                if (isset($workModeByMonth[$label][$mode])) {
+                    $workModeByMonth[$label][$mode] = (int) $row->count;
+                }
+            }
+            $workModeDistribution = array_values($workModeByMonth);
+
+            // ── Top Late Employees ──────────────────────────────────────────
+            $topLateEmployees = DB::table('attendances')
+                ->join('employee_profiles', 'employee_profiles.id', '=', 'attendances.employee_id')
+                ->join('users', 'users.id', '=', 'employee_profiles.user_id')
+                ->whereIn('attendances.employee_id', $filteredEmployeeIds)
+                ->whereBetween('attendances.date', [$start->toDateString(), $end->toDateString()])
+                ->where('attendances.status', 'late')
+                ->groupBy('attendances.employee_id', 'users.name', 'employee_profiles.code')
+                ->selectRaw("
+                    attendances.employee_id,
+                    users.name as employee_name,
+                    employee_profiles.code as employee_code,
+                    COUNT(*) as late_count
+                ")
+                ->orderByDesc('late_count')
+                ->limit(10)
+                ->get()
+                ->map(fn ($row) => [
+                    'employee_id' => (int) $row->employee_id,
+                    'employee_name' => $row->employee_name,
+                    'employee_code' => $row->employee_code,
+                    'late_count' => (int) $row->late_count,
+                ])
+                ->values()
+                ->all();
+
+            // ── Policy Mismatch Trend ───────────────────────────────────────
+            $mismatchTrend = DB::table('attendance_policy_mismatches')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('mismatch_date', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    DATE_FORMAT(mismatch_date, '%Y-%m') as month_key,
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN status = 'resolved' THEN 1 END) as resolved
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($row) => [
+                    'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                    'total' => (int) $row->total,
+                    'resolved' => (int) $row->resolved,
+                ])
+                ->values()
+                ->all();
+
+            // ── Correction Request Rate ─────────────────────────────────────
+            $correctionTrend = DB::table('attendance_corrections')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('created_at', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    DATE_FORMAT(created_at, '%Y-%m') as month_key,
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                    COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(function ($row) {
+                    $approvalRate = $row->total > 0
+                        ? round((($row->approved) / $row->total) * 100, 1)
+                        : 0;
+
+                    return [
+                        'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                        'total' => (int) $row->total,
+                        'approved' => (int) $row->approved,
+                        'rejected' => (int) $row->rejected,
+                        'pending' => (int) $row->pending,
+                        'approval_rate' => $approvalRate,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            return [
+                'period' => [
+                    'start' => $start->toDateString(),
+                    'end' => $end->toDateString(),
+                    'label' => $parsed['label'],
+                ],
+                'monthly_attendance_rate' => $monthlyAttendanceRate,
+                'status_distribution' => $statusDistribution,
+                'lateness_trend' => $latenessTrend,
+                'avg_hours_trend' => $avgHoursTrend,
+                'work_mode_distribution' => $workModeDistribution,
+                'top_late_employees' => $topLateEmployees,
+                'policy_mismatch_trend' => $mismatchTrend,
+                'correction_trend' => $correctionTrend,
+            ];
+        });
     }
 
     public function getLeaveAnalytics(string $period, ?string $department): array
     {
-        // TODO: Implement leave analytics (utilization by type, seasonal patterns, balance overview)
-        return [];
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'leave_' . md5(json_encode([$period, $department])) . '_' . now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $start = $parsed['start'];
+            $end = $parsed['end'];
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+
+            // ── Leave Requests by Month ──────────────────────────────────────
+            $monthlyTrend = DB::table('leave_requests')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    DATE_FORMAT(start_date, '%Y-%m') as month_key,
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                    COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'total' => (int) $r->total,
+                    'approved' => (int) $r->approved,
+                    'rejected' => (int) $r->rejected,
+                    'pending' => (int) $r->pending,
+                ])
+                ->values()->all();
+
+            // ── Leave Type Distribution ──────────────────────────────────────
+            $typeDistribution = DB::table('leave_requests')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("leave_type, COUNT(*) as count, COALESCE(SUM(total_days), 0) as total_days")
+                ->groupBy('leave_type')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => [
+                    'type' => $r->leave_type,
+                    'count' => (int) $r->count,
+                    'total_days' => (int) $r->total_days,
+                ])
+                ->values()->all();
+
+            // ── Approval Rate ───────────────────────────────────────────────
+            $approvalStats = DB::table('leave_requests')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                    COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending
+                ")
+                ->first();
+
+            $approvalRate = [
+                'total' => (int) $approvalStats->total,
+                'approved' => (int) $approvalStats->approved,
+                'rejected' => (int) $approvalStats->rejected,
+                'pending' => (int) $approvalStats->pending,
+                'approval_percentage' => $approvalStats->total > 0
+                    ? round(($approvalStats->approved / $approvalStats->total) * 100, 1)
+                    : 0,
+            ];
+
+            // ── Average Leave Duration by Type ──────────────────────────────
+            $avgDuration = DB::table('leave_requests')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+                ->where('status', 'approved')
+                ->selectRaw("leave_type, ROUND(AVG(total_days), 1) as avg_days")
+                ->groupBy('leave_type')
+                ->orderByDesc('avg_days')
+                ->get()
+                ->map(fn ($r) => ['type' => $r->leave_type, 'avg_days' => (float) $r->avg_days])
+                ->values()->all();
+
+            // ── Leave by Department ──────────────────────────────────────────
+            $leaveByDepartment = DB::table('leave_requests')
+                ->join('employee_profiles', 'employee_profiles.id', '=', 'leave_requests.employee_id')
+                ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+                ->join('teams', 'teams.id', '=', 'job_information.team_id')
+                ->whereIn('leave_requests.employee_id', $filteredEmployeeIds)
+                ->whereBetween('leave_requests.start_date', [$start->toDateString(), $end->toDateString()])
+                ->where('leave_requests.status', 'approved')
+                ->whereNotNull('teams.department')
+                ->selectRaw("teams.department, leave_requests.leave_type, COALESCE(SUM(leave_requests.total_days), 0) as total_days")
+                ->groupBy('teams.department', 'leave_requests.leave_type')
+                ->orderBy('teams.department')
+                ->get();
+
+            // Pivot by department
+            $deptLeaveMap = [];
+            foreach ($leaveByDepartment as $row) {
+                if (! isset($deptLeaveMap[$row->department])) {
+                    $deptLeaveMap[$row->department] = ['department' => $row->department, 'total_days' => 0, 'types' => []];
+                }
+                $deptLeaveMap[$row->department]['total_days'] += (int) $row->total_days;
+                $deptLeaveMap[$row->department]['types'][] = ['type' => $row->leave_type, 'days' => (int) $row->total_days];
+            }
+            $leaveByDept = array_values($deptLeaveMap);
+
+            // ── Top Leave Takers ────────────────────────────────────────────
+            $topLeaveTakers = DB::table('leave_requests')
+                ->join('employee_profiles', 'employee_profiles.id', '=', 'leave_requests.employee_id')
+                ->join('users', 'users.id', '=', 'employee_profiles.user_id')
+                ->whereIn('leave_requests.employee_id', $filteredEmployeeIds)
+                ->whereBetween('leave_requests.start_date', [$start->toDateString(), $end->toDateString()])
+                ->where('leave_requests.status', 'approved')
+                ->groupBy('leave_requests.employee_id', 'users.name', 'employee_profiles.code')
+                ->selectRaw("leave_requests.employee_id, users.name, employee_profiles.code, SUM(leave_requests.total_days) as total_days, COUNT(*) as request_count")
+                ->orderByDesc('total_days')
+                ->limit(10)
+                ->get()
+                ->map(fn ($r) => [
+                    'employee_name' => $r->name,
+                    'employee_code' => $r->code,
+                    'total_days' => (int) $r->total_days,
+                    'request_count' => (int) $r->request_count,
+                ])
+                ->values()->all();
+
+            // ── Sick Leave Proof Compliance ──────────────────────────────────
+            $proofCompliance = DB::table('leave_requests')
+                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+                ->where('leave_type', 'sick_leave')
+                ->where('status', 'approved')
+                ->selectRaw("
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN proof_file_path IS NOT NULL THEN 1 END) as with_proof,
+                    COUNT(CASE WHEN proof_review_status = 'approved' THEN 1 END) as proof_approved
+                ")
+                ->first();
+
+            $proofComplianceData = [
+                'total_sick_leaves' => (int) $proofCompliance->total,
+                'with_proof' => (int) $proofCompliance->with_proof,
+                'proof_approved' => (int) $proofCompliance->proof_approved,
+                'compliance_rate' => $proofCompliance->total > 0
+                    ? round(($proofCompliance->with_proof / $proofCompliance->total) * 100, 1)
+                    : 0,
+            ];
+
+            return [
+                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => $parsed['label']],
+                'monthly_trend' => $monthlyTrend,
+                'type_distribution' => $typeDistribution,
+                'approval_rate' => $approvalRate,
+                'avg_duration_by_type' => $avgDuration,
+                'leave_by_department' => $leaveByDept,
+                'top_leave_takers' => $topLeaveTakers,
+                'proof_compliance' => $proofComplianceData,
+            ];
+        });
     }
 
     public function getPayrollAnalytics(string $period, ?string $department): array
     {
-        // TODO: Implement payroll analytics (cost distribution, salary bands, tax/BPJS breakdown)
-        return [];
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'payroll_' . md5(json_encode([$period, $department])) . '_' . now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $start = $parsed['start'];
+            $end = $parsed['end'];
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+
+            // ── Total Payroll Cost Trend ─────────────────────────────────────
+            $costTrend = DB::table('payroll_details')
+                ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
+                    COALESCE(SUM(payroll_details.final_salary), 0) as total_salary,
+                    COALESCE(SUM(payroll_details.deduction_amount), 0) as total_deductions,
+                    COUNT(DISTINCT payroll_details.employee_id) as employee_count,
+                    ROUND(AVG(payroll_details.final_salary), 2) as avg_salary
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'total_salary' => round((float) $r->total_salary, 2),
+                    'total_deductions' => round((float) $r->total_deductions, 2),
+                    'employee_count' => (int) $r->employee_count,
+                    'avg_salary' => round((float) $r->avg_salary, 2),
+                ])
+                ->values()->all();
+
+            // ── Salary Distribution Histogram ────────────────────────────────
+            $salaryDistribution = DB::table('payroll_details')
+                ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
+                ->selectRaw("
+                    CASE
+                        WHEN final_salary < 3000000 THEN '<3M'
+                        WHEN final_salary BETWEEN 3000000 AND 5000000 THEN '3-5M'
+                        WHEN final_salary BETWEEN 5000001 AND 8000000 THEN '5-8M'
+                        WHEN final_salary BETWEEN 8000001 AND 12000000 THEN '8-12M'
+                        WHEN final_salary BETWEEN 12000001 AND 20000000 THEN '12-20M'
+                        ELSE '20M+'
+                    END as salary_range,
+                    COUNT(*) as count
+                ")
+                ->groupBy('salary_range')
+                ->orderByRaw("FIELD(salary_range, '<3M', '3-5M', '5-8M', '8-12M', '12-20M', '20M+')")
+                ->get()
+                ->map(fn ($r) => ['range' => $r->salary_range, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Tax & BPJS Contribution Trend ────────────────────────────────
+            $taxBpjsTrend = DB::table('payroll_details')
+                ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
+                ->selectRaw("
+                    DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
+                    COALESCE(SUM(payroll_details.ph21_amount), 0) as pph21,
+                    COALESCE(SUM(payroll_details.bpjs_tk_employee + payroll_details.bpjs_tk_employer), 0) as bpjs_tk,
+                    COALESCE(SUM(payroll_details.bpjs_kes_employee + payroll_details.bpjs_kes_employer), 0) as bpjs_kes
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'pph21' => round((float) $r->pph21, 2),
+                    'bpjs_tk' => round((float) $r->bpjs_tk, 2),
+                    'bpjs_kes' => round((float) $r->bpjs_kes, 2),
+                ])
+                ->values()->all();
+
+            // ── Cost per Department ──────────────────────────────────────────
+            $costByDepartment = DB::table('payroll_details')
+                ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+                ->join('job_information', 'job_information.employee_id', '=', 'payroll_details.employee_id')
+                ->join('teams', 'teams.id', '=', 'job_information.team_id')
+                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
+                ->whereNotNull('teams.department')
+                ->selectRaw("
+                    teams.department,
+                    COALESCE(SUM(payroll_details.final_salary), 0) as total_cost,
+                    ROUND(AVG(payroll_details.final_salary), 2) as avg_salary,
+                    COUNT(DISTINCT payroll_details.employee_id) as employee_count
+                ")
+                ->groupBy('teams.department')
+                ->orderByDesc('total_cost')
+                ->get()
+                ->map(fn ($r) => [
+                    'department' => $r->department,
+                    'total_cost' => round((float) $r->total_cost, 2),
+                    'avg_salary' => round((float) $r->avg_salary, 2),
+                    'employee_count' => (int) $r->employee_count,
+                ])
+                ->values()->all();
+
+            // ── Deduction Breakdown (latest month) ──────────────────────────
+            $deductionBreakdown = DB::table('payroll_details')
+                ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
+                ->selectRaw("
+                    COALESCE(SUM(payroll_details.deduction_amount), 0) as attendance_deductions,
+                    COALESCE(SUM(payroll_details.ph21_amount), 0) as tax,
+                    COALESCE(SUM(payroll_details.bpjs_tk_employee), 0) as bpjs_tk_employee,
+                    COALESCE(SUM(payroll_details.bpjs_kes_employee), 0) as bpjs_kes_employee
+                ")
+                ->first();
+
+            $deductionData = [
+                ['category' => 'Attendance Deductions', 'amount' => round((float) $deductionBreakdown->attendance_deductions, 2)],
+                ['category' => 'PPh21 Tax', 'amount' => round((float) $deductionBreakdown->tax, 2)],
+                ['category' => 'BPJS TK (Employee)', 'amount' => round((float) $deductionBreakdown->bpjs_tk_employee, 2)],
+                ['category' => 'BPJS Kes (Employee)', 'amount' => round((float) $deductionBreakdown->bpjs_kes_employee, 2)],
+            ];
+
+            return [
+                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => $parsed['label']],
+                'cost_trend' => $costTrend,
+                'salary_distribution' => $salaryDistribution,
+                'tax_bpjs_trend' => $taxBpjsTrend,
+                'cost_by_department' => $costByDepartment,
+                'deduction_breakdown' => $deductionData,
+            ];
+        });
     }
 
     public function getProjectAnalytics(string $period, ?int $projectId): array
     {
-        // TODO: Implement project analytics (velocity, burndown, resource allocation)
-        return [];
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'projects_' . md5(json_encode([$period, $projectId])) . '_' . now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $projectId) {
+            $start = $parsed['start'];
+            $end = $parsed['end'];
+
+            // ── Task Velocity (tasks completed per month) ───────────────────
+            $taskVelocity = DB::table('project_task_status_logs')
+                ->join('project_tasks', 'project_tasks.id', '=', 'project_task_status_logs.project_task_id')
+                ->where('project_task_status_logs.to_status', 'done')
+                ->whereBetween('project_task_status_logs.changed_at', [$start->toDateString(), $end->toDateString()])
+                ->when($projectId, fn ($q) => $q->where('project_tasks.project_id', $projectId))
+                ->selectRaw("
+                    DATE_FORMAT(project_task_status_logs.changed_at, '%Y-%m') as month_key,
+                    COUNT(*) as completed_count
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'completed' => (int) $r->completed_count,
+                ])
+                ->values()->all();
+
+            // ── Task Status Distribution ─────────────────────────────────────
+            $taskStatusDistribution = DB::table('project_tasks')
+                ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
+                ->selectRaw("status, COUNT(*) as count")
+                ->groupBy('status')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['status' => $r->status, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Task Priority Distribution ───────────────────────────────────
+            $taskPriorityDistribution = DB::table('project_tasks')
+                ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
+                ->selectRaw("priority, COUNT(*) as count")
+                ->groupBy('priority')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['priority' => $r->priority, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Overdue Tasks ────────────────────────────────────────────────
+            $overdueTasks = DB::table('project_tasks')
+                ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
+                ->whereNotNull('due_date')
+                ->where('due_date', '<', now()->toDateString())
+                ->whereNotIn('status', ['done', 'cancelled'])
+                ->count();
+
+            $totalActiveTasks = DB::table('project_tasks')
+                ->when($projectId, fn ($q) => $q->where('project_id', $projectId))
+                ->whereNotIn('status', ['done', 'cancelled'])
+                ->count();
+
+            // ── Project Status Overview ──────────────────────────────────────
+            $projectStatusOverview = DB::table('projects')
+                ->selectRaw("status, COUNT(*) as count")
+                ->groupBy('status')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['status' => $r->status, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Project Type Distribution ────────────────────────────────────
+            $projectTypeDistribution = DB::table('projects')
+                ->whereNotNull('type')
+                ->selectRaw("type, COUNT(*) as count")
+                ->groupBy('type')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => ['type' => $r->type, 'count' => (int) $r->count])
+                ->values()->all();
+
+            // ── Team Productivity (tasks completed per team per month) ──────
+            $teamProductivity = DB::table('project_task_status_logs')
+                ->join('project_tasks', 'project_tasks.id', '=', 'project_task_status_logs.project_task_id')
+                ->join('team_members', function ($join) {
+                    $join->on('team_members.employee_id', '=', 'project_tasks.assignee_id')
+                        ->whereNull('team_members.left_at');
+                })
+                ->join('teams', 'teams.id', '=', 'team_members.team_id')
+                ->where('project_task_status_logs.to_status', 'done')
+                ->whereBetween('project_task_status_logs.changed_at', [$start->toDateString(), $end->toDateString()])
+                ->when($projectId, fn ($q) => $q->where('project_tasks.project_id', $projectId))
+                ->selectRaw("teams.name as team_name, COUNT(*) as completed_count")
+                ->groupBy('teams.id', 'teams.name')
+                ->orderByDesc('completed_count')
+                ->get()
+                ->map(fn ($r) => [
+                    'team_name' => $r->team_name,
+                    'completed' => (int) $r->completed_count,
+                ])
+                ->values()->all();
+
+            return [
+                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => $parsed['label']],
+                'task_velocity' => $taskVelocity,
+                'task_status_distribution' => $taskStatusDistribution,
+                'task_priority_distribution' => $taskPriorityDistribution,
+                'overdue_tasks' => $overdueTasks,
+                'total_active_tasks' => $totalActiveTasks,
+                'project_status_overview' => $projectStatusOverview,
+                'project_type_distribution' => $projectTypeDistribution,
+                'team_productivity' => $teamProductivity,
+            ];
+        });
+    }
+
+    /**
+     * Get filtered employee IDs based on department and team filters.
+     */
+    private function getFilteredEmployeeIds(?string $department, ?int $teamId): \Illuminate\Support\Collection
+    {
+        return DB::table('employee_profiles')
+            ->select('employee_profiles.id')
+            ->whereNull('employee_profiles.deleted_at')
+            ->when($department, function ($q) use ($department) {
+                $q->join('job_information as ji_filter', 'ji_filter.employee_id', '=', 'employee_profiles.id')
+                    ->join('teams as t_filter', 't_filter.id', '=', 'ji_filter.team_id')
+                    ->where('t_filter.department', $department);
+            })
+            ->when($teamId, function ($q) use ($teamId) {
+                $q->join('team_members as tm_filter', 'tm_filter.employee_id', '=', 'employee_profiles.id')
+                    ->where('tm_filter.team_id', $teamId)
+                    ->whereNull('tm_filter.left_at');
+            })
+            ->pluck('id');
     }
 
     /**

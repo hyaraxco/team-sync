@@ -145,5 +145,43 @@ export const useAnalyticsStore = defineStore("analytics", {
                 this.projectsLoading = false;
             }
         },
+
+        async exportExcel(tab) {
+            try {
+                const response = await axiosInstance.get('/analytics/export/excel', {
+                    params: { ...this.buildParams(), tab },
+                    responseType: 'blob',
+                });
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `analytics-${tab}-${new Date().toISOString().slice(0, 10)}.xlsx`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                this.error = handleError(error);
+            }
+        },
+
+        async exportPdf(tab) {
+            try {
+                const response = await axiosInstance.get('/analytics/export/pdf', {
+                    params: { ...this.buildParams(), tab },
+                    responseType: 'blob',
+                });
+                const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+                const link = document.createElement('a');
+                link.href = url;
+                link.setAttribute('download', `analytics-${tab}-${new Date().toISOString().slice(0, 10)}.pdf`);
+                document.body.appendChild(link);
+                link.click();
+                link.remove();
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                this.error = handleError(error);
+            }
+        },
     }
 });

@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AnalyticsController;
+use App\Http\Controllers\AnalyticsExportController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\AuthController;
@@ -152,5 +153,7 @@ Route::prefix('v1')
             Route::get('analytics/leave', [AnalyticsController::class, 'getLeaveAnalytics']);
             Route::get('analytics/payroll', [AnalyticsController::class, 'getPayrollAnalytics']);
             Route::get('analytics/projects', [AnalyticsController::class, 'getProjectAnalytics']);
+            Route::get('analytics/export/excel', [AnalyticsExportController::class, 'exportExcel']);
+            Route::get('analytics/export/pdf', [AnalyticsExportController::class, 'exportPdf']);
         });
     });
