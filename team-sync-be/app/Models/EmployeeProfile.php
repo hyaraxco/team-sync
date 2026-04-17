@@ -20,16 +20,20 @@ class EmployeeProfile extends Model
         'user_id',
         'code',
         'identity_number',
+        'npwp',
+        'bpjs_ketenagakerjaan',
+        'bpjs_kesehatan',
+        'ptkp_status',
         'phone',
         'date_of_birth',
         'gender',
-        'hobby',
+        'religion',
+        'marital_status',
+        'blood_type',
         'place_of_birth',
         'address',
         'city',
         'postal_code',
-        'preferred_language',
-        'additional_notes',
     ];
 
     protected function casts(): array
