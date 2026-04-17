@@ -6,10 +6,12 @@ use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\EmployeeProfileController;
 use App\Http\Controllers\LeaveBalanceController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PayrollSettingController;
@@ -23,12 +25,17 @@ Route::prefix('v1')
     ->group(function () {
 
         Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+        Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword'])->middleware('throttle:5,1');
+        Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])->middleware('throttle:5,1');
+        Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:5,1');
+        Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
         Route::middleware('auth:sanctum')->group(function () {
             Route::get('me', [AuthController::class, 'me']);
             Route::put('me', [AuthController::class, 'updateProfile']);
 
             Route::post('logout', [AuthController::class, 'logout']);
+            Route::post('email/verify/send', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:5,1');
 
             Route::get('teams/statistics', [TeamController::class, 'getStatistics']);
             Route::get('teams/all/paginated', [TeamController::class, 'getAllPaginated']);

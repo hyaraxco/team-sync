@@ -1,5 +1,5 @@
 <script setup>
-import Statisctics from "@/components/admin/employee/list/Statisctics.vue";
+import Statistics from "@/components/admin/employee/list/Statistics.vue";
 import CardList from "@/components/admin/employee/list/CardList.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import { useEmployeeStore } from "@/stores/employee";
@@ -39,7 +39,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <Statisctics />
+  <Statistics />
 
   <!-- Search Section -->
   <div class="mb-6">

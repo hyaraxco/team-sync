@@ -9,6 +9,14 @@
       />
     </div>
 
-    <RouterView />
+    <div class="auth-view w-full lg:w-1/2">
+      <RouterView />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.auth-view :deep(.router-link-active) {
+  text-decoration: none;
+}
+</style>

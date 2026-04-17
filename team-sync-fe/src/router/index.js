@@ -3,6 +3,9 @@ import { useAuthStore } from '@/stores/auth'
 import AuthLayout from '@/layouts/Auth.vue'
 import AdminLayout from '@/layouts/Admin.vue'
 import Login from '@/views/auth/Login.vue'
+import ForgotPassword from '@/views/auth/ForgotPassword.vue'
+import ResetPassword from '@/views/auth/ResetPassword.vue'
+import VerifyEmailResult from '@/views/auth/VerifyEmailResult.vue'
 import AdminDashboard from '@/views/admin/Dashboard.vue'
 import teamRoutes from './team';
 import employeeRoutes from './employee';
@@ -131,6 +134,21 @@ export const appRoutes = [
         path: 'login',
         name: 'login',
         component: Login,
+      },
+      {
+        path: 'forgot-password',
+        name: 'forgot-password',
+        component: ForgotPassword,
+      },
+      {
+        path: 'reset-password',
+        name: 'reset-password',
+        component: ResetPassword,
+      },
+      {
+        path: 'verify-email',
+        name: 'verify-email',
+        component: VerifyEmailResult,
       },
     ],
   },

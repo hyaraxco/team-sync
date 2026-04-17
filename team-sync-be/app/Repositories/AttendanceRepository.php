@@ -133,7 +133,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     {
         return DB::transaction(function () use ($data) {
             if (! $this->attendancePeriodService->canSubmitCorrection(Carbon::now())) {
-                throw new \Exception('Attendance correction is closed because this period is no longer open.');
+                throw new \Exception('Attendance period is no longer open for check-in.');
             }
 
             $existingAttendance = Attendance::where('employee_id', Auth::user()->employeeProfile->id)
@@ -170,6 +170,10 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function checkOut(array $data): Attendance
     {
         return DB::transaction(function () use ($data) {
+            if (! $this->attendancePeriodService->canSubmitCorrection(Carbon::now())) {
+                throw new \Exception('Attendance period is no longer open for check-out.');
+            }
+
             $attendance = Attendance::where('employee_id', Auth::user()->employeeProfile->id)
                 ->whereBetween('date', [
                     now()->startOfDay(),
@@ -180,10 +184,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
             if (! $attendance) {
                 throw new \Exception('Tidak ada data check in hari ini');
-            }
-
-            if (! $this->attendancePeriodService->canSubmitCorrection($attendance->date)) {
-                throw new \Exception('Attendance correction is closed because this period is no longer open.');
             }
 
             $checkOutTime = Carbon::now();

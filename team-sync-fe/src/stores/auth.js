@@ -19,6 +19,7 @@ export const useAuthStore = defineStore("auth", {
         async login(credentials) {
             this.loading = true
             this.error = null
+            this.success = null
 
             try {
                 const response = await axiosInstance.post('/login', credentials)
@@ -102,6 +103,53 @@ export const useAuthStore = defineStore("auth", {
                 // refresh user
                 await this.checkAuth()
                 return response.data.data
+            } catch (error) {
+                this.error = handleError(error)
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async forgotPassword(payload) {
+            this.loading = true
+            this.error = null
+            this.success = null
+
+            try {
+                const response = await axiosInstance.post('/forgot-password', payload)
+                this.success = response.data.message
+            } catch (error) {
+                this.error = handleError(error)
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async resetPassword(payload) {
+            this.loading = true
+            this.error = null
+            this.success = null
+
+            try {
+                const response = await axiosInstance.post('/reset-password', payload)
+                this.success = response.data.message
+                router.push({ name: 'login' })
+            } catch (error) {
+                this.error = handleError(error)
+            } finally {
+                this.loading = false
+            }
+        },
+
+        async sendVerificationEmail(payload = {}) {
+            this.loading = true
+            this.error = null
+            this.success = null
+
+            try {
+                const endpoint = this.token ? '/email/verify/send' : '/email/verification-notification'
+                const response = await axiosInstance.post(endpoint, payload)
+                this.success = response.data.message
             } catch (error) {
                 this.error = handleError(error)
             } finally {

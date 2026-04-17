@@ -20,7 +20,7 @@ class AuthRepository implements AuthRepositoryInterface
                 throw new \Exception('Unauthorized', 401);
             }
 
-            $user = Auth::user()->load('roles');
+            $user = Auth::user()->load(['roles', 'permissions']);
             $user->token = $user->createToken('auth_token')->plainTextToken;
 
             DB::commit();
@@ -41,9 +41,7 @@ class AuthRepository implements AuthRepositoryInterface
 
         $user = Auth::user()->load(['roles', 'permissions']);
 
-        if ($user->hasRole('employee')) {
-            $user->load('employeeProfile');
-        }
+        $user->load('employeeProfile');
 
         return $user;
     }
@@ -94,7 +92,7 @@ class AuthRepository implements AuthRepositoryInterface
 
             DB::commit();
 
-            return $user->fresh()->load(['roles', 'permissions']);
+            return $user->fresh()->load(['roles', 'permissions', 'employeeProfile']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception($e->getMessage(), $e->getCode() ?: 500);

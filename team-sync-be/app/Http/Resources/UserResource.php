@@ -19,6 +19,8 @@ class UserResource extends JsonResource
             'profile_photo' => $this->profile_photo ? asset('storage/'.$this->profile_photo) : null,
             'name' => $this->name,
             'email' => $this->email,
+            'email_verified_at' => $this->email_verified_at,
+            'has_verified_email' => method_exists($this->resource, 'hasVerifiedEmail') ? $this->hasVerifiedEmail() : false,
             'employee_profile' => new EmployeeProfileResource($this->whenLoaded('employeeProfile')),
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name');
