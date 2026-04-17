@@ -104,7 +104,21 @@ export const useProjectStore = defineStore("project", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.post('projects', payload);
+                const formData = new FormData();
+
+                Object.entries(payload).forEach(([key, value]) => {
+                    if (key === 'photo_url') return; // skip local preview URL
+
+                    if (key === 'teams' && Array.isArray(value)) {
+                        value.forEach((id) => formData.append('teams[]', id));
+                    } else if (value !== null && value !== undefined && value !== '') {
+                        formData.append(key, value);
+                    }
+                });
+
+                const response = await axiosInstance.post('projects', formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
+                });
 
                 this.success = response.data.message;
             } catch (error) {
@@ -118,9 +132,21 @@ export const useProjectStore = defineStore("project", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.post(`projects/${id}`, {
-                    ...payload,
-                    _method: 'PUT',
+                const formData = new FormData();
+                formData.append('_method', 'PUT');
+
+                Object.entries(payload).forEach(([key, value]) => {
+                    if (key === 'photo_url') return; // skip local preview URL
+
+                    if (key === 'teams' && Array.isArray(value)) {
+                        value.forEach((teamId) => formData.append('teams[]', teamId));
+                    } else if (value !== null && value !== undefined && value !== '') {
+                        formData.append(key, value);
+                    }
+                });
+
+                const response = await axiosInstance.post(`projects/${id}`, formData, {
+                    headers: { 'Content-Type': 'multipart/form-data' },
                 });
 
                 this.success = response.data.message;
