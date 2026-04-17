@@ -16,7 +16,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history', 'update']),
+            new Middleware(PermissionMiddleware::using(['payroll-list|payroll-statistics']), only: ['show', 'history']),
+            new Middleware(PermissionMiddleware::using(['payroll-edit']), only: ['update']),
         ];
     }
 

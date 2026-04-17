@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class PayrollSetting extends Model
 {
@@ -62,19 +63,23 @@ class PayrollSetting extends Model
 
     public function resolveActiveVersion(?int $actorId = null): PayrollSettingVersion
     {
-        /** @var PayrollSettingVersion|null $latestVersion */
-        $latestVersion = $this->latestVersion()->first();
+        return DB::transaction(function () use ($actorId) {
+            /** @var PayrollSettingVersion|null $latestVersion */
+            $latestVersion = $this->versions()
+                ->lockForUpdate()
+                ->first();
 
-        if (! $latestVersion || $this->hasVersionMismatch($latestVersion)) {
-            return $this->versions()->create([
-                ...$this->toVersionAttributes(),
-                'version_number' => (int) ($latestVersion?->version_number ?? 0) + 1,
-                'effective_at' => now(),
-                'updated_by' => $actorId ?? $this->updated_by,
-            ]);
-        }
+            if (! $latestVersion || $this->hasVersionMismatch($latestVersion)) {
+                return $this->versions()->create([
+                    ...$this->toVersionAttributes(),
+                    'version_number' => (int) ($latestVersion?->version_number ?? 0) + 1,
+                    'effective_at' => now(),
+                    'updated_by' => $actorId ?? $this->updated_by,
+                ]);
+            }
 
-        return $latestVersion;
+            return $latestVersion;
+        });
     }
 
     public function versions()
