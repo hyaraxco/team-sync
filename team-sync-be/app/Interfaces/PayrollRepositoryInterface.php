@@ -1,0 +1,51 @@
+<?php
+
+namespace App\Interfaces;
+
+interface PayrollRepositoryInterface
+{
+    public function getAll(
+        ?string $search,
+        ?int $limit,
+        bool $execute
+    );
+
+    public function getAllPaginated(
+        ?string $search,
+        int $rowPerPage
+    );
+
+    public function getById(string $id);
+
+    public function getPayrollDetailsPaginated(string $payrollId, int $perPage);
+
+    public function generatePayroll(string $salaryMonth, ?int $actorId = null);
+
+    public function getGenerateReadiness(string $salaryMonth): array;
+
+    public function getReadinessDashboard(string $salaryMonth): array;
+
+    public function getReconciliation(string $payrollId, array $filters = []): array;
+
+    public function updatePayrollDetail(string $id, array $data, ?int $actorId = null);
+
+    public function approvePayroll(string $payrollId, ?int $actorId = null);
+
+    public function markAsPaid(string $payrollId, string $paymentDate, ?int $actorId = null);
+
+    public function reopenPayroll(string $payrollId, string $reason, ?int $actorId = null);
+
+    public function resendNotifications(string $payrollId, ?int $actorId = null);
+
+    public function getNotificationDeliverySummary(string $payrollId): array;
+
+    public function getStatistics();
+
+    public function getAnalytics(int $months = 6): array;
+
+    public function getPayrollStatistics(string $payrollId);
+
+    public function getPayrollReportRows(array $filters);
+
+    public function getActivityLogs(string $payrollId);
+}

@@ -1,0 +1,35 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class HybridWorkSchedule extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'employee_id',
+        'effective_from',
+        'effective_until',
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'effective_from' => 'date',
+            'effective_until' => 'date',
+        ];
+    }
+
+    public function employee()
+    {
+        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+    }
+}

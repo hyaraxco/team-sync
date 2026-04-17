@@ -1,0 +1,123 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Attendance;
+use App\Models\EmployeeProfile;
+use App\Models\Payroll;
+use App\Models\PayrollDetail;
+use App\Models\PayrollSetting;
+use Carbon\Carbon;
+use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+
+class MinimalPayrollE2ESeeder extends Seeder
+{
+    /**
+     * Seed the minimum data needed for the HR -> Finance payroll flow.
+     */
+    public function run(): void
+    {
+        EmployeeProfile::withoutSyncingToSearch(function () {
+            $this->call([
+                PermissionSeeder::class,
+                RoleSeeder::class,
+                RolePermissionSeeder::class,
+                AttendancePolicySeeder::class,
+                LeaveEntitlementSeeder::class,
+                ManagerSeeder::class,
+                EmployeeSeeder::class,
+                HrSeeder::class,
+                FinanceSeeder::class,
+            ]);
+        });
+
+        DB::transaction(function () {
+            $payrollMonth = now()->startOfMonth();
+            PayrollSetting::current()->update([
+                'attendance_cutoff_day' => 1,
+            ]);
+            $employee = EmployeeProfile::with('jobInformation')
+                ->where('code', 'EMP001')
+                ->firstOrFail();
+
+            $employee->jobInformation()->updateOrCreate(
+                ['employee_id' => $employee->id],
+                [
+                    'employee_id' => $employee->id,
+                    'job_title' => 'Software Engineer',
+                    'years_experience' => 5,
+                    'status' => 'active',
+                    'employment_type' => 'full_time',
+                    'work_location' => 'remote',
+                    'start_date' => '2024-01-01',
+                    'monthly_salary' => 10000000,
+                    'skill_level' => 'expert',
+                ]
+            );
+
+            $this->resetPayrollMonth($payrollMonth);
+            $this->seedAttendanceForActiveEmployeesForMonth($payrollMonth);
+
+            $this->command?->info(sprintf(
+                'Minimal payroll E2E data ready for %s. Accounts: HR tasyia@teamsync.com, Manager yudhis@teamsync.com, Employee agung@teamsync.com, Finance dwimeta@teamsync.com (password: teamsync). Use HR to generate the draft, then Finance to review and mark it as paid.',
+                $payrollMonth->format('F Y')
+            ));
+        });
+    }
+
+    private function resetPayrollMonth(Carbon $payrollMonth): void
+    {
+        $payrollIds = Payroll::withTrashed()
+            ->whereDate('salary_month', $payrollMonth->toDateString())
+            ->pluck('id');
+
+        if ($payrollIds->isEmpty()) {
+            return;
+        }
+
+        PayrollDetail::withTrashed()->whereIn('payroll_id', $payrollIds)->forceDelete();
+        Payroll::withTrashed()->whereIn('id', $payrollIds)->forceDelete();
+    }
+
+    private function seedAttendanceForActiveEmployeesForMonth(Carbon $payrollMonth): void
+    {
+        $activeEmployeeIds = EmployeeProfile::query()
+            ->whereHas('jobInformation', function ($query) {
+                $query->where('status', 'active');
+            })
+            ->pluck('id')
+            ->all();
+
+        foreach ($activeEmployeeIds as $employeeId) {
+            $this->seedAttendanceForMonth((int) $employeeId, $payrollMonth);
+        }
+    }
+
+    private function seedAttendanceForMonth(int $employeeId, Carbon $payrollMonth): void
+    {
+        Attendance::withTrashed()
+            ->where('employee_id', $employeeId)
+            ->whereDate('date', '>=', $payrollMonth->copy()->startOfMonth()->toDateString())
+            ->whereDate('date', '<=', $payrollMonth->copy()->endOfMonth()->toDateString())
+            ->forceDelete();
+
+        $cursor = $payrollMonth->copy()->startOfMonth();
+        $monthEnd = $payrollMonth->copy()->endOfMonth();
+
+        while ($cursor->lte($monthEnd)) {
+            if (! $cursor->isWeekend()) {
+                Attendance::create([
+                    'employee_id' => $employeeId,
+                    'date' => $cursor->toDateString(),
+                    'check_in' => $cursor->format('Y-m-d').' 08:00:00',
+                    'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                    'status' => 'present',
+                    'notes' => 'Seeded for payroll E2E flow',
+                ]);
+            }
+
+            $cursor->addDay();
+        }
+    }
+}

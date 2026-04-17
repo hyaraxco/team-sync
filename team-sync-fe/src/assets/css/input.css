@@ -1,0 +1,163 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+html {
+    font-family: "Plus Jakarta Sans", sans-serif;
+    color: #0C1C3C;
+}
+
+.blue-gradient {
+    background: linear-gradient(265.5deg, #0C51D9 5.45%, #6F96E3 52%, #0C51D9 100.36%);
+}
+
+.blue-btn-shadow {
+    box-shadow: 2px 2px 1px 0px #6197FF8C inset;
+    box-shadow: -2px 2px 1px 0px #6197FF inset;
+}
+
+/* Typography styles */
+.text-brand-dark {
+    color: #0C1C3C;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-brand-light {
+    color: #6B7280;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-brand-white {
+    color: #FFF;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-brand-white-90 {
+    color: rgba(255, 255, 255, 0.9);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-brand-white-80 {
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-brand-white-70 {
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-success {
+    color: #059669;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.text-danger {
+    color: #DC2626;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Button and link styles */
+.nav-link {
+    display: flex;
+    padding: 14px 20px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    background: #FFF;
+}
+
+.nav-link-active {
+    display: flex;
+    padding: 14px 20px;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 10px;
+    align-self: stretch;
+    background: linear-gradient(266deg, #040724 5.45%, #0C1448 52%, #040724 100.36%);
+    box-shadow: -2px 2px 1px 0 #1A2570 inset, 2px 2px 1px 0 rgba(26, 37, 112, 0.55) inset;
+}
+
+.btn-primary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Card styles */
+.main-card {
+    background: linear-gradient(266deg, #040724 5.45%, #0C1448 52%, #040724 100.36%);
+    box-shadow: -2px 2px 1px 0 #1A2570 inset, 2px 2px 1px 0 rgba(26, 37, 112, 0.55) inset;
+}
+
+/* Section headers */
+.section-title {
+    color: #0C1C3C;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    padding-left: 12px;
+}
+
+/* Badge styles */
+.badge-expert {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-intermediate {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-beginner {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-active {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-growing {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-creative {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-high-performing {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
+
+.badge-247 {
+    background-color: #EBF8FF;
+    color: #1E40AF;
+}
