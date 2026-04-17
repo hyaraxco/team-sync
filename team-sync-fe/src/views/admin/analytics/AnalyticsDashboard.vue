@@ -6,7 +6,13 @@ import { useTeamStore } from '@/stores/team'
 import { useOptionStore } from '@/stores/option'
 import StatsCard from '@/components/common/StatsCard.vue'
 import MainCard from '@/components/common/MainCard.vue'
+import AttendanceAnalytics from '@/components/admin/analytics/AttendanceAnalytics.vue'
+import WorkforceAnalytics from '@/components/admin/analytics/WorkforceAnalytics.vue'
+import LeaveAnalytics from '@/components/admin/analytics/LeaveAnalytics.vue'
+import PayrollAnalytics from '@/components/admin/analytics/PayrollAnalytics.vue'
+import ProjectAnalytics from '@/components/admin/analytics/ProjectAnalytics.vue'
 import { formatRupiahCompact, formatRupiah } from '@/utils/formatUtils'
+import { can } from '@/helpers/permissionHelper'
 import {
   BarChart3Icon,
   UsersIcon,
@@ -17,7 +23,27 @@ import {
   TrendingUpIcon,
   TrendingDownIcon,
   FilterIcon,
+  DownloadIcon,
+  FileSpreadsheetIcon,
+  FileTextIcon,
 } from 'lucide-vue-next'
+
+const exportLoading = ref(false)
+const showExportMenu = ref(false)
+
+async function handleExportExcel() {
+  exportLoading.value = true
+  showExportMenu.value = false
+  await analyticsStore.exportExcel(activeTab.value)
+  exportLoading.value = false
+}
+
+async function handleExportPdf() {
+  exportLoading.value = true
+  showExportMenu.value = false
+  await analyticsStore.exportPdf(activeTab.value)
+  exportLoading.value = false
+}
 
 const analyticsStore = useAnalyticsStore()
 const teamStore = useTeamStore()
@@ -179,7 +205,7 @@ onMounted(() => {
         </p>
       </div>
 
-      <!-- Global Filters -->
+      <!-- Global Filters + Export -->
       <div class="flex items-center gap-3 flex-wrap">
         <div class="flex items-center gap-2 px-3 py-2 bg-white border border-[#DCDEDD] rounded-[12px]">
           <FilterIcon class="w-4 h-4 text-gray-400" />
@@ -204,6 +230,38 @@ onMounted(() => {
             {{ dept.label }}
           </option>
         </select>
+
+        <!-- Export Dropdown -->
+        <div v-if="can('analytics-export')" class="relative">
+          <button
+            @click="showExportMenu = !showExportMenu"
+            :disabled="exportLoading"
+            class="flex items-center gap-2 px-3 py-2 bg-[#0C51D9] text-white text-sm font-medium rounded-[12px] hover:bg-[#0a44b8] transition-colors disabled:opacity-50"
+          >
+            <DownloadIcon class="w-4 h-4" />
+            <span v-if="exportLoading">Exporting...</span>
+            <span v-else>Export</span>
+          </button>
+          <div
+            v-if="showExportMenu"
+            class="absolute right-0 mt-2 w-48 bg-white border border-[#DCDEDD] rounded-[12px] shadow-lg z-10 overflow-hidden"
+          >
+            <button
+              @click="handleExportExcel"
+              class="flex items-center gap-3 w-full px-4 py-3 text-sm text-brand-dark hover:bg-gray-50 transition-colors"
+            >
+              <FileSpreadsheetIcon class="w-4 h-4 text-green-600" />
+              Export as Excel
+            </button>
+            <button
+              @click="handleExportPdf"
+              class="flex items-center gap-3 w-full px-4 py-3 text-sm text-brand-dark hover:bg-gray-50 transition-colors border-t border-gray-100"
+            >
+              <FileTextIcon class="w-4 h-4 text-red-500" />
+              Export as PDF
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -381,11 +439,19 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Placeholder for other tabs -->
-    <div v-else class="flex flex-col items-center justify-center py-20 bg-white border border-[#DCDEDD] rounded-[20px]">
-      <component :is="tabs.find(t => t.id === activeTab)?.icon" class="w-16 h-16 text-gray-300 mb-4" />
-      <p class="text-lg font-medium text-gray-500">{{ tabs.find(t => t.id === activeTab)?.label }} Analytics</p>
-      <p class="text-sm text-gray-400 mt-1">Coming soon</p>
-    </div>
+    <!-- Workforce Analytics Tab -->
+    <WorkforceAnalytics v-else-if="activeTab === 'workforce'" />
+
+    <!-- Attendance Analytics Tab -->
+    <AttendanceAnalytics v-else-if="activeTab === 'attendance'" />
+
+    <!-- Leave Analytics Tab -->
+    <LeaveAnalytics v-else-if="activeTab === 'leave'" />
+
+    <!-- Payroll Analytics Tab -->
+    <PayrollAnalytics v-else-if="activeTab === 'payroll'" />
+
+    <!-- Project Analytics Tab -->
+    <ProjectAnalytics v-else-if="activeTab === 'projects'" />
   </div>
 </template>

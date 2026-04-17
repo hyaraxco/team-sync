@@ -64,6 +64,7 @@ class RolePermissionSeeder extends Seeder
                 'task-',
                 'attendance-',
                 'leave-request-',
+                'analytics-',
             ], array_merge($employeeSpecific, [
                 'task-delete',
             ]))->merge(
