@@ -1,0 +1,2007 @@
+{
+	"info": {
+		"_postman_id": "121968aa-6956-4f46-9f4d-af18d303ebdf",
+		"name": "Team Sync",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40343580",
+		"_collection_link": "https://kapturise-3911.postman.co/workspace/Team-Workspace~914c2bd5-4df1-4d1c-8a18-10ee17129a3a/collection/40343580-121968aa-6956-4f46-9f4d-af18d303ebdf?action=share&source=collection_link&creator=40343580"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Parse response JSON",
+									"let response = pm.response.json();",
+									"",
+									"// Cek apakah ada token di response",
+									"if (response.data && response.data.token) {",
+									"    // Simpan token ke environment variable",
+									"    pm.environment.set(\"token\", response.data.token);",
+									"}",
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						},
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript",
+								"packages": {}
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "agung@teamsync.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "teamsync",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/login",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/me",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"me"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Team",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/teams?search=Elang&leader_id=",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "Elang"
+								},
+								{
+									"key": "leader_id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/teams/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Id",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/teams/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Team Elang",
+									"type": "text"
+								},
+								{
+									"key": "icon",
+									"type": "file",
+									"src": "/Users/xrafff/Documents/asset hris/command.png"
+								},
+								{
+									"key": "department",
+									"value": "marketing",
+									"type": "text"
+								},
+								{
+									"key": "responsibilities[]",
+									"value": "Menagih hutang ke pada customer",
+									"type": "text"
+								},
+								{
+									"key": "responsibilities[]",
+									"value": "Mencatatat keuangan",
+									"type": "text"
+								},
+								{
+									"key": "responsibilities[]",
+									"value": "Mematikan PDAM",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/teams",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/teams/3",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"3"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/teams/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Employee",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/employees?status=active&type=full_time&work_location=",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"employees"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "active"
+								},
+								{
+									"key": "type",
+									"value": "full_time"
+								},
+								{
+									"key": "work_location",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/employees/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"employees",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "Muhamad Rafli Al Farizqi",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "rafli@employee.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								},
+								{
+									"key": "identity_number",
+									"value": "2311102311",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "085325483259",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "20-04-2006",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "male",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Jalan Soekarno Hatta No 12",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Jakarta",
+									"type": "text"
+								},
+								{
+									"key": "postal_code",
+									"value": "52276",
+									"type": "text"
+								},
+								{
+									"key": "job_title",
+									"value": "Backend Developer",
+									"type": "text"
+								},
+								{
+									"key": "years_experience",
+									"value": "3",
+									"type": "text"
+								},
+								{
+									"key": "job_status",
+									"value": "active",
+									"type": "text"
+								},
+								{
+									"key": "employment_type",
+									"value": "full_time",
+									"type": "text"
+								},
+								{
+									"key": "work_location",
+									"value": "remote",
+									"type": "text"
+								},
+								{
+									"key": "start_date",
+									"value": "18-09-2025",
+									"type": "text"
+								},
+								{
+									"key": "monthly_salary",
+									"value": "5000000",
+									"type": "text"
+								},
+								{
+									"key": "skill_level",
+									"value": "advanced",
+									"type": "text"
+								},
+								{
+									"key": "bank_name",
+									"value": "bri",
+									"type": "text"
+								},
+								{
+									"key": "account_number",
+									"value": "88992131231",
+									"type": "text"
+								},
+								{
+									"key": "account_holder_name",
+									"value": "Muhamad Rafli Al Farizqi",
+									"type": "text"
+								},
+								{
+									"key": "account_type",
+									"value": "savings",
+									"type": "text"
+								},
+								{
+									"key": "emergency_contacts[]",
+									"value": "Grashela",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/employees",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"employees"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "Joni",
+									"type": "text"
+								},
+								{
+									"key": "email",
+									"value": "joni@employee.com",
+									"type": "text"
+								},
+								{
+									"key": "identity_number",
+									"value": "123131311231",
+									"type": "text"
+								},
+								{
+									"key": "phone",
+									"value": "085325483251",
+									"type": "text"
+								},
+								{
+									"key": "date_of_birth",
+									"value": "20-04-2005",
+									"type": "text"
+								},
+								{
+									"key": "gender",
+									"value": "female",
+									"type": "text"
+								},
+								{
+									"key": "hobby",
+									"value": "Olahraga, Ngoding",
+									"type": "text"
+								},
+								{
+									"key": "place_of_birth",
+									"value": "Bandung",
+									"type": "text"
+								},
+								{
+									"key": "address",
+									"value": "Jalan Soekarno Hatta No 13",
+									"type": "text"
+								},
+								{
+									"key": "city",
+									"value": "Bandung",
+									"type": "text"
+								},
+								{
+									"key": "postal_code",
+									"value": "4442131",
+									"type": "text"
+								},
+								{
+									"key": "preferred_language",
+									"value": "Indonesia",
+									"type": "text"
+								},
+								{
+									"key": "additional_notes",
+									"value": "Lorem ipsum dolor siamet",
+									"type": "text"
+								},
+								{
+									"key": "job_title",
+									"value": "Frontend Developer",
+									"type": "text"
+								},
+								{
+									"key": "team_id",
+									"value": "1",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "years_experience",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "resigned",
+									"type": "text"
+								},
+								{
+									"key": "employment_type",
+									"value": "contract",
+									"type": "text"
+								},
+								{
+									"key": "work_location",
+									"value": "hybrid",
+									"type": "text"
+								},
+								{
+									"key": "monthly_salary",
+									"value": "300000",
+									"type": "text"
+								},
+								{
+									"key": "skill_level",
+									"value": "intermediate",
+									"type": "text"
+								},
+								{
+									"key": "bank_name",
+									"value": "bca",
+									"type": "text"
+								},
+								{
+									"key": "account_number",
+									"value": "121321321312",
+									"type": "text"
+								},
+								{
+									"key": "account_holder_name",
+									"value": "Joni",
+									"type": "text"
+								},
+								{
+									"key": "emergency_contacts[0][id]",
+									"value": "10",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "emergency_contacts[0][full_name]",
+									"value": "John",
+									"type": "text",
+									"disabled": true
+								},
+								{
+									"key": "emergency_contacts[0][phone]",
+									"value": "00099213131",
+									"type": "text",
+									"disabled": true
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/employees/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"employees",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/teams/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"teams",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Project",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/projects?search=design&status=active",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects"
+							],
+							"query": [
+								{
+									"key": "search",
+									"value": "design"
+								},
+								{
+									"key": "status",
+									"value": "active"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/projects/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "name",
+									"value": "E-commerce Platform Redesign",
+									"type": "text"
+								},
+								{
+									"key": "type",
+									"value": "design",
+									"type": "text"
+								},
+								{
+									"key": "priority",
+									"value": "high",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "draft",
+									"type": "text"
+								},
+								{
+									"key": "start_date",
+									"value": "20-09-2025",
+									"type": "text"
+								},
+								{
+									"key": "description",
+									"value": "This comprehensive e-commerce platform redesign project aims to revolutionize our online shopping experience by implementing cutting-edge technologies and user-centered design principles. The project encompasses a complete frontend overhaul with React 18 and Next.js, featuring improved performance through server-side rendering and optimized bundle sizes.\n\nKey objectives include reducing page load times by 60%, improving mobile responsiveness across all device types, and implementing a modern design system that aligns with current accessibility standards (WCAG 2.1 AA compliance). The platform will integrate advanced.",
+									"type": "text"
+								},
+								{
+									"key": "photo",
+									"value": "",
+									"type": "text"
+								},
+								{
+									"key": "budget",
+									"value": "60000000",
+									"type": "text"
+								},
+								{
+									"key": "project_leader_id",
+									"value": "",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/projects",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text"
+								},
+								{
+									"key": "budget",
+									"value": "5000000",
+									"type": "text"
+								},
+								{
+									"key": "teams[]",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "project_leader_id",
+									"value": "2",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/projects/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/projects/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"projects",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Task",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/project-tasks?project_id=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks"
+							],
+							"query": [
+								{
+									"key": "project_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/project-tasks/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "project_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "name",
+									"value": "Design Landing Page",
+									"type": "text"
+								},
+								{
+									"key": "priority",
+									"value": "high",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "todo",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/project-tasks",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "_method",
+									"value": "PUT",
+									"type": "text"
+								},
+								{
+									"key": "status",
+									"value": "done",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/project-tasks/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/project-tasks/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks",
+								"2"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Attendance",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/attendances",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/attendances/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"attendances",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Attendace",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/my-attendances",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"my-attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Last Attendace",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/my-attendances",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"my-attendances"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check In",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "check_in_lat",
+									"value": "-7.451584",
+									"type": "text"
+								},
+								{
+									"key": "check_in_long",
+									"value": "109.259628",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/attendances/check-in",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"attendances",
+								"check-in"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Check Out",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "check_out_lat",
+									"value": "-7.451584",
+									"type": "text"
+								},
+								{
+									"key": "check_out_long",
+									"value": "109.259628",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/attendances/check-out",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"attendances",
+								"check-out"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Leave Request",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/leave-requests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"leave-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/leave-requests/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"leave-requests",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "My Leave Request",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/my-leave-requests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"my-leave-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "leave_type",
+									"value": "sick_leave",
+									"type": "text"
+								},
+								{
+									"key": "start_date",
+									"value": "20-09-2025",
+									"type": "text"
+								},
+								{
+									"key": "end_date",
+									"value": "22-09-2025",
+									"type": "text"
+								},
+								{
+									"key": "reason",
+									"value": "lorem",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{url}}/leave-requests",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"leave-requests"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Approve",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/leave-requests/approve/2",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"leave-requests",
+								"approve",
+								"2"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Reject",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/leave-requests/reject/1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"leave-requests",
+								"reject",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Payroll",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/project-tasks?project_id=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks"
+							],
+							"query": [
+								{
+									"key": "project_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Paginated",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/payrolls/all/paginated?row_per_page=10",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payrolls",
+								"all",
+								"paginated"
+							],
+							"query": [
+								{
+									"key": "row_per_page",
+									"value": "10"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Generate",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "Bearer 1|c4q24eFJIDh7G2MerSrIKBVscwDJj8bJudNSKabW9e731ade",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/payrolls/generate",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payrolls",
+								"generate"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Mark As Paid",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{url}}/payrolls/1/mark-as-paid",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"payrolls",
+								"1",
+								"mark-as-paid"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Dashboard",
+			"item": [
+				{
+					"name": "My Statistics",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{url}}/project-tasks?project_id=1",
+							"host": [
+								"{{url}}"
+							],
+							"path": [
+								"project-tasks"
+							],
+							"query": [
+								{
+									"key": "project_id",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}

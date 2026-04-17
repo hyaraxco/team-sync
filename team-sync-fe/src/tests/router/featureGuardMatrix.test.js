@@ -1,0 +1,242 @@
+import { describe, expect, it } from "vitest";
+import { appRoutes } from "@/router/index";
+import { hasRoutePermissionAccess } from "@/router/permissionAccess";
+
+const flattenRoutes = (routes, parentMeta = {}) =>
+  routes.flatMap((route) => {
+    const effectiveMeta = {
+      ...parentMeta,
+      ...(route.meta ?? {}),
+    };
+
+    const current = route.name
+      ? [{ name: route.name, meta: effectiveMeta }]
+      : [];
+
+    if (!Array.isArray(route.children) || route.children.length === 0) {
+      return current;
+    }
+
+    return [...current, ...flattenRoutes(route.children, effectiveMeta)];
+  });
+
+const routeEntries = flattenRoutes(appRoutes);
+const routeMeta = (name) =>
+  routeEntries.find((route) => route.name === name)?.meta ?? {};
+
+const rolePermissions = {
+  manager: [
+    "dashboard-menu",
+    "team-menu",
+    "team-create",
+    "team-edit",
+    "employee-menu",
+    "employee-create",
+    "employee-edit",
+    "project-menu",
+    "project-list",
+    "project-create",
+    "project-edit",
+    "attendance-menu",
+    "profile-menu",
+    "profile-view",
+    "attendance-my-attendances",
+    "attendance-last-attendance",
+    "attendance-check-in",
+    "attendance-check-out",
+    "leave-request-menu",
+    "leave-request-create",
+    "leave-request-my-requests",
+    "payslip-view",
+  ],
+  hr: [
+    "dashboard-menu",
+    "team-menu",
+    "team-create",
+    "team-edit",
+    "employee-menu",
+    "employee-create",
+    "employee-edit",
+    "project-menu",
+    "project-list",
+    "project-create",
+    "project-edit",
+    "attendance-menu",
+    "payroll-menu",
+    "payroll-list",
+    "payroll-create",
+    "profile-menu",
+    "profile-view",
+    "attendance-my-attendances",
+    "attendance-last-attendance",
+    "attendance-check-in",
+    "attendance-check-out",
+    "leave-request-menu",
+    "leave-request-create",
+    "leave-request-my-requests",
+    "payslip-view",
+  ],
+  finance: [
+    "dashboard-menu",
+    "employee-menu",
+    "employee-list",
+    "attendance-menu",
+    "payroll-menu",
+    "payroll-list",
+    "payroll-edit",
+    "payroll-process",
+    "payroll-statistics",
+    "profile-menu",
+    "profile-view",
+    "attendance-my-attendances",
+    "attendance-last-attendance",
+    "attendance-check-in",
+    "attendance-check-out",
+    "leave-request-menu",
+    "leave-request-create",
+    "leave-request-my-requests",
+    "payslip-view",
+  ],
+  employee: [
+    "dashboard-menu",
+    "profile-menu",
+    "team-view",
+    "attendance-my-attendances",
+    "attendance-check-in",
+    "attendance-check-out",
+    "payslip-view",
+    "project-menu",
+    "project-list",
+  ],
+};
+
+describe("feature guard matrix", () => {
+  it("requires explicit permission guard for every named authenticated route", () => {
+    const protectedNamedRoutes = routeEntries.filter(
+      (route) => route.meta.requiresAuth
+    );
+
+    expect(protectedNamedRoutes.length).toBeGreaterThan(0);
+
+    for (const route of protectedNamedRoutes) {
+      const hasGuard =
+        Boolean(route.meta.requiredPermission) ||
+        (Array.isArray(route.meta.requiredAnyPermissions) &&
+          route.meta.requiredAnyPermissions.length > 0) ||
+        route.meta.allowAuthenticated === true;
+
+      expect(hasGuard).toBe(true);
+    }
+  });
+
+  it("enforces role access for admin core features", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.dashboard")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.teams"))
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.employee,
+        routeMeta("admin.employees")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.projects")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.employee,
+        routeMeta("admin.projects")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.employee,
+        routeMeta("admin.attendances")
+      )
+    ).toBe(false);
+  });
+
+  it("enforces role access for payroll and employee self-service", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.create")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.detail")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.payroll.create")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.payroll.detail")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.payroll.detail")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.employee,
+        routeMeta("employee.payroll")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("employee.payroll")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("employee.payroll")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("employee.payroll")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.employee,
+        routeMeta("employee.profile")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("employee.profile")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("employee.attendance.my-attendances")
+      )
+    ).toBe(true);
+  });
+});
