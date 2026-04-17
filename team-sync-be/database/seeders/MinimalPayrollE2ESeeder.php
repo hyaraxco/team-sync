@@ -46,13 +46,11 @@ class MinimalPayrollE2ESeeder extends Seeder
                 [
                     'employee_id' => $employee->id,
                     'job_title' => 'Software Engineer',
-                    'years_experience' => 5,
                     'status' => 'active',
                     'employment_type' => 'full_time',
                     'work_location' => 'remote',
                     'start_date' => '2024-01-01',
                     'monthly_salary' => 10000000,
-                    'skill_level' => 'expert',
                 ]
             );
 

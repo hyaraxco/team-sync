@@ -261,13 +261,11 @@ class EmployeeProfileRepository implements EmployeeProfileRepositoryInterface
             'employee_id' => $employeeId,
             'job_title' => $data['job_title'] ?? null,
             'team_id' => $data['team_id'] ?? null,
-            'years_experience' => $data['years_experience'] ?? null,
             'status' => $data['status'] ?? null,
             'employment_type' => $data['employment_type'] ?? null,
             'work_location' => $data['work_location'] ?? null,
             'start_date' => $data['start_date'] ?? null,
             'monthly_salary' => $data['monthly_salary'] ?? null,
-            'skill_level' => $data['skill_level'] ?? null,
         ];
 
         $this->jobInformationRepository->create($jobData);
@@ -280,8 +278,6 @@ class EmployeeProfileRepository implements EmployeeProfileRepositoryInterface
             'bank_name' => $data['bank_name'],
             'account_number' => $data['account_number'],
             'account_holder_name' => $data['account_holder_name'],
-            'bank_branch' => $data['bank_branch'] ?? null,
-            'account_type' => $data['account_type'] ?? null,
         ];
 
         $this->bankInformationRepository->create($bankData);
@@ -331,13 +327,11 @@ class EmployeeProfileRepository implements EmployeeProfileRepositoryInterface
         $fields = [
             'job_title',
             'team_id',
-            'years_experience',
             'status',
             'employment_type',
             'work_location',
             'start_date',
             'monthly_salary',
-            'skill_level',
         ];
 
         $jobData = array_intersect_key($data, array_flip($fields));
