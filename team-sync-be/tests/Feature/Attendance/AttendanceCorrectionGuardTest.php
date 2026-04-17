@@ -181,13 +181,11 @@ class AttendanceCorrectionGuardTest extends TestCase
         $employee->jobInformation()->create([
             'employee_id' => $employee->id,
             'job_title' => 'Software Engineer',
-            'years_experience' => 4,
             'status' => 'active',
             'employment_type' => 'full_time',
             'work_location' => 'remote',
             'start_date' => '2024-01-01',
             'monthly_salary' => 10000000,
-            'skill_level' => 'intermediate',
         ]);
 
         $user = User::query()->findOrFail($employee->user_id);

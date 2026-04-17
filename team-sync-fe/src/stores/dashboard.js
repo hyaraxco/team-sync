@@ -51,7 +51,7 @@ export const useDashboardStore = defineStore("dashboard", {
         async fetchTodayAttendance() {
             this.todayAttendanceLoading = true;
             try {
-                const response = await axiosInstance.get('/dashboard/today-attendance');
+                const response = await axiosInstance.get('/dashboard/today-attendance-overview');
                 this.todayAttendance = response.data.data;
             } catch (error) {
                 this.error = handleError(error);

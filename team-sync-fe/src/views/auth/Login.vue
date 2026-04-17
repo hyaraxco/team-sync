@@ -5,6 +5,7 @@ import Alert from "@/components/common/Alert.vue";
 import Input from "@/components/common/form/Input.vue";
 import { AtSign, BuildingIcon, Lock } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
+import { RouterLink } from "vue-router";
 
 const authStore = useAuthStore();
 const { loading, error } = storeToRefs(authStore);
@@ -105,12 +106,12 @@ const handleSubmit = async () => {
               Remember me
             </label>
           </div>
-          <a
-            href="#"
+          <RouterLink
+            :to="{ name: 'forgot-password' }"
             class="hover:brightness-110 transition-all duration-300 text-primary-600"
           >
             Forgot password?
-          </a>
+          </RouterLink>
         </div>
 
         <!-- Login Button -->
