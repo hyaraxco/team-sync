@@ -1,28 +1,20 @@
 <template>
-  <div>
+  <div class="w-full space-y-1.5 focus-within:z-10 relative text-left">
     <label
       :for="fieldId"
-      class="block mb-2 text-gray-700 font-semibold font-jakarta text-[14px]"
+      class="block text-sm font-medium text-gray-700"
       v-if="label"
     >
       {{ label }}
     </label>
 
-    <div class="relative">
+    <div class="relative flex items-center h-12">
       <!-- slot icon -->
       <div
-        v-if="$slots.icon"
-        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+        v-if="hasIcon"
+        class="absolute left-4 flex h-full items-center pointer-events-none text-gray-400 transition-colors peer-focus:text-[#0C51D9] z-10"
       >
         <slot name="icon" />
-      </div>
-
-      <!-- slot suffix -->
-      <div
-        v-if="$slots.suffix"
-        class="absolute inset-y-0 right-0 pr-3 flex items-center"
-      >
-        <slot name="suffix" />
       </div>
 
       <input
@@ -34,21 +26,34 @@
         :required="required"
         :min="min"
         :step="step"
+        class="peer w-full h-full bg-white text-gray-900 border text-sm rounded-xl outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal font-medium"
         :class="[
-          'w-full border rounded-[16px] transition-all duration-300',
-          'hover:border-[#0C51D9] hover:border-2',
-          'focus:border-[#0C51D9] focus:border-2 focus:bg-white',
-          borderColor,
+          hasIcon ? 'pl-12' : 'pl-4',
+          hasSuffix ? 'pr-12' : 'pr-4',
+          error 
+            ? 'border-red-300 ring-4 ring-red-500/10 focus:border-red-500 focus:ring-red-500/20' 
+            : 'border-gray-200 hover:border-gray-300 focus:border-[#0C51D9] focus:ring-4 focus:ring-[#0C51D9]/10'
         ]"
-        :style="inputStyle"
         @input="modelValue = $event.target.value"
         @blur="emit('blur', $event)"
       />
+
+      <!-- slot suffix -->
+      <div
+        v-if="hasSuffix"
+        class="absolute right-4 flex h-full items-center z-10"
+      >
+        <slot name="suffix" />
+      </div>
     </div>
 
-    <p v-if="error" class="mt-2" :style="errorStyle">
-      {{ error }}
-    </p>
+    <!-- Error Message -->
+    <div v-if="error" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
+      <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="leading-tight">{{ error }}</span>
+    </div>
   </div>
 </template>
 
@@ -68,7 +73,10 @@ const props = defineProps({
   step: { type: [String, Number], default: undefined },
 });
 const emit = defineEmits(["update:modelValue", "blur"]);
+
 const slots = useSlots();
+const hasIcon = computed(() => !!slots.icon);
+const hasSuffix = computed(() => !!slots.suffix);
 
 const fieldId = computed(() => {
   if (props.id) return props.id;
@@ -83,29 +91,15 @@ const modelValue = computed({
   get: () => props.modelValue || "",
   set: (value) => emit("update:modelValue", value),
 });
-
-const borderColor = computed(() =>
-  props.error ? "border-[#DC2626] border-2" : "border-[#DCDEDD]"
-);
-
-const hasIcon = computed(() => Boolean(slots.icon));
-const hasSuffix = computed(() => Boolean(slots.suffix));
-
-const inputStyle = computed(() => ({
-  display: "flex",
-  padding: "12px",
-  paddingLeft: hasIcon.value ? "40px" : "12px",
-  paddingRight: hasSuffix.value ? "44px" : "12px",
-  justifyContent: "flex-start",
-  alignItems: "center",
-  gap: "10px",
-  background: "#ffffff",
-}));
-
-const errorStyle = {
-  color: "#dc2626",
-  fontFamily: "Plus Jakarta Sans",
-  fontSize: "14px",
-  fontWeight: 400,
-};
 </script>
+
+<style>
+/* Global because scoped keyframes can be tricky with dynamic classes */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+</style>

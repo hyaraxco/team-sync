@@ -8,7 +8,6 @@ import {
   EyeOff,
   Phone,
   Calendar,
-  Heart,
   MapPin,
   Hash,
   Building2,
@@ -361,20 +360,69 @@ const showPasswordConfirmation = ref(false);
             </Input>
           </div>
 
+          <!-- Religion -->
           <div class="mb-4">
-            <Input
-              id="hobby"
-              name="hobby"
-              type="text"
-              v-model="form.hobby"
-              label="Hobby"
-              placeholder="e.g. Reading, Swimming, Gaming"
-              :error="errors?.hobby?.join(', ')"
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Religion</label
             >
-              <template #icon>
-                <Heart class="h-5 w-5 text-gray-400" />
-              </template>
-            </Input>
+            <select
+              id="religion"
+              name="religion"
+              v-model="form.religion"
+              class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+            >
+              <option value="">Select religion</option>
+              <option value="islam">Islam</option>
+              <option value="kristen">Kristen Protestan</option>
+              <option value="katolik">Katolik</option>
+              <option value="hindu">Hindu</option>
+              <option value="budha">Budha</option>
+              <option value="konghucu">Konghucu</option>
+            </select>
+            <p v-if="errors?.religion?.join(', ')" class="text-red-500 text-xs mt-1">
+              {{ errors?.religion?.join(', ') }}
+            </p>
+          </div>
+
+          <!-- Marital Status -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Marital Status</label
+            >
+            <select
+              id="marital_status"
+              name="marital_status"
+              v-model="form.marital_status"
+              class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+            >
+              <option value="">Select marital status</option>
+              <option value="single">Single / Belum Menikah</option>
+              <option value="married">Married / Menikah</option>
+              <option value="widowed">Widowed / Janda/Duda</option>
+              <option value="divorced">Divorced / Bercerai</option>
+            </select>
+            <p v-if="errors?.marital_status?.join(', ')" class="text-red-500 text-xs mt-1">
+              {{ errors?.marital_status?.join(', ') }}
+            </p>
+          </div>
+
+          <!-- Blood Type -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >Blood Type</label
+            >
+            <select
+              id="blood_type"
+              name="blood_type"
+              v-model="form.blood_type"
+              class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+            >
+              <option value="">Select blood type</option>
+              <option value="A">A</option>
+              <option value="B">B</option>
+              <option value="AB">AB</option>
+              <option value="O">O</option>
+            </select>
           </div>
 
           <div class="mb-4">
@@ -395,7 +443,7 @@ const showPasswordConfirmation = ref(false);
 
           <!-- Gender (Full Width) -->
           <div class="xl:col-span-2 mb-4">
-            <label class="block text-brand-dark text-base font-semibold mb-1"
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
               >Gender *</label
             >
             <div class="flex flex-col sm:flex-row gap-4">

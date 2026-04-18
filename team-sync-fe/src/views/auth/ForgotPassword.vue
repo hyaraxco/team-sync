@@ -1,17 +1,18 @@
 <script setup lang="ts">
-import { shallowRef } from "vue";
+import { computed, shallowRef } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import Input from "@/components/common/form/Input.vue";
 import Alert from "@/components/common/Alert.vue";
-import { AtSign, BuildingIcon } from "lucide-vue-next";
+import { AtSign, ArrowLeft, Mail, Send, CheckCircle2 } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 
 const authStore = useAuthStore();
 const { loading, error, success } = storeToRefs(authStore);
 const email = shallowRef("");
-
-// Thin route-level component: one form, one request, explicit store action.
+const fieldErrors = computed(() =>
+  error.value && typeof error.value === "object" ? error.value : {}
+);
 
 const handleSubmit = async () => {
   await authStore.forgotPassword({ email: email.value });
@@ -19,69 +20,128 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="w-full lg:w-1/2 flex items-center justify-center" style="padding: 20px">
-    <div class="w-full max-w-md space-y-8">
-      <div class="flex items-center gap-4">
-        <div class="w-16 h-16 relative flex items-center justify-center">
-          <div class="w-16 h-16 absolute bg-gradient-to-br from-primary-100 to-primary-200 rounded-full"></div>
-          <div class="w-10 h-10 absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full opacity-90"></div>
-          <BuildingIcon class="w-5 h-5 text-white relative z-10" />
+  <div class="w-full max-w-[420px] mx-auto animate-fadeIn px-4">
+    <!-- Success State -->
+    <div v-if="success" class="text-center">
+      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 mb-6 ring-4 ring-white shadow-sm">
+        <CheckCircle2 class="h-8 w-8 text-green-500" aria-hidden="true" stroke-width="1.5" />
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
+        Check your email
+      </h1>
+      <p class="mt-3 text-[15px] text-gray-600 max-w-[280px] mx-auto leading-relaxed">
+        We've sent a password reset link to <br/><strong class="text-gray-900 font-semibold">{{ email }}</strong>
+      </p>
+      <div class="mt-8 rounded-xl bg-gray-50 p-4 border border-gray-100">
+        <p class="text-sm text-gray-500">
+          Didn't receive it? Check your spam folder or try again.
+        </p>
+      </div>
+      <RouterLink
+        :to="{ name: 'login' }"
+        class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20"
+      >
+        <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
+        Return to sign in
+      </RouterLink>
+    </div>
+
+    <!-- Form State -->
+    <template v-else>
+      <div class="text-center mb-8">
+        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 mb-6 ring-4 ring-white shadow-sm">
+          <Mail class="h-6 w-6 text-[#0C51D9]" aria-hidden="true" stroke-width="1.5" />
         </div>
-        <div>
-          <h1 class="text-brand-dark text-lg font-bold">Reset Password</h1>
-          <p class="text-brand-dark text-xs font-normal">We'll send you a reset link</p>
-        </div>
+        <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
+          Reset password
+        </h1>
+        <p class="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-[280px] mx-auto">
+          Enter your email and we'll send you a link to reset your password.
+        </p>
       </div>
 
-      <Alert
-        v-if="typeof success === 'string'"
-        type="success"
-        title="Email Sent"
-        :message="success"
-        :show="true"
-      />
+      <!-- Error Alert -->
+      <Transition name="fade-slide">
+        <Alert
+          v-if="typeof error === 'string'"
+          type="danger"
+          title="Request Failed"
+          :message="error"
+          :show="true"
+          class="mb-6"
+        />
+      </Transition>
 
-      <Alert
-        v-if="typeof error === 'string'"
-        type="danger"
-        title="Request Failed"
-        :message="error"
-        :show="true"
-      />
+      <!-- Form Card -->
+      <div class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-left">
+        <form class="space-y-6" @submit.prevent="handleSubmit" novalidate>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            autocomplete="email"
+            v-model="email"
+            label="Email Address"
+            placeholder="name@company.com"
+            :required="true"
+            :error="fieldErrors?.email?.join(', ')"
+          >
+            <template #icon>
+              <AtSign class="h-5 w-5" aria-hidden="true" stroke-width="1.5" />
+            </template>
+          </Input>
 
-      <form class="space-y-6" @submit.prevent="handleSubmit">
-        <Input
-          id="email"
-          name="email"
-          type="email"
-          v-model="email"
-          label="Email Address"
-          placeholder="Enter your email"
-          :required="true"
-          :error="typeof error === 'object' ? error?.email?.join(', ') : ''"
-        >
-          <template #icon>
-            <AtSign class="h-5 w-5 text-gray-400" />
-          </template>
-        </Input>
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-[#0C51D9] overflow-hidden"
+            :disabled="loading"
+          >
+            <span class="relative z-10 flex items-center gap-2">
+              {{ loading ? 'Sending…' : 'Send reset link' }}
+              <Send v-if="!loading" class="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
+              <svg v-else class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </span>
+            <div v-if="!loading" class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+          </button>
+        </form>
+      </div>
 
-        <button
-          type="submit"
-          class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full justify-center bg-gradient-to-l from-[#0c51d9] via-[#6f96e3] to-[#0c51d9] shadow-[inset_-2px_2px_1px_0_#6197ff,inset_2px_2px_1px_0_rgba(97,151,255,0.55)] text-white font-plus-jakarta-sans text-[14px] font-semibold cursor-pointer"
-          :disabled="loading"
-        >
-          {{ loading ? 'Sending...' : 'Send Reset Link' }}
-        </button>
-      </form>
-
-      <div class="text-center">
+      <!-- Back Link -->
+      <div class="mt-8 text-center">
         <RouterLink
           :to="{ name: 'login' }"
-          class="hover:brightness-110 transition-all duration-300 text-primary-600"
+          class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
         >
-          Back to Sign In
+          <ArrowLeft class="h-4 w-4" aria-hidden="true" />
+          Back to sign in
         </RouterLink>
       </div>
-    </div>
+    </template>
   </div>
 </template>
+
+<style>
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+</style>

@@ -32,6 +32,8 @@ class PayrollSetting extends Model
         'rounding_mode',
         'rounding_unit',
         'note_template',
+        'payroll_bank_name',
+        'payroll_bank_code',
         'updated_by',
     ];
 
@@ -53,6 +55,8 @@ class PayrollSetting extends Model
             'rounding_mode' => 'nearest',
             'rounding_unit' => 1000,
             'note_template' => self::DEFAULT_NOTE_TEMPLATE,
+            'payroll_bank_name' => null,
+            'payroll_bank_code' => null,
         ];
     }
 

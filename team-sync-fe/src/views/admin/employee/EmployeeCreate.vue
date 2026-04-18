@@ -33,9 +33,11 @@ const step1Data = ref({
   identity_number: "",
   phone: "",
   date_of_birth: "",
-  hobby: "",
-  place_of_birth: "",
   gender: "",
+  religion: "",
+  marital_status: "",
+  blood_type: "",
+  place_of_birth: "",
   address: "",
   city: "",
   postal_code: "",
@@ -47,18 +49,18 @@ const step1Data = ref({
 const step2Data = ref({
   job_title: "",
   team_id: "",
-  years_experience: "",
   status: "",
   employment_type: "",
   work_location: "",
   start_date: "",
   monthly_salary: "",
-  skill_level: "",
   bank_name: "",
   account_number: "",
   account_holder_name: "",
-  bank_branch: "",
-  account_type: "",
+  npwp: "",
+  bpjs_ketenagakerjaan: "",
+  bpjs_kesehatan: "",
+  ptkp_status: "",
   role: "",
 });
 
@@ -68,8 +70,6 @@ const step3Data = ref({
   emergency_contact_relationship: "",
   emergency_contact_phone: "",
   emergency_contact_email: "",
-  additional_notes: "",
-  preferred_language: "",
 });
 
 const parseSalaryNumber = (value: any): number | null => {
@@ -248,17 +248,14 @@ const validateStep2 = () => {
   const validationErrors: Record<string, string[]> = {};
   const step2RequiredChecks: Array<[string, string]> = [
     ["job_title", step2Data.value.job_title],
-    ["years_experience", step2Data.value.years_experience],
     ["status", step2Data.value.status],
     ["employment_type", step2Data.value.employment_type],
     ["work_location", step2Data.value.work_location],
     ["start_date", step2Data.value.start_date],
     ["monthly_salary", step2Data.value.monthly_salary],
-    ["skill_level", step2Data.value.skill_level],
     ["bank_name", step2Data.value.bank_name],
     ["account_number", step2Data.value.account_number],
     ["account_holder_name", step2Data.value.account_holder_name],
-    ["account_type", step2Data.value.account_type],
   ];
 
   for (const [field, value] of step2RequiredChecks) {
@@ -351,14 +348,9 @@ const goToErrorStep = (validationErrors: Record<string, any>) => {
     "employment_type",
     "work_location",
     "status",
-    "years_experience",
-    "start_date",
-    "monthly_salary",
-    "skill_level",
     "bank_name",
     "account_number",
     "account_holder_name",
-    "account_type",
   ];
 
   if (keys.some((key) => step1Fields.includes(key))) {
@@ -388,7 +380,9 @@ const handleSubmit = async () => {
     formData.append("identity_number", step1Data.value.identity_number);
     formData.append("phone", step1Data.value.phone);
     formData.append("date_of_birth", step1Data.value.date_of_birth);
-    appendIfNotEmpty(formData, "hobby", step1Data.value.hobby);
+    appendIfNotEmpty(formData, "religion", step1Data.value.religion);
+    appendIfNotEmpty(formData, "marital_status", step1Data.value.marital_status);
+    appendIfNotEmpty(formData, "blood_type", step1Data.value.blood_type);
     formData.append("place_of_birth", step1Data.value.place_of_birth);
     formData.append("gender", step1Data.value.gender);
     formData.append("address", step1Data.value.address);
@@ -402,7 +396,6 @@ const handleSubmit = async () => {
     // Step 2 data (Job Information & Bank Information)
     formData.append("job_title", step2Data.value.job_title);
     appendIfNotEmpty(formData, "team_id", step2Data.value.team_id);
-    formData.append("years_experience", step2Data.value.years_experience);
     formData.append("status", step2Data.value.status);
     formData.append("employment_type", step2Data.value.employment_type);
     formData.append("work_location", step2Data.value.work_location);
@@ -411,12 +404,13 @@ const handleSubmit = async () => {
       "monthly_salary",
       normalizeRupiah(step2Data.value.monthly_salary),
     );
-    formData.append("skill_level", step2Data.value.skill_level);
     formData.append("bank_name", step2Data.value.bank_name);
     formData.append("account_number", step2Data.value.account_number);
     formData.append("account_holder_name", step2Data.value.account_holder_name);
-    appendIfNotEmpty(formData, "bank_branch", step2Data.value.bank_branch);
-    formData.append("account_type", step2Data.value.account_type);
+    appendIfNotEmpty(formData, "npwp", step2Data.value.npwp);
+    appendIfNotEmpty(formData, "bpjs_ketenagakerjaan", step2Data.value.bpjs_ketenagakerjaan);
+    appendIfNotEmpty(formData, "bpjs_kesehatan", step2Data.value.bpjs_kesehatan);
+    appendIfNotEmpty(formData, "ptkp_status", step2Data.value.ptkp_status);
     if (step2Data.value.role) {
       formData.append("roles[]", step2Data.value.role);
     }
@@ -441,17 +435,6 @@ const handleSubmit = async () => {
         step3Data.value.emergency_contact_email,
       );
     }
-
-    appendIfNotEmpty(
-      formData,
-      "preferred_language",
-      step3Data.value.preferred_language,
-    );
-    appendIfNotEmpty(
-      formData,
-      "additional_notes",
-      step3Data.value.additional_notes,
-    );
 
     await employeeStore.createEmployee(formData);
 

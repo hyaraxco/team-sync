@@ -9,12 +9,7 @@ import {
   Clock,
   CalendarPlus,
   DollarSign,
-  PlayCircle,
-  Zap,
-  Award,
-  Crown,
   CreditCard,
-  Wallet,
   MapPin,
   Calendar,
   X,
@@ -22,10 +17,12 @@ import {
   Search,
   SearchX,
   Users,
+  ShieldCheck,
 } from "lucide-vue-next";
 import { ref, computed, onMounted, watch } from "vue";
 import { useTeamStore } from "@/stores/team";
 import { useOptionStore } from "@/stores/option";
+import { usePayrollStore } from "@/stores/payroll";
 import { storeToRefs } from "pinia";
 import RightSidebarStep2 from "@/components/admin/employee/create/RightSidebarStep2.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
@@ -57,6 +54,21 @@ const { teams } = storeToRefs(teamStore);
 const optionStore = useOptionStore();
 const { employmentTypes, jobStatuses, workLocations, skillLevels } =
   storeToRefs(optionStore);
+
+// Payroll Settings — used to lock bank selection to the company's configured bank
+const payrollStore = usePayrollStore();
+const { settings: payrollSettings } = storeToRefs(payrollStore);
+const loadingPayrollSettings = ref(true);
+
+const companyBankName = computed(() => payrollSettings.value?.payroll_bank_name || null);
+const companyBankCode = computed(() => payrollSettings.value?.payroll_bank_code || null);
+
+// When company bank is configured, auto-set the employee's bank_name to match
+watch(companyBankName, (bankName) => {
+  if (bankName) {
+    form.value.bank_name = bankName;
+  }
+}, { immediate: true });
 
 const teamOptions = computed<TeamOption[]>(() => {
   return Array.isArray(teams.value) ? (teams.value as TeamOption[]) : [];
@@ -101,11 +113,27 @@ const handleRemoveTeam = () => {
 };
 
 onMounted(async () => {
-  await teamStore.fetchTeams();
-  await optionStore.fetchEmploymentTypes();
-  await optionStore.fetchJobStatuses();
-  await optionStore.fetchWorkLocations();
-  await optionStore.fetchSkillLevels();
+  // Fetch payroll settings independently so it always resolves regardless of other fetch failures
+  const payrollSettingsFetch = (async () => {
+    try {
+      if (!payrollSettings.value) {
+        await payrollStore.fetchSettings();
+      }
+    } catch (_) { /* non-critical */ } finally {
+      loadingPayrollSettings.value = false;
+    }
+  })();
+
+  // Run all other fetches in parallel
+  await Promise.allSettled([
+    teamStore.fetchTeams(),
+    optionStore.fetchEmploymentTypes(),
+    optionStore.fetchJobStatuses(),
+    optionStore.fetchWorkLocations(),
+    optionStore.fetchSkillLevels(),
+    payrollSettingsFetch,
+  ]);
+
   if (form.value.monthly_salary) {
     form.value.monthly_salary = formatRupiah(form.value.monthly_salary);
   }
@@ -228,7 +256,7 @@ watch(
 
           <!-- Team -->
           <div class="mb-4">
-            <label class="block text-brand-dark text-base font-semibold mb-1"
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
               >Team</label
             >
             <div class="relative">
@@ -287,22 +315,6 @@ watch(
             </div>
           </div>
 
-          <div class="mb-4">
-            <Input
-              id="years_experience"
-              name="years_experience"
-              type="number"
-              v-model="form.years_experience"
-              label="Years of Experience *"
-              placeholder="e.g. 3"
-              :error="errors?.years_experience?.join(', ')"
-              required
-            >
-              <template #icon>
-                <Calendar class="h-5 w-5 text-gray-400" />
-              </template>
-            </Input>
-          </div>
 
           <div class="mb-4">
             <Select
@@ -386,152 +398,104 @@ watch(
             </Input>
           </div>
 
-          <!-- Skill Level (Full Width) -->
-          <div class="lg:col-span-2 mb-4">
-            <label class="block text-brand-dark text-base font-semibold mb-1"
-              >Skill Level *</label
+        </div>
+      </div>
+
+      <!-- Tax & BPJS Identity Section -->
+      <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div
+            class="w-12 h-12 bg-emerald-50 rounded-[12px] flex items-center justify-center"
+          >
+            <ShieldCheck class="w-6 h-6 text-emerald-600" />
+          </div>
+          <div>
+            <h3 class="text-brand-dark text-xl font-bold">Tax & BPJS Identity</h3>
+            <p class="text-brand-light text-sm font-normal">
+              Mandatory tax and social insurance numbers (NPWP & BPJS)
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- NPWP -->
+          <div class="mb-4">
+            <Input
+              id="npwp"
+              name="npwp"
+              type="text"
+              v-model="form.npwp"
+              label="NPWP"
+              placeholder="e.g. 12.345.678.9-012.000"
+              :error="errors?.npwp?.join(', ')"
             >
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <!-- Beginner Option -->
-              <label
-                class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-green-50 rounded-[12px] flex items-center justify-center"
-                  >
-                    <PlayCircle class="w-5 h-5 text-green-600" />
-                  </div>
-                  <div class="flex flex-col">
-                    <p class="text-brand-dark text-base font-semibold">
-                      Beginner
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
-                >
-                  <input
-                    type="radio"
-                    name="skill_level"
-                    value="beginner"
-                    class="hidden"
-                    v-model="form.skill_level"
-                  />
-                  <div
-                    class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
-                  ></div>
-                  <p
-                    class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
-                  ></p>
-                </div>
-              </label>
+              <template #icon>
+                <Hash class="h-5 w-5 text-gray-400" />
+              </template>
+            </Input>
+            <p class="text-brand-light text-xs mt-1">Nomor Pokok Wajib Pajak (PPh 21)</p>
+          </div>
 
-              <!-- Intermediate Option -->
-              <label
-                class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-yellow-50 rounded-[12px] flex items-center justify-center"
-                  >
-                    <Zap class="w-5 h-5 text-yellow-600" />
-                  </div>
-                  <div class="flex flex-col">
-                    <p class="text-brand-dark text-base font-semibold">
-                      Intermediate
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
-                >
-                  <input
-                    type="radio"
-                    name="skill_level"
-                    value="intermediate"
-                    class="hidden"
-                    v-model="form.skill_level"
-                  />
-                  <div
-                    class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
-                  ></div>
-                  <p
-                    class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
-                  ></p>
-                </div>
-              </label>
+          <!-- PTKP Status -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">PTKP Status</label>
+            <select
+              id="ptkp_status"
+              name="ptkp_status"
+              v-model="form.ptkp_status"
+              class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+            >
+              <option value="">Select PTKP status</option>
+              <option value="TK/0">TK/0 – Tidak Kawin, Tanpa Tanggungan</option>
+              <option value="TK/1">TK/1 – Tidak Kawin, 1 Tanggungan</option>
+              <option value="TK/2">TK/2 – Tidak Kawin, 2 Tanggungan</option>
+              <option value="TK/3">TK/3 – Tidak Kawin, 3 Tanggungan</option>
+              <option value="K/0">K/0 – Kawin, Tanpa Tanggungan</option>
+              <option value="K/1">K/1 – Kawin, 1 Tanggungan</option>
+              <option value="K/2">K/2 – Kawin, 2 Tanggungan</option>
+              <option value="K/3">K/3 – Kawin, 3 Tanggungan</option>
+              <option value="K/I/0">K/I/0 – Kawin, Istri Penghasilan, 0 Tanggungan</option>
+              <option value="K/I/1">K/I/1 – Kawin, Istri Penghasilan, 1 Tanggungan</option>
+              <option value="K/I/2">K/I/2 – Kawin, Istri Penghasilan, 2 Tanggungan</option>
+              <option value="K/I/3">K/I/3 – Kawin, Istri Penghasilan, 3 Tanggungan</option>
+            </select>
+            <p class="text-brand-light text-xs mt-1">Digunakan untuk perhitungan PPh 21</p>
+          </div>
 
-              <!-- Advanced Option -->
-              <label
-                class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-purple-50 rounded-[12px] flex items-center justify-center"
-                  >
-                    <Award class="w-5 h-5 text-purple-600" />
-                  </div>
-                  <div class="flex flex-col">
-                    <p class="text-brand-dark text-base font-semibold">
-                      Advanced
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
-                >
-                  <input
-                    type="radio"
-                    name="skill_level"
-                    value="advanced"
-                    class="hidden"
-                    v-model="form.skill_level"
-                  />
-                  <div
-                    class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
-                  ></div>
-                  <p
-                    class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
-                  ></p>
-                </div>
-              </label>
+          <!-- BPJS Ketenagakerjaan -->
+          <div class="mb-4">
+            <Input
+              id="bpjs_ketenagakerjaan"
+              name="bpjs_ketenagakerjaan"
+              type="text"
+              v-model="form.bpjs_ketenagakerjaan"
+              label="BPJS Ketenagakerjaan"
+              placeholder="e.g. 1234567890"
+              :error="errors?.bpjs_ketenagakerjaan?.join(', ')"
+            >
+              <template #icon>
+                <ShieldCheck class="h-5 w-5 text-gray-400" />
+              </template>
+            </Input>
+            <p class="text-brand-light text-xs mt-1">No. BPJS Jamsostek (JHT, JKK, JKM, JP)</p>
+          </div>
 
-              <!-- Expert Option -->
-              <label
-                class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
-              >
-                <div class="flex items-center gap-3">
-                  <div
-                    class="w-10 h-10 bg-red-50 rounded-[12px] flex items-center justify-center"
-                  >
-                    <Crown class="w-5 h-5 text-red-600" />
-                  </div>
-                  <div class="flex flex-col">
-                    <p class="text-brand-dark text-base font-semibold">
-                      Expert
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
-                >
-                  <input
-                    type="radio"
-                    name="skill_level"
-                    value="expert"
-                    class="hidden"
-                    v-model="form.skill_level"
-                  />
-                  <div
-                    class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
-                  ></div>
-                  <p
-                    class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
-                  ></p>
-                </div>
-              </label>
-            </div>
+          <!-- BPJS Kesehatan -->
+          <div class="mb-4">
+            <Input
+              id="bpjs_kesehatan"
+              name="bpjs_kesehatan"
+              type="text"
+              v-model="form.bpjs_kesehatan"
+              label="BPJS Kesehatan"
+              placeholder="e.g. 0001234567890"
+              :error="errors?.bpjs_kesehatan?.join(', ')"
+            >
+              <template #icon>
+                <ShieldCheck class="h-5 w-5 text-gray-400" />
+              </template>
+            </Input>
+            <p class="text-brand-light text-xs mt-1">No. BPJS Kesehatan / JKN</p>
           </div>
         </div>
       </div>
@@ -554,31 +518,69 @@ watch(
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
           <div class="mb-4">
-            <Select
-              id="bank_name"
-              name="bank_name"
-              v-model="form.bank_name"
-              label="Bank Name *"
-              placeholder="Select bank"
-              :options="[
-                { value: 'bca', label: 'Bank Central Asia (BCA)' },
-                { value: 'mandiri', label: 'Bank Mandiri' },
-                { value: 'bni', label: 'Bank Negara Indonesia (BNI)' },
-                { value: 'bri', label: 'Bank Rakyat Indonesia (BRI)' },
-                { value: 'cimb', label: 'CIMB Niaga' },
-                { value: 'danamon', label: 'Bank Danamon' },
-                { value: 'permata', label: 'Bank Permata' },
-                { value: 'maybank', label: 'Maybank Indonesia' },
-                { value: 'ocbc', label: 'OCBC NISP' },
-                { value: 'panin', label: 'Panin Bank' },
-              ]"
-              :error="errors?.bank_name?.join(', ')"
-              required
-            >
-              <template #icon>
-                <Building2 class="h-5 w-5 text-gray-400" />
-              </template>
-            </Select>
+            <!-- Skeleton: while payroll settings are being fetched -->
+            <template v-if="loadingPayrollSettings">
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                Bank Name *
+              </label>
+              <div class="w-full h-[50px] bg-gray-100 border border-[#DCDEDD] rounded-[16px] animate-pulse"></div>
+              <p class="text-brand-light text-xs mt-1">Loading bank configuration...</p>
+            </template>
+
+            <!-- Bank locked by company payroll settings -->
+            <template v-else-if="companyBankName">
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                Bank Name *
+              </label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <Building2 class="h-5 w-5 text-gray-400" />
+                </div>
+                <div
+                  class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] bg-gray-50 text-brand-dark font-semibold cursor-not-allowed flex items-center justify-between"
+                  data-testid="bank-name-locked"
+                >
+                  <span>{{ companyBankName }}</span>
+                  <span class="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5 whitespace-nowrap">
+                    Company Default
+                  </span>
+                </div>
+              </div>
+              <p class="text-brand-light text-xs mt-1 flex items-center gap-1">
+                <span class="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                Dikunci sesuai konfigurasi Bank Payroll perusahaan
+                <template v-if="companyBankCode">(Kode BI: {{ companyBankCode }})</template>
+              </p>
+            </template>
+
+            <!-- Fallback: free bank selection when no company bank is configured -->
+            <template v-else>
+              <Select
+                id="bank_name"
+                name="bank_name"
+                v-model="form.bank_name"
+                label="Bank Name *"
+                placeholder="Select bank"
+                :options="[
+                  { value: 'bca', label: 'Bank Central Asia (BCA)' },
+                  { value: 'mandiri', label: 'Bank Mandiri' },
+                  { value: 'bni', label: 'Bank Negara Indonesia (BNI)' },
+                  { value: 'bri', label: 'Bank Rakyat Indonesia (BRI)' },
+                  { value: 'cimb', label: 'CIMB Niaga' },
+                  { value: 'danamon', label: 'Bank Danamon' },
+                  { value: 'permata', label: 'Bank Permata' },
+                  { value: 'maybank', label: 'Maybank Indonesia' },
+                  { value: 'ocbc', label: 'OCBC NISP' },
+                  { value: 'panin', label: 'Panin Bank' },
+                ]"
+                :error="errors?.bank_name?.join(', ')"
+                required
+              >
+                <template #icon>
+                  <Building2 class="h-5 w-5 text-gray-400" />
+                </template>
+              </Select>
+            </template>
           </div>
 
           <div class="mb-4">
@@ -621,42 +623,6 @@ watch(
             </p>
           </div>
 
-          <div class="mb-4">
-            <Input
-              id="bank_branch"
-              name="bank_branch"
-              type="text"
-              v-model="form.bank_branch"
-              label="Bank Branch (Optional)"
-              placeholder="e.g. Jakarta Pusat"
-              :error="errors?.bank_branch?.join(', ')"
-            >
-              <template #icon>
-                <MapPin class="h-5 w-5 text-gray-400" />
-              </template>
-            </Input>
-          </div>
-
-          <div class="mb-4">
-            <Select
-              id="account_type"
-              name="account_type"
-              v-model="form.account_type"
-              label="Account Type *"
-              placeholder="Select account type"
-              :options="[
-                { value: 'savings', label: 'Savings Account' },
-                { value: 'checking', label: 'Checking Account' },
-                { value: 'current', label: 'Current Account' },
-              ]"
-              :error="errors?.account_type?.join(', ')"
-              required
-            >
-              <template #icon>
-                <Wallet class="h-5 w-5 text-gray-400" />
-              </template>
-            </Select>
-          </div>
         </div>
       </div>
     </div>

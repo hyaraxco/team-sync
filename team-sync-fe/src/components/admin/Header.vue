@@ -4,7 +4,6 @@ import {
   ChevronDownIcon,
   MessageCircleIcon,
   UserIcon,
-  SettingsIcon,
   LogOutIcon,
   MenuIcon,
 } from "lucide-vue-next";
@@ -25,7 +24,7 @@ const router = useRouter();
 const isAccountMenuOpen = ref(false);
 const isNotificationPanelOpen = ref(false);
 const notificationPanelId = "header-notification-panel";
-const unreadPollingIntervalMs = 30000;
+const unreadPollingIntervalMs = 15000;
 const unreadPollingIntervalId = ref(null);
 const emit = defineEmits(["toggle-sidebar"]);
 
@@ -357,13 +356,6 @@ onUnmounted(() => {
             class="hidden sm:flex w-10 h-10 rounded-full border border-[#DCDEDD] items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
           >
             <MessageCircleIcon class="w-5 h-5 text-gray-600" />
-          </button>
-          <button
-            type="button"
-            aria-label="Quick settings"
-            class="hidden sm:flex w-10 h-10 rounded-full border border-[#DCDEDD] items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
-          >
-            <SettingsIcon class="w-5 h-5 text-gray-600" />
           </button>
         </div>
 

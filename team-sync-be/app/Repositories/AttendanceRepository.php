@@ -50,6 +50,16 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             })
             ->orderBy('created_at', 'desc');
 
+        $user = Auth::user();
+        if ($user && $user->hasRole('manager') && !$user->hasRole('hr')) {
+            $manageableIds = $this->getManageableEmployeeIdsForManager();
+            if (empty($manageableIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('employee_id', $manageableIds);
+            }
+        }
+
         if ($limit) {
             $query->take($limit);
         }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, onMounted } from "vue";
 import { RouterLink } from "vue-router";
 import {
   UserPlusIcon,
@@ -9,6 +9,10 @@ import {
   Clock3Icon,
 } from "lucide-vue-next";
 import { can, canOneOf } from "@/helpers/permissionHelper";
+import { useAttendanceStore } from "@/stores/attendance";
+import { useAuthStore } from "@/stores/auth";
+import { storeToRefs } from "pinia";
+import { useToast } from "@/composables/useToast";
 
 type QuickActionLink = {
   name: string;
@@ -17,11 +21,13 @@ type QuickActionLink = {
 
 type ActionableQuickAction = {
   id: string;
-  label: string;
+  label: string | (() => string);
   icon: unknown;
-  to: QuickActionLink;
+  to?: QuickActionLink;
+  action?: () => void;
   isPlaceholder?: false;
   isVisible: () => boolean;
+  isDisabled?: () => boolean;
 };
 
 type PlaceholderQuickAction = {
@@ -58,14 +64,49 @@ const actionConfigs: ActionableQuickAction[] = [
   },
   {
     id: "clock-in-out",
-    label: "Clock In/Out",
-    icon: Clock3Icon,
-    to: {
-      name: "employee.attendance.my-attendances",
-      query: { action: "clock" },
+    label: () => {
+      const { todayAttendance } = storeToRefs(useAttendanceStore());
+      const isCheckedIn = todayAttendance.value?.check_in && !todayAttendance.value?.check_out;
+      return isCheckedIn ? "Clock Out" : "Clock In";
     },
-    isVisible: () =>
-      canOneOf(["attendance-check-in", "attendance-check-out"]),
+    icon: Clock3Icon,
+    action: async () => {
+      const attendanceStore = useAttendanceStore();
+      const toast = useToast();
+      const { todayAttendance } = storeToRefs(attendanceStore);
+      const isCheckedIn = todayAttendance.value?.check_in && !todayAttendance.value?.check_out;
+      
+      try {
+        if (!isCheckedIn) {
+          await attendanceStore.checkIn({ check_in_lat: null, check_in_long: null });
+          toast.success("Clocked In", "You have successfully clocked in.");
+        } else {
+          await attendanceStore.checkOut({ check_out_lat: null, check_out_long: null });
+          toast.success("Clocked Out", "You have successfully clocked out.");
+        }
+        await attendanceStore.fetchTodayAttendance();
+      } catch (e: any) {
+        toast.error("Action Failed", e?.response?.data?.message || "Failed to process attendance action.");
+      }
+    },
+    isDisabled: () => {
+       const attendanceStore = useAttendanceStore();
+       const { todayAttendance, loading } = storeToRefs(attendanceStore);
+       if (loading.value) return true;
+       const isCheckedIn = todayAttendance.value?.check_in && !todayAttendance.value?.check_out;
+       if (isCheckedIn) {
+         const checkInDate = new Date(todayAttendance.value.check_in);
+         const diff = Date.now() - checkInDate.getTime();
+         // Require 8 hours gap for clock out
+         return diff < 8 * 60 * 60 * 1000;
+       }
+       return false;
+    },
+    isVisible: () => {
+      const workLocation = useAuthStore().user?.employee_profile?.job_information?.work_location;
+      if (workLocation === 'remote') return false;
+      return canOneOf(["attendance-check-in", "attendance-check-out"]);
+    },
   },
   {
     id: "request-leave",
@@ -138,6 +179,20 @@ const getLabelClasses = (action: QuickAction) => {
     ? "text-brand-white text-sm font-semibold"
     : "text-brand-dark text-sm font-medium";
 };
+
+const resolveLabel = (action: QuickAction) => {
+  if (typeof action.label === 'function') {
+    return action.label();
+  }
+  return action.label;
+};
+
+onMounted(async () => {
+  if (canOneOf(["attendance-check-in", "attendance-check-out"])) {
+    const attendanceStore = useAttendanceStore();
+    await attendanceStore.fetchTodayAttendance();
+  }
+});
 </script>
 
 <template>
@@ -148,15 +203,30 @@ const getLabelClasses = (action: QuickAction) => {
     <h3 class="text-brand-dark text-lg font-bold mb-4">Quick Actions</h3>
     <div class="space-y-3">
       <template v-for="action in visibleActions" :key="action.id">
+        <!-- Route Link Action -->
         <RouterLink
-          v-if="!action.isPlaceholder"
+          v-if="!action.isPlaceholder && action.to"
           :to="action.to"
           :class="getActionClasses(action)"
           :data-action-id="action.id"
         >
           <component :is="action.icon" :class="getIconClasses(action)" />
-          <span :class="getLabelClasses(action)">{{ action.label }}</span>
+          <span :class="getLabelClasses(action)">{{ resolveLabel(action) }}</span>
         </RouterLink>
+
+        <!-- Button Action (Click Handler) -->
+        <button
+          v-else-if="!action.isPlaceholder && action.action"
+          type="button"
+          :disabled="action.isDisabled?.()"
+          @click="action.action"
+          class="disabled:opacity-50 disabled:cursor-not-allowed"
+          :class="getActionClasses(action)"
+          :data-action-id="action.id"
+        >
+          <component :is="action.icon" :class="getIconClasses(action)" />
+          <span :class="getLabelClasses(action)">{{ resolveLabel(action) }}</span>
+        </button>
 
         <button
           v-else
@@ -167,7 +237,7 @@ const getLabelClasses = (action: QuickAction) => {
         >
           <component :is="action.icon" :class="getIconClasses(action)" />
           <div class="flex items-center justify-between w-full gap-2">
-            <span :class="getLabelClasses(action)">{{ action.label }}</span>
+            <span :class="getLabelClasses(action)">{{ resolveLabel(action) }}</span>
             <span class="text-xs font-semibold text-gray-400">Coming soon</span>
           </div>
         </button>

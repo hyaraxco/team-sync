@@ -1,19 +1,25 @@
 <template>
   <div
     v-if="visible"
-    class="rounded-[8px] p-4 mb-6 flex items-center gap-3"
-    :class="bgClass"
-    :style="{ border: `1px solid ${borderColor}` }"
+    class="rounded-xl p-4 mb-6 flex items-start gap-3 shadow-sm border transition-all duration-300"
+    :class="[
+      type === 'danger' 
+        ? 'bg-red-50/50 border-red-200 text-red-700' 
+        : 'bg-green-50/50 border-green-200 text-green-700'
+    ]"
+    role="alert"
+    aria-live="polite"
   >
     <svg
       width="20"
       height="20"
       viewBox="0 0 24 24"
       fill="none"
-      :stroke="iconColor"
+      :stroke="type === 'danger' ? '#DC2626' : '#16A34A'"
       stroke-width="2"
       stroke-linecap="round"
       stroke-linejoin="round"
+      class="mt-0.5 shrink-0"
     >
       <template v-if="type === 'danger'">
         <circle cx="12" cy="12" r="10" />
@@ -25,43 +31,27 @@
         <polyline points="9 12 11 14 15 10" />
       </template>
     </svg>
-    <div class="flex-1">
-      <h4
-        :style="{
-          color: textColor,
-          fontFamily: 'Plus Jakarta Sans',
-          fontSize: '14px',
-          fontWeight: 600,
-          margin: 0,
-        }"
-      >
+    <div class="flex-1 space-y-1">
+      <h4 class="text-sm font-semibold tracking-tight m-0">
         {{ title }}
       </h4>
-      <p
-        :style="{
-          color: textColor,
-          fontFamily: 'Plus Jakarta Sans',
-          fontSize: '14px',
-          fontWeight: 400,
-          margin: 0,
-        }"
-      >
+      <p class="text-sm opacity-90 leading-relaxed m-0">
         {{ message }}
       </p>
     </div>
     <button
       @click="visible = false"
-      class="ml-2 p-1 rounded hover:bg-black/10 transition"
+      class="ml-2 p-1.5 rounded-lg transition-colors hover:bg-black/5 focus:outline-none focus:ring-2"
+      :class="type === 'danger' ? 'focus:ring-red-500/20' : 'focus:ring-green-500/20'"
       aria-label="Close"
       type="button"
-      :style="{ color: iconColor }"
     >
       <svg
         width="16"
         height="16"
         viewBox="0 0 20 20"
         fill="none"
-        :stroke="iconColor"
+        :stroke="type === 'danger' ? '#DC2626' : '#16A34A'"
         stroke-width="2"
         stroke-linecap="round"
         stroke-linejoin="round"
@@ -74,7 +64,7 @@
 </template>
 
 <script setup>
-import { computed, ref, watch } from "vue";
+import { ref, watch } from "vue";
 
 const props = defineProps({
   type: { type: String, default: "success" }, // success | danger
@@ -90,21 +80,5 @@ watch(
   (val) => {
     visible.value = val;
   }
-);
-
-const bgClass = computed(() =>
-  props.type === "danger" ? "bg-red-100" : "bg-green-100"
-);
-
-const borderColor = computed(() =>
-  props.type === "danger" ? "#f87171" : "#4ade80"
-);
-
-const iconColor = computed(() =>
-  props.type === "danger" ? "#DC2626" : "#16A34A"
-);
-
-const textColor = computed(() =>
-  props.type === "danger" ? "#DC2626" : "#16A34A"
 );
 </script>

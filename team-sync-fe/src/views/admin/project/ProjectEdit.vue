@@ -192,7 +192,7 @@ watch(
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- Project Photo -->
             <div class="md:col-span-2 mb-4">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Project Photo</label
               >
               <div class="flex items-start gap-4">
@@ -298,7 +298,7 @@ watch(
 
             <!-- Priority -->
             <div class="md:col-span-2 mb-4">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Priority *</label
               >
               <div class="grid grid-cols-3 gap-4">
@@ -508,7 +508,7 @@ watch(
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- Project Leader Selection -->
             <div class="md:col-span-2">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Select Project Leader</label
               >
               <button
@@ -699,7 +699,7 @@ watch(
 
             <!-- Initial Project Status (Full Width) -->
             <div class="md:col-span-2 mb-4">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Initial Project Status</label
               >
               <div class="grid grid-cols-2 gap-4">

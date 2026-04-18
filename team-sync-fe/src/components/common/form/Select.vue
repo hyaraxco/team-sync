@@ -1,14 +1,14 @@
 <template>
   <div>
-    <label :for="fieldId" class="block mb-2" :style="labelStyle">
+    <label :for="fieldId" class="block text-sm font-medium text-gray-700 mb-1.5" v-if="label">
       {{ label }}
     </label>
 
     <div class="relative">
       <!-- slot icon -->
       <div
-        v-if="$slots.icon"
-        class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"
+        v-if="hasIcon"
+        class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
       >
         <slot name="icon" />
       </div>
@@ -19,7 +19,8 @@
         v-model="modelValue"
         :required="required"
         :class="[
-          'w-full pl-10 pr-4 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
+          'appearance-none w-full pr-10 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
+          hasIcon ? 'pl-12' : 'pl-4',
           'hover:border-[#0C51D9] hover:border-2',
           'focus:border-[#0C51D9] focus:border-2 focus:bg-white',
           'cursor-pointer',
@@ -35,14 +36,26 @@
       </select>
     </div>
 
-    <p v-if="error" class="mt-2" :style="errorStyle">
-      {{ error }}
+    <!-- custom chevron -->
+    <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none opacity-50">
+      <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+      </svg>
+    </div>
+
+    <p v-if="error" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
+      <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+      <span class="leading-tight">{{ error }}</span>
     </p>
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, useSlots } from "vue";
+const slots = useSlots();
+const hasIcon = computed(() => !!slots.icon);
 
 const props = defineProps({
   id: { type: String, default: "" },
@@ -77,20 +90,5 @@ const borderColor = computed(() =>
   props.error ? "border-[#DC2626] border-2" : "border-[#DCDEDD]"
 );
 
-const labelStyle = {
-  color: "#4b5563",
-  fontFamily: "Plus Jakarta Sans",
-  fontSize: "14px",
-  fontWeight: 600,
-};
-const selectStyle = {
-  background: "#ffffff",
-  paddingLeft: "40px",
-};
-const errorStyle = {
-  color: "#dc2626",
-  fontFamily: "Plus Jakarta Sans",
-  fontSize: "14px",
-  fontWeight: 400,
-};
+
 </script>

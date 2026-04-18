@@ -5,22 +5,23 @@ import {
   CalendarCheck,
   CalendarDays,
   Clock,
-  Clock3,
-  Download,
   Plus,
   User,
   CalendarPlus,
   Eye,
   CalendarX,
-  ShieldCheck,
+  PenSquare,
 } from "lucide-vue-next";
+import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
+import AttendanceCorrectionsList from "@/components/employee/attendance/AttendanceCorrectionsList.vue";
+import AttendanceCorrectionModal from "@/components/employee/attendance/AttendanceCorrectionModal.vue";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useOptionStore } from "@/stores/option";
 import { storeToRefs } from "pinia";
 import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
-import ClockInOut from "@/views/employee/ClockInOut.vue";
+import { useAuthStore } from "@/stores/auth";
 
 // Utils
 import {
@@ -46,13 +47,18 @@ const {
   loading: attendanceLoading,
   attendances,
   statistics,
+  todayAttendance,
 } = storeToRefs(attendanceStore);
-const { fetchAttendances, fetchStatistics } = attendanceStore;
+const { fetchAttendances, fetchStatistics, checkIn, checkOut, fetchTodayAttendance } = attendanceStore;
 
 const leaveRequestStore = useLeaveRequestStore();
-const { loading: leaveLoading, myLeaveRequests } =
+const { loading: leaveLoading, myLeaveRequests, myLeaveBalances } =
   storeToRefs(leaveRequestStore);
-const { fetchMyLeaveRequests, createLeaveRequest } = leaveRequestStore;
+const { fetchMyLeaveRequests, fetchMyLeaveBalances, createLeaveRequest } = leaveRequestStore;
+
+const attendanceCorrectionStore = useAttendanceCorrectionStore();
+const { loading: correctionLoading, myCorrections } = storeToRefs(attendanceCorrectionStore);
+const { fetchMyCorrections, requestCorrection } = attendanceCorrectionStore;
 
 const optionStore = useOptionStore();
 const { leaveTypes } = storeToRefs(optionStore);
@@ -62,6 +68,8 @@ const { fetchLeaveTypes } = optionStore;
 const showLeaveRequestModal = ref(false);
 const showLeaveDetailsModal = ref(false);
 const showSuccessModal = ref(false);
+const showCorrectionModal = ref(false);
+const selectedAttendanceForCorrection = ref(null);
 const selectedLeaveRequest = ref(null);
 const submittedLeaveData = ref(null);
 const activeSection = ref("overview");
@@ -92,8 +100,14 @@ const pendingRequestsCount = computed(() => {
   return myLeaveRequests.value.filter((r) => r.status === "pending").length;
 });
 
+const authStore = useAuthStore();
+const workLocation = computed(
+  () => authStore.user?.employee_profile?.job_information?.work_location || 'office'
+);
+const isRemote = computed(() => workLocation.value === 'remote');
+
 const canUseClockActions = computed(
-  () => can("attendance-check-in") || can("attendance-check-out"),
+  () => !isRemote.value && (can("attendance-check-in") || can("attendance-check-out")),
 );
 
 const canViewMyAttendanceData = computed(() =>
@@ -103,6 +117,7 @@ const canViewMyAttendanceData = computed(() =>
 const canViewMyLeaveRequests = computed(() => can("leave-request-my-requests"));
 
 const canCreateLeaveRequest = computed(() => can("leave-request-create"));
+const canCreateCorrection = computed(() => can("attendance-correction-create"));
 
 const sections = computed(() =>
   [
@@ -113,16 +128,10 @@ const sections = computed(() =>
       isVisible: true,
     },
     {
-      id: "clock",
-      label: "Clock In/Out",
-      icon: Clock,
-      isVisible: canUseClockActions.value,
-    },
-    {
-      id: "leave",
-      label: "Leave Requests",
-      icon: ShieldCheck,
-      isVisible: canViewMyLeaveRequests.value || canCreateLeaveRequest.value,
+      id: "corrections",
+      label: "Corrections",
+      icon: PenSquare,
+      isVisible: canCreateCorrection.value,
     },
   ].filter((section) => section.isVisible),
 );
@@ -231,6 +240,57 @@ const updateEndDateMin = () => {
   }
 };
 
+const openCorrectionModal = (record) => {
+    selectedAttendanceForCorrection.value = record;
+    showCorrectionModal.value = true;
+};
+
+const submitCorrection = async (payload) => {
+    try {
+        await requestCorrection(payload);
+        showCorrectionModal.value = false;
+        toast.success("Success", "Correction request submitted.");
+    } catch (error) {
+        toast.error("Error", "Failed to submit correction request.");
+    }
+};
+
+const isCheckedIn = computed(() => {
+  return todayAttendance.value?.check_in && !todayAttendance.value?.check_out;
+});
+
+const isClockOutDisabled = computed(() => {
+  if (!isCheckedIn.value || !todayAttendance.value?.check_in) return true;
+  if (attendanceLoading.value) return true;
+  const checkInDate = new Date(todayAttendance.value.check_in);
+  const diff = Date.now() - checkInDate.getTime();
+  return diff < 8 * 60 * 60 * 1000;
+});
+
+const handleCheckIn = async () => {
+  if (attendanceLoading.value) return;
+  try {
+    await checkIn({ check_in_lat: null, check_in_long: null });
+    toast.success("Clocked In", "You have successfully clocked in!");
+    await fetchTodayAttendance();
+    await fetchAttendances();
+  } catch (error) {
+    toast.error("Check-in Failed", error?.response?.data?.message || "Failed to check in. Please try again.");
+  }
+};
+
+const handleCheckOut = async () => {
+  if (attendanceLoading.value) return;
+  try {
+    await checkOut({ check_out_lat: null, check_out_long: null });
+    toast.success("Clocked Out", "You have successfully clocked out!");
+    await fetchTodayAttendance();
+    await fetchAttendances();
+  } catch (error) {
+    toast.error("Check-out Failed", error?.response?.data?.message || "Failed to check out. Please try again.");
+  }
+};
+
 const clearLeaveRequestActionQuery = async () => {
   const { action, ...query } = route.query;
 
@@ -243,12 +303,6 @@ const clearLeaveRequestActionQuery = async () => {
 };
 
 const handleRouteActionQuery = async () => {
-  if (route.query.action === "clock" && canUseClockActions.value) {
-    activeSection.value = "clock";
-    await clearLeaveRequestActionQuery();
-    return;
-  }
-
   if (
     !["request-leave", "leave"].includes(route.query.action) ||
     !canCreateLeaveRequest.value
@@ -273,8 +327,16 @@ onMounted(async () => {
     requests.push(fetchAttendances(), fetchStatistics());
   }
 
+  if (canUseClockActions.value) {
+    requests.push(fetchTodayAttendance());
+  }
+
   if (canViewMyLeaveRequests.value) {
-    requests.push(fetchMyLeaveRequests());
+    requests.push(fetchMyLeaveRequests(), fetchMyLeaveBalances());
+  }
+
+  if (canCreateCorrection.value) {
+    requests.push(fetchMyCorrections());
   }
 
   await Promise.all(requests);
@@ -316,13 +378,32 @@ onMounted(async () => {
 
       <!-- Overlapped Action Buttons -->
       <div class="absolute bottom-4 right-6 flex items-center gap-[10px] z-10">
-        <button
-          class="border border-[#DCDEDD] bg-white rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg"
+        <!-- Auto-present badge for remote employees -->
+        <div
+          v-if="isRemote"
+          class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-[8px] border border-green-300 px-4 py-3 flex items-center gap-2 shadow-lg"
         >
-          <Download class="w-4 h-4 text-gray-600" />
-          <span class="text-brand-dark text-sm font-semibold"
-            >Export Report</span
-          >
+          <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+          <span class="text-green-700 text-sm font-semibold">Auto-present · Remote</span>
+        </div>
+
+        <button
+          v-if="canUseClockActions && !isCheckedIn"
+          @click="handleCheckIn"
+          :disabled="attendanceLoading"
+          class="bg-white text-brand-dark rounded-[8px] border border-[#DCDEDD] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Clock class="w-4 h-4 text-[#0C51D9]" />
+          <span class="text-brand-dark text-sm font-semibold">Clock In</span>
+        </button>
+        <button
+          v-else-if="canUseClockActions && isCheckedIn"
+          @click="handleCheckOut"
+          :disabled="isClockOutDisabled"
+          class="bg-white text-brand-dark rounded-[8px] border border-[#EE2A3B] hover:border-[#EE2A3B] hover:border-2 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Clock class="w-4 h-4 text-[#EE2A3B]" />
+          <span class="text-brand-dark text-sm font-semibold">Clock Out</span>
         </button>
 
         <button
@@ -343,7 +424,7 @@ onMounted(async () => {
     />
 
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
        
         <button
           v-for="section in sections"
@@ -589,8 +670,8 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-else-if="activeSection === 'clock'">
-      <ClockInOut />
+    <div v-else-if="activeSection === 'corrections'">
+      <AttendanceCorrectionsList :corrections="myCorrections" />
     </div>
 
     <div v-else class="space-y-6">
@@ -773,7 +854,7 @@ onMounted(async () => {
                   <!-- Leave Type -->
                   <div class="md:col-span-2">
                     <label
-                      class="block text-brand-dark text-base font-semibold mb-1"
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
                       >Leave Type *</label
                     >
                     <select
@@ -795,7 +876,7 @@ onMounted(async () => {
                   <!-- Start Date -->
                   <div>
                     <label
-                      class="block text-brand-dark text-base font-semibold mb-1"
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
                       >Start Date *</label
                     >
                     <input
@@ -810,7 +891,7 @@ onMounted(async () => {
                   <!-- End Date -->
                   <div>
                     <label
-                      class="block text-brand-dark text-base font-semibold mb-1"
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
                       >End Date *</label
                     >
                     <input
@@ -825,7 +906,7 @@ onMounted(async () => {
                   <!-- Total Days -->
                   <div class="md:col-span-2">
                     <label
-                      class="block text-brand-dark text-base font-semibold mb-1"
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
                       >Total Days</label
                     >
                     <div
@@ -858,7 +939,7 @@ onMounted(async () => {
                   <!-- Reason -->
                   <div>
                     <label
-                      class="block text-brand-dark text-base font-semibold mb-1"
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
                       >Reason for Leave *</label
                     >
                     <textarea
@@ -873,7 +954,7 @@ onMounted(async () => {
                   <!-- Emergency Contact -->
                   <div>
                     <label
-                      class="block text-brand-dark text-base font-semibold mb-1"
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
                       >Emergency Contact (Optional)</label
                     >
                     <input

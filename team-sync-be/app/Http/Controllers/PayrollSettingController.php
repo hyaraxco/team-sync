@@ -71,6 +71,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
             'rounding_mode' => 'required|in:none,nearest,floor,ceil',
             'rounding_unit' => 'nullable|integer|min:1|max:1000000',
             'note_template' => 'nullable|string|max:2000',
+            'payroll_bank_name' => 'nullable|string|max:100',
+            'payroll_bank_code' => 'nullable|string|max:10',
         ]);
 
         try {
@@ -87,6 +89,12 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 'note_template' => filled($validated['note_template'] ?? null)
                     ? trim($validated['note_template'])
                     : PayrollSetting::DEFAULT_NOTE_TEMPLATE,
+                'payroll_bank_name' => filled($validated['payroll_bank_name'] ?? null)
+                    ? trim($validated['payroll_bank_name'])
+                    : null,
+                'payroll_bank_code' => filled($validated['payroll_bank_code'] ?? null)
+                    ? strtoupper(trim($validated['payroll_bank_code']))
+                    : null,
                 'updated_by' => $request->user()->id,
             ]);
 

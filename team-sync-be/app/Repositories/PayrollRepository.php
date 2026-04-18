@@ -21,6 +21,7 @@ use App\Models\PayrollSettingVersion;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
+use App\Services\Payroll\TaxCalculationService;
 use App\Services\PayrollActivityLogger;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -51,18 +52,21 @@ class PayrollRepository implements PayrollRepositoryInterface
     protected PayrollActivityLogger $activityLogger;
     protected AttendanceClassifier $attendanceClassifier;
     protected AttendancePeriodService $attendancePeriodService;
+    protected TaxCalculationService $taxCalculationService;
 
     public function __construct(
         EmailService $emailService,
         PayrollActivityLogger $activityLogger,
         AttendanceClassifier $attendanceClassifier,
-        AttendancePeriodService $attendancePeriodService
+        AttendancePeriodService $attendancePeriodService,
+        TaxCalculationService $taxCalculationService
     )
     {
         $this->emailService = $emailService;
         $this->activityLogger = $activityLogger;
         $this->attendanceClassifier = $attendanceClassifier;
         $this->attendancePeriodService = $attendancePeriodService;
+        $this->taxCalculationService = $taxCalculationService;
     }
 
     public function getAll(
@@ -226,6 +230,32 @@ class PayrollRepository implements PayrollRepositoryInterface
                 $absentDays = (int) ($fairnessSummary['absent_days'] ?? 0);
                 $warningFlags = $fairnessSummary['warning_flags'] ?? [];
 
+                // ── Tax & BPJS Calculation ────────────────────────────
+                $ptkpStatus = $employee->ptkp_status ?? null;
+                $hasNpwp = ! empty($employee->npwp);
+                $grossForTax = (float) $originalSalary;
+
+                $taxResult = $this->taxCalculationService->calculateMonthlyPph21(
+                    $grossForTax,
+                    $ptkpStatus,
+                    $hasNpwp
+                );
+
+                $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax);
+
+                $pph21Amount = $taxResult['pph21_monthly'];
+
+                // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
+                $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
+                    + ($bpjsResult['breakdown']['jp_employee'] ?? 0);
+                $bpjsTkEmployer = ($bpjsResult['breakdown']['jht_employer'] ?? 0)
+                    + ($bpjsResult['breakdown']['jkk_employer'] ?? 0)
+                    + ($bpjsResult['breakdown']['jkm_employer'] ?? 0)
+                    + ($bpjsResult['breakdown']['jp_employer'] ?? 0);
+
+                $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
+                $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
+
                 $payrollDetails[] = [
                     'payroll_id' => $payroll->id,
                     'employee_id' => $employee->id,
@@ -244,6 +274,12 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'absent_days' => $absentDays,
                     'deduction_days' => round($deductionDays, 2),
                     'deduction_amount' => round($deduction, 2),
+                    'pph21_amount' => round($pph21Amount, 2),
+                    'bpjs_tk_employee' => round($bpjsTkEmployee, 2),
+                    'bpjs_tk_employer' => round($bpjsTkEmployer, 2),
+                    'bpjs_kes_employee' => round($bpjsKesEmployee, 2),
+                    'bpjs_kes_employer' => round($bpjsKesEmployer, 2),
+                    'tax_calculation_meta' => json_encode($taxResult, JSON_THROW_ON_ERROR),
                     'policy_mismatch_days' => (int) ($fairnessSummary['policy_mismatch_days'] ?? 0),
                     'warning_flags' => empty($warningFlags) ? null : json_encode(array_values($warningFlags), JSON_THROW_ON_ERROR),
                     'notes' => $this->buildPayrollNote($settingsVersion, [
@@ -1270,7 +1306,20 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->values()
             ->all();
 
-        $attendanceDateLookupByEmployee = Attendance::query()
+        return [
+            'attendance_date_lookup_by_employee' => $this->getAttendanceDateLookup($employeeIds, $startDate, $endDate),
+            'pending_lookup' => $this->getPendingLeaveLookup($employeeIds, $startDate, $endDate),
+            'sick_proof_lookup' => $this->getSickProofLookup($employeeIds, $startDate, $endDate),
+            'mismatch_lookup' => $this->getMismatchLookup($employeeIds, $startDate, $endDate),
+            'approved_leaves_by_employee' => $this->getApprovedLeavesLookup($employeeIds, $startDate, $endDate),
+            'entitlements_by_employment_type' => $this->getEntitlementsLookup($employees),
+            'holiday_calendars' => $this->getHolidayCalendarsLookup($startDate, $endDate),
+        ];
+    }
+
+    private function getAttendanceDateLookup(array $employeeIds, Carbon $startDate, Carbon $endDate): SupportCollection
+    {
+        return Attendance::query()
             ->select(['employee_id', 'date'])
             ->whereIn('employee_id', $employeeIds)
             ->whereDate('date', '>=', $startDate->toDateString())
@@ -1286,7 +1335,10 @@ class PayrollRepository implements PayrollRepositoryInterface
 
                 return $lookup;
             });
+    }
 
+    private function getPendingLeaveLookup(array $employeeIds, Carbon $startDate, Carbon $endDate): array
+    {
         $pendingLeaveApproval = LeaveRequest::query()
             ->whereIn('employee_id', $employeeIds)
             ->where('status', 'pending')
@@ -1298,6 +1350,11 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->values()
             ->all();
 
+        return array_fill_keys($pendingLeaveApproval, true);
+    }
+
+    private function getSickProofLookup(array $employeeIds, Carbon $startDate, Carbon $endDate): array
+    {
         $sickProofUnresolved = LeaveRequest::query()
             ->whereIn('employee_id', $employeeIds)
             ->where('status', 'approved')
@@ -1319,6 +1376,11 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->values()
             ->all();
 
+        return array_fill_keys($sickProofUnresolved, true);
+    }
+
+    private function getMismatchLookup(array $employeeIds, Carbon $startDate, Carbon $endDate): array
+    {
         $unresolvedPolicyMismatch = AttendancePolicyMismatch::query()
             ->whereIn('employee_id', $employeeIds)
             ->whereDate('mismatch_date', '>=', $startDate->toDateString())
@@ -1330,40 +1392,41 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->values()
             ->all();
 
-        $approvedLeavesByEmployee = LeaveRequest::query()
+        return array_fill_keys($unresolvedPolicyMismatch, true);
+    }
+
+    private function getApprovedLeavesLookup(array $employeeIds, Carbon $startDate, Carbon $endDate): SupportCollection
+    {
+        return LeaveRequest::query()
             ->whereIn('employee_id', $employeeIds)
             ->where('status', 'approved')
             ->whereDate('start_date', '<=', $endDate->toDateString())
             ->whereDate('end_date', '>=', $startDate->toDateString())
             ->get()
             ->groupBy('employee_id');
+    }
 
+    private function getEntitlementsLookup(SupportCollection $employees): SupportCollection
+    {
         $employmentTypes = $employees
             ->map(fn (EmployeeProfile $employee) => $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
             ->unique()
             ->values()
             ->all();
 
-        $entitlementsByEmploymentType = LeaveEntitlement::query()
+        return LeaveEntitlement::query()
             ->whereIn('employment_type', $employmentTypes)
             ->get()
             ->groupBy('employment_type')
             ->map(fn (SupportCollection $rows) => $rows->keyBy('leave_type'));
+    }
 
-        $holidayCalendars = HolidayCalendar::query()
+    private function getHolidayCalendarsLookup(Carbon $startDate, Carbon $endDate): SupportCollection
+    {
+        return HolidayCalendar::query()
             ->whereDate('date', '>=', $startDate->toDateString())
             ->whereDate('date', '<=', $endDate->toDateString())
             ->get();
-
-        return [
-            'attendance_date_lookup_by_employee' => $attendanceDateLookupByEmployee,
-            'pending_lookup' => array_fill_keys($pendingLeaveApproval, true),
-            'sick_proof_lookup' => array_fill_keys($sickProofUnresolved, true),
-            'mismatch_lookup' => array_fill_keys($unresolvedPolicyMismatch, true),
-            'approved_leaves_by_employee' => $approvedLeavesByEmployee,
-            'entitlements_by_employment_type' => $entitlementsByEmploymentType,
-            'holiday_calendars' => $holidayCalendars,
-        ];
     }
 
     /**

@@ -24,6 +24,8 @@ class PayrollSettingResource extends JsonResource
             'rounding_mode' => $this->rounding_mode,
             'rounding_unit' => $this->rounding_unit,
             'note_template' => $this->note_template,
+            'payroll_bank_name' => $this->payroll_bank_name,
+            'payroll_bank_code' => $this->payroll_bank_code,
             'active_version_id' => $this->latestVersion?->id,
             'active_version' => $this->whenLoaded(
                 'latestVersion',
