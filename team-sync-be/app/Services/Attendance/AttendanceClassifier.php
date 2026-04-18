@@ -237,6 +237,31 @@ class AttendanceClassifier
             ];
         }
 
+        // Auto-present: remote employees don't need to clock in
+        if ($context['work_location'] === 'remote') {
+            return [
+                'status' => 'present',
+                'source' => 'auto_present',
+                'is_paid_leave' => false,
+                'policy_mismatch_flag' => false,
+            ];
+        }
+
+        // Auto-present: hybrid employees on WFH days
+        if ($context['work_location'] === 'hybrid') {
+            $resolved = $this->hybridScheduleResolver->resolve($context['employee']->id, $date);
+            $plannedMode = $resolved['planned_mode'] ?? null;
+
+            if ($plannedMode === 'wfh') {
+                return [
+                    'status' => 'present',
+                    'source' => 'auto_present',
+                    'is_paid_leave' => false,
+                    'policy_mismatch_flag' => false,
+                ];
+            }
+        }
+
         return [
             'status' => 'absent',
             'source' => 'absent',

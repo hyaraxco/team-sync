@@ -41,7 +41,7 @@ class AuthRepository implements AuthRepositoryInterface
 
         $user = Auth::user()->load(['roles', 'permissions']);
 
-        $user->load('employeeProfile');
+        $user->load('employeeProfile.jobInformation');
 
         return $user;
     }

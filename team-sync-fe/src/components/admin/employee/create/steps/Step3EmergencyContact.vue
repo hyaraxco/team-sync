@@ -3,13 +3,9 @@ import { computed } from "vue";
 import {
   User,
   Phone,
-  MapPin,
-  FileText,
-  ChevronRight,
-  Globe,
   Mail,
 } from "lucide-vue-next";
-import { Input, TextArea, Select } from "@/components/common/form";
+import { Input } from "@/components/common/form";
 import RightSidebarStep3 from "@/components/admin/employee/create/RightSidebarStep3.vue";
 
 interface Props {
@@ -18,8 +14,6 @@ interface Props {
     emergency_contact_relationship: string;
     emergency_contact_phone: string;
     emergency_contact_email: string;
-    additional_notes: string;
-    preferred_language: string;
   };
   errors?: any;
 }
@@ -123,66 +117,6 @@ const form = computed({
                 <Mail class="w-5 h-5 text-gray-400" />
               </template>
             </Input>
-          </div>
-        </div>
-      </div>
-
-      <!-- Additional Information Section -->
-      <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
-        <div class="flex items-center gap-3 mb-6">
-          <div
-            class="w-12 h-12 bg-orange-50 rounded-[12px] flex items-center justify-center"
-          >
-            <FileText class="w-6 h-6 text-orange-600" />
-          </div>
-          <div>
-            <h3 class="text-brand-dark text-xl font-bold">
-              Additional Information
-            </h3>
-            <p class="text-brand-light text-sm font-normal">
-              Optional details and preferences
-            </p>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
-          <!-- Preferred Language -->
-          <div class="mb-4">
-            <Select
-              id="preferred_language"
-              name="preferred_language"
-              v-model="form.preferred_language"
-              label="Preferred Language"
-              placeholder="Select language"
-              :error="props.errors?.preferred_language?.join(', ')"
-              :options="[
-                { value: 'en', label: 'English' },
-                { value: 'id', label: 'Indonesian' },
-                { value: 'es', label: 'Spanish' },
-                { value: 'fr', label: 'French' },
-              ]"
-            >
-              <template #icon>
-                <Globe class="w-5 h-5 text-gray-400" />
-              </template>
-            </Select>
-          </div>
-
-          <!-- Additional Notes -->
-          <div class="lg:col-span-2 mb-4">
-            <TextArea
-              id="additional_notes"
-              name="additional_notes"
-              v-model="form.additional_notes"
-              label="Additional Notes"
-              placeholder="Any additional information about the employee..."
-              :error="props.errors?.additional_notes?.join(', ')"
-              rows="4"
-            >
-              <template #icon>
-                <FileText class="w-5 h-5 text-gray-400" />
-              </template>
-            </TextArea>
           </div>
         </div>
       </div>

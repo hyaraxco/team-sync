@@ -184,7 +184,7 @@ class AnalyticsExportController extends Controller implements HasMiddleware
             'employment_types' => ['Type', 'Count', 'Employment Types', 'type'],
             'work_locations' => ['Location', 'Count', 'Work Locations', 'location'],
             'department_headcount' => ['Department', 'Count', 'Department Headcount', 'department'],
-            'skill_levels' => ['Level', 'Count', 'Skill Levels', 'level'],
+            'skill_levels' => ['PTKP Status', 'Count', 'PTKP Status Distribution', 'level'],
             'age_distribution' => ['Age Range', 'Count', 'Age Distribution', 'range'],
             'tenure_distribution' => ['Tenure', 'Count', 'Tenure Distribution', 'range'],
         ];

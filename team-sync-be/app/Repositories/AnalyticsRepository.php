@@ -422,12 +422,14 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->map(fn ($r) => ['department' => $r->department, 'count' => (int) $r->count])
                 ->values()->all();
 
-            // ── Skill Level Distribution ────────────────────────────────────
-            $skillLevels = DB::table('job_information')
-                ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereNotNull('skill_level')
-                ->selectRaw("skill_level, COUNT(*) as count")
-                ->groupBy('skill_level')
+            // ── PTKP Status Distribution (replaces dropped skill_level column) ─
+            // skill_level was removed from job_information in the April 2026 refactor.
+            // ptkp_status is the relevant tax-identity classification stored in employee_profiles.
+            $skillLevels = DB::table('employee_profiles')
+                ->whereIn('id', $filteredEmployeeIds)
+                ->whereNotNull('ptkp_status')
+                ->selectRaw("ptkp_status as skill_level, COUNT(*) as count")
+                ->groupBy('ptkp_status')
                 ->orderByDesc('count')
                 ->get()
                 ->map(fn ($r) => ['level' => $r->skill_level, 'count' => (int) $r->count])

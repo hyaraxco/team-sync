@@ -172,9 +172,21 @@ const formatText = (text: string) => {
           </p>
         </div>
         <div>
-          <p class="text-brand-light text-xs font-semibold mb-1">Hobby</p>
+          <p class="text-brand-light text-xs font-semibold mb-1">Religion</p>
           <p class="text-brand-dark text-base font-semibold">
-            {{ step1Data.hobby || "-" }}
+            {{ formatText(step1Data.religion) || "-" }}
+          </p>
+        </div>
+        <div>
+          <p class="text-brand-light text-xs font-semibold mb-1">Marital Status</p>
+          <p class="text-brand-dark text-base font-semibold">
+            {{ formatText(step1Data.marital_status) || "-" }}
+          </p>
+        </div>
+        <div>
+          <p class="text-brand-light text-xs font-semibold mb-1">Blood Type</p>
+          <p class="text-brand-dark text-base font-semibold">
+            {{ step1Data.blood_type || "-" }}
           </p>
         </div>
         <div class="lg:col-span-2">
@@ -234,18 +246,6 @@ const formatText = (text: string) => {
           </p>
         </div>
         <div>
-          <p class="text-brand-light text-xs font-semibold mb-1">
-            Years of Experience
-          </p>
-          <p class="text-brand-dark text-base font-semibold">
-            {{
-              step2Data.years_experience
-                ? `${step2Data.years_experience} years`
-                : "-"
-            }}
-          </p>
-        </div>
-        <div>
           <p class="text-brand-light text-xs font-semibold mb-1">Status</p>
           <p class="text-brand-dark text-base font-semibold">
             {{ formatText(step2Data.status) }}
@@ -282,9 +282,27 @@ const formatText = (text: string) => {
           </p>
         </div>
         <div>
-          <p class="text-brand-light text-xs font-semibold mb-1">Skill Level</p>
+          <p class="text-brand-light text-xs font-semibold mb-1">NPWP</p>
           <p class="text-brand-dark text-base font-semibold">
-            {{ formatText(step2Data.skill_level) }}
+            {{ step2Data.npwp || "-" }}
+          </p>
+        </div>
+        <div>
+          <p class="text-brand-light text-xs font-semibold mb-1">PTKP Status</p>
+          <p class="text-brand-dark text-base font-semibold">
+            {{ step2Data.ptkp_status || "-" }}
+          </p>
+        </div>
+        <div>
+          <p class="text-brand-light text-xs font-semibold mb-1">BPJS Ketenagakerjaan</p>
+          <p class="text-brand-dark text-base font-semibold">
+            {{ step2Data.bpjs_ketenagakerjaan || "-" }}
+          </p>
+        </div>
+        <div>
+          <p class="text-brand-light text-xs font-semibold mb-1">BPJS Kesehatan</p>
+          <p class="text-brand-dark text-base font-semibold">
+            {{ step2Data.bpjs_kesehatan || "-" }}
           </p>
         </div>
       </div>
@@ -327,20 +345,6 @@ const formatText = (text: string) => {
           </p>
           <p class="text-brand-dark text-base font-semibold">
             {{ step2Data.account_holder_name || "-" }}
-          </p>
-        </div>
-        <div>
-          <p class="text-brand-light text-xs font-semibold mb-1">Bank Branch</p>
-          <p class="text-brand-dark text-base font-semibold">
-            {{ step2Data.bank_branch || "-" }}
-          </p>
-        </div>
-        <div>
-          <p class="text-brand-light text-xs font-semibold mb-1">
-            Account Type
-          </p>
-          <p class="text-brand-dark text-base font-semibold">
-            {{ formatText(step2Data.account_type) }}
           </p>
         </div>
       </div>
@@ -391,26 +395,6 @@ const formatText = (text: string) => {
           </p>
           <p class="text-brand-dark text-base font-semibold">
             {{ step3Data.emergency_contact_email || "-" }}
-          </p>
-        </div>
-        <div>
-          <p class="text-brand-light text-xs font-semibold mb-1">
-            Preferred Language
-          </p>
-          <p class="text-brand-dark text-base font-semibold">
-            {{
-              step3Data.preferred_language
-                ? formatText(step3Data.preferred_language)
-                : "-"
-            }}
-          </p>
-        </div>
-        <div class="lg:col-span-2" v-if="step3Data.additional_notes">
-          <p class="text-brand-light text-xs font-semibold mb-1">
-            Additional Notes
-          </p>
-          <p class="text-brand-dark text-base font-semibold">
-            {{ step3Data.additional_notes }}
           </p>
         </div>
       </div>

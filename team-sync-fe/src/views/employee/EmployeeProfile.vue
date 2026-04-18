@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
+import { RouterLink } from "vue-router";
 import { useEmployeeStore } from "@/stores/employee";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
+import { can } from "@/helpers/permissionHelper";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
 import {
@@ -152,7 +154,8 @@ onMounted(() => {
       v-if="typeof error === 'string' && !hasDetailedProfile"
       class="bg-amber-50 border border-amber-200 text-amber-900 rounded-[16px] px-5 py-4 mb-6"
     >
-      {{ error }}. Showing basic account information while the full employee profile is unavailable.
+      {{ error }}. Showing basic account information while the full employee
+      profile is unavailable.
     </div>
 
     <!-- Employee Header -->
@@ -204,111 +207,37 @@ onMounted(() => {
               <Calendar class="w-4 h-4" />
               <span
                 >Joined
-                {{ formatDate(resolvedProfile?.job_information?.start_date) }}</span
+                {{
+                  formatDate(resolvedProfile?.job_information?.start_date)
+                }}</span
               >
             </div>
           </div>
         </div>
         <div class="flex items-center">
-          <button
+          <RouterLink
+            v-if="can('employee-edit') && resolvedProfile?.id"
+            :to="{
+              name: 'admin.employees.edit',
+              params: { id: resolvedProfile.id },
+            }"
             class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
           >
             <Edit class="w-4 h-4 text-white" />
             <span class="text-brand-white text-sm font-semibold"
-              >Request Edit to Manager</span
+              >Edit Profile</span
             >
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <!-- Tasks Completed Card -->
-      <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-brand-dark text-sm font-medium">Tasks Completed</p>
-            <p
-              class="text-brand-dark text-3xl font-extrabold leading-none my-2"
-            >
-              <AnimatedValue :value="performanceStatistics?.tasks_completed || 0" />
-            </p>
-            <p class="text-success text-sm font-medium">This month</p>
-          </div>
-          <div
-            class="w-14 h-14 bg-blue-50 rounded-[16px] flex items-center justify-center"
+          </RouterLink>
+          <RouterLink
+            v-else
+            :to="{ name: 'employee.profile.edit' }"
+            class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
           >
-            <CheckCircle class="w-6 h-6 text-blue-600" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Attendance Rate Card -->
-      <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-brand-dark text-sm font-medium">Attendance Rate</p>
-            <p
-              class="text-brand-dark text-3xl font-extrabold leading-none my-2"
+            <Edit class="w-4 h-4 text-white" />
+            <span class="text-brand-white text-sm font-semibold"
+              >Edit Profile</span
             >
-              <AnimatedValue :value="performanceStatistics?.attendance_rate || 0" suffix="%" />
-            </p>
-            <p class="text-success text-sm font-medium">Above average</p>
-          </div>
-          <div
-            class="w-14 h-14 bg-green-50 rounded-[16px] flex items-center justify-center"
-          >
-            <CalendarCheck class="w-6 h-6 text-green-600" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Active Projects Card -->
-      <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-brand-dark text-sm font-medium">Active Projects</p>
-            <p
-              class="text-brand-dark text-3xl font-extrabold leading-none my-2"
-            >
-              <AnimatedValue :value="performanceStatistics?.projects_count || 0" />
-            </p>
-            <p class="text-success text-sm font-medium">Current projects</p>
-          </div>
-          <div
-            class="w-14 h-14 bg-purple-50 rounded-[16px] flex items-center justify-center"
-          >
-            <Folder class="w-6 h-6 text-purple-600" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Performance Rating Card -->
-      <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
-      >
-        <div class="flex items-center justify-between">
-          <div>
-            <p class="text-brand-dark text-sm font-medium">Performance</p>
-            <p
-              class="text-brand-dark text-3xl font-extrabold leading-none my-2"
-            >
-              <AnimatedValue :value="performanceStatistics?.performance_score || 0" suffix="%" />
-            </p>
-            <p class="text-success text-sm font-medium">Excellent rating</p>
-          </div>
-          <div
-            class="w-14 h-14 bg-orange-50 rounded-[16px] flex items-center justify-center"
-          >
-            <TrendingUp class="w-6 h-6 text-orange-600" />
-          </div>
+          </RouterLink>
         </div>
       </div>
     </div>
@@ -318,7 +247,7 @@ onMounted(() => {
       <!-- Left Column -->
       <div class="space-y-6">
         <!-- Personal Information -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
+        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
               class="w-12 h-12 bg-teal-50 rounded-[12px] flex items-center justify-center"
@@ -375,67 +304,8 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Employment Details -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
-          <div class="flex items-center gap-3 mb-4">
-            <div
-              class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center"
-            >
-              <Briefcase class="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <h3 class="text-brand-dark text-lg font-bold">
-                Employment Details
-              </h3>
-              <p class="text-brand-light text-base">
-                Work and compensation information
-              </p>
-            </div>
-          </div>
-          <div class="space-y-4">
-            <div class="flex justify-between items-center">
-              <span class="text-brand-light text-base">Job Title</span>
-              <span class="text-brand-dark text-base font-medium">{{
-                capitalize(resolvedProfile?.job_information?.job_title)
-              }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-brand-light text-base">Start Date</span>
-              <span class="text-brand-dark text-base font-medium">{{
-                formatDate(resolvedProfile?.job_information?.start_date)
-              }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-brand-light text-base">Employment Type</span>
-              <span class="text-brand-dark text-base font-medium">{{
-                capitalize(resolvedProfile?.job_information?.employment_type)
-              }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-brand-light text-base">Monthly Salary</span>
-              <span class="text-brand-dark text-base font-medium">{{
-                formatCurrency(resolvedProfile?.job_information?.monthly_salary)
-              }}</span>
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-brand-light text-base">Skill Level</span>
-              <StatusBadge
-                v-if="resolvedProfile?.job_information?.skill_level"
-                type="skill"
-                :value="resolvedProfile.job_information.skill_level"
-              />
-            </div>
-            <div class="flex justify-between items-center">
-              <span class="text-brand-light text-base">Work Location</span>
-              <span class="text-brand-dark text-base font-medium">{{
-                capitalize(resolvedProfile?.job_information?.work_location)
-              }}</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Location Details -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
+        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
               class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center"
@@ -493,7 +363,7 @@ onMounted(() => {
         </div>
 
         <!-- Emergency Contact -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
+        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
               class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center"
@@ -549,9 +419,68 @@ onMounted(() => {
 
       <!-- Right Column -->
       <div class="space-y-6">
+        <!-- Employment Details -->
+        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
+          <div class="flex items-center gap-3 mb-4">
+            <div
+              class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center"
+            >
+              <Briefcase class="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h3 class="text-brand-dark text-lg font-bold">
+                Employment Details
+              </h3>
+              <p class="text-brand-light text-base">
+                Work and compensation information
+              </p>
+            </div>
+          </div>
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <span class="text-brand-light text-base">Job Title</span>
+              <span class="text-brand-dark text-base font-medium">{{
+                capitalize(resolvedProfile?.job_information?.job_title)
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-brand-light text-base">Start Date</span>
+              <span class="text-brand-dark text-base font-medium">{{
+                formatDate(resolvedProfile?.job_information?.start_date)
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-brand-light text-base">Employment Type</span>
+              <span class="text-brand-dark text-base font-medium">{{
+                capitalize(resolvedProfile?.job_information?.employment_type)
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-brand-light text-base">Monthly Salary</span>
+              <span class="text-brand-dark text-base font-medium">{{
+                formatCurrency(resolvedProfile?.job_information?.monthly_salary)
+              }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-brand-light text-base">Skill Level</span>
+              <StatusBadge
+                v-if="resolvedProfile?.job_information?.skill_level"
+                type="skill"
+                :value="resolvedProfile.job_information.skill_level"
+              />
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-brand-light text-base">Work Location</span>
+              <span class="text-brand-dark text-base font-medium">{{
+                capitalize(resolvedProfile?.job_information?.work_location)
+              }}</span>
+            </div>
+          </div>
+        </div>
+
         <!-- Team Information -->
         <div
-          class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 h-fit"
+          class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 h-fit"
           v-if="resolvedProfile?.team"
         >
           <div class="flex items-center justify-between mb-4">
@@ -686,7 +615,10 @@ onMounted(() => {
     </div>
   </div>
 
-  <div v-else class="bg-white border border-[#DCDEDD] rounded-[20px] p-8 text-center text-gray-600">
+  <div
+    v-else
+    class="bg-white border border-[#DCDEDD] rounded-[20px] p-8 text-center text-gray-600"
+  >
     Your employee profile is not available yet.
   </div>
 </template>

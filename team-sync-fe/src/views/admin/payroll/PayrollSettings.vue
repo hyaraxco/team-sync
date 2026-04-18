@@ -11,6 +11,7 @@ import {
   FileText,
   History,
   ArrowLeft,
+  Landmark,
 } from "lucide-vue-next";
 
 const router = useRouter();
@@ -28,12 +29,15 @@ const fallbackSettings = {
   rounding_unit: 1000,
   note_template:
     "Hari kerja: {working_days} | Hadir: {attended_days} | Terlambat: {late_days} | Sakit: {sick_days} | Izin: {permission_days} | Alpha: {absent_days} | Potongan: Rp {deduction}",
+  payroll_bank_name: null,
+  payroll_bank_code: null,
 };
 
 const form = reactive({ ...fallbackSettings });
 const settingsHistory = ref([]);
 const loadingHistory = ref(false);
 const selectedHistoryVersionId = ref(null);
+const activeTab = ref("schedule");
 
 const trackedVersionFields = [
   "payday_day",
@@ -262,6 +266,8 @@ const handleSubmit = async () => {
         form.rounding_mode === "none" ? 1 : Number(form.rounding_unit || 1),
       note_template:
         form.note_template?.trim() || fallbackSettings.note_template,
+      payroll_bank_name: form.payroll_bank_name?.trim() || null,
+      payroll_bank_code: form.payroll_bank_code?.trim()?.toUpperCase() || null,
     });
 
     toast.success(
@@ -330,12 +336,35 @@ onMounted(() => {
       </p>
     </div>
 
+    <!-- Tab Navigation -->
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6" data-testid="payroll-settings-tabs">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <button @click="activeTab = 'schedule'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'schedule' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-schedule">
+          <Calendar class="w-4 h-4" :class="activeTab === 'schedule' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Schedule</span>
+        </button>
+        <button @click="activeTab = 'rules'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'rules' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-rules">
+          <Calculator class="w-4 h-4" :class="activeTab === 'rules' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Calculation Rules</span>
+        </button>
+        <button @click="activeTab = 'bank_notes'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'bank_notes' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-bank-notes">
+          <Landmark class="w-4 h-4" :class="activeTab === 'bank_notes' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Bank & Note</span>
+        </button>
+        <button @click="activeTab = 'history'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'history' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-history">
+          <History class="w-4 h-4" :class="activeTab === 'history' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">History</span>
+        </button>
+      </div>
+    </div>
+
     <div
-      class="grid grid-cols-1 xl:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] items-start gap-6"
+      class="items-start gap-6 relative"
     >
-      <div class="xl:col-span-1 space-y-6 min-w-0">
+      <div class="space-y-6 min-w-0 pb-10">
         <section
-          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+          v-show="activeTab === 'schedule'"
+          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)] animate-fade-in"
         >
           <div class="flex items-center gap-3 mb-6">
             <div
@@ -384,7 +413,8 @@ onMounted(() => {
         </section>
 
         <section
-          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+          v-show="activeTab === 'rules'"
+          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)] animate-fade-in"
         >
           <div class="flex items-center gap-3 mb-6">
             <div
@@ -484,6 +514,7 @@ onMounted(() => {
           </div>
         </section>
 
+        <div v-show="activeTab === 'bank_notes'" class="space-y-6 animate-fade-in">
         <section
           class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
         >
@@ -519,15 +550,77 @@ onMounted(() => {
             `{deduction}`.
           </p>
         </section>
-      </div>
 
-      <div class="self-start xl:sticky xl:top-6">
-        <div
+        <!-- Payroll Bank Partner -->
+        <section
           class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
         >
-          <h3 class="text-brand-dark text-lg font-bold mb-4">Preview</h3>
-          <div class="space-y-3">
-            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3">
+          <div class="flex items-center gap-3 mb-6">
+            <div
+              class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center"
+            >
+              <Landmark class="w-6 h-6 text-green-600" />
+            </div>
+            <div>
+              <h3 class="text-brand-dark text-xl font-bold">
+                Payroll Bank Partner
+              </h3>
+              <p class="text-brand-light text-sm">
+                Primary bank for salary disbursement. Employees with a different bank will be flagged.
+              </p>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-brand-dark text-sm font-semibold mb-2"
+                >Bank Partner Name</label
+              >
+              <input
+                v-model="form.payroll_bank_name"
+                data-testid="payroll-settings-bank-name"
+                type="text"
+                placeholder="e.g. BCA, Bank Mandiri, BRI"
+                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+              />
+              <p class="text-brand-light text-xs mt-2">
+                Nama lengkap bank yang digunakan untuk pembayaran gaji.
+              </p>
+            </div>
+            <div>
+              <label class="block text-brand-dark text-sm font-semibold mb-2"
+                >Bank Code (Kode BI)</label
+              >
+              <input
+                v-model="form.payroll_bank_code"
+                data-testid="payroll-settings-bank-code"
+                type="text"
+                placeholder="e.g. 014 (BCA), 008 (Mandiri), 002 (BRI)"
+                maxlength="10"
+                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+              />
+              <p class="text-brand-light text-xs mt-2">
+                Kode bank berdasarkan BI RTGS / SKNBI (3 digit, opsional).
+              </p>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Preview block moved to Bank & Note -->
+        <section
+          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+        >
+          <div class="flex items-start justify-between gap-4 mb-4">
+            <div>
+              <h3 class="text-brand-dark text-lg font-bold">Preview Result</h3>
+              <p class="text-brand-light text-sm font-normal mt-1">Review your generated note format along with summary configurations.</p>
+            </div>
+            <div class="w-10 h-10 bg-blue-50 rounded-[10px] flex items-center justify-center">
+              <FileText class="w-5 h-5 text-blue-600" />
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50">
               <p class="text-brand-light text-xs font-semibold uppercase">
                 Future draft note
               </p>
@@ -538,33 +631,23 @@ onMounted(() => {
                 {{ notePreview }}
               </p>
             </div>
-            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3">
+            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50">
               <p class="text-brand-light text-xs font-semibold uppercase">
-                Summary
+                Summary config
               </p>
               <p class="text-brand-dark text-sm mt-2">
-                Payday day {{ form.payday_day }}, cut-off day
-                {{ form.attendance_cutoff_day }}, rounding
-                {{ form.rounding_mode }}.
+                Payday day <span class="font-bold">{{ form.payday_day }}</span>, cut-off day
+                <span class="font-bold">{{ form.attendance_cutoff_day }}</span>, rounding
+                <span class="font-bold capitalize">{{ form.rounding_mode }}</span>.
               </p>
             </div>
-            <button
-              type="button"
-              data-testid="payroll-settings-save"
-              :disabled="loading"
-              @click="handleSubmit"
-              class="w-full btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-70"
-            >
-              <Settings class="w-4 h-4 text-white" />
-              <span class="text-brand-white text-sm font-semibold">
-                {{ loading ? "Saving..." : "Save Payroll Settings" }}
-              </span>
-            </button>
           </div>
+        </section>
         </div>
 
         <div
-          class="mt-6 bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+          v-show="activeTab === 'history'"
+          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)] animate-fade-in"
         >
           <div class="flex items-center gap-3 mb-4">
             <div
@@ -679,6 +762,28 @@ onMounted(() => {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      <!-- Save Settings Sticky Footer / Action Bar -->
+      <div v-show="activeTab !== 'history'" class="sticky bottom-6 z-20 mt-4 animate-fade-in">
+        <div class="bg-white/80 backdrop-blur-md border border-[#DCDEDD] rounded-[20px] p-5 flex flex-col md:flex-row items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.12)] gap-4">
+          <div>
+            <h3 class="text-brand-dark text-base font-bold">Ready to save your changes?</h3>
+            <p class="text-brand-light text-sm mt-0.5">Please make sure to review your settings.</p>
+          </div>
+          <button
+            type="button"
+            data-testid="payroll-settings-save"
+            :disabled="loading"
+            @click="handleSubmit"
+            class="w-full md:w-auto min-w-[200px] btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
+          >
+            <Settings class="w-4 h-4 text-white" />
+            <span class="text-brand-white text-sm font-semibold">
+              {{ loading ? "Saving..." : "Save Configuration" }}
+            </span>
+          </button>
         </div>
       </div>
     </div>

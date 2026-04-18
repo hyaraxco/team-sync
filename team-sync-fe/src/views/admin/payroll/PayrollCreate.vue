@@ -406,7 +406,7 @@ watch(
           </div>
 
           <div class="mb-4">
-            <label class="block text-brand-dark text-base font-semibold mb-1"
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
               >Salary Month *</label
             >
             <div class="relative">

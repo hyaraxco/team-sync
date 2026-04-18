@@ -34,9 +34,11 @@ const step1Data = ref({
   identity_number: "",
   phone: "",
   date_of_birth: "",
-  hobby: "",
-  place_of_birth: "",
   gender: "",
+  religion: "",
+  marital_status: "",
+  blood_type: "",
+  place_of_birth: "",
   address: "",
   city: "",
   postal_code: "",
@@ -48,18 +50,18 @@ const step1Data = ref({
 const step2Data = ref({
   job_title: "",
   team_id: "",
-  years_experience: "",
   status: "",
   employment_type: "",
   work_location: "",
   start_date: "",
   monthly_salary: "",
-  skill_level: "",
   bank_name: "",
   account_number: "",
   account_holder_name: "",
-  bank_branch: "",
-  account_type: "",
+  npwp: "",
+  bpjs_ketenagakerjaan: "",
+  bpjs_kesehatan: "",
+  ptkp_status: "",
   role: "",
 });
 
@@ -69,8 +71,6 @@ const step3Data = ref({
   emergency_contact_relationship: "",
   emergency_contact_phone: "",
   emergency_contact_email: "",
-  additional_notes: "",
-  preferred_language: "",
 });
 
 const parseSalaryNumber = (value: any): number | null => {
@@ -133,7 +133,9 @@ const loadEmployeeData = async () => {
       step1Data.value.date_of_birth = formatDateForInput(
         employee.date_of_birth,
       );
-      step1Data.value.hobby = employee.hobby || "";
+      step1Data.value.religion = employee.religion || "";
+      step1Data.value.marital_status = employee.marital_status || "";
+      step1Data.value.blood_type = employee.blood_type || "";
       step1Data.value.place_of_birth = employee.place_of_birth || "";
       step1Data.value.gender = employee.gender || "";
       step1Data.value.address = employee.address || "";
@@ -146,9 +148,6 @@ const loadEmployeeData = async () => {
       step2Data.value.team_id = String(
         jobInformation.team?.id ?? employee.team?.id ?? "",
       );
-      step2Data.value.years_experience = String(
-        jobInformation.years_experience ?? "",
-      );
       step2Data.value.status = jobInformation.status || "";
       step2Data.value.employment_type = jobInformation.employment_type || "";
       step2Data.value.work_location = jobInformation.work_location || "";
@@ -158,13 +157,14 @@ const loadEmployeeData = async () => {
       step2Data.value.monthly_salary = String(
         jobInformation.monthly_salary ?? "",
       );
-      step2Data.value.skill_level = jobInformation.skill_level || "";
       step2Data.value.bank_name = bankInformation.bank_name || "";
       step2Data.value.account_number = bankInformation.account_number || "";
       step2Data.value.account_holder_name =
         bankInformation.account_holder_name || "";
-      step2Data.value.bank_branch = bankInformation.bank_branch || "";
-      step2Data.value.account_type = bankInformation.account_type || "";
+      step2Data.value.npwp = employee.npwp || "";
+      step2Data.value.bpjs_ketenagakerjaan = employee.bpjs_ketenagakerjaan || "";
+      step2Data.value.bpjs_kesehatan = employee.bpjs_kesehatan || "";
+      step2Data.value.ptkp_status = employee.ptkp_status || "";
       step2Data.value.role = extractRoleValue(employee.user?.roles);
 
       // Reset emergency contact values before applying loaded data.
@@ -185,8 +185,6 @@ const loadEmployeeData = async () => {
         step3Data.value.emergency_contact_phone = contact.phone || "";
         step3Data.value.emergency_contact_email = contact.email || "";
       }
-      step3Data.value.preferred_language = employee.preferred_language || "";
-      step3Data.value.additional_notes = employee.additional_notes || "";
     }
   } catch (err) {
     console.error("Error loading employee data:", err);
@@ -211,7 +209,9 @@ const handleSubmit = async () => {
     formData.append("identity_number", step1Data.value.identity_number);
     formData.append("phone", step1Data.value.phone);
     formData.append("date_of_birth", step1Data.value.date_of_birth);
-    formData.append("hobby", step1Data.value.hobby);
+    if (step1Data.value.religion) formData.append("religion", step1Data.value.religion);
+    if (step1Data.value.marital_status) formData.append("marital_status", step1Data.value.marital_status);
+    if (step1Data.value.blood_type) formData.append("blood_type", step1Data.value.blood_type);
     formData.append("place_of_birth", step1Data.value.place_of_birth);
     formData.append("gender", step1Data.value.gender);
     formData.append("address", step1Data.value.address);
@@ -225,7 +225,6 @@ const handleSubmit = async () => {
     // Step 2 data (Job Information & Bank Information)
     formData.append("job_title", step2Data.value.job_title);
     formData.append("team_id", step2Data.value.team_id);
-    formData.append("years_experience", step2Data.value.years_experience);
     formData.append("status", step2Data.value.status);
     formData.append("employment_type", step2Data.value.employment_type);
     formData.append("work_location", step2Data.value.work_location);
@@ -234,12 +233,13 @@ const handleSubmit = async () => {
       "monthly_salary",
       normalizeRupiah(step2Data.value.monthly_salary),
     );
-    formData.append("skill_level", step2Data.value.skill_level);
     formData.append("bank_name", step2Data.value.bank_name);
     formData.append("account_number", step2Data.value.account_number);
     formData.append("account_holder_name", step2Data.value.account_holder_name);
-    formData.append("bank_branch", step2Data.value.bank_branch);
-    formData.append("account_type", step2Data.value.account_type);
+    if (step2Data.value.npwp) formData.append("npwp", step2Data.value.npwp);
+    if (step2Data.value.bpjs_ketenagakerjaan) formData.append("bpjs_ketenagakerjaan", step2Data.value.bpjs_ketenagakerjaan);
+    if (step2Data.value.bpjs_kesehatan) formData.append("bpjs_kesehatan", step2Data.value.bpjs_kesehatan);
+    if (step2Data.value.ptkp_status) formData.append("ptkp_status", step2Data.value.ptkp_status);
     formData.append("roles[]", step2Data.value.role);
 
     // Step 3 data (Emergency Contacts & Additional Info)
@@ -261,9 +261,6 @@ const handleSubmit = async () => {
         step3Data.value.emergency_contact_email,
       );
     }
-
-    formData.append("preferred_language", step3Data.value.preferred_language);
-    formData.append("additional_notes", step3Data.value.additional_notes);
 
     const employeeId = route.params.id as string;
     await employeeStore.updateEmployee(employeeId, formData);

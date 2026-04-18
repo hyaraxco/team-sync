@@ -11,6 +11,7 @@ import {
   WalletIcon,
   BarChart3Icon,
   XIcon,
+  SettingsIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
@@ -353,6 +354,24 @@ const onNavigate = () => emit("navigate");
               >My Team</span
             >
           </RouterLink>
+        </div>
+      </div>
+
+      <!-- PREFERENCES Section -->
+      <div data-testid="sidebar-section-preferences">
+        <h3 class="section-title">PREFERENCES</h3>
+        <div class="space-y-3">
+          <button
+            type="button"
+            disabled
+            class="nav-link w-full text-left border border-[#DCDEDD] rounded-[20px] bg-gray-50 cursor-not-allowed opacity-70 flex items-center justify-between"
+          >
+            <div class="flex items-center gap-3">
+              <SettingsIcon class="w-5 h-5 text-gray-400" />
+              <span class="text-brand-dark text-base font-medium">Settings</span>
+            </div>
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider bg-gray-200 px-2 py-0.5 rounded-full">Soon</span>
+          </button>
         </div>
       </div>
     </nav>

@@ -6,7 +6,7 @@
 
     <div class="relative">
       <!-- slot icon -->
-      <div v-if="$slots.icon" class="absolute top-3 left-4 pointer-events-none">
+      <div v-if="hasIcon" class="absolute top-3 left-4 pointer-events-none">
         <slot name="icon" />
       </div>
 
@@ -18,7 +18,8 @@
         :placeholder="placeholder"
         :required="required"
         :class="[
-          'w-full pl-12 pr-4 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
+          'w-full pr-4 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
+          hasIcon ? 'pl-12' : 'pl-4',
           'hover:border-[#0C51D9] hover:border-2',
           'focus:border-[#0C51D9] focus:border-2 focus:bg-white',
           borderColor,
@@ -48,6 +49,10 @@ const props = defineProps({
   error: { type: String, default: "" },
 });
 const emit = defineEmits(["update:modelValue"]);
+
+import { useSlots } from "vue";
+const slots = useSlots();
+const hasIcon = computed(() => !!slots.icon);
 
 const fieldId = computed(() => {
   if (props.id) return props.id;

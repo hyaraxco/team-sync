@@ -15,6 +15,9 @@ import {
   CheckCircle,
   AlertTriangle,
   RotateCcw,
+  Settings,
+  Activity,
+  UserCheck,
 } from "lucide-vue-next";
 import { debounce } from "lodash";
 import Pagination from "@/components/admin/payroll/Pagination.vue";
@@ -77,6 +80,8 @@ const paymentDate = ref(new Date().toISOString().split("T")[0]);
 const reopenReason = ref("");
 const selectedAdjustmentEmployee = ref(null);
 const showAdjustmentDetailsModal = ref(false);
+
+const activeTab = ref("employees");
 
 const selectedAdjustmentItems = computed(
   () => selectedAdjustmentEmployee.value?.adjustments || []
@@ -800,8 +805,66 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
+    <!-- Tab Navigation -->
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mt-2 mb-6" data-testid="payroll-tabs">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <button
+          @click="activeTab = 'employees'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'employees'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-employees"
+        >
+          <Users class="w-4 h-4" :class="activeTab === 'employees' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Employee Details</span>
+        </button>
+        <button
+          @click="activeTab = 'reconciliation'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'reconciliation'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-reconciliation"
+        >
+          <AlertTriangle class="w-4 h-4" :class="activeTab === 'reconciliation' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Reconciliation Check</span>
+        </button>
+        <button
+          @click="activeTab = 'settings'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'settings'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-settings"
+        >
+          <Settings class="w-4 h-4" :class="activeTab === 'settings' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Settings Used</span>
+        </button>
+        <button
+          @click="activeTab = 'activity'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'activity'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-activity"
+        >
+          <Activity class="w-4 h-4" :class="activeTab === 'activity' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Activity Logs</span>
+        </button>
+      </div>
+    </div>
+
     <!-- Employee Details Section -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+    <div v-show="activeTab === 'employees'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
@@ -979,7 +1042,7 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+    <div v-show="activeTab === 'activity'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
       <div class="flex items-start justify-between gap-4 mb-6">
         <div>
           <h3 class="text-brand-dark text-lg font-bold">Payroll Activity</h3>
@@ -1044,8 +1107,9 @@ const handleApprovePayroll = () => {
     </div>
 
     <div
+      v-show="activeTab === 'settings'"
       data-testid="payroll-settings-used-section"
-      class="bg-white border border-[#DCDEDD] rounded-[20px] p-6"
+      class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in"
     >
       <div class="flex items-start justify-between gap-4 mb-6">
         <div>
@@ -1122,7 +1186,7 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+    <div v-show="activeTab === 'reconciliation'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
       <div class="flex items-start justify-between gap-4 mb-6">
         <div>
           <h3 class="text-brand-dark text-lg font-bold">Reconciliation Check</h3>

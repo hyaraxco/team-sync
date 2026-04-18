@@ -355,8 +355,6 @@ class EmployeeProfileRepository implements EmployeeProfileRepositoryInterface
             'bank_name',
             'account_number',
             'account_holder_name',
-            'bank_branch',
-            'account_type',
         ];
 
         $bankData = array_intersect_key($data, array_flip($fields));

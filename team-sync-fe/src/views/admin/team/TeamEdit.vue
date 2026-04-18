@@ -173,7 +173,7 @@ watch(
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- Team Icon -->
             <div class="md:col-span-2">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Team Icon</label
               >
               <div class="flex items-center gap-4">
@@ -337,7 +337,7 @@ watch(
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- Team Lead Selection -->
             <div class="md:col-span-2">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Select Team Lead</label
               >
               <button
@@ -508,7 +508,7 @@ watch(
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
             <!-- Initial Team Status (Full Width) -->
             <div class="md:col-span-2 mb-4">
-              <label class="block text-brand-dark text-base font-semibold mb-1"
+              <label class="block text-sm font-medium text-gray-700 mb-1.5"
                 >Initial Team Status</label
               >
               <div class="grid grid-cols-2 gap-4">
