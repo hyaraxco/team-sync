@@ -48,9 +48,6 @@ const handleSearch = (params) => {
 
     <template v-else-if="isFinance">
       <div class="space-y-6">
-        <div class="flex items-center justify-between">
-          <h1 class="text-2xl font-bold text-gray-900">Finance Dashboard</h1>
-        </div>
         <PayrollAnalyticsEnhanced />
       </div>
     </template>
