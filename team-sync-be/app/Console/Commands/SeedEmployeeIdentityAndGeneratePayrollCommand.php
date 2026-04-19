@@ -40,7 +40,8 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
 
     public function handle(PayrollRepository $payrollRepository): int
     {
-        $isDryRun = $this->option('dry-run');
+        $isDryRun = (bool) $this->option('dry-run');
+        /** @var string $month */
         $month = $this->option('month') ?? now()->addMonth()->format('Y-m');
 
         // Validate month format
@@ -57,7 +58,15 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
             return self::FAILURE;
         }
 
+        $this->seedIdentity($isDryRun);
+
+        return $this->generatePayrollForMonth($month, $isDryRun, $payrollRepository);
+    }
+
+    private function seedIdentity(bool $isDryRun): void
+    {
         // ── Step 1: Seed identity data ──────────────────────────────────────
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\EmployeeProfile> $employees */
         $employees = EmployeeProfile::whereNull('ptkp_status')
             ->orWhereNull('npwp')
             ->get();
@@ -67,54 +76,59 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
 
         if ($employees->isEmpty()) {
             $this->info('✓ All employees already have identity data.');
+            $this->newLine();
+            return;
+        }
+
+        $rows = [];
+        foreach ($employees as $i => $emp) {
+            $ptkp    = $this->ptkpPool[$i % count($this->ptkpPool)];
+            $npwp    = $this->makeNpwp($i + 1);
+            $bpjsTk  = $this->makeBpjsTk($i + 1);
+            $bpjsKes = $this->makeBpjsKes($i + 1);
+
+            $rows[] = [
+                'id'                   => $emp->id,
+                'ptkp'                 => $ptkp,
+                'npwp'                 => $npwp,
+                'bpjs_tk'              => $bpjsTk,
+                'bpjs_kes'             => $bpjsKes,
+                'religion'             => $emp->religion ?? $this->religionPool[$i % count($this->religionPool)],
+                'marital_status'       => $emp->marital_status ?? $this->maritalPool[$i % count($this->maritalPool)],
+                'blood_type'           => $emp->blood_type ?? $this->bloodPool[$i % count($this->bloodPool)],
+            ];
+        }
+
+        // Display table
+        $this->table(
+            ['Employee ID', 'PTKP', 'NPWP', 'BPJS-TK', 'BPJS-Kes'],
+            collect($rows)->map(fn ($r) => [
+                $r['id'], $r['ptkp'], $r['npwp'], $r['bpjs_tk'], $r['bpjs_kes'],
+            ])->toArray()
+        );
+
+        if (! $isDryRun) {
+            foreach ($rows as $row) {
+                DB::table('employee_profiles')->where('id', $row['id'])->update([
+                    'npwp'                 => $row['npwp'],
+                    'bpjs_ketenagakerjaan' => $row['bpjs_tk'],
+                    'bpjs_kesehatan'       => $row['bpjs_kes'],
+                    'ptkp_status'          => $row['ptkp'],
+                    'religion'             => $row['religion'],
+                    'marital_status'       => $row['marital_status'],
+                    'blood_type'           => $row['blood_type'],
+                ]);
+            }
+            $this->info("✓ Updated {$employees->count()} employees with identity data.");
         } else {
-            $rows = [];
-            foreach ($employees as $i => $emp) {
-                $ptkp    = $this->ptkpPool[$i % count($this->ptkpPool)];
-                $npwp    = $this->makeNpwp($i + 1);
-                $bpjsTk  = $this->makeBpjsTk($i + 1);
-                $bpjsKes = $this->makeBpjsKes($i + 1);
-
-                $rows[] = [
-                    'id'                   => $emp->id,
-                    'ptkp'                 => $ptkp,
-                    'npwp'                 => $npwp,
-                    'bpjs_tk'              => $bpjsTk,
-                    'bpjs_kes'             => $bpjsKes,
-                    'religion'             => $emp->religion ?? $this->religionPool[$i % count($this->religionPool)],
-                    'marital_status'       => $emp->marital_status ?? $this->maritalPool[$i % count($this->maritalPool)],
-                    'blood_type'           => $emp->blood_type ?? $this->bloodPool[$i % count($this->bloodPool)],
-                ];
-            }
-
-            // Display table
-            $this->table(
-                ['Employee ID', 'PTKP', 'NPWP', 'BPJS-TK', 'BPJS-Kes'],
-                collect($rows)->map(fn ($r) => [
-                    $r['id'], $r['ptkp'], $r['npwp'], $r['bpjs_tk'], $r['bpjs_kes'],
-                ])->toArray()
-            );
-
-            if (! $isDryRun) {
-                foreach ($rows as $row) {
-                    DB::table('employee_profiles')->where('id', $row['id'])->update([
-                        'npwp'                 => $row['npwp'],
-                        'bpjs_ketenagakerjaan' => $row['bpjs_tk'],
-                        'bpjs_kesehatan'       => $row['bpjs_kes'],
-                        'ptkp_status'          => $row['ptkp'],
-                        'religion'             => $row['religion'],
-                        'marital_status'       => $row['marital_status'],
-                        'blood_type'           => $row['blood_type'],
-                    ]);
-                }
-                $this->info("✓ Updated {$employees->count()} employees with identity data.");
-            } else {
-                $this->warn('[DRY-RUN] No changes written to DB.');
-            }
+            $this->warn('[DRY-RUN] No changes written to DB.');
         }
 
         $this->newLine();
+    }
 
+    private function generatePayrollForMonth(string $month, bool $isDryRun, PayrollRepository $payrollRepository): int
+    {
         // ── Step 2: Generate payroll ─────────────────────────────────────────
         $this->info("→ Generating payroll for {$month}...");
 
@@ -126,7 +140,7 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
         // Resolve actor ID
         $actorEmail = $this->option('actor-email');
         $actorId = null;
-        if ($actorEmail) {
+        if (is_string($actorEmail) && $actorEmail !== '') {
             $actor = User::where('email', $actorEmail)->first();
             $actorId = $actor?->id;
             if (! $actorId) {
@@ -144,8 +158,9 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
             $this->newLine();
 
             // Show summary of tax & BPJS
+            /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\PayrollDetail> $details */
             $details = $payroll->payrollDetails()->get();
-            $totalPph21 = $details->sum('ph21_amount');
+            $totalPph21 = $details->sum('pph21_amount');
             $totalBpjsTkEmp = $details->sum('bpjs_tk_employee');
             $totalBpjsKesEmp = $details->sum('bpjs_kes_employee');
             $totalNet = $details->sum('final_salary');
@@ -154,10 +169,10 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
                 ['Metric', 'Total'],
                 [
                     ['Employees Processed', $details->count()],
-                    ['Total Net Salary',    'Rp ' . number_format($totalNet, 0, ',', '.')],
-                    ['Total PPh 21',        'Rp ' . number_format($totalPph21, 0, ',', '.')],
-                    ['Total BPJS TK (emp)', 'Rp ' . number_format($totalBpjsTkEmp, 0, ',', '.')],
-                    ['Total BPJS Kes (emp)','Rp ' . number_format($totalBpjsKesEmp, 0, ',', '.')],
+                    ['Total Net Salary',    'Rp ' . number_format((float) $totalNet, 0, ',', '.')],
+                    ['Total PPh 21',        'Rp ' . number_format((float) $totalPph21, 0, ',', '.')],
+                    ['Total BPJS TK (emp)', 'Rp ' . number_format((float) $totalBpjsTkEmp, 0, ',', '.')],
+                    ['Total BPJS Kes (emp)','Rp ' . number_format((float) $totalBpjsKesEmp, 0, ',', '.')],
                 ]
             );
 
