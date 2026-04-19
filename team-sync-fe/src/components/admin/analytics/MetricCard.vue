@@ -1,31 +1,37 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
+  <div
+    class="bg-white rounded-[16px] border border-[#DCDEDD] hover:border-[#0C51D9] hover:shadow-lg transition-all duration-300 p-5 group"
+  >
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-medium text-gray-500">{{ title }}</h3>
-      <div v-if="icon" class="p-2 bg-blue-50 rounded-lg">
-        <component :is="icon" class="w-5 h-5 text-blue-600" />
+      <h3 class="text-xs font-semibold uppercase tracking-wider text-[#737373] group-hover:text-[#0C51D9] transition-colors">
+        {{ title }}
+      </h3>
+      <div v-if="icon" class="p-2.5 bg-[#F4F7FF] rounded-[10px] group-hover:bg-[#0C51D9] transition-colors">
+        <component :is="icon" class="w-5 h-5 text-[#0C51D9] group-hover:text-white transition-colors" />
       </div>
     </div>
 
-    <div class="space-y-2">
+    <div class="space-y-2 relative">
       <div class="flex items-baseline justify-between">
-        <span class="text-3xl font-bold text-gray-900">{{
-          formattedValue
-        }}</span>
+        <span class="text-[28px] leading-tight font-extrabold text-[#202020] tracking-tight">
+          {{ formattedValue }}
+        </span>
         <span
           v-if="trend !== null"
-          :class="trendClass"
-          class="flex items-center text-sm font-medium"
+          :class="[trendClass, 'flex items-center text-xs font-bold px-2 py-1 rounded-[6px] bg-opacity-10']"
+          :style="trend >= 0 ? 'background-color: rgba(16, 185, 129, 0.1)' : 'background-color: rgba(239, 68, 68, 0.1)'"
         >
-          <component :is="trendIcon" class="w-4 h-4 mr-1" />
+          <component :is="trendIcon" class="w-3 h-3 mr-1" />
           {{ Math.abs(trend) }}%
         </span>
       </div>
 
-      <p v-if="subtitle" class="text-sm text-gray-600">{{ subtitle }}</p>
+      <p v-if="subtitle" class="text-sm font-medium text-[#8F8F8F]">{{ subtitle }}</p>
 
-      <div v-if="loading" class="mt-4">
-        <div class="animate-pulse h-2 bg-gray-200 rounded"></div>
+      <div v-if="loading" class="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center rounded-lg">
+        <div class="w-full max-w-[60%] h-2 bg-gray-200 rounded-full overflow-hidden">
+          <div class="h-full bg-[#0C51D9] w-1/2 animate-[progress_1s_ease-in-out_infinite]"></div>
+        </div>
       </div>
     </div>
   </div>

@@ -37,68 +37,57 @@
       />
     </div>
 
-    <!-- Payroll Cost Trends -->
-    <div v-if="payrollCostTrends" class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
-        Payroll Cost Trends
-      </h3>
-      <VueApexCharts
-        v-if="payrollCostTrends.total_cost_trend"
-        type="line"
-        height="300"
-        :options="costTrendOptions"
-        :series="costTrendSeries"
-      />
-    </div>
-
-    <!-- Salary Distribution -->
-    <div
-      v-if="salaryDistribution?.distribution"
-      class="bg-white rounded-lg shadow p-6"
-    >
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
-        Salary Distribution
-      </h3>
-      <VueApexCharts
-        type="bar"
-        height="300"
-        :options="salaryDistChartOptions"
-        :series="salaryDistChartSeries"
-      />
-    </div>
-
-    <!-- Deduction Analysis Trend -->
-    <TrendChart
-      v-if="deductionAnalysis?.data"
-      title="Deduction Rate Trend"
-      subtitle="Monthly deduction percentage"
-      :chart-data="deductionAnalysis.data"
-      chart-type="line"
-      x-key="period"
-      y-key="value"
-      y-label="Deduction Rate (%)"
-      :loading="enhancedMetricsLoading"
-    />
-
-    <!-- Existing Payroll Analytics -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      <!-- Payroll Trend -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
-          Monthly Payroll Trend
+    <!-- Charts Section 1 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      <!-- Total Cost Trend -->
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
+          Payroll Cost Trends
         </h3>
         <VueApexCharts
-          v-if="!payrollLoading && payroll?.payroll_trend"
-          type="area"
+          v-if="payrollCostTrends.total_cost_trend"
+          type="line"
           height="300"
-          :options="payrollTrendOptions"
-          :series="payrollTrendSeries"
+          :options="costTrendOptions"
+          :series="costTrendSeries"
         />
+        <div v-else class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200">
+          <p class="text-sm font-medium text-[#737373]">No trend data</p>
+        </div>
       </div>
 
-      <!-- Department Cost Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <!-- Salary Distribution -->
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
+          Salary Distribution
+        </h3>
+        <VueApexCharts
+          type="bar"
+          height="300"
+          :options="salaryDistChartOptions"
+          :series="salaryDistChartSeries"
+        />
+      </div>
+    </div>
+
+    <!-- Charts Section 2 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
+      <!-- Deduction Trends -->
+      <TrendChart
+        v-if="deductionAnalysis?.data"
+        title="Deduction Rate Trend"
+        subtitle="Monthly deduction percentage"
+        :chart-data="deductionAnalysis.data"
+        chart-type="line"
+        x-key="period"
+        y-key="value"
+        y-label="Deduction Rate (%)"
+        :loading="enhancedMetricsLoading"
+      />
+
+      <!-- Cost by Department -->
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
           Cost by Department
         </h3>
         <VueApexCharts
@@ -108,6 +97,9 @@
           :options="departmentCostOptions"
           :series="departmentCostSeries"
         />
+        <div v-else class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200">
+          <p class="text-sm font-medium text-[#737373]">No department data</p>
+        </div>
       </div>
     </div>
   </div>

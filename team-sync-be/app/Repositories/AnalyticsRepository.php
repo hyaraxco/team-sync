@@ -232,7 +232,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->selectRaw("
                     DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
                     COALESCE(SUM(payroll_details.final_salary), 0) as salary,
-                    COALESCE(SUM(payroll_details.ph21_amount), 0) as tax,
+                    COALESCE(SUM(payroll_details.pph21_amount), 0) as tax,
                     COALESCE(SUM(
                         payroll_details.bpjs_tk_employee + payroll_details.bpjs_tk_employer +
                         payroll_details.bpjs_kes_employee + payroll_details.bpjs_kes_employer
@@ -347,35 +347,36 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'workforce_' . md5(json_encode([$period, $department])) . '_' . now()->format('Y-m-d-H');
 
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
-            $start = $parsed['start'];
-            $end = $parsed['end'];
+            return $this->computeWorkforceAnalytics($parsed['start'], $parsed['end'], $parsed['label'], $department);
+        });
+    }
 
-            // ── Headcount Trend (monthly) ───────────────────────────────────
-            $headcountTrend = [];
-            $cursor = $start->copy()->startOfMonth();
-            while ($cursor->lte($end)) {
-                $monthEnd = $cursor->copy()->endOfMonth();
-                $count = DB::table('employee_profiles')
-                    ->where('created_at', '<=', $monthEnd)
-                    ->where(function ($q) use ($monthEnd) {
-                        $q->whereNull('deleted_at')->orWhere('deleted_at', '>', $monthEnd);
-                    })
-                    ->when($department, function ($q) use ($department) {
-                        $q->join('job_information as ji', 'ji.employee_id', '=', 'employee_profiles.id')
-                            ->join('teams as t', 't.id', '=', 'ji.team_id')
-                            ->where('t.department', $department);
-                    })
-                    ->count(DB::raw('DISTINCT employee_profiles.id'));
-
-                $headcountTrend[] = [
-                    'month' => $cursor->format('M Y'),
-                    'count' => $count,
-                ];
-                $cursor->addMonth();
-            }
-
+    /**
+     * @param Carbon $start
+     * @param Carbon $end
+     * @param string $label
+     * @param string|null $department
+     * @return array<string, mixed>
+     */
+    private function computeWorkforceAnalytics(Carbon $start, Carbon $end, string $label, ?string $department): array
+    {
+            /** @var array<int, int> $filteredEmployeeIds */
             $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
 
+            return [
+                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => $label],
+                'headcount_trend' => $this->getHeadcountTrend($start, $end, $department),
+                ...$this->getWorkforceDemographics($filteredEmployeeIds),
+                ...$this->getWorkforceDistributions($filteredEmployeeIds),
+            ];
+    }
+
+    /**
+     * @param array<int, int> $filteredEmployeeIds
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function getWorkforceDemographics(array $filteredEmployeeIds): array
+    {
             // ── Gender Distribution ─────────────────────────────────────────
             $genderDistribution = DB::table('employee_profiles')
                 ->whereIn('id', $filteredEmployeeIds)
@@ -422,6 +423,20 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->map(fn ($r) => ['department' => $r->department, 'count' => (int) $r->count])
                 ->values()->all();
 
+            return [
+                'gender_distribution' => $genderDistribution,
+                'employment_types' => $employmentTypes,
+                'work_locations' => $workLocations,
+                'department_headcount' => $departmentHeadcount,
+            ];
+    }
+
+    /**
+     * @param array<int, int> $filteredEmployeeIds
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function getWorkforceDistributions(array $filteredEmployeeIds): array
+    {
             // ── PTKP Status Distribution (replaces dropped skill_level column) ─
             // skill_level was removed from job_information in the April 2026 refactor.
             // ptkp_status is the relevant tax-identity classification stored in employee_profiles.
@@ -477,17 +492,41 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->values()->all();
 
             return [
-                'period' => ['start' => $start->toDateString(), 'end' => $end->toDateString(), 'label' => $parsed['label']],
-                'headcount_trend' => $headcountTrend,
-                'gender_distribution' => $genderDistribution,
-                'employment_types' => $employmentTypes,
-                'work_locations' => $workLocations,
-                'department_headcount' => $departmentHeadcount,
                 'skill_levels' => $skillLevels,
                 'age_distribution' => $ageDistribution,
                 'tenure_distribution' => $tenureDistribution,
             ];
-        });
+    }
+
+    /**
+     * @return array<int, array{month: string, count: int}>
+     */
+    private function getHeadcountTrend(Carbon $start, Carbon $end, ?string $department): array
+    {
+            $headcountTrend = [];
+            $cursor = $start->copy()->startOfMonth();
+            while ($cursor->lte($end)) {
+                $monthEnd = $cursor->copy()->endOfMonth();
+                $count = DB::table('employee_profiles')
+                    ->where('created_at', '<=', $monthEnd)
+                    ->where(function ($q) use ($monthEnd) {
+                        $q->whereNull('deleted_at')->orWhere('deleted_at', '>', $monthEnd);
+                    })
+                    ->when($department, function ($q) use ($department) {
+                        $q->join('job_information as ji', 'ji.employee_id', '=', 'employee_profiles.id')
+                            ->join('teams as t', 't.id', '=', 'ji.team_id')
+                            ->where('t.department', $department);
+                    })
+                    ->count(DB::raw('DISTINCT employee_profiles.id'));
+
+                $headcountTrend[] = [
+                    'month' => $cursor->format('M Y'),
+                    'count' => $count,
+                ];
+                $cursor->addMonth();
+            }
+
+            return $headcountTrend;
     }
 
     public function getAttendanceAnalytics(string $period, ?string $department, ?int $teamId): array
@@ -496,15 +535,46 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX . 'attendance_' . md5(json_encode([$period, $department, $teamId])) . '_' . now()->format('Y-m-d-H');
 
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department, $teamId) {
-            $start = $parsed['start'];
-            $end = $parsed['end'];
+            return $this->computeAttendanceAnalytics($parsed['start'], $parsed['end'], $parsed['label'], $department, $teamId);
+        });
+    }
 
+    /**
+     * @param Carbon $start
+     * @param Carbon $end
+     * @param string $label
+     * @param string|null $department
+     * @param int|null $teamId
+     * @return array<string, mixed>
+     */
+    private function computeAttendanceAnalytics(Carbon $start, Carbon $end, string $label, ?string $department, ?int $teamId): array
+    {
+            /** @var array<int, int> $filteredEmployeeIds */
             $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, $teamId);
+            $startDate = $start->toDateString();
+            $endDate = $end->toDateString();
 
+            return [
+                'period' => [
+                    'start' => $startDate,
+                    'end' => $endDate,
+                    'label' => $label,
+                ],
+                ...$this->getAttendanceRateAndStatus($filteredEmployeeIds, $startDate, $endDate),
+                ...$this->getAttendanceComplianceMetrics($filteredEmployeeIds, $startDate, $endDate),
+            ];
+    }
+
+    /**
+     * @param array<int, int> $filteredEmployeeIds
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function getAttendanceRateAndStatus(array $filteredEmployeeIds, string $startDate, string $endDate): array
+    {
             // ── Monthly Attendance Rate Trend ────────────────────────────────
             $monthlyTrend = DB::table('attendances')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('date', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(date, '%Y-%m') as month_key,
                     COUNT(*) as total_records,
@@ -540,7 +610,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Status Distribution (current period) ────────────────────────
             $statusDistribution = DB::table('attendances')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('date', [$startDate, $endDate])
                 ->selectRaw("
                     status,
                     COUNT(*) as count
@@ -558,7 +628,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Weekly Lateness Trend ────────────────────────────────────────
             $latenessTrend = DB::table('attendances')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('date', [$startDate, $endDate])
                 ->where('status', 'late')
                 ->selectRaw("
                     YEARWEEK(date, 1) as week_key,
@@ -578,7 +648,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Average Hours Worked per Day ────────────────────────────────
             $avgHoursTrend = DB::table('attendances')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('date', [$startDate, $endDate])
                 ->whereNotNull('worked_minutes')
                 ->where('worked_minutes', '>', 0)
                 ->selectRaw("
@@ -595,10 +665,24 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->values()
                 ->all();
 
+            return [
+                'monthly_attendance_rate' => $monthlyAttendanceRate,
+                'status_distribution' => $statusDistribution,
+                'lateness_trend' => $latenessTrend,
+                'avg_hours_trend' => $avgHoursTrend,
+            ];
+    }
+
+    /**
+     * @param array<int, int> $filteredEmployeeIds
+     * @return array<string, array<int, array<string, mixed>>>
+     */
+    private function getAttendanceComplianceMetrics(array $filteredEmployeeIds, string $startDate, string $endDate): array
+    {
             // ── Work Mode Distribution (monthly stacked) ────────────────────
             $workModeTrend = DB::table('attendances')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('date', [$startDate, $endDate])
                 ->whereNotNull('actual_work_mode')
                 ->selectRaw("
                     DATE_FORMAT(date, '%Y-%m') as month_key,
@@ -612,13 +696,13 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // Pivot work mode data by month
             $workModeByMonth = [];
             foreach ($workModeTrend as $row) {
-                $label = Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y');
-                if (! isset($workModeByMonth[$label])) {
-                    $workModeByMonth[$label] = ['month' => $label, 'office' => 0, 'remote' => 0, 'hybrid' => 0];
+                $monthLabel = Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y');
+                if (! isset($workModeByMonth[$monthLabel])) {
+                    $workModeByMonth[$monthLabel] = ['month' => $monthLabel, 'office' => 0, 'remote' => 0, 'hybrid' => 0];
                 }
                 $mode = strtolower($row->actual_work_mode);
-                if (isset($workModeByMonth[$label][$mode])) {
-                    $workModeByMonth[$label][$mode] = (int) $row->count;
+                if (isset($workModeByMonth[$monthLabel][$mode])) {
+                    $workModeByMonth[$monthLabel][$mode] = (int) $row->count;
                 }
             }
             $workModeDistribution = array_values($workModeByMonth);
@@ -628,7 +712,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->join('employee_profiles', 'employee_profiles.id', '=', 'attendances.employee_id')
                 ->join('users', 'users.id', '=', 'employee_profiles.user_id')
                 ->whereIn('attendances.employee_id', $filteredEmployeeIds)
-                ->whereBetween('attendances.date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('attendances.date', [$startDate, $endDate])
                 ->where('attendances.status', 'late')
                 ->groupBy('attendances.employee_id', 'users.name', 'employee_profiles.code')
                 ->selectRaw("
@@ -652,7 +736,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Policy Mismatch Trend ───────────────────────────────────────
             $mismatchTrend = DB::table('attendance_policy_mismatches')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('mismatch_date', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('mismatch_date', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(mismatch_date, '%Y-%m') as month_key,
                     COUNT(*) as total,
@@ -672,7 +756,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Correction Request Rate ─────────────────────────────────────
             $correctionTrend = DB::table('attendance_corrections')
                 ->whereIn('employee_id', $filteredEmployeeIds)
-                ->whereBetween('created_at', [$start->toDateString(), $end->toDateString()])
+                ->whereBetween('created_at', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(created_at, '%Y-%m') as month_key,
                     COUNT(*) as total,
@@ -701,21 +785,11 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->all();
 
             return [
-                'period' => [
-                    'start' => $start->toDateString(),
-                    'end' => $end->toDateString(),
-                    'label' => $parsed['label'],
-                ],
-                'monthly_attendance_rate' => $monthlyAttendanceRate,
-                'status_distribution' => $statusDistribution,
-                'lateness_trend' => $latenessTrend,
-                'avg_hours_trend' => $avgHoursTrend,
                 'work_mode_distribution' => $workModeDistribution,
                 'top_late_employees' => $topLateEmployees,
                 'policy_mismatch_trend' => $mismatchTrend,
                 'correction_trend' => $correctionTrend,
             ];
-        });
     }
 
     public function getLeaveAnalytics(string $period, ?string $department): array
@@ -946,7 +1020,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
                     DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
-                    COALESCE(SUM(payroll_details.ph21_amount), 0) as pph21,
+                    COALESCE(SUM(payroll_details.pph21_amount), 0) as pph21,
                     COALESCE(SUM(payroll_details.bpjs_tk_employee + payroll_details.bpjs_tk_employer), 0) as bpjs_tk,
                     COALESCE(SUM(payroll_details.bpjs_kes_employee + payroll_details.bpjs_kes_employer), 0) as bpjs_kes
                 ")
@@ -995,7 +1069,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
                 ->selectRaw("
                     COALESCE(SUM(payroll_details.deduction_amount), 0) as attendance_deductions,
-                    COALESCE(SUM(payroll_details.ph21_amount), 0) as tax,
+                    COALESCE(SUM(payroll_details.pph21_amount), 0) as tax,
                     COALESCE(SUM(payroll_details.bpjs_tk_employee), 0) as bpjs_tk_employee,
                     COALESCE(SUM(payroll_details.bpjs_kes_employee), 0) as bpjs_kes_employee
                 ")
@@ -1190,5 +1264,624 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 'months' => 6,
             ],
         };
+    }
+
+    /**
+     * Get turnover rate metrics from snapshots
+     */
+    public function getTurnoverRate(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'workforce',
+            'turnover_rate',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'average' => 0];
+    }
+
+    /**
+     * Get average tenure metrics
+     */
+    public function getAverageTenure(?string $department): array
+    {
+        $latest = DB::table('analytics_snapshots')
+            ->where('metric_type', 'workforce')
+            ->where('metric_name', 'average_tenure_days')
+            ->orderByDesc('period_end')
+            ->first();
+
+        return [
+            'average_tenure_days' => $latest ? (float) $latest->value : 0,
+            'average_tenure_years' => $latest ? round($latest->value / 365, 1) : 0,
+        ];
+    }
+
+    /**
+     * Get new hire trends
+     */
+    public function getNewHireTrends(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'workforce',
+            'new_hires',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'total' => 0];
+    }
+
+    /**
+     * Get attendance compliance rate
+     */
+    public function getAttendanceComplianceRate(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'attendance',
+            'compliance_rate',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'average' => 0];
+    }
+
+    /**
+     * Get attendance patterns (day of week analysis)
+     */
+    public function getAttendancePatterns(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $start = $parsed['start'];
+        $end = $parsed['end'];
+
+        $patterns = DB::table('attendances')
+            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->selectRaw("
+                DAYNAME(date) as day_name,
+                DAYOFWEEK(date) as day_number,
+                COUNT(*) as total_records,
+                COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as attended,
+                COUNT(CASE WHEN status = 'late' THEN 1 END) as late_count
+            ")
+            ->groupBy('day_name', 'day_number')
+            ->orderBy('day_number')
+            ->get()
+            ->map(fn ($r) => [
+                'day' => $r->day_name,
+                'attendance_rate' => $r->total_records > 0 ? round(($r->attended / $r->total_records) * 100, 2) : 0,
+                'late_rate' => $r->attended > 0 ? round(($r->late_count / $r->attended) * 100, 2) : 0,
+            ])
+            ->values()->all();
+
+        return ['patterns' => $patterns];
+    }
+
+    /**
+     * Get remote vs office ratio
+     */
+    public function getRemoteOfficeRatio(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'attendance',
+            'remote_ratio',
+            'daily',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'average_remote_ratio' => 0];
+    }
+
+    /**
+     * Get leave utilization rate
+     */
+    public function getLeaveUtilizationRate(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'leave',
+            'utilization_rate',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'average' => 0];
+    }
+
+    /**
+     * Get leave balance trends
+     */
+    public function getLeaveBalanceTrends(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $start = $parsed['start'];
+        $end = $parsed['end'];
+
+        $trends = DB::table('leave_entitlements')
+            ->selectRaw("
+                leave_type,
+                SUM(total_days) as total_entitled,
+                SUM(used_days) as total_used,
+                SUM(total_days - used_days) as total_remaining
+            ")
+            ->groupBy('leave_type')
+            ->get()
+            ->map(fn ($r) => [
+                'leave_type' => $r->leave_type,
+                'entitled' => (float) $r->total_entitled,
+                'used' => (float) $r->total_used,
+                'remaining' => (float) $r->total_remaining,
+                'utilization_rate' => $r->total_entitled > 0 ? round(($r->total_used / $r->total_entitled) * 100, 2) : 0,
+            ])
+            ->values()->all();
+
+        return ['trends' => $trends];
+    }
+
+    /**
+     * Get peak leave periods
+     */
+    public function getPeakLeavePeriods(string $period): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $start = $parsed['start'];
+        $end = $parsed['end'];
+
+        $peaks = DB::table('leave_requests')
+            ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
+            ->where('status', 'approved')
+            ->selectRaw("
+                DATE_FORMAT(start_date, '%Y-%m') as month,
+                COUNT(*) as request_count,
+                SUM(DATEDIFF(end_date, start_date) + 1) as total_days
+            ")
+            ->groupBy('month')
+            ->orderBy('month')
+            ->get()
+            ->map(fn ($r) => [
+                'month' => $r->month,
+                'requests' => (int) $r->request_count,
+                'total_days' => (int) $r->total_days,
+            ])
+            ->values()->all();
+
+        return ['peak_periods' => $peaks];
+    }
+
+    /**
+     * Get payroll cost trends
+     */
+    public function getPayrollCostTrends(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        $costData = $this->getSnapshotMetric(
+            'payroll',
+            'total_cost',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        );
+
+        $perEmployeeData = $this->getSnapshotMetric(
+            'payroll',
+            'cost_per_employee',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        );
+
+        return [
+            'total_cost_trend' => $costData['data'] ?? [],
+            'cost_per_employee_trend' => $perEmployeeData['data'] ?? [],
+        ];
+    }
+
+    /**
+     * Get salary distribution
+     */
+    public function getSalaryDistribution(?string $department): array
+    {
+        $query = DB::table('payroll_details')
+            ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+            ->join('employee_profiles', 'employee_profiles.id', '=', 'payroll_details.employee_id')
+            ->where('payrolls.status', 'paid')
+            ->whereNull('employee_profiles.deleted_at');
+
+        if ($department) {
+            $query->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+                ->join('teams', 'teams.id', '=', 'job_information.team_id')
+                ->where('teams.department', $department);
+        }
+
+        $distribution = $query
+            ->selectRaw("
+                CASE
+                    WHEN original_salary < 5000000 THEN '< 5M'
+                    WHEN original_salary < 10000000 THEN '5M - 10M'
+                    WHEN original_salary < 15000000 THEN '10M - 15M'
+                    WHEN original_salary < 20000000 THEN '15M - 20M'
+                    ELSE '> 20M'
+                END as salary_range,
+                COUNT(DISTINCT payroll_details.employee_id) as employee_count
+            ")
+            ->groupBy('salary_range')
+            ->get()
+            ->map(fn ($r) => [
+                'range' => $r->salary_range,
+                'count' => (int) $r->employee_count,
+            ])
+            ->values()->all();
+
+        return ['distribution' => $distribution];
+    }
+
+    /**
+     * Get deduction analysis
+     */
+    public function getDeductionAnalysis(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'payroll',
+            'deduction_rate',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'average' => 0];
+    }
+
+    /**
+     * Get project timeline adherence
+     */
+    public function getProjectTimelineAdherence(string $period): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $start = $parsed['start'];
+        $end = $parsed['end'];
+
+        $adherence = DB::table('projects')
+            ->whereBetween('end_date', [$start->toDateString(), $end->toDateString()])
+            ->where('status', 'completed')
+            ->selectRaw("
+                COUNT(*) as total_completed,
+                COUNT(CASE WHEN completed_at <= end_date THEN 1 END) as on_time_count,
+                COUNT(CASE WHEN completed_at > end_date THEN 1 END) as late_count
+            ")
+            ->first();
+
+        $adherenceRate = $adherence->total_completed > 0
+            ? round(($adherence->on_time_count / $adherence->total_completed) * 100, 2)
+            : 0;
+
+        return [
+            'adherence_rate' => $adherenceRate,
+            'total_completed' => (int) $adherence->total_completed,
+            'on_time' => (int) $adherence->on_time_count,
+            'late' => (int) $adherence->late_count,
+        ];
+    }
+
+    /**
+     * Get task velocity
+     */
+    public function getTaskVelocity(string $period, ?int $teamId): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'project',
+            'task_velocity',
+            'monthly',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'average' => 0];
+    }
+
+    /**
+     * Get overdue trends
+     */
+    public function getOverdueTrends(string $period): array
+    {
+        $parsed = $this->parsePeriod($period);
+        
+        return $this->getSnapshotMetric(
+            'project',
+            'overdue_tasks',
+            'daily',
+            $parsed['start']->toDateString(),
+            $parsed['end']->toDateString()
+        ) ?? ['data' => [], 'current' => 0];
+    }
+
+    /**
+     * Helper method to retrieve snapshot metrics
+     */
+    public function getSnapshotMetric(
+        string $metricType,
+        string $metricName,
+        string $periodType,
+        string $startDate,
+        string $endDate
+    ): ?array {
+        $snapshots = DB::table('analytics_snapshots')
+            ->where('metric_type', $metricType)
+            ->where('metric_name', $metricName)
+            ->where('period_type', $periodType)
+            ->whereBetween('period_start', [$startDate, $endDate])
+            ->orderBy('period_start')
+            ->get();
+
+        if ($snapshots->isEmpty()) {
+            return null;
+        }
+
+        $data = $snapshots->map(fn ($s) => [
+            'period' => $s->period_start,
+            'value' => (float) $s->value,
+            'metadata' => json_decode($s->metadata, true),
+        ])->values()->all();
+
+        $average = $snapshots->avg('value');
+
+        return [
+            'data' => $data,
+            'average' => round($average, 2),
+            'latest' => (float) $snapshots->last()->value,
+        ];
+    }
+
+    /**
+     * Get team performance summary
+     */
+    public function getTeamPerformanceSummary(int $teamId, ?int $cycleId = null): array
+    {
+        $query = DB::table('performance_reviews as pr')
+            ->join('employee_profiles as ep', 'pr.employee_id', '=', 'ep.id')
+            ->join('team_members as tm', 'tm.employee_id', '=', 'ep.id')
+            ->where('tm.team_id', $teamId)
+            ->whereNull('tm.left_at')
+            ->whereNull('ep.deleted_at');
+
+        if ($cycleId) {
+            $query->where('pr.review_cycle_id', $cycleId);
+        }
+
+        $reviews = $query->select(
+            'pr.id',
+            'pr.employee_id',
+            'pr.overall_rating',
+            'pr.status',
+            'ep.full_name as employee_name'
+        )->get();
+
+        $totalReviews = $reviews->count();
+        $completedReviews = $reviews->where('status', 'completed')->count();
+        $averageRating = $reviews->where('overall_rating', '>', 0)->avg('overall_rating');
+
+        return [
+            'team_id' => $teamId,
+            'total_reviews' => $totalReviews,
+            'completed_reviews' => $completedReviews,
+            'completion_rate' => $totalReviews > 0 ? round(($completedReviews / $totalReviews) * 100, 1) : 0,
+            'average_rating' => $averageRating ? round($averageRating, 2) : null,
+            'reviews' => $reviews->toArray(),
+        ];
+    }
+
+    /**
+     * Get company-wide performance summary
+     */
+    public function getCompanyPerformanceSummary(?int $cycleId = null): array
+    {
+        $query = DB::table('performance_reviews as pr')
+            ->join('employee_profiles as ep', 'pr.employee_id', '=', 'ep.id')
+            ->whereNull('ep.deleted_at');
+
+        if ($cycleId) {
+            $query->where('pr.review_cycle_id', $cycleId);
+        }
+
+        $reviews = $query->select(
+            'pr.id',
+            'pr.employee_id',
+            'pr.overall_rating',
+            'pr.status',
+            'pr.review_type'
+        )->get();
+
+        $totalReviews = $reviews->count();
+        $completedReviews = $reviews->where('status', 'completed')->count();
+        $averageRating = $reviews->where('overall_rating', '>', 0)->avg('overall_rating');
+
+        // Rating distribution
+        $ratingDistribution = $reviews
+            ->where('overall_rating', '>', 0)
+            ->groupBy('overall_rating')
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        // Status breakdown
+        $statusBreakdown = $reviews
+            ->groupBy('status')
+            ->map(fn ($group) => $group->count())
+            ->toArray();
+
+        return [
+            'total_reviews' => $totalReviews,
+            'completed_reviews' => $completedReviews,
+            'completion_rate' => $totalReviews > 0 ? round(($completedReviews / $totalReviews) * 100, 1) : 0,
+            'average_rating' => $averageRating ? round($averageRating, 2) : null,
+            'rating_distribution' => $ratingDistribution,
+            'status_breakdown' => $statusBreakdown,
+        ];
+    }
+
+    /**
+     * Get rating distribution across the company
+     */
+    public function getRatingDistribution(?int $cycleId = null): array
+    {
+        $query = DB::table('performance_reviews as pr')
+            ->join('employee_profiles as ep', 'pr.employee_id', '=', 'ep.id')
+            ->whereNull('ep.deleted_at')
+            ->where('pr.status', 'completed')
+            ->whereNotNull('pr.overall_rating');
+
+        if ($cycleId) {
+            $query->where('pr.review_cycle_id', $cycleId);
+        }
+
+        $ratings = $query->select('pr.overall_rating')->get();
+
+        $distribution = [
+            1 => 0,
+            2 => 0,
+            3 => 0,
+            4 => 0,
+            5 => 0,
+        ];
+
+        foreach ($ratings as $rating) {
+            $ratingValue = (int) $rating->overall_rating;
+            if (isset($distribution[$ratingValue])) {
+                $distribution[$ratingValue]++;
+            }
+        }
+
+        $total = $ratings->count();
+
+        return [
+            'distribution' => $distribution,
+            'percentages' => array_map(
+                fn ($count) => $total > 0 ? round(($count / $total) * 100, 1) : 0,
+                $distribution
+            ),
+            'total' => $total,
+            'average' => $total > 0 ? round($ratings->avg('overall_rating'), 2) : null,
+        ];
+    }
+
+    /**
+     * Get goal completion rate metrics
+     */
+    public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array
+    {
+        $query = DB::table('performance_goals as pg')
+            ->join('employee_profiles as ep', 'pg.employee_id', '=', 'ep.id')
+            ->whereNull('ep.deleted_at');
+
+        if ($employeeId) {
+            $query->where('pg.employee_id', $employeeId);
+        }
+
+        if ($teamId) {
+            $query->join('team_members as tm', 'tm.employee_id', '=', 'ep.id')
+                ->where('tm.team_id', $teamId)
+                ->whereNull('tm.left_at');
+        }
+
+        $goals = $query->select(
+            'pg.id',
+            'pg.employee_id',
+            'pg.title',
+            'pg.status',
+            'pg.progress_percentage',
+            'pg.category',
+            'pg.target_date'
+        )->get();
+
+        $totalGoals = $goals->count();
+        $completedGoals = $goals->where('status', 'completed')->count();
+        $inProgressGoals = $goals->where('status', 'in_progress')->count();
+        $notStartedGoals = $goals->where('status', 'not_started')->count();
+
+        // Average progress
+        $averageProgress = $goals->avg('progress_percentage');
+
+        // Goals by category
+        $byCategory = $goals->groupBy('category')->map(function ($categoryGoals) {
+            $total = $categoryGoals->count();
+            $completed = $categoryGoals->where('status', 'completed')->count();
+            return [
+                'total' => $total,
+                'completed' => $completed,
+                'completion_rate' => $total > 0 ? round(($completed / $total) * 100, 1) : 0,
+            ];
+        })->toArray();
+
+        // Overdue goals
+        $now = Carbon::now()->toDateString();
+        $overdueGoals = $goals->filter(function ($goal) use ($now) {
+            return $goal->status !== 'completed'
+                && $goal->status !== 'cancelled'
+                && $goal->target_date < $now;
+        })->count();
+
+        return [
+            'total_goals' => $totalGoals,
+            'completed_goals' => $completedGoals,
+            'in_progress_goals' => $inProgressGoals,
+            'not_started_goals' => $notStartedGoals,
+            'completion_rate' => $totalGoals > 0 ? round(($completedGoals / $totalGoals) * 100, 1) : 0,
+            'average_progress' => $averageProgress ? round($averageProgress, 1) : 0,
+            'by_category' => $byCategory,
+            'overdue_goals' => $overdueGoals,
+        ];
+    }
+
+    /**
+     * Get feedback metrics
+     */
+    public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array
+    {
+        $query = DB::table('performance_feedback as pf')
+            ->join('employee_profiles as ep', 'pf.employee_id', '=', 'ep.id')
+            ->whereNull('ep.deleted_at');
+
+        if ($employeeId) {
+            $query->where(function ($q) use ($employeeId) {
+                $q->where('pf.employee_id', $employeeId)
+                    ->orWhere('pf.giver_id', $employeeId);
+            });
+        }
+
+        if ($teamId) {
+            $query->join('team_members as tm', 'tm.employee_id', '=', 'ep.id')
+                ->where('tm.team_id', $teamId)
+                ->whereNull('tm.left_at');
+        }
+
+        $feedback = $query->select(
+            'pf.id',
+            'pf.employee_id',
+            'pf.giver_id',
+            'pf.feedback_type',
+            'pf.is_private',
+            'pf.created_at'
+        )->get();
+
+        $totalFeedback = $feedback->count();
+
+        // Feedback by type
+        $byType = $feedback->groupBy('feedback_type')->map(fn ($group) => $group->count())->toArray();
+
+        // Recent feedback (last 30 days)
+        $thirtyDaysAgo = Carbon::now()->subDays(30);
+        $recentFeedback = $feedback->filter(fn ($f) => Carbon::parse($f->created_at)->gte($thirtyDaysAgo))->count();
+
+        return [
+            'total_feedback' => $totalFeedback,
+            'by_type' => $byType,
+            'recent_feedback_30d' => $recentFeedback,
+            'average_per_employee' => $employeeId ? null : ($totalFeedback > 0 ? round($totalFeedback / DB::table('employee_profiles')->whereNull('deleted_at')->count(), 2) : 0),
+        ];
     }
 }

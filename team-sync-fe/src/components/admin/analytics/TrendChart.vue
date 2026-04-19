@@ -1,21 +1,29 @@
 <template>
-  <div class="bg-white rounded-lg shadow p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-semibold text-gray-900">{{ title }}</h3>
-      <div v-if="subtitle" class="text-sm text-gray-500">{{ subtitle }}</div>
+  <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+    <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+      <div>
+        <h3 class="text-lg font-bold text-[#202020]">{{ title }}</h3>
+        <p v-if="subtitle" class="text-sm font-medium text-[#737373] mt-1">{{ subtitle }}</p>
+      </div>
     </div>
 
-    <div v-if="loading" class="flex items-center justify-center h-64">
-      <div
-        class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"
-      ></div>
+    <div v-if="loading" class="flex items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px]">
+      <div class="relative w-12 h-12">
+        <div class="absolute inset-0 rounded-full border-2 border-gray-200"></div>
+        <div class="absolute inset-0 rounded-full border-2 border-[#0C51D9] border-t-transparent animate-spin"></div>
+      </div>
     </div>
 
     <div
       v-else-if="!chartData || chartData.length === 0"
-      class="flex items-center justify-center h-64 text-gray-500"
+      class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200"
     >
-      No data available
+      <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
+        <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+        </svg>
+      </div>
+      <p class="text-sm font-medium text-[#737373]">No data available</p>
     </div>
 
     <VueApexCharts
@@ -75,11 +83,11 @@ const apexOptions = computed(() => {
       toolbar: { show: false },
       fontFamily: 'inherit'
     },
-    colors: ["#3b82f6"],
-    stroke: isLine ? { curve: "smooth", width: 2 } : undefined,
-    plotOptions: !isLine ? { bar: { borderRadius: 4 } } : undefined,
+    colors: ["#0C51D9"],
+    stroke: isLine ? { curve: "smooth", width: 3 } : undefined,
+    plotOptions: !isLine ? { bar: { borderRadius: 6, columnWidth: '45%' } } : undefined,
     fill: isLine
-      ? { type: "gradient", gradient: { opacityFrom: 0.4, opacityTo: 0.1 } }
+      ? { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.45, opacityTo: 0.05, stops: [50, 100, 100] } }
       : undefined,
     xaxis: {
       categories: (props.chartData || []).map((item) => item[props.xKey]),
