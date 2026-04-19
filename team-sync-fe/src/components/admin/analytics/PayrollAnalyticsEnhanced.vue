@@ -45,7 +45,7 @@
           Payroll Cost Trends
         </h3>
         <VueApexCharts
-          v-if="payrollCostTrends.total_cost_trend"
+          v-if="payrollCostTrends?.total_cost_trend"
           type="line"
           height="300"
           :options="costTrendOptions"
