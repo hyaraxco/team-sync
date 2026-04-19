@@ -8,11 +8,18 @@ import LatestEmployees from "@/components/admin/dashboard/LatestEmployees.vue";
 import LatestTeams from "@/components/admin/dashboard/LatestTeams.vue";
 import TodayAttendanceOverview from "@/components/admin/dashboard/TodayAttendanceOverview.vue";
 
+import PayrollAnalyticsEnhanced from "@/components/admin/analytics/PayrollAnalyticsEnhanced.vue";
+
 const authStore = useAuthStore();
 
 // Check if user is employee role
 const isEmployee = computed(() => {
   return authStore.user?.roles?.some((role: any) => role === "employee");
+});
+
+// Check if user is finance role
+const isFinance = computed(() => {
+  return authStore.user?.roles?.some((role: any) => role === "finance");
 });
 
 // Check if user has dashboard view permission
@@ -36,6 +43,15 @@ const handleSearch = (params) => {
       <div class="space-y-6">
         <EmployeeStatistics />
         <SearchSection v-if="hasDashboardPermission" @search="handleSearch" />
+      </div>
+    </template>
+
+    <template v-else-if="isFinance">
+      <div class="space-y-6">
+        <div class="flex items-center justify-between">
+          <h1 class="text-2xl font-bold text-gray-900">Finance Dashboard</h1>
+        </div>
+        <PayrollAnalyticsEnhanced />
       </div>
     </template>
 
