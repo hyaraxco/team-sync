@@ -16,6 +16,7 @@ import {
   TargetIcon,
   MessageSquareIcon,
   StarIcon,
+  ScaleIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
@@ -284,7 +285,28 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <!-- 2. Review Cycles (HR manages) -->
+          <!-- 2. Pending Calibration (HR calibrates) -->
+          <RouterLink
+            v-if="can('review-calibrate')"
+            :to="{ name: 'admin.performance.pending-calibration' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.pending-calibration',
+            }"
+            @click="onNavigate"
+          >
+            <ScaleIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.pending-calibration' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.pending-calibration' }"
+              >Pending Calibration</span
+            >
+          </RouterLink>
+
+          <!-- 3. Review Cycles (HR manages) -->
           <RouterLink
             v-if="can('review-cycle-manage')"
             :to="{ name: 'admin.performance.cycles' }"
