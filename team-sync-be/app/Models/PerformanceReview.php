@@ -18,6 +18,7 @@ class PerformanceReview extends Model
         'status',
         'self_assessment_submitted_at',
         'manager_assessment_submitted_at',
+        'manager_recommended_rating',
         'final_rating',
         'final_rating_label',
         'calibrated_at',
@@ -32,6 +33,7 @@ class PerformanceReview extends Model
         'calibrated_at' => 'datetime',
         'completed_at' => 'datetime',
         'acknowledged_by_employee_at' => 'datetime',
+        'manager_recommended_rating' => 'decimal:2',
         'final_rating' => 'decimal:2',
     ];
 
