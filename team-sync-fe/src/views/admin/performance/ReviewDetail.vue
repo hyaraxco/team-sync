@@ -34,6 +34,8 @@ const {
   sectionsLoading,
   error,
   success,
+  calibrationContext,
+  calibrationContextLoading,
 } = storeToRefs(reviewStore);
 
 const reviewId = computed(() => route.params.id);
@@ -45,10 +47,7 @@ const confirmAction = shallowRef(null);
 // Assessment form data
 const selfAssessmentForm = ref({});
 const managerAssessmentForm = ref({});
-const managerFinalRating = shallowRef(null);
 const calibrationForm = ref({});
-const calibrationFinalRating = shallowRef(null);
-const calibrationFinalLabel = shallowRef("");
 
 // Tabs config
 const tabs = [
@@ -166,7 +165,11 @@ const canSubmitManagerAssessment = computed(() => {
 });
 
 const canCalibrate = computed(() => {
-  return reviewStatus.value === "pending_calibration" && hasRole("hr");
+  return (
+    reviewStatus.value === "pending_calibration" &&
+    hasRole("hr") &&
+    currentEmployeeId.value !== review.value?.employee_id
+  );
 });
 
 // Get sections list (from review responses or from sections endpoint)
@@ -209,14 +212,6 @@ const initFormData = () => {
       rating: existingResponse?.final_rating || null,
     };
   });
-
-  if (review.value.final_rating) {
-    managerFinalRating.value = review.value.final_rating;
-    calibrationFinalRating.value = review.value.final_rating;
-  }
-  if (review.value.final_rating_label) {
-    calibrationFinalLabel.value = review.value.final_rating_label;
-  }
 };
 
 // Form validation
@@ -235,11 +230,39 @@ const isManagerAssessmentValid = computed(() => {
 });
 
 const isCalibrationValid = computed(() => {
-  return (
-    calibrationFinalRating.value &&
-    calibrationFinalRating.value >= 1 &&
-    calibrationFinalRating.value <= 5
-  );
+  return canCalibrate.value;
+});
+
+const calculatedFinalRating = computed(() => {
+  if (!displaySections.value.length) return null;
+  let weightedSum = 0;
+  let totalWeight = 0;
+  for (const section of displaySections.value) {
+    const response = getResponseForSection(section.id);
+    const calibrationOverride = calibrationForm.value[section.id]?.rating;
+    const effectiveRating = calibrationOverride || response?.manager_rating || response?.self_rating;
+    if (effectiveRating && section.weight) {
+      weightedSum += effectiveRating * parseFloat(section.weight);
+      totalWeight += parseFloat(section.weight);
+    }
+  }
+  if (totalWeight <= 0) return null;
+  return Math.max(1, Math.min(5, weightedSum / totalWeight)).toFixed(2);
+});
+
+const calculatedManagerRating = computed(() => {
+  if (!displaySections.value.length) return null;
+  let weightedSum = 0;
+  let totalWeight = 0;
+  for (const section of displaySections.value) {
+    const rating = managerAssessmentForm.value[section.id]?.rating;
+    if (rating && section.weight) {
+      weightedSum += rating * parseFloat(section.weight);
+      totalWeight += parseFloat(section.weight);
+    }
+  }
+  if (totalWeight <= 0) return null;
+  return Math.max(1, Math.min(5, weightedSum / totalWeight)).toFixed(2);
 });
 
 // Submit handlers
@@ -281,7 +304,7 @@ const submitManagerAssessment = async () => {
     await reviewStore.submitManagerAssessment(
       reviewId.value,
       responses,
-      managerFinalRating.value,
+      null,
     );
     await reviewStore.fetchReviewById(reviewId.value);
   } finally {
@@ -301,8 +324,6 @@ const submitCalibration = async () => {
     await reviewStore.calibrateReview(
       reviewId.value,
       responses,
-      calibrationFinalRating.value,
-      calibrationFinalLabel.value,
     );
     await reviewStore.fetchReviewById(reviewId.value);
   } finally {
@@ -343,10 +364,18 @@ onMounted(async () => {
     reviewStore.fetchActiveSections(),
   ]);
   initFormData();
+
+  // Fetch calibration context if review is pending calibration
+  if (currentReview.value?.status === 'pending_calibration') {
+    reviewStore.fetchCalibrationContext(reviewId.value);
+  }
 });
 
-watch(currentReview, () => {
+watch(currentReview, (newVal) => {
   initFormData();
+  if (newVal?.status === 'pending_calibration') {
+    reviewStore.fetchCalibrationContext(reviewId.value);
+  }
 });
 </script>
 
@@ -1055,31 +1084,28 @@ watch(currentReview, () => {
             </div>
           </MainCard>
 
-          <!-- Final Rating Input (Manager) -->
+          <!-- Auto-Calculated Rating Preview (Manager) -->
           <MainCard v-if="canSubmitManagerAssessment">
             <div class="space-y-4">
               <h3 class="text-lg font-semibold text-brand-dark">
-                Overall Final Rating
+                Projected Final Rating
               </h3>
               <p class="text-sm text-brand-light">
-                Provide an overall rating for this employee (1.00 - 5.00)
+                Auto-calculated from your section ratings above.
               </p>
               <div class="flex items-center gap-4">
-                <input
-                  v-model.number="managerFinalRating"
-                  type="number"
-                  min="1"
-                  max="5"
-                  step="0.01"
-                  class="w-32 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent text-center text-lg font-bold"
-                  placeholder="0.00"
-                />
-                <span
-                  v-if="managerFinalRating"
-                  class="px-3 py-1 text-sm font-medium rounded-full border"
-                  :class="getRatingLabel(managerFinalRating)?.bg"
+                <p
+                  class="text-3xl font-bold"
+                  :class="getRatingLabel(calculatedManagerRating)?.color || 'text-gray-400'"
                 >
-                  {{ getRatingLabel(managerFinalRating)?.label }}
+                  {{ calculatedManagerRating || '-' }}
+                </p>
+                <span
+                  v-if="calculatedManagerRating"
+                  class="px-3 py-1 text-sm font-medium rounded-full border"
+                  :class="getRatingLabel(calculatedManagerRating)?.bg"
+                >
+                  {{ getRatingLabel(calculatedManagerRating)?.label }}
                 </span>
               </div>
             </div>
@@ -1274,80 +1300,113 @@ watch(currentReview, () => {
             </div>
           </MainCard>
 
-          <!-- Final Rating & Label (Calibration) -->
+          <!-- Auto-Calculated Rating & Normalization Context -->
           <MainCard v-if="canCalibrate">
-            <div class="space-y-4">
-              <h3 class="text-lg font-semibold text-brand-dark">
-                Final Rating & Label
-              </h3>
-              <p class="text-sm text-brand-light">
-                Set the final calibrated rating and performance label for this
-                review.
-              </p>
-              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label class="block text-sm font-medium text-brand-dark mb-2"
-                    >Final Rating (Required)</label
+            <div class="space-y-6">
+              <!-- Projected Final Rating -->
+              <div>
+                <h3 class="text-lg font-semibold text-brand-dark">
+                  Projected Final Rating
+                </h3>
+                <p class="text-sm text-brand-light mt-1">
+                  Auto-calculated from weighted section ratings. Adjust section overrides above to see changes.
+                </p>
+                <div class="mt-3 flex items-center gap-4">
+                  <p
+                    class="text-4xl font-bold"
+                    :class="getRatingLabel(calculatedFinalRating)?.color || 'text-gray-400'"
                   >
-                  <input
-                    v-model.number="calibrationFinalRating"
-                    type="number"
-                    min="1"
-                    max="5"
-                    step="0.01"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent text-lg font-bold"
-                    placeholder="0.00"
-                  />
+                    {{ calculatedFinalRating || '-' }}
+                  </p>
                   <span
-                    v-if="calibrationFinalRating"
-                    class="px-3 py-1 text-xs font-medium rounded-full border mt-2 inline-block"
-                    :class="getRatingLabel(calibrationFinalRating)?.bg"
+                    v-if="calculatedFinalRating"
+                    class="px-3 py-1 text-sm font-medium rounded-full border"
+                    :class="getRatingLabel(calculatedFinalRating)?.bg"
                   >
-                    {{ getRatingLabel(calibrationFinalRating)?.label }}
+                    {{ getRatingLabel(calculatedFinalRating)?.label }}
                   </span>
                 </div>
-                <div>
-                  <label class="block text-sm font-medium text-brand-dark mb-2"
-                    >Performance Label</label
+              </div>
+
+              <!-- Manager's Recommended Rating -->
+              <div v-if="review.manager_recommended_rating" class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                <p class="text-sm font-medium text-blue-700">Manager's Recommended Rating</p>
+                <div class="flex items-center gap-3 mt-2">
+                  <p class="text-2xl font-bold text-blue-800">
+                    {{ Number(review.manager_recommended_rating).toFixed(2) }}
+                  </p>
+                  <span
+                    class="px-2 py-1 text-xs font-medium rounded-full border"
+                    :class="getRatingLabel(review.manager_recommended_rating)?.bg"
                   >
-                  <select
-                    v-model="calibrationFinalLabel"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
-                  >
-                    <option value="">Select label...</option>
-                    <option value="Outstanding">Outstanding</option>
-                    <option value="Exceeds Expectations">
-                      Exceeds Expectations
-                    </option>
-                    <option value="Meets Expectations">
-                      Meets Expectations
-                    </option>
-                    <option value="Needs Improvement">
-                      Needs Improvement
-                    </option>
-                    <option value="Unsatisfactory">Unsatisfactory</option>
-                  </select>
+                    {{ getRatingLabel(review.manager_recommended_rating)?.label }}
+                  </span>
                 </div>
+              </div>
+
+              <!-- Normalization Context -->
+              <div v-if="calibrationContext && !calibrationContextLoading">
+                <h4 class="text-sm font-semibold text-brand-dark mb-3">
+                  Cross-Manager Normalization Context
+                </h4>
+                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-brand-light">Cycle</span>
+                    <span class="text-sm font-medium text-brand-dark">{{ calibrationContext.cycle_name }}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-brand-light">Total Reviews in Cycle</span>
+                    <span class="text-sm font-medium text-brand-dark">{{ calibrationContext.total_reviews_in_cycle }}</span>
+                  </div>
+                  <div class="flex items-center justify-between">
+                    <span class="text-sm text-brand-light">Cycle Average Rating</span>
+                    <span class="text-sm font-bold text-brand-dark">{{ calibrationContext.cycle_avg_rating || '-' }}</span>
+                  </div>
+                  <div v-if="calibrationContext.manager_breakdown?.length" class="mt-3 pt-3 border-t border-gray-200">
+                    <p class="text-xs font-semibold text-brand-dark mb-2 uppercase tracking-wider">Manager Breakdown</p>
+                    <div class="space-y-2">
+                      <div
+                        v-for="manager in calibrationContext.manager_breakdown"
+                        :key="manager.manager_id"
+                        class="flex items-center justify-between p-2 rounded-lg"
+                        :class="manager.is_current_reviewer ? 'bg-blue-50 border border-blue-200' : 'bg-white'"
+                      >
+                        <div class="flex items-center gap-2">
+                          <span class="text-sm text-brand-dark">{{ manager.manager_name }}</span>
+                          <span v-if="manager.is_current_reviewer" class="text-xs text-blue-600 font-medium">(This reviewer)</span>
+                        </div>
+                        <div class="flex items-center gap-3 text-sm">
+                          <span class="text-brand-light">{{ manager.review_count }} reviews</span>
+                          <span class="font-semibold text-brand-dark">Avg: {{ manager.avg_rating || '-' }}</span>
+                          <span class="text-xs text-brand-light">{{ manager.min_rating }}-{{ manager.max_rating }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else-if="calibrationContextLoading" class="flex justify-center py-4">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+              </div>
+
+              <!-- Submit Button -->
+              <div class="flex justify-end pt-2">
+                <button
+                  @click="openConfirmModal('calibrate')"
+                  :disabled="!isCalibrationValid || submitting"
+                  class="px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all"
+                  :class="
+                    isCalibrationValid && !submitting
+                      ? 'bg-purple-600 text-white hover:bg-purple-700'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  "
+                >
+                  <ScaleIcon class="w-4 h-4" />
+                  Finalize Calibration
+                </button>
               </div>
             </div>
           </MainCard>
-
-          <!-- Submit Button -->
-          <div v-if="canCalibrate" class="flex justify-end">
-            <button
-              @click="openConfirmModal('calibrate')"
-              :disabled="!isCalibrationValid || submitting"
-              class="px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all"
-              :class="
-                isCalibrationValid && !submitting
-                  ? 'bg-purple-600 text-white hover:bg-purple-700'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-              "
-            >
-              <ScaleIcon class="w-4 h-4" />
-              Finalize Calibration
-            </button>
-          </div>
 
           <!-- Readonly final result for completed reviews -->
           <MainCard
