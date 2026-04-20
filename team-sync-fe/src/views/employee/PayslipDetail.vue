@@ -200,10 +200,13 @@ const getAdjustmentStatusClass = (status) => {
                 {{ formatPeriod(payslip.period) }}
               </p>
               <div
-                class="mt-2 flex w-fit items-center gap-2 rounded-full bg-green-100 px-3 py-1.5 text-sm font-semibold text-green-800"
+                class="mt-2 flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-sm font-semibold"
+                :class="payslip.status === 'paid'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-yellow-100 text-yellow-800'"
               >
                 <BadgeCheck class="w-4 h-4" />
-                Paid
+                {{ payslip.status === 'paid' ? 'Paid' : payslip.status || 'Paid' }}
               </div>
             </div>
             <div class="text-right">

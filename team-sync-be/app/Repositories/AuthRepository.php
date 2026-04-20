@@ -20,7 +20,9 @@ class AuthRepository implements AuthRepositoryInterface
                 throw new \Exception('Unauthorized', 401);
             }
 
-            $user = Auth::user()->load(['roles', 'permissions']);
+            /** @var \App\Models\User $user */
+            $user = Auth::user();
+            $user->load(['roles', 'permissions']);
             $user->token = $user->createToken('auth_token')->plainTextToken;
 
             DB::commit();
@@ -39,9 +41,9 @@ class AuthRepository implements AuthRepositoryInterface
             throw new \Exception('Unauthorized', 401);
         }
 
-        $user = Auth::user()->load(['roles', 'permissions']);
-
-        $user->load('employeeProfile.jobInformation');
+        /** @var \App\Models\User $user */
+        $user = Auth::user();
+        $user->load(['roles', 'permissions', 'employeeProfile.jobInformation']);
 
         return $user;
     }
@@ -52,6 +54,7 @@ class AuthRepository implements AuthRepositoryInterface
             throw new \Exception('Unauthorized', 401);
         }
 
+        /** @var \App\Models\User $user */
         $user = Auth::user();
         $user->tokens()->delete();
 
@@ -67,6 +70,7 @@ class AuthRepository implements AuthRepositoryInterface
                 throw new \Exception('Unauthorized', 401);
             }
 
+            /** @var \App\Models\User $user */
             $user = Auth::user();
 
             if (isset($data['name'])) {

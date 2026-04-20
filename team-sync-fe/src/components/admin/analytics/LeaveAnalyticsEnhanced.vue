@@ -52,12 +52,12 @@
     <!-- Peak Leave Periods -->
     <div
       v-if="peakLeavePeriods?.peak_periods"
-      class="bg-white rounded-lg shadow p-6"
+      class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
     >
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">
         Peak Leave Periods
       </h3>
-      <apexchart
+      <VueApexCharts
         type="bar"
         height="300"
         :options="peakPeriodsChartOptions"
@@ -68,9 +68,9 @@
     <!-- Leave Balance Trends by Type -->
     <div
       v-if="leaveBalanceTrends?.trends"
-      class="bg-white rounded-lg shadow p-6"
+      class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
     >
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">
         Leave Balance by Type
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -114,11 +114,11 @@
     <!-- Existing Leave Analytics -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Leave Type Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
           Leave Type Distribution
         </h3>
-        <apexchart
+        <VueApexCharts
           v-if="!leaveLoading && leave?.leave_type_distribution"
           type="donut"
           height="300"
@@ -128,9 +128,9 @@
       </div>
 
       <!-- Leave Status Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Leave Status</h3>
-        <apexchart
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">Leave Status</h3>
+        <VueApexCharts
           v-if="!leaveLoading && leave?.status_distribution"
           type="donut"
           height="300"

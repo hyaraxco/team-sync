@@ -10,8 +10,13 @@ import { RouterLink } from "vue-router";
 const authStore = useAuthStore();
 const { loading, error, success } = storeToRefs(authStore);
 const email = shallowRef("");
-const fieldErrors = computed(() =>
-  error.value && typeof error.value === "object" ? error.value : {}
+
+type ForgotPasswordFieldErrors = Partial<Record<"email", string[]>>;
+
+const fieldErrors = computed<ForgotPasswordFieldErrors>(() =>
+  error.value && typeof error.value === "object"
+    ? (error.value as ForgotPasswordFieldErrors)
+    : {},
 );
 
 const handleSubmit = async () => {
@@ -20,17 +25,28 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="w-full max-w-[420px] mx-auto animate-fadeIn px-4">
+  <div class="w-full max-w-md mx-auto animate-fadeIn px-4">
     <!-- Success State -->
     <div v-if="success" class="text-center">
-      <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-green-50 mb-6 ring-4 ring-white shadow-sm">
-        <CheckCircle2 class="h-8 w-8 text-green-500" aria-hidden="true" stroke-width="1.5" />
+      <div
+        class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-50 mb-6 ring-4 ring-white shadow-sm"
+      >
+        <CheckCircle2
+          class="h-8 w-8 text-green-500"
+          aria-hidden="true"
+          stroke-width="1.5"
+        />
       </div>
       <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
         Check your email
       </h1>
-      <p class="mt-3 text-[15px] text-gray-600 max-w-[280px] mx-auto leading-relaxed">
-        We've sent a password reset link to <br/><strong class="text-gray-900 font-semibold">{{ email }}</strong>
+      <p
+        class="mt-3 text-[15px] text-gray-600 max-w-[280px] mx-auto leading-relaxed"
+      >
+        We've sent a password reset link to <br /><strong
+          class="text-gray-900 font-semibold"
+          >{{ email }}</strong
+        >
       </p>
       <div class="mt-8 rounded-xl bg-gray-50 p-4 border border-gray-100">
         <p class="text-sm text-gray-500">
@@ -41,7 +57,10 @@ const handleSubmit = async () => {
         :to="{ name: 'login' }"
         class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20"
       >
-        <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
+        <ArrowLeft
+          class="h-4 w-4 transition-transform group-hover:-translate-x-1"
+          aria-hidden="true"
+        />
         Return to sign in
       </RouterLink>
     </div>
@@ -49,13 +68,12 @@ const handleSubmit = async () => {
     <!-- Form State -->
     <template v-else>
       <div class="text-center mb-8">
-        <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 mb-6 ring-4 ring-white shadow-sm">
-          <Mail class="h-6 w-6 text-[#0C51D9]" aria-hidden="true" stroke-width="1.5" />
-        </div>
         <h1 class="text-3xl font-bold text-gray-900 tracking-tight">
           Reset password
         </h1>
-        <p class="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-[280px] mx-auto">
+        <p
+          class="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-[280px] mx-auto"
+        >
           Enter your email and we'll send you a link to reset your password.
         </p>
       </div>
@@ -73,7 +91,9 @@ const handleSubmit = async () => {
       </Transition>
 
       <!-- Form Card -->
-      <div class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)] text-left">
+      <div
+        class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+      >
         <form class="space-y-6" @submit.prevent="handleSubmit" novalidate>
           <Input
             id="email"
@@ -98,26 +118,53 @@ const handleSubmit = async () => {
             :disabled="loading"
           >
             <span class="relative z-10 flex items-center gap-2">
-              {{ loading ? 'Sending…' : 'Send reset link' }}
-              <Send v-if="!loading" class="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden="true" />
-              <svg v-else class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              {{ loading ? "Sending…" : "Send reset link" }}
+              <Send
+                v-if="!loading"
+                class="h-4 w-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                aria-hidden="true"
+              />
+              <svg
+                v-else
+                class="animate-spin h-4 w-4 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                ></path>
               </svg>
             </span>
-            <div v-if="!loading" class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+            <div
+              v-if="!loading"
+              class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
+            ></div>
           </button>
         </form>
       </div>
 
       <!-- Back Link -->
-      <div class="mt-8 text-center">
+      <div class="mt-6">
         <RouterLink
           :to="{ name: 'login' }"
-          class="inline-flex items-center gap-2 text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors"
+          class="group mx-auto flex w-full max-w-[260px] items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-600 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200/70"
         >
-          <ArrowLeft class="h-4 w-4" aria-hidden="true" />
-          Back to sign in
+          <ArrowLeft
+            class="h-4 w-4 shrink-0 transition-transform group-hover:-translate-x-0.5"
+            aria-hidden="true"
+          />
+          <span>Back to sign in</span>
         </RouterLink>
       </div>
     </template>
@@ -126,8 +173,14 @@ const handleSubmit = async () => {
 
 <style>
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .animate-fadeIn {

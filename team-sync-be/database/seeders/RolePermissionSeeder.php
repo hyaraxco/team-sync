@@ -33,6 +33,11 @@ class RolePermissionSeeder extends Seeder
                 'leave-request-create',
                 'leave-request-my-requests',
                 'payslip-view',
+                // Performance Management Baseline
+                'performance-menu',
+                'review-self-submit',
+                'goal-create-own',
+                'feedback-give',
             ];
 
             $employeeSpecific = array_merge($selfServiceBaseline, [
@@ -65,6 +70,10 @@ class RolePermissionSeeder extends Seeder
                 'attendance-',
                 'leave-request-',
                 'analytics-',
+                'performance-',
+                'review-',
+                'goal-',
+                'feedback-',
             ], array_merge($employeeSpecific, [
                 'task-delete',
             ]))->merge(
@@ -108,9 +117,6 @@ class RolePermissionSeeder extends Seeder
                     'dashboard-view',
                     'employee-menu',
                     'employee-list',
-                    'attendance-menu',
-                    'attendance-list',
-                    'leave-request-list',
                     'payroll-menu',
                     'payroll-list',
                     'payroll-edit',

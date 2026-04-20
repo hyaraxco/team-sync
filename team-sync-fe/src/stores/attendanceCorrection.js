@@ -21,7 +21,7 @@ export const useAttendanceCorrectionStore = defineStore('attendanceCorrection', 
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('attendance-corrections/my-corrections');
+                const response = await axiosInstance.get('my-attendance-corrections');
                 this.myCorrections = response.data.data;
             } catch (error) {
                 this.error = handleError(error);

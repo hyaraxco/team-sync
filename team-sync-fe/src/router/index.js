@@ -1,50 +1,51 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import AuthLayout from '@/layouts/Auth.vue'
-import AdminLayout from '@/layouts/Admin.vue'
-import Login from '@/views/auth/Login.vue'
-import ForgotPassword from '@/views/auth/ForgotPassword.vue'
-import ResetPassword from '@/views/auth/ResetPassword.vue'
-import VerifyEmailResult from '@/views/auth/VerifyEmailResult.vue'
-import AdminDashboard from '@/views/admin/Dashboard.vue'
-import teamRoutes from './team';
-import employeeRoutes from './employee';
-import EmployeeCreate from '@/views/admin/employee/EmployeeCreate.vue';
-import EmployeeEdit from '@/views/admin/employee/EmployeeEdit.vue';
-import EmployeeDetail from '@/views/admin/employee/EmployeeDetail.vue';
-import EmployeeProfile from '@/views/employee/EmployeeProfile.vue';
-import EmployeeTeam from '@/views/employee/EmployeeTeam.vue';
-import EmployeeCreateLayout from '@/layouts/EmployeeCreateLayout.vue';
-import projectRoutes from './project';
-import attendanceRoutes from './attendance';
-import payrollRoutes from './payroll';
-import analyticsRoutes from './analytics';
-import { hasRoutePermissionAccess } from './permissionAccess';
+import { createRouter, createWebHistory } from "vue-router";
+import { useAuthStore } from "@/stores/auth";
+import AuthLayout from "@/layouts/Auth.vue";
+import AdminLayout from "@/layouts/Admin.vue";
+import Login from "@/views/auth/Login.vue";
+import ForgotPassword from "@/views/auth/ForgotPassword.vue";
+import ResetPassword from "@/views/auth/ResetPassword.vue";
+import VerifyEmailResult from "@/views/auth/VerifyEmailResult.vue";
+import AdminDashboard from "@/views/admin/Dashboard.vue";
+import teamRoutes from "./team";
+import employeeRoutes from "./employee";
+import EmployeeCreate from "@/views/admin/employee/EmployeeCreate.vue";
+import EmployeeEdit from "@/views/admin/employee/EmployeeEdit.vue";
+import EmployeeDetail from "@/views/admin/employee/EmployeeDetail.vue";
+import EmployeeProfile from "@/views/employee/EmployeeProfile.vue";
+import EmployeeTeam from "@/views/employee/EmployeeTeam.vue";
+import EmployeeCreateLayout from "@/layouts/EmployeeCreateLayout.vue";
+import projectRoutes from "./project";
+import attendanceRoutes from "./attendance";
+import payrollRoutes from "./payroll";
+import analyticsRoutes from "./analytics";
+import performanceRoutes from "./performance";
+import { hasRoutePermissionAccess } from "./permissionAccess";
 
 export const appRoutes = [
   {
-    path: '/',
-    redirect: '/admin/dashboard',
+    path: "/",
+    redirect: "/admin/dashboard",
   },
   {
-    path: '/admin',
+    path: "/admin",
     component: AdminLayout,
     meta: {
       requiresAuth: true,
     },
     children: [
       {
-        path: 'dashboard',
-        name: 'admin.dashboard',
+        path: "dashboard",
+        name: "admin.dashboard",
         component: AdminDashboard,
         meta: {
-          requiredPermission: 'dashboard-menu',
+          requiredPermission: "dashboard-menu",
         },
       },
       {
-        path: 'notifications',
-        name: 'admin.notifications',
-        component: () => import('@/views/admin/Notifications.vue'),
+        path: "notifications",
+        name: "admin.notifications",
+        component: () => import("@/views/admin/Notifications.vue"),
         meta: {
           allowAuthenticated: true,
         },
@@ -55,107 +56,108 @@ export const appRoutes = [
       ...attendanceRoutes,
       ...payrollRoutes,
       ...analyticsRoutes,
+      ...performanceRoutes,
       {
-        path: 'my-profile',
-        name: 'employee.profile',
+        path: "my-profile",
+        name: "employee.profile",
         component: EmployeeProfile,
         meta: {
-          requiredPermission: 'profile-menu',
+          requiredPermission: "profile-menu",
         },
       },
       {
-        path: 'my-profile/edit',
-        name: 'employee.profile.edit',
-        component: () => import('@/views/employee/EmployeeProfileEdit.vue'),
+        path: "my-profile/edit",
+        name: "employee.profile.edit",
+        component: () => import("@/views/employee/EmployeeProfileEdit.vue"),
         meta: {
-          requiredPermission: 'profile-menu',
+          requiredPermission: "profile-menu",
         },
       },
       {
-        path: 'my-team',
-        name: 'employee.team',
+        path: "my-team",
+        name: "employee.team",
         component: EmployeeTeam,
         meta: {
-          requiredPermission: 'team-view',
+          requiredPermission: "team-view",
         },
-      }
+      },
     ],
   },
   {
-    path: '/admin/employees/create',
+    path: "/admin/employees/create",
     component: EmployeeCreateLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: 'employee-create',
+      requiredPermission: "employee-create",
     },
     children: [
       {
-        path: '',
-        name: 'admin.employees.create',
-        component: EmployeeCreate
-      }
-    ]
+        path: "",
+        name: "admin.employees.create",
+        component: EmployeeCreate,
+      },
+    ],
   },
   {
-    path: '/admin/employees/:id/edit',
+    path: "/admin/employees/:id/edit",
     component: EmployeeCreateLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: 'employee-edit',
+      requiredPermission: "employee-edit",
     },
     children: [
       {
-        path: '',
-        name: 'admin.employees.edit',
-        component: EmployeeEdit
-      }
-    ]
+        path: "",
+        name: "admin.employees.edit",
+        component: EmployeeEdit,
+      },
+    ],
   },
   {
-    path: '/admin/employees/:id',
+    path: "/admin/employees/:id",
     component: AdminLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: 'employee-menu',
+      requiredPermission: "employee-menu",
     },
     children: [
       {
-        path: '',
-        name: 'admin.employees.detail',
-        component: EmployeeDetail
-      }
-    ]
+        path: "",
+        name: "admin.employees.detail",
+        component: EmployeeDetail,
+      },
+    ],
   },
   {
-    path: '/auth',
+    path: "/auth",
     component: AuthLayout,
     children: [
       {
-        path: 'login',
-        name: 'login',
+        path: "login",
+        name: "login",
         component: Login,
       },
       {
-        path: 'forgot-password',
-        name: 'forgot-password',
+        path: "forgot-password",
+        name: "forgot-password",
         component: ForgotPassword,
       },
       {
-        path: 'reset-password',
-        name: 'reset-password',
+        path: "reset-password",
+        name: "reset-password",
         component: ResetPassword,
       },
       {
-        path: 'verify-email',
-        name: 'verify-email',
+        path: "verify-email",
+        name: "verify-email",
         component: VerifyEmailResult,
       },
     ],
   },
   {
-    path: '/:pathMatch(.*)*',
-    name: 'not-found',
-    component: () => import('@/views/NotFound.vue'),
+    path: "/:pathMatch(.*)*",
+    name: "not-found",
+    component: () => import("@/views/NotFound.vue"),
   },
 ];
 
@@ -165,7 +167,7 @@ const router = createRouter({
     // Scroll the main content area to top
     return new Promise((resolve) => {
       setTimeout(() => {
-        const mainContent = document.querySelector('.main-content');
+        const mainContent = document.querySelector(".main-content");
         if (mainContent) {
           mainContent.scrollTop = 0;
         }
@@ -174,40 +176,39 @@ const router = createRouter({
     });
   },
   routes: appRoutes,
-})
+});
 
 export const registerAuthGuard = (targetRouter) => {
   targetRouter.beforeEach(async (to, from, next) => {
-    const authStore = useAuthStore()
+    const authStore = useAuthStore();
 
     if (to.meta.requiresAuth) {
       if (authStore.token) {
         try {
           if (!authStore.user) {
-            await authStore.checkAuth()
+            await authStore.checkAuth();
           }
 
           if (!hasRoutePermissionAccess(authStore.user?.permissions, to.meta)) {
-            next({ name: 'admin.dashboard' })
-            return
+            next({ name: "admin.dashboard" });
+            return;
           }
 
-          next()
+          next();
         } catch (error) {
-          next({ name: 'login' })
+          next({ name: "login" });
         }
       } else {
-        next({ name: 'login' })
+        next({ name: "login" });
       }
     } else if (to.meta.requiresUnauth && authStore.token) {
-      next({ name: 'admin.dashboard' })
+      next({ name: "admin.dashboard" });
     } else {
-      next()
+      next();
     }
-  })
-}
+  });
+};
 
-registerAuthGuard(router)
+registerAuthGuard(router);
 
-
-export default router
+export default router;

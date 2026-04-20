@@ -12,12 +12,41 @@ import {
   History,
   ArrowLeft,
   Landmark,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-vue-next";
 
 const router = useRouter();
 const payrollStore = usePayrollStore();
 const toast = useToast();
 const { loading, settings } = storeToRefs(payrollStore);
+
+const popularBanks = [
+  { code: "014", name: "BCA (Bank Central Asia)" },
+  { code: "008", name: "Bank Mandiri" },
+  { code: "002", name: "BRI (Bank Rakyat Indonesia)" },
+  { code: "009", name: "BNI (Bank Negara Indonesia)" },
+  { code: "022", name: "CIMB Niaga" },
+  { code: "011", name: "Bank Danamon" },
+  { code: "013", name: "Bank Permata" },
+  { code: "451", name: "BSI (Bank Syariah Indonesia)" },
+  { code: "213", name: "Bank BTPN / Jenius" },
+  { code: "542", name: "Bank Jago" },
+];
+
+const handleBankChange = (event) => {
+  const code = event.target.value;
+  if (!code) {
+    form.payroll_bank_name = null;
+    form.payroll_bank_code = null;
+    return;
+  }
+  const bank = popularBanks.find((b) => b.code === code);
+  if (bank) {
+    form.payroll_bank_name = bank.name;
+    form.payroll_bank_code = bank.code;
+  }
+};
 
 const fallbackSettings = {
   payday_day: 25,
@@ -28,7 +57,7 @@ const fallbackSettings = {
   rounding_mode: "nearest",
   rounding_unit: 1000,
   note_template:
-    "Hari kerja: {working_days} | Hadir: {attended_days} | Terlambat: {late_days} | Sakit: {sick_days} | Izin: {permission_days} | Alpha: {absent_days} | Potongan: Rp {deduction}",
+    "Working days: {working_days} | Attended: {attended_days} | Late: {late_days} | Sick: {sick_days} | Permission: {permission_days} | Absent: {absent_days} | Deduction: IDR {deduction}",
   payroll_bank_name: null,
   payroll_bank_code: null,
 };
@@ -62,10 +91,17 @@ const versionFieldLabels = {
 };
 
 const hydrateForm = (payload = {}) => {
-  Object.assign(form, {
-    ...fallbackSettings,
-    ...payload,
-  });
+  const merged = { ...fallbackSettings, ...payload };
+
+  // Force migration from legacy Indonesian template to English format if found
+  if (
+    merged.note_template ===
+    "Hari kerja: {working_days} | Hadir: {attended_days} | Terlambat: {late_days} | Sakit: {sick_days} | Izin: {permission_days} | Alpha: {absent_days} | Potongan: Rp {deduction}"
+  ) {
+    merged.note_template = fallbackSettings.note_template;
+  }
+
+  Object.assign(form, merged);
 };
 
 const lastUpdatedLabel = computed(() => {
@@ -247,7 +283,11 @@ const historyComparisonRows = computed(() => {
 });
 
 const selectHistoryVersion = (versionId) => {
-  selectedHistoryVersionId.value = versionId;
+  if (selectedHistoryVersionId.value === versionId) {
+    selectedHistoryVersionId.value = null; // Toggle off if clicked again
+  } else {
+    selectedHistoryVersionId.value = versionId;
+  }
 };
 
 const handleSubmit = async () => {
@@ -337,30 +377,79 @@ onMounted(() => {
     </div>
 
     <!-- Tab Navigation -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6" data-testid="payroll-settings-tabs">
+    <div
+      class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6"
+      data-testid="payroll-settings-tabs"
+    >
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-        <button @click="activeTab = 'schedule'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'schedule' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-schedule">
-          <Calendar class="w-4 h-4" :class="activeTab === 'schedule' ? 'text-white' : 'text-gray-600'" />
+        <button
+          @click="activeTab = 'schedule'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'schedule'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-schedule"
+        >
+          <Calendar
+            class="w-4 h-4"
+            :class="activeTab === 'schedule' ? 'text-white' : 'text-gray-600'"
+          />
           <span class="text-sm font-semibold">Schedule</span>
         </button>
-        <button @click="activeTab = 'rules'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'rules' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-rules">
-          <Calculator class="w-4 h-4" :class="activeTab === 'rules' ? 'text-white' : 'text-gray-600'" />
+        <button
+          @click="activeTab = 'rules'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'rules'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-rules"
+        >
+          <Calculator
+            class="w-4 h-4"
+            :class="activeTab === 'rules' ? 'text-white' : 'text-gray-600'"
+          />
           <span class="text-sm font-semibold">Calculation Rules</span>
         </button>
-        <button @click="activeTab = 'bank_notes'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'bank_notes' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-bank-notes">
-          <Landmark class="w-4 h-4" :class="activeTab === 'bank_notes' ? 'text-white' : 'text-gray-600'" />
+        <button
+          @click="activeTab = 'bank_notes'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'bank_notes'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-bank-notes"
+        >
+          <Landmark
+            class="w-4 h-4"
+            :class="activeTab === 'bank_notes' ? 'text-white' : 'text-gray-600'"
+          />
           <span class="text-sm font-semibold">Bank & Note</span>
         </button>
-        <button @click="activeTab = 'history'" class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2" :class="activeTab === 'history' ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white' : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'" data-testid="tab-history">
-          <History class="w-4 h-4" :class="activeTab === 'history' ? 'text-white' : 'text-gray-600'" />
+        <button
+          @click="activeTab = 'history'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'history'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-history"
+        >
+          <History
+            class="w-4 h-4"
+            :class="activeTab === 'history' ? 'text-white' : 'text-gray-600'"
+          />
           <span class="text-sm font-semibold">History</span>
         </button>
       </div>
     </div>
 
-    <div
-      class="items-start gap-6 relative"
-    >
+    <div class="items-start gap-6 relative">
       <div class="space-y-6 min-w-0 pb-10">
         <section
           v-show="activeTab === 'schedule'"
@@ -514,135 +603,164 @@ onMounted(() => {
           </div>
         </section>
 
-        <div v-show="activeTab === 'bank_notes'" class="space-y-6 animate-fade-in">
-        <section
-          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+        <div
+          v-show="activeTab === 'bank_notes'"
+          class="space-y-6 animate-fade-in"
         >
-          <div class="flex items-center gap-3 mb-6">
-            <div
-              class="w-12 h-12 bg-amber-50 rounded-[12px] flex items-center justify-center"
-            >
-              <FileText class="w-6 h-6 text-amber-600" />
-            </div>
-            <div>
-              <h3 class="text-brand-dark text-xl font-bold">
-                Payroll Note Template
-              </h3>
-              <p class="text-brand-light text-sm">
-                Use placeholders to keep every generated payroll note
-                consistent.
-              </p>
-            </div>
-          </div>
-
-          <label class="block text-brand-dark text-sm font-semibold mb-2"
-            >Template</label
+          <section
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
           >
-          <textarea
-            v-model="form.note_template"
-            data-testid="payroll-settings-note-template"
-            rows="5"
-            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 resize-none"
-          />
-          <p class="text-brand-light text-xs mt-2">
-            Available placeholders: `{working_days}`, `{attended_days}`,
-            `{late_days}`, `{sick_days}`, `{permission_days}`, `{absent_days}`,
-            `{deduction}`.
-          </p>
-        </section>
+            <div class="flex items-center gap-3 mb-6">
+              <div
+                class="w-12 h-12 bg-amber-50 rounded-[12px] flex items-center justify-center"
+              >
+                <FileText class="w-6 h-6 text-amber-600" />
+              </div>
+              <div>
+                <h3 class="text-brand-dark text-xl font-bold">
+                  Payroll Note Template
+                </h3>
+                <p class="text-brand-light text-sm">
+                  Use placeholders to keep every generated payroll note
+                  consistent.
+                </p>
+              </div>
+            </div>
 
-        <!-- Payroll Bank Partner -->
-        <section
-          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
-        >
-          <div class="flex items-center gap-3 mb-6">
-            <div
-              class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center"
+            <label class="block text-brand-dark text-sm font-semibold mb-2"
+              >Template</label
             >
-              <Landmark class="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-              <h3 class="text-brand-dark text-xl font-bold">
-                Payroll Bank Partner
-              </h3>
-              <p class="text-brand-light text-sm">
-                Primary bank for salary disbursement. Employees with a different bank will be flagged.
-              </p>
-            </div>
-          </div>
+            <textarea
+              v-model="form.note_template"
+              data-testid="payroll-settings-note-template"
+              rows="5"
+              class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 resize-none"
+            />
+            <p class="text-brand-light text-xs mt-2">
+              Available placeholders: `{working_days}`, `{attended_days}`,
+              `{late_days}`, `{sick_days}`, `{permission_days}`,
+              `{absent_days}`, `{deduction}`.
+            </p>
+          </section>
 
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-brand-dark text-sm font-semibold mb-2"
-                >Bank Partner Name</label
+          <!-- Payroll Bank Partner -->
+          <section
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+          >
+            <div class="flex items-center gap-3 mb-6">
+              <div
+                class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center"
               >
-              <input
-                v-model="form.payroll_bank_name"
-                data-testid="payroll-settings-bank-name"
-                type="text"
-                placeholder="e.g. BCA, Bank Mandiri, BRI"
-                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
-              />
-              <p class="text-brand-light text-xs mt-2">
-                Nama lengkap bank yang digunakan untuk pembayaran gaji.
-              </p>
+                <Landmark class="w-6 h-6 text-green-600" />
+              </div>
+              <div>
+                <h3 class="text-brand-dark text-xl font-bold">
+                  Payroll Bank Partner
+                </h3>
+                <p class="text-brand-light text-sm">
+                  Primary bank for salary disbursement. Employees with a
+                  different bank will be flagged.
+                </p>
+              </div>
             </div>
-            <div>
-              <label class="block text-brand-dark text-sm font-semibold mb-2"
-                >Bank Code (Kode BI)</label
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-brand-dark text-sm font-semibold mb-2"
+                  >Bank Partner Name</label
+                >
+                <select
+                  :value="form.payroll_bank_code"
+                  @change="handleBankChange"
+                  data-testid="payroll-settings-bank-select"
+                  class="w-full h-[48px] px-4 py-2 bg-white border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                >
+                  <option value="">Select a Bank...</option>
+                  <option
+                    v-for="bank in popularBanks"
+                    :key="bank.code"
+                    :value="bank.code"
+                  >
+                    {{ bank.name }}
+                  </option>
+                </select>
+                <p class="text-brand-light text-xs mt-2">
+                  Choose a popular bank from the dropdown to auto-fill details.
+                </p>
+              </div>
+              <div>
+                <label class="block text-brand-dark text-sm font-semibold mb-2"
+                  >Bank Code (Kode BI)</label
+                >
+                <input
+                  v-model="form.payroll_bank_code"
+                  data-testid="payroll-settings-bank-code"
+                  type="text"
+                  placeholder="e.g. 014 (BCA)"
+                  maxlength="10"
+                  disabled
+                  class="w-full h-[48px] px-4 py-2 border border-[#DCDEDD] rounded-[12px] bg-gray-50 text-gray-500 cursor-not-allowed transition-all duration-300"
+                />
+                <p class="text-brand-light text-xs mt-2">
+                  Bank code based on BI RTGS / SKNBI (3 digits, optional).
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <!-- Preview block moved to Bank & Note -->
+          <section
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+          >
+            <div class="flex items-center gap-3 mb-6">
+              <div
+                class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center shrink-0"
               >
-              <input
-                v-model="form.payroll_bank_code"
-                data-testid="payroll-settings-bank-code"
-                type="text"
-                placeholder="e.g. 014 (BCA), 008 (Mandiri), 002 (BRI)"
-                maxlength="10"
-                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
-              />
-              <p class="text-brand-light text-xs mt-2">
-                Kode bank berdasarkan BI RTGS / SKNBI (3 digit, opsional).
-              </p>
+                <FileText class="w-6 h-6 text-blue-600" />
+              </div>
+              <div>
+                <h3 class="text-brand-dark text-xl font-bold">
+                  Preview Result
+                </h3>
+                <p class="text-brand-light text-sm font-normal mt-1">
+                  Review your generated note format along with summary
+                  configurations.
+                </p>
+              </div>
             </div>
-          </div>
-        </section>
-        
-        <!-- Preview block moved to Bank & Note -->
-        <section
-          class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
-        >
-          <div class="flex items-start justify-between gap-4 mb-4">
-            <div>
-              <h3 class="text-brand-dark text-lg font-bold">Preview Result</h3>
-              <p class="text-brand-light text-sm font-normal mt-1">Review your generated note format along with summary configurations.</p>
-            </div>
-            <div class="w-10 h-10 bg-blue-50 rounded-[10px] flex items-center justify-center">
-              <FileText class="w-5 h-5 text-blue-600" />
-            </div>
-          </div>
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50">
-              <p class="text-brand-light text-xs font-semibold uppercase">
-                Future draft note
-              </p>
-              <p
-                class="text-brand-dark text-sm mt-2 leading-6"
-                data-testid="payroll-settings-note-preview"
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div
+                class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50"
               >
-                {{ notePreview }}
-              </p>
+                <p class="text-brand-light text-xs font-semibold uppercase">
+                  Future draft note
+                </p>
+                <p
+                  class="text-brand-dark text-sm mt-2 leading-6"
+                  data-testid="payroll-settings-note-preview"
+                >
+                  {{ notePreview }}
+                </p>
+              </div>
+              <div
+                class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50"
+              >
+                <p class="text-brand-light text-xs font-semibold uppercase">
+                  Summary config
+                </p>
+                <p class="text-brand-dark text-sm mt-2">
+                  Payday day <span class="font-bold">{{ form.payday_day }}</span
+                  >, cut-off day
+                  <span class="font-bold">{{ form.attendance_cutoff_day }}</span
+                  >, rounding
+                  <span class="font-bold capitalize">{{
+                    form.rounding_mode
+                  }}</span
+                  >.
+                </p>
+              </div>
             </div>
-            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50">
-              <p class="text-brand-light text-xs font-semibold uppercase">
-                Summary config
-              </p>
-              <p class="text-brand-dark text-sm mt-2">
-                Payday day <span class="font-bold">{{ form.payday_day }}</span>, cut-off day
-                <span class="font-bold">{{ form.attendance_cutoff_day }}</span>, rounding
-                <span class="font-bold capitalize">{{ form.rounding_mode }}</span>.
-              </p>
-            </div>
-          </div>
-        </section>
+          </section>
         </div>
 
         <div
@@ -680,97 +798,133 @@ onMounted(() => {
             data-testid="payroll-settings-history-list"
             class="space-y-2"
           >
-            <div
-              v-for="version in settingsHistory"
-              :key="version.id"
-              data-testid="payroll-settings-history-item"
-              :class="[
-                'rounded-[12px] border px-3 py-3 transition-colors duration-200',
-                selectedHistoryVersionId === version.id
-                  ? 'border-blue-300 bg-blue-50'
-                  : 'border-[#DCDEDD]'
-              ]"
-            >
-              <div class="flex items-center justify-between gap-3">
-                <p class="text-sm font-semibold text-brand-dark">
-                  Version v{{ version.version_number }}
-                </p>
-                <p class="text-xs text-brand-light">
-                  {{ formatHistoryDate(version.effective_at || version.updated_at) }}
-                </p>
-              </div>
-              <p class="mt-1 text-xs text-brand-light">
-                Updated by
-                <span class="font-semibold text-brand-dark">
-                  {{ version.updated_by?.name || "System" }}
-                </span>
-              </p>
-              <button
-                type="button"
-                :data-testid="`payroll-settings-history-compare-select-${version.id}`"
-                @click="selectHistoryVersion(version.id)"
-                class="mt-2 text-xs font-semibold text-blue-700 hover:text-blue-800"
-              >
-                Compare with previous version
-              </button>
-            </div>
-
-            <div
-              v-if="selectedHistoryVersion"
-              data-testid="payroll-settings-history-compare-panel"
-              class="mt-4 rounded-[12px] border border-[#DCDEDD] bg-gray-50 px-4 py-4"
-            >
-              <p class="text-xs uppercase tracking-wide text-brand-light">
-                Version Comparison
-              </p>
-              <p class="text-sm font-semibold text-brand-dark mt-1">
-                v{{ selectedHistoryVersion.version_number }}
-                <template v-if="previousHistoryVersion">
-                  vs v{{ previousHistoryVersion.version_number }}
-                </template>
-              </p>
-
+            <template v-for="version in settingsHistory" :key="version.id">
               <div
-                v-if="!previousHistoryVersion"
-                data-testid="payroll-settings-history-compare-empty"
-                class="mt-3 text-xs text-brand-light"
+                data-testid="payroll-settings-history-item"
+                :class="[
+                  'rounded-[12px] border px-3 py-3 transition-colors duration-200',
+                  selectedHistoryVersionId === version.id
+                    ? 'border-blue-300 bg-blue-50'
+                    : 'border-[#DCDEDD]',
+                ]"
               >
-                This is the oldest version in history. No previous version is available for comparison.
-              </div>
-
-              <div
-                v-else-if="historyComparisonRows.length === 0"
-                data-testid="payroll-settings-history-compare-no-change"
-                class="mt-3 text-xs text-brand-light"
-              >
-                No tracked settings changed between these two versions.
-              </div>
-
-              <div v-else class="mt-3 space-y-2">
-                <div
-                  v-for="row in historyComparisonRows"
-                  :key="row.field"
-                  data-testid="payroll-settings-history-compare-row"
-                  class="rounded-[10px] border border-[#DCDEDD] bg-white px-3 py-2"
-                >
-                  <p class="text-xs font-semibold text-brand-dark">{{ row.label }}</p>
-                  <p class="text-xs text-brand-light mt-1">
-                    From <span class="font-semibold text-brand-dark">{{ row.previous }}</span>
-                    to <span class="font-semibold text-blue-700">{{ row.current }}</span>
+                <div class="flex items-center justify-between gap-3">
+                  <p class="text-sm font-semibold text-brand-dark">
+                    Version v{{ version.version_number }}
+                  </p>
+                  <p class="text-xs text-brand-light">
+                    {{
+                      formatHistoryDate(
+                        version.effective_at || version.updated_at,
+                      )
+                    }}
                   </p>
                 </div>
+                <p class="mt-1 text-xs text-brand-light">
+                  Updated by
+                  <span class="font-semibold text-brand-dark">
+                    {{ version.updated_by?.name || "System" }}
+                  </span>
+                </p>
+                <button
+                  type="button"
+                  :data-testid="`payroll-settings-history-compare-select-${version.id}`"
+                  @click="selectHistoryVersion(version.id)"
+                  class="mt-2 text-xs font-semibold hover:text-blue-800 flex items-center gap-1"
+                  :class="
+                    selectedHistoryVersionId === version.id
+                      ? 'text-blue-800'
+                      : 'text-blue-600'
+                  "
+                >
+                  <span>Compare with previous version</span>
+                  <component
+                    :is="
+                      selectedHistoryVersionId === version.id
+                        ? ChevronUp
+                        : ChevronDown
+                    "
+                    class="w-3.5 h-3.5"
+                  />
+                </button>
               </div>
-            </div>
+
+              <!-- Accordion compare panel -->
+              <div
+                v-if="selectedHistoryVersionId === version.id"
+                data-testid="payroll-settings-history-compare-panel"
+                class="mt-2 rounded-[12px] border border-blue-100 bg-white shadow-sm px-4 py-4 mb-2 animate-fade-in"
+              >
+                <p class="text-xs uppercase tracking-wide text-brand-light">
+                  Version Comparison
+                </p>
+                <p class="text-sm font-semibold text-brand-dark mt-1">
+                  v{{ selectedHistoryVersion?.version_number }}
+                  <template v-if="previousHistoryVersion">
+                    vs v{{ previousHistoryVersion.version_number }}
+                  </template>
+                </p>
+
+                <div
+                  v-if="!previousHistoryVersion"
+                  data-testid="payroll-settings-history-compare-empty"
+                  class="mt-3 text-xs text-brand-light"
+                >
+                  This is the oldest version in history. No previous version is
+                  available for comparison.
+                </div>
+
+                <div
+                  v-else-if="historyComparisonRows.length === 0"
+                  data-testid="payroll-settings-history-compare-no-change"
+                  class="mt-3 text-xs text-brand-light"
+                >
+                  No tracked settings changed between these two versions.
+                </div>
+
+                <div v-else class="mt-3 space-y-2">
+                  <div
+                    v-for="row in historyComparisonRows"
+                    :key="row.field"
+                    data-testid="payroll-settings-history-compare-row"
+                    class="rounded-[10px] border border-[#DCDEDD] bg-gray-50 px-3 py-2"
+                  >
+                    <p class="text-xs font-semibold text-brand-dark">
+                      {{ row.label }}
+                    </p>
+                    <p class="text-xs text-brand-light mt-1">
+                      From
+                      <span class="font-semibold text-brand-dark">{{
+                        row.previous
+                      }}</span>
+                      to
+                      <span class="font-semibold text-blue-700">{{
+                        row.current
+                      }}</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
         </div>
       </div>
 
       <!-- Save Settings Sticky Footer / Action Bar -->
-      <div v-show="activeTab !== 'history'" class="sticky bottom-6 z-20 mt-4 animate-fade-in">
-        <div class="bg-white/80 backdrop-blur-md border border-[#DCDEDD] rounded-[20px] p-5 flex flex-col md:flex-row items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.12)] gap-4">
+      <div
+        v-show="activeTab !== 'history'"
+        class="sticky bottom-6 z-20 mt-4 animate-fade-in"
+      >
+        <div
+          class="bg-white/80 backdrop-blur-md border border-[#DCDEDD] rounded-[20px] p-5 flex flex-col md:flex-row items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.12)] gap-4"
+        >
           <div>
-            <h3 class="text-brand-dark text-base font-bold">Ready to save your changes?</h3>
-            <p class="text-brand-light text-sm mt-0.5">Please make sure to review your settings.</p>
+            <h3 class="text-brand-dark text-base font-bold">
+              Ready to save your changes?
+            </h3>
+            <p class="text-brand-light text-sm mt-0.5">
+              Please make sure to review your settings.
+            </p>
           </div>
           <button
             type="button"

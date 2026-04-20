@@ -70,7 +70,7 @@ class WorkingDaysCalculator
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
             ->get()
             ->filter(function (HolidayCalendar $holiday) use ($employmentType, $scheduledDateKeys) {
-                $dateKey = $holiday->date->toDateString();
+                $dateKey = Carbon::parse($holiday->date)->toDateString();
                 if (! in_array($dateKey, $scheduledDateKeys, true)) {
                     return false;
                 }

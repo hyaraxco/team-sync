@@ -52,7 +52,7 @@ const { teams } = storeToRefs(teamStore);
 
 // Option store
 const optionStore = useOptionStore();
-const { employmentTypes, jobStatuses, workLocations, skillLevels } =
+const { employmentTypes, jobStatuses, workLocations } =
   storeToRefs(optionStore);
 
 // Payroll Settings — used to lock bank selection to the company's configured bank
@@ -60,15 +60,23 @@ const payrollStore = usePayrollStore();
 const { settings: payrollSettings } = storeToRefs(payrollStore);
 const loadingPayrollSettings = ref(true);
 
-const companyBankName = computed(() => payrollSettings.value?.payroll_bank_name || null);
-const companyBankCode = computed(() => payrollSettings.value?.payroll_bank_code || null);
+const companyBankName = computed(
+  () => payrollSettings.value?.payroll_bank_name || null,
+);
+const companyBankCode = computed(
+  () => payrollSettings.value?.payroll_bank_code || null,
+);
 
 // When company bank is configured, auto-set the employee's bank_name to match
-watch(companyBankName, (bankName) => {
-  if (bankName) {
-    form.value.bank_name = bankName;
-  }
-}, { immediate: true });
+watch(
+  companyBankName,
+  (bankName) => {
+    if (bankName) {
+      form.value.bank_name = bankName;
+    }
+  },
+  { immediate: true },
+);
 
 const teamOptions = computed<TeamOption[]>(() => {
   return Array.isArray(teams.value) ? (teams.value as TeamOption[]) : [];
@@ -119,7 +127,9 @@ onMounted(async () => {
       if (!payrollSettings.value) {
         await payrollStore.fetchSettings();
       }
-    } catch (_) { /* non-critical */ } finally {
+    } catch (_) {
+      /* non-critical */
+    } finally {
       loadingPayrollSettings.value = false;
     }
   })();
@@ -130,7 +140,7 @@ onMounted(async () => {
     optionStore.fetchEmploymentTypes(),
     optionStore.fetchJobStatuses(),
     optionStore.fetchWorkLocations(),
-    optionStore.fetchSkillLevels(),
+
     payrollSettingsFetch,
   ]);
 
@@ -183,6 +193,33 @@ watch(
   },
 );
 
+// Enforce numbers-only for account number
+watch(
+  () => form.value.account_number,
+  (val) => {
+    if (val) {
+      const sanitized = val.replace(/\D/g, "");
+      if (val !== sanitized) {
+        form.value.account_number = sanitized;
+      }
+    }
+  },
+);
+
+// Enforce letters and spaces only for account holder name
+watch(
+  () => form.value.account_holder_name,
+  (val) => {
+    if (val) {
+      // allow letters, spaces, dots and apostrophes which are common in names
+      const sanitized = val.replace(/[^a-zA-Z\s\.\']/g, "");
+      if (val !== sanitized) {
+        form.value.account_holder_name = sanitized;
+      }
+    }
+  },
+);
+
 watch(
   [() => form.value.team_id, teamOptions],
   () => {
@@ -193,7 +230,9 @@ watch(
 </script>
 
 <template>
-  <div class="flex flex-col 2xl:flex-row gap-5 items-stretch 2xl:items-start pr-0">
+  <div
+    class="flex flex-col 2xl:flex-row gap-5 items-stretch 2xl:items-start pr-0"
+  >
     <div class="flex-1 w-full space-y-6">
       <!-- Job Information Section -->
       <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
@@ -315,7 +354,6 @@ watch(
             </div>
           </div>
 
-
           <div class="mb-4">
             <Select
               id="status"
@@ -397,7 +435,6 @@ watch(
               <template #icon> Rp </template>
             </Input>
           </div>
-
         </div>
       </div>
 
@@ -410,7 +447,9 @@ watch(
             <ShieldCheck class="w-6 h-6 text-emerald-600" />
           </div>
           <div>
-            <h3 class="text-brand-dark text-xl font-bold">Tax & BPJS Identity</h3>
+            <h3 class="text-brand-dark text-xl font-bold">
+              Tax & BPJS Identity
+            </h3>
             <p class="text-brand-light text-sm font-normal">
               Mandatory tax and social insurance numbers (NPWP & BPJS)
             </p>
@@ -433,12 +472,16 @@ watch(
                 <Hash class="h-5 w-5 text-gray-400" />
               </template>
             </Input>
-            <p class="text-brand-light text-xs mt-1">Nomor Pokok Wajib Pajak (PPh 21)</p>
+            <p class="text-brand-light text-xs mt-1">
+              Nomor Pokok Wajib Pajak (PPh 21)
+            </p>
           </div>
 
           <!-- PTKP Status -->
           <div class="mb-4">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">PTKP Status</label>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5"
+              >PTKP Status</label
+            >
             <select
               id="ptkp_status"
               name="ptkp_status"
@@ -454,12 +497,22 @@ watch(
               <option value="K/1">K/1 – Kawin, 1 Tanggungan</option>
               <option value="K/2">K/2 – Kawin, 2 Tanggungan</option>
               <option value="K/3">K/3 – Kawin, 3 Tanggungan</option>
-              <option value="K/I/0">K/I/0 – Kawin, Istri Penghasilan, 0 Tanggungan</option>
-              <option value="K/I/1">K/I/1 – Kawin, Istri Penghasilan, 1 Tanggungan</option>
-              <option value="K/I/2">K/I/2 – Kawin, Istri Penghasilan, 2 Tanggungan</option>
-              <option value="K/I/3">K/I/3 – Kawin, Istri Penghasilan, 3 Tanggungan</option>
+              <option value="K/I/0">
+                K/I/0 – Kawin, Istri Penghasilan, 0 Tanggungan
+              </option>
+              <option value="K/I/1">
+                K/I/1 – Kawin, Istri Penghasilan, 1 Tanggungan
+              </option>
+              <option value="K/I/2">
+                K/I/2 – Kawin, Istri Penghasilan, 2 Tanggungan
+              </option>
+              <option value="K/I/3">
+                K/I/3 – Kawin, Istri Penghasilan, 3 Tanggungan
+              </option>
             </select>
-            <p class="text-brand-light text-xs mt-1">Digunakan untuk perhitungan PPh 21</p>
+            <p class="text-brand-light text-xs mt-1">
+              Digunakan untuk perhitungan PPh 21
+            </p>
           </div>
 
           <!-- BPJS Ketenagakerjaan -->
@@ -477,7 +530,9 @@ watch(
                 <ShieldCheck class="h-5 w-5 text-gray-400" />
               </template>
             </Input>
-            <p class="text-brand-light text-xs mt-1">No. BPJS Jamsostek (JHT, JKK, JKM, JP)</p>
+            <p class="text-brand-light text-xs mt-1">
+              No. BPJS Jamsostek (JHT, JKK, JKM, JP)
+            </p>
           </div>
 
           <!-- BPJS Kesehatan -->
@@ -495,7 +550,9 @@ watch(
                 <ShieldCheck class="h-5 w-5 text-gray-400" />
               </template>
             </Input>
-            <p class="text-brand-light text-xs mt-1">No. BPJS Kesehatan / JKN</p>
+            <p class="text-brand-light text-xs mt-1">
+              No. BPJS Kesehatan / JKN
+            </p>
           </div>
         </div>
       </div>
@@ -523,8 +580,12 @@ watch(
               <label class="block text-sm font-medium text-gray-700 mb-1.5">
                 Bank Name *
               </label>
-              <div class="w-full h-[50px] bg-gray-100 border border-[#DCDEDD] rounded-[16px] animate-pulse"></div>
-              <p class="text-brand-light text-xs mt-1">Loading bank configuration...</p>
+              <div
+                class="w-full h-[50px] bg-gray-100 border border-[#DCDEDD] rounded-[16px] animate-pulse"
+              ></div>
+              <p class="text-brand-light text-xs mt-1">
+                Loading bank configuration...
+              </p>
             </template>
 
             <!-- Bank locked by company payroll settings -->
@@ -533,7 +594,9 @@ watch(
                 Bank Name *
               </label>
               <div class="relative">
-                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <div
+                  class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
+                >
                   <Building2 class="h-5 w-5 text-gray-400" />
                 </div>
                 <div
@@ -541,15 +604,21 @@ watch(
                   data-testid="bank-name-locked"
                 >
                   <span>{{ companyBankName }}</span>
-                  <span class="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5 whitespace-nowrap">
+                  <span
+                    class="ml-2 text-xs font-semibold text-blue-600 bg-blue-50 border border-blue-200 rounded-full px-2 py-0.5 whitespace-nowrap"
+                  >
                     Company Default
                   </span>
                 </div>
               </div>
               <p class="text-brand-light text-xs mt-1 flex items-center gap-1">
-                <span class="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"></span>
+                <span
+                  class="inline-block w-1.5 h-1.5 bg-blue-500 rounded-full"
+                ></span>
                 Dikunci sesuai konfigurasi Bank Payroll perusahaan
-                <template v-if="companyBankCode">(Kode BI: {{ companyBankCode }})</template>
+                <template v-if="companyBankCode"
+                  >(Kode BI: {{ companyBankCode }})</template
+                >
               </p>
             </template>
 
@@ -622,7 +691,6 @@ watch(
               Name should match the bank account holder exactly
             </p>
           </div>
-
         </div>
       </div>
     </div>

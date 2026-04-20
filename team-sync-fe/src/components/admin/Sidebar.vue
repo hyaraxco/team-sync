@@ -12,6 +12,10 @@ import {
   BarChart3Icon,
   XIcon,
   SettingsIcon,
+  TrendingUpIcon,
+  TargetIcon,
+  MessageSquareIcon,
+  StarIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
@@ -74,6 +78,7 @@ const onNavigate = () => emit("navigate");
       <div data-testid="sidebar-section-general">
         <h3 class="section-title">GENERAL</h3>
         <div class="space-y-3">
+          <!-- 1. Dashboard (all roles) -->
           <RouterLink
             :to="{ name: 'admin.dashboard' }"
             :class="{
@@ -98,78 +103,7 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <RouterLink
-            :to="{ name: 'admin.teams' }"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            :class="{
-              'nav-link-active': $route.name?.startsWith('admin.team'),
-            }"
-            v-if="can('team-menu')"
-            @click="onNavigate"
-          >
-            <UsersIcon
-              class="w-5 h-5 text-gray-600"
-              :class="{
-                'text-white': $route.name?.startsWith('admin.team'),
-              }"
-            />
-            <span
-              class="text-brand-dark text-base font-medium"
-              :class="{
-                'text-brand-white': $route.name?.startsWith('admin.team'),
-              }"
-              >Our Teams</span
-            >
-          </RouterLink>
-
-          <RouterLink
-            :to="{ name: 'admin.employees' }"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            :class="{
-              'nav-link-active': $route.name?.startsWith('admin.employee'),
-            }"
-            v-if="can('employee-menu')"
-            @click="onNavigate"
-          >
-            <UsersIcon
-              class="w-5 h-5 text-gray-600"
-              :class="{
-                'text-white': $route.name?.startsWith('admin.employee'),
-              }"
-            />
-            <span
-              class="text-brand-dark text-base font-medium"
-              :class="{
-                'text-brand-white': $route.name?.startsWith('admin.employee'),
-              }"
-              >Employees</span
-            >
-          </RouterLink>
-
-          <RouterLink
-            :to="{ name: 'admin.attendances' }"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            :class="{
-              'nav-link-active': $route.name === 'admin.attendances',
-            }"
-            v-if="can('attendance-menu')"
-            @click="onNavigate"
-          >
-            <CalendarIcon
-              class="w-5 h-5 text-gray-600"
-              :class="{
-                'text-white': $route.name === 'admin.attendances',
-              }"
-            />
-            <span
-              class="text-brand-dark text-base font-medium"
-              :class="{
-                'text-brand-white': $route.name === 'admin.attendances',
-              }"
-              >Attendance</span
-            >
-          </RouterLink>
-
+          <!-- 2. Projects (employee daily, manager daily) -->
           <RouterLink
             :to="{ name: 'admin.projects' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -194,6 +128,82 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
+          <!-- 3. Employees (HR/Manager core) -->
+          <RouterLink
+            :to="{ name: 'admin.employees' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name?.startsWith('admin.employee'),
+            }"
+            v-if="can('employee-menu')"
+            @click="onNavigate"
+          >
+            <UsersIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name?.startsWith('admin.employee'),
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name?.startsWith('admin.employee'),
+              }"
+              >Employees</span
+            >
+          </RouterLink>
+
+          <!-- 4. Our Teams (HR/Manager) -->
+          <RouterLink
+            :to="{ name: 'admin.teams' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name?.startsWith('admin.team'),
+            }"
+            v-if="can('team-menu')"
+            @click="onNavigate"
+          >
+            <UsersIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name?.startsWith('admin.team'),
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name?.startsWith('admin.team'),
+              }"
+              >Our Teams</span
+            >
+          </RouterLink>
+
+          <!-- 5. Attendance (HR/Manager admin) -->
+          <RouterLink
+            :to="{ name: 'admin.attendances' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.attendances',
+            }"
+            v-if="can('attendance-menu')"
+            @click="onNavigate"
+          >
+            <CalendarIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name === 'admin.attendances',
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name === 'admin.attendances',
+              }"
+              >Attendance</span
+            >
+          </RouterLink>
+
+          <!-- 6. Payroll (HR/Finance core) -->
           <RouterLink
             :to="{ name: 'admin.payroll.dashboard' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -218,6 +228,7 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
+          <!-- 7. Analytics (periodic) -->
           <RouterLink
             :to="{ name: 'admin.analytics' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -244,6 +255,140 @@ const onNavigate = () => emit("navigate");
         </div>
       </div>
 
+      <!-- PERFORMANCE Section -->
+      <div
+        v-if="can('performance-menu')"
+        data-testid="sidebar-section-performance"
+      >
+        <h3 class="section-title">PERFORMANCE</h3>
+        <div class="space-y-3">
+
+          <!-- 1. Team Reviews (Manager/HR primary action) -->
+          <RouterLink
+            v-if="can('review-manager-submit')"
+            :to="{ name: 'admin.performance.team-reviews' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.team-reviews',
+            }"
+            @click="onNavigate"
+          >
+            <UsersIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.team-reviews' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.team-reviews' }"
+              >Team Reviews</span
+            >
+          </RouterLink>
+
+          <!-- 2. Review Cycles (HR manages) -->
+          <RouterLink
+            v-if="can('review-cycle-manage')"
+            :to="{ name: 'admin.performance.cycles' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name?.startsWith('admin.performance.cycles'),
+            }"
+            @click="onNavigate"
+          >
+            <CalendarIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name?.startsWith('admin.performance.cycles') }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name?.startsWith('admin.performance.cycles') }"
+              >Review Cycles</span
+            >
+          </RouterLink>
+
+          <!-- 3. My Reviews (personal) -->
+          <RouterLink
+            :to="{ name: 'admin.performance.my-reviews' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.my-reviews',
+            }"
+            @click="onNavigate"
+          >
+            <StarIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.my-reviews' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.my-reviews' }"
+              >My Reviews</span
+            >
+          </RouterLink>
+
+          <!-- 4. Team Goals (Manager/HR) -->
+          <RouterLink
+            v-if="can('goal-assign-team')"
+            :to="{ name: 'admin.performance.team-goals' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.team-goals',
+            }"
+            @click="onNavigate"
+          >
+            <TrendingUpIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.team-goals' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.team-goals' }"
+              >Team Goals</span
+            >
+          </RouterLink>
+
+          <!-- 5. My Goals (personal) -->
+          <RouterLink
+            :to="{ name: 'admin.performance.my-goals' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.my-goals',
+            }"
+            @click="onNavigate"
+          >
+            <TargetIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.my-goals' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.my-goals' }"
+              >My Goals</span
+            >
+          </RouterLink>
+
+          <!-- 6. Feedback (least frequent) -->
+          <RouterLink
+            :to="{ name: 'admin.performance.feedback.received' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.feedback.received' || $route.name === 'admin.performance.feedback.given',
+            }"
+            @click="onNavigate"
+          >
+            <MessageSquareIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.feedback.received' || $route.name === 'admin.performance.feedback.given' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.feedback.received' || $route.name === 'admin.performance.feedback.given' }"
+              >Feedback</span
+            >
+          </RouterLink>
+
+        </div>
+      </div>
+
       <!-- PERSONAL Section -->
       <div
         v-if="can('profile-menu') || can('payslip-view') || can('team-view') || canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
@@ -252,6 +397,63 @@ const onNavigate = () => emit("navigate");
         <h3 class="section-title">PERSONAL</h3>
         <div class="space-y-3">
 
+          <!-- 1. My Attendance (daily check-in/out) -->
+          <RouterLink
+            :to="{ name: 'employee.attendance.my-attendances' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active':
+                $route.name === 'employee.attendance.my-attendances' ||
+                $route.name === 'employee.attendance.clock',
+            }"
+            v-if="canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
+            @click="onNavigate"
+          >
+            <CalendarIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white':
+                  $route.name === 'employee.attendance.my-attendances' ||
+                  $route.name === 'employee.attendance.clock',
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white':
+                  $route.name === 'employee.attendance.my-attendances' ||
+                  $route.name === 'employee.attendance.clock',
+              }"
+              >My Attendance</span
+            >
+          </RouterLink>
+
+          <!-- 2. My Team (frequent collaboration) -->
+          <RouterLink
+            :to="{ name: 'employee.team' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'employee.team',
+            }"
+            v-if="can('team-view')"
+            @click="onNavigate"
+          >
+            <UsersIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name === 'employee.team',
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name === 'employee.team',
+              }"
+              >My Team</span
+            >
+          </RouterLink>
+
+          <!-- 3. My Payroll (monthly) -->
           <RouterLink
             :to="{ name: 'employee.payroll' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -277,36 +479,7 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <RouterLink
-            :to="{ name: 'employee.attendance.my-attendances' }"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            :class="{
-              'nav-link-active':
-                $route.name === 'employee.attendance.my-attendances' ||
-                $route.name === 'employee.attendance.clock',
-            }"
-            v-if="canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
-            @click="onNavigate"
-          >
-            <FileTextIcon
-              class="w-5 h-5 text-gray-600"
-              :class="{
-                'text-white':
-                  $route.name === 'employee.attendance.my-attendances' ||
-                  $route.name === 'employee.attendance.clock',
-              }"
-            />
-            <span
-              class="text-brand-dark text-base font-medium"
-              :class="{
-                'text-brand-white':
-                  $route.name === 'employee.attendance.my-attendances' ||
-                  $route.name === 'employee.attendance.clock',
-              }"
-              >My Attendance</span
-            >
-          </RouterLink>
-
+          <!-- 4. My Profile (rarely used) -->
           <RouterLink
             :to="{ name: 'employee.profile' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -328,30 +501,6 @@ const onNavigate = () => emit("navigate");
                 'text-brand-white': $route.name === 'employee.profile',
               }"
               >My Profile</span
-            >
-          </RouterLink>
-
-          <RouterLink
-            :to="{ name: 'employee.team' }"
-            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
-            :class="{
-              'nav-link-active': $route.name === 'employee.team',
-            }"
-            v-if="can('team-view')"
-            @click="onNavigate"
-          >
-            <UsersIcon
-              class="w-5 h-5 text-gray-600"
-              :class="{
-                'text-white': $route.name === 'employee.team',
-              }"
-            />
-            <span
-              class="text-brand-dark text-base font-medium"
-              :class="{
-                'text-brand-white': $route.name === 'employee.team',
-              }"
-              >My Team</span
             >
           </RouterLink>
         </div>

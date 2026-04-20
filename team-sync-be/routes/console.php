@@ -10,3 +10,5 @@ Artisan::command('inspire', function () {
 
 Schedule::command('attendance-periods:sync')->dailyAt('00:10');
 Schedule::command('attendance-mismatches:escalate')->dailyAt('00:20');
+Schedule::command('analytics:calculate-daily-snapshots')->dailyAt('00:30');
+Schedule::command('analytics:calculate-daily-metrics')->dailyAt('00:40');

@@ -53,12 +53,12 @@
     <!-- Attendance Patterns by Day of Week -->
     <div
       v-if="attendancePatterns?.patterns"
-      class="bg-white rounded-lg shadow p-6"
+      class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
     >
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">
         Attendance Patterns by Day
       </h3>
-      <apexchart
+      <VueApexCharts
         type="bar"
         height="300"
         :options="patternsChartOptions"
@@ -82,11 +82,11 @@
     <!-- Existing Attendance Analytics -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Attendance Trend -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
           Attendance Trend
         </h3>
-        <apexchart
+        <VueApexCharts
           v-if="!attendanceLoading && attendance?.attendance_trend"
           type="line"
           height="300"
@@ -96,11 +96,11 @@
       </div>
 
       <!-- Status Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
           Status Distribution
         </h3>
-        <apexchart
+        <VueApexCharts
           v-if="!attendanceLoading && attendance?.status_distribution"
           type="donut"
           height="300"

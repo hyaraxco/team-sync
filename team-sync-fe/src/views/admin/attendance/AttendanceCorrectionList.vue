@@ -13,6 +13,7 @@ import ModalWrapper from '@/components/common/ModalWrapper.vue';
 import { useSearchFilter } from '@/composables/useSearchFilter';
 import { useConfirmAction } from '@/composables/useConfirmAction';
 import { useToast } from '@/composables/useToast';
+import { can } from '@/helpers/permissionHelper';
 
 const store = useAttendanceCorrectionStore();
 const { paginatedCorrections, meta, loading, error } = storeToRefs(store);
@@ -199,7 +200,7 @@ const onRejectAction = (req) => {
               </span>
             </td>
             <td class="py-4 px-4">
-               <div class="flex items-center gap-2" v-if="correction.status === 'pending'">
+               <div class="flex items-center gap-2" v-if="correction.status === 'pending' && can('attendance-correction-approve')">
                   <button
                     @click="showApproveModal(correction)"
                     class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:bg-blue-50 transition-all duration-300 px-3 py-2"
@@ -216,7 +217,7 @@ const onRejectAction = (req) => {
                   </button>
                </div>
                <div v-else class="text-xs text-brand-light">
-                    Reviewed by {{ correction.reviewer?.name || 'Admin' }}
+                    {{ correction.status === 'pending' ? 'Pending Review' : `Reviewed by ${correction.reviewer?.name || 'Admin'}` }}
                </div>
             </td>
           </tr>

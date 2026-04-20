@@ -44,6 +44,7 @@ class PayslipResource extends JsonResource
         return [
             'id' => $this->getKey(),
             'payroll_id' => $this->payroll_id,
+            'status' => $payroll?->status ?? 'paid',
             'period' => $payroll?->salary_month?->format('Y-m-d'),
             'payment_date' => $payroll?->payment_date?->format('Y-m-d'),
             'created_at' => $this->created_at,
