@@ -16,18 +16,24 @@ use App\Http\Controllers\OptionController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PayrollSettingController;
 use App\Http\Controllers\PayslipController;
+use App\Http\Controllers\PerformanceFeedbackController;
+use App\Http\Controllers\PerformanceGoalController;
+use App\Http\Controllers\PerformanceReviewController;
+use App\Http\Controllers\PerformanceReviewCycleController;
+use App\Http\Controllers\PerformanceTopsisController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\TeamController;
 use Illuminate\Support\Facades\Route;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
 Route::prefix('v1')
     ->group(function () {
 
-        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
-        Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword'])->middleware('throttle:5,1');
-        Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])->middleware('throttle:5,1');
-        Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:5,1');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:60,1');
+        Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword'])->middleware('throttle:60,1');
+        Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])->middleware('throttle:60,1');
+        Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:60,1');
         Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
         Route::middleware('auth:sanctum')->group(function () {
@@ -35,7 +41,7 @@ Route::prefix('v1')
             Route::put('me', [AuthController::class, 'updateProfile']);
 
             Route::post('logout', [AuthController::class, 'logout']);
-            Route::post('email/verify/send', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:5,1');
+            Route::post('email/verify/send', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:60,1');
 
             Route::get('teams/statistics', [TeamController::class, 'getStatistics']);
             Route::get('teams/all/paginated', [TeamController::class, 'getAllPaginated']);
@@ -162,5 +168,73 @@ Route::prefix('v1')
             Route::get('analytics/projects', [AnalyticsController::class, 'getProjectAnalytics']);
             Route::get('analytics/export/excel', [AnalyticsExportController::class, 'exportExcel']);
             Route::get('analytics/export/pdf', [AnalyticsExportController::class, 'exportPdf']);
+
+            // Enhanced Analytics routes
+            Route::prefix('analytics')->group(function () {
+                // Workforce
+                Route::get('workforce/turnover-rate', [AnalyticsController::class, 'getTurnoverRate']);
+                Route::get('workforce/average-tenure', [AnalyticsController::class, 'getAverageTenure']);
+                Route::get('workforce/new-hire-trends', [AnalyticsController::class, 'getNewHireTrends']);
+
+                // Attendance
+                Route::get('attendance/compliance-rate', [AnalyticsController::class, 'getAttendanceComplianceRate']);
+                Route::get('attendance/patterns', [AnalyticsController::class, 'getAttendancePatterns']);
+                Route::get('attendance/remote-office-ratio', [AnalyticsController::class, 'getRemoteOfficeRatio']);
+
+                // Leave
+                Route::get('leave/utilization-rate', [AnalyticsController::class, 'getLeaveUtilizationRate']);
+                Route::get('leave/balance-trends', [AnalyticsController::class, 'getLeaveBalanceTrends']);
+                Route::get('leave/peak-periods', [AnalyticsController::class, 'getPeakLeavePeriods']);
+
+                // Payroll
+                Route::get('payroll/cost-trends', [AnalyticsController::class, 'getPayrollCostTrends']);
+                Route::get('payroll/salary-distribution', [AnalyticsController::class, 'getSalaryDistribution']);
+                Route::get('payroll/deduction-analysis', [AnalyticsController::class, 'getDeductionAnalysis']);
+
+                // Projects
+                Route::get('projects/timeline-adherence', [AnalyticsController::class, 'getProjectTimelineAdherence']);
+                Route::get('projects/task-velocity', [AnalyticsController::class, 'getTaskVelocity']);
+                Route::get('projects/overdue-trends', [AnalyticsController::class, 'getOverdueTrends']);
+
+                // Performance Management
+                Route::get('performance/team-summary', [AnalyticsController::class, 'getTeamPerformanceSummary']);
+                Route::get('performance/company-summary', [AnalyticsController::class, 'getCompanyPerformanceSummary']);
+                Route::get('performance/rating-distribution', [AnalyticsController::class, 'getRatingDistribution']);
+                Route::get('performance/goal-completion-rate', [AnalyticsController::class, 'getGoalCompletionRate']);
+                Route::get('performance/feedback-metrics', [AnalyticsController::class, 'getFeedbackMetrics']);
+            });
+
+            // Performance Management routes
+            Route::prefix('performance')->group(function () {
+                // Review Cycles (HR only)
+                Route::middleware(PermissionMiddleware::using(['review-cycle-manage']))->group(function () {
+                    Route::apiResource('cycles', PerformanceReviewCycleController::class);
+                    Route::get('cycles/{id}/topsis-ranking', [PerformanceTopsisController::class, 'ranking']);
+                });
+
+                // Reviews
+                Route::get('reviews/my-reviews', [PerformanceReviewController::class, 'getMyReviews']);
+                Route::get('reviews/team-reviews', [PerformanceReviewController::class, 'getTeamReviews']);
+                Route::get('reviews/sections', [PerformanceReviewController::class, 'getActiveSections']);
+                Route::get('reviews/{id}', [PerformanceReviewController::class, 'show']);
+                Route::post('reviews/{id}/self-assessment', [PerformanceReviewController::class, 'submitSelfAssessment']);
+                Route::post('reviews/{id}/manager-assessment', [PerformanceReviewController::class, 'submitManagerAssessment']);
+                Route::post('reviews/{id}/calibrate', [PerformanceReviewController::class, 'calibrateReview'])
+                    ->middleware(PermissionMiddleware::using(['review-calibrate']));
+
+                // Goals
+                Route::get('goals/my-goals', [PerformanceGoalController::class, 'getMyGoals']);
+                Route::get('goals/team-goals', [PerformanceGoalController::class, 'getTeamGoals']);
+                Route::get('goals/{id}/updates', [PerformanceGoalController::class, 'getProgressUpdates']);
+                Route::post('goals/{id}/update-progress', [PerformanceGoalController::class, 'addProgressUpdate']);
+                Route::apiResource('goals', PerformanceGoalController::class);
+
+                // Feedback
+                Route::get('feedback/received', [PerformanceFeedbackController::class, 'getReceivedFeedback']);
+                Route::get('feedback/given', [PerformanceFeedbackController::class, 'getGivenFeedback']);
+                Route::post('feedback', [PerformanceFeedbackController::class, 'store']);
+                Route::get('feedback/{id}', [PerformanceFeedbackController::class, 'show']);
+                Route::post('feedback/{id}/acknowledge', [PerformanceFeedbackController::class, 'acknowledge']);
+            });
         });
     });

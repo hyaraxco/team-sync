@@ -3,12 +3,14 @@
     <!-- Key Metrics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       <MetricCard
+        class="lg rounded-[20px] border border-[#0B1042] relative overflow-hidden main-card p-5"
         title="Total Payroll Cost"
         :value="payroll?.total_payroll_cost || 0"
         format="currency"
         :trend="payroll?.payroll_cost_change"
         subtitle="This period"
         :loading="payrollLoading"
+        highlight
       />
 
       <MetricCard
@@ -40,7 +42,9 @@
     <!-- Charts Section 1 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
       <!-- Total Cost Trend -->
-      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+      <div
+        class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+      >
         <h3 class="text-lg font-bold text-[#202020] mb-6">
           Payroll Cost Trends
         </h3>
@@ -51,13 +55,18 @@
           :options="costTrendOptions"
           :series="costTrendSeries"
         />
-        <div v-else class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200">
+        <div
+          v-else
+          class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200"
+        >
           <p class="text-sm font-medium text-[#737373]">No trend data</p>
         </div>
       </div>
 
       <!-- Salary Distribution -->
-      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+      <div
+        class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+      >
         <h3 class="text-lg font-bold text-[#202020] mb-6">
           Salary Distribution
         </h3>
@@ -86,7 +95,9 @@
       />
 
       <!-- Cost by Department -->
-      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+      <div
+        class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+      >
         <h3 class="text-lg font-bold text-[#202020] mb-6">
           Cost by Department
         </h3>
@@ -97,7 +108,10 @@
           :options="departmentCostOptions"
           :series="departmentCostSeries"
         />
-        <div v-else class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200">
+        <div
+          v-else
+          class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200"
+        >
           <p class="text-sm font-medium text-[#737373]">No department data</p>
         </div>
       </div>
@@ -111,7 +125,7 @@ import { storeToRefs } from "pinia";
 import { useAnalyticsStore } from "@/stores/analytics";
 import MetricCard from "./MetricCard.vue";
 import TrendChart from "./TrendChart.vue";
-import { capitalize } from "@/utils/formatUtils";
+import { capitalize, formatIDR } from "@/utils/formatUtils";
 
 const analyticsStore = useAnalyticsStore();
 const {
@@ -152,22 +166,12 @@ const costTrendOptions = computed(() => ({
   },
   yaxis: {
     labels: {
-      formatter: (v) =>
-        new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-          minimumFractionDigits: 0,
-        }).format(v),
+      formatter: (v) => formatIDR(v),
     },
   },
   tooltip: {
     y: {
-      formatter: (v) =>
-        new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-          minimumFractionDigits: 0,
-        }).format(v),
+      formatter: (v) => formatIDR(v),
     },
   },
   dataLabels: { enabled: false },
@@ -231,12 +235,7 @@ const payrollTrendOptions = computed(() => ({
   },
   tooltip: {
     y: {
-      formatter: (v) =>
-        new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-          minimumFractionDigits: 0,
-        }).format(v),
+      formatter: (v) => formatIDR(v),
     },
   },
   dataLabels: { enabled: false },
@@ -260,12 +259,7 @@ const departmentCostOptions = computed(() => {
     plotOptions: { pie: { donut: { size: "60%" } } },
     tooltip: {
       y: {
-        formatter: (v) =>
-          new Intl.NumberFormat("id-ID", {
-            style: "currency",
-            currency: "IDR",
-            minimumFractionDigits: 0,
-          }).format(v),
+        formatter: (v) => formatIDR(v),
       },
     },
   };
