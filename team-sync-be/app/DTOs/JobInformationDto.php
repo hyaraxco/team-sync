@@ -54,7 +54,7 @@ class JobInformationDto
             status: $data['status'] ?? $existingJob->status ?? 'active',
             employment_type: $data['employment_type'] ?? $existingJob->employment_type ?? 'full_time',
             work_location: $data['work_location'] ?? $existingJob->work_location ?? 'office',
-            start_date: $data['start_date'] ?? ($existingJob->start_date ? $existingJob->start_date->format('Y-m-d') : now()->format('Y-m-d')),
+            start_date: $data['start_date'] ?? ($existingJob->start_date ? \Carbon\Carbon::parse($existingJob->start_date)->format('Y-m-d') : now()->format('Y-m-d')),
             monthly_salary: isset($data['monthly_salary']) ? (float) $data['monthly_salary'] : ($existingJob->monthly_salary ?? 0.0),
         );
     }

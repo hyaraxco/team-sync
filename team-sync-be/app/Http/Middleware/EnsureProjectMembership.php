@@ -13,6 +13,7 @@ class EnsureProjectMembership
 {
     public function handle(Request $request, Closure $next)
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         if (!$user) {

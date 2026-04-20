@@ -1,5 +1,5 @@
 <template>
-  <div class="w-full space-y-1.5 focus-within:z-10 relative text-left">
+  <div class="w-full space-y-2 focus-within:z-10 relative text-left">
     <label
       :for="fieldId"
       class="block text-sm font-medium text-gray-700"
@@ -30,9 +30,9 @@
         :class="[
           hasIcon ? 'pl-12' : 'pl-4',
           hasSuffix ? 'pr-12' : 'pr-4',
-          error 
-            ? 'border-red-300 ring-4 ring-red-500/10 focus:border-red-500 focus:ring-red-500/20' 
-            : 'border-gray-200 hover:border-gray-300 focus:border-[#0C51D9] focus:ring-4 focus:ring-[#0C51D9]/10'
+          error
+            ? 'border-red-300 ring-4 ring-red-500/10 focus:border-red-500 focus:ring-red-500/20'
+            : 'border-gray-200 hover:border-gray-300 focus:border-[#0C51D9] focus:ring-4 focus:ring-[#0C51D9]/10',
         ]"
         @input="modelValue = $event.target.value"
         @blur="emit('blur', $event)"
@@ -48,9 +48,22 @@
     </div>
 
     <!-- Error Message -->
-    <div v-if="error" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
-      <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    <div
+      v-if="error"
+      class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1"
+    >
+      <svg
+        class="w-3.5 h-3.5 mt-0.5 shrink-0"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke="currentColor"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+        />
       </svg>
       <span class="leading-tight">{{ error }}</span>
     </div>
@@ -96,8 +109,14 @@ const modelValue = computed({
 <style>
 /* Global because scoped keyframes can be tricky with dynamic classes */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 .animate-fadeIn {
   animation: fadeIn 0.5s ease-out forwards;

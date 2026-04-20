@@ -66,9 +66,9 @@
     />
 
     <!-- Existing Workforce Analytics -->
-    <div class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Headcount Trend</h3>
-      <apexchart
+    <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">Headcount Trend</h3>
+      <VueApexCharts
         v-if="!workforceLoading && workforce?.headcount_trend"
         type="area"
         height="300"
@@ -85,11 +85,11 @@
     <!-- Demographics Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Gender Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
           Gender Distribution
         </h3>
-        <apexchart
+        <VueApexCharts
           v-if="!workforceLoading && workforce?.gender_distribution"
           type="donut"
           height="300"
@@ -99,11 +99,11 @@
       </div>
 
       <!-- Employment Type Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">
           Employment Type
         </h3>
-        <apexchart
+        <VueApexCharts
           v-if="!workforceLoading && workforce?.employment_types"
           type="donut"
           height="300"
@@ -114,11 +114,11 @@
     </div>
 
     <!-- Department Distribution -->
-    <div class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+    <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">
         Department Headcount
       </h3>
-      <apexchart
+      <VueApexCharts
         v-if="!workforceLoading && workforce?.department_headcount"
         type="bar"
         height="300"

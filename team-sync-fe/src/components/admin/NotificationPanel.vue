@@ -36,10 +36,6 @@ const emit = defineEmits(["retry", "select"]);
 
 const visibleNotifications = computed(() => props.notifications.slice(0, 5));
 
-const unreadCount = computed(() =>
-  visibleNotifications.value.filter((notification) => !notification?.is_read).length
-);
-
 const errorMessage = computed(() => {
   if (!props.error) {
     return "";
@@ -115,7 +111,10 @@ const formatRelativeTime = (value) => {
 
 const resolveCategory = (notification) =>
   String(
-    notification?.category ?? notification?.data?.category ?? notification?.type ?? ""
+    notification?.category ??
+      notification?.data?.category ??
+      notification?.type ??
+      "",
   )
     .trim()
     .toLowerCase();
@@ -209,28 +208,19 @@ const getIconTextClass = (notification) => {
     :class="{ hidden: !open, 'notification-panel--open': open }"
   >
     <div class="notification-panel__header border-b border-[#E4EBF9] px-4 py-3">
-      <div class="relative z-10 flex items-start justify-between gap-3">
+      <div class="relative z-10 flex items-start gap-3">
         <div>
-          <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0C51D9]">
-            Realtime Feed
+          <p
+            class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0C51D9]"
+          >
+            Notifications
           </p>
-          <p class="text-sm font-extrabold text-[#0C1C3C]">Notifications</p>
           <p class="text-xs text-[#5D6882]">Latest 5 updates</p>
         </div>
-        <span
-          v-if="unreadCount > 0"
-          class="rounded-full border border-[#C8DAFF] bg-white/85 px-2.5 py-1 text-[11px] font-semibold text-[#0C51D9]"
-        >
-          {{ unreadCount }} new
-        </span>
       </div>
     </div>
 
-    <div
-      v-if="loading"
-      data-testid="notification-loading"
-      class="px-4 py-4"
-    >
+    <div v-if="loading" data-testid="notification-loading" class="px-4 py-4">
       <p class="text-sm font-medium text-[#334155]">Loading notifications...</p>
       <div class="mt-3 space-y-2.5">
         <div class="h-2 w-20 animate-pulse rounded-full bg-[#D6E3FD]"></div>
@@ -240,7 +230,10 @@ const getIconTextClass = (notification) => {
     </div>
 
     <div v-else-if="errorMessage" class="space-y-3 px-4 py-4">
-      <p data-testid="notification-error" class="text-sm font-medium text-red-600">
+      <p
+        data-testid="notification-error"
+        class="text-sm font-medium text-red-600"
+      >
         {{ errorMessage }}
       </p>
       <button
@@ -267,7 +260,10 @@ const getIconTextClass = (notification) => {
       <p class="mt-1 text-xs text-[#64748B]">No notifications yet.</p>
     </div>
 
-    <ul v-else class="notification-panel__list max-h-96 overflow-auto px-2 py-2">
+    <ul
+      v-else
+      class="notification-panel__list max-h-96 overflow-auto px-2 py-2"
+    >
       <li
         v-for="notification in visibleNotifications"
         :key="notification.id"
@@ -289,18 +285,16 @@ const getIconTextClass = (notification) => {
               class="h-5 w-5"
               :class="getIconTextClass(notification)"
             />
-            <span
-              v-if="!notification.is_read"
-              :data-testid="`notification-unread-${notification.id}`"
-              class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#0C51D9] ring-2 ring-white"
-            ></span>
           </div>
 
           <div class="min-w-0 flex-1">
             <p class="text-sm font-semibold leading-5 text-[#0C1C3C]">
               {{ notification.title }}
             </p>
-            <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-[#4B5563]">
+            <p
+              v-if="notification.body"
+              class="mt-0.5 text-xs leading-5 text-[#4B5563]"
+            >
               {{ notification.body }}
             </p>
             <p
@@ -331,8 +325,16 @@ const getIconTextClass = (notification) => {
   inset: 0;
   pointer-events: none;
   background:
-    radial-gradient(circle at 92% -8%, rgba(12, 81, 217, 0.28), transparent 46%),
-    radial-gradient(circle at 8% -14%, rgba(111, 150, 227, 0.2), transparent 40%);
+    radial-gradient(
+      circle at 92% -8%,
+      rgba(12, 81, 217, 0.28),
+      transparent 46%
+    ),
+    radial-gradient(
+      circle at 8% -14%,
+      rgba(111, 150, 227, 0.2),
+      transparent 40%
+    );
 }
 
 .notification-panel__header {

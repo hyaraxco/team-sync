@@ -16,6 +16,8 @@ class EmployeeProfile extends Model
 {
     use HasFactory, Searchable, SoftDeletes;
 
+    protected $appends = ['full_name', 'email'];
+
     protected $fillable = [
         'user_id',
         'code',
@@ -41,6 +43,16 @@ class EmployeeProfile extends Model
         return [
             'date_of_birth' => 'date',
         ];
+    }
+
+    public function getFullNameAttribute(): ?string
+    {
+        return $this->user?->name;
+    }
+
+    public function getEmailAttribute(): ?string
+    {
+        return $this->user?->email;
     }
 
     /**

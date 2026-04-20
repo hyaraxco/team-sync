@@ -44,7 +44,19 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 </script>
 
 <template>
-  <div class="main-card rounded-[20px] border border-[#0B1042] relative overflow-hidden p-4 sm:p-5">
+  <!-- Wrapper mode: when default slot content is provided, render as a plain card -->
+  <div
+    v-if="$slots.default"
+    class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5"
+  >
+    <slot></slot>
+  </div>
+
+  <!-- Stat card mode: when no default slot, render the metric card -->
+  <div
+    v-else
+    class="main-card rounded-[20px] border border-[#0B1042] relative overflow-hidden p-4 sm:p-5"
+  >
     <div class="flex flex-col justify-center h-full relative z-10">
       <!-- Trending Badge -->
       <div v-if="trendLabel" class="flex items-center gap-2 mb-3">

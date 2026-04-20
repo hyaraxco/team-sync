@@ -319,6 +319,8 @@ const fetchMyStatistics = async () => {
       tasks_review: tasks.review ?? 0,
       assigned_active_projects: projects.assigned_active ?? 0,
       led_active_projects: projects.led_active ?? 0,
+      total_hours_worked: attendance.total_hours_worked ?? null,
+      leave_balance: data.leave_balance ?? null,
     };
   } catch (error) {
   } finally {

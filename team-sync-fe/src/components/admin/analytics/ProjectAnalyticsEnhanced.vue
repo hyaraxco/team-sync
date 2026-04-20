@@ -37,8 +37,8 @@
     </div>
 
     <!-- Timeline Adherence Details -->
-    <div v-if="timelineAdherence" class="bg-white rounded-lg shadow p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+    <div v-if="timelineAdherence" class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">
         Project Timeline Performance
       </h3>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -94,9 +94,9 @@
     <!-- Existing Project Analytics -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <!-- Project Status Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Project Status</h3>
-        <apexchart
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">Project Status</h3>
+        <VueApexCharts
           v-if="!projectsLoading && projects?.project_status_overview"
           type="donut"
           height="300"
@@ -106,9 +106,9 @@
       </div>
 
       <!-- Task Status Distribution -->
-      <div class="bg-white rounded-lg shadow p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-4">Task Status</h3>
-        <apexchart
+      <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+        <h3 class="text-lg font-bold text-[#202020] mb-6">Task Status</h3>
+        <VueApexCharts
           v-if="!projectsLoading && projects?.task_status_distribution"
           type="donut"
           height="300"
@@ -121,12 +121,12 @@
     <!-- Team Productivity -->
     <div
       v-if="projects?.team_productivity"
-      class="bg-white rounded-lg shadow p-6"
+      class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
     >
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">
+      <h3 class="text-lg font-bold text-[#202020] mb-6">
         Team Productivity
       </h3>
-      <apexchart
+      <VueApexCharts
         type="bar"
         height="300"
         :options="teamProductivityOptions"

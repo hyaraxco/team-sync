@@ -266,19 +266,28 @@ onMounted(() => {
     </div>
 
     <!-- Tab Navigation -->
-    <div class="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-      <button
-        v-for="tab in tabs"
-        :key="tab.id"
-        @click="activeTab = tab.id"
-        class="flex items-center gap-2 px-4 py-2.5 rounded-[12px] border text-sm font-medium whitespace-nowrap transition-all duration-200"
-        :class="activeTab === tab.id
-          ? 'bg-[#0C51D9] text-white border-[#0C51D9] shadow-md'
-          : 'bg-white text-gray-600 border-[#DCDEDD] hover:border-[#0C51D9] hover:text-[#0C51D9]'"
-      >
-        <component :is="tab.icon" class="w-4 h-4" />
-        {{ tab.label }}
-      </button>
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6">
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          type="button"
+          @click="activeTab = tab.id"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === tab.id
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+        >
+          <component
+            :is="tab.icon"
+            class="w-4 h-4"
+            :class="activeTab === tab.id ? 'text-white' : 'text-gray-600'"
+          />
+          <span class="text-sm font-semibold">{{ tab.label }}</span>
+        </button>
+      </div>
     </div>
 
     <!-- Tab Content -->

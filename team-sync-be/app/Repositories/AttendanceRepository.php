@@ -50,6 +50,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             })
             ->orderBy('created_at', 'desc');
 
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
         if ($user && $user->hasRole('manager') && !$user->hasRole('hr')) {
             $manageableIds = $this->getManageableEmployeeIdsForManager();
@@ -106,25 +107,60 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     {
         $employeeId = Auth::user()->employeeProfile->id;
         $startOfMonth = now()->startOfMonth();
-        $endOfMonth = now()->endOfMonth();
+        $today = now();
 
-        $totalDays = now()->day; // Days elapsed in current month
+        // Calculate actual working days (excludes weekends & holidays) up to today
+        $totalWorkingDays = 0;
+        try {
+            $calculator = app(\App\Services\Attendance\WorkingDaysCalculator::class);
+            $totalWorkingDays = $calculator->calculateForEmployee(
+                $employeeId,
+                $startOfMonth,
+                $today
+            );
+        } catch (\Throwable) {
+            // Fallback: count weekdays (Mon-Fri) up to today
+            $totalWorkingDays = 0;
+            $cursor = $startOfMonth->copy();
+            while ($cursor->lte($today)) {
+                if ($cursor->isWeekday()) {
+                    $totalWorkingDays++;
+                }
+                $cursor->addDay();
+            }
+        }
 
-        // Single optimized query instead of 3 separate queries
+        // Attendance stats for current month
         $stats = Attendance::where('employee_id', $employeeId)
-            ->whereBetween('date', [$startOfMonth, $endOfMonth])
+            ->whereBetween('date', [$startOfMonth, $today])
             ->selectRaw("
-                COUNT(CASE WHEN status = 'present' THEN 1 END) as present_days,
+                COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as present_days,
                 COUNT(CASE WHEN status = 'sick' THEN 1 END) as sick_days,
-                COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days
+                COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
+                AVG(TIMESTAMPDIFF(MINUTE, check_in, check_out)) as avg_minutes
             ")
             ->first();
 
+        $avgHours = $stats->avg_minutes ? round($stats->avg_minutes / 60, 1) : 0;
+
+        // Leave balance: annual leave remaining days (most relevant for daily use)
+        $leaveBalance = 0;
+        try {
+            $leaveService = app(\App\Services\Attendance\LeaveBalanceService::class);
+            $balances = $leaveService->getEmployeeBalances($employeeId);
+            $annualLeave = $balances->firstWhere('leave_type', 'annual_leave');
+            $leaveBalance = $annualLeave ? (int) $annualLeave['remaining_days'] : (int) $balances->sum('remaining_days');
+        } catch (\Throwable) {
+            $leaveBalance = 0;
+        }
+
         return [
-            'total_days' => $totalDays,
+            'total_days' => $totalWorkingDays,
             'present_days' => (int) $stats->present_days,
             'sick_days' => (int) $stats->sick_days,
             'absent_days' => (int) $stats->absent_days,
+            'avg_hours' => $avgHours,
+            'leave_balance' => $leaveBalance,
         ];
     }
 
@@ -393,6 +429,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function authorizeManagerScopeForMismatch(AttendancePolicyMismatch $mismatch): void
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('manager')) {
@@ -408,6 +445,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function authorizeHrForMismatchResolution(): void
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('hr')) {
@@ -428,6 +466,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function getManageableEmployeeIdsForManager(): array
     {
+        /** @var \App\Models\User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('manager')) {

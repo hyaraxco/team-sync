@@ -104,6 +104,7 @@ const loadStatistics = async () => {
 };
 
 const loadLeaveRequests = async () => {
+  if (!can('leave-request-list')) return;
   loadingLeaveRequests.value = true;
   try {
     leaveRequests.value = await leaveRequestStore.fetchLatestLeaveRequests(5);
@@ -115,6 +116,7 @@ const loadLeaveRequests = async () => {
 };
 
 const loadCorrections = async () => {
+  if (!can('attendance-correction-list')) return;
   loadingCorrections.value = true;
   try {
     await attendanceCorrectionStore.fetchAllPaginated({ status: 'pending', row_per_page: 5, page: 1 });
@@ -339,9 +341,12 @@ onMounted(async () => {
     </div>
 
     <!-- Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div :class="[
+      'grid grid-cols-1 gap-6',
+      (can('leave-request-list') && can('attendance-correction-list')) ? 'lg:grid-cols-2' : ''
+    ]">
       <!-- Latest Leave Requests -->
-      <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+      <div v-if="can('leave-request-list')" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <div
@@ -435,7 +440,7 @@ onMounted(async () => {
       </div>
 
       <!-- Pending Corrections -->
-      <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+      <div v-if="can('attendance-correction-list')" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
             <div

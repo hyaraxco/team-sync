@@ -18,6 +18,7 @@ import {
 } from "lucide-vue-next";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
+import MainCard from "@/components/common/MainCard.vue";
 
 const router = useRouter();
 const payrollStore = usePayrollStore();
@@ -172,25 +173,17 @@ const clearSearch = () => {
 
     <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
-      <div
-        class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-[20px] p-6 text-white"
-      >
-        <div class="flex items-center justify-between mb-3">
-          <div
-            class="w-12 h-12 bg-white/20 rounded-[16px] flex items-center justify-center backdrop-blur-sm"
-          >
-            <FileText class="w-6 h-6" />
-          </div>
-        </div>
-        <p class="text-white/80 text-sm font-medium mb-2">Payroll Periods</p>
-        <p class="text-3xl font-extrabold"><AnimatedValue :value="meta.total || 0" /></p>
-        <p class="text-white/80 text-sm font-medium mt-1">
-          For {{ filters.year }}
-        </p>
-      </div>
+      <MainCard
+        title="Payroll Periods"
+        :value="String(meta.total || 0)"
+        :subtitle="`For ${filters.year}`"
+        iconName="FileText"
+        :trendLabel="`Year ${filters.year}`"
+        :isTrendUp="true"
+      />
 
       <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#10B981] hover:border-2 transition-all duration-300 p-6"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
         <div class="flex items-center justify-between mb-3">
           <div
@@ -207,7 +200,7 @@ const clearSearch = () => {
       </div>
 
       <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#EF4444] hover:border-2 transition-all duration-300 p-6"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
         <div class="flex items-center justify-between mb-3">
           <div
@@ -224,7 +217,7 @@ const clearSearch = () => {
       </div>
 
       <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
         <div class="flex items-center justify-between mb-3">
           <div
@@ -315,9 +308,12 @@ const clearSearch = () => {
               <FileText class="w-6 h-6 text-blue-600" />
             </div>
             <span
-              class="px-3 py-1 bg-green-100 text-green-800 text-xs font-semibold rounded-full"
+              class="px-3 py-1 text-xs font-semibold rounded-full"
+              :class="payslip.status === 'paid'
+                ? 'bg-green-100 text-green-800'
+                : 'bg-yellow-100 text-yellow-800'"
             >
-              Paid
+              {{ payslip.status === 'paid' ? 'Paid' : payslip.status || 'Paid' }}
             </span>
           </div>
 

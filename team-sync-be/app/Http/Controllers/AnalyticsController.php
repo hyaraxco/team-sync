@@ -110,4 +110,283 @@ class AnalyticsController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
         }
     }
+
+    // Enhanced Workforce Analytics
+    public function getTurnoverRate(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getTurnoverRate(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Turnover rate retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getAverageTenure(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getAverageTenure(
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Average tenure retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getNewHireTrends(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getNewHireTrends(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'New hire trends retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // Enhanced Attendance Analytics
+    public function getAttendanceComplianceRate(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getAttendanceComplianceRate(
+                $request->input('period', '6m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Attendance compliance rate retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getAttendancePatterns(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getAttendancePatterns(
+                $request->input('period', '3m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Attendance patterns retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getRemoteOfficeRatio(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getRemoteOfficeRatio(
+                $request->input('period', '3m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Remote/office ratio retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // Enhanced Leave Analytics
+    public function getLeaveUtilizationRate(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getLeaveUtilizationRate(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Leave utilization rate retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getLeaveBalanceTrends(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getLeaveBalanceTrends(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Leave balance trends retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getPeakLeavePeriods(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getPeakLeavePeriods(
+                $request->input('period', '12m'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Peak leave periods retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // Enhanced Payroll Analytics
+    public function getPayrollCostTrends(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getPayrollCostTrends(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Payroll cost trends retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getSalaryDistribution(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getSalaryDistribution(
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Salary distribution retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getDeductionAnalysis(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getDeductionAnalysis(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Deduction analysis retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // Enhanced Project Analytics
+    public function getProjectTimelineAdherence(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getProjectTimelineAdherence(
+                $request->input('period', '6m'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Project timeline adherence retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getTaskVelocity(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getTaskVelocity(
+                $request->input('period', '6m'),
+                $request->input('team_id') ? (int) $request->input('team_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Task velocity retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getOverdueTrends(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getOverdueTrends(
+                $request->input('period', '3m'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Overdue trends retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    // Performance Management Analytics
+    public function getTeamPerformanceSummary(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getTeamPerformanceSummary(
+                (int) $request->input('team_id'),
+                $request->input('cycle_id') ? (int) $request->input('cycle_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Team performance summary retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getCompanyPerformanceSummary(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getCompanyPerformanceSummary(
+                $request->input('cycle_id') ? (int) $request->input('cycle_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Company performance summary retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getRatingDistribution(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getRatingDistribution(
+                $request->input('cycle_id') ? (int) $request->input('cycle_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Rating distribution retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getGoalCompletionRate(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getGoalCompletionRate(
+                $request->input('employee_id') ? (int) $request->input('employee_id') : null,
+                $request->input('team_id') ? (int) $request->input('team_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Goal completion rate retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
+
+    public function getFeedbackMetrics(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getFeedbackMetrics(
+                $request->input('employee_id') ? (int) $request->input('employee_id') : null,
+                $request->input('team_id') ? (int) $request->input('team_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Feedback metrics retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+        }
+    }
 }

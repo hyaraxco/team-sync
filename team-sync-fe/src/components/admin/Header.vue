@@ -32,16 +32,16 @@ const route = useRoute();
 
 const titles = {
   "admin.dashboard": {
-    title: "Dashboard Overview",
-    subtitle: "Monitor your team performance and key metrics",
+    title: "Dashboard",
+    subtitle: "Track your team's performance and key metrics at a glance.",
   },
   "admin.notifications": {
     title: "Notifications",
-    subtitle: "Review your latest activity updates",
+    subtitle: "Stay up to date with your latest activity.",
   },
   "admin.teams": {
     title: "Teams",
-    subtitle: "Manage teams and organization units",
+    subtitle: "Organize teams and keep everyone aligned.",
   },
   "admin.team.detail": {
     title: "Team Details",
@@ -74,11 +74,11 @@ const titles = {
   },
   "admin.attendances": {
     title: "Attendance",
-    subtitle: "Review clock in/out records",
+    subtitle: "Review clock-in and clock-out records quickly.",
   },
   "admin.projects": {
     title: "Projects",
-    subtitle: "Manage projects and tasks",
+    subtitle: "Plan projects and keep tasks on track.",
   },
   "admin.projects.create": {
     title: "Create Project",
@@ -94,7 +94,7 @@ const titles = {
   },
   "admin.payroll.dashboard": {
     title: "Payroll",
-    subtitle: "Manage payroll and payments",
+    subtitle: "Manage payroll with clear payment insights.",
   },
   "admin.payroll.create": {
     title: "Create Payroll",
@@ -115,15 +115,15 @@ const titles = {
   "employee.team": { title: "My Team", subtitle: "See your team members" },
   "employee.attendance.my-attendances": {
     title: "My Attendance",
-    subtitle: "Track attendance, clock in/out, and leave requests",
+    subtitle: "Check your attendance, clock logs, and leave status.",
   },
   "employee.attendance.clock": {
     title: "My Attendance",
-    subtitle: "Track attendance, clock in/out, and leave requests",
+    subtitle: "Check your attendance, clock logs, and leave status.",
   },
   "employee.payroll": {
     title: "My Payroll",
-    subtitle: "View your payroll history",
+    subtitle: "Review your payroll history and details.",
   },
   "employee.payroll.detail": {
     title: "Payroll Details",
@@ -131,7 +131,7 @@ const titles = {
   },
   "employee.payslips": {
     title: "My Payroll",
-    subtitle: "View your payroll history",
+    subtitle: "Review your payroll history and details.",
   },
   "employee.payslips.detail": {
     title: "Payroll Details",
@@ -150,17 +150,35 @@ const notifications = computed(() => notificationStore.notifications);
 const notificationsLoading = computed(() => notificationStore.loading);
 const notificationsError = computed(() => notificationStore.error);
 const unreadNotificationCount = computed(() => notificationStore.unreadCount);
-const formatUnreadCount = (count) => {
+const isEmployeeUser = computed(() => {
+  const roles = Array.isArray(user.value?.roles) ? user.value.roles : [];
+  return roles.some((role) => String(role).toLowerCase() === "employee");
+});
+const formatUnreadCount = (count, maxCount = 99) => {
   const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
-  return safeCount > 99 ? "99+" : String(safeCount);
+  return safeCount > maxCount ? `${maxCount}+` : String(safeCount);
 };
 const unreadBadgeText = computed(() =>
-  formatUnreadCount(unreadNotificationCount.value)
+  formatUnreadCount(
+    unreadNotificationCount.value,
+    isEmployeeUser.value ? 9 : 99,
+  ),
 );
+const unreadBadgeClass = computed(() => {
+  if (isEmployeeUser.value) {
+    const safeCount = Number.isFinite(unreadNotificationCount.value)
+      ? Math.max(0, Math.floor(unreadNotificationCount.value))
+      : 0;
+    const sizeClass = safeCount > 9 ? "w-6 px-1" : "w-5";
+
+    return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-[#0C51D9] text-[10px] font-bold leading-none text-white`;
+  }
+
+  return "absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-[#EE2A3B] px-1.5 text-[11px] font-bold leading-none tracking-tight text-white";
+});
 const notificationButtonLabel = computed(() => {
   if (unreadNotificationCount.value > 0) {
-    const displayCount = formatUnreadCount(unreadNotificationCount.value);
-    return `Notifications, ${displayCount} new`;
+    return `Notifications, ${unreadBadgeText.value} new`;
   }
 
   return "Notifications";
@@ -293,10 +311,12 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="page-header bg-white border-b border-[#DCDEDD] px-3 sm:px-5 py-3 sm:py-4"
+    class="page-header bg-white border-b border-[#DCDEDD] px-4 sm:px-6 py-3.5 sm:py-4"
   >
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-3 sm:gap-4">
+    <div
+      class="flex items-start sm:items-center justify-between gap-3 sm:gap-4"
+    >
+      <div class="min-w-0 flex items-start sm:items-center gap-3 sm:gap-4">
         <button
           type="button"
           aria-label="Toggle sidebar"
@@ -306,17 +326,21 @@ onUnmounted(() => {
         >
           <MenuIcon class="w-5 h-5 text-gray-600" />
         </button>
-        <div>
-          <h2 class="text-brand-dark text-xl sm:text-2xl font-extrabold">
+        <div class="min-w-0">
+          <h2
+            class="text-brand-dark text-xl sm:text-2xl font-extrabold leading-tight truncate"
+          >
             {{ pageTitle }}
           </h2>
-          <p class="hidden sm:block text-brand-light text-sm font-normal mt-1">
+          <p
+            class="hidden md:block text-brand-light text-sm font-normal leading-snug mt-1 truncate"
+          >
             {{ pageSubtitle }}
           </p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2 sm:gap-4">
+      <div class="flex shrink-0 items-center gap-2 sm:gap-4">
         <!-- Action Buttons -->
         <div class="flex items-center gap-2 sm:gap-3">
           <div class="relative z-50" ref="notificationDropdownRef">
@@ -334,7 +358,7 @@ onUnmounted(() => {
               <span
                 v-if="unreadNotificationCount > 0"
                 data-testid="header-notification-unread-badge"
-                class="absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-[#EE2A3B] px-1.5 text-[11px] font-bold leading-none tracking-tight text-white"
+                :class="unreadBadgeClass"
               >
                 {{ unreadBadgeText }}
               </span>

@@ -243,8 +243,8 @@ const preloadExistingPayrollMonths = async () => {
 
   if (payrollStore.error) {
     toast.warning(
-      "Data payroll belum lengkap",
-      "Validasi bulan duplikat akan dicek saat submit."
+      "Incomplete payroll data",
+      "Duplicate month validation will be checked upon submission."
     );
     return;
   }
@@ -306,7 +306,7 @@ const parseErrorMessage = (err) =>
   err?.response?.data?.data?.message ||
   err?.response?.data?.message ||
   err?.message ||
-  "Gagal membuat payroll. Silakan coba lagi.";
+  "Failed to generate payroll. Please try again.";
 
 const isSubmitDisabled = computed(
   () =>
@@ -319,7 +319,7 @@ const isSubmitDisabled = computed(
 
 const handleSubmit = async () => {
   if (!form.value.salary_month) {
-    toast.warning("Salary month wajib dipilih");
+    toast.warning("Salary month requires selection");
     return;
   }
 
@@ -340,12 +340,12 @@ const handleSubmit = async () => {
     payrollStore.error = null;
     await payrollStore.generatePayroll(form.value);
     toast.success(
-      "Payroll berhasil digenerate",
-      `Payroll ${formatMonth(form.value.salary_month)} berhasil dibuat.`
+      "Payroll successfully generated",
+      `Payroll for ${formatMonth(form.value.salary_month)} has been successfully created.`
     );
     router.push({ name: "admin.payroll.dashboard" });
   } catch (err) {
-    toast.error("Generate payroll gagal", parseErrorMessage(err));
+    toast.error("Failed to generate payroll", parseErrorMessage(err));
   }
 };
 

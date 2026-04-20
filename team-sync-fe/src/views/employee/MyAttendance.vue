@@ -142,7 +142,6 @@ const openLeaveRequestModal = () => {
   }
 
   showLeaveRequestModal.value = true;
-  activeSection.value = "leave";
   const tomorrow = new Date();
   tomorrow.setDate(tomorrow.getDate() + 1);
   leaveForm.value.start_date = tomorrow.toISOString().split("T")[0];
@@ -310,7 +309,6 @@ const handleRouteActionQuery = async () => {
     return;
   }
 
-  activeSection.value = "leave";
   openLeaveRequestModal();
   await clearLeaveRequestActionQuery();
 };

@@ -26,7 +26,7 @@ const props = defineProps({
           <p class="text-brand-dark text-2xl font-extrabold leading-tight my-1">
             <AnimatedValue :value="statistics.present_days" />/{{ statistics.total_days }}
           </p>
-          <p class="text-success text-xs font-medium">Days present</p>
+          <p class="text-success text-xs font-medium">Working days present</p>
         </div>
         <div
           class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center"
@@ -44,7 +44,7 @@ const props = defineProps({
         <div>
           <p class="text-brand-dark text-sm font-medium">Leave Balance</p>
           <p class="text-brand-dark text-2xl font-extrabold leading-tight my-1">
-            18
+            <AnimatedValue :value="statistics.leave_balance ?? 0" />
           </p>
           <p class="text-brand-light text-xs font-medium">Days remaining</p>
         </div>
@@ -84,7 +84,7 @@ const props = defineProps({
         <div>
           <p class="text-brand-dark text-sm font-medium">Average Hours</p>
           <p class="text-brand-dark text-2xl font-extrabold leading-tight my-1">
-            8.5h
+            {{ statistics.avg_hours ? statistics.avg_hours + 'h' : '0h' }}
           </p>
           <p class="text-success text-xs font-medium">Daily average</p>
         </div>

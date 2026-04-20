@@ -51,8 +51,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                     'on_leave_today' => $leaveKpis['on_leave_today'],
                     'leave_utilization' => $leaveKpis['leave_utilization'],
                 ],
-                'attendance_vs_deduction_trend' => $attendanceVsDeductionTrend,
-                'monthly_hr_cost' => $monthlyHrCost,
+                'attendance_vs_deduction_trend' => $trendData['attendance_vs_deduction_trend'],
+                'monthly_hr_cost' => $trendData['monthly_hr_cost'],
                 'team_performance' => $teamPerformance,
             ];
         });
@@ -1609,13 +1609,15 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     private function getEmployeeKpis(array $filteredEmployeeIds, Carbon $start, Carbon $prevStart): array
     {
         $currentCount = DB::table('employee_profiles')
-            ->whereIn('id', $filteredEmployeeIds)
-            ->where('join_date', '<=', $start->endOfMonth()->toDateString())
+            ->whereIn('employee_profiles.id', $filteredEmployeeIds)
+            ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+            ->where('job_information.start_date', '<=', $start->endOfMonth()->toDateString())
             ->count();
 
         $previousCount = DB::table('employee_profiles')
-            ->whereIn('id', $filteredEmployeeIds)
-            ->where('join_date', '<=', $prevStart->endOfMonth()->toDateString())
+            ->whereIn('employee_profiles.id', $filteredEmployeeIds)
+            ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+            ->where('job_information.start_date', '<=', $prevStart->endOfMonth()->toDateString())
             ->count();
 
         $employeeChange = $previousCount > 0
@@ -1623,8 +1625,9 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             : 0;
 
         $newHires = DB::table('employee_profiles')
-            ->whereIn('id', $filteredEmployeeIds)
-            ->whereBetween('join_date', [$start->toDateString(), $start->endOfMonth()->toDateString()])
+            ->whereIn('employee_profiles.id', $filteredEmployeeIds)
+            ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+            ->whereBetween('job_information.start_date', [$start->toDateString(), $start->endOfMonth()->toDateString()])
             ->count();
 
         return [

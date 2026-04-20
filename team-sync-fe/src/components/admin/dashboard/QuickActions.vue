@@ -36,6 +36,9 @@ type PlaceholderQuickAction = {
   icon: unknown;
   isPlaceholder: true;
   isVisible: () => boolean;
+  to?: never;
+  action?: never;
+  isDisabled?: never;
 };
 
 type QuickAction = ActionableQuickAction | PlaceholderQuickAction;

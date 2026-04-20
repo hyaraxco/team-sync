@@ -95,6 +95,42 @@ class PermissionSeeder extends Seeder
         'payslip' => [
             'view',
         ],
+
+        'review-cycle' => [
+            'manage',
+        ],
+
+        'review-self' => [
+            'submit',
+        ],
+
+        'review-manager' => [
+            'submit',
+        ],
+
+        'review' => [
+            'calibrate',
+        ],
+
+        'goal-create' => [
+            'own',
+        ],
+
+        'goal-assign' => [
+            'team',
+        ],
+
+        'feedback' => [
+            'give',
+        ],
+
+        'performance-analytics' => [
+            'view',
+        ],
+
+        'performance' => [
+            'menu',
+        ],
     ];
 
     /**
