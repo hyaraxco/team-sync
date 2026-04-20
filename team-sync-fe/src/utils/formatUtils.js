@@ -9,25 +9,31 @@ export const formatCurrency = (amount) => {
 };
 
 export const formatRupiah = (amount) => {
-  if (!amount) return "Rp 0";
+  if (!amount) return "IDR 0";
+  return `IDR ${new Intl.NumberFormat("id-ID", {
+    minimumFractionDigits: 0,
+  }).format(amount)}`;
+};
+
+export const formatIDR = (amount) => {
   return new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
-  }).format(amount);
+  }).format(amount || 0);
 };
 
 export const formatRupiahCompact = (amount) => {
   const n = Number(amount);
-  if (!n) return "Rp 0";
+  if (!n) return "IDR 0";
   const abs = Math.abs(n);
   const sign = n < 0 ? "-" : "";
   if (abs >= 1000000000) {
-    return `Rp ${sign}${(abs / 1000000000).toFixed(1)}B`;
+    return `IDR ${sign}${(abs / 1000000000).toFixed(1)}B`;
   } else if (abs >= 1000000) {
-    return `Rp ${sign}${(abs / 1000000).toFixed(1)}M`;
+    return `IDR ${sign}${(abs / 1000000).toFixed(1)}M`;
   } else if (abs >= 1000) {
-    return `Rp ${sign}${(abs / 1000).toFixed(1)}K`;
+    return `IDR ${sign}${(abs / 1000).toFixed(1)}K`;
   }
   return formatRupiah(n);
 };
