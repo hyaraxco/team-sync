@@ -19,6 +19,14 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
     sections: [],
     sectionsLoading: false,
 
+    // Pending Calibration
+    pendingCalibrationReviews: [],
+    pendingCalibrationLoading: false,
+
+    // Calibration Context
+    calibrationContext: null,
+    calibrationContextLoading: false,
+
     // TOPSIS Ranking
     topsisResult: null,
     topsisLoading: false,
@@ -256,18 +264,14 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
       }
     },
 
-    async calibrateReview(reviewId, responses, finalRating, finalRatingLabel) {
+    async calibrateReview(reviewId, responses) {
       this.reviewsLoading = true;
       this.error = null;
       this.success = false;
       try {
         const response = await axiosInstance.post(
           `/performance/reviews/${reviewId}/calibrate`,
-          {
-            responses,
-            final_rating: finalRating,
-            final_rating_label: finalRatingLabel,
-          },
+          { responses },
         );
         this.currentReview = response.data.data;
         this.success = true;
@@ -277,6 +281,47 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
         throw error;
       } finally {
         this.reviewsLoading = false;
+      }
+    },
+
+    async fetchPendingCalibration(filters = {}) {
+      this.pendingCalibrationLoading = true;
+      this.error = null;
+      try {
+        const response = await axiosInstance.get(
+          "/performance/reviews/pending-calibration",
+          { params: filters },
+        );
+        this.pendingCalibrationReviews = response.data.data.data || [];
+        this.pagination = {
+          current_page: response.data.data.current_page,
+          per_page: response.data.data.per_page,
+          total: response.data.data.total,
+          last_page: response.data.data.last_page,
+        };
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.pendingCalibrationLoading = false;
+      }
+    },
+
+    async fetchCalibrationContext(reviewId) {
+      this.calibrationContextLoading = true;
+      this.error = null;
+      try {
+        const response = await axiosInstance.get(
+          `/performance/reviews/${reviewId}/calibration-context`,
+        );
+        this.calibrationContext = response.data.data;
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.calibrationContextLoading = false;
       }
     },
 
