@@ -46,7 +46,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_employee_moving_task_to_review_notifies_project_leader(): void
     {
         [$managerUser, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Project Leader');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Task Assignee');
+        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Task Assignee');
 
         $project = Project::query()->create([
             'name' => 'Notif Project '.uniqid(),
@@ -85,7 +85,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_manager_adding_team_member_notifies_employee(): void
     {
         [$managerUser] = $this->createUserWithRoleAndProfile('manager', 'Team Manager');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Added Employee');
+        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Added Employee');
 
         $team = Team::factory()->active()->create([
             'team_lead_id' => $managerUser->id,
@@ -106,7 +106,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_task_comment_and_attachment_notify_related_stakeholders(): void
     {
         [$managerUser, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Comment Manager');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Comment Employee');
+        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Comment Employee');
 
         $project = Project::query()->create([
             'name' => 'Collab Notif Project '.uniqid(),
@@ -156,7 +156,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_team_status_change_notifies_related_employee_members(): void
     {
         [$managerUser] = $this->createUserWithRoleAndProfile('manager', 'Status Manager');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Status Employee');
+        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Status Employee');
 
         $team = Team::factory()->active()->create([
             'team_lead_id' => $managerUser->id,
@@ -188,7 +188,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
     public function test_employee_check_in_and_check_out_send_notifications(): void
     {
-        [$employeeUser] = $this->createUserWithRoleAndProfile('employee', 'Attendance Employee');
+        [$employeeUser] = $this->createUserWithRoleAndProfile('staff', 'Attendance Employee');
 
         Sanctum::actingAs($employeeUser);
 
@@ -235,7 +235,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         ]);
 
         [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+            'staff',
             'Mismatch Employee',
             $team->id
         );
@@ -301,7 +301,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         ]);
 
         [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+            'staff',
             'Hybrid Employee',
             $team->id
         );
@@ -375,13 +375,13 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_lp3es_mobile_project_flow_notifies_all_participating_employees_across_teams(): void
     {
         [$managerUser, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'LP3ES Manager');
-        $managerUser->assignRole('employee');
+        $managerUser->assignRole('staff');
 
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'LP3ES HR');
 
-        [$frontendUser, $frontendProfile] = $this->createUserWithRoleAndProfile('employee', 'LP3ES Frontend Dev');
-        [$backendUser, $backendProfile] = $this->createUserWithRoleAndProfile('employee', 'LP3ES Backend Dev');
-        [$qaUser, $qaProfile] = $this->createUserWithRoleAndProfile('employee', 'LP3ES QA Engineer');
+        [$frontendUser, $frontendProfile] = $this->createUserWithRoleAndProfile('staff', 'LP3ES Frontend Dev');
+        [$backendUser, $backendProfile] = $this->createUserWithRoleAndProfile('staff', 'LP3ES Backend Dev');
+        [$qaUser, $qaProfile] = $this->createUserWithRoleAndProfile('staff', 'LP3ES QA Engineer');
 
         $mobileTeam = Team::factory()->active()->create([
             'name' => 'LP3ES Mobile Development',
@@ -604,7 +604,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_mismatch_escalation_notifies_employee_and_hr_reviewer(): void
     {
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'Escalation HR');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Escalation Employee');
+        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Escalation Employee');
 
         $mismatchDate = Carbon::parse('2026-04-06')->startOfDay();
 

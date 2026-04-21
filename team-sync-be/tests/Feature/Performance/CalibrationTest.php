@@ -26,7 +26,7 @@ function actingAsHR() {
     $role = Role::findByName('HR', 'sanctum');
     $user->assignRole($role);
     Sanctum::actingAs($user);
-    return ['user' => $user, 'employee' => $employee];
+    return ['user' => $user, 'staff' => $employee];
 }
 
 function createReviewForCalibration($employeeId = null, $status = 'pending_calibration', $reviewerId = null) {
@@ -62,7 +62,7 @@ it('hr can calibrate another employee review', function () {
 
 it('hr cannot calibrate their own review', function () {
     $hr = actingAsHR();
-    $review = createReviewForCalibration($hr['employee']->id);
+    $review = createReviewForCalibration($hr['staff']->id);
 
     $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/calibrate", [
         'responses' => []
@@ -132,7 +132,7 @@ it('pending calibration endpoint excludes hr own review', function () {
     $hr = actingAsHR();
     
     $otherReview = createReviewForCalibration(null, 'pending_calibration');
-    $hrReview = createReviewForCalibration($hr['employee']->id, 'pending_calibration');
+    $hrReview = createReviewForCalibration($hr['staff']->id, 'pending_calibration');
 
     $response = $this->getJson('/api/v1/performance/reviews/pending-calibration');
 

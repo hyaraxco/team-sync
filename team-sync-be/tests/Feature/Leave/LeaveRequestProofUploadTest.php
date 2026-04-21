@@ -133,7 +133,7 @@ class LeaveRequestProofUploadTest extends TestCase
     {
         $employee = $this->createEmployee($employmentType);
         $user = $employee->user;
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 
