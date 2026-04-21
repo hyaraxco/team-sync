@@ -45,7 +45,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             if (empty($manageableEmployeeIds)) {
                 $query->whereRaw('1 = 0');
             } else {
-                $query->whereIn('employee_id', $manageableEmployeeIds);
+                $query->whereIn('staff_member_id', $manageableEmployeeIds);
             }
         }
 
@@ -87,7 +87,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
     public function getMyLeaveRequests()
     {
         return LeaveRequest::with(['staffMember.user', 'approver.user'])
-            ->where('employee_id', Auth::user()->staffMemberProfile->getKey())
+            ->where('staff_member_id', Auth::user()->staffMemberProfile->getKey())
             ->whereDate('created_at', '>=', now()->subDays(6)->startOfDay())
             ->whereDate('created_at', '<=', now()->endOfDay())
             ->orderBy('created_at', 'desc')
@@ -276,11 +276,11 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
         $fromTeamMembers = TeamMember::whereIn('team_id', $leadTeamIds)
             ->whereNull('left_at')
-            ->pluck('employee_id')
+            ->pluck('staff_member_id')
             ->toArray();
 
         $fromJobInformation = JobInformation::whereIn('team_id', $leadTeamIds)
-            ->pluck('employee_id')
+            ->pluck('staff_member_id')
             ->toArray();
 
         return array_values(array_unique(array_merge($fromTeamMembers, $fromJobInformation)));
@@ -293,7 +293,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             return;
         }
 
-        if (! in_array($leaveRequest->employee_id, $manageableEmployeeIds, true)) {
+        if (! in_array($leaveRequest->staff_member_id, $manageableEmployeeIds, true)) {
             throw new AuthorizationException('You can only access leave requests from your direct reports.');
         }
     }
@@ -302,7 +302,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
     {
         $staffMemberProfileId = Auth::user()?->staffMemberProfile?->getKey();
 
-        if (! $staffMemberProfileId || $leaveRequest->employee_id !== $staffMemberProfileId) {
+        if (! $staffMemberProfileId || $leaveRequest->staff_member_id !== $staffMemberProfileId) {
             throw new AuthorizationException('You can only upload proof for your own leave requests.');
         }
     }
@@ -339,7 +339,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 $targetPeriod = $this->resolveNextAdjustableTargetPeriod($sourcePeriod);
 
                 $dailyRate = (float) PayrollDetail::query()
-                    ->where('employee_id', $leaveRequest->employee_id)
+                    ->where('staff_member_id', $leaveRequest->staff_member_id)
                     ->whereHas('payroll', function ($query) use ($sourcePeriodId) {
                         $query->where('attendance_period_id', $sourcePeriodId);
                     })
@@ -350,7 +350,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 $amountDelta = round($dailyRate * $daysDeltaValue, 2);
 
                 $existingAdjustment = PayrollAdjustment::query()
-                    ->where('employee_id', $leaveRequest->employee_id)
+                    ->where('staff_member_id', $leaveRequest->staff_member_id)
                     ->where('source_period_id', $sourcePeriodId)
                     ->where('target_period_id', $targetPeriod->id)
                     ->where('source_reference_type', 'leave_request')
@@ -375,7 +375,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 }
 
                 PayrollAdjustment::query()->create([
-                    'employee_id' => $leaveRequest->employee_id,
+                    'staff_member_id' => $leaveRequest->staff_member_id,
                     'source_period_id' => $sourcePeriodId,
                     'target_period_id' => $targetPeriod->id,
                     'source_reference_type' => 'leave_request',

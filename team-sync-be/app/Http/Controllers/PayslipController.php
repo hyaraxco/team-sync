@@ -48,7 +48,7 @@ class PayslipController extends Controller implements HasMiddleware
             'staffMember.jobInformation.team',
         ])
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-            ->where('employee_id', $staffMemberProfile->id)
+            ->where('staff_member_id', $staffMemberProfile->id)
             ->where('payrolls.status', 'paid')
             ->when($validated['year'] ?? null, function ($query, $year) {
                 $query->whereYear('payrolls.salary_month', $year);
@@ -110,7 +110,7 @@ class PayslipController extends Controller implements HasMiddleware
             'staffMember.bankInformation',
         ])
             ->where('id', $id)
-            ->where('employee_id', $staffMemberProfile->id)
+            ->where('staff_member_id', $staffMemberProfile->id)
             ->whereHas('payroll', function ($query) {
                 $query->where('status', 'paid');
             })
@@ -121,7 +121,7 @@ class PayslipController extends Controller implements HasMiddleware
 
         if ($targetPeriodId) {
             $appliedAdjustments = PayrollAdjustment::query()
-                ->where('employee_id', $payslip->employee_id)
+                ->where('staff_member_id', $payslip->staff_member_id)
                 ->where('target_period_id', $targetPeriodId)
                 ->where('status', PayrollAdjustment::STATUS_APPLIED)
                 ->orderBy('id')

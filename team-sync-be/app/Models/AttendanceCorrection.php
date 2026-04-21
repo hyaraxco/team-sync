@@ -10,7 +10,7 @@ class AttendanceCorrection extends Model {
 
     protected $fillable = [
         'attendance_id',
-        'employee_id',
+        'staff_member_id',
         'original_check_in',
         'original_check_out',
         'requested_check_in',

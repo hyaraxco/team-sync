@@ -109,7 +109,7 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
 
         if (! $isDryRun) {
             foreach ($rows as $row) {
-                DB::table('employee_profiles')->where('id', $row['id'])->update([
+                DB::table('staff_member_profiles')->where('id', $row['id'])->update([
                     'npwp'                 => $row['npwp'],
                     'bpjs_ketenagakerjaan' => $row['bpjs_tk'],
                     'bpjs_kesehatan'       => $row['bpjs_kes'],

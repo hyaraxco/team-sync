@@ -341,7 +341,7 @@ const handleCreateComment = async () => {
 };
 
 const startEditComment = (comment) => {
-  if (!canMutateEntityOwner(comment.employee_id)) {
+  if (!canMutateEntityOwner(comment.staff_member_id)) {
     return;
   }
 
@@ -370,7 +370,7 @@ const handleUpdateComment = async (commentId) => {
 };
 
 const handleDeleteComment = async (comment) => {
-  if (!canMutateEntityOwner(comment.employee_id)) {
+  if (!canMutateEntityOwner(comment.staff_member_id)) {
     return;
   }
 
@@ -414,7 +414,7 @@ const handleAttachmentSelected = async (event) => {
 };
 
 const handleDeleteAttachment = async (attachment) => {
-  if (!canMutateEntityOwner(attachment.employee_id)) {
+  if (!canMutateEntityOwner(attachment.staff_member_id)) {
     return;
   }
 
@@ -676,7 +676,7 @@ watch(
                         </div>
                         <div
                           class="flex items-center gap-2"
-                          v-if="canMutateEntityOwner(comment.employee_id)"
+                          v-if="canMutateEntityOwner(comment.staff_member_id)"
                         >
                           <button
                             type="button"
@@ -825,7 +825,7 @@ watch(
                         </p>
                       </div>
                       <button
-                        v-if="canMutateEntityOwner(attachment.employee_id)"
+                        v-if="canMutateEntityOwner(attachment.staff_member_id)"
                         type="button"
                         @click="handleDeleteAttachment(attachment)"
                         class="text-gray-400 hover:text-red-600 transition-colors"

@@ -89,7 +89,7 @@ class PayrollExportVersioningTest extends TestCase
             ->create();
 
         $employee->bankInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'bank_name' => 'BCA',
             'account_number' => '5566778899',
             'account_holder_name' => 'Payroll Export User',
@@ -104,7 +104,7 @@ class PayrollExportVersioningTest extends TestCase
 
         $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'effective_working_days' => $effectiveWorkingDays,

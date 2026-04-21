@@ -11,7 +11,7 @@ class BankInformation extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'bank_name',
         'account_number',
         'account_holder_name',
@@ -19,6 +19,6 @@ class BankInformation extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 }

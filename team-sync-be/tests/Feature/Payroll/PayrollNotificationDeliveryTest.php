@@ -52,7 +52,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_AUTO_PAID,
@@ -63,7 +63,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_MANUAL_RESEND,
@@ -93,7 +93,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_AUTO_PAID,
@@ -104,7 +104,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_MANUAL_RESEND,
@@ -150,7 +150,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'recipient_email' => '',
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_AUTO_PAID,
@@ -186,7 +186,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         });
 
         $staffMemberProfile->bankInformation()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '7778889990',
             'account_holder_name' => 'Notification Test User',
@@ -200,7 +200,7 @@ class PayrollNotificationDeliveryTest extends TestCase
 
         $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

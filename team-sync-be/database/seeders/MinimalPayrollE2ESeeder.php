@@ -42,9 +42,9 @@ class MinimalPayrollE2ESeeder extends Seeder
                 ->firstOrFail();
 
             $employee->jobInformation()->updateOrCreate(
-                ['employee_id' => $employee->id],
+                ['staff_member_id' => $employee->id],
                 [
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'job_title' => 'Software Engineer',
                     'status' => 'active',
                     'employment_type' => 'full_time',
@@ -95,7 +95,7 @@ class MinimalPayrollE2ESeeder extends Seeder
     private function seedAttendanceForMonth(int $employeeId, Carbon $payrollMonth): void
     {
         Attendance::withTrashed()
-            ->where('employee_id', $employeeId)
+            ->where('staff_member_id', $employeeId)
             ->whereDate('date', '>=', $payrollMonth->copy()->startOfMonth()->toDateString())
             ->whereDate('date', '<=', $payrollMonth->copy()->endOfMonth()->toDateString())
             ->forceDelete();
@@ -106,7 +106,7 @@ class MinimalPayrollE2ESeeder extends Seeder
         while ($cursor->lte($monthEnd)) {
             if (! $cursor->isWeekend()) {
                 Attendance::create([
-                    'employee_id' => $employeeId,
+                    'staff_member_id' => $employeeId,
                     'date' => $cursor->toDateString(),
                     'check_in' => $cursor->format('Y-m-d').' 08:00:00',
                     'check_out' => $cursor->format('Y-m-d').' 17:00:00',

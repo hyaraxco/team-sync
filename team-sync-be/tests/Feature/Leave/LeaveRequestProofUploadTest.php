@@ -40,7 +40,7 @@ class LeaveRequestProofUploadTest extends TestCase
         $user = $this->actingAsEmployee('full_time');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $user->staffMemberProfile->id,
+            'staff_member_id' => $user->staffMemberProfile->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-15',
             'end_date' => '2026-04-15',
@@ -80,7 +80,7 @@ class LeaveRequestProofUploadTest extends TestCase
         $anotherEmployee = $this->createEmployee('full_time');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $anotherEmployee->id,
+            'staff_member_id' => $anotherEmployee->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-16',
             'end_date' => '2026-04-16',
@@ -105,7 +105,7 @@ class LeaveRequestProofUploadTest extends TestCase
         $user = $this->actingAsEmployee('full_time');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $user->staffMemberProfile->id,
+            'staff_member_id' => $user->staffMemberProfile->id,
             'leave_type' => 'annual_leave',
             'start_date' => '2026-04-17',
             'end_date' => '2026-04-17',
@@ -146,7 +146,7 @@ class LeaveRequestProofUploadTest extends TestCase
             $employee = StaffMemberProfile::factory()->create();
 
             $employee->jobInformation()->create([
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'job_title' => 'QA Engineer',
                 'years_experience' => 3,
                 'status' => 'active',

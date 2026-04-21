@@ -42,7 +42,7 @@ class EnsureProjectMembership
         $isLeader = ($project->project_leader_id === $employee->id);
 
         $jobInfoTeamId = $employee->jobInformation->team_id ?? null;
-        $teamMemberIds = TeamMember::where('employee_id', $employee->id)
+        $teamMemberIds = TeamMember::where('staff_member_id', $employee->id)
             ->whereNull('left_at')
             ->pluck('team_id')
             ->toArray();

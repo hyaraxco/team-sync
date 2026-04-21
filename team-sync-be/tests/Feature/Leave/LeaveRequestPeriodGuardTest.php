@@ -96,7 +96,7 @@ class LeaveRequestPeriodGuardTest extends TestCase
         });
 
         $employee->jobInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'job_title' => 'QA Engineer',
             'years_experience' => 3,
             'status' => 'active',

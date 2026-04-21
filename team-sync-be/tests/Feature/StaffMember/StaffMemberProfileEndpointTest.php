@@ -65,7 +65,7 @@ class StaffMemberProfileEndpointTest extends TestCase
         TeamMember::query()->updateOrCreate(
             [
                 'team_id' => $teamId,
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
             ],
             [
                 'joined_at' => now(),
@@ -74,7 +74,7 @@ class StaffMemberProfileEndpointTest extends TestCase
         );
 
         $activeTeamMembership = TeamMember::query()
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->whereNull('left_at')
             ->with('team')
             ->orderByDesc('joined_at')

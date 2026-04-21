@@ -24,14 +24,14 @@ class DashboardRepository implements DashboardRepositoryInterface
             $lastWeekEnd = Carbon::now()->subWeek()->endOfWeek();
 
             // Single query for employee and team stats
-            $employeeTeamStats = DB::table('employee_profiles')
+            $employeeTeamStats = DB::table('staff_member_profiles')
                 ->crossJoin('teams')
                 ->selectRaw('
-                    COUNT(DISTINCT employee_profiles.id) as total_employees,
+                    COUNT(DISTINCT staff_member_profiles.id) as total_employees,
                     COUNT(DISTINCT CASE
-                        WHEN MONTH(employee_profiles.created_at) = ?
-                        AND YEAR(employee_profiles.created_at) = ?
-                        THEN employee_profiles.id
+                        WHEN MONTH(staff_member_profiles.created_at) = ?
+                        AND YEAR(staff_member_profiles.created_at) = ?
+                        THEN staff_member_profiles.id
                     END) as employees_this_month,
                     COUNT(DISTINCT teams.id) as total_teams,
                     COUNT(DISTINCT CASE
@@ -154,7 +154,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             $yesterday = Carbon::yesterday()->toDateString();
 
             $attendanceStats = DB::table('attendances')
-                ->where('employee_id', $employeeId)
+                ->where('staff_member_id', $employeeId)
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->selectRaw("
                     COUNT(CASE WHEN status = 'present' THEN 1 END) as present_days,
@@ -188,7 +188,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             $assignedProjects = DB::table('project_teams')
                 ->join('team_members', 'project_teams.team_id', '=', 'team_members.team_id')
                 ->join('projects', 'projects.id', '=', 'project_teams.project_id')
-                ->where('team_members.employee_id', $employeeId)
+                ->where('team_members.staff_member_id', $employeeId)
                 ->whereNull('team_members.left_at')
                 ->where('projects.status', 'active')
                 ->selectRaw('COUNT(DISTINCT projects.id) as assigned_count')
@@ -237,12 +237,12 @@ class DashboardRepository implements DashboardRepositoryInterface
         $today = Carbon::today()->toDateString();
 
         // Get all active employees with their user info
-        $allEmployees = DB::table('employee_profiles')
-            ->join('users', 'employee_profiles.user_id', '=', 'users.id')
-            ->leftJoin('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
-            ->whereNull('employee_profiles.deleted_at')
+        $allEmployees = DB::table('staff_member_profiles')
+            ->join('users', 'staff_member_profiles.'user_id', '=', 'users.id')
+            ->leftJoin('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
+            ->whereNull('staff_member_profiles.'deleted_at')
             ->select([
-                'employee_profiles.id as employee_id',
+                'staff_member_profiles.'id as staff_member_id',
                 'users.name',
                 'users.profile_photo',
                 'job_information.job_title',
@@ -255,7 +255,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             ->whereDate('date', $today)
             ->whereNull('deleted_at')
             ->get()
-            ->keyBy('employee_id');
+            ->keyBy('staff_member_id');
 
         $checkedIn = [];
         $notCheckedIn = [];
@@ -268,10 +268,10 @@ class DashboardRepository implements DashboardRepositoryInterface
         ];
 
         foreach ($allEmployees as $employee) {
-            $attendance = $todayAttendances->get($employee->employee_id);
+            $attendance = $todayAttendances->get($employee->staff_member_id);
 
             $employeeData = [
-                'id' => $employee->employee_id,
+                'id' => $employee->staff_member_id,
                 'name' => $employee->name,
                 'profile_photo' => $employee->profile_photo,
                 'position' => $employee->job_title,

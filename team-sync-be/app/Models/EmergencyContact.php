@@ -11,7 +11,7 @@ class EmergencyContact extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'full_name',
         'relationship',
         'phone',
@@ -20,6 +20,6 @@ class EmergencyContact extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 }

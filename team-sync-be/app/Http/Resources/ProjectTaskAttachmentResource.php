@@ -17,7 +17,7 @@ class ProjectTaskAttachmentResource extends JsonResource
         return [
             'id' => $this->id,
             'project_task_id' => $this->project_task_id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'file_name' => $this->file_name,
             'file_path' => $this->file_path,
             'file_url' => $this->file_path ? asset('storage/'.$this->file_path) : null,

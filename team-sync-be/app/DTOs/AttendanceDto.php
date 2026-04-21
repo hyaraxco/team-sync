@@ -7,7 +7,7 @@ use App\Models\Attendance;
 class AttendanceDto
 {
     public function __construct(
-        public readonly int $employee_id,
+        public readonly int $staff_member_id,
         public readonly string $date,
         public readonly ?string $check_in,
         public readonly ?float $check_in_lat,
@@ -22,7 +22,7 @@ class AttendanceDto
     public function toArray(): array
     {
         return [
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'date' => $this->date,
             'check_in' => $this->check_in,
             'check_in_lat' => $this->check_in_lat,
@@ -38,7 +38,7 @@ class AttendanceDto
     public static function fromArray(array $data): self
     {
         return new self(
-            employee_id: $data['employee_id'],
+            staff_member_id: $data['staff_member_id'],
             date: $data['date'],
             check_in: $data['check_in'] ?? null,
             check_in_lat: isset($data['check_in_lat']) ? (float) $data['check_in_lat'] : null,
@@ -54,7 +54,7 @@ class AttendanceDto
     public static function fromArrayForUpdate(array $data, Attendance $existingAttendance): self
     {
         return new self(
-            employee_id: $data['employee_id'] ?? $existingAttendance->employee_id,
+            staff_member_id: $data['staff_member_id'] ?? $existingAttendance->staff_member_id,
             date: $data['date'] ?? ($existingAttendance->date ? $existingAttendance->date : null),
             check_in: $data['check_in'] ?? ($existingAttendance->check_in ? $existingAttendance->check_in : null),
             check_in_lat: isset($data['check_in_lat']) ? (float) $data['check_in_lat'] : $existingAttendance->check_in_lat,

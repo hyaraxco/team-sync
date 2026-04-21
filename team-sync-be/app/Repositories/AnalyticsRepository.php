@@ -95,7 +95,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     private function getWorkforceDemographics(array $filteredEmployeeIds): array
     {
             // ── Gender Distribution ─────────────────────────────────────────
-            $genderDistribution = DB::table('employee_profiles')
+            $genderDistribution = DB::table('staff_member_profiles')
                 ->whereIn('id', $filteredEmployeeIds)
                 ->whereNotNull('gender')
                 ->selectRaw("gender, COUNT(*) as count")
@@ -106,7 +106,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Employment Type Breakdown ────────────────────────────────────
             $employmentTypes = DB::table('job_information')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereNotNull('employment_type')
                 ->selectRaw("employment_type, COUNT(*) as count")
                 ->groupBy('employment_type')
@@ -117,7 +117,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Work Location Distribution ──────────────────────────────────
             $workLocations = DB::table('job_information')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereNotNull('work_location')
                 ->selectRaw("work_location, COUNT(*) as count")
                 ->groupBy('work_location')
@@ -131,9 +131,9 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->join('team_members', function ($join) {
                     $join->on('team_members.team_id', '=', 'teams.id')->whereNull('team_members.left_at');
                 })
-                ->whereIn('team_members.employee_id', $filteredEmployeeIds)
+                ->whereIn('team_members.staff_member_id', $filteredEmployeeIds)
                 ->whereNotNull('teams.department')
-                ->selectRaw("teams.department, COUNT(DISTINCT team_members.employee_id) as count")
+                ->selectRaw("teams.department, COUNT(DISTINCT team_members.staff_member_id) as count")
                 ->groupBy('teams.department')
                 ->orderByDesc('count')
                 ->get()
@@ -156,8 +156,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     {
             // ── PTKP Status Distribution (replaces dropped skill_level column) ─
             // skill_level was removed from job_information in the April 2026 refactor.
-            // ptkp_status is the relevant tax-identity classification stored in employee_profiles.
-            $skillLevels = DB::table('employee_profiles')
+            // ptkp_status is the relevant tax-identity classification stored in staff_member_profiles.
+            $skillLevels = DB::table('staff_member_profiles')
                 ->whereIn('id', $filteredEmployeeIds)
                 ->whereNotNull('ptkp_status')
                 ->selectRaw("ptkp_status as skill_level, COUNT(*) as count")
@@ -168,7 +168,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->values()->all();
 
             // ── Age Distribution ────────────────────────────────────────────
-            $ageDistribution = DB::table('employee_profiles')
+            $ageDistribution = DB::table('staff_member_profiles')
                 ->whereIn('id', $filteredEmployeeIds)
                 ->whereNotNull('date_of_birth')
                 ->selectRaw("
@@ -190,7 +190,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Tenure Distribution ─────────────────────────────────────────
             $tenureDistribution = DB::table('job_information')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereNotNull('start_date')
                 ->selectRaw("
                     CASE
@@ -224,17 +224,17 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $cursor = $start->copy()->startOfMonth();
             while ($cursor->lte($end)) {
                 $monthEnd = $cursor->copy()->endOfMonth();
-                $count = DB::table('employee_profiles')
+                $count = DB::table('staff_member_profiles')
                     ->where('created_at', '<=', $monthEnd)
                     ->where(function ($q) use ($monthEnd) {
                         $q->whereNull('deleted_at')->orWhere('deleted_at', '>', $monthEnd);
                     })
                     ->when($department, function ($q) use ($department) {
-                        $q->join('job_information as ji', 'ji.employee_id', '=', 'employee_profiles.id')
+                        $q->join('job_information as ji', 'ji.staff_member_id', '=', 'staff_member_profiles.id')
                             ->join('teams as t', 't.id', '=', 'ji.team_id')
                             ->where('t.department', $department);
                     })
-                    ->count(DB::raw('DISTINCT employee_profiles.id'));
+                    ->count(DB::raw('DISTINCT staff_member_profiles.id'));
 
                 $headcountTrend[] = [
                     'month' => $cursor->format('M Y'),
@@ -290,7 +290,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     {
             // ── Monthly Attendance Rate Trend ────────────────────────────────
             $monthlyTrend = DB::table('attendances')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(date, '%Y-%m') as month_key,
@@ -326,7 +326,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Status Distribution (current period) ────────────────────────
             $statusDistribution = DB::table('attendances')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->selectRaw("
                     status,
@@ -344,7 +344,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Weekly Lateness Trend ────────────────────────────────────────
             $latenessTrend = DB::table('attendances')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->where('status', 'late')
                 ->selectRaw("
@@ -364,7 +364,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Average Hours Worked per Day ────────────────────────────────
             $avgHoursTrend = DB::table('attendances')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->whereNotNull('worked_minutes')
                 ->where('worked_minutes', '>', 0)
@@ -398,7 +398,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     {
             // ── Work Mode Distribution (monthly stacked) ────────────────────
             $workModeTrend = DB::table('attendances')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('date', [$startDate, $endDate])
                 ->whereNotNull('actual_work_mode')
                 ->selectRaw("
@@ -426,23 +426,23 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Top Late Employees ──────────────────────────────────────────
             $topLateEmployees = DB::table('attendances')
-                ->join('employee_profiles', 'employee_profiles.id', '=', 'attendances.employee_id')
-                ->join('users', 'users.id', '=', 'employee_profiles.user_id')
-                ->whereIn('attendances.employee_id', $filteredEmployeeIds)
+                ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'attendances.staff_member_id')
+                ->join('users', 'users.id', '=', 'staff_member_profiles.'user_id')
+                ->whereIn('attendances.staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('attendances.date', [$startDate, $endDate])
                 ->where('attendances.status', 'late')
-                ->groupBy('attendances.employee_id', 'users.name', 'employee_profiles.code')
+                ->groupBy('attendances.staff_member_id', 'users.name', 'staff_member_profiles.'code')
                 ->selectRaw("
-                    attendances.employee_id,
+                    attendances.staff_member_id,
                     users.name as employee_name,
-                    employee_profiles.code as employee_code,
+                    staff_member_profiles.code as employee_code,
                     COUNT(*) as late_count
                 ")
                 ->orderByDesc('late_count')
                 ->limit(10)
                 ->get()
                 ->map(fn ($row) => [
-                    'employee_id' => (int) $row->employee_id,
+                    'staff_member_id' => (int) $row->staff_member_id,
                     'employee_name' => $row->employee_name,
                     'employee_code' => $row->employee_code,
                     'late_count' => (int) $row->late_count,
@@ -452,7 +452,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Policy Mismatch Trend ───────────────────────────────────────
             $mismatchTrend = DB::table('attendance_policy_mismatches')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('mismatch_date', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(mismatch_date, '%Y-%m') as month_key,
@@ -472,7 +472,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Correction Request Rate ─────────────────────────────────────
             $correctionTrend = DB::table('attendance_corrections')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(created_at, '%Y-%m') as month_key,
@@ -521,7 +521,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Leave Requests by Month ──────────────────────────────────────
             $monthlyTrend = DB::table('leave_requests')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
                     DATE_FORMAT(start_date, '%Y-%m') as month_key,
@@ -544,7 +544,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Leave Type Distribution ──────────────────────────────────────
             $typeDistribution = DB::table('leave_requests')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("leave_type, COUNT(*) as count, COALESCE(SUM(total_days), 0) as total_days")
                 ->groupBy('leave_type')
@@ -559,7 +559,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Approval Rate ───────────────────────────────────────────────
             $approvalStats = DB::table('leave_requests')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
                     COUNT(*) as total,
@@ -581,7 +581,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Average Leave Duration by Type ──────────────────────────────
             $avgDuration = DB::table('leave_requests')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
                 ->where('status', 'approved')
                 ->selectRaw("leave_type, ROUND(AVG(total_days), 1) as avg_days")
@@ -593,10 +593,10 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Leave by Department ──────────────────────────────────────────
             $leaveByDepartment = DB::table('leave_requests')
-                ->join('employee_profiles', 'employee_profiles.id', '=', 'leave_requests.employee_id')
-                ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+                ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'leave_requests.staff_member_id')
+                ->join('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
                 ->join('teams', 'teams.id', '=', 'job_information.team_id')
-                ->whereIn('leave_requests.employee_id', $filteredEmployeeIds)
+                ->whereIn('leave_requests.staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('leave_requests.start_date', [$start->toDateString(), $end->toDateString()])
                 ->where('leave_requests.status', 'approved')
                 ->whereNotNull('teams.department')
@@ -618,13 +618,13 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Top Leave Takers ────────────────────────────────────────────
             $topLeaveTakers = DB::table('leave_requests')
-                ->join('employee_profiles', 'employee_profiles.id', '=', 'leave_requests.employee_id')
-                ->join('users', 'users.id', '=', 'employee_profiles.user_id')
-                ->whereIn('leave_requests.employee_id', $filteredEmployeeIds)
+                ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'leave_requests.staff_member_id')
+                ->join('users', 'users.id', '=', 'staff_member_profiles.'user_id')
+                ->whereIn('leave_requests.staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('leave_requests.start_date', [$start->toDateString(), $end->toDateString()])
                 ->where('leave_requests.status', 'approved')
-                ->groupBy('leave_requests.employee_id', 'users.name', 'employee_profiles.code')
-                ->selectRaw("leave_requests.employee_id, users.name, employee_profiles.code, SUM(leave_requests.total_days) as total_days, COUNT(*) as request_count")
+                ->groupBy('leave_requests.staff_member_id', 'users.name', 'staff_member_profiles.'code')
+                ->selectRaw("leave_requests.staff_member_id, users.name, staff_member_profiles.code, SUM(leave_requests.total_days) as total_days, COUNT(*) as request_count")
                 ->orderByDesc('total_days')
                 ->limit(10)
                 ->get()
@@ -638,7 +638,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
             // ── Sick Leave Proof Compliance ──────────────────────────────────
             $proofCompliance = DB::table('leave_requests')
-                ->whereIn('employee_id', $filteredEmployeeIds)
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
                 ->where('leave_type', 'sick_leave')
                 ->where('status', 'approved')
@@ -684,14 +684,14 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Total Payroll Cost Trend ─────────────────────────────────────
             $costTrend = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
                 ->whereIn('payrolls.status', ['approved', 'paid'])
                 ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
                     DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
                     COALESCE(SUM(payroll_details.final_salary), 0) as total_salary,
                     COALESCE(SUM(payroll_details.deduction_amount), 0) as total_deductions,
-                    COUNT(DISTINCT payroll_details.employee_id) as employee_count,
+                    COUNT(DISTINCT payroll_details.staff_member_id) as employee_count,
                     ROUND(AVG(payroll_details.final_salary), 2) as avg_salary
                 ")
                 ->groupBy('month_key')
@@ -709,7 +709,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Salary Distribution Histogram ────────────────────────────────
             $salaryDistribution = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
                 ->whereIn('payrolls.status', ['approved', 'paid'])
                 ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
                 ->selectRaw("
@@ -732,7 +732,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Tax & BPJS Contribution Trend ────────────────────────────────
             $taxBpjsTrend = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
                 ->whereIn('payrolls.status', ['approved', 'paid'])
                 ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
@@ -755,9 +755,9 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Cost per Department ──────────────────────────────────────────
             $costByDepartment = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-                ->join('job_information', 'job_information.employee_id', '=', 'payroll_details.employee_id')
+                ->join('job_information', 'job_information.staff_member_id', '=', 'payroll_details.staff_member_id')
                 ->join('teams', 'teams.id', '=', 'job_information.team_id')
-                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
                 ->whereIn('payrolls.status', ['approved', 'paid'])
                 ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
                 ->whereNotNull('teams.department')
@@ -765,7 +765,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                     teams.department,
                     COALESCE(SUM(payroll_details.final_salary), 0) as total_cost,
                     ROUND(AVG(payroll_details.final_salary), 2) as avg_salary,
-                    COUNT(DISTINCT payroll_details.employee_id) as employee_count
+                    COUNT(DISTINCT payroll_details.staff_member_id) as employee_count
                 ")
                 ->groupBy('teams.department')
                 ->orderByDesc('total_cost')
@@ -781,7 +781,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Deduction Breakdown (latest month) ──────────────────────────
             $deductionBreakdown = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-                ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+                ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
                 ->whereIn('payrolls.status', ['approved', 'paid'])
                 ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
                 ->selectRaw("
@@ -894,7 +894,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $teamProductivity = DB::table('project_task_status_logs')
                 ->join('project_tasks', 'project_tasks.id', '=', 'project_task_status_logs.project_task_id')
                 ->join('team_members', function ($join) {
-                    $join->on('team_members.employee_id', '=', 'project_tasks.assignee_id')
+                    $join->on('team_members.staff_member_id', '=', 'project_tasks.assignee_id')
                         ->whereNull('team_members.left_at');
                 })
                 ->join('teams', 'teams.id', '=', 'team_members.team_id')
@@ -933,16 +933,16 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
      */
     private function getFilteredEmployeeIds(?string $department, ?int $teamId): array
     {
-        return DB::table('employee_profiles')
-            ->select('employee_profiles.id')
-            ->whereNull('employee_profiles.deleted_at')
+        return DB::table('staff_member_profiles')
+            ->select('staff_member_profiles.id')
+            ->whereNull('staff_member_profiles.'deleted_at')
             ->when($department, function ($q) use ($department) {
-                $q->join('job_information as ji_filter', 'ji_filter.employee_id', '=', 'employee_profiles.id')
+                $q->join('job_information as ji_filter', 'ji_filter.staff_member_id', '=', 'staff_member_profiles.id')
                     ->join('teams as t_filter', 't_filter.id', '=', 'ji_filter.team_id')
                     ->where('t_filter.department', $department);
             })
             ->when($teamId, function ($q) use ($teamId) {
-                $q->join('team_members as tm_filter', 'tm_filter.employee_id', '=', 'employee_profiles.id')
+                $q->join('team_members as tm_filter', 'tm_filter.staff_member_id', '=', 'staff_member_profiles.id')
                     ->where('tm_filter.team_id', $teamId)
                     ->whereNull('tm_filter.left_at');
             })
@@ -1211,12 +1211,12 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     {
         $query = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-            ->join('employee_profiles', 'employee_profiles.id', '=', 'payroll_details.employee_id')
+            ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'payroll_details.staff_member_id')
             ->where('payrolls.status', 'paid')
-            ->whereNull('employee_profiles.deleted_at');
+            ->whereNull('staff_member_profiles.'deleted_at');
 
         if ($department) {
-            $query->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+            $query->join('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
                 ->join('teams', 'teams.id', '=', 'job_information.team_id')
                 ->where('teams.department', $department);
         }
@@ -1230,7 +1230,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                     WHEN original_salary < 20000000 THEN '15M - 20M'
                     ELSE '> 20M'
                 END as salary_range,
-                COUNT(DISTINCT payroll_details.employee_id) as employee_count
+                COUNT(DISTINCT payroll_details.staff_member_id) as employee_count
             ")
             ->groupBy('salary_range')
             ->get()
@@ -1365,8 +1365,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     public function getTeamPerformanceSummary(int $teamId, ?int $cycleId = null): array
     {
         $query = DB::table('performance_reviews as pr')
-            ->join('employee_profiles as ep', 'pr.employee_id', '=', 'ep.id')
-            ->join('team_members as tm', 'tm.employee_id', '=', 'ep.id')
+            ->join('staff_member_profiles as ep', 'pr.staff_member_id', '=', 'ep.id')
+            ->join('team_members as tm', 'tm.staff_member_id', '=', 'ep.id')
             ->where('tm.team_id', $teamId)
             ->whereNull('tm.left_at')
             ->whereNull('ep.deleted_at');
@@ -1377,7 +1377,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
         $reviews = $query->select(
             'pr.id',
-            'pr.employee_id',
+            'pr.staff_member_id',
             'pr.overall_rating',
             'pr.status',
             'ep.full_name as employee_name'
@@ -1403,7 +1403,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     public function getCompanyPerformanceSummary(?int $cycleId = null): array
     {
         $query = DB::table('performance_reviews as pr')
-            ->join('employee_profiles as ep', 'pr.employee_id', '=', 'ep.id')
+            ->join('staff_member_profiles as ep', 'pr.staff_member_id', '=', 'ep.id')
             ->whereNull('ep.deleted_at');
 
         if ($cycleId) {
@@ -1412,7 +1412,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
         $reviews = $query->select(
             'pr.id',
-            'pr.employee_id',
+            'pr.staff_member_id',
             'pr.overall_rating',
             'pr.status',
             'pr.review_type'
@@ -1451,7 +1451,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     public function getRatingDistribution(?int $cycleId = null): array
     {
         $query = DB::table('performance_reviews as pr')
-            ->join('employee_profiles as ep', 'pr.employee_id', '=', 'ep.id')
+            ->join('staff_member_profiles as ep', 'pr.staff_member_id', '=', 'ep.id')
             ->whereNull('ep.deleted_at')
             ->where('pr.status', 'completed')
             ->whereNotNull('pr.overall_rating');
@@ -1496,22 +1496,22 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array
     {
         $query = DB::table('performance_goals as pg')
-            ->join('employee_profiles as ep', 'pg.employee_id', '=', 'ep.id')
+            ->join('staff_member_profiles as ep', 'pg.staff_member_id', '=', 'ep.id')
             ->whereNull('ep.deleted_at');
 
         if ($employeeId) {
-            $query->where('pg.employee_id', $employeeId);
+            $query->where('pg.staff_member_id', $employeeId);
         }
 
         if ($teamId) {
-            $query->join('team_members as tm', 'tm.employee_id', '=', 'ep.id')
+            $query->join('team_members as tm', 'tm.staff_member_id', '=', 'ep.id')
                 ->where('tm.team_id', $teamId)
                 ->whereNull('tm.left_at');
         }
 
         $goals = $query->select(
             'pg.id',
-            'pg.employee_id',
+            'pg.staff_member_id',
             'pg.title',
             'pg.status',
             'pg.progress_percentage',
@@ -1564,25 +1564,25 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array
     {
         $query = DB::table('performance_feedback as pf')
-            ->join('employee_profiles as ep', 'pf.employee_id', '=', 'ep.id')
+            ->join('staff_member_profiles as ep', 'pf.staff_member_id', '=', 'ep.id')
             ->whereNull('ep.deleted_at');
 
         if ($employeeId) {
             $query->where(function ($q) use ($employeeId) {
-                $q->where('pf.employee_id', $employeeId)
+                $q->where('pf.staff_member_id', $employeeId)
                     ->orWhere('pf.giver_id', $employeeId);
             });
         }
 
         if ($teamId) {
-            $query->join('team_members as tm', 'tm.employee_id', '=', 'ep.id')
+            $query->join('team_members as tm', 'tm.staff_member_id', '=', 'ep.id')
                 ->where('tm.team_id', $teamId)
                 ->whereNull('tm.left_at');
         }
 
         $feedback = $query->select(
             'pf.id',
-            'pf.employee_id',
+            'pf.staff_member_id',
             'pf.giver_id',
             'pf.feedback_type',
             'pf.is_private',
@@ -1602,21 +1602,21 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             'total_feedback' => $totalFeedback,
             'by_type' => $byType,
             'recent_feedback_30d' => $recentFeedback,
-            'average_per_employee' => $employeeId ? null : ($totalFeedback > 0 ? round($totalFeedback / DB::table('employee_profiles')->whereNull('deleted_at')->count(), 2) : 0),
+            'average_per_employee' => $employeeId ? null : ($totalFeedback > 0 ? round($totalFeedback / DB::table('staff_member_profiles')->whereNull('deleted_at')->count(), 2) : 0),
         ];
     }
 
     private function getEmployeeKpis(array $filteredEmployeeIds, Carbon $start, Carbon $prevStart): array
     {
-        $currentCount = DB::table('employee_profiles')
-            ->whereIn('employee_profiles.id', $filteredEmployeeIds)
-            ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+        $currentCount = DB::table('staff_member_profiles')
+            ->whereIn('staff_member_profiles.id', $filteredEmployeeIds)
+            ->join('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
             ->where('job_information.start_date', '<=', $start->endOfMonth()->toDateString())
             ->count();
 
-        $previousCount = DB::table('employee_profiles')
-            ->whereIn('employee_profiles.id', $filteredEmployeeIds)
-            ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+        $previousCount = DB::table('staff_member_profiles')
+            ->whereIn('staff_member_profiles.id', $filteredEmployeeIds)
+            ->join('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
             ->where('job_information.start_date', '<=', $prevStart->endOfMonth()->toDateString())
             ->count();
 
@@ -1624,9 +1624,9 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             ? round((($currentCount - $previousCount) / $previousCount) * 100, 1)
             : 0;
 
-        $newHires = DB::table('employee_profiles')
-            ->whereIn('employee_profiles.id', $filteredEmployeeIds)
-            ->join('job_information', 'job_information.employee_id', '=', 'employee_profiles.id')
+        $newHires = DB::table('staff_member_profiles')
+            ->whereIn('staff_member_profiles.id', $filteredEmployeeIds)
+            ->join('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
             ->whereBetween('job_information.start_date', [$start->toDateString(), $start->endOfMonth()->toDateString()])
             ->count();
 
@@ -1640,7 +1640,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     private function getAttendanceKpis(array $filteredEmployeeIds, Carbon $start, Carbon $end, Carbon $prevStart, Carbon $prevEnd): array
     {
         $attendanceStats = DB::table('attendances')
-            ->whereIn('employee_id', $filteredEmployeeIds)
+            ->whereIn('staff_member_id', $filteredEmployeeIds)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
                 COUNT(*) as total,
@@ -1653,7 +1653,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             : 0;
 
         $prevAttendanceStats = DB::table('attendances')
-            ->whereIn('employee_id', $filteredEmployeeIds)
+            ->whereIn('staff_member_id', $filteredEmployeeIds)
             ->whereBetween('date', [$prevStart->toDateString(), $prevEnd->toDateString()])
             ->selectRaw("
                 COUNT(*) as total,
@@ -1675,12 +1675,12 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     {
         $salaryStats = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-            ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+            ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
             ->whereIn('payrolls.status', ['approved', 'paid'])
             ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
                 COALESCE(SUM(payroll_details.final_salary), 0) as total_salary,
-                COUNT(DISTINCT payroll_details.employee_id) as employees_paid
+                COUNT(DISTINCT payroll_details.staff_member_id) as employees_paid
             ")
             ->first();
 
@@ -1690,7 +1690,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
         $prevSalaryStats = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-            ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+            ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
             ->whereIn('payrolls.status', ['approved', 'paid'])
             ->whereBetween('payrolls.salary_month', [$prevStart->toDateString(), $prevEnd->toDateString()])
             ->selectRaw("COALESCE(SUM(payroll_details.final_salary), 0) as total_salary")
@@ -1730,14 +1730,14 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     private function getLeaveKpis(array $filteredEmployeeIds, int $totalEmployees, Carbon $start, Carbon $end): array
     {
         $onLeaveToday = DB::table('leave_requests')
-            ->whereIn('employee_id', $filteredEmployeeIds)
+            ->whereIn('staff_member_id', $filteredEmployeeIds)
             ->where('status', 'approved')
             ->where('start_date', '<=', now()->toDateString())
             ->where('end_date', '>=', now()->toDateString())
             ->count();
 
         $totalLeaveDays = DB::table('leave_requests')
-            ->whereIn('employee_id', $filteredEmployeeIds)
+            ->whereIn('staff_member_id', $filteredEmployeeIds)
             ->where('status', 'approved')
             ->whereBetween('start_date', [$start->toDateString(), $end->toDateString()])
             ->sum('total_days');
@@ -1755,7 +1755,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     private function getTrendData(array $filteredEmployeeIds, Carbon $start, Carbon $end): array
     {
         $attendanceTrend = DB::table('attendances')
-            ->whereIn('employee_id', $filteredEmployeeIds)
+            ->whereIn('staff_member_id', $filteredEmployeeIds)
             ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
                 DATE_FORMAT(date, '%Y-%m') as month_key,
@@ -1769,7 +1769,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
         $deductionTrend = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-            ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+            ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
             ->whereIn('payrolls.status', ['approved', 'paid'])
             ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
@@ -1787,7 +1787,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
         $monthlyCostData = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
-            ->whereIn('payroll_details.employee_id', $filteredEmployeeIds)
+            ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
             ->whereIn('payrolls.status', ['approved', 'paid'])
             ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
@@ -1855,17 +1855,17 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                     ->whereNull('team_members.left_at');
             })
             ->leftJoin('attendances', function ($join) use ($start, $end) {
-                $join->on('attendances.employee_id', '=', 'team_members.employee_id')
+                $join->on('attendances.staff_member_id', '=', 'team_members.staff_member_id')
                     ->whereBetween('attendances.date', [$start->toDateString(), $end->toDateString()]);
             })
             ->leftJoin('project_tasks', function ($join) {
-                $join->on('project_tasks.assignee_id', '=', 'team_members.employee_id')
+                $join->on('project_tasks.assignee_id', '=', 'team_members.staff_member_id')
                     ->whereIn('project_tasks.status', ['todo', 'in_progress', 'review', 'done']);
             })
             ->groupBy('teams.id', 'teams.name')
             ->selectRaw("
                 teams.name as team_name,
-                COUNT(DISTINCT team_members.employee_id) as member_count,
+                COUNT(DISTINCT team_members.staff_member_id) as member_count,
                 CASE
                     WHEN COUNT(attendances.id) > 0
                     THEN ROUND(

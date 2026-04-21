@@ -259,7 +259,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
     private function createJobInformation(array $data, int $employeeId): void
     {
         $jobData = [
-            'employee_id' => $employeeId,
+            'staff_member_id' => $employeeId,
             'job_title' => $data['job_title'] ?? null,
             'team_id' => $data['team_id'] ?? null,
             'status' => $data['status'] ?? null,
@@ -275,7 +275,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
     private function createBankInformation(array $data, int $employeeId): void
     {
         $bankData = [
-            'employee_id' => $employeeId,
+            'staff_member_id' => $employeeId,
             'bank_name' => $data['bank_name'],
             'account_number' => $data['account_number'],
             'account_holder_name' => $data['account_holder_name'],
@@ -287,7 +287,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
     private function createEmergencyContacts(array $data, int $employeeId): void
     {
         foreach ($data['emergency_contacts'] as $contactData) {
-            $contactData['employee_id'] = $employeeId;
+            $contactData['staff_member_id'] = $employeeId;
             $emergencyContactDto = EmergencyContactDto::fromArray($contactData);
 
             $this->emergencyContactRepository->create($emergencyContactDto->toArray());
@@ -341,7 +341,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             return;
         }
 
-        $jobInfo = JobInformation::where('employee_id', $employeeId)->first();
+        $jobInfo = JobInformation::where('staff_member_id', $employeeId)->first();
 
         if ($jobInfo) {
             $this->jobInformationRepository->update($jobInfo->id, $jobData);
@@ -364,7 +364,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             return;
         }
 
-        $bankInfo = BankInformation::where('employee_id', $employeeId)->first();
+        $bankInfo = BankInformation::where('staff_member_id', $employeeId)->first();
 
         if ($bankInfo) {
             $this->bankInformationRepository->update($bankInfo->id, $bankData);
@@ -380,14 +380,14 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             return;
         }
 
-        $existingContactIds = EmergencyContact::where('employee_id', $employeeId)
+        $existingContactIds = EmergencyContact::where('staff_member_id', $employeeId)
             ->pluck('id')
             ->toArray();
 
         $submittedContactIds = [];
 
         foreach ($contacts as $contact) {
-            $contact['employee_id'] = $employeeId;
+            $contact['staff_member_id'] = $employeeId;
 
             if (isset($contact['id']) && $contact['id']) {
                 $existingContact = EmergencyContact::find($contact['id']);
@@ -411,7 +411,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
 
     private function manageTeamMembership(int $employeeId, ?int $teamId): void
     {
-        $currentMembership = TeamMember::where('employee_id', $employeeId)
+        $currentMembership = TeamMember::where('staff_member_id', $employeeId)
             ->whereNull('left_at')
             ->first();
 
@@ -436,7 +436,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
         TeamMember::updateOrCreate(
             [
                 'team_id' => $teamId,
-                'employee_id' => $employeeId,
+                'staff_member_id' => $employeeId,
             ],
             [
                 'joined_at' => now(),
@@ -455,32 +455,32 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             $currentYear = now()->year;
 
             // Single optimized query for employee counts
-            $employeeStats = DB::table('employee_profiles')
-                ->leftJoin('job_information', 'employee_profiles.id', '=', 'job_information.employee_id')
+            $employeeStats = DB::table('staff_member_profiles')
+                ->leftJoin('job_information', 'staff_member_profiles.id', '=', 'job_information.staff_member_id')
                 ->selectRaw("
-                    COUNT(DISTINCT employee_profiles.id) as total,
+                    COUNT(DISTINCT staff_member_profiles.id) as total,
                     COUNT(DISTINCT CASE
-                        WHEN MONTH(employee_profiles.created_at) = ?
-                        AND YEAR(employee_profiles.created_at) = ?
-                        THEN employee_profiles.id
+                        WHEN MONTH(staff_member_profiles.created_at) = ?
+                        AND YEAR(staff_member_profiles.created_at) = ?
+                        THEN staff_member_profiles.id
                     END) as added_this_month,
                     COUNT(DISTINCT CASE
                         WHEN job_information.status = 'active'
-                        THEN employee_profiles.id
+                        THEN staff_member_profiles.id
                     END) as active,
                     COUNT(DISTINCT CASE
                         WHEN job_information.status = 'active'
-                        AND employee_profiles.created_at <= ?
-                        THEN employee_profiles.id
+                        AND staff_member_profiles.created_at <= ?
+                        THEN staff_member_profiles.id
                     END) as active_last_week,
                     COUNT(DISTINCT CASE
                         WHEN job_information.status = 'on_leave'
-                        THEN employee_profiles.id
+                        THEN staff_member_profiles.id
                     END) as on_leave,
                     COUNT(DISTINCT CASE
                         WHEN job_information.status = 'on_leave'
-                        AND employee_profiles.created_at <= ?
-                        THEN employee_profiles.id
+                        AND staff_member_profiles.created_at <= ?
+                        THEN staff_member_profiles.id
                     END) as on_leave_last_week,
                     AVG(job_information.monthly_salary) as average_salary
                 ", [
@@ -531,7 +531,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
         }, now()->startOfMonth());
 
         $attendanceCount = DB::table('attendances')
-            ->where('employee_id', $employeeId)
+            ->where('staff_member_id', $employeeId)
             ->whereMonth('date', now()->month)
             ->whereYear('date', now()->year)
             ->count();
@@ -545,7 +545,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             ->join('teams', 'team_members.team_id', '=', 'teams.id')
             ->join('project_teams', 'teams.id', '=', 'project_teams.team_id')
             ->join('projects', 'project_teams.project_id', '=', 'projects.id')
-            ->where('team_members.employee_id', $employeeId)
+            ->where('team_members.staff_member_id', $employeeId)
             ->where('projects.status', 'active')
             ->distinct()
             ->count('projects.id');
@@ -653,7 +653,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
         }
 
         $activeMembership = TeamMember::with('team.leader')
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->whereNull('left_at')
             ->orderByDesc('joined_at')
             ->orderByDesc('id')

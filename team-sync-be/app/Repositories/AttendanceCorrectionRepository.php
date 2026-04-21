@@ -45,7 +45,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
         
         return AttendanceCorrection::query()
             ->with(['attendance'])
-            ->where('employee_id', $employeeId)
+            ->where('staff_member_id', $employeeId)
             ->orderBy('created_at', 'desc')
             ->get();
     }
@@ -61,7 +61,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
         // Check if employee tries to read someone else's request
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        if ($user->hasRole('staff') && $correction->employee_id !== $user->staffMemberProfile->id) {
+        if ($user->hasRole('staff') && $correction->staff_member_id !== $user->staffMemberProfile->id) {
             throw new AuthorizationException("You are not authorized to view this request.");
         }
 
@@ -82,7 +82,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
         $employeeId = Auth::user()->staffMemberProfile->id;
 
-        if ($attendance->employee_id !== $employeeId) {
+        if ($attendance->staff_member_id !== $employeeId) {
              throw new AuthorizationException("You are not authorized to request correction for this attendance.");
         }
 
@@ -97,7 +97,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
             $correction = AttendanceCorrection::create([
                 'attendance_id' => $attendance->id,
-                'employee_id' => $employeeId,
+                'staff_member_id' => $employeeId,
                 'original_check_in' => $attendance->check_in,
                 'original_check_out' => $attendance->check_out,
                 'requested_check_in' => $data['requested_check_in'] ?? null,
@@ -157,7 +157,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             }
 
             // Re-classify attendance to get the correct status
-            $classification = $this->attendanceClassifier->classify($attendance->employee_id, $attendance->date);
+            $classification = $this->attendanceClassifier->classify($attendance->staff_member_id, $attendance->date);
 
             $attendance->update([
                  'status' => $classification['status'],

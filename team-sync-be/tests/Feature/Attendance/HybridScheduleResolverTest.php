@@ -30,7 +30,7 @@ class HybridScheduleResolverTest extends TestCase
         $employee = $this->createEmployeeWithWorkLocation('hybrid');
 
         HybridWorkSchedule::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'effective_from' => '2026-04-01',
             'effective_until' => null,
             'monday' => 'office',
@@ -41,7 +41,7 @@ class HybridScheduleResolverTest extends TestCase
         ]);
 
         HybridScheduleOverride::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => '2026-04-06',
             'planned_work_mode' => 'remote',
             'reason' => 'Approved swap',
@@ -64,7 +64,7 @@ class HybridScheduleResolverTest extends TestCase
         $employee = $this->createEmployeeWithWorkLocation('hybrid');
 
         HybridWorkSchedule::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'effective_from' => '2026-04-01',
             'effective_until' => null,
             'monday' => 'office',

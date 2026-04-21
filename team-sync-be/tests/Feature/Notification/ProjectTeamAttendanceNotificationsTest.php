@@ -94,7 +94,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         Sanctum::actingAs($managerUser);
 
         $this->postJson('/api/v1/teams/'.$team->id.'/add-member', [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ])->assertOk();
 
         $employeeNotif = $this->latestNotification($employeeUser);
@@ -165,7 +165,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         TeamMember::query()->updateOrCreate(
             [
                 'team_id' => $team->id,
-                'employee_id' => $staffMemberProfile->id,
+                'staff_member_id' => $staffMemberProfile->id,
             ],
             [
                 'joined_at' => now()->subDays(5),
@@ -241,7 +241,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         );
 
         $attendance = Attendance::query()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'date' => now()->toDateString(),
             'status' => 'present',
             'check_in' => now()->subHours(8),
@@ -253,7 +253,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
         $mismatch = AttendancePolicyMismatch::query()->create([
             'attendance_id' => $attendance->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'mismatch_date' => now()->toDateString(),
             'planned_work_mode' => 'remote',
             'actual_work_mode' => 'office',
@@ -314,7 +314,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         $targetDate = Carbon::parse('next monday')->startOfDay();
 
         HybridWorkSchedule::query()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'effective_from' => $targetDate->copy()->subWeek()->toDateString(),
             'effective_until' => null,
             'monday' => 'remote',
@@ -325,7 +325,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         ]);
 
         $attendance = Attendance::query()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'date' => $targetDate->toDateString(),
             'status' => 'present',
             'check_in' => $targetDate->copy()->setTime(9, 15),
@@ -341,7 +341,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
         $this->assertDatabaseHas('attendance_policy_mismatches', [
             'attendance_id' => $attendance->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'status' => AttendancePolicyMismatch::STATUS_PENDING_REVIEW,
         ]);
 
@@ -400,17 +400,17 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         Sanctum::actingAs($managerUser);
 
         $this->postJson('/api/v1/teams/'.$mobileTeam->id.'/add-member', [
-            'employee_id' => $frontendProfile->id,
+            'staff_member_id' => $frontendProfile->id,
         ])->assertOk();
 
         $this->postJson('/api/v1/teams/'.$mobileTeam->id.'/add-member', [
-            'employee_id' => $backendProfile->id,
+            'staff_member_id' => $backendProfile->id,
         ])->assertOk();
 
         Sanctum::actingAs($hrUser);
 
         $this->postJson('/api/v1/teams/'.$qaTeam->id.'/add-member', [
-            'employee_id' => $qaProfile->id,
+            'staff_member_id' => $qaProfile->id,
         ])->assertOk();
 
         Sanctum::actingAs($managerUser);
@@ -609,7 +609,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         $mismatchDate = Carbon::parse('2026-04-06')->startOfDay();
 
         $attendance = Attendance::query()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'date' => $mismatchDate->toDateString(),
             'status' => 'present',
             'check_in' => $mismatchDate->copy()->setTime(9, 10),
@@ -621,7 +621,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
         $mismatch = AttendancePolicyMismatch::query()->create([
             'attendance_id' => $attendance->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'mismatch_date' => $mismatchDate->toDateString(),
             'planned_work_mode' => 'remote',
             'actual_work_mode' => 'office',

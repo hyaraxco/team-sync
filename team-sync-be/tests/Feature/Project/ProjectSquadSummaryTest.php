@@ -262,7 +262,7 @@ class ProjectSquadSummaryTest extends TestCase
         $profile = StaffMemberProfile::factory()->forUser($user)->create();
 
         $profile->jobInformation()->create([
-            'employee_id' => $profile->id,
+            'staff_member_id' => $profile->id,
             'job_title' => $jobTitle,
             'team_id' => $team?->id,
             'years_experience' => 5,
@@ -277,7 +277,7 @@ class ProjectSquadSummaryTest extends TestCase
         if ($team) {
             TeamMember::query()->create([
                 'team_id' => $team->id,
-                'employee_id' => $profile->id,
+                'staff_member_id' => $profile->id,
                 'joined_at' => now()->subMonths(4),
                 'left_at' => null,
             ]);

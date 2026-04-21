@@ -31,8 +31,8 @@ class PayslipAccessTest extends TestCase
         $otherStaffMemberProfile = $this->createSecondEmployeeWithAttendance();
         $payroll = $this->createPaidPayrollForCurrentMonth();
 
-        $employeePayslip = $payroll->payrollDetails()->where('employee_id', $employee->staffMemberProfile->id)->firstOrFail();
-        $otherPayslip = $payroll->payrollDetails()->where('employee_id', $otherStaffMemberProfile->id)->firstOrFail();
+        $employeePayslip = $payroll->payrollDetails()->where('staff_member_id', $employee->staffMemberProfile->id)->firstOrFail();
+        $otherPayslip = $payroll->payrollDetails()->where('staff_member_id', $otherStaffMemberProfile->id)->firstOrFail();
 
         Sanctum::actingAs($employee);
 
@@ -86,7 +86,7 @@ class PayslipAccessTest extends TestCase
         foreach ($cases as $email) {
             $user = User::where('email', $email)->firstOrFail();
             $ownPayslip = $payroll->payrollDetails()
-                ->where('employee_id', $user->staffMemberProfile->id)
+                ->where('staff_member_id', $user->staffMemberProfile->id)
                 ->firstOrFail();
 
             Sanctum::actingAs($user);
@@ -114,7 +114,7 @@ class PayslipAccessTest extends TestCase
         while ($cursor->lte($monthEnd)) {
             if (! $cursor->isWeekend()) {
                 $attendance = Attendance::query()
-                    ->where('employee_id', $staffMemberProfile->id)
+                    ->where('staff_member_id', $staffMemberProfile->id)
                     ->whereDate('date', $cursor->toDateString())
                     ->first();
 
@@ -127,7 +127,7 @@ class PayslipAccessTest extends TestCase
                     ]);
                 } else {
                     Attendance::create([
-                        'employee_id' => $staffMemberProfile->id,
+                        'staff_member_id' => $staffMemberProfile->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',
@@ -147,7 +147,7 @@ class PayslipAccessTest extends TestCase
             $staffMemberProfile = StaffMemberProfile::factory()->create();
 
             $staffMemberProfile->jobInformation()->create([
-                'employee_id' => $staffMemberProfile->id,
+                'staff_member_id' => $staffMemberProfile->id,
                 'job_title' => 'QA Engineer',
                 'years_experience' => 3,
                 'status' => 'active',
@@ -159,7 +159,7 @@ class PayslipAccessTest extends TestCase
             ]);
 
             $staffMemberProfile->bankInformation()->create([
-                'employee_id' => $staffMemberProfile->id,
+                'staff_member_id' => $staffMemberProfile->id,
                 'bank_name' => 'Mandiri',
                 'account_number' => '4455667788',
                 'account_holder_name' => 'Second Payslip Employee',

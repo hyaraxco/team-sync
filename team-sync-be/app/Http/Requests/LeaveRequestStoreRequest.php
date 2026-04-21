@@ -16,7 +16,7 @@ class LeaveRequestStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => 'required|exists:employee_profiles,id',
+            'staff_member_id' => 'required|exists:staff_member_profiles,id',
             'leave_type' => 'required|string|in:'.implode(',', array_column(LeaveType::cases(), 'value')),
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after_or_equal:start_date',
@@ -30,7 +30,7 @@ class LeaveRequestStoreRequest extends FormRequest
     public function attributes()
     {
         return [
-            'employee_id' => 'Employee',
+            'staff_member_id' => 'Employee',
             'leave_type' => 'Leave Type',
             'start_date' => 'Start Date',
             'end_date' => 'End Date',
@@ -40,7 +40,7 @@ class LeaveRequestStoreRequest extends FormRequest
     public function prepareForValidation()
     {
         $this->merge([
-            'employee_id' => Auth::user()->staffMemberProfile->id,
+            'staff_member_id' => Auth::user()->staffMemberProfile->id,
         ]);
     }
 }

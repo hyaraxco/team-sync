@@ -194,7 +194,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         $comment = ProjectTaskComment::create([
             'project_task_id' => $task->id,
-            'employee_id' => $user->staffMemberProfile->id,
+            'staff_member_id' => $user->staffMemberProfile->id,
             'comment' => $data['comment'],
         ])->load(['staffMember.user']);
 
@@ -276,7 +276,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         $attachment = ProjectTaskAttachment::create([
             'project_task_id' => $task->id,
-            'employee_id' => $user->staffMemberProfile->id,
+            'staff_member_id' => $user->staffMemberProfile->id,
             'file_name' => $file->getClientOriginalName(),
             'file_path' => $storedPath,
             'file_size' => $file->getSize(),
@@ -464,7 +464,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
 
         $jobInfoTeamId = $employee->jobInformation->team_id ?? null;
-        $teamMemberIds = TeamMember::where('employee_id', $employee->id)
+        $teamMemberIds = TeamMember::where('staff_member_id', $employee->id)
             ->whereNull('left_at')
             ->pluck('team_id')
             ->toArray();
@@ -505,7 +505,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task->loadMissing('project.teams');
 
         $jobInfoTeamId = $employee->jobInformation->team_id ?? null;
-        $teamMemberIds = TeamMember::where('employee_id', $employee->id)
+        $teamMemberIds = TeamMember::where('staff_member_id', $employee->id)
             ->whereNull('left_at')
             ->pluck('team_id')
             ->toArray();
@@ -577,7 +577,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
 
         $staffMemberProfileId = $user->staffMemberProfile->id;
-        $isOwner = $comment->employee_id === $staffMemberProfileId;
+        $isOwner = $comment->staff_member_id === $staffMemberProfileId;
 
         if (! $isOwner) {
             throw new AuthorizationException('You are not allowed to modify this comment.');
@@ -596,7 +596,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
 
         $staffMemberProfileId = $user->staffMemberProfile->id;
-        $isOwner = $attachment->employee_id === $staffMemberProfileId;
+        $isOwner = $attachment->staff_member_id === $staffMemberProfileId;
 
         if (! $isOwner) {
             throw new AuthorizationException('You are not allowed to modify this attachment.');

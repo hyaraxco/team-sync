@@ -16,7 +16,7 @@ class AttendanceResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'date' => $this->date,
             'check_in' => $this->check_in,
             'check_in_lat' => $this->check_in_lat,

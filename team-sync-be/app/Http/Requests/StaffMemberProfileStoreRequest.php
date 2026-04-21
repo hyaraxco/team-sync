@@ -38,7 +38,7 @@ class StaffMemberProfileStoreRequest extends FormRequest
             ],
 
             // Employee Profile fields
-            'identity_number' => ['required', 'string', 'max:20', 'unique:employee_profiles,identity_number'],
+            'identity_number' => ['required', 'string', 'max:20', 'unique:staff_member_profiles,identity_number'],
             'npwp' => ['nullable', 'string', 'max:30'],
             'bpjs_ketenagakerjaan' => ['nullable', 'string', 'max:30'],
             'bpjs_kesehatan' => ['nullable', 'string', 'max:30'],

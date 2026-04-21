@@ -57,7 +57,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             if (empty($manageableIds)) {
                 $query->whereRaw('1 = 0');
             } else {
-                $query->whereIn('employee_id', $manageableIds);
+                $query->whereIn('staff_member_id', $manageableIds);
             }
         }
 
@@ -96,7 +96,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function getMyAttendances(): Collection
     {
         return Attendance::with(['staffMember.user'])
-            ->where('employee_id', Auth::user()->staffMemberProfile->id)
+            ->where('staff_member_id', Auth::user()->staffMemberProfile->id)
             ->whereDate('date', '>=', now()->subDays(6)->startOfDay())
             ->whereDate('date', '<=', now()->endOfDay())
             ->orderBy('date', 'desc')
@@ -131,7 +131,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         }
 
         // Attendance stats for current month
-        $stats = Attendance::where('employee_id', $employeeId)
+        $stats = Attendance::where('staff_member_id', $employeeId)
             ->whereBetween('date', [$startOfMonth, $today])
             ->selectRaw("
                 COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as present_days,
@@ -167,7 +167,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function getLastAttendanceByEmployee(): ?Attendance
     {
         return Attendance::with(['staffMember.user'])
-            ->where('employee_id', Auth::user()->staffMemberProfile->id)
+            ->where('staff_member_id', Auth::user()->staffMemberProfile->id)
             ->whereBetween('date', [
                 now()->startOfDay(),
                 now()->endOfDay(),
@@ -182,7 +182,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 throw new \Exception('Attendance period is no longer open for check-in.');
             }
 
-            $existingAttendance = Attendance::where('employee_id', Auth::user()->staffMemberProfile->id)
+            $existingAttendance = Attendance::where('staff_member_id', Auth::user()->staffMemberProfile->id)
                 ->whereBetween('date', [
                     now()->startOfDay(),
                     now()->endOfDay(),
@@ -220,7 +220,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 throw new \Exception('Attendance period is no longer open for check-out.');
             }
 
-            $attendance = Attendance::where('employee_id', Auth::user()->staffMemberProfile->id)
+            $attendance = Attendance::where('staff_member_id', Auth::user()->staffMemberProfile->id)
                 ->whereBetween('date', [
                     now()->startOfDay(),
                     now()->endOfDay(),
@@ -363,8 +363,8 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
             // Remote workers today
             $remoteToday = DB::table('attendances')
-                ->join('employee_profiles', 'attendances.employee_id', '=', 'employee_profiles.id')
-                ->join('job_information', 'employee_profiles.id', '=', 'job_information.employee_id')
+                ->join('staff_member_profiles', 'attendances.staff_member_id', '=', 'staff_member_profiles.id')
+                ->join('job_information', 'staff_member_profiles.id', '=', 'job_information.staff_member_id')
                 ->where('attendances.date', '>=', $today.' 00:00:00')
                 ->where('attendances.date', '<=', $today.' 23:59:59')
                 ->where('job_information.work_location', 'remote')
@@ -385,7 +385,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
             // Get cached employee count
             $totalEmployees = cache()->remember(CacheConstants::CACHE_KEY_EMPLOYEE_TOTAL_COUNT, CacheConstants::ONE_HOUR, function () {
-                return DB::table('employee_profiles')->count();
+                return DB::table('staff_member_profiles')->count();
             });
 
             // Calculate rates
@@ -438,7 +438,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
         $manageableEmployeeIds = $this->getManageableEmployeeIdsForManager();
 
-        if (empty($manageableEmployeeIds) || ! in_array($mismatch->employee_id, $manageableEmployeeIds, true)) {
+        if (empty($manageableEmployeeIds) || ! in_array($mismatch->staff_member_id, $manageableEmployeeIds, true)) {
             throw new AuthorizationException('You can only acknowledge mismatches from your direct reports.');
         }
     }
@@ -485,12 +485,12 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         $fromTeamMembers = TeamMember::query()
             ->whereIn('team_id', $leadTeamIds)
             ->whereNull('left_at')
-            ->pluck('employee_id')
+            ->pluck('staff_member_id')
             ->toArray();
 
         $fromJobInformation = JobInformation::query()
             ->whereIn('team_id', $leadTeamIds)
-            ->pluck('employee_id')
+            ->pluck('staff_member_id')
             ->toArray();
 
         return array_values(array_unique(array_merge($fromTeamMembers, $fromJobInformation)));

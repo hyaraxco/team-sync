@@ -53,7 +53,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         $attendance = Attendance::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => '2026-04-10',
             'attendance_period_id' => $period->id,
             'check_in' => '2026-04-10 08:55:00',
@@ -102,7 +102,7 @@ class AttendanceCorrectionGuardTest extends TestCase
 
         $this->assertFalse(
             Attendance::query()
-                ->where('employee_id', $employee->id)
+                ->where('staff_member_id', $employee->id)
                 ->whereDate('date', '2026-04-10')
                 ->exists()
         );
@@ -123,7 +123,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         Attendance::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => '2026-04-10',
             'attendance_period_id' => $period->id,
             'check_in' => '2026-04-10 08:55:00',
@@ -166,7 +166,7 @@ class AttendanceCorrectionGuardTest extends TestCase
 
         $this->assertFalse(
             Attendance::query()
-                ->where('employee_id', $employee->id)
+                ->where('staff_member_id', $employee->id)
                 ->whereDate('date', '2026-04-10')
                 ->exists()
         );
@@ -179,7 +179,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         });
 
         $employee->jobInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'job_title' => 'Software Engineer',
             'status' => 'active',
             'employment_type' => 'full_time',

@@ -19,7 +19,7 @@ class PayrollAdjustment extends Model
     public const KIND_ABSENCE_CORRECTION_DEDUCTION = 'absence_correction_deduction';
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'source_period_id',
         'target_period_id',
         'source_reference_type',
@@ -41,7 +41,7 @@ class PayrollAdjustment extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function sourcePeriod()

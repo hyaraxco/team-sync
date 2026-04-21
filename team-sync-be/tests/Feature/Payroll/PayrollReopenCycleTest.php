@@ -220,7 +220,7 @@ class PayrollReopenCycleTest extends TestCase
         });
 
         $staffMemberProfile->bankInformation()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '1234567890',
             'account_holder_name' => 'Reopen Cycle User',
@@ -234,7 +234,7 @@ class PayrollReopenCycleTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

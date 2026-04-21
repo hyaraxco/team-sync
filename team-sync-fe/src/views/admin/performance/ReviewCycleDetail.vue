@@ -368,11 +368,11 @@ onMounted(async () => {
                 </tr>
               </thead>
               <tbody>
-                <template v-for="item in rankingList" :key="item.employee_id">
+                <template v-for="item in rankingList" :key="item.staff_member_id">
                   <!-- Main row -->
                   <tr
                     class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
-                    @click="toggleRow(item.employee_id)"
+                    @click="toggleRow(item.staff_member_id)"
                   >
                     <!-- Rank -->
                     <td class="py-4 px-3">
@@ -430,14 +430,14 @@ onMounted(async () => {
                     <!-- Expand icon -->
                     <td class="py-4 px-2 text-center">
                       <component
-                        :is="expandedRows.has(item.employee_id) ? ChevronUp : ChevronDown"
+                        :is="expandedRows.has(item.staff_member_id) ? ChevronUp : ChevronDown"
                         class="w-4 h-4 text-brand-light"
                       />
                     </td>
                   </tr>
 
                   <!-- Detail row (expandable) -->
-                  <tr v-if="expandedRows.has(item.employee_id)" class="bg-blue-50/40">
+                  <tr v-if="expandedRows.has(item.staff_member_id)" class="bg-blue-50/40">
                     <td colspan="10" class="px-6 py-4">
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <!-- Normalisasi steps -->

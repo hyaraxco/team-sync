@@ -45,7 +45,7 @@ class StaffMemberProfileDtoTest extends TestCase
         ]);
 
         $profile->jobInformation()->create([
-            'employee_id' => $profile->id,
+            'staff_member_id' => $profile->id,
             'job_title' => 'Engineer',
             'team_id' => null,
             'status' => 'active',
@@ -56,7 +56,7 @@ class StaffMemberProfileDtoTest extends TestCase
         ]);
 
         $profile->bankInformation()->create([
-            'employee_id' => $profile->id,
+            'staff_member_id' => $profile->id,
             'bank_name' => 'BCA',
             'account_number' => '12345',
             'account_holder_name' => 'Old Holder',

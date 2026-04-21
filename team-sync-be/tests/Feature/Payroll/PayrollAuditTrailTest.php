@@ -333,7 +333,7 @@ class PayrollAuditTrailTest extends TestCase
         while ($cursor->lte($monthEnd)) {
             if (! $cursor->isWeekend()) {
                 Attendance::create([
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'date' => $cursor->toDateString(),
                     'status' => 'present',
                     'check_in' => $cursor->copy()->format('Y-m-d').' 08:00:00',
@@ -356,7 +356,7 @@ class PayrollAuditTrailTest extends TestCase
         });
 
         $staffMemberProfile->bankInformation()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '9876543210',
             'account_holder_name' => 'Payroll Audit User',
@@ -371,7 +371,7 @@ class PayrollAuditTrailTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

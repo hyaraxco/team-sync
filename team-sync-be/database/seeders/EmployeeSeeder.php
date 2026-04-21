@@ -48,9 +48,9 @@ class EmployeeSeeder extends Seeder
         ]);
 
         $staffMemberProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'Software Engineer',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -60,19 +60,19 @@ class EmployeeSeeder extends Seeder
         ]);
 
         $staffMemberProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => '1234567890',
             'account_holder_name' => 'Agung Ramadhan',
         ]);
 
         $staffMemberProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'agung.emergency@teamsync.com',
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Agung Emergency Contact',
             'phone' => '081234567890',
             'relationship' => 'Family',

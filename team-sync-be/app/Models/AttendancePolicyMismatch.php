@@ -25,7 +25,7 @@ class AttendancePolicyMismatch extends Model
 
     protected $fillable = [
         'attendance_id',
-        'employee_id',
+        'staff_member_id',
         'mismatch_date',
         'planned_work_mode',
         'actual_work_mode',
@@ -55,7 +55,7 @@ class AttendancePolicyMismatch extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function acknowledgedBy()

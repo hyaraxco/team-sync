@@ -154,7 +154,7 @@ class LeaveEntitlementValidatorTest extends TestCase
     private function createLeaveRequest(StaffMemberProfile $employee, array $overrides = []): LeaveRequest
     {
         return LeaveRequest::query()->create(array_merge([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'annual_leave',
             'start_date' => '2026-04-06',
             'end_date' => '2026-04-06',

@@ -106,7 +106,7 @@ class RecalculatePayrollTaxCommand extends Command
 
             $rows[] = [
                 'id'              => $detail->id,
-                'employee_id'     => $employee->id,
+                'staff_member_id'     => $employee->id,
                 'ptkp'            => $ptkp ?? '—',
                 'npwp'            => $hasNpwp ? 'Yes' : 'No',
                 'old_pph21'       => number_format($detail->pph21_amount, 0, ',', '.'),
@@ -127,7 +127,7 @@ class RecalculatePayrollTaxCommand extends Command
         $this->table(
             ['Detail ID', 'Emp', 'PTKP', 'NPWP', 'PPh21 Before', 'PPh21 After', 'BPJS-TK Before', 'BPJS-TK After'],
             collect($rows)->map(fn ($r) => [
-                $r['id'], $r['employee_id'], $r['ptkp'], $r['npwp'],
+                $r['id'], $r['staff_member_id'], $r['ptkp'], $r['npwp'],
                 'Rp ' . $r['old_pph21'], 'Rp ' . $r['new_pph21'],
                 'Rp ' . $r['old_bpjs_tk'], 'Rp ' . $r['new_bpjs_tk'],
             ])->toArray()

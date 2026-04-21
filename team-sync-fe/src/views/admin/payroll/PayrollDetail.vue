@@ -297,7 +297,7 @@ const fetchPayrollDetails = async (page = 1) => {
       response.data?.map((detail) => ({
         id: detail.employee?.id,
         name: detail.employee?.user?.name || "N/A",
-        employee_id: detail.employee?.code || detail.employee?.id,
+        staff_member_id: detail.employee?.code || detail.employee?.id,
         position: detail.employee?.job_information?.job_title || "N/A",
         department: detail.employee?.job_information?.team?.name || "N/A",
         profile_photo: detail.employee?.user?.profile_photo || null,
@@ -946,7 +946,7 @@ const handleApprovePayroll = () => {
                       {{ emp.name }}
                     </p>
                     <p class="text-brand-light text-xs">
-                      {{ emp.employee_id }} • {{ emp.position }}
+                      {{ emp.staff_member_id }} • {{ emp.position }}
                     </p>
                   </div>
                 </div>
@@ -1296,7 +1296,7 @@ const handleApprovePayroll = () => {
           >
           <div
             v-for="(issue, index) in filteredReconciliationExceptions"
-            :key="`${issue.employee_id}-${issue.type}-${index}`"
+            :key="`${issue.staff_member_id}-${issue.type}-${index}`"
             class="rounded-[12px] border border-[#DCDEDD] px-4 py-3"
           >
             <div class="flex items-start justify-between gap-3">

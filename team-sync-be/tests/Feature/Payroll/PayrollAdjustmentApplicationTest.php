@@ -76,7 +76,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
         ]);
 
         $adjustment = PayrollAdjustment::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'source_period_id' => $sourcePeriod->id,
             'target_period_id' => $targetPeriod->id,
             'source_reference_type' => 'leave_request',
@@ -108,7 +108,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
 
         $detail = PayrollDetail::query()
             ->where('payroll_id', $payroll->id)
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->firstOrFail();
 
         $baseFinalSalary = max(
@@ -161,7 +161,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             $employee = StaffMemberProfile::factory()->create();
 
             $employee->jobInformation()->create([
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'job_title' => 'Software Engineer',
                 'years_experience' => 5,
                 'status' => 'active',
@@ -178,7 +178,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             while ($cursor->lte($monthEnd)) {
                 if (! $cursor->isWeekend()) {
                     Attendance::create([
-                        'employee_id' => $employee->id,
+                        'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->copy()->format('Y-m-d').' 08:00:00',
                         'check_out' => $cursor->copy()->format('Y-m-d').' 17:00:00',

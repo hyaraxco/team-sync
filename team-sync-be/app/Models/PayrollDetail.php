@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * @property int $id
  * @property int $payroll_id
- * @property int $employee_id
+ * @property int $staff_member_id
  */
 class PayrollDetail extends Model
 {
@@ -17,7 +17,7 @@ class PayrollDetail extends Model
 
     protected $fillable = [
         'payroll_id',
-        'employee_id',
+        'staff_member_id',
         'original_salary',
         'final_salary',
         'effective_working_days',
@@ -57,12 +57,12 @@ class PayrollDetail extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function appliedAdjustments()
     {
-        return $this->hasMany(PayrollAdjustment::class, 'employee_id', 'employee_id');
+        return $this->hasMany(PayrollAdjustment::class, 'staff_member_id', 'staff_member_id');
     }
 
     public function notificationDeliveries()

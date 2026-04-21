@@ -132,9 +132,9 @@ class MobileDevelopmentDummySeeder extends Seeder
             }
 
             $profile->jobInformation()->updateOrCreate(
-                ['employee_id' => $profile->id],
+                ['staff_member_id' => $profile->id],
                 [
-                    'employee_id' => $profile->id,
+                    'staff_member_id' => $profile->id,
                     'job_title' => $employeeBlueprint['job_title'],
                     'team_id' => $team->id,
                     'status' => JobStatus::ACTIVE->value,
@@ -149,7 +149,7 @@ class MobileDevelopmentDummySeeder extends Seeder
             $teamMember = TeamMember::withTrashed()->updateOrCreate(
                 [
                     'team_id' => $team->id,
-                    'employee_id' => $profile->id,
+                    'staff_member_id' => $profile->id,
                 ],
                 [
                     'joined_at' => now()->subMonths(4 + $sequence),

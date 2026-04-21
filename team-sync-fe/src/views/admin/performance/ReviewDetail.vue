@@ -153,7 +153,7 @@ const canSubmitSelfAssessment = computed(() => {
   return (
     reviewStatus.value === "pending_self" &&
     (hasRole("staff") || hasRole("manager")) &&
-    currentEmployeeId.value === review.value?.employee_id
+    currentEmployeeId.value === review.value?.staff_member_id
   );
 });
 

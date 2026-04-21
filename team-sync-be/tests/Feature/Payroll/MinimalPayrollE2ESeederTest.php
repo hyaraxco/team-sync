@@ -37,7 +37,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
         $expectedBusinessDays = $this->resolveBusinessDaysInMonth($payrollMonth);
 
-        $this->assertSame($expectedBusinessDays, Attendance::where('employee_id', $employee->id)
+        $this->assertSame($expectedBusinessDays, Attendance::where('staff_member_id', $employee->id)
             ->whereBetween('date', [
                 $payrollMonth->copy()->startOfMonth()->startOfDay(),
                 $payrollMonth->copy()->endOfMonth()->endOfDay(),
@@ -48,7 +48,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
         $this->assertSame('pending', $payroll->status);
         $this->assertGreaterThan(0, $payroll->payrollDetails()->count());
-        $this->assertContains($employee->id, $payroll->payrollDetails->pluck('employee_id')->all());
+        $this->assertContains($employee->id, $payroll->payrollDetails->pluck('staff_member_id')->all());
 
         $this->assertNull(User::where('email', 'manager@gmail.com')->first());
         $this->assertNull(User::where('email', 'employee@gmail.com')->first());
@@ -73,7 +73,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $payrollMonth = now()->startOfMonth();
         $expectedBusinessDays = $this->resolveBusinessDaysInMonth($payrollMonth);
 
-        $this->assertSame($expectedBusinessDays, Attendance::where('employee_id', $employee->id)
+        $this->assertSame($expectedBusinessDays, Attendance::where('staff_member_id', $employee->id)
             ->whereRaw('date(date) >= ?', [$payrollMonth->copy()->startOfMonth()->toDateString()])
             ->whereRaw('date(date) <= ?', [$payrollMonth->copy()->endOfMonth()->toDateString()])
             ->count());

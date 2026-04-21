@@ -22,7 +22,7 @@ class PayrollNotificationDelivery extends Model
     protected $fillable = [
         'payroll_id',
         'payroll_detail_id',
-        'employee_id',
+        'staff_member_id',
         'recipient_email',
         'channel',
         'trigger_type',
@@ -50,6 +50,6 @@ class PayrollNotificationDelivery extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 }

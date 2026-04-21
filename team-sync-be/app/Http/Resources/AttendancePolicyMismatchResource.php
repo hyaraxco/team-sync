@@ -17,7 +17,7 @@ class AttendancePolicyMismatchResource extends JsonResource
         return [
             'id' => $this->id,
             'attendance_id' => $this->attendance_id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'mismatch_date' => $this->mismatch_date,
             'planned_work_mode' => $this->planned_work_mode,
             'actual_work_mode' => $this->actual_work_mode,
