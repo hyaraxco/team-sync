@@ -17,11 +17,11 @@ vi.mock("@/views/admin/payroll/PayrollSettings.vue", () => ({
   default: {},
 }));
 
-vi.mock("@/views/employee/MyPayslips.vue", () => ({
+vi.mock("@/views/staff-member/MyPayslips.vue", () => ({
   default: {},
 }));
 
-vi.mock("@/views/employee/PayslipDetail.vue", () => ({
+vi.mock("@/views/staff-member/PayslipDetail.vue", () => ({
   default: {},
 }));
 
@@ -35,7 +35,7 @@ const rolePermissions = {
     "dashboard-menu",
     "dashboard-view",
     "team-menu",
-    "employee-menu",
+    "staff-member-menu",
     "attendance-menu",
   ],
   hr: ["payroll-menu", "payroll-list", "payroll-create"],
@@ -46,7 +46,7 @@ const rolePermissions = {
     "payroll-process",
     "payroll-statistics",
   ],
-  employee: [
+  staff: [
     "dashboard-menu",
     "dashboard-view",
     "attendance-my-attendances",
@@ -80,19 +80,19 @@ describe("payroll route access matrix", () => {
 
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
+        rolePermissions.staff,
         routeMeta("admin.payroll.dashboard")
       )
     ).toBe(false);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
+        rolePermissions.staff,
         routeMeta("admin.payroll.create")
       )
     ).toBe(false);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
+        rolePermissions.staff,
         routeMeta("admin.payroll.detail")
       )
     ).toBe(false);
@@ -155,20 +155,20 @@ describe("payroll route access matrix", () => {
   it("allows employee payroll routes only when payslip-view is granted", () => {
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("employee.payroll")
+        rolePermissions.staff,
+        routeMeta("staffMember.payroll")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("employee.payroll.detail")
+        rolePermissions.staff,
+        routeMeta("staffMember.payroll.detail")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         ["dashboard-menu", "dashboard-view"],
-        routeMeta("employee.payroll")
+        routeMeta("staffMember.payroll")
       )
     ).toBe(false);
   });

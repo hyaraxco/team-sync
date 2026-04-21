@@ -29,18 +29,18 @@ class HybridScheduleOverride extends Model
         ];
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 
     public function requestedBy()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'requested_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'requested_by');
     }
 
     public function approvedBy()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'approved_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'approved_by');
     }
 }

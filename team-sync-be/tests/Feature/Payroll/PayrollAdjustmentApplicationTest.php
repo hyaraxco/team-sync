@@ -6,7 +6,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
@@ -155,10 +155,10 @@ class PayrollAdjustmentApplicationTest extends TestCase
         return $user;
     }
 
-    private function createActiveEmployeeWithAttendance(Carbon $attendanceDate): EmployeeProfile
+    private function createActiveEmployeeWithAttendance(Carbon $attendanceDate): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($attendanceDate) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($attendanceDate) {
+            $employee = StaffMemberProfile::factory()->create();
 
             $employee->jobInformation()->create([
                 'employee_id' => $employee->id,

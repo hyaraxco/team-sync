@@ -29,7 +29,7 @@ class AttendanceResource extends JsonResource
                 : null,
             'status' => $this->status,
             'notes' => $this->notes,
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

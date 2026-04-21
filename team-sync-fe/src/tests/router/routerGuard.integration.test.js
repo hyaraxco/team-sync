@@ -71,7 +71,7 @@ describe("router guard integration", () => {
 
   it("denies manager-style role from payroll admin pages", async () => {
     setAuth({
-      permissions: ["dashboard-menu", "team-menu", "employee-menu"],
+      permissions: ["dashboard-menu", "team-menu", "staff-member-menu"],
     });
     const router = createTestRouter();
 
@@ -82,18 +82,18 @@ describe("router guard integration", () => {
 
   it("enforces team and employee-management routes by role", async () => {
     setAuth({
-      permissions: ["dashboard-menu", "team-menu", "employee-menu"],
+      permissions: ["dashboard-menu", "team-menu", "staff-member-menu"],
     });
     const managerRouter = createTestRouter();
 
     await goTo(managerRouter, "/admin/teams");
     expect(managerRouter.currentRoute.value.name).toBe("admin.teams");
 
-    await goTo(managerRouter, "/admin/employees");
-    expect(managerRouter.currentRoute.value.name).toBe("admin.employees");
+    await goTo(managerRouter, "/admin/staff-members");
+    expect(managerRouter.currentRoute.value.name).toBe("admin.staffMembers");
 
     setAuth({
-      permissions: ["dashboard-menu", "employee-menu", "attendance-menu"],
+      permissions: ["dashboard-menu", "staff-member-menu", "attendance-menu"],
     });
     const financeRouter = createTestRouter();
 
@@ -105,7 +105,7 @@ describe("router guard integration", () => {
     });
     const employeeRouter = createTestRouter();
 
-    await goTo(employeeRouter, "/admin/employees");
+    await goTo(employeeRouter, "/admin/staff-members");
     expect(employeeRouter.currentRoute.value.name).toBe("admin.dashboard");
   });
 
@@ -196,7 +196,7 @@ describe("router guard integration", () => {
     expect(hrRouter.currentRoute.value.name).toBe("admin.payroll.detail");
 
     await goTo(hrRouter, "/admin/my-payroll");
-    expect(hrRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(hrRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
     setAuth({
       permissions: [
@@ -215,10 +215,10 @@ describe("router guard integration", () => {
     expect(financeRouter.currentRoute.value.name).toBe("admin.payroll.detail");
 
     await goTo(financeRouter, "/admin/my-payslips");
-    expect(financeRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(financeRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
     setAuth({
-      permissions: ["dashboard-menu", "team-menu", "employee-menu", "payslip-view"],
+      permissions: ["dashboard-menu", "team-menu", "staff-member-menu", "payslip-view"],
     });
     const managerRouter = createTestRouter();
 
@@ -226,7 +226,7 @@ describe("router guard integration", () => {
     expect(managerRouter.currentRoute.value.name).toBe("admin.dashboard");
 
     await goTo(managerRouter, "/admin/my-payslips");
-    expect(managerRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(managerRouter.currentRoute.value.name).toBe("staffMember.payroll");
   });
 
   it("enforces attendance split between admin attendance and employee workspace", async () => {
@@ -245,7 +245,7 @@ describe("router guard integration", () => {
 
     await goTo(employeeRouter, "/admin/attendance/my-attendances");
     expect(employeeRouter.currentRoute.value.name).toBe(
-      "employee.attendance.my-attendances"
+      "staffMember.attendance.my-attendances"
     );
 
     await goTo(employeeRouter, "/admin/attendances");
@@ -268,7 +268,7 @@ describe("router guard integration", () => {
 
     await goTo(clockRouter, "/admin/attendance/clock");
     expect(clockRouter.currentRoute.value.name).toBe(
-      "employee.attendance.my-attendances"
+      "staffMember.attendance.my-attendances"
     );
     expect(clockRouter.currentRoute.value.query.action).toBe("clock");
   });
@@ -285,10 +285,10 @@ describe("router guard integration", () => {
     const router = createTestRouter();
 
     await goTo(router, "/admin/my-payroll");
-    expect(router.currentRoute.value.name).toBe("employee.payroll");
+    expect(router.currentRoute.value.name).toBe("staffMember.payroll");
 
     await goTo(router, "/admin/my-payroll/21");
-    expect(router.currentRoute.value.name).toBe("employee.payroll.detail");
+    expect(router.currentRoute.value.name).toBe("staffMember.payroll.detail");
 
     await goTo(router, "/admin/payroll");
     expect(router.currentRoute.value.name).toBe("admin.dashboard");
@@ -299,7 +299,7 @@ describe("router guard integration", () => {
     await goTo(router, "/admin/attendances");
     expect(router.currentRoute.value.name).toBe("admin.dashboard");
 
-    await goTo(router, "/admin/employees");
+    await goTo(router, "/admin/staff-members");
     expect(router.currentRoute.value.name).toBe("admin.dashboard");
 
     await goTo(router, "/admin/teams");
@@ -313,7 +313,7 @@ describe("router guard integration", () => {
     const employeeRouter = createTestRouter();
 
     await goTo(employeeRouter, "/admin/my-payslips");
-    expect(employeeRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(employeeRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
     setAuth({
       permissions: ["dashboard-menu", "team-menu"],
@@ -331,10 +331,10 @@ describe("router guard integration", () => {
     const employeeRouter = createTestRouter();
 
     await goTo(employeeRouter, "/admin/my-profile");
-    expect(employeeRouter.currentRoute.value.name).toBe("employee.profile");
+    expect(employeeRouter.currentRoute.value.name).toBe("staffMember.profile");
 
     await goTo(employeeRouter, "/admin/my-team");
-    expect(employeeRouter.currentRoute.value.name).toBe("employee.team");
+    expect(employeeRouter.currentRoute.value.name).toBe("staffMember.team");
 
     setAuth({
       permissions: ["dashboard-menu", "profile-menu"],
@@ -364,14 +364,14 @@ describe("router guard integration", () => {
     const financeRouter = createTestRouter();
 
     await goTo(financeRouter, "/admin/my-payroll");
-    expect(financeRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(financeRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
     await goTo(financeRouter, "/admin/my-profile");
-    expect(financeRouter.currentRoute.value.name).toBe("employee.profile");
+    expect(financeRouter.currentRoute.value.name).toBe("staffMember.profile");
 
     await goTo(financeRouter, "/admin/attendance/my-attendances");
     expect(financeRouter.currentRoute.value.name).toBe(
-      "employee.attendance.my-attendances"
+      "staffMember.attendance.my-attendances"
     );
 
     await goTo(financeRouter, "/admin/payroll/create");
@@ -393,18 +393,18 @@ describe("router guard integration", () => {
     const hrRouter = createTestRouter();
 
     await goTo(hrRouter, "/admin/my-payroll");
-    expect(hrRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(hrRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
     await goTo(hrRouter, "/admin/attendance/my-attendances");
     expect(hrRouter.currentRoute.value.name).toBe(
-      "employee.attendance.my-attendances"
+      "staffMember.attendance.my-attendances"
     );
 
     setAuth({
       permissions: [
         "dashboard-menu",
         "team-menu",
-        "employee-menu",
+        "staff-member-menu",
         "profile-menu",
         "attendance-my-attendances",
         "attendance-check-in",
@@ -415,10 +415,10 @@ describe("router guard integration", () => {
     const managerRouter = createTestRouter();
 
     await goTo(managerRouter, "/admin/my-payroll");
-    expect(managerRouter.currentRoute.value.name).toBe("employee.payroll");
+    expect(managerRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
     await goTo(managerRouter, "/admin/my-profile");
-    expect(managerRouter.currentRoute.value.name).toBe("employee.profile");
+    expect(managerRouter.currentRoute.value.name).toBe("staffMember.profile");
 
     await goTo(managerRouter, "/admin/payroll");
     expect(managerRouter.currentRoute.value.name).toBe("admin.dashboard");

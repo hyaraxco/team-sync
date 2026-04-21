@@ -5,7 +5,7 @@ namespace Tests\Feature\Payroll;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\User;
 use App\Notifications\PayrollPaid;
@@ -104,7 +104,7 @@ class PayrollRoleJourneyTest extends TestCase
         $this->assertSame('paid', $payroll->fresh()->status);
 
         $employeeUser = User::where('email', 'agung@teamsync.com')->firstOrFail();
-        $employeePayslip = $payroll->fresh()->payrollDetails()->where('employee_id', $employeeUser->employeeProfile?->id)->firstOrFail();
+        $employeePayslip = $payroll->fresh()->payrollDetails()->where('employee_id', $employeeUser->staffMemberProfile?->id)->firstOrFail();
         Notification::assertSentTo($employeeUser, PayrollPaid::class, function (PayrollPaid $notification) use ($employeeUser, $employeePayslip) {
             $mailMessage = $notification->toMail($employeeUser);
 
@@ -142,7 +142,7 @@ class PayrollRoleJourneyTest extends TestCase
         $month = Carbon::createFromFormat('Y-m', $salaryMonth)->startOfMonth();
         $monthEnd = $month->copy()->endOfMonth();
 
-        $employees = EmployeeProfile::query()
+        $employees = StaffMemberProfile::query()
             ->whereHas('jobInformation', function ($query) {
                 $query->where('status', 'active');
             })

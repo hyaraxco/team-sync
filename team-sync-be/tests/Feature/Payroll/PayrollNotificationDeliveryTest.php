@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
@@ -46,14 +46,14 @@ class PayrollNotificationDeliveryTest extends TestCase
     public function test_delivery_summary_returns_correct_counts(): void
     {
         $finance = $this->actingAsRole('finance');
-        [$payroll, $detail, $employeeProfile] = $this->createPaidPayrollWithDetail();
+        [$payroll, $detail, $staffMemberProfile] = $this->createPaidPayrollWithDetail();
 
         // Seed delivery records manually
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $employeeProfile->id,
-            'recipient_email' => $employeeProfile->user->email,
+            'employee_id' => $staffMemberProfile->id,
+            'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_AUTO_PAID,
             'delivery_status' => PayrollNotificationDelivery::STATUS_SENT,
@@ -63,8 +63,8 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $employeeProfile->id,
-            'recipient_email' => $employeeProfile->user->email,
+            'employee_id' => $staffMemberProfile->id,
+            'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_MANUAL_RESEND,
             'delivery_status' => PayrollNotificationDelivery::STATUS_FAILED,
@@ -87,14 +87,14 @@ class PayrollNotificationDeliveryTest extends TestCase
     public function test_delivery_summary_groups_latest_by_employee(): void
     {
         $this->actingAsRole('finance');
-        [$payroll, $detail, $employeeProfile] = $this->createPaidPayrollWithDetail();
+        [$payroll, $detail, $staffMemberProfile] = $this->createPaidPayrollWithDetail();
 
         // Two deliveries for same employee/detail
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $employeeProfile->id,
-            'recipient_email' => $employeeProfile->user->email,
+            'employee_id' => $staffMemberProfile->id,
+            'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_AUTO_PAID,
             'delivery_status' => PayrollNotificationDelivery::STATUS_SENT,
@@ -104,8 +104,8 @@ class PayrollNotificationDeliveryTest extends TestCase
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $employeeProfile->id,
-            'recipient_email' => $employeeProfile->user->email,
+            'employee_id' => $staffMemberProfile->id,
+            'recipient_email' => $staffMemberProfile->user->email,
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_MANUAL_RESEND,
             'delivery_status' => PayrollNotificationDelivery::STATUS_SENT,
@@ -145,12 +145,12 @@ class PayrollNotificationDeliveryTest extends TestCase
     public function test_delivery_summary_includes_skipped_status(): void
     {
         $this->actingAsRole('finance');
-        [$payroll, $detail, $employeeProfile] = $this->createPaidPayrollWithDetail();
+        [$payroll, $detail, $staffMemberProfile] = $this->createPaidPayrollWithDetail();
 
         PayrollNotificationDelivery::create([
             'payroll_id' => $payroll->id,
             'payroll_detail_id' => $detail->id,
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'recipient_email' => '',
             'channel' => 'mail',
             'trigger_type' => PayrollNotificationDelivery::TRIGGER_AUTO_PAID,
@@ -181,12 +181,12 @@ class PayrollNotificationDeliveryTest extends TestCase
             'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
-        $employeeProfile = EmployeeProfile::withoutSyncingToSearch(function () use ($user) {
-            return EmployeeProfile::factory()->for($user)->create();
+        $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {
+            return StaffMemberProfile::factory()->for($user)->create();
         });
 
-        $employeeProfile->bankInformation()->create([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->create([
+            'employee_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '7778889990',
             'account_holder_name' => 'Notification Test User',
@@ -200,7 +200,7 @@ class PayrollNotificationDeliveryTest extends TestCase
 
         $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,
@@ -209,6 +209,6 @@ class PayrollNotificationDeliveryTest extends TestCase
             'notes' => 'Notification delivery test seed',
         ]);
 
-        return [$payroll, $detail, $employeeProfile];
+        return [$payroll, $detail, $staffMemberProfile];
     }
 }

@@ -28,7 +28,7 @@ class PerformanceFeedbackRepository implements PerformanceFeedbackRepositoryInte
 
     public function getFeedbackGivenByUser(string $userId, array $filters = []): LengthAwarePaginator
     {
-        $query = PerformanceFeedback::with(['employee', 'linkedGoal'])
+        $query = PerformanceFeedback::with(['staffMember', 'linkedGoal'])
             ->where('given_by', $userId);
 
         if (isset($filters['feedback_type'])) {
@@ -41,7 +41,7 @@ class PerformanceFeedbackRepository implements PerformanceFeedbackRepositoryInte
 
     public function getFeedbackById(int $id)
     {
-        return PerformanceFeedback::with(['employee', 'giver', 'linkedGoal'])->findOrFail($id);
+        return PerformanceFeedback::with(['staffMember', 'giver', 'linkedGoal'])->findOrFail($id);
     }
 
     public function createFeedback(array $data)

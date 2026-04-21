@@ -28,8 +28,8 @@ class HybridWorkSchedule extends Model
         ];
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 }

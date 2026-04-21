@@ -53,18 +53,18 @@ class AttendancePolicyMismatch extends Model
         return $this->belongsTo(Attendance::class);
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 
     public function acknowledgedBy()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'acknowledged_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'acknowledged_by');
     }
 
     public function resolvedBy()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'resolved_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'resolved_by');
     }
 }

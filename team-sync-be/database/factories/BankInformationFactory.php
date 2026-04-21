@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -31,7 +31,7 @@ class BankInformationFactory extends Factory
         ];
 
         return [
-            'employee_id' => EmployeeProfile::factory(),
+            'employee_id' => StaffMemberProfile::factory(),
             'bank_name' => fake()->randomElement($banks),
             'account_number' => $this->generateAccountNumber(),
             'account_holder_name' => fake()->name(),
@@ -59,7 +59,7 @@ class BankInformationFactory extends Factory
     /**
      * Assign to specific employee
      */
-    public function forEmployee(EmployeeProfile $employee): static
+    public function forEmployee(StaffMemberProfile $employee): static
     {
         return $this->state(fn(array $attributes) => [
             'employee_id' => $employee->id,

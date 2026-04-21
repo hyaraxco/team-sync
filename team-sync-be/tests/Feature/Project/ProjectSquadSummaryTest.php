@@ -13,7 +13,7 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Enums\TeamStatus;
 use App\Enums\WorkLocation;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\Team;
@@ -65,49 +65,49 @@ class ProjectSquadSummaryTest extends TestCase
         $pmTeam = $this->createTeam('Mobile Product Management');
 
         $frontendA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Frontend A',
             'fe-a@teamsync.test',
             'Frontend Engineer',
             $frontendTeam
         )['profile'];
         $frontendB = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Frontend B',
             'fe-b@teamsync.test',
             'Frontend Engineer',
             $frontendTeam
         )['profile'];
         $backendA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Backend A',
             'be-a@teamsync.test',
             'Backend Engineer',
             $backendTeam
         )['profile'];
         $backendB = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Backend B',
             'be-b@teamsync.test',
             'Backend Engineer',
             $backendTeam
         )['profile'];
         $uiuxA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'UIUX A',
             'uiux-a@teamsync.test',
             'UI/UX Designer',
             $uiuxTeam
         )['profile'];
         $qaA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'QA A',
             'qa-a@teamsync.test',
             'QA Tester',
             $qaTeam
         )['profile'];
         $pmA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'PM A',
             'pm-a@teamsync.test',
             'Project Manager',
@@ -189,7 +189,7 @@ class ProjectSquadSummaryTest extends TestCase
 
         $assignedTeam = $this->createTeam('Assigned Team');
         $memberProfile = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Project Member',
             'project.member@teamsync.test',
             'Frontend Engineer',
@@ -198,7 +198,7 @@ class ProjectSquadSummaryTest extends TestCase
 
         $outsideTeam = $this->createTeam('Outside Team');
         $outsideUser = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Outside Employee',
             'outside.employee@teamsync.test',
             'QA Tester',
@@ -244,7 +244,7 @@ class ProjectSquadSummaryTest extends TestCase
     }
 
     /**
-     * @return array{user: User, profile: EmployeeProfile}
+     * @return array{user: User, profile: StaffMemberProfile}
      */
     private function createUserWithProfileAndTeam(
         string $role,
@@ -259,7 +259,7 @@ class ProjectSquadSummaryTest extends TestCase
         ]);
         $user->syncRoles([$role]);
 
-        $profile = EmployeeProfile::factory()->forUser($user)->create();
+        $profile = StaffMemberProfile::factory()->forUser($user)->create();
 
         $profile->jobInformation()->create([
             'employee_id' => $profile->id,
@@ -292,7 +292,7 @@ class ProjectSquadSummaryTest extends TestCase
     private function createTask(
         Project $project,
         string $name,
-        EmployeeProfile $assignee,
+        StaffMemberProfile $assignee,
         string $status
     ): ProjectTask {
         return ProjectTask::query()->create([

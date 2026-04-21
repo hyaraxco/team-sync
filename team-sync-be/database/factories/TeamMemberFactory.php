@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -20,7 +20,7 @@ class TeamMemberFactory extends Factory
     {
         return [
             'team_id' => Team::factory(),
-            'employee_id' => EmployeeProfile::factory(),
+            'employee_id' => StaffMemberProfile::factory(),
             'joined_at' => fake()->dateTimeBetween('-2 years', 'now'),
             'left_at' => null,
         ];
@@ -74,7 +74,7 @@ class TeamMemberFactory extends Factory
     /**
      * Assign specific employee
      */
-    public function forEmployee(EmployeeProfile $employee): static
+    public function forEmployee(StaffMemberProfile $employee): static
     {
         return $this->state(fn (array $attributes) => [
             'employee_id' => $employee->id,

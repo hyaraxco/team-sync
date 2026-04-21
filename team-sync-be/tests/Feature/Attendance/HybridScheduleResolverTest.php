@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Attendance;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HybridScheduleOverride;
 use App\Models\HybridWorkSchedule;
 use App\Models\JobInformation;
@@ -106,10 +106,10 @@ class HybridScheduleResolverTest extends TestCase
         ], $resolved);
     }
 
-    private function createEmployeeWithWorkLocation(string $workLocation): EmployeeProfile
+    private function createEmployeeWithWorkLocation(string $workLocation): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()

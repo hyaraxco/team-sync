@@ -49,25 +49,25 @@ class LeaveRequest extends Model
             $query->where('reason', 'like', "%{$search}%")
                 ->orWhere('leave_type', 'like', "%{$search}%")
                 ->orWhere('emergency_contact', 'like', "%{$search}%")
-                ->orWhereHas('employee.user', function ($q) use ($search) {
+                ->orWhereHas('staffMember.user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
                 });
         });
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 
     public function approver()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'approved_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'approved_by');
     }
 
     public function proofReviewedBy()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'proof_reviewed_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'proof_reviewed_by');
     }
 
     public function payrollAdjustments()

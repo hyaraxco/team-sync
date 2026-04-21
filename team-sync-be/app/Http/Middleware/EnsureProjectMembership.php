@@ -20,11 +20,11 @@ class EnsureProjectMembership
             return ResponseHelper::jsonResponse(false, 'Unauthorized', null, 401);
         }
 
-        if (!$user->hasRole('employee')) {
+        if (!$user->hasRole('staff')) {
             return $next($request);
         }
 
-        $employee = $user->employeeProfile;
+        $employee = $user->staffMemberProfile;
         if (!$employee) {
             return ResponseHelper::jsonResponse(false, 'Forbidden', null, 403);
         }

@@ -316,7 +316,7 @@ onMounted(() => {
         <!-- KPI Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <StatsCard
-            title="Total Employees"
+            title="Total Staff Members"
             :value="kpis.total_employees || 0"
             :subtitle="`${kpis.employee_growth >= 0 ? '+' : ''}${kpis.employee_growth?.toFixed(1) || 0}% growth`"
             :subtitleColor="kpis.employee_growth >= 0 ? 'success' : 'danger'"

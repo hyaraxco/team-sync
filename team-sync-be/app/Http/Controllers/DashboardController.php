@@ -41,7 +41,7 @@ class DashboardController extends Controller implements HasMiddleware
     public function getEmployeeStatistics()
     {
         try {
-            $employeeId = auth()->user()->employeeProfile->id;
+            $employeeId = auth()->user()->staffMemberProfile->id;
             $statistics = $this->dashboardRepository->getEmployeeStatistics($employeeId);
 
             return ResponseHelper::jsonResponse(true, 'Employee Dashboard Statistics Retrieved Successfully', $statistics, 200);

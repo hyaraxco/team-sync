@@ -25,11 +25,11 @@ class PerformanceDataSeeder extends Seeder
             return;
         }
 
-        $managerProfile = $manager->employeeProfile;
-        $employeeProfile = $employee->employeeProfile;
-        $hrProfile = $hr->employeeProfile;
+        $managerProfile = $manager->staffMemberProfile;
+        $staffMemberProfile = $employee->staffMemberProfile;
+        $hrProfile = $hr->staffMemberProfile;
 
-        if (! $managerProfile || ! $employeeProfile || ! $hrProfile) {
+        if (! $managerProfile || ! $staffMemberProfile || ! $hrProfile) {
             $this->command->warn('Employee profiles not found for required users.');
 
             return;
@@ -62,7 +62,7 @@ class PerformanceDataSeeder extends Seeder
 
         // Review 1: Employee Agung - pending_self (employee can test self-assessment)
         $review1 = PerformanceReview::updateOrCreate(
-            ['cycle_id' => $cycle->id, 'employee_id' => $employeeProfile->id],
+            ['cycle_id' => $cycle->id, 'employee_id' => $staffMemberProfile->id],
             [
                 'reviewer_id' => $managerProfile->id,
                 'status' => 'pending_self',
@@ -134,7 +134,7 @@ class PerformanceDataSeeder extends Seeder
 
         // Review 4: Employee Agung - completed (all data filled)
         $review4 = PerformanceReview::updateOrCreate(
-            ['cycle_id' => $completedCycle->id, 'employee_id' => $employeeProfile->id],
+            ['cycle_id' => $completedCycle->id, 'employee_id' => $staffMemberProfile->id],
             [
                 'reviewer_id' => $managerProfile->id,
                 'status' => 'completed',

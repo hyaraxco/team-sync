@@ -6,7 +6,7 @@ use App\Constants\CacheConstants;
 use App\DTOs\ProjectDto;
 use App\Enums\TaskStatus;
 use App\Interfaces\ProjectRepositoryInterface;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Project;
 use App\Models\TeamMember;
 use App\Services\EmailService;
@@ -43,11 +43,11 @@ class ProjectRepository implements ProjectRepositoryInterface
             ->withCount('tasks')
             ->orderByDesc('created_at');
 
-        if (Auth::user()->hasRole('employee')) {
-            $employeeId = Auth::user()->employeeProfile->id;
+        if (Auth::user()->hasRole('staff')) {
+            $employeeId = Auth::user()->staffMemberProfile->id;
 
             // Get team ID from JobInformation
-            $jobInfoTeamId = Auth::user()->employeeProfile->jobInformation->team_id ?? null;
+            $jobInfoTeamId = Auth::user()->staffMemberProfile->jobInformation->team_id ?? null;
 
             // Get all team IDs that the employee is currently a member of (not left)
             $teamMemberIds = TeamMember::where('employee_id', $employeeId)
@@ -277,13 +277,13 @@ class ProjectRepository implements ProjectRepositoryInterface
     public function getSquadSummary(string $id): array
     {
         $project = Project::with([
-            'teams.members.employee.jobInformation.team',
+            'teams.members.staffMember.jobInformation.team',
             'tasks.assignee.jobInformation.team',
         ])->findOrFail($id);
 
         $members = $project->teams
             ->flatMap(fn ($team) => $team->members)
-            ->map(fn ($member) => $member->employee)
+            ->map(fn ($member) => $member->staffMember)
             ->filter()
             ->unique('id')
             ->values();
@@ -373,7 +373,7 @@ class ProjectRepository implements ProjectRepositoryInterface
         cache()->forget($cacheKey);
     }
 
-    private function resolveWorkStream(EmployeeProfile $employee): string
+    private function resolveWorkStream(StaffMemberProfile $employee): string
     {
         $teamName = strtolower((string) ($employee->jobInformation?->team?->name ?? ''));
         $jobTitle = strtolower((string) ($employee->jobInformation?->job_title ?? ''));

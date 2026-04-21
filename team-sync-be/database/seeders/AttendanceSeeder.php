@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -33,7 +33,7 @@ class AttendanceSeeder extends Seeder
         $this->command->info('Work days in month: '.count($workDays));
 
         // Get limited set of employees for payroll testing
-        $employees = EmployeeProfile::limit($employeeLimit)->get();
+        $employees = StaffMemberProfile::limit($employeeLimit)->get();
 
         $progressBar = $this->command->getOutput()->createProgressBar($employees->count());
         $progressBar->start();

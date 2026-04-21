@@ -23,7 +23,7 @@ class ProjectTaskAttachmentResource extends JsonResource
             'file_url' => $this->file_path ? asset('storage/'.$this->file_path) : null,
             'file_size' => $this->file_size,
             'mime_type' => $this->mime_type,
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

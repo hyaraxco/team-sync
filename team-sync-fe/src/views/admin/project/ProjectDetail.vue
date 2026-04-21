@@ -320,7 +320,7 @@ onMounted(async () => {
           </div>
           <RouterLink
             :to="{
-              name: 'admin.employees.detail',
+              name: 'admin.staffMembers.detail',
               params: { id: project.leader.id },
             }"
             class="border border-[#DCDEDD] text-brand-dark py-2 px-4 rounded-[8px] font-medium hover:bg-gray-50 hover:border-[#0C51D9] hover:border-2 transition-all duration-300 flex items-center gap-2"

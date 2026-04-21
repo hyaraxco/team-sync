@@ -129,7 +129,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         if ($hasStatusChange && $toStatus === TaskStatus::REJECTED->value) {
             $updatePayload['rejected_reason'] = trim((string) ($data['rejected_reason'] ?? ''));
-            $updatePayload['rejected_by'] = Auth::user()?->employeeProfile?->id;
+            $updatePayload['rejected_by'] = Auth::user()?->staffMemberProfile?->id;
             $updatePayload['rejected_at'] = now();
         }
 
@@ -176,7 +176,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task = $this->getById($taskId);
 
         return $task->comments()
-            ->with(['employee.user'])
+            ->with(['staffMember.user'])
             ->orderBy('created_at', 'asc')
             ->get();
     }
@@ -186,7 +186,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task = $this->getById($taskId);
 
         $user = Auth::user();
-        if (! $user || ! $user->employeeProfile) {
+        if (! $user || ! $user->staffMemberProfile) {
             throw new AuthorizationException('Your account is not linked to an employee profile.');
         }
 
@@ -194,9 +194,9 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         $comment = ProjectTaskComment::create([
             'project_task_id' => $task->id,
-            'employee_id' => $user->employeeProfile->id,
+            'employee_id' => $user->staffMemberProfile->id,
             'comment' => $data['comment'],
-        ])->load(['employee.user']);
+        ])->load(['staffMember.user']);
 
         $this->emailService->sendProjectTaskCommentAddedNotification(
             $task,
@@ -220,7 +220,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             'comment' => $data['comment'],
         ]);
 
-        return $comment->load(['employee.user']);
+        return $comment->load(['staffMember.user']);
     }
 
     public function deleteComment(string $taskId, string $commentId): ProjectTaskComment
@@ -241,7 +241,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task = $this->getById($taskId);
 
         return $task->attachments()
-            ->with(['employee.user'])
+            ->with(['staffMember.user'])
             ->orderBy('created_at', 'asc')
             ->get();
     }
@@ -265,7 +265,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task = $this->getById($taskId);
 
         $user = Auth::user();
-        if (! $user || ! $user->employeeProfile) {
+        if (! $user || ! $user->staffMemberProfile) {
             throw new AuthorizationException('Your account is not linked to an employee profile.');
         }
 
@@ -276,12 +276,12 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         $attachment = ProjectTaskAttachment::create([
             'project_task_id' => $task->id,
-            'employee_id' => $user->employeeProfile->id,
+            'employee_id' => $user->staffMemberProfile->id,
             'file_name' => $file->getClientOriginalName(),
             'file_path' => $storedPath,
             'file_size' => $file->getSize(),
             'mime_type' => $file->getClientMimeType(),
-        ])->load(['employee.user']);
+        ])->load(['staffMember.user']);
 
         $this->emailService->sendProjectTaskAttachmentAddedNotification(
             $task,
@@ -319,14 +319,14 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         $task->loadMissing('project');
 
-        $employeeProfileId = $user->employeeProfile?->id;
+        $staffMemberProfileId = $user->staffMemberProfile?->id;
         $isManager = $user->hasRole('manager');
         $isHr = $user->hasRole('hr');
-        $isEmployee = $user->hasRole('employee');
+        $isEmployee = $user->hasRole('staff');
         $isReviewerRole = $isManager || $isHr;
         $isPureEmployee = $isEmployee && ! $isReviewerRole;
-        $isProjectLeader = $employeeProfileId !== null && $task->project?->project_leader_id === $employeeProfileId;
-        $isAssignee = $employeeProfileId !== null && $task->assignee_id === $employeeProfileId;
+        $isProjectLeader = $staffMemberProfileId !== null && $task->project?->project_leader_id === $staffMemberProfileId;
+        $isAssignee = $staffMemberProfileId !== null && $task->assignee_id === $staffMemberProfileId;
 
         if ($isPureEmployee && ! $isAssignee && ! $isProjectLeader) {
             throw new AuthorizationException('You can only update your own assigned tasks.');
@@ -450,13 +450,13 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     {
         $user = Auth::user();
         $isReviewerRole = $user && ($user->hasRole('manager') || $user->hasRole('hr'));
-        $isPureEmployee = $user && $user->hasRole('employee') && ! $isReviewerRole;
+        $isPureEmployee = $user && $user->hasRole('staff') && ! $isReviewerRole;
 
         if (! $isPureEmployee) {
             return;
         }
 
-        $employee = $user->employeeProfile;
+        $employee = $user->staffMemberProfile;
         if (! $employee) {
             $query->whereRaw('1 = 0');
 
@@ -491,13 +491,13 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     {
         $user = Auth::user();
         $isReviewerRole = $user && ($user->hasRole('manager') || $user->hasRole('hr'));
-        $isPureEmployee = $user && $user->hasRole('employee') && ! $isReviewerRole;
+        $isPureEmployee = $user && $user->hasRole('staff') && ! $isReviewerRole;
 
         if (! $isPureEmployee) {
             return;
         }
 
-        $employee = $user->employeeProfile;
+        $employee = $user->staffMemberProfile;
         if (! $employee) {
             throw new AuthorizationException('Forbidden.');
         }
@@ -536,17 +536,17 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     private function authorizeTaskCollaboration(ProjectTask $task, string $action): void
     {
         $user = Auth::user();
-        if (! $user || ! $user->employeeProfile) {
+        if (! $user || ! $user->staffMemberProfile) {
             throw new AuthorizationException('Unauthorized.');
         }
 
-        $employeeProfileId = $user->employeeProfile->id;
+        $staffMemberProfileId = $user->staffMemberProfile->id;
         $isManager = $user->hasRole('manager');
         $isHr = $user->hasRole('hr');
         $isReviewerRole = $isManager || $isHr;
-        $isPureEmployee = $user->hasRole('employee') && ! $isReviewerRole;
-        $isProjectLeader = $task->project?->project_leader_id === $employeeProfileId;
-        $isAssignee = $task->assignee_id === $employeeProfileId;
+        $isPureEmployee = $user->hasRole('staff') && ! $isReviewerRole;
+        $isProjectLeader = $task->project?->project_leader_id === $staffMemberProfileId;
+        $isAssignee = $task->assignee_id === $staffMemberProfileId;
 
         if (! $isReviewerRole && ! $isProjectLeader && ! $isAssignee) {
             throw new AuthorizationException('Forbidden.');
@@ -572,18 +572,18 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     private function authorizeCommentMutation(ProjectTask $task, ProjectTaskComment $comment): void
     {
         $user = Auth::user();
-        if (! $user || ! $user->employeeProfile) {
+        if (! $user || ! $user->staffMemberProfile) {
             throw new AuthorizationException('Unauthorized.');
         }
 
-        $employeeProfileId = $user->employeeProfile->id;
-        $isOwner = $comment->employee_id === $employeeProfileId;
+        $staffMemberProfileId = $user->staffMemberProfile->id;
+        $isOwner = $comment->employee_id === $staffMemberProfileId;
 
         if (! $isOwner) {
             throw new AuthorizationException('You are not allowed to modify this comment.');
         }
 
-        if ($user->hasRole('employee') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
+        if ($user->hasRole('staff') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
             $this->authorizeTaskCollaboration($task, 'update-comment');
         }
     }
@@ -591,18 +591,18 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     private function authorizeAttachmentMutation(ProjectTask $task, ProjectTaskAttachment $attachment): void
     {
         $user = Auth::user();
-        if (! $user || ! $user->employeeProfile) {
+        if (! $user || ! $user->staffMemberProfile) {
             throw new AuthorizationException('Unauthorized.');
         }
 
-        $employeeProfileId = $user->employeeProfile->id;
-        $isOwner = $attachment->employee_id === $employeeProfileId;
+        $staffMemberProfileId = $user->staffMemberProfile->id;
+        $isOwner = $attachment->employee_id === $staffMemberProfileId;
 
         if (! $isOwner) {
             throw new AuthorizationException('You are not allowed to modify this attachment.');
         }
 
-        if ($user->hasRole('employee') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
+        if ($user->hasRole('staff') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
             $this->authorizeTaskCollaboration($task, 'delete-attachment');
         }
     }
@@ -617,7 +617,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             'project_task_id' => $task->id,
             'from_status' => $fromStatus,
             'to_status' => $toStatus,
-            'changed_by' => Auth::user()?->employeeProfile?->id,
+            'changed_by' => Auth::user()?->staffMemberProfile?->id,
             'reason' => $reason ? trim((string) $reason) : null,
             'changed_at' => now(),
         ]);

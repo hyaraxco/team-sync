@@ -2,7 +2,7 @@
 
 namespace App\Services\Attendance;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HybridScheduleOverride;
 use App\Models\HybridWorkSchedule;
 use Carbon\Carbon;
@@ -12,7 +12,7 @@ class HybridScheduleResolver
 {
     public function resolve(int $employeeId, CarbonInterface|string $date): array
     {
-        $employee = EmployeeProfile::query()
+        $employee = StaffMemberProfile::query()
             ->with('jobInformation')
             ->findOrFail($employeeId);
 

@@ -30,7 +30,7 @@ This document outlines the detailed implementation plan for two major features:
 
 - Create migrations for all new tables listed in 2.1 and 2.2.
 - Create Eloquent Models (`PerformanceReviewCycle`, `PerformanceReview`, etc.).
-- Define relationships between new models and existing models (`EmployeeProfile`, `User`, `Team`).
+- Define relationships between new models and existing models (`StaffMemberProfile`, `User`, `Team`).
 
 ### 3.2 Step 2: Repositories & Services
 

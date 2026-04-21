@@ -4,7 +4,7 @@ import { nextTick } from "vue";
 
 const {
   authStoreMock,
-  employeeStoreMock,
+  staffMemberStoreMock,
   taskStoreMock,
   notificationStoreMock,
   axiosGetMock,
@@ -19,7 +19,7 @@ const {
       },
     },
   },
-  employeeStoreMock: {
+  staffMemberStoreMock: {
     fetchMyTeamProjects: vi.fn(),
   },
   taskStoreMock: {
@@ -46,8 +46,8 @@ vi.mock("@/stores/auth", () => ({
   useAuthStore: () => authStoreMock,
 }));
 
-vi.mock("@/stores/employee", () => ({
-  useEmployeeStore: () => employeeStoreMock,
+vi.mock("@/stores/staffMember", () => ({
+  useStaffMemberStore: () => staffMemberStoreMock,
 }));
 
 vi.mock("@/stores/task", () => ({
@@ -109,7 +109,7 @@ describe("EmployeeStatistics smoke", () => {
     };
     taskStoreMock.tasks = [];
     taskStoreMock.fetchProjectTasks.mockReset().mockResolvedValue(undefined);
-    employeeStoreMock.fetchMyTeamProjects.mockReset().mockResolvedValue([]);
+    staffMemberStoreMock.fetchMyTeamProjects.mockReset().mockResolvedValue([]);
     notificationStoreMock.notifications = [];
     notificationStoreMock.loading = false;
     notificationStoreMock.error = null;

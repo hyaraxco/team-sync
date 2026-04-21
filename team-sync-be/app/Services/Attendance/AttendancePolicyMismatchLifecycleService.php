@@ -38,7 +38,7 @@ class AttendancePolicyMismatchLifecycleService
                 'escalated_at' => Carbon::now(),
             ]);
 
-            $this->emailService->sendAttendanceMismatchEscalatedNotification($mismatch->fresh(['employee.user']));
+            $this->emailService->sendAttendanceMismatchEscalatedNotification($mismatch->fresh(['staffMember.user']));
 
             $escalatedCount++;
         }

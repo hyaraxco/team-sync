@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -25,7 +25,7 @@ class ManagerSeeder extends Seeder
             ]
         );
 
-        $employeeProfile = EmployeeProfile::withTrashed()->updateOrCreate([
+        $staffMemberProfile = StaffMemberProfile::withTrashed()->updateOrCreate([
             'code' => 'MGR001',
         ], [
             'user_id' => $manager->id,
@@ -48,12 +48,12 @@ class ManagerSeeder extends Seeder
         ]);
 
         // Ensure seeded bank account number stays unique globally.
-        $managerAccountNumber = '9'.str_pad((string) $employeeProfile->id, 9, '0', STR_PAD_LEFT);
+        $managerAccountNumber = '9'.str_pad((string) $staffMemberProfile->id, 9, '0', STR_PAD_LEFT);
 
-        $employeeProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->jobInformation()->updateOrCreate([
+            'employee_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'job_title' => 'Manager',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -62,20 +62,20 @@ class ManagerSeeder extends Seeder
             'monthly_salary' => 15000000,
         ]);
 
-        $employeeProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->updateOrCreate([
+            'employee_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => $managerAccountNumber,
             'account_holder_name' => 'Yudhis',
         ]);
 
-        $employeeProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->emergencyContacts()->updateOrCreate([
+            'employee_id' => $staffMemberProfile->id,
             'email' => 'yudhis.emergency@teamsync.com',
         ], [
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'full_name' => 'Yudhis Emergency Contact',
             'phone' => '081234567899',
             'relationship' => 'Family',

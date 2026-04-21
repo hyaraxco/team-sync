@@ -152,7 +152,7 @@ const isDeadlinePassed = (deadline) => {
 const canSubmitSelfAssessment = computed(() => {
   return (
     reviewStatus.value === "pending_self" &&
-    (hasRole("employee") || hasRole("manager")) &&
+    (hasRole("staff") || hasRole("manager")) &&
     currentEmployeeId.value === review.value?.employee_id
   );
 });

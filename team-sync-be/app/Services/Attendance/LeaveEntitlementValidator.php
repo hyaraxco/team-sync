@@ -3,7 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Models\AttendancePolicy;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
@@ -99,10 +99,10 @@ class LeaveEntitlementValidator
         return $this->normalizeEmploymentType($employmentType);
     }
 
-    private function resolveEmployee(LeaveRequest $leaveRequest): ?EmployeeProfile
+    private function resolveEmployee(LeaveRequest $leaveRequest): ?StaffMemberProfile
     {
-        if ($leaveRequest->relationLoaded('employee') && $leaveRequest->employee) {
-            $employee = $leaveRequest->employee;
+        if ($leaveRequest->relationLoaded('staffMember') && $leaveRequest->staffMember) {
+            $employee = $leaveRequest->staffMember;
             if (! $employee->relationLoaded('jobInformation')) {
                 $employee->load('jobInformation');
             }
@@ -110,7 +110,7 @@ class LeaveEntitlementValidator
             return $employee;
         }
 
-        return EmployeeProfile::query()
+        return StaffMemberProfile::query()
             ->with('jobInformation')
             ->find($leaveRequest->employee_id);
     }

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Leave;
 
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
 use App\Models\Payroll;
 use App\Models\PayrollAdjustment;
@@ -100,7 +100,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'proof_uploaded_at' => now()->subDay(),
         ]);
 
-        $hr = $this->actingAsHrWithEmployeeProfile();
+        $hr = $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -132,7 +132,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         $this->assertDatabaseHas('leave_requests', [
             'id' => $leaveRequest->id,
             'proof_review_status' => 'approved',
-            'proof_reviewed_by' => $hr->employeeProfile->id,
+            'proof_reviewed_by' => $hr->staffMemberProfile->id,
         ]);
 
         // Idempotency check: re-approving should not create a duplicate adjustment.
@@ -178,7 +178,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'proof_uploaded_at' => now()->subHours(8),
         ]);
 
-        $this->actingAsHrWithEmployeeProfile();
+        $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -269,7 +269,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'proof_uploaded_at' => now()->subDay(),
         ]);
 
-        $this->actingAsHrWithEmployeeProfile();
+        $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -371,7 +371,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'status' => PayrollAdjustment::STATUS_APPLIED,
         ]);
 
-        $this->actingAsHrWithEmployeeProfile();
+        $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -397,10 +397,10 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         $this->assertSame('already applied and immutable', $freshAdjustment->reason);
     }
 
-    private function actingAsHrWithEmployeeProfile(): User
+    private function actingAsHrWithStaffMemberProfile(): User
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         $employee->jobInformation()->create([
@@ -423,10 +423,10 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         return $user;
     }
 
-    private function createActiveEmployee(string $employmentType): EmployeeProfile
+    private function createActiveEmployee(string $employmentType): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($employmentType) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($employmentType) {
+            $employee = StaffMemberProfile::factory()->create();
 
             $employee->jobInformation()->create([
                 'employee_id' => $employee->id,

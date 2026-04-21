@@ -4,7 +4,7 @@ namespace Tests\Feature\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
@@ -172,10 +172,10 @@ class AttendanceCorrectionGuardTest extends TestCase
         );
     }
 
-    private function actingAsEmployee(): EmployeeProfile
+    private function actingAsEmployee(): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         $employee->jobInformation()->create([
@@ -189,7 +189,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         $user = User::query()->findOrFail($employee->user_id);
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 

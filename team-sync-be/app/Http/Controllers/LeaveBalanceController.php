@@ -29,7 +29,7 @@ class LeaveBalanceController extends Controller implements HasMiddleware
     public function getMyBalances(Request $request)
     {
         try {
-            $employee = $request->user()->employeeProfile;
+            $employee = $request->user()->staffMemberProfile;
             if (!$employee) {
                 return ResponseHelper::jsonResponse(false, 'Employee profile not found.', [], 404);
             }

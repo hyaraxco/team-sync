@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollSetting;
@@ -191,10 +191,10 @@ class PayrollCalculationTest extends TestCase
         $this->assertGreaterThan(0, (float) $detail->daily_rate);
     }
 
-    private function createActiveEmployeeWithAttendance(Carbon $month, int $monthlySalary): EmployeeProfile
+    private function createActiveEmployeeWithAttendance(Carbon $month, int $monthlySalary): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($month, $monthlySalary) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($month, $monthlySalary) {
+            $employee = StaffMemberProfile::factory()->create();
             $startDate = $month->copy()->startOfMonth();
             $endDate = $month->copy()->endOfMonth();
 

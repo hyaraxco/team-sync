@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Notification;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\User;
@@ -36,8 +36,8 @@ class TaskAssignmentNotificationsTest extends TestCase
     public function test_manager_creating_task_with_assignee_notifies_non_manager_employee(): void
     {
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Task Manager');
-        [$employee, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Task Employee');
-        $project = $this->createProject($employeeProfile->id);
+        [$employee, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Task Employee');
+        $project = $this->createProject($staffMemberProfile->id);
 
         Sanctum::actingAs($manager);
 
@@ -45,7 +45,7 @@ class TaskAssignmentNotificationsTest extends TestCase
             'project_id' => $project->id,
             'name' => 'Prepare sprint report',
             'description' => 'Build report and update progress.',
-            'assignee_id' => $employeeProfile->id,
+            'assignee_id' => $staffMemberProfile->id,
             'priority' => 'medium',
             'status' => 'todo',
             'due_date' => now()->addDay()->toDateString(),
@@ -66,9 +66,9 @@ class TaskAssignmentNotificationsTest extends TestCase
     public function test_reassigning_task_notifies_new_assignee_as_reassignment(): void
     {
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Assignment Manager');
-        [$employeeA, $employeeProfileA] = $this->createUserWithRoleAndProfile('employee', 'Employee Alpha');
-        [$employeeB, $employeeProfileB] = $this->createUserWithRoleAndProfile('employee', 'Employee Beta');
-        $project = $this->createProject($employeeProfileA->id);
+        [$employeeA, $staffMemberProfileA] = $this->createUserWithRoleAndProfile('staff', 'Employee Alpha');
+        [$employeeB, $staffMemberProfileB] = $this->createUserWithRoleAndProfile('staff', 'Employee Beta');
+        $project = $this->createProject($staffMemberProfileA->id);
 
         Sanctum::actingAs($manager);
 
@@ -76,7 +76,7 @@ class TaskAssignmentNotificationsTest extends TestCase
             'project_id' => $project->id,
             'name' => 'Draft QA checklist',
             'description' => 'Prepare test matrix for release.',
-            'assignee_id' => $employeeProfileA->id,
+            'assignee_id' => $staffMemberProfileA->id,
             'priority' => 'high',
             'status' => 'todo',
             'due_date' => now()->addDays(2)->toDateString(),
@@ -85,7 +85,7 @@ class TaskAssignmentNotificationsTest extends TestCase
         $taskId = (int) $createResponse->json('data.id');
 
         $this->putJson('/api/v1/project-tasks/'.$taskId, [
-            'assignee_id' => $employeeProfileB->id,
+            'assignee_id' => $staffMemberProfileB->id,
         ])->assertOk();
 
         Sanctum::actingAs($employeeB);
@@ -114,8 +114,8 @@ class TaskAssignmentNotificationsTest extends TestCase
     {
         [$actor] = $this->createUserWithRoleAndProfile('manager', 'Actor Manager');
         [$managerAssignee, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Assignee Manager');
-        [, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Leader Employee');
-        $project = $this->createProject($employeeProfile->id);
+        [, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Leader Employee');
+        $project = $this->createProject($staffMemberProfile->id);
 
         Sanctum::actingAs($actor);
 
@@ -139,9 +139,9 @@ class TaskAssignmentNotificationsTest extends TestCase
     public function test_reassigning_rejected_task_resets_status_to_backlog_and_clears_rejection_metadata(): void
     {
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Workflow Manager');
-        [, $employeeProfileA] = $this->createUserWithRoleAndProfile('employee', 'Owner Employee');
-        [, $employeeProfileB] = $this->createUserWithRoleAndProfile('employee', 'Replacement Employee');
-        $project = $this->createProject($employeeProfileA->id);
+        [, $staffMemberProfileA] = $this->createUserWithRoleAndProfile('staff', 'Owner Employee');
+        [, $staffMemberProfileB] = $this->createUserWithRoleAndProfile('staff', 'Replacement Employee');
+        $project = $this->createProject($staffMemberProfileA->id);
 
         Sanctum::actingAs($manager);
 
@@ -149,7 +149,7 @@ class TaskAssignmentNotificationsTest extends TestCase
             'project_id' => $project->id,
             'name' => 'Revise API contract',
             'description' => 'Implement request format changes.',
-            'assignee_id' => $employeeProfileA->id,
+            'assignee_id' => $staffMemberProfileA->id,
             'priority' => 'high',
             'status' => 'review',
             'due_date' => now()->addDays(3)->toDateString(),
@@ -163,11 +163,11 @@ class TaskAssignmentNotificationsTest extends TestCase
         ])->assertOk();
 
         $reassignResponse = $this->putJson('/api/v1/project-tasks/'.$taskId, [
-            'assignee_id' => $employeeProfileB->id,
+            'assignee_id' => $staffMemberProfileB->id,
         ])->assertOk();
 
         $reassignResponse
-            ->assertJsonPath('data.assignee_id', $employeeProfileB->id)
+            ->assertJsonPath('data.assignee_id', $staffMemberProfileB->id)
             ->assertJsonPath('data.status', 'todo')
             ->assertJsonPath('data.rejected_reason', null)
             ->assertJsonPath('data.rejected_by', null)
@@ -176,14 +176,14 @@ class TaskAssignmentNotificationsTest extends TestCase
         $task = ProjectTask::query()->findOrFail($taskId);
 
         $this->assertSame('todo', $task->status);
-        $this->assertSame((int) $employeeProfileB->id, (int) $task->assignee_id);
+        $this->assertSame((int) $staffMemberProfileB->id, (int) $task->assignee_id);
         $this->assertNull($task->rejected_reason);
         $this->assertNull($task->rejected_by);
         $this->assertNull($task->rejected_at);
     }
 
     /**
-     * @return array{0: User, 1: EmployeeProfile}
+     * @return array{0: User, 1: StaffMemberProfile}
      */
     private function createUserWithRoleAndProfile(string $role, string $name): array
     {
@@ -195,7 +195,7 @@ class TaskAssignmentNotificationsTest extends TestCase
         ]);
         $user->syncRoles([$role]);
 
-        $profile = EmployeeProfile::factory()->forUser($user)->create([
+        $profile = StaffMemberProfile::factory()->forUser($user)->create([
             'code' => sprintf('%s%03d', strtoupper(substr($role, 0, 3)), $sequence),
             'identity_number' => str_pad((string) (88000000000000 + $sequence), 14, '0', STR_PAD_LEFT),
         ]);

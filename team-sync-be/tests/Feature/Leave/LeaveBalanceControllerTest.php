@@ -40,7 +40,7 @@ class LeaveBalanceControllerTest extends TestCase
         Sanctum::actingAs($user);
 
         // Assert they do not have an employee profile
-        $this->assertNull($user->employee);
+        $this->assertNull($user->staffMember);
 
         // Act
         $response = $this->getJson('/api/v1/my-leave-balances');

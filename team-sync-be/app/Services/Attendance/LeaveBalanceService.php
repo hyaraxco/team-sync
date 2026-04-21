@@ -3,7 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Models\AttendancePolicy;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
@@ -22,7 +22,7 @@ class LeaveBalanceService
 
     public function getEmployeeBalances(int $employeeId, ?string $asOfDate = null): Collection
     {
-        $employee = EmployeeProfile::with('jobInformation')->find($employeeId);
+        $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);
         if (!$employee) {
             return collect();
         }

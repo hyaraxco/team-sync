@@ -34,8 +34,8 @@ class TeamRepository implements TeamRepositoryInterface
     ): Builder|Collection {
         $query = Team::with([
             'leader',
-            'leader.employeeProfile',
-            'leader.employeeProfile.jobInformation',
+            'leader.staffMemberProfile',
+            'leader.staffMemberProfile.jobInformation',
         ])
             ->where(function ($query) use ($search, $leaderId, $status, $department) {
                 if ($search) {
@@ -90,12 +90,12 @@ class TeamRepository implements TeamRepositoryInterface
     ): Team {
         return Team::with([
             'leader',
-            'leader.employeeProfile',
-            'leader.employeeProfile.jobInformation',
+            'leader.staffMemberProfile',
+            'leader.staffMemberProfile.jobInformation',
             'members',
-            'members.employee',
-            'members.employee.user',
-            'members.employee.jobInformation',
+            'members.staffMember',
+            'members.staffMember.user',
+            'members.staffMember.jobInformation',
         ])->withCount('members')->findOrFail($id);
     }
 
@@ -115,12 +115,12 @@ class TeamRepository implements TeamRepositoryInterface
             }
 
             if ($team->team_lead_id) {
-                $newLeader = User::with('employeeProfile')->find($team->team_lead_id);
-                if ($newLeader && $newLeader->employeeProfile) {
+                $newLeader = User::with('staffMemberProfile')->find($team->team_lead_id);
+                if ($newLeader && $newLeader->staffMemberProfile) {
                     TeamMember::updateOrCreate(
                         [
                             'team_id' => $team->id,
-                            'employee_id' => $newLeader->employeeProfile->id,
+                            'employee_id' => $newLeader->staffMemberProfile->id,
                         ],
                         [
                             'joined_at' => now(),
@@ -175,21 +175,21 @@ class TeamRepository implements TeamRepositoryInterface
 
             if ($team->team_lead_id && $team->team_lead_id !== $oldLeaderId) {
                 if ($oldLeaderId) {
-                    $oldLeader = User::with('employeeProfile')->find($oldLeaderId);
-                    if ($oldLeader && $oldLeader->employeeProfile) {
+                    $oldLeader = User::with('staffMemberProfile')->find($oldLeaderId);
+                    if ($oldLeader && $oldLeader->staffMemberProfile) {
                         TeamMember::where('team_id', $team->id)
-                            ->where('employee_id', $oldLeader->employeeProfile->id)
+                            ->where('employee_id', $oldLeader->staffMemberProfile->id)
                             ->whereNull('left_at')
                             ->update(['left_at' => now()]);
                     }
                 }
 
-                $newLeader = User::with('employeeProfile')->find($team->team_lead_id);
-                if ($newLeader && $newLeader->employeeProfile) {
+                $newLeader = User::with('staffMemberProfile')->find($team->team_lead_id);
+                if ($newLeader && $newLeader->staffMemberProfile) {
                     TeamMember::updateOrCreate(
                         [
                             'team_id' => $team->id,
-                            'employee_id' => $newLeader->employeeProfile->id,
+                            'employee_id' => $newLeader->staffMemberProfile->id,
                         ],
                         [
                             'joined_at' => now(),
@@ -470,7 +470,7 @@ class TeamRepository implements TeamRepositoryInterface
                 );
             });
 
-            return $member->load(['employee', 'employee.user', 'employee.jobInformation']);
+            return $member->load(['staffMember', 'staffMember.user', 'staffMember.jobInformation']);
         });
     }
 
@@ -521,7 +521,7 @@ class TeamRepository implements TeamRepositoryInterface
                 );
             });
 
-            return $member->load(['employee', 'employee.user', 'employee.jobInformation']);
+            return $member->load(['staffMember', 'staffMember.user', 'staffMember.jobInformation']);
         });
     }
 

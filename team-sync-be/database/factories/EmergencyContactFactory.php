@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -32,7 +32,7 @@ class EmergencyContactFactory extends Factory
         ];
 
         return [
-            'employee_id' => EmployeeProfile::factory(),
+            'employee_id' => StaffMemberProfile::factory(),
             'full_name' => fake()->name(),
             'relationship' => fake()->randomElement($relationships),
             'phone' => fake()->phoneNumber(),
@@ -73,7 +73,7 @@ class EmergencyContactFactory extends Factory
     /**
      * Assign to specific employee
      */
-    public function forEmployee(EmployeeProfile $employee): static
+    public function forEmployee(StaffMemberProfile $employee): static
     {
         return $this->state(fn (array $attributes) => [
             'employee_id' => $employee->id,

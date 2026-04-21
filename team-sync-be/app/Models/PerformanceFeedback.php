@@ -26,14 +26,14 @@ class PerformanceFeedback extends Model
         'acknowledged_at' => 'datetime',
     ];
 
-    public function employee(): BelongsTo
+    public function staffMember(): BelongsTo
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 
     public function giver(): BelongsTo
     {
-        return $this->belongsTo(EmployeeProfile::class, 'given_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'given_by');
     }
 
     public function linkedGoal(): BelongsTo

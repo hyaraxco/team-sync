@@ -33,7 +33,7 @@ class ProjectResource extends JsonResource
             'photo' => $this->photo ? asset('storage/'.$this->photo) : null,
             'budget' => (float) (string) $this->budget,
             'progress' => $progress,
-            'leader' => new EmployeeProfileResource($this->projectLeader),
+            'leader' => new StaffMemberProfileResource($this->projectLeader),
             'teams' => TeamResource::collection($this->whenLoaded('teams')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

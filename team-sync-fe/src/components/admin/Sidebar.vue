@@ -130,12 +130,12 @@ const onNavigate = () => emit("navigate");
 
           <!-- 3. Employees (HR/Manager core) -->
           <RouterLink
-            :to="{ name: 'admin.employees' }"
+            :to="{ name: 'admin.staffMembers' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
               'nav-link-active': $route.name?.startsWith('admin.employee'),
             }"
-            v-if="can('employee-menu')"
+            v-if="can('staff-member-menu')"
             @click="onNavigate"
           >
             <UsersIcon
@@ -399,12 +399,12 @@ const onNavigate = () => emit("navigate");
 
           <!-- 1. My Attendance (daily check-in/out) -->
           <RouterLink
-            :to="{ name: 'employee.attendance.my-attendances' }"
+            :to="{ name: 'staffMember.attendance.my-attendances' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
               'nav-link-active':
-                $route.name === 'employee.attendance.my-attendances' ||
-                $route.name === 'employee.attendance.clock',
+                $route.name === 'staffMember.attendance.my-attendances' ||
+                $route.name === 'staffMember.attendance.clock',
             }"
             v-if="canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
             @click="onNavigate"
@@ -413,16 +413,16 @@ const onNavigate = () => emit("navigate");
               class="w-5 h-5 text-gray-600"
               :class="{
                 'text-white':
-                  $route.name === 'employee.attendance.my-attendances' ||
-                  $route.name === 'employee.attendance.clock',
+                  $route.name === 'staffMember.attendance.my-attendances' ||
+                  $route.name === 'staffMember.attendance.clock',
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
                 'text-brand-white':
-                  $route.name === 'employee.attendance.my-attendances' ||
-                  $route.name === 'employee.attendance.clock',
+                  $route.name === 'staffMember.attendance.my-attendances' ||
+                  $route.name === 'staffMember.attendance.clock',
               }"
               >My Attendance</span
             >
@@ -430,10 +430,10 @@ const onNavigate = () => emit("navigate");
 
           <!-- 2. My Team (frequent collaboration) -->
           <RouterLink
-            :to="{ name: 'employee.team' }"
+            :to="{ name: 'staffMember.team' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
-              'nav-link-active': $route.name === 'employee.team',
+              'nav-link-active': $route.name === 'staffMember.team',
             }"
             v-if="can('team-view')"
             @click="onNavigate"
@@ -441,13 +441,13 @@ const onNavigate = () => emit("navigate");
             <UsersIcon
               class="w-5 h-5 text-gray-600"
               :class="{
-                'text-white': $route.name === 'employee.team',
+                'text-white': $route.name === 'staffMember.team',
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
-                'text-brand-white': $route.name === 'employee.team',
+                'text-brand-white': $route.name === 'staffMember.team',
               }"
               >My Team</span
             >
@@ -455,10 +455,10 @@ const onNavigate = () => emit("navigate");
 
           <!-- 3. My Payroll (monthly) -->
           <RouterLink
-            :to="{ name: 'employee.payroll' }"
+            :to="{ name: 'staffMember.payroll' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
-              'nav-link-active': $route.name?.startsWith('employee.payroll') || $route.name?.startsWith('employee.payslips'),
+              'nav-link-active': $route.name?.startsWith('staffMember.payroll') || $route.name?.startsWith('staffMember.payslips'),
             }"
             v-if="can('payslip-view')"
             @click="onNavigate"
@@ -466,14 +466,14 @@ const onNavigate = () => emit("navigate");
             <WalletIcon
               class="w-5 h-5 text-gray-600"
               :class="{
-                'text-white': $route.name?.startsWith('employee.payroll') || $route.name?.startsWith('employee.payslips'),
+                'text-white': $route.name?.startsWith('staffMember.payroll') || $route.name?.startsWith('staffMember.payslips'),
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
                 'text-brand-white':
-                  $route.name?.startsWith('employee.payroll') || $route.name?.startsWith('employee.payslips'),
+                  $route.name?.startsWith('staffMember.payroll') || $route.name?.startsWith('staffMember.payslips'),
               }"
               >My Payroll</span
             >
@@ -481,10 +481,10 @@ const onNavigate = () => emit("navigate");
 
           <!-- 4. My Profile (rarely used) -->
           <RouterLink
-            :to="{ name: 'employee.profile' }"
+            :to="{ name: 'staffMember.profile' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
-              'nav-link-active': $route.name === 'employee.profile',
+              'nav-link-active': $route.name === 'staffMember.profile',
             }"
             v-if="can('profile-menu')"
             @click="onNavigate"
@@ -492,13 +492,13 @@ const onNavigate = () => emit("navigate");
             <UserIcon
               class="w-5 h-5 text-gray-600"
               :class="{
-                'text-white': $route.name === 'employee.profile',
+                'text-white': $route.name === 'staffMember.profile',
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
-                'text-brand-white': $route.name === 'employee.profile',
+                'text-brand-white': $route.name === 'staffMember.profile',
               }"
               >My Profile</span
             >

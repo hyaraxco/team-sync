@@ -7,7 +7,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
@@ -76,7 +76,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     ): Builder|QueryBuilder|Collection {
         $query = Payroll::with(['payrollDetails', 'payrollSettingVersion'])
             ->when($search, function ($query) use ($search) {
-                $query->whereHas('payrollDetails.employee', function ($q) use ($search) {
+                $query->whereHas('payrollDetails.staffMember', function ($q) use ($search) {
                     $q->whereHas('user', function ($userQuery) use ($search) {
                         $userQuery->where('name', 'like', '%' . $search . '%');
                     })
@@ -123,9 +123,9 @@ class PayrollRepository implements PayrollRepositoryInterface
 
         // Get paginated details with optimized eager loading
         $paginated = PayrollDetail::with([
-            'employee.user',
-            'employee.jobInformation.team',
-            'employee.bankInformation',
+            'staffMember.user',
+            'staffMember.jobInformation.team',
+            'staffMember.bankInformation',
             'payroll',
         ])
             ->where('payroll_id', $payrollId)
@@ -189,7 +189,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 'status' => 'processing',
             ]);
 
-            $activeEmployees = EmployeeProfile::with(['jobInformation', 'user'])
+            $activeEmployees = StaffMemberProfile::with(['jobInformation', 'user'])
                 ->whereIn('id', $readiness['meta']['employee_ids_with_attendance'] ?? [])
                 ->whereHas('jobInformation', function ($query) {
                     $query->where('status', 'active');
@@ -348,9 +348,9 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             return $payroll->load([
                 'payrollSettingVersion.updatedBy',
-                'payrollDetails.employee.user',
-                'payrollDetails.employee.jobInformation.team',
-                'payrollDetails.employee.bankInformation',
+                'payrollDetails.staffMember.user',
+                'payrollDetails.staffMember.jobInformation.team',
+                'payrollDetails.staffMember.bankInformation',
             ]);
         });
     }
@@ -367,7 +367,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         $month = Carbon::createFromFormat('Y-m', $salaryMonth)->startOfMonth();
         $readiness = $this->buildGenerateReadiness($month);
 
-        $activeEmployeeIds = EmployeeProfile::query()
+        $activeEmployeeIds = StaffMemberProfile::query()
             ->whereHas('jobInformation', function ($query) {
                 $query->where('status', 'active');
             })
@@ -424,8 +424,8 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         $payroll = Payroll::query()
             ->with([
-                'payrollDetails.employee.user',
-                'payrollDetails.employee.bankInformation',
+                'payrollDetails.staffMember.user',
+                'payrollDetails.staffMember.bankInformation',
             ])
             ->findOrFail($payrollId);
 
@@ -467,8 +467,8 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
 
             return $payrollDetail->load([
-                'employee.user',
-                'employee.jobInformation.team',
+                'staffMember.user',
+                'staffMember.jobInformation.team',
                 'payroll',
             ]);
         });
@@ -675,7 +675,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->findOrFail($payrollId);
 
         $deliveries = PayrollNotificationDelivery::query()
-            ->with(['employee.user'])
+            ->with(['staffMember.user'])
             ->where('payroll_id', $payrollId)
             ->orderByDesc('id')
             ->get();
@@ -712,8 +712,8 @@ class PayrollRepository implements PayrollRepositoryInterface
                 return [
                     'payroll_detail_id' => (int) $delivery->payroll_detail_id,
                     'employee_id' => $delivery->employee_id ? (int) $delivery->employee_id : null,
-                    'employee_name' => $delivery->employee?->user?->name,
-                    'employee_code' => $delivery->employee?->code,
+                    'employee_name' => $delivery->staffMember?->user?->name,
+                    'employee_code' => $delivery->staffMember?->code,
                     'recipient_email' => $delivery->recipient_email,
                     'delivery_status' => $delivery->delivery_status,
                     'trigger_type' => $delivery->trigger_type,
@@ -943,8 +943,8 @@ class PayrollRepository implements PayrollRepositoryInterface
             $query = PayrollDetail::query()
                 ->with([
                     'payroll',
-                    'employee.user',
-                    'employee.jobInformation.team',
+                    'staffMember.user',
+                    'staffMember.jobInformation.team',
                 ])
                 ->whereHas('payroll', function ($payrollQuery) use ($status, $periodType, $filters) {
                     if ($status !== 'all') {
@@ -967,7 +967,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             return $query->get()->map(function (PayrollDetail $detail) {
                 $payroll = $detail->payroll;
-                $employee = $detail->employee;
+                $employee = $detail->staffMember;
                 $jobInformation = $employee?->jobInformation;
 
                 return [
@@ -1111,7 +1111,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ];
         }
 
-        $activeEmployeeIds = EmployeeProfile::query()
+        $activeEmployeeIds = StaffMemberProfile::query()
             ->whereHas('jobInformation', function ($query) {
                 $query->where('status', 'active');
             })
@@ -1273,7 +1273,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     private function loadActiveEmployeesForReadiness(array $activeEmployeeIds): SupportCollection
     {
-        return EmployeeProfile::query()
+        return StaffMemberProfile::query()
             ->with([
                 'user',
                 'jobInformation.team',
@@ -1287,7 +1287,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     }
 
     /**
-     * @param  SupportCollection<int, EmployeeProfile>  $employees
+     * @param  SupportCollection<int, StaffMemberProfile>  $employees
      * @return array{
      *   attendance_date_lookup_by_employee: SupportCollection<int, array<string, bool>>,
      *   pending_lookup: array<int, bool>,
@@ -1409,7 +1409,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     private function getEntitlementsLookup(SupportCollection $employees): SupportCollection
     {
         $employmentTypes = $employees
-            ->map(fn (EmployeeProfile $employee) => $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
+            ->map(fn (StaffMemberProfile $employee) => $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
             ->unique()
             ->values()
             ->all();
@@ -1447,7 +1447,7 @@ class PayrollRepository implements PayrollRepositoryInterface
      *   warning_flags: array<int, string>
      * }
      */
-    private function buildEmployeeReadinessRow(EmployeeProfile $employee, Carbon $startDate, Carbon $endDate, array $lookups): array
+    private function buildEmployeeReadinessRow(StaffMemberProfile $employee, Carbon $startDate, Carbon $endDate, array $lookups): array
     {
         $employeeId = (int) $employee->id;
         $employmentType = $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time'));
@@ -1601,7 +1601,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         };
     }
 
-    private function resolveScheduledWeekdays(EmployeeProfile $employee, string $employmentType): array
+    private function resolveScheduledWeekdays(StaffMemberProfile $employee, string $employmentType): array
     {
         $policyWeekdays = $employee->jobInformation?->attendancePolicy?->default_working_weekdays;
 
@@ -1796,8 +1796,8 @@ class PayrollRepository implements PayrollRepositoryInterface
     private function buildPayrollReconciliationPayload(Payroll $payroll, array $filters = []): array
     {
         $payroll->loadMissing([
-            'payrollDetails.employee.user',
-            'payrollDetails.employee.bankInformation',
+            'payrollDetails.staffMember.user',
+            'payrollDetails.staffMember.bankInformation',
         ]);
 
         $exceptions = [];
@@ -1806,7 +1806,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
         foreach ($payroll->payrollDetails as $payrollDetail) {
             /** @var PayrollDetail $payrollDetail */
-            $employee = $payrollDetail->employee;
+            $employee = $payrollDetail->staffMember;
             $employeeId = (int) $payrollDetail->employee_id;
             $employeeName = $employee?->user?->name ?? 'Unknown employee';
             $employeeCode = $employee?->code;

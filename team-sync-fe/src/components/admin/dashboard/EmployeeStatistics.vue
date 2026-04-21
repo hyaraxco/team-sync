@@ -20,7 +20,7 @@ import MainCard from "@/components/common/MainCard.vue";
 import { useAuthStore } from "@/stores/auth";
 import { axiosInstance } from "@/plugins/axios";
 import { useTaskStore } from "@/stores/task";
-import { useEmployeeStore } from "@/stores/employee";
+import { useStaffMemberStore } from "@/stores/staffMember";
 import { useNotificationStore } from "@/stores/notifications";
 import { RouterLink, useRouter } from "vue-router";
 import { getTimeAgo } from "@/utils/dateUtils";
@@ -47,7 +47,7 @@ const statistics = ref({
 });
 
 const taskStore = useTaskStore();
-const employeeStore = useEmployeeStore();
+const staffMemberStore = useStaffMemberStore();
 const currentEmployeeId = computed(
   () => authStore.user?.employee_profile?.id ?? authStore.user?.employeeProfile?.id ?? null
 );
@@ -331,7 +331,7 @@ const fetchMyStatistics = async () => {
 onMounted(() => {
   fetchMyStatistics();
   fetchRecentActivities();
-  employeeStore
+  staffMemberStore
     .fetchMyTeamProjects()
     .then((projects: any[]) => {
       const firstProjectId =

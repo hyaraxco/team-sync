@@ -7,7 +7,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
 use App\Models\Payroll;
 use App\Models\PayrollSetting;
@@ -117,8 +117,8 @@ class PayrollGenerateRulesTest extends TestCase
         PayrollSetting::current()->update([
             'attendance_cutoff_day' => 25,
         ]);
-        EmployeeProfile::withoutSyncingToSearch(function () {
-            $employee = EmployeeProfile::factory()->create();
+        StaffMemberProfile::withoutSyncingToSearch(function () {
+            $employee = StaffMemberProfile::factory()->create();
             $employee->jobInformation()->create([
                 'employee_id' => $employee->id,
                 'job_title' => 'QA Engineer',
@@ -541,10 +541,10 @@ class PayrollGenerateRulesTest extends TestCase
         return $user;
     }
 
-    private function createActiveEmployeeWithAttendance(Carbon $month): EmployeeProfile
+    private function createActiveEmployeeWithAttendance(Carbon $month): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($month) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($month) {
+            $employee = StaffMemberProfile::factory()->create();
             $startDate = $month->copy()->startOfMonth();
             $endDate = $month->copy()->endOfMonth();
 

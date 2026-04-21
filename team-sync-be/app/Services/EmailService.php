@@ -58,7 +58,7 @@ class EmailService
             return;
         }
 
-        $isNonManagerEmployee = $user->hasRole('employee')
+        $isNonManagerEmployee = $user->hasRole('staff')
             && ! $user->hasRole('manager')
             && ! $user->hasRole('hr')
             && ! $user->hasRole('finance');
@@ -127,8 +127,8 @@ class EmailService
         ?int $actorUserId = null,
         ?string $actorName = null,
     ): void {
-        $task->loadMissing(['assignee.user', 'project.projectLeader.user', 'comments.employee.user']);
-        $comment->loadMissing('employee.user');
+        $task->loadMissing(['assignee.user', 'project.projectLeader.user', 'comments.staffMember.user']);
+        $comment->loadMissing('staffMember.user');
 
         $commentSnippet = trim((string) $comment->comment);
         if ($commentSnippet !== '') {
@@ -163,7 +163,7 @@ class EmailService
         ?int $actorUserId = null,
         ?string $actorName = null,
     ): void {
-        $task->loadMissing(['assignee.user', 'project.projectLeader.user', 'comments.employee.user']);
+        $task->loadMissing(['assignee.user', 'project.projectLeader.user', 'comments.staffMember.user']);
 
         $recipients = $this->resolveTaskStakeholderRecipients($task, $actorUserId);
 
@@ -194,14 +194,14 @@ class EmailService
     ): void {
         $project->loadMissing([
             'projectLeader.user',
-            'teams.members.employee.user',
+            'teams.members.staffMember.user',
         ]);
 
         $projectLeaderUser = $project->projectLeader?->user;
 
         $teamMemberUsers = $project->teams
             ->flatMap(fn (Team $team) => $team->members)
-            ->map(fn (TeamMember $member) => $member->employee?->user)
+            ->map(fn (TeamMember $member) => $member->staffMember?->user)
             ->filter(fn ($user) => $user instanceof User)
             ->values();
 
@@ -213,7 +213,7 @@ class EmailService
         $recipients = $recipients
             ->filter(fn ($user) => $user instanceof User)
             ->filter(function (User $user): bool {
-                return $user->hasRole('employee') && ! $user->hasRole('finance');
+                return $user->hasRole('staff') && ! $user->hasRole('finance');
             })
             ->reject(function (User $user) use ($actorUserId): bool {
                 return $actorUserId !== null && (int) $user->id === $actorUserId;
@@ -244,11 +244,11 @@ class EmailService
         ?string $actorName = null,
     ): void {
         $team->loadMissing('leader');
-        $member->loadMissing('employee.user');
+        $member->loadMissing('staffMember.user');
 
-        $memberUser = $member->employee?->user;
+        $memberUser = $member->staffMember?->user;
         $leaderUser = $team->leader;
-        $memberName = (string) ($memberUser?->name ?: ($member->employee?->code ?: 'Employee'));
+        $memberName = (string) ($memberUser?->name ?: ($member->staffMember?->code ?: 'Employee'));
         $teamName = (string) $team->name;
 
         $recipients = collect([$memberUser, $leaderUser])
@@ -281,11 +281,11 @@ class EmailService
         ?string $actorName = null,
     ): void {
         $team->loadMissing('leader');
-        $member->loadMissing('employee.user');
+        $member->loadMissing('staffMember.user');
 
-        $memberUser = $member->employee?->user;
+        $memberUser = $member->staffMember?->user;
         $leaderUser = $team->leader;
-        $memberName = (string) ($memberUser?->name ?: ($member->employee?->code ?: 'Employee'));
+        $memberName = (string) ($memberUser?->name ?: ($member->staffMember?->code ?: 'Employee'));
         $teamName = (string) $team->name;
 
         $recipients = collect([$memberUser, $leaderUser])
@@ -355,11 +355,11 @@ class EmailService
         ?int $actorUserId = null,
         ?string $actorName = null,
     ): void {
-        $team->loadMissing(['leader', 'members.employee.user']);
+        $team->loadMissing(['leader', 'members.staffMember.user']);
 
         $leaderUser = $team->leader;
         $memberUsers = $team->members
-            ->map(fn (TeamMember $member) => $member->employee?->user)
+            ->map(fn (TeamMember $member) => $member->staffMember?->user)
             ->filter(fn ($user) => $user instanceof User)
             ->values();
 
@@ -394,9 +394,9 @@ class EmailService
 
     public function sendAttendanceCheckedInNotification(Attendance $attendance): void
     {
-        $attendance->loadMissing('employee.user');
+        $attendance->loadMissing('staffMember.user');
 
-        $user = $attendance->employee?->user;
+        $user = $attendance->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;
@@ -407,9 +407,9 @@ class EmailService
 
     public function sendAttendanceCheckedOutNotification(Attendance $attendance): void
     {
-        $attendance->loadMissing('employee.user');
+        $attendance->loadMissing('staffMember.user');
 
-        $user = $attendance->employee?->user;
+        $user = $attendance->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;
@@ -420,7 +420,7 @@ class EmailService
 
     public function sendAttendanceMismatchAcknowledgedNotification(AttendancePolicyMismatch $mismatch): void
     {
-        $mismatch->loadMissing(['employee.user', 'acknowledgedBy.user']);
+        $mismatch->loadMissing(['staffMember.user', 'acknowledgedBy.user']);
 
         $this->sendAttendanceMismatchStatusChangedNotification(
             $mismatch,
@@ -430,7 +430,7 @@ class EmailService
 
     public function sendAttendanceMismatchResolvedNotification(AttendancePolicyMismatch $mismatch): void
     {
-        $mismatch->loadMissing(['employee.user', 'resolvedBy.user']);
+        $mismatch->loadMissing(['staffMember.user', 'resolvedBy.user']);
 
         $this->sendAttendanceMismatchStatusChangedNotification(
             $mismatch,
@@ -440,11 +440,11 @@ class EmailService
 
     public function sendAttendanceMismatchEscalatedNotification(AttendancePolicyMismatch $mismatch): void
     {
-        $mismatch->loadMissing(['employee.user', 'employee.jobInformation']);
+        $mismatch->loadMissing(['staffMember.user', 'staffMember.jobInformation']);
 
         $this->sendAttendanceMismatchStatusChangedNotification($mismatch, 'System');
 
-        $employeeUserId = (int) ($mismatch->employee?->user?->id ?? 0);
+        $employeeUserId = (int) ($mismatch->staffMember?->user?->id ?? 0);
         $hrRecipients = $this->resolveHrRecipients($employeeUserId > 0 ? $employeeUserId : null);
 
         foreach ($hrRecipients as $recipient) {
@@ -462,9 +462,9 @@ class EmailService
 
     public function sendAttendanceMismatchCreatedNotification(AttendancePolicyMismatch $mismatch): void
     {
-        $mismatch->loadMissing(['employee.user', 'employee.jobInformation']);
+        $mismatch->loadMissing(['staffMember.user', 'staffMember.jobInformation']);
 
-        $employeeUser = $mismatch->employee?->user;
+        $employeeUser = $mismatch->staffMember?->user;
 
         if ($employeeUser instanceof User && $employeeUser->email) {
             $employeeUser->notify(AttendanceMismatchStatusChanged::fromMismatch($mismatch, 'System'));
@@ -472,7 +472,7 @@ class EmailService
 
         $managerRecipients = $this->resolveManagersForEmployee(
             (int) $mismatch->employee_id,
-            $mismatch->employee?->jobInformation?->team_id,
+            $mismatch->staffMember?->jobInformation?->team_id,
         );
 
         $managerRecipients = $managerRecipients
@@ -500,7 +500,7 @@ class EmailService
         AttendancePolicyMismatch $mismatch,
         ?string $actorName = null,
     ): void {
-        $user = $mismatch->employee?->user;
+        $user = $mismatch->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;
@@ -517,7 +517,7 @@ class EmailService
         $assigneeUser = $task->assignee?->user;
         $projectLeaderUser = $task->project?->projectLeader?->user;
         $commenterUsers = $task->comments
-            ->map(fn (ProjectTaskComment $comment) => $comment->employee?->user)
+            ->map(fn (ProjectTaskComment $comment) => $comment->staffMember?->user)
             ->filter(fn ($user) => $user instanceof User)
             ->values();
 
@@ -594,9 +594,9 @@ class EmailService
      */
     public function sendLeaveRequestCreatedNotification(LeaveRequest $leaveRequest): void
     {
-        $leaveRequest->loadMissing(['employee.user', 'employee.jobInformation']);
+        $leaveRequest->loadMissing(['staffMember.user', 'staffMember.jobInformation']);
 
-        $requester = $leaveRequest->employee?->user;
+        $requester = $leaveRequest->staffMember?->user;
 
         if ($requester && $requester->email) {
             $requester->notify(new LeaveRequestCreated($leaveRequest));
@@ -619,7 +619,7 @@ class EmailService
      */
     public function sendLeaveRequestApprovedNotification(LeaveRequest $leaveRequest): void
     {
-        $user = $leaveRequest->employee?->user;
+        $user = $leaveRequest->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;
@@ -633,7 +633,7 @@ class EmailService
      */
     public function sendLeaveRequestRejectedNotification(LeaveRequest $leaveRequest): void
     {
-        $user = $leaveRequest->employee?->user;
+        $user = $leaveRequest->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;
@@ -644,9 +644,9 @@ class EmailService
 
     public function sendLeaveProofUploadedNotification(LeaveRequest $leaveRequest, ?int $actorUserId = null): void
     {
-        $leaveRequest->loadMissing(['employee.user', 'employee.jobInformation']);
+        $leaveRequest->loadMissing(['staffMember.user', 'staffMember.jobInformation']);
 
-        $uploaderName = $leaveRequest->employee?->user?->name;
+        $uploaderName = $leaveRequest->staffMember?->user?->name;
         $reviewers = $this->resolveLeaveReviewRecipients($leaveRequest, $actorUserId);
 
         foreach ($reviewers as $reviewer) {
@@ -660,9 +660,9 @@ class EmailService
 
     public function sendLeaveProofReviewedNotification(LeaveRequest $leaveRequest, ?int $actorUserId = null): void
     {
-        $leaveRequest->loadMissing(['employee.user', 'proofReviewedBy.user']);
+        $leaveRequest->loadMissing(['staffMember.user', 'proofReviewedBy.user']);
 
-        $requester = $leaveRequest->employee?->user;
+        $requester = $leaveRequest->staffMember?->user;
 
         if (! $requester || ! $requester->email) {
             return;
@@ -690,7 +690,7 @@ class EmailService
         }
 
         $teamIds = [];
-        $jobTeamId = $leaveRequest->employee?->jobInformation?->team_id;
+        $jobTeamId = $leaveRequest->staffMember?->jobInformation?->team_id;
 
         if (is_numeric($jobTeamId) && (int) $jobTeamId > 0) {
             $teamIds[] = (int) $jobTeamId;
@@ -737,7 +737,7 @@ class EmailService
 
     private function resolveTeamNotificationActionUrl(User $recipient, int $teamId): string
     {
-        $isPureEmployee = $recipient->hasRole('employee')
+        $isPureEmployee = $recipient->hasRole('staff')
             && ! $recipient->hasRole('manager')
             && ! $recipient->hasRole('hr')
             && ! $recipient->hasRole('finance');
@@ -757,7 +757,7 @@ class EmailService
         Payroll::findOrFail($payrollId);
 
         $payrollDetails = PayrollDetail::where('payroll_id', $payrollId)
-            ->with('employee.user')
+            ->with('staffMember.user')
             ->get();
 
         foreach ($payrollDetails as $payrollDetail) {
@@ -765,7 +765,7 @@ class EmailService
                 continue;
             }
 
-            $user = $payrollDetail->employee?->user;
+            $user = $payrollDetail->staffMember?->user;
             $recipientEmail = $user?->email;
 
             $basePayload = [
@@ -815,9 +815,9 @@ class EmailService
      */
     public function sendAttendanceCorrectionCreatedNotification(AttendanceCorrection $correction): void
     {
-        $correction->loadMissing(['employee.user', 'attendance']);
+        $correction->loadMissing(['staffMember.user', 'attendance']);
 
-        $requester = $correction->employee?->user;
+        $requester = $correction->staffMember?->user;
         $requesterName = $requester?->name;
         $date = optional($correction->attendance)->date ?? now()->toDateString();
 
@@ -842,9 +842,9 @@ class EmailService
      */
     public function sendAttendanceCorrectionApprovedNotification(AttendanceCorrection $correction): void
     {
-        $correction->loadMissing(['employee.user', 'attendance']);
+        $correction->loadMissing(['staffMember.user', 'attendance']);
 
-        $user = $correction->employee?->user;
+        $user = $correction->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;
@@ -858,9 +858,9 @@ class EmailService
      */
     public function sendAttendanceCorrectionRejectedNotification(AttendanceCorrection $correction): void
     {
-        $correction->loadMissing(['employee.user', 'attendance']);
+        $correction->loadMissing(['staffMember.user', 'attendance']);
 
-        $user = $correction->employee?->user;
+        $user = $correction->staffMember?->user;
 
         if (! $user || ! $user->email) {
             return;

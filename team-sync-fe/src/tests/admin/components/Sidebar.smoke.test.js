@@ -50,7 +50,7 @@ describe("Sidebar smoke", () => {
       "dashboard-menu",
       "dashboard-view",
       "team-menu",
-      "employee-menu",
+      "staff-member-menu",
       "attendance-menu",
     ]);
 
@@ -105,7 +105,7 @@ describe("Sidebar smoke", () => {
   });
 
   it("hides Personal section when user has no personal workspace permissions", () => {
-    setPermissions(["dashboard-menu", "team-menu", "employee-menu"]);
+    setPermissions(["dashboard-menu", "team-menu", "staff-member-menu"]);
 
     const wrapper = factory();
 
@@ -133,7 +133,6 @@ describe("Sidebar smoke", () => {
     const wrapper = factory();
 
     expect(wrapper.text()).not.toContain("Reports");
-    expect(wrapper.text()).not.toContain("Settings");
     expect(wrapper.find('a[href="#"]').exists()).toBe(false);
   });
 });

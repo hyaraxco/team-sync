@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\User;
@@ -183,7 +183,7 @@ class PayrollAuthorizationTest extends TestCase
     public function test_employee_has_no_admin_payroll_access(): void
     {
         Queue::fake();
-        $user = $this->actingAsRole('employee');
+        $user = $this->actingAsRole('staff');
         $payrollDetail = $this->createPayrollDetail();
 
         $this->getJson('/api/v1/payrolls/all/paginated')->assertForbidden();
@@ -237,12 +237,12 @@ class PayrollAuthorizationTest extends TestCase
 
     private function createPayrollDetail(): PayrollDetail
     {
-        $employeeProfile = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
-        $employeeProfile->bankInformation()->create([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->create([
+            'employee_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '1122334455',
             'account_holder_name' => 'Payroll Authorization User',
@@ -256,7 +256,7 @@ class PayrollAuthorizationTest extends TestCase
 
         return PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,
@@ -266,15 +266,15 @@ class PayrollAuthorizationTest extends TestCase
         ]);
     }
 
-    private function createActiveEmployeeWithAttendance(string $salaryMonth): EmployeeProfile
+    private function createActiveEmployeeWithAttendance(string $salaryMonth): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($salaryMonth) {
-            $employeeProfile = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($salaryMonth) {
+            $staffMemberProfile = StaffMemberProfile::factory()->create();
             $month = Carbon::createFromFormat('Y-m', $salaryMonth)->startOfMonth();
             $monthEnd = $month->copy()->endOfMonth();
 
-            $employeeProfile->jobInformation()->create([
-                'employee_id' => $employeeProfile->id,
+            $staffMemberProfile->jobInformation()->create([
+                'employee_id' => $staffMemberProfile->id,
                 'job_title' => 'HR Specialist',
                 'years_experience' => 4,
                 'status' => 'active',
@@ -289,7 +289,7 @@ class PayrollAuthorizationTest extends TestCase
             while ($cursor->lte($monthEnd)) {
                 if (! $cursor->isWeekend()) {
                     Attendance::create([
-                        'employee_id' => $employeeProfile->id,
+                        'employee_id' => $staffMemberProfile->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d').' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d').' 17:00:00',
@@ -301,7 +301,7 @@ class PayrollAuthorizationTest extends TestCase
                 $cursor->addDay();
             }
 
-            return $employeeProfile;
+            return $staffMemberProfile;
         });
     }
 }

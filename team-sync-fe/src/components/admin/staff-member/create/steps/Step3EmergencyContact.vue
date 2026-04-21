@@ -1,0 +1,127 @@
+<script setup lang="ts">
+import { computed } from "vue";
+import {
+  User,
+  Phone,
+  Mail,
+} from "lucide-vue-next";
+import { Input } from "@/components/common/form";
+import RightSidebarStep3 from "@/components/admin/staff-member/create/RightSidebarStep3.vue";
+
+interface Props {
+  modelValue: {
+    emergency_contact_name: string;
+    emergency_contact_relationship: string;
+    emergency_contact_phone: string;
+    emergency_contact_email: string;
+  };
+  errors?: any;
+}
+
+const props = defineProps<Props>();
+const emit = defineEmits(["update:modelValue"]);
+
+const form = computed({
+  get: () => props.modelValue,
+  set: (value) => emit("update:modelValue", value),
+});
+</script>
+
+<template>
+  <div class="flex flex-col 2xl:flex-row gap-5 items-stretch 2xl:items-start pr-0">
+    <div class="flex-1 w-full space-y-6">
+      <!-- Emergency Contact Section -->
+      <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="flex items-center gap-3 mb-6">
+          <div
+            class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center"
+          >
+            <Phone class="w-6 h-6 text-red-600" />
+          </div>
+          <div>
+            <h3 class="text-brand-dark text-xl font-bold">Emergency Contact</h3>
+            <p class="text-brand-light text-sm font-normal">
+              Person to contact in case of emergency
+            </p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          <!-- Emergency Contact Name -->
+          <div class="mb-4">
+            <Input
+              id="emergency_contact_name"
+              name="emergency_contact_name"
+              v-model="form.emergency_contact_name"
+              label="Full Name *"
+              placeholder="Emergency contact name"
+              :error="
+                props.errors?.['emergency_contacts.0.full_name']?.join(', ')
+              "
+              required
+            >
+              <template #icon>
+                <User class="w-5 h-5 text-gray-400" />
+              </template>
+            </Input>
+          </div>
+
+          <!-- Emergency Contact Relationship -->
+          <div class="mb-4">
+            <Input
+              id="emergency_contact_relationship"
+              name="emergency_contact_relationship"
+              v-model="form.emergency_contact_relationship"
+              label="Relationship *"
+              placeholder="e.g., Spouse, Parent, Sibling"
+              :error="
+                props.errors?.['emergency_contacts.0.relationship']?.join(', ')
+              "
+              required
+            >
+              <template #icon>
+                <User class="w-5 h-5 text-gray-400" />
+              </template>
+            </Input>
+          </div>
+
+          <!-- Emergency Contact Phone -->
+          <div class="mb-4">
+            <Input
+              id="emergency_contact_phone"
+              name="emergency_contact_phone"
+              v-model="form.emergency_contact_phone"
+              label="Phone Number *"
+              placeholder="+1 (555) 123-4567"
+              :error="props.errors?.['emergency_contacts.0.phone']?.join(', ')"
+              required
+            >
+              <template #icon>
+                <Phone class="w-5 h-5 text-gray-400" />
+              </template>
+            </Input>
+          </div>
+
+          <!-- Emergency Contact Email -->
+          <div class="mb-4">
+            <Input
+              id="emergency_contact_email"
+              name="emergency_contact_email"
+              v-model="form.emergency_contact_email"
+              label="Email Address"
+              placeholder="emergency@email.com"
+              type="email"
+              :error="props.errors?.['emergency_contacts.0.email']?.join(', ')"
+            >
+              <template #icon>
+                <Mail class="w-5 h-5 text-gray-400" />
+              </template>
+            </Input>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <RightSidebarStep3 />
+  </div>
+</template>

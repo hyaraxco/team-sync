@@ -37,9 +37,9 @@ class PerformanceGoal extends Model
         'completion_percentage' => 'integer',
     ];
 
-    public function employee(): BelongsTo
+    public function staffMember(): BelongsTo
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 
     public function creator(): BelongsTo
@@ -49,7 +49,7 @@ class PerformanceGoal extends Model
 
     public function assigner(): BelongsTo
     {
-        return $this->belongsTo(EmployeeProfile::class, 'assigned_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'assigned_by');
     }
 
     public function linkedReview(): BelongsTo

@@ -41,9 +41,9 @@ class PayrollExport implements FromCollection, ShouldAutoSize, WithEvents, WithH
     {
         return PayrollDetail::where('payroll_id', $this->payrollId)
             ->with([
-                'employee.user',
-                'employee.jobInformation.team',
-                'employee.bankInformation',
+                'staffMember.user',
+                'staffMember.jobInformation.team',
+                'staffMember.bankInformation',
             ])
             ->orderBy('final_salary', 'desc')
             ->get();
@@ -84,13 +84,13 @@ class PayrollExport implements FromCollection, ShouldAutoSize, WithEvents, WithH
 
         return [
             $this->rowNumber,
-            $detail->employee->user->name ?? 'N/A',
-            $detail->employee->code ?? $detail->employee->id,
-            $detail->employee->jobInformation->job_title ?? 'N/A',
-            $detail->employee->jobInformation->team->name ?? 'N/A',
-            $detail->employee->bankInformation->bank_name ?? 'N/A',
-            $detail->employee->bankInformation->account_number ?? 'N/A',
-            $detail->employee->bankInformation->account_holder_name ?? 'N/A',
+            $detail->staffMember->user->name ?? 'N/A',
+            $detail->staffMember->code ?? $detail->staffMember->id,
+            $detail->staffMember->jobInformation->job_title ?? 'N/A',
+            $detail->staffMember->jobInformation->team->name ?? 'N/A',
+            $detail->staffMember->bankInformation->bank_name ?? 'N/A',
+            $detail->staffMember->bankInformation->account_number ?? 'N/A',
+            $detail->staffMember->bankInformation->account_holder_name ?? 'N/A',
             $this->resolveWorkingDaysForDetail($detail),
             $detail->attended_days ?? 0,
             $detail->sick_days ?? 0,

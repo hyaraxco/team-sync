@@ -32,7 +32,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         ?int $limit,
         bool $execute
     ) {
-        $query = LeaveRequest::with(['employee.user', 'approver.user'])
+        $query = LeaveRequest::with(['staffMember.user', 'approver.user'])
             ->where(function ($query) use ($search) {
                 if ($search) {
                     $query->search($search);
@@ -76,7 +76,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
     public function getById(
         string $id
     ) {
-        $leaveRequest = LeaveRequest::with(['employee.user', 'approver.user'])
+        $leaveRequest = LeaveRequest::with(['staffMember.user', 'approver.user'])
             ->findOrFail($id);
 
         $this->authorizeManagerScope($leaveRequest);
@@ -86,8 +86,8 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
     public function getMyLeaveRequests()
     {
-        return LeaveRequest::with(['employee.user', 'approver.user'])
-            ->where('employee_id', Auth::user()->employeeProfile->getKey())
+        return LeaveRequest::with(['staffMember.user', 'approver.user'])
+            ->where('employee_id', Auth::user()->staffMemberProfile->getKey())
             ->whereDate('created_at', '>=', now()->subDays(6)->startOfDay())
             ->whereDate('created_at', '<=', now()->endOfDay())
             ->orderBy('created_at', 'desc')
@@ -132,7 +132,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
             $data = [
                 'status' => 'approved',
-                'approved_by' => Auth::user()->employeeProfile->getKey(),
+                'approved_by' => Auth::user()->staffMemberProfile->getKey(),
             ];
 
             $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
@@ -153,7 +153,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
             $data = [
                 'status' => 'rejected',
-                'approved_by' => Auth::user()->employeeProfile->getKey(),
+                'approved_by' => Auth::user()->staffMemberProfile->getKey(),
             ];
 
             $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
@@ -204,7 +204,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 'proof_review_notes' => null,
             ]);
 
-            $updatedLeaveRequest = $leaveRequest->fresh(['employee.user', 'approver.user', 'proofReviewedBy.user']);
+            $updatedLeaveRequest = $leaveRequest->fresh(['staffMember.user', 'approver.user', 'proofReviewedBy.user']);
 
             DB::afterCommit(function () use ($updatedLeaveRequest) {
                 $this->emailService->sendLeaveProofUploadedNotification($updatedLeaveRequest, Auth::id());
@@ -239,7 +239,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
             $leaveRequest->update([
                 'proof_review_status' => $reviewStatus,
-                'proof_reviewed_by' => Auth::user()?->employeeProfile?->getKey(),
+                'proof_reviewed_by' => Auth::user()?->staffMemberProfile?->getKey(),
                 'proof_reviewed_at' => now(),
                 'proof_review_notes' => $data['proof_review_notes'] ?? null,
             ]);
@@ -248,7 +248,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 $this->createPostLockAdjustmentsForApprovedSickProof($leaveRequest->fresh());
             }
 
-            $updatedLeaveRequest = $leaveRequest->fresh(['employee.user', 'approver.user', 'proofReviewedBy.user']);
+            $updatedLeaveRequest = $leaveRequest->fresh(['staffMember.user', 'approver.user', 'proofReviewedBy.user']);
 
             DB::afterCommit(function () use ($updatedLeaveRequest) {
                 $this->emailService->sendLeaveProofReviewedNotification($updatedLeaveRequest, Auth::id());
@@ -300,9 +300,9 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
     private function authorizeProofUpload(LeaveRequest $leaveRequest): void
     {
-        $employeeProfileId = Auth::user()?->employeeProfile?->getKey();
+        $staffMemberProfileId = Auth::user()?->staffMemberProfile?->getKey();
 
-        if (! $employeeProfileId || $leaveRequest->employee_id !== $employeeProfileId) {
+        if (! $staffMemberProfileId || $leaveRequest->employee_id !== $staffMemberProfileId) {
             throw new AuthorizationException('You can only upload proof for your own leave requests.');
         }
     }

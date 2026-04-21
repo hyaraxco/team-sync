@@ -46,7 +46,7 @@ class DualRoleSelfServiceAccessTest extends TestCase
                 ->assertCreated();
 
             $this->assertDatabaseHas('leave_requests', [
-                'employee_id' => $user->employeeProfile->id,
+                'employee_id' => $user->staffMemberProfile->id,
                 'reason' => 'Personal leave for '.$email,
             ]);
         }
