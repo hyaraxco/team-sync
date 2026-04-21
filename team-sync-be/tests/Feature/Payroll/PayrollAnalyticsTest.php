@@ -127,7 +127,7 @@ class PayrollAnalyticsTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => $finalSalary + $deductionAmount,
             'final_salary' => $finalSalary,
             'attended_days' => 20,

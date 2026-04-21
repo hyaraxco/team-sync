@@ -16,7 +16,7 @@ class StaffMemberProfile extends Model
 {
     use HasFactory, Searchable, SoftDeletes;
 
-    protected $table = 'employee_profiles';
+
 
     protected $appends = ['full_name', 'email'];
 
@@ -79,34 +79,34 @@ class StaffMemberProfile extends Model
 
     public function jobInformation()
     {
-        return $this->hasOne(JobInformation::class, 'employee_id');
+        return $this->hasOne(JobInformation::class, 'staff_member_id');
     }
 
     public function bankInformation()
     {
-        return $this->hasOne(BankInformation::class, 'employee_id');
+        return $this->hasOne(BankInformation::class, 'staff_member_id');
     }
 
     public function emergencyContacts()
     {
-        return $this->hasMany(EmergencyContact::class, 'employee_id');
+        return $this->hasMany(EmergencyContact::class, 'staff_member_id');
     }
 
     public function teamMembers()
     {
-        return $this->hasMany(TeamMember::class, 'employee_id');
+        return $this->hasMany(TeamMember::class, 'staff_member_id');
     }
 
     public function team()
     {
         return $this->belongsTo(Team::class, 'id', 'id')
             ->join('team_members', 'teams.id', '=', 'team_members.team_id')
-            ->where('team_members.employee_id', $this->id);
+            ->where('team_members.staff_member_id', $this->id);
     }
 
     public function teams()
     {
-        return $this->belongsToMany(Team::class, 'team_members', 'employee_id', 'team_id');
+        return $this->belongsToMany(Team::class, 'team_members', 'staff_member_id', 'team_id');
     }
 
     public function ledProjects()
@@ -121,12 +121,12 @@ class StaffMemberProfile extends Model
 
     public function attendances()
     {
-        return $this->hasMany(Attendance::class, 'employee_id');
+        return $this->hasMany(Attendance::class, 'staff_member_id');
     }
 
     public function leaveRequests()
     {
-        return $this->hasMany(LeaveRequest::class, 'employee_id');
+        return $this->hasMany(LeaveRequest::class, 'staff_member_id');
     }
 
     public function approvedLeaveRequests()
@@ -141,26 +141,26 @@ class StaffMemberProfile extends Model
 
     public function payrollDetails()
     {
-        return $this->hasMany(PayrollDetail::class, 'employee_id');
+        return $this->hasMany(PayrollDetail::class, 'staff_member_id');
     }
 
     public function hybridWorkSchedules()
     {
-        return $this->hasMany(HybridWorkSchedule::class, 'employee_id');
+        return $this->hasMany(HybridWorkSchedule::class, 'staff_member_id');
     }
 
     public function hybridScheduleOverrides()
     {
-        return $this->hasMany(HybridScheduleOverride::class, 'employee_id');
+        return $this->hasMany(HybridScheduleOverride::class, 'staff_member_id');
     }
 
     public function attendancePolicyMismatches()
     {
-        return $this->hasMany(AttendancePolicyMismatch::class, 'employee_id');
+        return $this->hasMany(AttendancePolicyMismatch::class, 'staff_member_id');
     }
 
     public function payrollAdjustments()
     {
-        return $this->hasMany(PayrollAdjustment::class, 'employee_id');
+        return $this->hasMany(PayrollAdjustment::class, 'staff_member_id');
     }
 }

@@ -94,7 +94,7 @@ class AttendancePeriodLifecycleTest extends TestCase
         $this->seedFullMonthAttendance($employee, $month);
 
         $attendance = Attendance::query()
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->whereDate('date', $month->copy()->startOfMonth()->toDateString())
             ->firstOrFail();
 
@@ -140,7 +140,7 @@ class AttendancePeriodLifecycleTest extends TestCase
         while ($cursor->lte($monthEnd)) {
             if (! $cursor->isWeekend()) {
                 Attendance::create([
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'date' => $cursor->toDateString(),
                     'check_in' => $cursor->format('Y-m-d').' 08:50:00',
                     'check_out' => $cursor->format('Y-m-d').' 17:00:00',

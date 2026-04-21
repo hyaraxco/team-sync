@@ -51,9 +51,9 @@ class ManagerSeeder extends Seeder
         $managerAccountNumber = '9'.str_pad((string) $staffMemberProfile->id, 9, '0', STR_PAD_LEFT);
 
         $staffMemberProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'Manager',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -63,19 +63,19 @@ class ManagerSeeder extends Seeder
         ]);
 
         $staffMemberProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => $managerAccountNumber,
             'account_holder_name' => 'Yudhis',
         ]);
 
         $staffMemberProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'yudhis.emergency@teamsync.com',
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Yudhis Emergency Contact',
             'phone' => '081234567899',
             'relationship' => 'Family',

@@ -14,7 +14,7 @@ class CreateGoalRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => 'required|exists:employee_profiles,id',
+            'staff_member_id' => 'required|exists:staff_member_profiles,id',
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
             'goal_type' => 'required|in:okr,kpi,development,project',
@@ -25,7 +25,7 @@ class CreateGoalRequest extends FormRequest
             'weight' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',
             'due_date' => 'required|date|after:start_date',
-            'assigned_by' => 'nullable|exists:employee_profiles,id',
+            'assigned_by' => 'nullable|exists:staff_member_profiles,id',
             'linked_review_id' => 'nullable|exists:performance_reviews,id',
         ];
     }

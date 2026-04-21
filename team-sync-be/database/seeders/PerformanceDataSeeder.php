@@ -62,7 +62,7 @@ class PerformanceDataSeeder extends Seeder
 
         // Review 1: Employee Agung - pending_self (employee can test self-assessment)
         $review1 = PerformanceReview::updateOrCreate(
-            ['cycle_id' => $cycle->id, 'employee_id' => $staffMemberProfile->id],
+            ['cycle_id' => $cycle->id, 'staff_member_id' => $staffMemberProfile->id],
             [
                 'reviewer_id' => $managerProfile->id,
                 'status' => 'pending_self',
@@ -71,7 +71,7 @@ class PerformanceDataSeeder extends Seeder
 
         // Review 2: Manager Yudhis - pending_manager (has self-assessment filled)
         $review2 = PerformanceReview::updateOrCreate(
-            ['cycle_id' => $cycle->id, 'employee_id' => $managerProfile->id],
+            ['cycle_id' => $cycle->id, 'staff_member_id' => $managerProfile->id],
             [
                 'reviewer_id' => $managerProfile->id,
                 'status' => 'pending_manager',
@@ -92,7 +92,7 @@ class PerformanceDataSeeder extends Seeder
 
         // Review 3: HR Tasyia - pending_calibration (has self + manager assessment)
         $review3 = PerformanceReview::updateOrCreate(
-            ['cycle_id' => $cycle->id, 'employee_id' => $hrProfile->id],
+            ['cycle_id' => $cycle->id, 'staff_member_id' => $hrProfile->id],
             [
                 'reviewer_id' => $managerProfile->id,
                 'status' => 'pending_calibration',
@@ -134,7 +134,7 @@ class PerformanceDataSeeder extends Seeder
 
         // Review 4: Employee Agung - completed (all data filled)
         $review4 = PerformanceReview::updateOrCreate(
-            ['cycle_id' => $completedCycle->id, 'employee_id' => $staffMemberProfile->id],
+            ['cycle_id' => $completedCycle->id, 'staff_member_id' => $staffMemberProfile->id],
             [
                 'reviewer_id' => $managerProfile->id,
                 'status' => 'completed',

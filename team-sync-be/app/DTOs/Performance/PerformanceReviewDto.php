@@ -6,7 +6,7 @@ class PerformanceReviewDto
 {
     public function __construct(
         public readonly int $cycle_id,
-        public readonly int $employee_id,
+        public readonly int $staff_member_id,
         public readonly int $reviewer_id,
         public readonly ?string $status
     ) {}
@@ -15,7 +15,7 @@ class PerformanceReviewDto
     {
         return new self(
             $data['cycle_id'],
-            $data['employee_id'],
+            $data['staff_member_id'],
             $data['reviewer_id'],
             $data['status'] ?? 'pending_self'
         );
@@ -25,7 +25,7 @@ class PerformanceReviewDto
     {
         $array = [
             'cycle_id' => $this->cycle_id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'reviewer_id' => $this->reviewer_id,
         ];
 

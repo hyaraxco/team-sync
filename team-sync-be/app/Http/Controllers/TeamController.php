@@ -192,7 +192,7 @@ class TeamController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $member = $this->teamRepository->addMember($team->id, $validated['employee_id']);
+            $member = $this->teamRepository->addMember($team->id, $validated['staff_member_id']);
 
             return ResponseHelper::jsonResponse(true, 'Member Added Successfully', $member, 200);
         } catch (\Exception $e) {
@@ -210,7 +210,7 @@ class TeamController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $member = $this->teamRepository->removeMember($team->id, $validated['employee_id']);
+            $member = $this->teamRepository->removeMember($team->id, $validated['staff_member_id']);
 
             return ResponseHelper::jsonResponse(true, 'Member Removed Successfully', $member, 200);
         } catch (\Exception $e) {

@@ -112,7 +112,7 @@ class LeaveEntitlementValidator
 
         return StaffMemberProfile::query()
             ->with('jobInformation')
-            ->find($leaveRequest->employee_id);
+            ->find($leaveRequest->staff_member_id);
     }
 
     private function validateSickLeaveProof(LeaveRequest $leaveRequest, LeaveEntitlement $entitlement): array
@@ -196,7 +196,7 @@ class LeaveEntitlementValidator
         $scheduledWeekdays = $this->resolveScheduledWeekdays($employmentType);
 
         $approvedLeavesInYear = LeaveRequest::query()
-            ->where('employee_id', $leaveRequest->employee_id)
+            ->where('staff_member_id', $leaveRequest->staff_member_id)
             ->where('status', 'approved')
             ->where('id', '!=', $leaveRequest->id)
             ->where('leave_type', $leaveType)

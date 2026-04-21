@@ -56,7 +56,7 @@ class AttendancePolicyMismatchLifecycleService
 
         try {
             $elapsedWorkingDays = $this->workingDaysCalculator->calculateForEmployee(
-                $mismatch->employee_id,
+                $mismatch->staff_member_id,
                 $start,
                 $asOf
             );

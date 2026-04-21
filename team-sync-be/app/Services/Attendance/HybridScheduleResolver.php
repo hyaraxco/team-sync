@@ -26,7 +26,7 @@ class HybridScheduleResolver
         $targetDate = Carbon::parse($date)->toDateString();
 
         $override = HybridScheduleOverride::query()
-            ->where('employee_id', $employeeId)
+            ->where('staff_member_id', $employeeId)
             ->whereDate('date', $targetDate)
             ->where('status', 'approved')
             ->latest('approved_at')
@@ -40,7 +40,7 @@ class HybridScheduleResolver
         }
 
         $schedule = HybridWorkSchedule::query()
-            ->where('employee_id', $employeeId)
+            ->where('staff_member_id', $employeeId)
             ->whereDate('effective_from', '<=', $targetDate)
             ->where(function ($query) use ($targetDate) {
                 $query->whereNull('effective_until')

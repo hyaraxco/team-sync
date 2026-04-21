@@ -12,7 +12,7 @@ class PerformanceGoal extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'title',
         'description',
         'goal_type',
@@ -39,7 +39,7 @@ class PerformanceGoal extends Model
 
     public function staffMember(): BelongsTo
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function creator(): BelongsTo

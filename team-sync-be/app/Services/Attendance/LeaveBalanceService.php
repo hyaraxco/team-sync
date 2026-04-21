@@ -43,7 +43,7 @@ class LeaveBalanceService
         return $entitlements->map(function (LeaveEntitlement $entitlement) use ($employeeId, $employmentType, $yearStart, $yearEnd, $scheduledWeekdays) {
             $usedDays = 0;
             if ($entitlement->quota_scope === 'annual') {
-                $approvedLeaves = LeaveRequest::where('employee_id', $employeeId)
+                $approvedLeaves = LeaveRequest::where('staff_member_id', $employeeId)
                     ->where('status', 'approved')
                     ->where('leave_type', $entitlement->leave_type)
                     ->whereDate('start_date', '<=', $yearEnd)

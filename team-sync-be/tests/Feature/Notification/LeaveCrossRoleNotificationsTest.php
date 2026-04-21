@@ -77,7 +77,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         $managerNotification = $this->latestNotification($managerUser);
         $this->assertSame('Leave Request Needs Approval', $managerNotification['title']);
         $this->assertSame($leaveRequestId, (int) ($managerNotification['data']['leave_request_id'] ?? 0));
-        $this->assertSame($staffMemberProfile->id, (int) ($managerNotification['data']['employee_id'] ?? 0));
+        $this->assertSame($staffMemberProfile->id, (int) ($managerNotification['data']['staff_member_id'] ?? 0));
 
         $hrNotification = $this->latestNotification($hrUser);
         $this->assertSame('Leave Request Needs Approval', $hrNotification['title']);
@@ -106,7 +106,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         );
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-15',
             'end_date' => '2026-04-15',
@@ -141,7 +141,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Reviewed Employee');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-10',
             'end_date' => '2026-04-10',

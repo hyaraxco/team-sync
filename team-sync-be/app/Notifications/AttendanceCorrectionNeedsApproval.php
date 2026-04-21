@@ -24,7 +24,7 @@ class AttendanceCorrectionNeedsApproval extends Notification implements ShouldQu
     {
         return new self(
             correctionId: (int) $correction->id,
-            employeeId: (int) $correction->employee_id,
+            employeeId: (int) $correction->staff_member_id,
             date: $date,
             reason: (string) $correction->reason,
             requestedByName: $requestedByName,
@@ -66,7 +66,7 @@ class AttendanceCorrectionNeedsApproval extends Notification implements ShouldQu
             'body' => sprintf('%s submitted an attendance correction for your review.', $requesterLabel),
             'action_url' => '/admin/attendance-corrections',
             'correction_id' => $this->correctionId,
-            'employee_id' => $this->employeeId,
+            'staff_member_id' => $this->employeeId,
             'date' => $this->date,
             'requested_by' => $this->requestedByName,
         ];

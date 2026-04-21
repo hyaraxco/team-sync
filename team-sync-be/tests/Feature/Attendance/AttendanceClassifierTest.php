@@ -63,7 +63,7 @@ class AttendanceClassifierTest extends TestCase
         $employee = $this->createEmployeeWithEmploymentType('full_time');
 
         LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'annual_leave',
             'start_date' => '2026-04-08',
             'end_date' => '2026-04-08',
@@ -84,7 +84,7 @@ class AttendanceClassifierTest extends TestCase
         $employee = $this->createEmployeeWithEmploymentType('intern');
 
         LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'maternity_leave',
             'start_date' => '2026-04-08',
             'end_date' => '2026-04-08',
@@ -168,7 +168,7 @@ class AttendanceClassifierTest extends TestCase
         $employee = $this->createEmployeeWithEmploymentType('full_time', 'hybrid');
 
         HybridWorkSchedule::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'effective_from' => '2026-04-01',
             'effective_until' => null,
             'monday' => 'office',
@@ -194,7 +194,7 @@ class AttendanceClassifierTest extends TestCase
 
         $this->assertDatabaseHas('attendance_policy_mismatches', [
             'attendance_id' => $attendance->id,
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'planned_work_mode' => 'office',
             'actual_work_mode' => 'remote',
             'status' => 'pending_review',
@@ -233,7 +233,7 @@ class AttendanceClassifierTest extends TestCase
     private function createAttendance(StaffMemberProfile $employee, string $date, array $overrides = []): Attendance
     {
         return Attendance::create(array_merge([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => $date,
             'check_in' => $date.' 09:00:00',
             'check_out' => $date.' 17:00:00',

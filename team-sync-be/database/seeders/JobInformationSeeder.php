@@ -71,7 +71,7 @@ class JobInformationSeeder extends Seeder
                     $teamId = ! empty($teams) ? $teams[array_rand($teams)] : null;
 
                     $insertData[] = [
-                        'employee_id' => $employee->id,
+                        'staff_member_id' => $employee->id,
                         'job_title' => $jobTitles[array_rand($jobTitles)],
                         'team_id' => $teamId,
                         'status' => 'active',

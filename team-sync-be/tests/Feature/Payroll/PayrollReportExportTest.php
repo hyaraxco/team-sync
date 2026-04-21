@@ -191,7 +191,7 @@ class PayrollReportExportTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

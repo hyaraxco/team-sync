@@ -69,7 +69,7 @@ class AttendanceSeeder extends Seeder
                 }
 
                 $attendanceBatch[] = [
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'date' => $date,
                     'status' => $status,
                     'check_in' => $checkIn,

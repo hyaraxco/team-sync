@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 class FeedbackDto
 {
     public function __construct(
-        public readonly int $employee_id,
+        public readonly int $staff_member_id,
         public readonly int $given_by,
         public readonly string $feedback_type,
         public readonly ?string $category,
@@ -20,7 +20,7 @@ class FeedbackDto
     public static function fromRequest(array $data): self
     {
         return new self(
-            $data['employee_id'],
+            $data['staff_member_id'],
             Auth::id() ?? $data['given_by'], // fallback for testing or manual creation
             $data['feedback_type'],
             $data['category'] ?? null,
@@ -33,7 +33,7 @@ class FeedbackDto
     public function toArray(): array
     {
         $array = [
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'given_by' => $this->given_by,
             'feedback_type' => $this->feedback_type,
             'content' => $this->content,

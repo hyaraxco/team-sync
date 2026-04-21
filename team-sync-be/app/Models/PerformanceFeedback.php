@@ -11,7 +11,7 @@ class PerformanceFeedback extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'given_by',
         'feedback_type',
         'category',
@@ -28,7 +28,7 @@ class PerformanceFeedback extends Model
 
     public function staffMember(): BelongsTo
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function giver(): BelongsTo

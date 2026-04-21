@@ -602,8 +602,8 @@ watch(
 
               <div
                 v-for="row in visibleReadinessEmployees"
-                :key="row.employee_id"
-                :data-testid="`payroll-readiness-row-${row.employee_id}`"
+                :key="row.staff_member_id"
+                :data-testid="`payroll-readiness-row-${row.staff_member_id}`"
                 class="rounded-[10px] border bg-white px-3 py-3"
                 :class="
                   row.status === 'blocked'
@@ -635,7 +635,7 @@ watch(
                 <div v-if="row.blocker_reasons?.length" class="mt-2 flex flex-wrap gap-1">
                   <span
                     v-for="reason in row.blocker_reasons"
-                    :key="`${row.employee_id}-${reason}`"
+                    :key="`${row.staff_member_id}-${reason}`"
                     class="text-[10px] px-2 py-1 rounded-full bg-red-100 text-red-700"
                   >
                     {{ mapReadinessLabel(reason, readinessReasonLabels) }}
@@ -648,7 +648,7 @@ watch(
                 >
                   <span
                     v-for="flag in row.warning_flags"
-                    :key="`${row.employee_id}-${flag}`"
+                    :key="`${row.staff_member_id}-${flag}`"
                     class="text-[10px] px-2 py-1 rounded-full bg-amber-100 text-amber-700"
                   >
                     {{ mapReadinessLabel(flag, readinessWarningLabels) }}
@@ -657,7 +657,7 @@ watch(
 
                 <button
                   type="button"
-                  :data-testid="`payroll-readiness-open-attendance-${row.employee_id}`"
+                  :data-testid="`payroll-readiness-open-attendance-${row.staff_member_id}`"
                   @click="openAttendanceWorkspace(row)"
                   class="mt-3 w-full border border-slate-200 rounded-[8px] px-3 py-2 text-xs font-semibold text-slate-700 hover:border-[#0C51D9] hover:text-[#0C51D9] transition-all duration-300"
                 >

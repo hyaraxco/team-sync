@@ -12,7 +12,7 @@ class TeamMember extends Model
 
     protected $fillable = [
         'team_id',
-        'employee_id',
+        'staff_member_id',
         'joined_at',
         'left_at',
     ];
@@ -32,6 +32,6 @@ class TeamMember extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 }

@@ -50,7 +50,7 @@ class ProjectRepository implements ProjectRepositoryInterface
             $jobInfoTeamId = Auth::user()->staffMemberProfile->jobInformation->team_id ?? null;
 
             // Get all team IDs that the employee is currently a member of (not left)
-            $teamMemberIds = TeamMember::where('employee_id', $employeeId)
+            $teamMemberIds = TeamMember::where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->pluck('team_id')
                 ->toArray();
@@ -319,7 +319,7 @@ class ProjectRepository implements ProjectRepositoryInterface
                     'team_id' => $team->id,
                     'team_name' => $team->name,
                     'members_count' => $team->members
-                        ->pluck('employee_id')
+                        ->pluck('staff_member_id')
                         ->filter()
                         ->unique()
                         ->count(),

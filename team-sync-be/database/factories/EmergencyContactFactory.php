@@ -32,7 +32,7 @@ class EmergencyContactFactory extends Factory
         ];
 
         return [
-            'employee_id' => StaffMemberProfile::factory(),
+            'staff_member_id' => StaffMemberProfile::factory(),
             'full_name' => fake()->name(),
             'relationship' => fake()->randomElement($relationships),
             'phone' => fake()->phoneNumber(),
@@ -76,7 +76,7 @@ class EmergencyContactFactory extends Factory
     public function forEmployee(StaffMemberProfile $employee): static
     {
         return $this->state(fn (array $attributes) => [
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
         ]);
     }
 }

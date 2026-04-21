@@ -53,7 +53,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     public function getReviewsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator
     {
         $query = PerformanceReview::with(['cycle', 'reviewer.user'])
-            ->where('employee_id', $employeeId);
+            ->where('staff_member_id', $employeeId);
             
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -194,7 +194,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
         $candidates = [];
         foreach ($reviewScores as $review) {
-            $employeeId = $review->employee_id;
+            $employeeId = $review->staff_member_id;
 
             // C1: Rata-rata manager_rating dari semua section responses
             $avgManagerRating = $review->responses
@@ -214,7 +214,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
             // C5: Jumlah positive feedback yang diterima selama periode cycle
             $cycle = $review->cycle ?? \App\Models\PerformanceReviewCycle::find($cycleId);
-            $positiveFeedbackCount = \App\Models\PerformanceFeedback::where('employee_id', $employeeId)
+            $positiveFeedbackCount = \App\Models\PerformanceFeedback::where('staff_member_id', $employeeId)
                 ->where('feedback_type', 'positive')
                 ->whereBetween('created_at', [
                     $cycle->start_date . ' 00:00:00',
@@ -223,7 +223,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ->count();
 
             $candidates[] = [
-                'employee_id'             => $employeeId,
+                'staff_member_id'             => $employeeId,
                 'employee_name'           => $review->staffMember->full_name ?? 'Unknown',
                 'department'              => $review->staffMember->jobInformation->department ?? null,
                 'team'                    => $review->staffMember->jobInformation->team->name ?? null,

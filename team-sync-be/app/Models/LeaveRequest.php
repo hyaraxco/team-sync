@@ -12,7 +12,7 @@ class LeaveRequest extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'leave_type',
         'start_date',
         'end_date',
@@ -57,7 +57,7 @@ class LeaveRequest extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function approver()

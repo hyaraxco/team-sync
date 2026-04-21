@@ -41,7 +41,7 @@ class PayrollDetailResource extends JsonResource
         return [
             'id' => $this->id,
             'payroll_id' => $this->payroll_id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'original_salary' => (float) $this->original_salary,
             'final_salary' => (float) $this->final_salary,
             'effective_working_days' => (int) ($this->effective_working_days ?? 0),

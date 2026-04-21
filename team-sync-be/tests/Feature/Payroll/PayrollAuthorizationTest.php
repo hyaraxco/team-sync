@@ -242,7 +242,7 @@ class PayrollAuthorizationTest extends TestCase
         });
 
         $staffMemberProfile->bankInformation()->create([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '1122334455',
             'account_holder_name' => 'Payroll Authorization User',
@@ -256,7 +256,7 @@ class PayrollAuthorizationTest extends TestCase
 
         return PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,
@@ -274,7 +274,7 @@ class PayrollAuthorizationTest extends TestCase
             $monthEnd = $month->copy()->endOfMonth();
 
             $staffMemberProfile->jobInformation()->create([
-                'employee_id' => $staffMemberProfile->id,
+                'staff_member_id' => $staffMemberProfile->id,
                 'job_title' => 'HR Specialist',
                 'years_experience' => 4,
                 'status' => 'active',
@@ -289,7 +289,7 @@ class PayrollAuthorizationTest extends TestCase
             while ($cursor->lte($monthEnd)) {
                 if (! $cursor->isWeekend()) {
                     Attendance::create([
-                        'employee_id' => $staffMemberProfile->id,
+                        'staff_member_id' => $staffMemberProfile->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d').' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d').' 17:00:00',

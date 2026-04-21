@@ -323,7 +323,7 @@ class PayrollSettingsTest extends TestCase
                 $status = isset($absentDateLookup[$dateKey]) ? 'absent' : 'present';
 
                 Attendance::create([
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'date' => $dateKey,
                     'status' => $status,
                     'check_in' => $status === 'present'

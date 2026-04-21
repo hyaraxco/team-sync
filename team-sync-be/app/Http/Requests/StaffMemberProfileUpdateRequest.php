@@ -28,7 +28,7 @@ class StaffMemberProfileUpdateRequest extends FormRequest
         $employeeId = $this->route('staff_member') ?? $this->route('id');
         $employee = StaffMemberProfile::find($employeeId);
         $userId = $employee?->user_id;
-        $bankInfoId = BankInformation::where('employee_id', $employeeId)->value('id');
+        $bankInfoId = BankInformation::where('staff_member_id', $employeeId)->value('id');
 
         return [
             // User fields
@@ -45,8 +45,8 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             ],
 
             // Employee Profile fields
-            'code' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('employee_profiles', 'code')->ignore($employeeId)],
-            'identity_number' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('employee_profiles', 'identity_number')->ignore($employeeId)],
+            'code' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('staff_member_profiles', 'code')->ignore($employeeId)],
+            'identity_number' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('staff_member_profiles', 'identity_number')->ignore($employeeId)],
             'npwp' => ['nullable', 'string', 'max:30'],
             'bpjs_ketenagakerjaan' => ['nullable', 'string', 'max:30'],
             'bpjs_kesehatan' => ['nullable', 'string', 'max:30'],

@@ -41,9 +41,9 @@ class HrSeeder extends Seeder
         ]);
 
         $staffMemberProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'HR Specialist',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -53,19 +53,19 @@ class HrSeeder extends Seeder
         ]);
 
         $staffMemberProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => '244422131',
             'account_holder_name' => 'Tasyia',
         ]);
 
         $staffMemberProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'tasyia.emergency@teamsync.com',
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Tasyia Emergency Contact',
             'phone' => '081234567890',
             'relationship' => 'Family',

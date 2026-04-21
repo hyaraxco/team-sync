@@ -226,7 +226,7 @@ describe("PayrollDetail smoke", () => {
       latest_by_employee: [
         {
           payroll_detail_id: 55,
-          employee_id: 77,
+          staff_member_id: 77,
           employee_name: "Delivery User",
           employee_code: "EMP077",
           recipient_email: "delivery@teamsync.com",
@@ -277,7 +277,7 @@ describe("PayrollDetail smoke", () => {
       },
       exceptions: [
         {
-          employee_id: 99,
+          staff_member_id: 99,
           employee_name: "Adjustment User",
           employee_code: "EMP099",
           severity: "critical",
@@ -323,7 +323,7 @@ describe("PayrollDetail smoke", () => {
         },
         exceptions: [
           {
-            employee_id: 101,
+            staff_member_id: 101,
             employee_name: "Critical Employee",
             employee_code: "EMP101",
             severity: "critical",
@@ -331,7 +331,7 @@ describe("PayrollDetail smoke", () => {
             message: "Employee bank account information is incomplete.",
           },
           {
-            employee_id: 202,
+            staff_member_id: 202,
             employee_name: "Warning Employee",
             employee_code: "EMP202",
             severity: "warning",
@@ -355,7 +355,7 @@ describe("PayrollDetail smoke", () => {
         },
         exceptions: [
           {
-            employee_id: 202,
+            staff_member_id: 202,
             employee_name: "Warning Employee",
             employee_code: "EMP202",
             severity: "warning",

@@ -14,7 +14,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
     public function getGoalsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator
     {
         $query = PerformanceGoal::with(['assigner', 'linkedReview'])
-            ->where('employee_id', $employeeId);
+            ->where('staff_member_id', $employeeId);
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);

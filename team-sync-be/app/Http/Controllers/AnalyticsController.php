@@ -366,7 +366,7 @@ class AnalyticsController extends Controller implements HasMiddleware
     {
         try {
             $data = $this->analyticsRepository->getGoalCompletionRate(
-                $request->input('employee_id') ? (int) $request->input('employee_id') : null,
+                $request->input('staff_member_id') ? (int) $request->input('staff_member_id') : null,
                 $request->input('team_id') ? (int) $request->input('team_id') : null,
             );
 
@@ -380,7 +380,7 @@ class AnalyticsController extends Controller implements HasMiddleware
     {
         try {
             $data = $this->analyticsRepository->getFeedbackMetrics(
-                $request->input('employee_id') ? (int) $request->input('employee_id') : null,
+                $request->input('staff_member_id') ? (int) $request->input('staff_member_id') : null,
                 $request->input('team_id') ? (int) $request->input('team_id') : null,
             );
 

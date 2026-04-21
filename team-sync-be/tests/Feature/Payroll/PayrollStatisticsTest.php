@@ -257,7 +257,7 @@ class PayrollStatisticsTest extends TestCase
 
             PayrollDetail::create([
                 'payroll_id' => $payroll->id,
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'original_salary' => $row['original'],
                 'final_salary' => $row['final'],
                 'attended_days' => $row['attended'] ?? 20,

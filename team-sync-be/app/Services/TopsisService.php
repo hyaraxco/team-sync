@@ -47,7 +47,7 @@ class TopsisService
     /**
      * Jalankan algoritma TOPSIS lengkap.
      *
-     * @param  array  $candidates   Array of ['employee_id', 'employee_name', 'department', 'C1'...'C5']
+     * @param  array  $candidates   Array of ['staff_member_id', 'employee_name', 'department', 'C1'...'C5']
      * @param  array  $weights      Bobot tiap kriteria ['avg_manager_rating' => 0.35, ...]
      * @return array  Hasil ranking beserta detail kalkulasi tiap langkah
      */
@@ -228,7 +228,7 @@ class TopsisService
         $ranking = [];
         foreach ($candidates as $idx => $candidate) {
             $ranking[] = [
-                'employee_id'          => $candidate['employee_id'],
+                'staff_member_id'          => $candidate['staff_member_id'],
                 'employee_name'        => $candidate['employee_name'],
                 'department'           => $candidate['department'] ?? null,
                 'raw_scores'           => $matrix[$idx],
@@ -291,7 +291,7 @@ class TopsisService
             'criteria_types'   => self::CRITERIA_TYPES,
             'ranking'          => [[
                 'rank'                  => 1,
-                'employee_id'           => $candidate['employee_id'],
+                'staff_member_id'           => $candidate['staff_member_id'],
                 'employee_name'         => $candidate['employee_name'],
                 'department'            => $candidate['department'] ?? null,
                 'raw_scores'            => $rawScores,

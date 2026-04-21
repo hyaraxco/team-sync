@@ -104,7 +104,7 @@ class PayrollRoleJourneyTest extends TestCase
         $this->assertSame('paid', $payroll->fresh()->status);
 
         $employeeUser = User::where('email', 'agung@teamsync.com')->firstOrFail();
-        $employeePayslip = $payroll->fresh()->payrollDetails()->where('employee_id', $employeeUser->staffMemberProfile?->id)->firstOrFail();
+        $employeePayslip = $payroll->fresh()->payrollDetails()->where('staff_member_id', $employeeUser->staffMemberProfile?->id)->firstOrFail();
         Notification::assertSentTo($employeeUser, PayrollPaid::class, function (PayrollPaid $notification) use ($employeeUser, $employeePayslip) {
             $mailMessage = $notification->toMail($employeeUser);
 
@@ -154,7 +154,7 @@ class PayrollRoleJourneyTest extends TestCase
             while ($cursor->lte($monthEnd)) {
                 if (! $cursor->isWeekend()) {
                     $attendance = Attendance::query()
-                        ->where('employee_id', $employee->id)
+                        ->where('staff_member_id', $employee->id)
                         ->whereDate('date', $cursor->toDateString())
                         ->first();
 
@@ -167,7 +167,7 @@ class PayrollRoleJourneyTest extends TestCase
                         ]);
                     } else {
                         Attendance::create([
-                            'employee_id' => $employee->id,
+                            'staff_member_id' => $employee->id,
                             'date' => $cursor->toDateString(),
                             'check_in' => $cursor->format('Y-m-d').' 08:00:00',
                             'check_out' => $cursor->format('Y-m-d').' 17:00:00',

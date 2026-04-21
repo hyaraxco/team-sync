@@ -10,7 +10,7 @@ class HybridScheduleOverride extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'date',
         'planned_work_mode',
         'reason',
@@ -31,7 +31,7 @@ class HybridScheduleOverride extends Model
 
     public function staffMember()
     {
-        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function requestedBy()

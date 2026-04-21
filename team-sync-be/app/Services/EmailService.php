@@ -471,7 +471,7 @@ class EmailService
         }
 
         $managerRecipients = $this->resolveManagersForEmployee(
-            (int) $mismatch->employee_id,
+            (int) $mismatch->staff_member_id,
             $mismatch->staffMember?->jobInformation?->team_id,
         );
 
@@ -549,7 +549,7 @@ class EmailService
         $teamIds = array_values(array_unique(array_merge(
             $teamIds,
             TeamMember::query()
-                ->where('employee_id', $employeeId)
+                ->where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->pluck('team_id')
                 ->map(fn ($teamId) => (int) $teamId)
@@ -683,7 +683,7 @@ class EmailService
      */
     private function resolveLeaveReviewRecipients(LeaveRequest $leaveRequest, ?int $excludeUserId = null): Collection
     {
-        $employeeId = (int) ($leaveRequest->employee_id ?? 0);
+        $employeeId = (int) ($leaveRequest->staff_member_id ?? 0);
 
         if ($employeeId <= 0) {
             return collect();
@@ -699,7 +699,7 @@ class EmailService
         $teamIds = array_values(array_unique(array_merge(
             $teamIds,
             TeamMember::query()
-                ->where('employee_id', $employeeId)
+                ->where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->pluck('team_id')
                 ->map(fn ($teamId) => (int) $teamId)
@@ -771,7 +771,7 @@ class EmailService
             $basePayload = [
                 'payroll_id' => $payrollId,
                 'payroll_detail_id' => $payrollDetail->id,
-                'employee_id' => $payrollDetail->employee_id,
+                'staff_member_id' => $payrollDetail->staff_member_id,
                 'recipient_email' => $recipientEmail,
                 'channel' => 'mail',
                 'trigger_type' => $triggerType,
@@ -821,7 +821,7 @@ class EmailService
         $requesterName = $requester?->name;
         $date = optional($correction->attendance)->date ?? now()->toDateString();
 
-        $managers = $this->resolveManagersForEmployee($correction->employee_id, $requester?->id);
+        $managers = $this->resolveManagersForEmployee($correction->staff_member_id, $requester?->id);
         $hrRecipients = $this->resolveHrRecipients($requester?->id);
 
         $recipients = $managers->merge($hrRecipients)->unique('id')->values();

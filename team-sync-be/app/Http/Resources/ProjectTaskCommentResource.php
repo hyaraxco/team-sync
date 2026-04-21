@@ -17,7 +17,7 @@ class ProjectTaskCommentResource extends JsonResource
         return [
             'id' => $this->id,
             'project_task_id' => $this->project_task_id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'comment' => $this->comment,
             'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
             'created_at' => $this->created_at,

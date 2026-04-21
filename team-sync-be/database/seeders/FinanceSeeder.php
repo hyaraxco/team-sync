@@ -41,9 +41,9 @@ class FinanceSeeder extends Seeder
         ]);
 
         $staffMemberProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'Finance Manager',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -53,19 +53,19 @@ class FinanceSeeder extends Seeder
         ]);
 
         $staffMemberProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => '9876543210',
             'account_holder_name' => 'Dwimeta',
         ]);
 
         $staffMemberProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'dwimeta.emergency@teamsync.com',
         ], [
-            'employee_id' => $staffMemberProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Dwimeta Emergency Contact',
             'phone' => '081234567891',
             'relationship' => 'Family',

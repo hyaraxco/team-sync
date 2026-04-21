@@ -23,7 +23,7 @@ class AttendanceUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => ['sometimes', 'required', 'integer', 'exists:employee_profiles,id'],
+            'staff_member_id' => ['sometimes', 'required', 'integer', 'exists:staff_member_profiles,id'],
             'date' => ['sometimes', 'required', 'date'],
             'check_in' => ['nullable', 'date_format:H:i:s'],
             'check_in_lat' => ['nullable', 'numeric', 'between:-90,90'],
@@ -40,7 +40,7 @@ class AttendanceUpdateRequest extends FormRequest
     public function attributes()
     {
         return [
-            'employee_id' => 'Employee',
+            'staff_member_id' => 'Employee',
             'date' => 'Date',
             'check_in' => 'Check In Time',
             'check_in_lat' => 'Check In Latitude',

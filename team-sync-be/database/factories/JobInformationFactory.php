@@ -57,7 +57,7 @@ class JobInformationFactory extends Factory
         $monthlySalary = $baseSalary * $salaryMultiplier * fake()->randomFloat(2, 0.9, 1.3);
 
         return [
-            'employee_id' => StaffMemberProfile::factory(),
+            'staff_member_id' => StaffMemberProfile::factory(),
             'job_title' => fake()->randomElement($jobTitles),
             'team_id' => null, // Will be assigned when team is created
             'status' => fake()->randomElement($statuses),
@@ -115,7 +115,7 @@ class JobInformationFactory extends Factory
     public function forEmployee(StaffMemberProfile $employee): static
     {
         return $this->state(fn(array $attributes) => [
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
         ]);
     }
 

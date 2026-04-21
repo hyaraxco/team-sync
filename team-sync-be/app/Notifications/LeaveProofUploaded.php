@@ -26,7 +26,7 @@ class LeaveProofUploaded extends Notification implements ShouldQueue
     {
         return new self(
             leaveRequestId: (int) $leaveRequest->id,
-            employeeId: (int) $leaveRequest->employee_id,
+            employeeId: (int) $leaveRequest->staff_member_id,
             leaveType: (string) ($leaveRequest->leave_type->value ?? $leaveRequest->leave_type),
             startDate: (string) optional($leaveRequest->start_date)->toDateString(),
             endDate: (string) optional($leaveRequest->end_date)->toDateString(),
@@ -72,7 +72,7 @@ class LeaveProofUploaded extends Notification implements ShouldQueue
             'body' => sprintf('%s uploaded sick leave proof that needs your review.', $uploaderLabel),
             'action_url' => '/admin/attendances',
             'leave_request_id' => $this->leaveRequestId,
-            'employee_id' => $this->employeeId,
+            'staff_member_id' => $this->employeeId,
             'leave_type' => $this->leaveType,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,

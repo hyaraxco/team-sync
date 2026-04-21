@@ -20,7 +20,7 @@ class TeamMemberFactory extends Factory
     {
         return [
             'team_id' => Team::factory(),
-            'employee_id' => StaffMemberProfile::factory(),
+            'staff_member_id' => StaffMemberProfile::factory(),
             'joined_at' => fake()->dateTimeBetween('-2 years', 'now'),
             'left_at' => null,
         ];
@@ -77,7 +77,7 @@ class TeamMemberFactory extends Factory
     public function forEmployee(StaffMemberProfile $employee): static
     {
         return $this->state(fn (array $attributes) => [
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
         ]);
     }
 }

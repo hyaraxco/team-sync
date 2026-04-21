@@ -26,7 +26,7 @@ class ProjectStoreRequest extends FormRequest
             'description' => ['nullable', 'string'],
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'budget' => ['nullable', 'numeric', 'min:0'],
-            'project_leader_id' => ['nullable', 'exists:employee_profiles,id'],
+            'project_leader_id' => ['nullable', 'exists:staff_member_profiles,id'],
             'teams' => ['nullable', 'array'],
             'teams.*' => ['integer', 'exists:teams,id'],
         ];
