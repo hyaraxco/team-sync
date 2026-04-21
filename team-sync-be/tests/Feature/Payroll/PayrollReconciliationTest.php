@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\User;
@@ -123,8 +123,8 @@ class PayrollReconciliationTest extends TestCase
             'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
-        $warningEmployee = EmployeeProfile::withoutSyncingToSearch(function () use ($warningUser) {
-            return EmployeeProfile::factory()->for($warningUser)->create();
+        $warningEmployee = StaffMemberProfile::withoutSyncingToSearch(function () use ($warningUser) {
+            return StaffMemberProfile::factory()->for($warningUser)->create();
         });
 
         $warningEmployee->bankInformation()->create([
@@ -201,13 +201,13 @@ class PayrollReconciliationTest extends TestCase
             'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
-        $employeeProfile = EmployeeProfile::withoutSyncingToSearch(function () use ($user) {
-            return EmployeeProfile::factory()->for($user)->create();
+        $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {
+            return StaffMemberProfile::factory()->for($user)->create();
         });
 
         if ($withBankInformation) {
-            $employeeProfile->bankInformation()->create([
-                'employee_id' => $employeeProfile->id,
+            $staffMemberProfile->bankInformation()->create([
+                'employee_id' => $staffMemberProfile->id,
                 'bank_name' => 'BCA',
                 'account_number' => '9990011223',
                 'account_holder_name' => 'Payroll Reconciliation User',
@@ -222,7 +222,7 @@ class PayrollReconciliationTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'original_salary' => $originalSalary,
             'final_salary' => $finalSalary,
             'attended_days' => 20,
@@ -233,6 +233,6 @@ class PayrollReconciliationTest extends TestCase
             'notes' => 'Reconciliation test fixture',
         ]);
 
-        return [$payroll, $employeeProfile, $user];
+        return [$payroll, $staffMemberProfile, $user];
     }
 }

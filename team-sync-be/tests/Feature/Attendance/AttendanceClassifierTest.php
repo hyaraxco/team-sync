@@ -4,7 +4,7 @@ namespace Tests\Feature\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\HybridWorkSchedule;
 use App\Models\JobInformation;
@@ -210,10 +210,10 @@ class AttendanceClassifierTest extends TestCase
         $this->assertSame(1, AttendancePolicyMismatch::query()->where('attendance_id', $attendance->id)->count());
     }
 
-    private function createEmployeeWithEmploymentType(string $employmentType, string $workLocation = 'office'): EmployeeProfile
+    private function createEmployeeWithEmploymentType(string $employmentType, string $workLocation = 'office'): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()
@@ -230,7 +230,7 @@ class AttendanceClassifierTest extends TestCase
         return $employee;
     }
 
-    private function createAttendance(EmployeeProfile $employee, string $date, array $overrides = []): Attendance
+    private function createAttendance(StaffMemberProfile $employee, string $date, array $overrides = []): Attendance
     {
         return Attendance::create(array_merge([
             'employee_id' => $employee->id,

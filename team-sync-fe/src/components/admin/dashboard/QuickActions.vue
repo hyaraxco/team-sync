@@ -46,10 +46,10 @@ type QuickAction = ActionableQuickAction | PlaceholderQuickAction;
 const actionConfigs: ActionableQuickAction[] = [
   {
     id: "add-employee",
-    label: "Add Employee",
+    label: "Add Staff Member",
     icon: UserPlusIcon,
-    to: { name: "admin.employees.create" },
-    isVisible: () => can("employee-create"),
+    to: { name: "admin.staffMembers.create" },
+    isVisible: () => can("staff-member-create"),
   },
   {
     id: "create-team",
@@ -116,7 +116,7 @@ const actionConfigs: ActionableQuickAction[] = [
     label: "Request Leave",
     icon: CalendarPlusIcon,
     to: {
-      name: "employee.attendance.my-attendances",
+      name: "staffMember.attendance.my-attendances",
       query: { action: "request-leave" },
     },
     isVisible: () =>

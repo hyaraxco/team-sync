@@ -19,15 +19,15 @@ const mockTaskStore = {
 };
 
 const mockEmployeeStore = {
-  fetchEmployees: vi.fn().mockResolvedValue([]),
+  fetchStaffMembers: vi.fn().mockResolvedValue([]),
 };
 
 vi.mock("@/stores/task", () => ({
   useTaskStore: () => mockTaskStore,
 }));
 
-vi.mock("@/stores/employee", () => ({
-  useEmployeeStore: () => mockEmployeeStore,
+vi.mock("@/stores/staffMember", () => ({
+  useStaffMemberStore: () => mockEmployeeStore,
 }));
 
 vi.mock("@/stores/auth", () => ({
@@ -100,7 +100,7 @@ describe("TaskDetailModal smoke", () => {
         fn.mockClear();
       }
     });
-    mockEmployeeStore.fetchEmployees.mockClear();
+    mockEmployeeStore.fetchStaffMembers.mockClear();
   });
 
   it("shows reviewer actions on review status", async () => {
@@ -126,7 +126,7 @@ describe("TaskDetailModal smoke", () => {
       {
         name: "Employee User",
         employee_profile: { id: 100 },
-        roles: [{ name: "employee" }],
+        roles: [{ name: "staff" }],
       }
     );
 
@@ -146,7 +146,7 @@ describe("TaskDetailModal smoke", () => {
       {
         name: "Employee User",
         employee_profile: { id: 100 },
-        roles: [{ name: "employee" }],
+        roles: [{ name: "staff" }],
       }
     );
 

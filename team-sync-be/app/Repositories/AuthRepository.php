@@ -43,7 +43,7 @@ class AuthRepository implements AuthRepositoryInterface
 
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        $user->load(['roles', 'permissions', 'employeeProfile.jobInformation']);
+        $user->load(['roles', 'permissions', 'staffMemberProfile.jobInformation']);
 
         return $user;
     }
@@ -92,11 +92,11 @@ class AuthRepository implements AuthRepositoryInterface
 
             // Email is intentionally not updatable
             $user->save();
-            $user->employeeProfile?->searchable();
+            $user->staffMemberProfile?->searchable();
 
             DB::commit();
 
-            return $user->fresh()->load(['roles', 'permissions', 'employeeProfile']);
+            return $user->fresh()->load(['roles', 'permissions', 'staffMemberProfile']);
         } catch (\Exception $e) {
             DB::rollBack();
             throw new \Exception($e->getMessage(), $e->getCode() ?: 500);

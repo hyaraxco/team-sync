@@ -228,7 +228,7 @@ Overall review rating is weighted average of section ratings.
 
 ### Permission Matrix
 
-| Action                    | Employee | Manager            | HR      | Finance |
+| Action                    | Staff Member | Manager            | HR      | Finance |
 | ------------------------- | -------- | ------------------ | ------- | ------- |
 | View own reviews          | ✓        | ✓                  | ✓       | -       |
 | Submit self-assessment    | ✓        | ✓                  | ✓       | -       |
@@ -415,7 +415,7 @@ graph TD
 
 ### Existing Systems
 
-- **Employee Management**: Reviews and goals linked to employee profiles
+- **Staff Member Management**: Reviews and goals linked to employee profiles
 - **Team Management**: Manager access based on team membership
 - **Notifications**: All performance events trigger notifications
 - **Analytics Dashboard**: Performance metrics integrated into HR analytics

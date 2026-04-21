@@ -684,12 +684,12 @@ const handleApprovePayroll = () => {
     <template v-if="hasPayrollStatistics">
       <!-- Payroll Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Total Employees Card -->
+        <!-- Total Staff Members Card -->
         <div
           class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6">
           <div class="flex items-center justify-between">
             <div>
-              <p class="text-brand-dark text-sm font-medium">Total Employees</p>
+              <p class="text-brand-dark text-sm font-medium">Total Staff Members</p>
               <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
                 <template v-if="loadingStatistics">...</template><AnimatedValue v-else :value="payrollStatistics?.total_employees || 0" />
               </p>
@@ -819,7 +819,7 @@ const handleApprovePayroll = () => {
           data-testid="tab-employees"
         >
           <Users class="w-4 h-4" :class="activeTab === 'employees' ? 'text-white' : 'text-gray-600'" />
-          <span class="text-sm font-semibold">Employee Details</span>
+          <span class="text-sm font-semibold">Staff Member Details</span>
         </button>
         <button
           @click="activeTab = 'reconciliation'"
@@ -863,7 +863,7 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <!-- Employee Details Section -->
+    <!-- Staff Member Details Section -->
     <div v-show="activeTab === 'employees'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
@@ -871,7 +871,7 @@ const handleApprovePayroll = () => {
             <Users class="w-6 h-6 text-blue-600" />
           </div>
           <div>
-            <h3 class="text-brand-dark text-xl font-bold">Employee Details</h3>
+            <h3 class="text-brand-dark text-xl font-bold">Staff Member Details</h3>
             <p class="text-brand-light text-sm font-normal">
               Complete payroll breakdown by employee
             </p>
@@ -1584,7 +1584,7 @@ const handleApprovePayroll = () => {
           v-if="selectedAdjustmentItems.length === 0"
           class="rounded-[12px] border border-dashed border-[#DCDEDD] px-4 py-4 text-sm text-brand-light"
         >
-          No adjustments available for this employee.
+          No adjustments available for this staff member.
         </div>
 
         <div v-else class="space-y-3 max-h-[360px] overflow-y-auto pr-1">

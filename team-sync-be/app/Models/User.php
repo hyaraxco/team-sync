@@ -50,9 +50,9 @@ class User extends Authenticatable implements MustVerifyEmail
         ];
     }
 
-    public function employeeProfile()
+    public function staffMemberProfile()
     {
-        return $this->hasOne(EmployeeProfile::class);
+        return $this->hasOne(StaffMemberProfile::class);
     }
 
     public function leadTeams()

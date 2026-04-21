@@ -34,7 +34,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         ?int $limit,
         bool $execute
     ): Builder|QueryBuilder|Collection {
-        $query = Attendance::with(['employee.user', 'employee.jobInformation.team'])
+        $query = Attendance::with(['staffMember.user', 'staffMember.jobInformation.team'])
             ->where(function ($query) use ($search, $date) {
                 if ($search) {
                     $query->search($search);
@@ -89,14 +89,14 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function getById(
         string $id
     ): Attendance {
-        return Attendance::with(['employee.user'])
+        return Attendance::with(['staffMember.user'])
             ->findOrFail($id);
     }
 
     public function getMyAttendances(): Collection
     {
-        return Attendance::with(['employee.user'])
-            ->where('employee_id', Auth::user()->employeeProfile->id)
+        return Attendance::with(['staffMember.user'])
+            ->where('employee_id', Auth::user()->staffMemberProfile->id)
             ->whereDate('date', '>=', now()->subDays(6)->startOfDay())
             ->whereDate('date', '<=', now()->endOfDay())
             ->orderBy('date', 'desc')
@@ -105,7 +105,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     public function getMyAttendanceStatistics()
     {
-        $employeeId = Auth::user()->employeeProfile->id;
+        $employeeId = Auth::user()->staffMemberProfile->id;
         $startOfMonth = now()->startOfMonth();
         $today = now();
 
@@ -166,8 +166,8 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     public function getLastAttendanceByEmployee(): ?Attendance
     {
-        return Attendance::with(['employee.user'])
-            ->where('employee_id', Auth::user()->employeeProfile->id)
+        return Attendance::with(['staffMember.user'])
+            ->where('employee_id', Auth::user()->staffMemberProfile->id)
             ->whereBetween('date', [
                 now()->startOfDay(),
                 now()->endOfDay(),
@@ -182,7 +182,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 throw new \Exception('Attendance period is no longer open for check-in.');
             }
 
-            $existingAttendance = Attendance::where('employee_id', Auth::user()->employeeProfile->id)
+            $existingAttendance = Attendance::where('employee_id', Auth::user()->staffMemberProfile->id)
                 ->whereBetween('date', [
                     now()->startOfDay(),
                     now()->endOfDay(),
@@ -220,7 +220,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 throw new \Exception('Attendance period is no longer open for check-out.');
             }
 
-            $attendance = Attendance::where('employee_id', Auth::user()->employeeProfile->id)
+            $attendance = Attendance::where('employee_id', Auth::user()->staffMemberProfile->id)
                 ->whereBetween('date', [
                     now()->startOfDay(),
                     now()->endOfDay(),
@@ -251,7 +251,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 $this->emailService->sendAttendanceCheckedOutNotification($attendance);
             });
 
-            return $attendance->load(['employee.user']);
+            return $attendance->load(['staffMember.user']);
         });
     }
 
@@ -268,7 +268,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
             $mismatch->update([
                 'status' => AttendancePolicyMismatch::STATUS_ACKNOWLEDGED,
-                'acknowledged_by' => $this->resolveActorEmployeeProfileId(),
+                'acknowledged_by' => $this->resolveActorStaffMemberProfileId(),
                 'acknowledged_at' => now(),
                 'resolution_notes' => $data['resolution_notes'] ?? $mismatch->resolution_notes,
             ]);
@@ -277,7 +277,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 $this->emailService->sendAttendanceMismatchAcknowledgedNotification($mismatch);
             });
 
-            return $mismatch->fresh(['attendance', 'employee.user', 'acknowledgedBy.user', 'resolvedBy.user']);
+            return $mismatch->fresh(['attendance', 'staffMember.user', 'acknowledgedBy.user', 'resolvedBy.user']);
         });
     }
 
@@ -294,7 +294,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
             $mismatch->update([
                 'status' => AttendancePolicyMismatch::STATUS_RESOLVED,
-                'resolved_by' => $this->resolveActorEmployeeProfileId(),
+                'resolved_by' => $this->resolveActorStaffMemberProfileId(),
                 'resolved_at' => now(),
                 'resolution_notes' => $data['resolution_notes'] ?? $mismatch->resolution_notes,
             ]);
@@ -303,7 +303,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 $this->emailService->sendAttendanceMismatchResolvedNotification($mismatch);
             });
 
-            return $mismatch->fresh(['attendance', 'employee.user', 'acknowledgedBy.user', 'resolvedBy.user']);
+            return $mismatch->fresh(['attendance', 'staffMember.user', 'acknowledgedBy.user', 'resolvedBy.user']);
         });
     }
 
@@ -453,9 +453,9 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         }
     }
 
-    private function resolveActorEmployeeProfileId(): int
+    private function resolveActorStaffMemberProfileId(): int
     {
-        $employeeId = Auth::user()?->employeeProfile?->getKey();
+        $employeeId = Auth::user()?->staffMemberProfile?->getKey();
 
         if (! $employeeId) {
             throw new AuthorizationException('Authenticated user does not have an employee profile.');

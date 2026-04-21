@@ -2,8 +2,8 @@ import PayrollDashboard from '@/views/admin/payroll/PayrollDashboard.vue';
 import PayrollCreate from '@/views/admin/payroll/PayrollCreate.vue';
 import PayrollDetail from '@/views/admin/payroll/PayrollDetail.vue';
 import PayrollSettings from '@/views/admin/payroll/PayrollSettings.vue';
-import MyPayslips from '@/views/employee/MyPayslips.vue';
-import PayslipDetail from '@/views/employee/PayslipDetail.vue';
+import MyPayslips from '@/views/staff-member/MyPayslips.vue';
+import PayslipDetail from '@/views/staff-member/PayslipDetail.vue';
 
 export default [
     {
@@ -44,7 +44,7 @@ export default [
     },
     {
         path: 'my-payroll',
-        name: 'employee.payroll',
+        name: 'staffMember.payroll',
         component: MyPayslips,
         meta: {
             requiredPermission: 'payslip-view',
@@ -53,7 +53,7 @@ export default [
     },
     {
         path: 'my-payroll/:id',
-        name: 'employee.payroll.detail',
+        name: 'staffMember.payroll.detail',
         component: PayslipDetail,
         meta: {
             requiredPermission: 'payslip-view',
@@ -62,9 +62,9 @@ export default [
     },
     {
         path: 'my-payslips',
-        name: 'employee.payslips',
+        name: 'staffMember.payslips',
         redirect: {
-            name: 'employee.payroll',
+            name: 'staffMember.payroll',
         },
         meta: {
             requiredPermission: 'payslip-view',
@@ -73,9 +73,9 @@ export default [
     },
     {
         path: 'my-payslips/:id',
-        name: 'employee.payslips.detail',
+        name: 'staffMember.payslips.detail',
         redirect: to => ({
-            name: 'employee.payroll.detail',
+            name: 'staffMember.payroll.detail',
             params: to.params,
         }),
         meta: {

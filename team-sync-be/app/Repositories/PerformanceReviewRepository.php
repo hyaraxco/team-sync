@@ -69,7 +69,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getReviewsForManager(string $managerId, array $filters = []): LengthAwarePaginator
     {
-        $query = PerformanceReview::with(['cycle', 'employee.user'])
+        $query = PerformanceReview::with(['cycle', 'staffMember.user'])
             ->where('reviewer_id', $managerId);
             
         if (isset($filters['status'])) {
@@ -86,7 +86,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getReviewById(int $id)
     {
-        return PerformanceReview::with(['cycle', 'employee.user', 'reviewer.user', 'responses.section', 'calibrator'])
+        return PerformanceReview::with(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator'])
             ->findOrFail($id);
     }
 
@@ -183,7 +183,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     public function getEmployeeScoresForCycle(int $cycleId): array
     {
         // C1 & C2: Dari performance_reviews + review_responses
-        $reviewScores = PerformanceReview::with(['employee.jobInformation.team', 'responses'])
+        $reviewScores = PerformanceReview::with(['staffMember.jobInformation.team', 'responses'])
             ->where('cycle_id', $cycleId)
             ->where('status', 'completed')
             ->get();
@@ -224,9 +224,9 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
             $candidates[] = [
                 'employee_id'             => $employeeId,
-                'employee_name'           => $review->employee->full_name ?? 'Unknown',
-                'department'              => $review->employee->jobInformation->department ?? null,
-                'team'                    => $review->employee->jobInformation->team->name ?? null,
+                'employee_name'           => $review->staffMember->full_name ?? 'Unknown',
+                'department'              => $review->staffMember->jobInformation->department ?? null,
+                'team'                    => $review->staffMember->jobInformation->team->name ?? null,
                 'review_id'               => $review->id,
                 'review_status'           => $review->status,
                 // Kriteria TOPSIS

@@ -30,8 +30,8 @@ class TeamMember extends Model
         return $this->belongsTo(Team::class);
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'employee_id');
     }
 }

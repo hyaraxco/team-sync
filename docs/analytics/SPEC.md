@@ -401,7 +401,7 @@ Fields:
 
 ### Existing Systems
 
-- **Employee Management**: Workforce metrics source
+- **Staff Member Management**: Workforce metrics source
 - **Attendance System**: Attendance metrics source
 - **Leave Management**: Leave metrics source
 - **Payroll System**: Payroll metrics source

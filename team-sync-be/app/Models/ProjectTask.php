@@ -38,7 +38,7 @@ class ProjectTask extends Model
 
     public function assignee()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'assignee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'assignee_id');
     }
 
     public function comments()

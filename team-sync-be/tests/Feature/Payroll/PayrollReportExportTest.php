@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\User;
@@ -179,8 +179,8 @@ class PayrollReportExportTest extends TestCase
 
     private function createPayrollWithDetail(string $salaryMonth, string $status, ?string $paymentDate = null): void
     {
-        $employeeProfile = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         $payroll = Payroll::create([
@@ -191,7 +191,7 @@ class PayrollReportExportTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

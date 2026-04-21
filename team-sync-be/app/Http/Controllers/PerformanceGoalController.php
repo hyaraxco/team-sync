@@ -20,13 +20,13 @@ class PerformanceGoalController extends Controller
 
     public function getMyGoals(Request $request)
     {
-        $goals = $this->repository->getGoalsForEmployee(Auth::user()->employeeProfile?->id, $request->all());
+        $goals = $this->repository->getGoalsForEmployee(Auth::user()->staffMemberProfile?->id, $request->all());
         return ResponseHelper::jsonResponse(true, 'My goals retrieved successfully', $goals);
     }
 
     public function getTeamGoals(Request $request)
     {
-        $goals = $this->repository->getGoalsForManager(Auth::user()->employeeProfile?->id, $request->all());
+        $goals = $this->repository->getGoalsForManager(Auth::user()->staffMemberProfile?->id, $request->all());
         return ResponseHelper::jsonResponse(true, 'Team goals retrieved successfully', $goals);
     }
 

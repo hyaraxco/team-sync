@@ -34,8 +34,8 @@ class AttendanceCorrection extends Model {
         return $this->belongsTo(Attendance::class);
     }
 
-    public function employee() {
-        return $this->belongsTo(EmployeeProfile::class);
+    public function staffMember() {
+        return $this->belongsTo(StaffMemberProfile::class);
     }
 
     public function reviewer() {

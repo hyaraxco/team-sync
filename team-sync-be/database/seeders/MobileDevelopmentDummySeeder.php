@@ -13,7 +13,7 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Enums\TeamStatus;
 use App\Enums\WorkLocation;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\ProjectTeam;
@@ -112,7 +112,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 $user->restore();
             }
 
-            $profile = EmployeeProfile::withTrashed()->updateOrCreate(
+            $profile = StaffMemberProfile::withTrashed()->updateOrCreate(
                 ['code' => sprintf('MBD%03d', $sequence)],
                 [
                     'user_id' => $user->id,
@@ -161,7 +161,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 $teamMember->restore();
             }
 
-            $user->syncRoles([$employeeBlueprint['role'] ?? 'employee']);
+            $user->syncRoles([$employeeBlueprint['role'] ?? 'staff']);
 
             $profilesByStream[$stream][] = [
                 'user' => $user,
@@ -190,7 +190,7 @@ class MobileDevelopmentDummySeeder extends Seeder
         }
     }
 
-    private function seedProject(EmployeeProfile $projectLeader): Project
+    private function seedProject(StaffMemberProfile $projectLeader): Project
     {
         $project = Project::withTrashed()->updateOrCreate(
             ['name' => 'TeamSync Mobile Development 20 Squad'],
@@ -386,7 +386,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '55281',
                 'monthly_salary' => 19000000,
                 'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'employee',
+                'role' => 'staff',
                 'profile_photo' => 'profile-pictures/female/1.avif',
             ],
             [
@@ -402,7 +402,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '50134',
                 'monthly_salary' => 17000000,
                 'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'uiux',
@@ -417,7 +417,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '65119',
                 'monthly_salary' => 13500000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'uiux',
@@ -432,7 +432,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '60241',
                 'monthly_salary' => 12000000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -447,7 +447,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '12730',
                 'monthly_salary' => 18500000,
                 'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -462,7 +462,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '17143',
                 'monthly_salary' => 12800000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -477,7 +477,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '16128',
                 'monthly_salary' => 11800000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -492,7 +492,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '16424',
                 'monthly_salary' => 13200000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -507,7 +507,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '55284',
                 'monthly_salary' => 9800000,
                 'skill_level' => SkillLevel::BEGINNER->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -522,7 +522,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '57141',
                 'monthly_salary' => 19500000,
                 'skill_level' => SkillLevel::EXPERT->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -537,7 +537,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '15345',
                 'monthly_salary' => 15000000,
                 'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -552,7 +552,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '35142',
                 'monthly_salary' => 14200000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -567,7 +567,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '25173',
                 'monthly_salary' => 11800000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -582,7 +582,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '20119',
                 'monthly_salary' => 12600000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -597,7 +597,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '30126',
                 'monthly_salary' => 9800000,
                 'skill_level' => SkillLevel::BEGINNER->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'qa',
@@ -612,7 +612,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '29444',
                 'monthly_salary' => 14800000,
                 'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'qa',
@@ -627,7 +627,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '28116',
                 'monthly_salary' => 13200000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'qa',
@@ -642,7 +642,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '45122',
                 'monthly_salary' => 10800000,
                 'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
             [
                 'stream' => 'qa',
@@ -657,7 +657,7 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'postal_code' => '70234',
                 'monthly_salary' => 9200000,
                 'skill_level' => SkillLevel::BEGINNER->value,
-                'role' => 'employee',
+                'role' => 'staff',
             ],
         ];
     }

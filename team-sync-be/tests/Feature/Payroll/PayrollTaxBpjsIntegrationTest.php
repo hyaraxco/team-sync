@@ -5,7 +5,7 @@ namespace Tests\Feature\Payroll;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\BpjsRate;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\PayrollSetting;
 use App\Models\PtkpAmount;
@@ -222,10 +222,10 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
     // Helper
     // ─────────────────────────────────────────────────────────────────────────
 
-    private function createEmployeeWithAttendance(int $salary): EmployeeProfile
+    private function createEmployeeWithAttendance(int $salary): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($salary) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($salary) {
+            $employee = StaffMemberProfile::factory()->create();
 
             JobInformation::factory()
                 ->forEmployee($employee)

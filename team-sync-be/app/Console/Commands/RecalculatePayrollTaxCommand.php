@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Services\Payroll\TaxCalculationService;
@@ -52,7 +52,7 @@ class RecalculatePayrollTaxCommand extends Command
         $this->newLine();
 
         // Load all payroll details with employee profile
-        $details = PayrollDetail::with(['employee' => function ($q) {
+        $details = PayrollDetail::with(['staffMember' => function ($q) {
             $q->select('id', 'npwp', 'ptkp_status');
         }])
         ->where('payroll_id', $payroll->id)
@@ -71,7 +71,7 @@ class RecalculatePayrollTaxCommand extends Command
         $after  = ['pph21' => 0, 'bpjs_tk' => 0, 'bpjs_kes' => 0];
 
         foreach ($details as $detail) {
-            $employee = $detail->employee;
+            $employee = $detail->staffMember;
             if (! $employee) continue;
 
             $gross    = (float) $detail->original_salary;

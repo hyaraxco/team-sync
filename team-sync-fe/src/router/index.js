@@ -8,13 +8,13 @@ import ResetPassword from "@/views/auth/ResetPassword.vue";
 import VerifyEmailResult from "@/views/auth/VerifyEmailResult.vue";
 import AdminDashboard from "@/views/admin/Dashboard.vue";
 import teamRoutes from "./team";
-import employeeRoutes from "./employee";
-import EmployeeCreate from "@/views/admin/employee/EmployeeCreate.vue";
-import EmployeeEdit from "@/views/admin/employee/EmployeeEdit.vue";
-import EmployeeDetail from "@/views/admin/employee/EmployeeDetail.vue";
-import EmployeeProfile from "@/views/employee/EmployeeProfile.vue";
-import EmployeeTeam from "@/views/employee/EmployeeTeam.vue";
-import EmployeeCreateLayout from "@/layouts/EmployeeCreateLayout.vue";
+import staffMemberRoutes from "./staffMember";
+import StaffMemberCreate from "@/views/admin/staff-member/StaffMemberCreate.vue";
+import StaffMemberEdit from "@/views/admin/staff-member/StaffMemberEdit.vue";
+import StaffMemberDetail from "@/views/admin/staff-member/StaffMemberDetail.vue";
+import StaffMemberProfile from "@/views/staff-member/StaffMemberProfile.vue";
+import StaffMemberTeam from "@/views/staff-member/StaffMemberTeam.vue";
+import StaffMemberCreateLayout from "@/layouts/StaffMemberCreateLayout.vue";
 import projectRoutes from "./project";
 import attendanceRoutes from "./attendance";
 import payrollRoutes from "./payroll";
@@ -51,7 +51,7 @@ export const appRoutes = [
         },
       },
       ...teamRoutes,
-      ...employeeRoutes,
+      ...staffMemberRoutes,
       ...projectRoutes,
       ...attendanceRoutes,
       ...payrollRoutes,
@@ -59,24 +59,24 @@ export const appRoutes = [
       ...performanceRoutes,
       {
         path: "my-profile",
-        name: "employee.profile",
-        component: EmployeeProfile,
+        name: "staffMember.profile",
+        component: StaffMemberProfile,
         meta: {
           requiredPermission: "profile-menu",
         },
       },
       {
         path: "my-profile/edit",
-        name: "employee.profile.edit",
-        component: () => import("@/views/employee/EmployeeProfileEdit.vue"),
+        name: "staffMember.profile.edit",
+        component: () => import("@/views/staff-member/StaffMemberProfileEdit.vue"),
         meta: {
           requiredPermission: "profile-menu",
         },
       },
       {
         path: "my-team",
-        name: "employee.team",
-        component: EmployeeTeam,
+        name: "staffMember.team",
+        component: StaffMemberTeam,
         meta: {
           requiredPermission: "team-view",
         },
@@ -84,47 +84,47 @@ export const appRoutes = [
     ],
   },
   {
-    path: "/admin/employees/create",
-    component: EmployeeCreateLayout,
+    path: "/admin/staff-members/create",
+    component: StaffMemberCreateLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: "employee-create",
+      requiredPermission: "staff-member-create",
     },
     children: [
       {
         path: "",
-        name: "admin.employees.create",
-        component: EmployeeCreate,
+        name: "admin.staffMembers.create",
+        component: StaffMemberCreate,
       },
     ],
   },
   {
-    path: "/admin/employees/:id/edit",
-    component: EmployeeCreateLayout,
+    path: "/admin/staff-members/:id/edit",
+    component: StaffMemberCreateLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: "employee-edit",
+      requiredPermission: "staff-member-edit",
     },
     children: [
       {
         path: "",
-        name: "admin.employees.edit",
-        component: EmployeeEdit,
+        name: "admin.staffMembers.edit",
+        component: StaffMemberEdit,
       },
     ],
   },
   {
-    path: "/admin/employees/:id",
+    path: "/admin/staff-members/:id",
     component: AdminLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: "employee-menu",
+      requiredPermission: "staff-member-menu",
     },
     children: [
       {
         path: "",
-        name: "admin.employees.detail",
-        component: EmployeeDetail,
+        name: "admin.staffMembers.detail",
+        component: StaffMemberDetail,
       },
     ],
   },

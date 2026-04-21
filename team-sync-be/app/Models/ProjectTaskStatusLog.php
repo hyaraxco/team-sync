@@ -32,6 +32,6 @@ class ProjectTaskStatusLog extends Model
 
     public function changedBy()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'changed_by');
+        return $this->belongsTo(StaffMemberProfile::class, 'changed_by');
     }
 }

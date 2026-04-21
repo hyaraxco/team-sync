@@ -35,7 +35,7 @@ import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import Header from "@/components/admin/team/detail/Header.vue";
 import Statistic from "@/components/admin/team/detail/Statistic.vue";
 import Chart from "@/components/admin/team/detail/Chart.vue";
-import { useEmployeeStore } from "@/stores/employee";
+import { useStaffMemberStore } from "@/stores/staffMember";
 import { Search, SearchX, ChevronDown, X } from "lucide-vue-next";
 import EmptyState from "@/components/common/EmptyState.vue";
 
@@ -47,9 +47,9 @@ const teamStore = useTeamStore();
 const { loading, success, error } = storeToRefs(teamStore);
 const { fetchTeam, deleteTeam, addMember, removeMember } = teamStore;
 
-const employeeStore = useEmployeeStore();
-const { employees } = storeToRefs(employeeStore);
-const { fetchEmployees } = employeeStore;
+const staffMemberStore = useStaffMemberStore();
+const { staffMembers } = storeToRefs(staffMemberStore);
+const { fetchStaffMembers } = staffMemberStore;
 
 const team = ref({});
 const showDeleteModal = ref(false);
@@ -60,14 +60,14 @@ const removingMember = ref(false);
 const showRemoveMemberModal = ref(false);
 const memberToRemove = ref(null);
 
-// Filter employees yang belum menjadi member
+// Filter staffMembers yang belum menjadi member
 const availableEmployees = computed(() => {
   if (!team.value.members || !Array.isArray(team.value.members)) {
-    return employees.value;
+    return staffMembers.value;
   }
 
   const memberIds = team.value.members.map((member) => member.employee.id);
-  return employees.value.filter((employee) => !memberIds.includes(employee.id));
+  return staffMembers.value.filter((employee) => !memberIds.includes(employee.id));
 });
 
 const handleFetchTeam = async () => {
@@ -87,7 +87,7 @@ const handleDeleteTeam = async () => {
 
 const openAddMemberModal = () => {
   showAddMemberModal.value = true;
-  fetchEmployees({ limit: 6 });
+  fetchStaffMembers({ limit: 6 });
 };
 
 const closeAddMemberModal = () => {
@@ -142,7 +142,7 @@ onMounted(async () => {
 watch(
   searchMember,
   debounce(() => {
-    fetchEmployees({
+    fetchStaffMembers({
       limit: 6,
       search: searchMember.value,
     });
@@ -465,7 +465,7 @@ watch(
         </div>
         <RouterLink
           :to="{
-            name: 'admin.employees.detail',
+            name: 'admin.staffMembers.detail',
             params: { id: member.employee.id },
           }"
           class="w-full border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
@@ -710,7 +710,7 @@ watch(
           <input
             type="text"
             class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
-            placeholder="Search employees..."
+            placeholder="Search staffMembers..."
             v-model="searchMember"
           />
         </div>
@@ -760,8 +760,8 @@ watch(
         <EmptyState
           v-if="availableEmployees.length === 0"
           icon="SearchX"
-          title="No employees available"
-          subtitle="All employees are already members of this team or try adjusting your search terms"
+          title="No staffMembers available"
+          subtitle="All staffMembers are already members of this team or try adjusting your search terms"
         />
       </div>
     </div>

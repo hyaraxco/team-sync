@@ -113,7 +113,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
         </span>
       </div>
 
-      <!-- Employee Lists -->
+      <!-- Staff Member Lists -->
       <div class="space-y-2 max-h-[280px] overflow-auto">
         <!-- Checked In -->
         <div
@@ -123,8 +123,8 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
         >
           <div class="relative">
             <img
-              v-if="employee.profile_photo"
-              :src="employee.profile_photo"
+              v-if="staffMember.profile_photo"
+              :src="staffMember.profile_photo"
               :alt="employee.name"
               class="w-8 h-8 rounded-full object-cover"
             />
@@ -165,8 +165,8 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
           >
             <div class="relative">
               <img
-                v-if="employee.profile_photo"
-                :src="employee.profile_photo"
+                v-if="staffMember.profile_photo"
+                :src="staffMember.profile_photo"
                 :alt="employee.name"
                 class="w-8 h-8 rounded-full object-cover grayscale"
               />

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Notification;
 
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
 use App\Models\Team;
 use App\Models\User;
@@ -56,8 +56,8 @@ class LeaveCrossRoleNotificationsTest extends TestCase
             'team_lead_id' => $managerUser->id,
         ]);
 
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile(
+            'staff',
             'Leave Employee',
             $team->id
         );
@@ -77,7 +77,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         $managerNotification = $this->latestNotification($managerUser);
         $this->assertSame('Leave Request Needs Approval', $managerNotification['title']);
         $this->assertSame($leaveRequestId, (int) ($managerNotification['data']['leave_request_id'] ?? 0));
-        $this->assertSame($employeeProfile->id, (int) ($managerNotification['data']['employee_id'] ?? 0));
+        $this->assertSame($staffMemberProfile->id, (int) ($managerNotification['data']['employee_id'] ?? 0));
 
         $hrNotification = $this->latestNotification($hrUser);
         $this->assertSame('Leave Request Needs Approval', $hrNotification['title']);
@@ -99,14 +99,14 @@ class LeaveCrossRoleNotificationsTest extends TestCase
             'team_lead_id' => $managerUser->id,
         ]);
 
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile(
+            'staff',
             'Proof Employee',
             $team->id
         );
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-15',
             'end_date' => '2026-04-15',
@@ -138,10 +138,10 @@ class LeaveCrossRoleNotificationsTest extends TestCase
     public function test_hr_proof_review_notifies_related_employee(): void
     {
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'Reviewer HR');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Reviewed Employee');
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Reviewed Employee');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $employeeProfile->id,
+            'employee_id' => $staffMemberProfile->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-10',
             'end_date' => '2026-04-10',
@@ -169,7 +169,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
     }
 
     /**
-     * @return array{0: User, 1: EmployeeProfile}
+     * @return array{0: User, 1: StaffMemberProfile}
      */
     private function createUserWithRoleAndProfile(string $role, string $name, ?int $teamId = null): array
     {
@@ -181,8 +181,8 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         ]);
         $user->syncRoles([$role]);
 
-        $profile = EmployeeProfile::withoutSyncingToSearch(function () use ($user, $role, $sequence, $teamId) {
-            $profile = EmployeeProfile::factory()->forUser($user)->create([
+        $profile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user, $role, $sequence, $teamId) {
+            $profile = StaffMemberProfile::factory()->forUser($user)->create([
                 'code' => sprintf('%s%03d', strtoupper(substr($role, 0, 3)), $sequence),
                 'identity_number' => str_pad((string) (89000000000000 + $sequence), 14, '0', STR_PAD_LEFT),
             ]);

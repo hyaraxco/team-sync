@@ -29,9 +29,9 @@ class AttendancePolicyMismatchResource extends JsonResource
             'resolved_at' => $this->resolved_at,
             'resolution_notes' => $this->resolution_notes,
             'attendance' => new AttendanceResource($this->whenLoaded('attendance')),
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
-            'acknowledged_by_employee' => new EmployeeProfileResource($this->whenLoaded('acknowledgedBy')),
-            'resolved_by_employee' => new EmployeeProfileResource($this->whenLoaded('resolvedBy')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
+            'acknowledged_by_employee' => new StaffMemberProfileResource($this->whenLoaded('acknowledgedBy')),
+            'resolved_by_employee' => new StaffMemberProfileResource($this->whenLoaded('resolvedBy')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -175,7 +175,7 @@ describe("PayrollDetail smoke", () => {
     expect(fetchPayrollNotificationDeliveries).not.toHaveBeenCalled();
     expect(wrapper.text()).toContain("Payroll Draft Review");
     expect(wrapper.text()).not.toContain("Mark as Paid");
-    expect(wrapper.text()).not.toContain("Total Employees");
+    expect(wrapper.text()).not.toContain("Total Staff Members");
     expect(wrapper.text()).toContain("Export Excel");
   });
 
@@ -187,7 +187,7 @@ describe("PayrollDetail smoke", () => {
     await vi.waitFor(() => expect(fetchPayrollActivityLogs).toHaveBeenCalledWith("1"));
 
     expect(fetchPayrollStatistics).toHaveBeenCalledWith("1");
-    expect(wrapper.text()).toContain("Total Employees");
+    expect(wrapper.text()).toContain("Total Staff Members");
     expect(wrapper.text()).toContain("Approve Payroll");
     expect(wrapper.text()).not.toContain("Mark as Paid");
     expect(wrapper.text()).not.toContain("Payroll Draft Review");

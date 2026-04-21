@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\User;
@@ -251,8 +251,8 @@ class PayrollStatisticsTest extends TestCase
                 'email' => 'employee+'.uniqid().'@teamsync.com',
             ]);
 
-            $employee = EmployeeProfile::withoutSyncingToSearch(function () use ($user) {
-                return EmployeeProfile::factory()->for($user)->create();
+            $employee = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {
+                return StaffMemberProfile::factory()->for($user)->create();
             });
 
             PayrollDetail::create([

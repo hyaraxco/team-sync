@@ -3,7 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
@@ -18,7 +18,7 @@ class MinimalPayrollE2ESeeder extends Seeder
      */
     public function run(): void
     {
-        EmployeeProfile::withoutSyncingToSearch(function () {
+        StaffMemberProfile::withoutSyncingToSearch(function () {
             $this->call([
                 PermissionSeeder::class,
                 RoleSeeder::class,
@@ -37,7 +37,7 @@ class MinimalPayrollE2ESeeder extends Seeder
             PayrollSetting::current()->update([
                 'attendance_cutoff_day' => 1,
             ]);
-            $employee = EmployeeProfile::with('jobInformation')
+            $employee = StaffMemberProfile::with('jobInformation')
                 ->where('code', 'EMP001')
                 ->firstOrFail();
 
@@ -80,7 +80,7 @@ class MinimalPayrollE2ESeeder extends Seeder
 
     private function seedAttendanceForActiveEmployeesForMonth(Carbon $payrollMonth): void
     {
-        $activeEmployeeIds = EmployeeProfile::query()
+        $activeEmployeeIds = StaffMemberProfile::query()
             ->whereHas('jobInformation', function ($query) {
                 $query->where('status', 'active');
             })

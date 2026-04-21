@@ -187,7 +187,7 @@ describe("PayrollCreate smoke", () => {
       salary_month: validMonth,
     });
     expect(toastSuccess).toHaveBeenCalledWith(
-      "Payroll berhasil digenerate",
+      "Payroll successfully generated",
       expect.stringContaining(String(new Date().getFullYear()))
     );
     expect(push).toHaveBeenCalledWith({ name: "admin.payroll.dashboard" });
@@ -209,7 +209,7 @@ describe("PayrollCreate smoke", () => {
     await flushAsync();
 
     expect(toastError).toHaveBeenCalledWith(
-      "Generate payroll gagal",
+      "Failed to generate payroll",
       "Payroll for current month already exists"
     );
     expect(push).not.toHaveBeenCalled();

@@ -26,9 +26,9 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
     public function getAllPaginated(?string $search, int $rowPerPage, ?string $status = null)
     {
         return AttendanceCorrection::query()
-            ->with(['employee.user', 'attendance', 'reviewer'])
+            ->with(['staffMember.user', 'attendance', 'reviewer'])
             ->when($search, function ($query, $search) {
-                $query->whereHas('employee.user', function ($q) use ($search) {
+                $query->whereHas('staffMember.user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
                 });
             })
@@ -41,7 +41,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
     public function getMyCorrections()
     {
-        $employeeId = Auth::user()->employeeProfile->id;
+        $employeeId = Auth::user()->staffMemberProfile->id;
         
         return AttendanceCorrection::query()
             ->with(['attendance'])
@@ -52,7 +52,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
     public function getById(string $id)
     {
-        $correction = AttendanceCorrection::with(['employee.user', 'attendance', 'reviewer'])->find($id);
+        $correction = AttendanceCorrection::with(['staffMember.user', 'attendance', 'reviewer'])->find($id);
 
         if (!$correction) {
             throw new ModelNotFoundException("Attendance Correction not found.");
@@ -61,7 +61,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
         // Check if employee tries to read someone else's request
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        if ($user->hasRole('employee') && $correction->employee_id !== $user->employeeProfile->id) {
+        if ($user->hasRole('staff') && $correction->employee_id !== $user->staffMemberProfile->id) {
             throw new AuthorizationException("You are not authorized to view this request.");
         }
 
@@ -80,7 +80,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             throw new \Exception("Pengajuan koreksi tidak dapat diproses karena periode absensi untuk tanggal tersebut sudah ditutup atau dikunci oleh HR.");
         }
 
-        $employeeId = Auth::user()->employeeProfile->id;
+        $employeeId = Auth::user()->staffMemberProfile->id;
 
         if ($attendance->employee_id !== $employeeId) {
              throw new AuthorizationException("You are not authorized to request correction for this attendance.");

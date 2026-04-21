@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Attendance;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
@@ -131,10 +131,10 @@ class LeaveEntitlementValidatorTest extends TestCase
         $this->assertTrue($result['is_paid_leave']);
     }
 
-    private function createEmployeeWithEmploymentType(string $employmentType): EmployeeProfile
+    private function createEmployeeWithEmploymentType(string $employmentType): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()
@@ -151,7 +151,7 @@ class LeaveEntitlementValidatorTest extends TestCase
         return $employee;
     }
 
-    private function createLeaveRequest(EmployeeProfile $employee, array $overrides = []): LeaveRequest
+    private function createLeaveRequest(StaffMemberProfile $employee, array $overrides = []): LeaveRequest
     {
         return LeaveRequest::query()->create(array_merge([
             'employee_id' => $employee->id,

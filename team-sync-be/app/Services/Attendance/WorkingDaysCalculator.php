@@ -3,7 +3,7 @@
 namespace App\Services\Attendance;
 
 use App\Models\AttendancePolicy;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -14,7 +14,7 @@ class WorkingDaysCalculator
 {
     public function calculateForEmployee(int $employeeId, CarbonInterface|string $startDate, CarbonInterface|string $endDate): int
     {
-        $employee = EmployeeProfile::query()
+        $employee = StaffMemberProfile::query()
             ->with('jobInformation')
             ->findOrFail($employeeId);
 

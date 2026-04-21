@@ -14,7 +14,7 @@ const authStore = useAuthStore();
 
 // Check if user is employee role
 const isEmployee = computed(() => {
-  return authStore.user?.roles?.some((role: any) => role === "employee");
+  return authStore.user?.roles?.some((role: any) => role === "staff");
 });
 
 // Check if user is finance role

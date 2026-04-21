@@ -5,7 +5,7 @@ namespace Tests\Feature\Attendance;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\PayrollSetting;
 use App\Services\Attendance\AttendancePeriodService;
@@ -112,10 +112,10 @@ class AttendancePeriodLifecycleTest extends TestCase
         $this->assertFalse($periodService->canSubmitCorrection('2026-04-10'));
     }
 
-    private function createActiveEmployee(): EmployeeProfile
+    private function createActiveEmployee(): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()
@@ -132,7 +132,7 @@ class AttendancePeriodLifecycleTest extends TestCase
         return $employee;
     }
 
-    private function seedFullMonthAttendance(EmployeeProfile $employee, Carbon $month): void
+    private function seedFullMonthAttendance(StaffMemberProfile $employee, Carbon $month): void
     {
         $cursor = $month->copy()->startOfMonth();
         $monthEnd = $month->copy()->endOfMonth();

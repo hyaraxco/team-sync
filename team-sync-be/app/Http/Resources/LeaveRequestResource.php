@@ -36,9 +36,9 @@ class LeaveRequestResource extends JsonResource
             'proof_review_notes' => $this->proof_review_notes,
             'status' => $this->status,
             'approved_by' => $this->approved_by,
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
-            'approver' => new EmployeeProfileResource($this->whenLoaded('approver')),
-            'proof_reviewer' => new EmployeeProfileResource($this->whenLoaded('proofReviewedBy')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
+            'approver' => new StaffMemberProfileResource($this->whenLoaded('approver')),
+            'proof_reviewer' => new StaffMemberProfileResource($this->whenLoaded('proofReviewedBy')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

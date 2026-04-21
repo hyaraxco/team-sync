@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,7 +23,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $hr = User::where('email', 'tasyia@teamsync.com')->firstOrFail();
         $finance = User::where('email', 'dwimeta@teamsync.com')->firstOrFail();
         $manager = User::where('email', 'yudhis@teamsync.com')->firstOrFail();
-        $employee = EmployeeProfile::where('code', 'EMP001')->firstOrFail();
+        $employee = StaffMemberProfile::where('code', 'EMP001')->firstOrFail();
         $payrollMonth = now()->startOfMonth();
 
         $this->assertTrue($hr->hasPermissionTo('payroll-create', 'sanctum'));
@@ -69,7 +69,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $this->seed(MinimalPayrollE2ESeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $employee = EmployeeProfile::where('code', 'EMP001')->firstOrFail();
+        $employee = StaffMemberProfile::where('code', 'EMP001')->firstOrFail();
         $payrollMonth = now()->startOfMonth();
         $expectedBusinessDays = $this->resolveBusinessDaysInMonth($payrollMonth);
 

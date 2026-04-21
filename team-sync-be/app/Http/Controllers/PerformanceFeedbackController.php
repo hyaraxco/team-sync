@@ -21,13 +21,13 @@ class PerformanceFeedbackController extends Controller
         // Don't show private feedback to the employee if they are not the manager/HR (handled by logic inside or around repository depending on rule)
         // For simplicity, the rule states private is visible to employee and manager.
         $filters = $request->all();
-        $feedback = $this->repository->getFeedbackForEmployee(Auth::user()->employeeProfile?->id, $filters);
+        $feedback = $this->repository->getFeedbackForEmployee(Auth::user()->staffMemberProfile?->id, $filters);
         return ResponseHelper::jsonResponse(true, 'Received feedback retrieved successfully', $feedback);
     }
 
     public function getGivenFeedback(Request $request)
     {
-        $feedback = $this->repository->getFeedbackGivenByUser(Auth::user()->employeeProfile?->id, $request->all());
+        $feedback = $this->repository->getFeedbackGivenByUser(Auth::user()->staffMemberProfile?->id, $request->all());
         return ResponseHelper::jsonResponse(true, 'Given feedback retrieved successfully', $feedback);
     }
 
