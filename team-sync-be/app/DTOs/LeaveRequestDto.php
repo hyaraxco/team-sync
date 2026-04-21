@@ -22,7 +22,7 @@ class LeaveRequestDto
     public function toArray(): array
     {
         return [
-            'employee_id' => $this->employeeId,
+            'staff_member_id' => $this->employeeId,
             'leave_type' => $this->leaveType,
             'start_date' => $this->startDate,
             'end_date' => $this->endDate,
@@ -38,7 +38,7 @@ class LeaveRequestDto
     {
         return new self(
             id: $data['id'] ?? null,
-            employeeId: $data['employee_id'],
+            employeeId: $data['staff_member_id'],
             leaveType: $data['leave_type'],
             startDate: $data['start_date'],
             endDate: $data['end_date'],
@@ -54,7 +54,7 @@ class LeaveRequestDto
     {
         return new self(
             id: $existingLeaveRequest->id,
-            employeeId: $data['employee_id'] ?? $existingLeaveRequest->employee_id,
+            employeeId: $data['staff_member_id'] ?? $existingLeaveRequest->staff_member_id,
             leaveType: $data['leave_type'] ?? $existingLeaveRequest->leave_type->value,
             startDate: $data['start_date'] ?? $existingLeaveRequest->start_date,
             endDate: $data['end_date'] ?? $existingLeaveRequest->end_date,

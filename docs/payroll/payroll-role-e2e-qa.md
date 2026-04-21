@@ -89,11 +89,11 @@
 - Semua kasus `deny` harus kembali ke dashboard (`/admin/dashboard`) atau login bila sesi invalid.
 
 ### Manager (`yudhis@teamsync.com`)
-- Allow: `/admin/dashboard`, `/admin/teams`, `/admin/employees`, `/admin/projects`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
+- Allow: `/admin/dashboard`, `/admin/teams`, `/admin/staff-members`, `/admin/projects`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
 - Deny: `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/payroll/settings`
 
 ### HR (`tasyia@teamsync.com`)
-- Allow: `/admin/dashboard`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/teams`, `/admin/employees`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
+- Allow: `/admin/dashboard`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/teams`, `/admin/staff-members`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
 - Deny: `/admin/payroll/settings`
 
 ### Finance (`dwimeta@teamsync.com`)
@@ -102,7 +102,7 @@
 
 ### Employee (`agung@teamsync.com`)
 - Allow: `/admin/dashboard`, `/admin/my-profile`, `/admin/my-team`, `/admin/attendance/my-attendances`, `/admin/attendance/clock`, `/admin/my-payroll`, `/admin/my-payslips`
-- Deny: `/admin/employees`, `/admin/teams`, `/admin/attendances`, `/admin/payroll`, `/admin/payroll/create`
+- Deny: `/admin/staff-members`, `/admin/teams`, `/admin/attendances`, `/admin/payroll`, `/admin/payroll/create`
 
 ## Automated UI E2E (Bun + Docker BE)
 - Install browser dependency once:

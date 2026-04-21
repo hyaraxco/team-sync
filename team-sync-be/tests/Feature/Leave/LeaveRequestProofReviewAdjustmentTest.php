@@ -3,7 +3,7 @@
 namespace Tests\Feature\Leave;
 
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
 use App\Models\Payroll;
 use App\Models\PayrollAdjustment;
@@ -64,7 +64,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $sourcePayroll->id,
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'original_salary' => 8000000,
             'final_salary' => 7900000,
             'effective_working_days' => 20,
@@ -86,7 +86,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         ]);
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-10',
             'end_date' => '2026-04-11',
@@ -100,7 +100,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'proof_uploaded_at' => now()->subDay(),
         ]);
 
-        $hr = $this->actingAsHrWithEmployeeProfile();
+        $hr = $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -116,7 +116,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         $this->assertNotNull($targetPeriod);
 
         $adjustment = PayrollAdjustment::query()
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->where('source_period_id', $sourcePeriod->id)
             ->where('source_reference_type', 'leave_request')
             ->where('source_reference_id', $leaveRequest->id)
@@ -132,7 +132,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         $this->assertDatabaseHas('leave_requests', [
             'id' => $leaveRequest->id,
             'proof_review_status' => 'approved',
-            'proof_reviewed_by' => $hr->employeeProfile->id,
+            'proof_reviewed_by' => $hr->staffMemberProfile->id,
         ]);
 
         // Idempotency check: re-approving should not create a duplicate adjustment.
@@ -164,7 +164,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         ]);
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-10',
             'end_date' => '2026-04-10',
@@ -178,7 +178,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'proof_uploaded_at' => now()->subHours(8),
         ]);
 
-        $this->actingAsHrWithEmployeeProfile();
+        $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -218,7 +218,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $sourcePayroll->id,
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'original_salary' => 8000000,
             'final_salary' => 7900000,
             'effective_working_days' => 20,
@@ -255,7 +255,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         ]);
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-10',
             'end_date' => '2026-04-10',
@@ -269,7 +269,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'proof_uploaded_at' => now()->subDay(),
         ]);
 
-        $this->actingAsHrWithEmployeeProfile();
+        $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -279,7 +279,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             ->assertJsonPath('data.proof_review_status', 'approved');
 
         $adjustment = PayrollAdjustment::query()
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->where('source_period_id', $sourcePeriod->id)
             ->where('source_reference_type', 'leave_request')
             ->where('source_reference_id', $leaveRequest->id)
@@ -315,7 +315,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $sourcePayroll->id,
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'original_salary' => 8000000,
             'final_salary' => 7900000,
             'effective_working_days' => 20,
@@ -344,7 +344,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         ]);
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-10',
             'end_date' => '2026-04-10',
@@ -359,7 +359,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         ]);
 
         $adjustment = PayrollAdjustment::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'source_period_id' => $sourcePeriod->id,
             'target_period_id' => $targetPeriod->id,
             'source_reference_type' => 'leave_request',
@@ -371,7 +371,7 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
             'status' => PayrollAdjustment::STATUS_APPLIED,
         ]);
 
-        $this->actingAsHrWithEmployeeProfile();
+        $this->actingAsHrWithStaffMemberProfile();
 
         $this->postJson("/api/v1/leave-requests/{$leaveRequest->id}/proof-review", [
             'proof_review_status' => 'approved',
@@ -397,14 +397,14 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         $this->assertSame('already applied and immutable', $freshAdjustment->reason);
     }
 
-    private function actingAsHrWithEmployeeProfile(): User
+    private function actingAsHrWithStaffMemberProfile(): User
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         $employee->jobInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'job_title' => 'HR Specialist',
             'years_experience' => 4,
             'status' => 'active',
@@ -423,13 +423,13 @@ class LeaveRequestProofReviewAdjustmentTest extends TestCase
         return $user;
     }
 
-    private function createActiveEmployee(string $employmentType): EmployeeProfile
+    private function createActiveEmployee(string $employmentType): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($employmentType) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($employmentType) {
+            $employee = StaffMemberProfile::factory()->create();
 
             $employee->jobInformation()->create([
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'job_title' => 'Engineer',
                 'years_experience' => 3,
                 'status' => 'active',

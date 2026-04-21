@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, watch } from "vue";
-import { useEmployeeStore } from "@/stores/employee";
+import { useStaffMemberStore } from "@/stores/staffMember";
 import { useRouter } from "vue-router";
 import { User } from "lucide-vue-next";
 import { getTimeAgo } from "@/utils/dateUtils";
@@ -14,13 +14,13 @@ const props = defineProps({
   },
 });
 
-const employeeStore = useEmployeeStore();
-const { latestEmployees, loadingLatest } = storeToRefs(employeeStore);
+const staffMemberStore = useStaffMemberStore();
+const { latestEmployees, loadingLatest } = storeToRefs(staffMemberStore);
 
 const router = useRouter();
 
 const loadEmployees = (params = {}) => {
-  employeeStore.fetchLatestEmployees(params);
+  staffMemberStore.fetchLatestStaffMembers(params);
 };
 
 onMounted(() => {
@@ -36,15 +36,15 @@ watch(
 );
 
 const goToEmployeeDetail = (id: number) => {
-  router.push({ name: "admin.employees.detail", params: { id } });
+  router.push({ name: "admin.staffMembers.detail", params: { id } });
 };
 </script>
 
 <template>
-  <!-- Latest Employees -->
+  <!-- Latest Staff Members -->
   <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-brand-dark text-lg font-bold">Latest Employees</h3>
+      <h3 class="text-brand-dark text-lg font-bold">Latest Staff Members</h3>
     </div>
 
     <!-- Loading State -->
@@ -70,7 +70,7 @@ const goToEmployeeDetail = (id: number) => {
       title="No employees found"
     />
 
-    <!-- Employee List -->
+    <!-- Staff Member List -->
     <div v-else class="space-y-4">
       <div
         v-for="employee in latestEmployees"

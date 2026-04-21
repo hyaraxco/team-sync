@@ -9,14 +9,14 @@ class TeamRemoveMemberRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => ['required', 'integer', 'exists:employee_profiles,id'],
+            'staff_member_id' => ['required', 'integer', 'exists:staff_member_profiles,id'],
         ];
     }
 
     public function attributes()
     {
         return [
-            'employee_id' => 'Employee ID',
+            'staff_member_id' => 'Employee ID',
         ];
     }
 }

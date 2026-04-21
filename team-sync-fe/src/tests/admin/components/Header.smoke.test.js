@@ -133,7 +133,7 @@ describe("Header smoke", () => {
       "dialog"
     );
     expect(wrapper.get('[data-testid="header-profile-menu-item"]').attributes("data-route-name")).toBe(
-      "employee.profile"
+      "staffMember.profile"
     );
     expect(wrapper.text()).toContain("Profile");
     expect(wrapper.text()).toContain("Sign Out");

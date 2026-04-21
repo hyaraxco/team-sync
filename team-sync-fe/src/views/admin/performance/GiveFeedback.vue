@@ -7,7 +7,7 @@ import MainCard from "@/components/common/MainCard.vue";
 const router = useRouter();
 
 const formData = ref({
-  employee_id: "",
+  staff_member_id: "",
   feedback_type: "positive",
   category: "",
   content: "",
@@ -44,7 +44,7 @@ const submitFeedback = async () => {
             >Employee *</label
           >
           <select
-            v-model="formData.employee_id"
+            v-model="formData.staff_member_id"
             required
             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
           >

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Leave;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
@@ -40,7 +40,7 @@ class LeaveRequestProofUploadTest extends TestCase
         $user = $this->actingAsEmployee('full_time');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $user->employeeProfile->id,
+            'staff_member_id' => $user->staffMemberProfile->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-15',
             'end_date' => '2026-04-15',
@@ -80,7 +80,7 @@ class LeaveRequestProofUploadTest extends TestCase
         $anotherEmployee = $this->createEmployee('full_time');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $anotherEmployee->id,
+            'staff_member_id' => $anotherEmployee->id,
             'leave_type' => 'sick_leave',
             'start_date' => '2026-04-16',
             'end_date' => '2026-04-16',
@@ -105,7 +105,7 @@ class LeaveRequestProofUploadTest extends TestCase
         $user = $this->actingAsEmployee('full_time');
 
         $leaveRequest = LeaveRequest::create([
-            'employee_id' => $user->employeeProfile->id,
+            'staff_member_id' => $user->staffMemberProfile->id,
             'leave_type' => 'annual_leave',
             'start_date' => '2026-04-17',
             'end_date' => '2026-04-17',
@@ -133,20 +133,20 @@ class LeaveRequestProofUploadTest extends TestCase
     {
         $employee = $this->createEmployee($employmentType);
         $user = $employee->user;
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 
         return $user;
     }
 
-    private function createEmployee(string $employmentType): EmployeeProfile
+    private function createEmployee(string $employmentType): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($employmentType) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($employmentType) {
+            $employee = StaffMemberProfile::factory()->create();
 
             $employee->jobInformation()->create([
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'job_title' => 'QA Engineer',
                 'years_experience' => 3,
                 'status' => 'active',

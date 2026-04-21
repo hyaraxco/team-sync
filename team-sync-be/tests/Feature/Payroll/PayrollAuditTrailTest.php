@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollActivityLog;
@@ -82,8 +82,8 @@ class PayrollAuditTrailTest extends TestCase
     {
         Carbon::setTestNow('2026-04-28 09:00:00');
         $hr = $this->createRoleUser('hr');
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()
@@ -182,7 +182,7 @@ class PayrollAuditTrailTest extends TestCase
         Sanctum::actingAs($finance);
 
         $payroll = $this->createPayrollWithDetail(status: 'paid', paymentDate: '2026-04-28');
-        $employeeUser = $payroll->payrollDetails->first()->employee->user;
+        $employeeUser = $payroll->payrollDetails->first()->staffMember->user;
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/resend-notifications")
             ->assertOk()
@@ -229,7 +229,7 @@ class PayrollAuditTrailTest extends TestCase
         Sanctum::actingAs($finance);
 
         $payroll = $this->createPayrollWithDetail(status: 'approved');
-        $employeeUser = $payroll->payrollDetails->first()->employee->user;
+        $employeeUser = $payroll->payrollDetails->first()->staffMember->user;
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => '2026-04-28',
@@ -325,7 +325,7 @@ class PayrollAuditTrailTest extends TestCase
         return $user;
     }
 
-    private function seedFullMonthAttendance(EmployeeProfile $employee, Carbon $month): void
+    private function seedFullMonthAttendance(StaffMemberProfile $employee, Carbon $month): void
     {
         $cursor = $month->copy()->startOfMonth();
         $monthEnd = $month->copy()->endOfMonth();
@@ -333,7 +333,7 @@ class PayrollAuditTrailTest extends TestCase
         while ($cursor->lte($monthEnd)) {
             if (! $cursor->isWeekend()) {
                 Attendance::create([
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'date' => $cursor->toDateString(),
                     'status' => 'present',
                     'check_in' => $cursor->copy()->format('Y-m-d').' 08:00:00',
@@ -351,12 +351,12 @@ class PayrollAuditTrailTest extends TestCase
             'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
-        $employeeProfile = EmployeeProfile::withoutSyncingToSearch(function () use ($user) {
-            return EmployeeProfile::factory()->for($user)->create();
+        $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {
+            return StaffMemberProfile::factory()->for($user)->create();
         });
 
-        $employeeProfile->bankInformation()->create([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->create([
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '9876543210',
             'account_holder_name' => 'Payroll Audit User',
@@ -371,7 +371,7 @@ class PayrollAuditTrailTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

@@ -87,7 +87,7 @@ describe("NotificationPanel smoke", () => {
     const emitted = wrapper.emitted("select");
     expect(emitted).toHaveLength(1);
     expect(emitted[0][0]).toMatchObject({ id: "n-9", action_url: "/admin/my-payroll/9" });
-    expect(wrapper.get('[data-testid="notification-unread-n-9"]').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="notification-item-n-9"]').exists()).toBe(true);
   });
 
   it("renders task assignment payload and preserves click contract", async () => {
@@ -112,7 +112,7 @@ describe("NotificationPanel smoke", () => {
 
     expect(wrapper.text()).toContain("New Task Assigned");
     expect(wrapper.text()).toContain("Prepare sprint report");
-    expect(wrapper.get('[data-testid="notification-unread-task-n-1"]').exists()).toBe(true);
+    expect(wrapper.get('[data-testid="notification-item-task-n-1"]').exists()).toBe(true);
 
     await wrapper.get('[data-testid="notification-select-task-n-1"]').trigger("click");
 

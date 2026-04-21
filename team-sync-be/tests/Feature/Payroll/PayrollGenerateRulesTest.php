@@ -7,7 +7,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
 use App\Models\Payroll;
 use App\Models\PayrollSetting;
@@ -117,10 +117,10 @@ class PayrollGenerateRulesTest extends TestCase
         PayrollSetting::current()->update([
             'attendance_cutoff_day' => 25,
         ]);
-        EmployeeProfile::withoutSyncingToSearch(function () {
-            $employee = EmployeeProfile::factory()->create();
+        StaffMemberProfile::withoutSyncingToSearch(function () {
+            $employee = StaffMemberProfile::factory()->create();
             $employee->jobInformation()->create([
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'job_title' => 'QA Engineer',
                 'years_experience' => 3,
                 'status' => 'active',
@@ -408,7 +408,7 @@ class PayrollGenerateRulesTest extends TestCase
         ]);
 
         LeaveRequest::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'leave_type' => 'annual_leave',
             'start_date' => '2026-04-14',
             'end_date' => '2026-04-14',
@@ -426,7 +426,7 @@ class PayrollGenerateRulesTest extends TestCase
 
         $this->assertContains(
             $employee->id,
-            $response->json('data.meta.blocked_employee_ids') ?? []
+            $response->json('data.meta.blocked_staff_member_ids') ?? []
         );
     }
 
@@ -439,12 +439,12 @@ class PayrollGenerateRulesTest extends TestCase
 
         $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
         $firstAttendanceDate = Carbon::parse((string) Attendance::query()
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->min('date'))
             ->toDateString();
 
         Attendance::query()
-            ->where('employee_id', $employee->id)
+            ->where('staff_member_id', $employee->id)
             ->whereDate('date', '!=', $firstAttendanceDate)
             ->delete();
 
@@ -479,23 +479,23 @@ class PayrollGenerateRulesTest extends TestCase
 
         $blockedEmployee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
         $blockedFirstAttendanceDate = Carbon::parse((string) Attendance::query()
-            ->where('employee_id', $blockedEmployee->id)
+            ->where('staff_member_id', $blockedEmployee->id)
             ->min('date'))
             ->toDateString();
 
         Attendance::query()
-            ->where('employee_id', $blockedEmployee->id)
+            ->where('staff_member_id', $blockedEmployee->id)
             ->whereDate('date', '!=', $blockedFirstAttendanceDate)
             ->delete();
 
         $warningEmployee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
         $warningAttendance = Attendance::query()
-            ->where('employee_id', $warningEmployee->id)
+            ->where('staff_member_id', $warningEmployee->id)
             ->firstOrFail();
 
         AttendancePolicyMismatch::create([
             'attendance_id' => $warningAttendance->id,
-            'employee_id' => $warningEmployee->id,
+            'staff_member_id' => $warningEmployee->id,
             'mismatch_date' => '2026-04-10',
             'planned_work_mode' => 'office',
             'actual_work_mode' => 'remote',
@@ -523,7 +523,7 @@ class PayrollGenerateRulesTest extends TestCase
             ->assertJsonPath('data.generation.reason_code', 'employees_blocked');
 
         $employeeRows = collect($response->json('data.employees') ?? []);
-        $rowsByEmployeeId = $employeeRows->keyBy('employee_id');
+        $rowsByEmployeeId = $employeeRows->keyBy('staff_member_id');
 
         $this->assertSame('ready', $rowsByEmployeeId->get($readyEmployee->id)['status'] ?? null);
         $this->assertSame('warning', $rowsByEmployeeId->get($warningEmployee->id)['status'] ?? null);
@@ -541,15 +541,15 @@ class PayrollGenerateRulesTest extends TestCase
         return $user;
     }
 
-    private function createActiveEmployeeWithAttendance(Carbon $month): EmployeeProfile
+    private function createActiveEmployeeWithAttendance(Carbon $month): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($month) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($month) {
+            $employee = StaffMemberProfile::factory()->create();
             $startDate = $month->copy()->startOfMonth();
             $endDate = $month->copy()->endOfMonth();
 
             $employee->jobInformation()->create([
-                'employee_id' => $employee->id,
+                'staff_member_id' => $employee->id,
                 'job_title' => 'Software Engineer',
                 'years_experience' => 5,
                 'status' => 'active',
@@ -564,7 +564,7 @@ class PayrollGenerateRulesTest extends TestCase
             while ($cursor->lte($endDate)) {
                 if (! $cursor->isWeekend()) {
                     Attendance::create([
-                        'employee_id' => $employee->id,
+                        'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d').' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d').' 17:00:00',

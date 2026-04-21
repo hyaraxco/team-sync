@@ -178,7 +178,7 @@ const onRejectAction = (req) => {
                 />
                 <div>
                   <p class="text-sm font-semibold text-brand-dark">{{ correction.employee?.user?.name }}</p>
-                  <p class="text-xs text-brand-light">{{ correction.employee?.employee_id }}</p>
+                  <p class="text-xs text-brand-light">{{ correction.employee?.staff_member_id }}</p>
                 </div>
               </div>
             </td>
@@ -304,7 +304,7 @@ const onRejectAction = (req) => {
              <img :src="selectedRejectCorrection.employee?.user?.profile_photo || DEFAULT_AVATAR" class="w-10 h-10 rounded-full object-cover" />
              <div>
                <p class="font-bold text-gray-900">{{ selectedRejectCorrection.employee?.user?.name }}</p>
-               <p class="text-xs text-gray-500">{{ selectedRejectCorrection.employee?.employee_id }}</p>
+               <p class="text-xs text-gray-500">{{ selectedRejectCorrection.employee?.staff_member_id }}</p>
              </div>
            </div>
            <div class="grid grid-cols-2 gap-y-2">

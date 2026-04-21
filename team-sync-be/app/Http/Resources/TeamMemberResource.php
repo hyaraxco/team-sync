@@ -18,7 +18,7 @@ class TeamMemberResource extends JsonResource
             'id' => $this->id,
             'joined_at' => $this->joined_at,
             'left_at' => $this->left_at,
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
         ];
     }
 }

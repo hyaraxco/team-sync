@@ -4,7 +4,7 @@ namespace Tests\Feature\Notification;
 
 use App\Models\Attendance;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HybridWorkSchedule;
 use App\Models\Project;
 use App\Models\ProjectTask;
@@ -46,7 +46,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_employee_moving_task_to_review_notifies_project_leader(): void
     {
         [$managerUser, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Project Leader');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Task Assignee');
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Task Assignee');
 
         $project = Project::query()->create([
             'name' => 'Notif Project '.uniqid(),
@@ -63,7 +63,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'project_id' => $project->id,
             'name' => 'Prepare delivery checklist',
             'description' => 'Checklist for final release',
-            'assignee_id' => $employeeProfile->id,
+            'assignee_id' => $staffMemberProfile->id,
             'priority' => 'medium',
             'status' => 'in_progress',
             'due_date' => now()->addDay()->toDateString(),
@@ -85,7 +85,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_manager_adding_team_member_notifies_employee(): void
     {
         [$managerUser] = $this->createUserWithRoleAndProfile('manager', 'Team Manager');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Added Employee');
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Added Employee');
 
         $team = Team::factory()->active()->create([
             'team_lead_id' => $managerUser->id,
@@ -94,7 +94,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         Sanctum::actingAs($managerUser);
 
         $this->postJson('/api/v1/teams/'.$team->id.'/add-member', [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
         ])->assertOk();
 
         $employeeNotif = $this->latestNotification($employeeUser);
@@ -106,7 +106,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_task_comment_and_attachment_notify_related_stakeholders(): void
     {
         [$managerUser, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Comment Manager');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Comment Employee');
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Comment Employee');
 
         $project = Project::query()->create([
             'name' => 'Collab Notif Project '.uniqid(),
@@ -123,7 +123,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'project_id' => $project->id,
             'name' => 'Implement collaboration alerts',
             'description' => 'Notify stakeholders on comments and attachments',
-            'assignee_id' => $employeeProfile->id,
+            'assignee_id' => $staffMemberProfile->id,
             'priority' => 'high',
             'status' => 'in_progress',
             'due_date' => now()->addDays(2)->toDateString(),
@@ -156,7 +156,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_team_status_change_notifies_related_employee_members(): void
     {
         [$managerUser] = $this->createUserWithRoleAndProfile('manager', 'Status Manager');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Status Employee');
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Status Employee');
 
         $team = Team::factory()->active()->create([
             'team_lead_id' => $managerUser->id,
@@ -165,7 +165,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         TeamMember::query()->updateOrCreate(
             [
                 'team_id' => $team->id,
-                'employee_id' => $employeeProfile->id,
+                'staff_member_id' => $staffMemberProfile->id,
             ],
             [
                 'joined_at' => now()->subDays(5),
@@ -188,7 +188,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
     public function test_employee_check_in_and_check_out_send_notifications(): void
     {
-        [$employeeUser] = $this->createUserWithRoleAndProfile('employee', 'Attendance Employee');
+        [$employeeUser] = $this->createUserWithRoleAndProfile('staff', 'Attendance Employee');
 
         Sanctum::actingAs($employeeUser);
 
@@ -234,14 +234,14 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'team_lead_id' => $managerUser->id,
         ]);
 
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile(
+            'staff',
             'Mismatch Employee',
             $team->id
         );
 
         $attendance = Attendance::query()->create([
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'date' => now()->toDateString(),
             'status' => 'present',
             'check_in' => now()->subHours(8),
@@ -253,7 +253,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
         $mismatch = AttendancePolicyMismatch::query()->create([
             'attendance_id' => $attendance->id,
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'mismatch_date' => now()->toDateString(),
             'planned_work_mode' => 'remote',
             'actual_work_mode' => 'office',
@@ -300,13 +300,13 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'team_lead_id' => $managerUser->id,
         ]);
 
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile(
+            'staff',
             'Hybrid Employee',
             $team->id
         );
 
-        $employeeProfile->jobInformation()->update([
+        $staffMemberProfile->jobInformation()->update([
             'work_location' => 'hybrid',
             'team_id' => $team->id,
         ]);
@@ -314,7 +314,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         $targetDate = Carbon::parse('next monday')->startOfDay();
 
         HybridWorkSchedule::query()->create([
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'effective_from' => $targetDate->copy()->subWeek()->toDateString(),
             'effective_until' => null,
             'monday' => 'remote',
@@ -325,7 +325,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         ]);
 
         $attendance = Attendance::query()->create([
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'date' => $targetDate->toDateString(),
             'status' => 'present',
             'check_in' => $targetDate->copy()->setTime(9, 15),
@@ -337,11 +337,11 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
         $classifier = app(AttendanceClassifier::class);
 
-        $classifier->classify($employeeProfile->id, $targetDate);
+        $classifier->classify($staffMemberProfile->id, $targetDate);
 
         $this->assertDatabaseHas('attendance_policy_mismatches', [
             'attendance_id' => $attendance->id,
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'status' => AttendancePolicyMismatch::STATUS_PENDING_REVIEW,
         ]);
 
@@ -356,7 +356,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         $this->assertSame(1, $employeeDetectedCountAfterFirstClassify);
         $this->assertSame(1, $managerDetectedCountAfterFirstClassify);
 
-        $classifier->classify($employeeProfile->id, $targetDate);
+        $classifier->classify($staffMemberProfile->id, $targetDate);
 
         $this->assertSame(1, AttendancePolicyMismatch::query()->where('attendance_id', $attendance->id)->count());
 
@@ -375,13 +375,13 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_lp3es_mobile_project_flow_notifies_all_participating_employees_across_teams(): void
     {
         [$managerUser, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'LP3ES Manager');
-        $managerUser->assignRole('employee');
+        $managerUser->assignRole('staff');
 
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'LP3ES HR');
 
-        [$frontendUser, $frontendProfile] = $this->createUserWithRoleAndProfile('employee', 'LP3ES Frontend Dev');
-        [$backendUser, $backendProfile] = $this->createUserWithRoleAndProfile('employee', 'LP3ES Backend Dev');
-        [$qaUser, $qaProfile] = $this->createUserWithRoleAndProfile('employee', 'LP3ES QA Engineer');
+        [$frontendUser, $frontendProfile] = $this->createUserWithRoleAndProfile('staff', 'LP3ES Frontend Dev');
+        [$backendUser, $backendProfile] = $this->createUserWithRoleAndProfile('staff', 'LP3ES Backend Dev');
+        [$qaUser, $qaProfile] = $this->createUserWithRoleAndProfile('staff', 'LP3ES QA Engineer');
 
         $mobileTeam = Team::factory()->active()->create([
             'name' => 'LP3ES Mobile Development',
@@ -400,17 +400,17 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         Sanctum::actingAs($managerUser);
 
         $this->postJson('/api/v1/teams/'.$mobileTeam->id.'/add-member', [
-            'employee_id' => $frontendProfile->id,
+            'staff_member_id' => $frontendProfile->id,
         ])->assertOk();
 
         $this->postJson('/api/v1/teams/'.$mobileTeam->id.'/add-member', [
-            'employee_id' => $backendProfile->id,
+            'staff_member_id' => $backendProfile->id,
         ])->assertOk();
 
         Sanctum::actingAs($hrUser);
 
         $this->postJson('/api/v1/teams/'.$qaTeam->id.'/add-member', [
-            'employee_id' => $qaProfile->id,
+            'staff_member_id' => $qaProfile->id,
         ])->assertOk();
 
         Sanctum::actingAs($managerUser);
@@ -604,12 +604,12 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     public function test_mismatch_escalation_notifies_employee_and_hr_reviewer(): void
     {
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'Escalation HR');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Escalation Employee');
+        [$employeeUser, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Escalation Employee');
 
         $mismatchDate = Carbon::parse('2026-04-06')->startOfDay();
 
         $attendance = Attendance::query()->create([
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'date' => $mismatchDate->toDateString(),
             'status' => 'present',
             'check_in' => $mismatchDate->copy()->setTime(9, 10),
@@ -621,7 +621,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
 
         $mismatch = AttendancePolicyMismatch::query()->create([
             'attendance_id' => $attendance->id,
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'mismatch_date' => $mismatchDate->toDateString(),
             'planned_work_mode' => 'remote',
             'actual_work_mode' => 'office',
@@ -650,7 +650,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
     }
 
     /**
-     * @return array{0: User, 1: EmployeeProfile}
+     * @return array{0: User, 1: StaffMemberProfile}
      */
     private function createUserWithRoleAndProfile(string $role, string $name, ?int $teamId = null): array
     {
@@ -662,8 +662,8 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         ]);
         $user->syncRoles([$role]);
 
-        $profile = EmployeeProfile::withoutSyncingToSearch(function () use ($user, $role, $sequence, $teamId) {
-            $profile = EmployeeProfile::factory()->forUser($user)->create([
+        $profile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user, $role, $sequence, $teamId) {
+            $profile = StaffMemberProfile::factory()->forUser($user)->create([
                 'code' => sprintf('%s%03d', strtoupper(substr($role, 0, 3)), $sequence),
                 'identity_number' => str_pad((string) (90000000000000 + $sequence), 14, '0', STR_PAD_LEFT),
             ]);

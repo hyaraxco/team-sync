@@ -30,7 +30,7 @@
       />
 
       <MetricCard
-        title="Total Employees"
+        title="Total Staff Members"
         :value="workforce?.total_employees || 0"
         format="number"
         :trend="workforce?.employee_growth"

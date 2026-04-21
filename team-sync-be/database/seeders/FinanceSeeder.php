@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -25,7 +25,7 @@ class FinanceSeeder extends Seeder
             ]
         );
 
-        $employeeProfile = EmployeeProfile::withTrashed()->updateOrCreate([
+        $staffMemberProfile = StaffMemberProfile::withTrashed()->updateOrCreate([
             'code' => 'FIN001',
         ], [
             'user_id' => $employee->id,
@@ -40,10 +40,10 @@ class FinanceSeeder extends Seeder
             'deleted_at' => null,
         ]);
 
-        $employeeProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->jobInformation()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'Finance Manager',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -52,20 +52,20 @@ class FinanceSeeder extends Seeder
             'monthly_salary' => 12000000,
         ]);
 
-        $employeeProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => '9876543210',
             'account_holder_name' => 'Dwimeta',
         ]);
 
-        $employeeProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->emergencyContacts()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'dwimeta.emergency@teamsync.com',
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Dwimeta Emergency Contact',
             'phone' => '081234567891',
             'relationship' => 'Family',

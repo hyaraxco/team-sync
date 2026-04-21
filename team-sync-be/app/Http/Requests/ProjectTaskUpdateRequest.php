@@ -19,7 +19,7 @@ class ProjectTaskUpdateRequest extends FormRequest
             'project_id' => ['sometimes', 'required', 'integer', 'exists:projects,id'],
             'name' => ['sometimes', 'required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'assignee_id' => ['nullable', 'integer', 'exists:employee_profiles,id'],
+            'assignee_id' => ['nullable', 'integer', 'exists:staff_member_profiles,id'],
             'priority' => ['sometimes', 'string', 'in:'.implode(',', array_column(TaskPriority::cases(), 'value'))],
             'status' => ['sometimes', 'string', 'in:'.implode(',', array_column(TaskStatus::cases(), 'value'))],
             'rejected_reason' => ['nullable', 'string', 'max:2000'],

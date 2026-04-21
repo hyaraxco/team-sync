@@ -15,7 +15,7 @@ class LeaveRequestUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => 'sometimes|exists:employee_profiles,id',
+            'staff_member_id' => 'sometimes|exists:staff_member_profiles,id',
             'leave_type' => 'sometimes|string|in:'.implode(',', array_column(LeaveType::cases(), 'value')),
             'start_date' => 'sometimes|date',
             'end_date' => 'sometimes|date|after_or_equal:start_date',
@@ -23,7 +23,7 @@ class LeaveRequestUpdateRequest extends FormRequest
             'reason' => 'sometimes|string|max:1000',
             'emergency_contact' => 'nullable|string|max:255',
             'status' => 'sometimes|string|in:pending,approved,rejected',
-            'approved_by' => 'nullable|exists:employee_profiles,id',
+            'approved_by' => 'nullable|exists:staff_member_profiles,id',
         ];
     }
 }

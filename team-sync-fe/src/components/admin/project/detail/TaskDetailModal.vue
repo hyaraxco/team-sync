@@ -19,7 +19,7 @@ import {
 import { debounce } from "lodash";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDate } from "@/utils/dateUtils";
-import { useEmployeeStore } from "@/stores/employee";
+import { useStaffMemberStore } from "@/stores/staffMember";
 import { useTaskStore } from "@/stores/task";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
@@ -45,9 +45,9 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "deleted", "assigneeChanged", "updated"]);
 
-const employeeStore = useEmployeeStore();
-const { employees } = storeToRefs(employeeStore);
-const { fetchEmployees } = employeeStore;
+const staffMemberStore = useStaffMemberStore();
+const { staffMembers } = storeToRefs(staffMemberStore);
+const { fetchStaffMembers } = staffMemberStore;
 
 const taskStore = useTaskStore();
 const {
@@ -132,21 +132,21 @@ const isTodoLikeStatus = computed(
 
 const canStartTask = computed(
   () =>
-    hasRole("employee") &&
+    hasRole("staff") &&
     isOwnAssignedTask.value &&
     isTodoLikeStatus.value
 );
 
 const canSubmitForReview = computed(
   () =>
-    hasRole("employee") &&
+    hasRole("staff") &&
     isOwnAssignedTask.value &&
     props.task?.status === "in_progress"
 );
 
 const canStartRework = computed(
   () =>
-    hasRole("employee") &&
+    hasRole("staff") &&
     isOwnAssignedTask.value &&
     props.task?.status === "rejected"
 );
@@ -172,7 +172,7 @@ const canCollaborateTask = computed(() => {
     return true;
   }
 
-  if (hasRole("employee")) {
+  if (hasRole("staff")) {
     return isOwnAssignedTask.value && isEmployeeEditableState.value;
   }
 
@@ -185,7 +185,7 @@ const canMutateEntityOwner = (ownerId) => {
   }
 
   return (
-    !hasRole("employee") ||
+    !hasRole("staff") ||
     (isOwnAssignedTask.value && isEmployeeEditableState.value)
   );
 };
@@ -341,7 +341,7 @@ const handleCreateComment = async () => {
 };
 
 const startEditComment = (comment) => {
-  if (!canMutateEntityOwner(comment.employee_id)) {
+  if (!canMutateEntityOwner(comment.staff_member_id)) {
     return;
   }
 
@@ -370,7 +370,7 @@ const handleUpdateComment = async (commentId) => {
 };
 
 const handleDeleteComment = async (comment) => {
-  if (!canMutateEntityOwner(comment.employee_id)) {
+  if (!canMutateEntityOwner(comment.staff_member_id)) {
     return;
   }
 
@@ -414,7 +414,7 @@ const handleAttachmentSelected = async (event) => {
 };
 
 const handleDeleteAttachment = async (attachment) => {
-  if (!canMutateEntityOwner(attachment.employee_id)) {
+  if (!canMutateEntityOwner(attachment.staff_member_id)) {
     return;
   }
 
@@ -440,7 +440,7 @@ const toggleAssigneeDropdown = () => {
 const handleSelectAssignee = async (employee) => {
   try {
     await updateTask(props.task.id, {
-      assignee_id: employee.id,
+      assignee_id: staffMember.id,
     });
     selectedAssignee.value = employee;
 
@@ -504,7 +504,7 @@ const cancelDueDateEdit = () => {
 };
 
 onMounted(async () => {
-  await fetchEmployees({
+  await fetchStaffMembers({
     limit: 6,
     project_id: props.projectId,
   });
@@ -525,7 +525,7 @@ onMounted(async () => {
 watch(
   searchAssignee,
   debounce(() => {
-    fetchEmployees({
+    fetchStaffMembers({
       limit: 6,
       search: searchAssignee.value,
       project_id: props.projectId,
@@ -676,7 +676,7 @@ watch(
                         </div>
                         <div
                           class="flex items-center gap-2"
-                          v-if="canMutateEntityOwner(comment.employee_id)"
+                          v-if="canMutateEntityOwner(comment.staff_member_id)"
                         >
                           <button
                             type="button"
@@ -825,7 +825,7 @@ watch(
                         </p>
                       </div>
                       <button
-                        v-if="canMutateEntityOwner(attachment.employee_id)"
+                        v-if="canMutateEntityOwner(attachment.staff_member_id)"
                         type="button"
                         @click="handleDeleteAttachment(attachment)"
                         class="text-gray-400 hover:text-red-600 transition-colors"
@@ -923,11 +923,11 @@ watch(
                       </div>
                     </div>
 
-                    <!-- Employee List -->
+                    <!-- Staff Member List -->
                     <div class="overflow-y-auto max-h-64">
                       <button
-                        v-for="employee in employees"
-                        :key="employee.id"
+                        v-for="staffMember in staffMembers"
+                        :key="staffMember.id"
                         type="button"
                         @click="handleSelectAssignee(employee)"
                         class="w-full p-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
@@ -956,7 +956,7 @@ watch(
 
                       <!-- No Results -->
                       <div
-                        v-if="employees.length === 0"
+                        v-if="staffMembers.length === 0"
                         class="p-4 text-center"
                       >
                         <SearchX class="w-8 h-8 text-gray-400 mx-auto mb-2" />

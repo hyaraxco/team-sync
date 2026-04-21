@@ -9,7 +9,7 @@ class PayslipResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
-        $employee = $this->employee;
+        $employee = $this->staffMember;
         $user = $employee?->user;
         $jobInformation = $employee?->jobInformation;
         $payroll = $this->payroll;

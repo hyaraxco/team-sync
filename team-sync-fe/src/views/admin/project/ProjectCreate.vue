@@ -1,6 +1,6 @@
 <script setup>
 import { Input, Select, TextArea } from "@/components/common/form";
-import RightSidebar from "@/components/admin/employee/create/RightSidebar.vue";
+import RightSidebar from "@/components/admin/staff-member/create/RightSidebar.vue";
 import {
   Briefcase,
   Image,
@@ -33,7 +33,7 @@ import { onMounted, ref, watch } from "vue";
 import { debounce } from "lodash";
 import { useProjectStore } from "@/stores/project";
 import { useTeamStore } from "@/stores/team";
-import { useEmployeeStore } from "@/stores/employee";
+import { useStaffMemberStore } from "@/stores/staffMember";
 import { storeToRefs } from "pinia";
 import router from "@/router";
 
@@ -45,9 +45,9 @@ const teamStore = useTeamStore();
 const { teams } = storeToRefs(teamStore);
 const { fetchTeams } = teamStore;
 
-const employeeStore = useEmployeeStore();
-const { employees } = storeToRefs(employeeStore);
-const { fetchEmployees } = employeeStore;
+const staffMemberStore = useStaffMemberStore();
+const { staffMembers } = storeToRefs(staffMemberStore);
+const { fetchStaffMembers } = staffMemberStore;
 
 const form = ref({
   name: "",
@@ -109,7 +109,7 @@ const handleRemoveLeader = () => {
 
 onMounted(async () => {
   await fetchTeams();
-  await fetchEmployees({
+  await fetchStaffMembers({
     limit: 6,
   });
   if (form.value.budget) {
@@ -120,7 +120,7 @@ onMounted(async () => {
 watch(
   searchLeader,
   debounce(() => {
-    fetchEmployees({
+    fetchStaffMembers({
       limit: 6,
       search: searchLeader.value,
     });
@@ -889,7 +889,7 @@ watch(
           <input
             type="text"
             class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
-            placeholder="Search employees..."
+            placeholder="Search staffMembers..."
             v-model="searchLeader"
           />
         </div>
@@ -900,7 +900,7 @@ watch(
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div
             class="leader-card border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
-            v-for="employee in employees"
+            v-for="employee in staffMembers"
             :key="employee.id"
             @click="handleSelectLeader(employee)"
           >
@@ -935,9 +935,9 @@ watch(
 
         <!-- No Results Message -->
         <EmptyState
-          v-if="employees.length === 0"
+          v-if="staffMembers.length === 0"
           icon="SearchX"
-          title="No employees found"
+          title="No staffMembers found"
           subtitle="Try adjusting your search terms"
         />
       </div>

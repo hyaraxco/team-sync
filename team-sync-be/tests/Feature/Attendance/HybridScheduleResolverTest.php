@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Attendance;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HybridScheduleOverride;
 use App\Models\HybridWorkSchedule;
 use App\Models\JobInformation;
@@ -30,7 +30,7 @@ class HybridScheduleResolverTest extends TestCase
         $employee = $this->createEmployeeWithWorkLocation('hybrid');
 
         HybridWorkSchedule::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'effective_from' => '2026-04-01',
             'effective_until' => null,
             'monday' => 'office',
@@ -41,7 +41,7 @@ class HybridScheduleResolverTest extends TestCase
         ]);
 
         HybridScheduleOverride::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => '2026-04-06',
             'planned_work_mode' => 'remote',
             'reason' => 'Approved swap',
@@ -64,7 +64,7 @@ class HybridScheduleResolverTest extends TestCase
         $employee = $this->createEmployeeWithWorkLocation('hybrid');
 
         HybridWorkSchedule::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'effective_from' => '2026-04-01',
             'effective_until' => null,
             'monday' => 'office',
@@ -106,10 +106,10 @@ class HybridScheduleResolverTest extends TestCase
         ], $resolved);
     }
 
-    private function createEmployeeWithWorkLocation(string $workLocation): EmployeeProfile
+    private function createEmployeeWithWorkLocation(string $workLocation): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()

@@ -187,7 +187,7 @@ describe("PayrollCreate smoke", () => {
       salary_month: validMonth,
     });
     expect(toastSuccess).toHaveBeenCalledWith(
-      "Payroll berhasil digenerate",
+      "Payroll successfully generated",
       expect.stringContaining(String(new Date().getFullYear()))
     );
     expect(push).toHaveBeenCalledWith({ name: "admin.payroll.dashboard" });
@@ -209,7 +209,7 @@ describe("PayrollCreate smoke", () => {
     await flushAsync();
 
     expect(toastError).toHaveBeenCalledWith(
-      "Generate payroll gagal",
+      "Failed to generate payroll",
       "Payroll for current month already exists"
     );
     expect(push).not.toHaveBeenCalled();
@@ -246,7 +246,7 @@ describe("PayrollCreate smoke", () => {
       },
       employees: [
         {
-          employee_id: 99,
+          staff_member_id: 99,
           employee_name: "QA Blocked",
           employee_code: "EMP2026040099",
           status: "blocked",
@@ -255,7 +255,7 @@ describe("PayrollCreate smoke", () => {
           attendance_workspace_url: "/admin/attendances?search=QA+Blocked",
         },
         {
-          employee_id: 100,
+          staff_member_id: 100,
           employee_name: "QA Warning",
           employee_code: "EMP2026040100",
           status: "warning",
@@ -264,7 +264,7 @@ describe("PayrollCreate smoke", () => {
           attendance_workspace_url: "/admin/attendances?search=QA+Warning",
         },
         {
-          employee_id: 101,
+          staff_member_id: 101,
           employee_name: "QA Ready",
           employee_code: "EMP2026040101",
           status: "ready",

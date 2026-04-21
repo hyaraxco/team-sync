@@ -7,7 +7,7 @@ use App\Models\JobInformation;
 class JobInformationDto
 {
     public function __construct(
-        public readonly string $employee_id,
+        public readonly string $staff_member_id,
         public readonly string $job_title,
         public readonly ?string $team_id,
         public readonly string $status,
@@ -20,7 +20,7 @@ class JobInformationDto
     public function toArray(): array
     {
         return [
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'job_title' => $this->job_title,
             'team_id' => $this->team_id,
             'status' => $this->status,
@@ -34,7 +34,7 @@ class JobInformationDto
     public static function fromArray(array $data): self
     {
         return new self(
-            employee_id: $data['employee_id'],
+            staff_member_id: $data['staff_member_id'],
             job_title: $data['job_title'],
             team_id: $data['team_id'] ?? null,
             status: $data['status'],
@@ -48,7 +48,7 @@ class JobInformationDto
     public static function fromArrayForUpdate(array $data, JobInformation $existingJob): self
     {
         return new self(
-            employee_id: $data['employee_id'] ?? $existingJob->employee_id,
+            staff_member_id: $data['staff_member_id'] ?? $existingJob->staff_member_id,
             job_title: $data['job_title'] ?? $existingJob->job_title,
             team_id: $data['team_id'] ?? $existingJob->team_id,
             status: $data['status'] ?? $existingJob->status ?? 'active',

@@ -11,7 +11,7 @@ class Attendance extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'date',
         'attendance_period_id',
         'check_in',
@@ -42,9 +42,9 @@ class Attendance extends Model
         ];
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function attendancePeriod()

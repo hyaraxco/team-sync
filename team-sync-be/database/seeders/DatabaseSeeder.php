@@ -33,7 +33,7 @@ class DatabaseSeeder extends Seeder
             PerformanceDataSeeder::class,
 
             // 4. Seed employee profiles with complete data (User, Profile, Job, Bank, Emergency Contacts)
-            // EmployeeProfileSeeder::class,
+            // StaffMemberProfileSeeder::class,
 
             // 4. Seed teams and assign employees to teams (requires employees to exist)
             // TeamSeeder::class,

@@ -16,7 +16,7 @@ class AttendanceResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'date' => $this->date,
             'check_in' => $this->check_in,
             'check_in_lat' => $this->check_in_lat,
@@ -29,7 +29,7 @@ class AttendanceResource extends JsonResource
                 : null,
             'status' => $this->status,
             'notes' => $this->notes,
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -106,7 +106,7 @@ const formatDate = (dateStr) => dateStr ? formatDateShort(dateStr) : '-';
                 />
                 <div>
                   <p class="text-sm font-semibold text-brand-dark">{{ attendance.employee?.user?.name }}</p>
-                  <p class="text-xs text-brand-light">{{ attendance.employee?.employee_id }}</p>
+                  <p class="text-xs text-brand-light">{{ attendance.employee?.staff_member_id }}</p>
                 </div>
               </div>
             </td>

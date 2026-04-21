@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 class GoalDto
 {
     public function __construct(
-        public readonly int $employee_id,
+        public readonly int $staff_member_id,
         public readonly string $title,
         public readonly ?string $description,
         public readonly string $goal_type,
@@ -29,7 +29,7 @@ class GoalDto
     public static function fromRequest(array $data): self
     {
         return new self(
-            $data['employee_id'],
+            $data['staff_member_id'],
             $data['title'],
             $data['description'] ?? null,
             $data['goal_type'],
@@ -51,7 +51,7 @@ class GoalDto
     public function toArray(): array
     {
         $array = [
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'title' => $this->title,
             'goal_type' => $this->goal_type,
             'start_date' => $this->start_date,

@@ -10,7 +10,7 @@ class PayslipPdfService
     public function render(PayrollDetail $payrollDetail): string
     {
         $payroll = $payrollDetail->payroll;
-        $employee = $payrollDetail->employee;
+        $employee = $payrollDetail->staffMember;
         $jobInformation = $employee?->jobInformation;
         $totalDeductions = max(0, (float) $payrollDetail->original_salary - (float) $payrollDetail->final_salary);
 

@@ -180,7 +180,7 @@ class DailyMetricsCalculator
         $this->storeSnapshot('performance', 'daily_feedback_count', 'daily', $date, $todayFeedback);
 
         // Average feedback per employee
-        $employeeCount = DB::table('employee_profiles')
+        $employeeCount = DB::table('staff_member_profiles')
             ->whereNull('deleted_at')
             ->count();
 

@@ -34,7 +34,7 @@ class AttendanceMismatchRequiresReview extends Notification implements ShouldQue
         return new self(
             mismatchId: (int) $mismatch->id,
             mismatchDate: (string) optional($mismatch->mismatch_date)->toDateString(),
-            employeeName: $mismatch->employee?->user?->name,
+            employeeName: $mismatch->staffMember?->user?->name,
             plannedWorkMode: (string) $mismatch->planned_work_mode,
             actualWorkMode: (string) $mismatch->actual_work_mode,
             eventType: $eventType,

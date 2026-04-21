@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -32,7 +32,7 @@ class EmployeeIdentitySeeder extends Seeder
 
     public function run(): void
     {
-        $employees = EmployeeProfile::whereNull('ptkp_status')->get();
+        $employees = StaffMemberProfile::whereNull('ptkp_status')->get();
 
         if ($employees->isEmpty()) {
             $this->command->info('All employees already have ptkp_status set. Skipping.');

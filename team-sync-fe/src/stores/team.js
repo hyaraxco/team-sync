@@ -206,7 +206,7 @@ export const useTeamStore = defineStore("team", {
 
             try {
                 const response = await axiosInstance.post(`/teams/${teamId}/add-member`, {
-                    employee_id: employeeId
+                    staff_member_id: employeeId
                 });
 
                 this.success = response.data.message;
@@ -226,7 +226,7 @@ export const useTeamStore = defineStore("team", {
 
             try {
                 const response = await axiosInstance.post(`/teams/${teamId}/remove-member`, {
-                    employee_id: employeeId
+                    staff_member_id: employeeId
                 });
 
                 this.success = response.data.message;

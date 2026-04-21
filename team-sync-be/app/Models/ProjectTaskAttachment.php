@@ -12,7 +12,7 @@ class ProjectTaskAttachment extends Model
 
     protected $fillable = [
         'project_task_id',
-        'employee_id',
+        'staff_member_id',
         'file_name',
         'file_path',
         'file_size',
@@ -24,8 +24,8 @@ class ProjectTaskAttachment extends Model
         return $this->belongsTo(ProjectTask::class, 'project_task_id');
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 }

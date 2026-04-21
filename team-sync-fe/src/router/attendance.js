@@ -1,4 +1,4 @@
-import MyAttendance from '@/views/employee/MyAttendance.vue';
+import MyAttendance from '@/views/staff-member/MyAttendance.vue';
 import AttendanceList from '@/views/admin/attendance/AttendanceList.vue';
 import AttendanceCorrectionList from '@/views/admin/attendance/AttendanceCorrectionList.vue';
 import LeaveRequestList from '@/views/admin/attendance/LeaveRequestList.vue';
@@ -38,7 +38,7 @@ export default [
     },
     {
         path: 'attendance/my-attendances',
-        name: 'employee.attendance.my-attendances',
+        name: 'staffMember.attendance.my-attendances',
         component: MyAttendance,
         meta: {
             requiredAnyPermissions: ['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'],
@@ -46,12 +46,12 @@ export default [
     },
     {
         path: 'attendance/clock',
-        name: 'employee.attendance.clock',
+        name: 'staffMember.attendance.clock',
         meta: {
             requiredAnyPermissions: ['attendance-check-in', 'attendance-check-out'],
         },
         beforeEnter: () => ({
-            name: 'employee.attendance.my-attendances',
+            name: 'staffMember.attendance.my-attendances',
             query: { action: 'clock' },
         }),
     },

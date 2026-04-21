@@ -11,7 +11,7 @@ class JobInformation extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'job_title',
         'team_id',
         'status',
@@ -29,9 +29,9 @@ class JobInformation extends Model
         ];
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function team()

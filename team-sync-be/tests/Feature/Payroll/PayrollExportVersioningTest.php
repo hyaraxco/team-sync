@@ -3,7 +3,7 @@
 namespace Tests\Feature\Payroll;
 
 use App\Exports\PayrollExport;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
@@ -72,8 +72,8 @@ class PayrollExportVersioningTest extends TestCase
     private function createPayrollDetail(string $salaryMonth, ?int $settingsVersionId, int $effectiveWorkingDays): PayrollDetail
     {
         $user = User::factory()->create();
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () use ($user) {
-            return EmployeeProfile::factory()->for($user)->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {
+            return StaffMemberProfile::factory()->for($user)->create();
         });
 
         $team = Team::factory()->create();
@@ -89,7 +89,7 @@ class PayrollExportVersioningTest extends TestCase
             ->create();
 
         $employee->bankInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'bank_name' => 'BCA',
             'account_number' => '5566778899',
             'account_holder_name' => 'Payroll Export User',
@@ -104,7 +104,7 @@ class PayrollExportVersioningTest extends TestCase
 
         $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'effective_working_days' => $effectiveWorkingDays,
@@ -115,9 +115,9 @@ class PayrollExportVersioningTest extends TestCase
         ]);
 
         return $detail->load([
-            'employee.user',
-            'employee.jobInformation.team',
-            'employee.bankInformation',
+            'staffMember.user',
+            'staffMember.jobInformation.team',
+            'staffMember.bankInformation',
         ]);
     }
 }

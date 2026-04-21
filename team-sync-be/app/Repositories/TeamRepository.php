@@ -34,8 +34,8 @@ class TeamRepository implements TeamRepositoryInterface
     ): Builder|Collection {
         $query = Team::with([
             'leader',
-            'leader.employeeProfile',
-            'leader.employeeProfile.jobInformation',
+            'leader.staffMemberProfile',
+            'leader.staffMemberProfile.jobInformation',
         ])
             ->where(function ($query) use ($search, $leaderId, $status, $department) {
                 if ($search) {
@@ -90,12 +90,12 @@ class TeamRepository implements TeamRepositoryInterface
     ): Team {
         return Team::with([
             'leader',
-            'leader.employeeProfile',
-            'leader.employeeProfile.jobInformation',
+            'leader.staffMemberProfile',
+            'leader.staffMemberProfile.jobInformation',
             'members',
-            'members.employee',
-            'members.employee.user',
-            'members.employee.jobInformation',
+            'members.staffMember',
+            'members.staffMember.user',
+            'members.staffMember.jobInformation',
         ])->withCount('members')->findOrFail($id);
     }
 
@@ -115,12 +115,12 @@ class TeamRepository implements TeamRepositoryInterface
             }
 
             if ($team->team_lead_id) {
-                $newLeader = User::with('employeeProfile')->find($team->team_lead_id);
-                if ($newLeader && $newLeader->employeeProfile) {
+                $newLeader = User::with('staffMemberProfile')->find($team->team_lead_id);
+                if ($newLeader && $newLeader->staffMemberProfile) {
                     TeamMember::updateOrCreate(
                         [
                             'team_id' => $team->id,
-                            'employee_id' => $newLeader->employeeProfile->id,
+                            'staff_member_id' => $newLeader->staffMemberProfile->id,
                         ],
                         [
                             'joined_at' => now(),
@@ -175,21 +175,21 @@ class TeamRepository implements TeamRepositoryInterface
 
             if ($team->team_lead_id && $team->team_lead_id !== $oldLeaderId) {
                 if ($oldLeaderId) {
-                    $oldLeader = User::with('employeeProfile')->find($oldLeaderId);
-                    if ($oldLeader && $oldLeader->employeeProfile) {
+                    $oldLeader = User::with('staffMemberProfile')->find($oldLeaderId);
+                    if ($oldLeader && $oldLeader->staffMemberProfile) {
                         TeamMember::where('team_id', $team->id)
-                            ->where('employee_id', $oldLeader->employeeProfile->id)
+                            ->where('staff_member_id', $oldLeader->staffMemberProfile->id)
                             ->whereNull('left_at')
                             ->update(['left_at' => now()]);
                     }
                 }
 
-                $newLeader = User::with('employeeProfile')->find($team->team_lead_id);
-                if ($newLeader && $newLeader->employeeProfile) {
+                $newLeader = User::with('staffMemberProfile')->find($team->team_lead_id);
+                if ($newLeader && $newLeader->staffMemberProfile) {
                     TeamMember::updateOrCreate(
                         [
                             'team_id' => $team->id,
-                            'employee_id' => $newLeader->employeeProfile->id,
+                            'staff_member_id' => $newLeader->staffMemberProfile->id,
                         ],
                         [
                             'joined_at' => now(),
@@ -427,7 +427,7 @@ class TeamRepository implements TeamRepositoryInterface
 
             // Check if member already exists and is active
             $existingMember = TeamMember::where('team_id', $teamId)
-                ->where('employee_id', $employeeId)
+                ->where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->first();
 
@@ -436,7 +436,7 @@ class TeamRepository implements TeamRepositoryInterface
             }
 
             // Keep one active team membership per employee.
-            TeamMember::where('employee_id', $employeeId)
+            TeamMember::where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->where('team_id', '!=', $teamId)
                 ->update(['left_at' => now()]);
@@ -445,7 +445,7 @@ class TeamRepository implements TeamRepositoryInterface
             $member = TeamMember::updateOrCreate(
                 [
                     'team_id' => $teamId,
-                    'employee_id' => $employeeId,
+                    'staff_member_id' => $employeeId,
                 ],
                 [
                     'joined_at' => now(),
@@ -454,7 +454,7 @@ class TeamRepository implements TeamRepositoryInterface
             );
 
             JobInformation::query()->updateOrCreate(
-                ['employee_id' => $employeeId],
+                ['staff_member_id' => $employeeId],
                 ['team_id' => (int) $teamId]
             );
 
@@ -470,7 +470,7 @@ class TeamRepository implements TeamRepositoryInterface
                 );
             });
 
-            return $member->load(['employee', 'employee.user', 'employee.jobInformation']);
+            return $member->load(['staffMember', 'staffMember.user', 'staffMember.jobInformation']);
         });
     }
 
@@ -482,7 +482,7 @@ class TeamRepository implements TeamRepositoryInterface
             $team = Team::query()->with('leader')->findOrFail($teamId);
 
             $member = TeamMember::where('team_id', $teamId)
-                ->where('employee_id', $employeeId)
+                ->where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->first();
 
@@ -493,7 +493,7 @@ class TeamRepository implements TeamRepositoryInterface
             $member->update(['left_at' => now()]);
 
             $fallbackTeamMember = TeamMember::query()
-                ->where('employee_id', $employeeId)
+                ->where('staff_member_id', $employeeId)
                 ->whereNull('left_at')
                 ->orderByDesc('joined_at')
                 ->orderByDesc('id')
@@ -501,12 +501,12 @@ class TeamRepository implements TeamRepositoryInterface
 
             if ($fallbackTeamMember) {
                 JobInformation::query()->updateOrCreate(
-                    ['employee_id' => $employeeId],
+                    ['staff_member_id' => $employeeId],
                     ['team_id' => $fallbackTeamMember->team_id]
                 );
             } else {
                 JobInformation::query()
-                    ->where('employee_id', $employeeId)
+                    ->where('staff_member_id', $employeeId)
                     ->update(['team_id' => null]);
             }
 
@@ -521,7 +521,7 @@ class TeamRepository implements TeamRepositoryInterface
                 );
             });
 
-            return $member->load(['employee', 'employee.user', 'employee.jobInformation']);
+            return $member->load(['staffMember', 'staffMember.user', 'staffMember.jobInformation']);
         });
     }
 

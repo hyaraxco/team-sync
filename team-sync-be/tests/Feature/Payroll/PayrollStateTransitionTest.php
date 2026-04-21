@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\User;
@@ -190,12 +190,12 @@ class PayrollStateTransitionTest extends TestCase
 
     private function createPayrollWithDetail(string $status = 'pending', ?string $paymentDate = null): Payroll
     {
-        $employeeProfile = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
-        $employeeProfile->bankInformation()->create([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->create([
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'BCA',
             'account_number' => '1234567890',
             'account_holder_name' => 'Payroll Transition User',
@@ -210,7 +210,7 @@ class PayrollStateTransitionTest extends TestCase
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
             'final_salary' => 9500000,
             'attended_days' => 20,

@@ -85,13 +85,13 @@ describe("QuickActions smoke", () => {
   });
 
   it("shows admin actions in order and promotes the first actionable item", () => {
-    setPermissions(["employee-create", "team-create", "payroll-create"]);
+    setPermissions(["staff-member-create", "team-create", "payroll-create"]);
 
     const wrapper = factory();
     const actions = wrapper.findAll("[data-action-id]").map((node) => node.text().trim());
 
     expect(actions).toEqual([
-      "Add Employee",
+      "Add Staff Member",
       "Create New Team",
       "Process Payroll",
       "Schedule MeetingComing soon",
@@ -132,7 +132,7 @@ describe("QuickActions smoke", () => {
   it("keeps payroll quick action hidden for manager-style permissions while allowing self-service leave", () => {
     setPermissions([
       "team-create",
-      "employee-create",
+      "staff-member-create",
       "attendance-my-attendances",
       "attendance-check-in",
       "leave-request-create",
@@ -155,10 +155,10 @@ describe("QuickActions smoke", () => {
     const actions = wrapper.findAll("[data-action-id]").map((node) => node.text().trim());
 
     expect(actions).toContain("Request Leave");
-    expect(wrapper.text()).not.toContain("Add Employee");
+    expect(wrapper.text()).not.toContain("Add Staff Member");
     expect(
       wrapper.find('[data-action-id="request-leave"]').attributes("data-route-name")
-    ).toBe("employee.attendance.my-attendances");
+    ).toBe("staffMember.attendance.my-attendances");
     expect(
       wrapper.find('[data-action-id="request-leave"]').attributes("data-route-action")
     ).toBe("request-leave");

@@ -13,7 +13,7 @@ class PerformanceReview extends Model
 
     protected $fillable = [
         'cycle_id',
-        'employee_id',
+        'staff_member_id',
         'reviewer_id',
         'status',
         'self_assessment_submitted_at',
@@ -40,14 +40,14 @@ class PerformanceReview extends Model
         return $this->belongsTo(PerformanceReviewCycle::class, 'cycle_id');
     }
 
-    public function employee(): BelongsTo
+    public function staffMember(): BelongsTo
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
     public function reviewer(): BelongsTo
     {
-        return $this->belongsTo(EmployeeProfile::class, 'reviewer_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'reviewer_id');
     }
 
     public function calibrator(): BelongsTo

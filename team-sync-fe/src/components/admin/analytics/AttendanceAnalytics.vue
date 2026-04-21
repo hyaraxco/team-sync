@@ -252,7 +252,7 @@ const correctionSeries = computed(() => {
         <div v-if="attendance.top_late_employees?.length" class="space-y-3 mt-2">
           <div
             v-for="(emp, idx) in attendance.top_late_employees"
-            :key="emp.employee_id"
+            :key="emp.staff_member_id"
             class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0"
           >
             <div class="flex items-center gap-3">

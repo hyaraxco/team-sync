@@ -87,7 +87,7 @@ describe("TaskBoard smoke", () => {
   });
 
   it("hides create button for employee", () => {
-    mockUser.value = { roles: [{ name: "employee" }] };
+    mockUser.value = { roles: [{ name: "staff" }] };
 
     const wrapper = factory();
 

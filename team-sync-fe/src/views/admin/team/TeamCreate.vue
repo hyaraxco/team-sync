@@ -29,7 +29,7 @@ import { onMounted, ref, watch } from "vue";
 import { debounce } from "lodash";
 import { useTeamStore } from "@/stores/team";
 import { useOptionStore } from "@/stores/option";
-import { useEmployeeStore } from "@/stores/employee";
+import { useStaffMemberStore } from "@/stores/staffMember";
 import { storeToRefs } from "pinia";
 import router from "@/router";
 
@@ -37,9 +37,9 @@ const teamStore = useTeamStore();
 const { loading, error, success } = storeToRefs(teamStore);
 const { createTeam } = teamStore;
 
-const employeeStore = useEmployeeStore();
-const { employees } = storeToRefs(employeeStore);
-const { fetchEmployees } = employeeStore;
+const staffMemberStore = useStaffMemberStore();
+const { staffMembers } = storeToRefs(staffMemberStore);
+const { fetchStaffMembers } = staffMemberStore;
 
 const optionStore = useOptionStore();
 const { departments } = storeToRefs(optionStore);
@@ -101,7 +101,7 @@ const removeResponsibility = (idx) => {
 
 onMounted(async () => {
   await fetchDepartments();
-  await fetchEmployees({
+  await fetchStaffMembers({
     limit: 6,
   });
 });
@@ -109,7 +109,7 @@ onMounted(async () => {
 watch(
   searchLead,
   debounce(() => {
-    fetchEmployees({
+    fetchStaffMembers({
       limit: 6,
       search: searchLead.value,
     });
@@ -691,7 +691,7 @@ watch(
             type="text"
             id="leadSearch"
             class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
-            placeholder="Search employees..."
+            placeholder="Search staffMembers..."
             v-model="searchLead"
           />
         </div>
@@ -703,7 +703,7 @@ watch(
           <!-- Employee Option 1 -->
           <div
             class="lead-card border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
-            v-for="employee in employees"
+            v-for="employee in staffMembers"
             :key="employee.id"
             @click="handleSelectLead(employee)"
           >
@@ -739,9 +739,9 @@ watch(
 
         <!-- No Results Message -->
         <EmptyState
-          v-if="employees.length === 0"
+          v-if="staffMembers.length === 0"
           icon="SearchX"
-          title="No employees found"
+          title="No staffMembers found"
           subtitle="Try adjusting your search terms"
         />
       </div>

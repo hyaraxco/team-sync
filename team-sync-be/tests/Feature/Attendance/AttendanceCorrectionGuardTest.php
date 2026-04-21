@@ -4,7 +4,7 @@ namespace Tests\Feature\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
@@ -53,7 +53,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         $attendance = Attendance::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => '2026-04-10',
             'attendance_period_id' => $period->id,
             'check_in' => '2026-04-10 08:55:00',
@@ -102,7 +102,7 @@ class AttendanceCorrectionGuardTest extends TestCase
 
         $this->assertFalse(
             Attendance::query()
-                ->where('employee_id', $employee->id)
+                ->where('staff_member_id', $employee->id)
                 ->whereDate('date', '2026-04-10')
                 ->exists()
         );
@@ -123,7 +123,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         Attendance::create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'date' => '2026-04-10',
             'attendance_period_id' => $period->id,
             'check_in' => '2026-04-10 08:55:00',
@@ -166,20 +166,20 @@ class AttendanceCorrectionGuardTest extends TestCase
 
         $this->assertFalse(
             Attendance::query()
-                ->where('employee_id', $employee->id)
+                ->where('staff_member_id', $employee->id)
                 ->whereDate('date', '2026-04-10')
                 ->exists()
         );
     }
 
-    private function actingAsEmployee(): EmployeeProfile
+    private function actingAsEmployee(): StaffMemberProfile
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         $employee->jobInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'job_title' => 'Software Engineer',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -189,7 +189,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         $user = User::query()->findOrFail($employee->user_id);
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 

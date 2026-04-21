@@ -53,7 +53,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     public function getReviewsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator
     {
         $query = PerformanceReview::with(['cycle', 'reviewer.user'])
-            ->where('employee_id', $employeeId);
+            ->where('staff_member_id', $employeeId);
             
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -69,7 +69,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getReviewsForManager(string $managerId, array $filters = []): LengthAwarePaginator
     {
-        $query = PerformanceReview::with(['cycle', 'employee.user'])
+        $query = PerformanceReview::with(['cycle', 'staffMember.user'])
             ->where('reviewer_id', $managerId);
             
         if (isset($filters['status'])) {
@@ -86,7 +86,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getReviewById(int $id)
     {
-        return PerformanceReview::with(['cycle', 'employee.user', 'reviewer.user', 'responses.section', 'calibrator'])
+        return PerformanceReview::with(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator'])
             ->findOrFail($id);
     }
 
@@ -183,7 +183,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     public function getEmployeeScoresForCycle(int $cycleId): array
     {
         // C1 & C2: Dari performance_reviews + review_responses
-        $reviewScores = PerformanceReview::with(['employee.jobInformation.team', 'responses'])
+        $reviewScores = PerformanceReview::with(['staffMember.jobInformation.team', 'responses'])
             ->where('cycle_id', $cycleId)
             ->where('status', 'completed')
             ->get();
@@ -194,7 +194,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
         $candidates = [];
         foreach ($reviewScores as $review) {
-            $employeeId = $review->employee_id;
+            $employeeId = $review->staff_member_id;
 
             // C1: Rata-rata manager_rating dari semua section responses
             $avgManagerRating = $review->responses
@@ -214,7 +214,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
             // C5: Jumlah positive feedback yang diterima selama periode cycle
             $cycle = $review->cycle ?? \App\Models\PerformanceReviewCycle::find($cycleId);
-            $positiveFeedbackCount = \App\Models\PerformanceFeedback::where('employee_id', $employeeId)
+            $positiveFeedbackCount = \App\Models\PerformanceFeedback::where('staff_member_id', $employeeId)
                 ->where('feedback_type', 'positive')
                 ->whereBetween('created_at', [
                     $cycle->start_date . ' 00:00:00',
@@ -223,10 +223,10 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ->count();
 
             $candidates[] = [
-                'employee_id'             => $employeeId,
-                'employee_name'           => $review->employee->full_name ?? 'Unknown',
-                'department'              => $review->employee->jobInformation->department ?? null,
-                'team'                    => $review->employee->jobInformation->team->name ?? null,
+                'staff_member_id'             => $employeeId,
+                'employee_name'           => $review->staffMember->full_name ?? 'Unknown',
+                'department'              => $review->staffMember->jobInformation->department ?? null,
+                'team'                    => $review->staffMember->jobInformation->team->name ?? null,
                 'review_id'               => $review->id,
                 'review_status'           => $review->status,
                 // Kriteria TOPSIS

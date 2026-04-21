@@ -5,7 +5,7 @@ namespace Tests\Feature\Payroll;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\BpjsRate;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\PayrollSetting;
 use App\Models\PtkpAmount;
@@ -67,7 +67,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(10_000_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail, 'PayrollDetail should exist for employee');
         $this->assertGreaterThan(0, (float) $detail->pph21_amount, 'PPh 21 should be non-zero for 10jt salary');
@@ -82,7 +82,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         // JHT(2%) + JP(1%) employee = 3% of salary (under cap)
@@ -98,7 +98,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         // JHT(3.7%) + JKK(0.24%) + JKM(0.3%) + JP(2%) employer = > 5%
@@ -118,7 +118,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         $this->assertGreaterThan(0, (float) $detail->bpjs_kes_employee);
@@ -141,7 +141,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(3_500_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         $this->assertEquals(0.0, (float) $detail->pph21_amount, 'PPh 21 should be 0 for salary below PTKP');
@@ -156,7 +156,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(10_000_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         $meta = is_string($detail->tax_calculation_meta)
@@ -181,8 +181,8 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
 
-        $highDetail = $payroll->payrollDetails->firstWhere('employee_id', $highEarner->id);
-        $normalDetail = $payroll->payrollDetails->firstWhere('employee_id', $normalEarner->id);
+        $highDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $highEarner->id);
+        $normalDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $normalEarner->id);
 
         $this->assertNotNull($highDetail);
         $this->assertNotNull($normalDetail);
@@ -209,7 +209,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         // Core payroll fields should still be populated
         $this->assertNotNull($detail);
@@ -222,10 +222,10 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
     // Helper
     // ─────────────────────────────────────────────────────────────────────────
 
-    private function createEmployeeWithAttendance(int $salary): EmployeeProfile
+    private function createEmployeeWithAttendance(int $salary): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($salary) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($salary) {
+            $employee = StaffMemberProfile::factory()->create();
 
             JobInformation::factory()
                 ->forEmployee($employee)
@@ -244,7 +244,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             while ($cursor->lte($endDate)) {
                 if (!$cursor->isWeekend()) {
                     Attendance::create([
-                        'employee_id' => $employee->id,
+                        'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',

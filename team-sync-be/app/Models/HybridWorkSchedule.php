@@ -10,7 +10,7 @@ class HybridWorkSchedule extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id',
+        'staff_member_id',
         'effective_from',
         'effective_until',
         'monday',
@@ -28,8 +28,8 @@ class HybridWorkSchedule extends Model
         ];
     }
 
-    public function employee()
+    public function staffMember()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'employee_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 }
