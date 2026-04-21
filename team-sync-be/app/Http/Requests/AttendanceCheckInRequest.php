@@ -15,7 +15,7 @@ class AttendanceCheckInRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => ['required', 'integer', 'exists:employee_profiles,id'],
+            'staff_member_id' => ['required', 'integer', 'exists:staff_member_profiles,id'],
             'check_in_lat' => ['nullable', 'numeric'],
             'check_in_long' => ['nullable', 'numeric'],
             'notes' => ['nullable', 'string', 'max:500'],
@@ -25,7 +25,7 @@ class AttendanceCheckInRequest extends FormRequest
     public function attributes()
     {
         return [
-            'employee_id' => 'Employee',
+            'staff_member_id' => 'Employee',
             'check_in_lat' => 'Latitude',
             'check_in_long' => 'Longitude',
             'notes' => 'Catatan',
@@ -38,7 +38,7 @@ class AttendanceCheckInRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
-            'employee_id' => Auth::user()->employeeProfile->id,
+            'staff_member_id' => Auth::user()->staffMemberProfile->id,
         ]);
     }
 }

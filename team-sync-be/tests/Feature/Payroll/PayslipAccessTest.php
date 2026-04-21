@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
@@ -28,11 +28,11 @@ class PayslipAccessTest extends TestCase
     public function test_employee_can_list_view_and_download_only_their_paid_payslip(): void
     {
         $employee = User::where('email', 'agung@teamsync.com')->firstOrFail();
-        $otherEmployeeProfile = $this->createSecondEmployeeWithAttendance();
+        $otherStaffMemberProfile = $this->createSecondEmployeeWithAttendance();
         $payroll = $this->createPaidPayrollForCurrentMonth();
 
-        $employeePayslip = $payroll->payrollDetails()->where('employee_id', $employee->employeeProfile->id)->firstOrFail();
-        $otherPayslip = $payroll->payrollDetails()->where('employee_id', $otherEmployeeProfile->id)->firstOrFail();
+        $employeePayslip = $payroll->payrollDetails()->where('staff_member_id', $employee->staffMemberProfile->id)->firstOrFail();
+        $otherPayslip = $payroll->payrollDetails()->where('staff_member_id', $otherStaffMemberProfile->id)->firstOrFail();
 
         Sanctum::actingAs($employee);
 
@@ -69,12 +69,12 @@ class PayslipAccessTest extends TestCase
     public function test_internal_admin_roles_can_access_only_their_own_paid_payslips(): void
     {
         foreach (['tasyia@teamsync.com', 'dwimeta@teamsync.com', 'yudhis@teamsync.com'] as $email) {
-            $this->createAttendanceForEmployee(User::where('email', $email)->firstOrFail()->employeeProfile);
+            $this->createAttendanceForEmployee(User::where('email', $email)->firstOrFail()->staffMemberProfile);
         }
 
         $payroll = $this->createPaidPayrollForCurrentMonth();
         $otherPayslip = $payroll->payrollDetails()
-            ->whereHas('employee.user', fn ($query) => $query->where('email', 'agung@teamsync.com'))
+            ->whereHas('staffMember.user', fn ($query) => $query->where('email', 'agung@teamsync.com'))
             ->firstOrFail();
 
         $cases = [
@@ -86,7 +86,7 @@ class PayslipAccessTest extends TestCase
         foreach ($cases as $email) {
             $user = User::where('email', $email)->firstOrFail();
             $ownPayslip = $payroll->payrollDetails()
-                ->where('employee_id', $user->employeeProfile->id)
+                ->where('staff_member_id', $user->staffMemberProfile->id)
                 ->firstOrFail();
 
             Sanctum::actingAs($user);
@@ -105,7 +105,7 @@ class PayslipAccessTest extends TestCase
         }
     }
 
-    private function createAttendanceForEmployee(EmployeeProfile $employeeProfile): void
+    private function createAttendanceForEmployee(StaffMemberProfile $staffMemberProfile): void
     {
         $month = now()->startOfMonth();
         $monthEnd = $month->copy()->endOfMonth();
@@ -114,7 +114,7 @@ class PayslipAccessTest extends TestCase
         while ($cursor->lte($monthEnd)) {
             if (! $cursor->isWeekend()) {
                 $attendance = Attendance::query()
-                    ->where('employee_id', $employeeProfile->id)
+                    ->where('staff_member_id', $staffMemberProfile->id)
                     ->whereDate('date', $cursor->toDateString())
                     ->first();
 
@@ -127,7 +127,7 @@ class PayslipAccessTest extends TestCase
                     ]);
                 } else {
                     Attendance::create([
-                        'employee_id' => $employeeProfile->id,
+                        'staff_member_id' => $staffMemberProfile->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',
@@ -141,13 +141,13 @@ class PayslipAccessTest extends TestCase
         }
     }
 
-    private function createSecondEmployeeWithAttendance(): EmployeeProfile
+    private function createSecondEmployeeWithAttendance(): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () {
-            $employeeProfile = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () {
+            $staffMemberProfile = StaffMemberProfile::factory()->create();
 
-            $employeeProfile->jobInformation()->create([
-                'employee_id' => $employeeProfile->id,
+            $staffMemberProfile->jobInformation()->create([
+                'staff_member_id' => $staffMemberProfile->id,
                 'job_title' => 'QA Engineer',
                 'years_experience' => 3,
                 'status' => 'active',
@@ -158,29 +158,29 @@ class PayslipAccessTest extends TestCase
                 'skill_level' => 'intermediate',
             ]);
 
-            $employeeProfile->bankInformation()->create([
-                'employee_id' => $employeeProfile->id,
+            $staffMemberProfile->bankInformation()->create([
+                'staff_member_id' => $staffMemberProfile->id,
                 'bank_name' => 'Mandiri',
                 'account_number' => '4455667788',
                 'account_holder_name' => 'Second Payslip Employee',
                 'account_type' => 'saving',
             ]);
 
-            $this->createAttendanceForEmployee($employeeProfile);
+            $this->createAttendanceForEmployee($staffMemberProfile);
 
-            return $employeeProfile;
+            return $staffMemberProfile;
         });
     }
 
     private function createPaidPayrollForCurrentMonth()
     {
-        EmployeeProfile::query()
+        StaffMemberProfile::query()
             ->whereHas('jobInformation', function ($query) {
                 $query->where('status', 'active');
             })
             ->get()
-            ->each(function (EmployeeProfile $employeeProfile) {
-                $this->createAttendanceForEmployee($employeeProfile);
+            ->each(function (StaffMemberProfile $staffMemberProfile) {
+                $this->createAttendanceForEmployee($staffMemberProfile);
             });
 
         $repository = app(PayrollRepositoryInterface::class);

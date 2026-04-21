@@ -30,9 +30,9 @@ const rolePermissions = {
     "team-menu",
     "team-create",
     "team-edit",
-    "employee-menu",
-    "employee-create",
-    "employee-edit",
+    "staff-member-menu",
+    "staff-member-create",
+    "staff-member-edit",
     "project-menu",
     "project-list",
     "project-create",
@@ -54,9 +54,9 @@ const rolePermissions = {
     "team-menu",
     "team-create",
     "team-edit",
-    "employee-menu",
-    "employee-create",
-    "employee-edit",
+    "staff-member-menu",
+    "staff-member-create",
+    "staff-member-edit",
     "project-menu",
     "project-list",
     "project-create",
@@ -78,8 +78,8 @@ const rolePermissions = {
   ],
   finance: [
     "dashboard-menu",
-    "employee-menu",
-    "employee-list",
+    "staff-member-menu",
+    "staff-member-list",
     "attendance-menu",
     "payroll-menu",
     "payroll-list",
@@ -97,7 +97,7 @@ const rolePermissions = {
     "leave-request-my-requests",
     "payslip-view",
   ],
-  employee: [
+  staff: [
     "dashboard-menu",
     "profile-menu",
     "team-view",
@@ -141,8 +141,8 @@ describe("feature guard matrix", () => {
     ).toBe(false);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("admin.employees")
+        rolePermissions.staff,
+        routeMeta("admin.staffMembers")
       )
     ).toBe(false);
     expect(
@@ -153,13 +153,13 @@ describe("feature guard matrix", () => {
     ).toBe(false);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
+        rolePermissions.staff,
         routeMeta("admin.projects")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
+        rolePermissions.staff,
         routeMeta("admin.attendances")
       )
     ).toBe(false);
@@ -198,44 +198,44 @@ describe("feature guard matrix", () => {
     ).toBe(false);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("employee.payroll")
+        rolePermissions.staff,
+        routeMeta("staffMember.payroll")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.manager,
-        routeMeta("employee.payroll")
+        routeMeta("staffMember.payroll")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
-        routeMeta("employee.payroll")
+        routeMeta("staffMember.payroll")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
-        routeMeta("employee.payroll")
+        routeMeta("staffMember.payroll")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("employee.profile")
+        rolePermissions.staff,
+        routeMeta("staffMember.profile")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
-        routeMeta("employee.profile")
+        routeMeta("staffMember.profile")
       )
     ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.manager,
-        routeMeta("employee.attendance.my-attendances")
+        routeMeta("staffMember.attendance.my-attendances")
       )
     ).toBe(true);
   });

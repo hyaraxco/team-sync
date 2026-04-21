@@ -38,7 +38,7 @@ class AttendancePolicyMismatchLifecycleService
                 'escalated_at' => Carbon::now(),
             ]);
 
-            $this->emailService->sendAttendanceMismatchEscalatedNotification($mismatch->fresh(['employee.user']));
+            $this->emailService->sendAttendanceMismatchEscalatedNotification($mismatch->fresh(['staffMember.user']));
 
             $escalatedCount++;
         }
@@ -56,7 +56,7 @@ class AttendancePolicyMismatchLifecycleService
 
         try {
             $elapsedWorkingDays = $this->workingDaysCalculator->calculateForEmployee(
-                $mismatch->employee_id,
+                $mismatch->staff_member_id,
                 $start,
                 $asOf
             );

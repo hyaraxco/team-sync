@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -25,7 +25,7 @@ class EmployeeSeeder extends Seeder
             ]
         );
 
-        $employeeProfile = EmployeeProfile::withTrashed()->updateOrCreate([
+        $staffMemberProfile = StaffMemberProfile::withTrashed()->updateOrCreate([
             'code' => 'EMP001',
         ], [
             'user_id' => $employee->id,
@@ -47,10 +47,10 @@ class EmployeeSeeder extends Seeder
             'deleted_at' => null,
         ]);
 
-        $employeeProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->jobInformation()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'Software Engineer',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -59,27 +59,27 @@ class EmployeeSeeder extends Seeder
             'monthly_salary' => 10000000,
         ]);
 
-        $employeeProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => '1234567890',
             'account_holder_name' => 'Agung Ramadhan',
         ]);
 
-        $employeeProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->emergencyContacts()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'agung.emergency@teamsync.com',
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Agung Emergency Contact',
             'phone' => '081234567890',
             'relationship' => 'Family',
             'email' => 'agung.emergency@teamsync.com',
         ]);
 
-        $employee->syncRoles(['employee']);
+        $employee->syncRoles(['staff']);
     }
 
     private function purgeLegacyDemoAccount(string $email): void

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Leave;
 
 use App\Models\AttendancePeriod;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
@@ -91,12 +91,12 @@ class LeaveRequestPeriodGuardTest extends TestCase
 
     private function actingAsEmployee(): User
     {
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         $employee->jobInformation()->create([
-            'employee_id' => $employee->id,
+            'staff_member_id' => $employee->id,
             'job_title' => 'QA Engineer',
             'years_experience' => 3,
             'status' => 'active',
@@ -108,7 +108,7 @@ class LeaveRequestPeriodGuardTest extends TestCase
         ]);
 
         $user = $employee->user;
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 

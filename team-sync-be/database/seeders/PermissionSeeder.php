@@ -27,7 +27,7 @@ class PermissionSeeder extends Seeder
             'view',
         ],
 
-        'employee' => [
+        'staff-member' => [
             'menu',
             'list',
             'create',

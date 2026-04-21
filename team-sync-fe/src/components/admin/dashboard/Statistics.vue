@@ -20,7 +20,7 @@ onMounted(() => {
 });
 
 // Computed properties for statistics
-const employees = computed(() => dashboardStore.statistics.employees);
+const employees = computed(() => dashboardStore.statistics.staffMembers);
 const teams = computed(() => dashboardStore.statistics.teams);
 const attendance = computed(() => dashboardStore.statistics.attendance);
 const tasks = computed(() => dashboardStore.statistics.tasks);
@@ -81,7 +81,7 @@ const loading = computed(() => dashboardStore.loading);
     <QuickActions />
 
     <!-- Row 2 Stats Cards -->
-    <!-- Tasks Completed (below Total Employees) -->
+    <!-- Tasks Completed (below Total Staff Members) -->
     <StatsCard
       title="Tasks Completed"
       :value="tasks.completed"

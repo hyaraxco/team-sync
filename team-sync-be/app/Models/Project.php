@@ -37,7 +37,7 @@ class Project extends Model
 
     public function projectLeader()
     {
-        return $this->belongsTo(EmployeeProfile::class, 'project_leader_id');
+        return $this->belongsTo(StaffMemberProfile::class, 'project_leader_id');
     }
 
     // Alias for projectLeader for backward compatibility

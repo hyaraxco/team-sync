@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -18,7 +18,7 @@ class JobInformationSeeder extends Seeder
         $this->command->info('Checking employees without job information...');
 
         // Count employees without job information
-        $totalEmployees = EmployeeProfile::whereDoesntHave('jobInformation')->count();
+        $totalEmployees = StaffMemberProfile::whereDoesntHave('jobInformation')->count();
 
         if ($totalEmployees === 0) {
             $this->command->info('All employees already have job information.');
@@ -53,7 +53,7 @@ class JobInformationSeeder extends Seeder
         $progressBar->start();
 
         // Process in chunks for memory efficiency
-        EmployeeProfile::whereDoesntHave('jobInformation')
+        StaffMemberProfile::whereDoesntHave('jobInformation')
             ->select('id') // Only select ID to reduce memory usage
             ->chunk($chunkSize, function ($employees) use (
                 $teams,
@@ -71,7 +71,7 @@ class JobInformationSeeder extends Seeder
                     $teamId = ! empty($teams) ? $teams[array_rand($teams)] : null;
 
                     $insertData[] = [
-                        'employee_id' => $employee->id,
+                        'staff_member_id' => $employee->id,
                         'job_title' => $jobTitles[array_rand($jobTitles)],
                         'team_id' => $teamId,
                         'status' => 'active',

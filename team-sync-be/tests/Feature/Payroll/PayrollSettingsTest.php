@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollSetting;
@@ -173,8 +173,8 @@ class PayrollSettingsTest extends TestCase
             'note_template' => 'Alpha {absent_days} | Potongan Rp {deduction}',
         ]);
 
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()
@@ -222,8 +222,8 @@ class PayrollSettingsTest extends TestCase
             'note_template' => 'Version 1 {absent_days}',
         ]);
 
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()
@@ -311,7 +311,7 @@ class PayrollSettingsTest extends TestCase
         return $user;
     }
 
-    private function seedFullMonthAttendance(EmployeeProfile $employee, Carbon $month, array $absentDates = []): void
+    private function seedFullMonthAttendance(StaffMemberProfile $employee, Carbon $month, array $absentDates = []): void
     {
         $absentDateLookup = array_fill_keys($absentDates, true);
         $cursor = $month->copy()->startOfMonth();
@@ -323,7 +323,7 @@ class PayrollSettingsTest extends TestCase
                 $status = isset($absentDateLookup[$dateKey]) ? 'absent' : 'present';
 
                 Attendance::create([
-                    'employee_id' => $employee->id,
+                    'staff_member_id' => $employee->id,
                     'date' => $dateKey,
                     'status' => $status,
                     'check_in' => $status === 'present'

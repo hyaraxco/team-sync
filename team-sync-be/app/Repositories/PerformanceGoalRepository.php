@@ -14,7 +14,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
     public function getGoalsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator
     {
         $query = PerformanceGoal::with(['assigner', 'linkedReview'])
-            ->where('employee_id', $employeeId);
+            ->where('staff_member_id', $employeeId);
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
@@ -32,7 +32,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
     {
         // Assuming a manager can see goals they assigned OR goals of their direct reports.
         // For simplicity based on the current model, let's fetch goals assigned by this manager.
-        $query = PerformanceGoal::with(['employee', 'linkedReview'])
+        $query = PerformanceGoal::with(['staffMember', 'linkedReview'])
             ->where('assigned_by', $managerId);
 
         if (isset($filters['status'])) {
@@ -45,7 +45,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
 
     public function getGoalById(int $id)
     {
-        return PerformanceGoal::with(['employee', 'creator', 'assigner', 'updates.updater', 'linkedReview'])
+        return PerformanceGoal::with(['staffMember', 'creator', 'assigner', 'updates.updater', 'linkedReview'])
             ->findOrFail($id);
     }
 

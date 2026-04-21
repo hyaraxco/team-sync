@@ -20,13 +20,13 @@ class PerformanceReviewController extends Controller
 
     public function getMyReviews(Request $request)
     {
-        $reviews = $this->repository->getReviewsForEmployee(Auth::user()->employeeProfile?->id, $request->all());
+        $reviews = $this->repository->getReviewsForEmployee(Auth::user()->staffMemberProfile?->id, $request->all());
         return ResponseHelper::jsonResponse(true, 'My reviews retrieved successfully', $reviews);
     }
 
     public function getTeamReviews(Request $request)
     {
-        $reviews = $this->repository->getReviewsForManager(Auth::user()->employeeProfile?->id, $request->all());
+        $reviews = $this->repository->getReviewsForManager(Auth::user()->staffMemberProfile?->id, $request->all());
         return ResponseHelper::jsonResponse(true, 'Team reviews retrieved successfully', $reviews);
     }
 

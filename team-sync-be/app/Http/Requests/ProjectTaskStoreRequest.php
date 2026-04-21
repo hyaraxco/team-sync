@@ -27,7 +27,7 @@ class ProjectTaskStoreRequest extends FormRequest
             'project_id' => ['required', 'integer', 'exists:projects,id'],
             'name' => ['required', 'string', 'max:255'],
             'description' => ['nullable', 'string'],
-            'assignee_id' => ['nullable', 'integer', 'exists:employee_profiles,id'],
+            'assignee_id' => ['nullable', 'integer', 'exists:staff_member_profiles,id'],
             'priority' => ['required', 'string', 'in:'.implode(',', array_column(TaskPriority::cases(), 'value'))],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(TaskStatus::cases(), 'value'))],
             'due_date' => ['nullable', 'date', 'after_or_equal:today'],

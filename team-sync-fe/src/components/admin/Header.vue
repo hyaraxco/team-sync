@@ -52,23 +52,23 @@ const titles = {
     title: "Edit Team",
     subtitle: "Update team information",
   },
-  "admin.employees": {
+  "admin.staffMembers": {
     title: "Employees",
     subtitle: "Manage employee records",
   },
-  "admin.employees.create": {
-    title: "Create Employee",
+  "admin.staffMembers.create": {
+    title: "Create Staff Member",
     subtitle: "Add new employee",
   },
-  "admin.employees.edit": {
-    title: "Edit Employee",
+  "admin.staffMembers.edit": {
+    title: "Edit Staff Member",
     subtitle: "Update employee information",
   },
-  "admin.employees.detail": {
-    title: "Employee Details",
+  "admin.staffMembers.detail": {
+    title: "Staff Member Details",
     subtitle: "View employee profile",
   },
-  "admin.employees.success": {
+  "admin.staffMembers.success": {
     title: "Employee Created",
     subtitle: "Employee has been added",
   },
@@ -104,36 +104,36 @@ const titles = {
     title: "Payroll Details",
     subtitle: "View payroll summary",
   },
-  "employee.profile": {
+  "staffMember.profile": {
     title: "My Profile",
     subtitle: "Manage your personal information",
   },
-  "employee.profile.edit": {
+  "staffMember.profile.edit": {
     title: "Edit Profile",
     subtitle: "Update your personal information",
   },
-  "employee.team": { title: "My Team", subtitle: "See your team members" },
-  "employee.attendance.my-attendances": {
+  "staffMember.team": { title: "My Team", subtitle: "See your team members" },
+  "staffMember.attendance.my-attendances": {
     title: "My Attendance",
     subtitle: "Check your attendance, clock logs, and leave status.",
   },
-  "employee.attendance.clock": {
+  "staffMember.attendance.clock": {
     title: "My Attendance",
     subtitle: "Check your attendance, clock logs, and leave status.",
   },
-  "employee.payroll": {
+  "staffMember.payroll": {
     title: "My Payroll",
     subtitle: "Review your payroll history and details.",
   },
-  "employee.payroll.detail": {
+  "staffMember.payroll.detail": {
     title: "Payroll Details",
     subtitle: "See payroll breakdown",
   },
-  "employee.payslips": {
+  "staffMember.payslips": {
     title: "My Payroll",
     subtitle: "Review your payroll history and details.",
   },
-  "employee.payslips.detail": {
+  "staffMember.payslips.detail": {
     title: "Payroll Details",
     subtitle: "See payroll breakdown",
   },
@@ -152,7 +152,7 @@ const notificationsError = computed(() => notificationStore.error);
 const unreadNotificationCount = computed(() => notificationStore.unreadCount);
 const isEmployeeUser = computed(() => {
   const roles = Array.isArray(user.value?.roles) ? user.value.roles : [];
-  return roles.some((role) => String(role).toLowerCase() === "employee");
+  return roles.some((role) => String(role).toLowerCase() === "staff");
 });
 const formatUnreadCount = (count, maxCount = 99) => {
   const safeCount = Number.isFinite(count) ? Math.max(0, Math.floor(count)) : 0;
@@ -446,7 +446,7 @@ onUnmounted(() => {
 
             <div class="py-1">
               <RouterLink
-                :to="{ name: 'employee.profile' }"
+                :to="{ name: 'staffMember.profile' }"
                 role="menuitem"
                 data-testid="header-profile-menu-item"
                 class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"

@@ -10,7 +10,7 @@ class JobInformationRepository implements JobInformationRepositoryInterface
 {
     public function getById(string $id): JobInformation
     {
-        return JobInformation::with(['employee', 'team'])->findOrFail($id);
+        return JobInformation::with(['staffMember', 'team'])->findOrFail($id);
     }
 
     public function create(array $data): JobInformation

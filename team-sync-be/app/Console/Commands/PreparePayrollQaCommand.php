@@ -141,7 +141,7 @@ class PreparePayrollQaCommand extends Command
         $employee = User::query()->where('email', 'agung@teamsync.com')->firstOrFail();
 
         $hasPaidPayslip = PayrollDetail::query()
-            ->where('employee_id', $employee->employeeProfile?->id)
+            ->where('staff_member_id', $employee->staffMemberProfile?->id)
             ->whereHas('payroll', function ($query) {
                 $query->where('status', 'paid');
             })

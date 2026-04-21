@@ -84,7 +84,7 @@ const canMoveTask = (task, targetStatus) => {
     return (reviewerTransitions[fromStatus] || []).includes(targetStatus);
   }
 
-  if (hasRole("employee") && isOwnAssignedTask(task)) {
+  if (hasRole("staff") && isOwnAssignedTask(task)) {
     const employeeTransitions = {
       todo: ["in_progress"],
       in_progress: ["review"],
@@ -114,11 +114,11 @@ const getMoveDeniedReason = (task, targetStatus) => {
     return "Task is already in this status.";
   }
 
-  if (hasRole("employee") && !isOwnAssignedTask(task)) {
+  if (hasRole("staff") && !isOwnAssignedTask(task)) {
     return "You can only move your own assigned tasks.";
   }
 
-  if (hasRole("employee")) {
+  if (hasRole("staff")) {
     return "Invalid status transition for employee workflow.";
   }
 

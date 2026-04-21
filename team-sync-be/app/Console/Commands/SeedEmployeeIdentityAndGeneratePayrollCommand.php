@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\User;
 use App\Repositories\PayrollRepository;
@@ -66,8 +66,8 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
     private function seedIdentity(bool $isDryRun): void
     {
         // ── Step 1: Seed identity data ──────────────────────────────────────
-        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\EmployeeProfile> $employees */
-        $employees = EmployeeProfile::whereNull('ptkp_status')
+        /** @var \Illuminate\Database\Eloquent\Collection<int, \App\Models\StaffMemberProfile> $employees */
+        $employees = StaffMemberProfile::whereNull('ptkp_status')
             ->orWhereNull('npwp')
             ->get();
 
@@ -109,7 +109,7 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
 
         if (! $isDryRun) {
             foreach ($rows as $row) {
-                DB::table('employee_profiles')->where('id', $row['id'])->update([
+                DB::table('staff_member_profiles')->where('id', $row['id'])->update([
                     'npwp'                 => $row['npwp'],
                     'bpjs_ketenagakerjaan' => $row['bpjs_tk'],
                     'bpjs_kesehatan'       => $row['bpjs_kes'],

@@ -3,7 +3,7 @@
 namespace Tests\Feature\Attendance;
 
 use App\Models\AttendancePolicy;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\JobInformation;
 use App\Services\Attendance\WorkingDaysCalculator;
@@ -96,14 +96,14 @@ class WorkingDaysCalculatorTest extends TestCase
         $this->assertSame(12, $workingDays);
     }
 
-    private function createEmployeeWithEmploymentType(string $employmentType): EmployeeProfile
+    private function createEmployeeWithEmploymentType(string $employmentType): StaffMemberProfile
     {
         $policy = AttendancePolicy::query()
             ->where('employment_type', $employmentType)
             ->firstOrFail();
 
-        $employee = EmployeeProfile::withoutSyncingToSearch(function () {
-            return EmployeeProfile::factory()->create();
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
         });
 
         JobInformation::factory()

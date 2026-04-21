@@ -9,7 +9,7 @@ class EmergencyContactRepository implements EmergencyContactRepositoryInterface
 {
     public function getById(string $id): EmergencyContact
     {
-        return EmergencyContact::with(['employee'])->findOrFail($id);
+        return EmergencyContact::with(['staffMember'])->findOrFail($id);
     }
 
     public function create(array $data): EmergencyContact

@@ -9,7 +9,7 @@ class BankInformationRepository implements BankInformationRepositoryInterface
 {
     public function getById(string $id): BankInformation
     {
-        return BankInformation::with(['employee'])->findOrFail($id);
+        return BankInformation::with(['staffMember'])->findOrFail($id);
     }
 
     public function create(array $data): BankInformation

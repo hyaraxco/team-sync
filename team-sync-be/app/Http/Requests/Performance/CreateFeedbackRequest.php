@@ -14,7 +14,7 @@ class CreateFeedbackRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'employee_id' => 'required|exists:employee_profiles,id',
+            'staff_member_id' => 'required|exists:staff_member_profiles,id',
             'feedback_type' => 'required|in:positive,constructive,general',
             'category' => 'nullable|string|max:255',
             'content' => 'required|string',

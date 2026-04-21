@@ -22,7 +22,7 @@ class ProjectTaskStatusLogResource extends JsonResource
             'reason' => $this->reason,
             'changed_at' => $this->changed_at,
             'changed_by' => $this->changed_by,
-            'changed_by_employee' => new EmployeeProfileResource($this->whenLoaded('changedBy')),
+            'changed_by_employee' => new StaffMemberProfileResource($this->whenLoaded('changedBy')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

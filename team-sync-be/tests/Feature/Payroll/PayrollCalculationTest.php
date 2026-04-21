@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollSetting;
@@ -56,7 +56,7 @@ class PayrollCalculationTest extends TestCase
         $repository = app(PayrollRepositoryInterface::class);
 
         $payroll = $repository->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         // floor(x / 1000) * 1000 should always be <= original value
         $this->assertSame(0, (int) $detail->final_salary % 1000);
@@ -77,7 +77,7 @@ class PayrollCalculationTest extends TestCase
         $repository = app(PayrollRepositoryInterface::class);
 
         $payroll = $repository->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         // ceil(x / 1000) * 1000 should be a multiple of 1000
         $this->assertSame(0, (int) $detail->final_salary % 1000);
@@ -97,7 +97,7 @@ class PayrollCalculationTest extends TestCase
         $repository = app(PayrollRepositoryInterface::class);
 
         $payroll = $repository->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         // With 'none', the value should not be rounded to a multiple of the unit
         // (exact depends on deductions/tax, but the rounding step is a no-op)
@@ -123,7 +123,7 @@ class PayrollCalculationTest extends TestCase
 
         // Mark 5 weekday attendance records as absent to simulate absences
         // This keeps the records (avoids readiness block) but triggers deductions
-        Attendance::where('employee_id', $absentEmployee->id)
+        Attendance::where('staff_member_id', $absentEmployee->id)
             ->orderBy('date')
             ->limit(5)
             ->update([
@@ -135,8 +135,8 @@ class PayrollCalculationTest extends TestCase
         $repository = app(PayrollRepositoryInterface::class);
         $payroll = $repository->generatePayroll('2026-04', null);
 
-        $fullDetail = $payroll->payrollDetails->firstWhere('employee_id', $fullEmployee->id);
-        $absentDetail = $payroll->payrollDetails->firstWhere('employee_id', $absentEmployee->id);
+        $fullDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $fullEmployee->id);
+        $absentDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $absentEmployee->id);
 
         // The absent employee should have a lower final salary due to deductions
         $this->assertNotNull($fullDetail);
@@ -163,7 +163,7 @@ class PayrollCalculationTest extends TestCase
         $repository = app(PayrollRepositoryInterface::class);
 
         $payroll = $repository->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         $this->assertEquals(0, (float) $detail->original_salary);
@@ -181,7 +181,7 @@ class PayrollCalculationTest extends TestCase
         $repository = app(PayrollRepositoryInterface::class);
 
         $payroll = $repository->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('employee_id', $employee->id);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
         $this->assertNotNull($detail);
         $this->assertGreaterThan(0, $detail->attended_days);
@@ -191,10 +191,10 @@ class PayrollCalculationTest extends TestCase
         $this->assertGreaterThan(0, (float) $detail->daily_rate);
     }
 
-    private function createActiveEmployeeWithAttendance(Carbon $month, int $monthlySalary): EmployeeProfile
+    private function createActiveEmployeeWithAttendance(Carbon $month, int $monthlySalary): StaffMemberProfile
     {
-        return EmployeeProfile::withoutSyncingToSearch(function () use ($month, $monthlySalary) {
-            $employee = EmployeeProfile::factory()->create();
+        return StaffMemberProfile::withoutSyncingToSearch(function () use ($month, $monthlySalary) {
+            $employee = StaffMemberProfile::factory()->create();
             $startDate = $month->copy()->startOfMonth();
             $endDate = $month->copy()->endOfMonth();
 
@@ -212,7 +212,7 @@ class PayrollCalculationTest extends TestCase
             while ($cursor->lte($endDate)) {
                 if (! $cursor->isWeekend()) {
                     Attendance::create([
-                        'employee_id' => $employee->id,
+                        'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
                         'check_in' => $cursor->format('Y-m-d').' 08:00:00',
                         'check_out' => $cursor->format('Y-m-d').' 17:00:00',

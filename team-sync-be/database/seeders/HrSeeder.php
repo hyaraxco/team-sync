@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -25,7 +25,7 @@ class HrSeeder extends Seeder
             ]
         );
 
-        $employeeProfile = EmployeeProfile::withTrashed()->updateOrCreate([
+        $staffMemberProfile = StaffMemberProfile::withTrashed()->updateOrCreate([
             'code' => 'HR001',
         ], [
             'user_id' => $employee->id,
@@ -40,10 +40,10 @@ class HrSeeder extends Seeder
             'deleted_at' => null,
         ]);
 
-        $employeeProfile->jobInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->jobInformation()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'job_title' => 'HR Specialist',
             'status' => 'active',
             'employment_type' => 'full_time',
@@ -52,20 +52,20 @@ class HrSeeder extends Seeder
             'monthly_salary' => 10000000,
         ]);
 
-        $employeeProfile->bankInformation()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->bankInformation()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'bank_name' => 'bca',
             'account_number' => '244422131',
             'account_holder_name' => 'Tasyia',
         ]);
 
-        $employeeProfile->emergencyContacts()->updateOrCreate([
-            'employee_id' => $employeeProfile->id,
+        $staffMemberProfile->emergencyContacts()->updateOrCreate([
+            'staff_member_id' => $staffMemberProfile->id,
             'email' => 'tasyia.emergency@teamsync.com',
         ], [
-            'employee_id' => $employeeProfile->id,
+            'staff_member_id' => $staffMemberProfile->id,
             'full_name' => 'Tasyia Emergency Contact',
             'phone' => '081234567890',
             'relationship' => 'Family',

@@ -20,11 +20,11 @@ class EnsureProjectMembership
             return ResponseHelper::jsonResponse(false, 'Unauthorized', null, 401);
         }
 
-        if (!$user->hasRole('employee')) {
+        if (!$user->hasRole('staff')) {
             return $next($request);
         }
 
-        $employee = $user->employeeProfile;
+        $employee = $user->staffMemberProfile;
         if (!$employee) {
             return ResponseHelper::jsonResponse(false, 'Forbidden', null, 403);
         }
@@ -42,7 +42,7 @@ class EnsureProjectMembership
         $isLeader = ($project->project_leader_id === $employee->id);
 
         $jobInfoTeamId = $employee->jobInformation->team_id ?? null;
-        $teamMemberIds = TeamMember::where('employee_id', $employee->id)
+        $teamMemberIds = TeamMember::where('staff_member_id', $employee->id)
             ->whereNull('left_at')
             ->pluck('team_id')
             ->toArray();

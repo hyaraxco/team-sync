@@ -4,7 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,7 +23,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $hr = User::where('email', 'tasyia@teamsync.com')->firstOrFail();
         $finance = User::where('email', 'dwimeta@teamsync.com')->firstOrFail();
         $manager = User::where('email', 'yudhis@teamsync.com')->firstOrFail();
-        $employee = EmployeeProfile::where('code', 'EMP001')->firstOrFail();
+        $employee = StaffMemberProfile::where('code', 'EMP001')->firstOrFail();
         $payrollMonth = now()->startOfMonth();
 
         $this->assertTrue($hr->hasPermissionTo('payroll-create', 'sanctum'));
@@ -37,7 +37,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
         $expectedBusinessDays = $this->resolveBusinessDaysInMonth($payrollMonth);
 
-        $this->assertSame($expectedBusinessDays, Attendance::where('employee_id', $employee->id)
+        $this->assertSame($expectedBusinessDays, Attendance::where('staff_member_id', $employee->id)
             ->whereBetween('date', [
                 $payrollMonth->copy()->startOfMonth()->startOfDay(),
                 $payrollMonth->copy()->endOfMonth()->endOfDay(),
@@ -48,7 +48,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
         $this->assertSame('pending', $payroll->status);
         $this->assertGreaterThan(0, $payroll->payrollDetails()->count());
-        $this->assertContains($employee->id, $payroll->payrollDetails->pluck('employee_id')->all());
+        $this->assertContains($employee->id, $payroll->payrollDetails->pluck('staff_member_id')->all());
 
         $this->assertNull(User::where('email', 'manager@gmail.com')->first());
         $this->assertNull(User::where('email', 'employee@gmail.com')->first());
@@ -69,11 +69,11 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $this->seed(MinimalPayrollE2ESeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
-        $employee = EmployeeProfile::where('code', 'EMP001')->firstOrFail();
+        $employee = StaffMemberProfile::where('code', 'EMP001')->firstOrFail();
         $payrollMonth = now()->startOfMonth();
         $expectedBusinessDays = $this->resolveBusinessDaysInMonth($payrollMonth);
 
-        $this->assertSame($expectedBusinessDays, Attendance::where('employee_id', $employee->id)
+        $this->assertSame($expectedBusinessDays, Attendance::where('staff_member_id', $employee->id)
             ->whereRaw('date(date) >= ?', [$payrollMonth->copy()->startOfMonth()->toDateString()])
             ->whereRaw('date(date) <= ?', [$payrollMonth->copy()->endOfMonth()->toDateString()])
             ->count());

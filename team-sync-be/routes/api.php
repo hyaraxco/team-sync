@@ -7,7 +7,7 @@ use App\Http\Controllers\AttendanceCorrectionController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailVerificationController;
-use App\Http\Controllers\EmployeeProfileController;
+use App\Http\Controllers\StaffMemberProfileController;
 use App\Http\Controllers\LeaveBalanceController;
 use App\Http\Controllers\LeaveRequestController;
 use App\Http\Controllers\NotificationController;
@@ -51,18 +51,18 @@ Route::prefix('v1')
             Route::post('teams/{team}/remove-member', [TeamController::class, 'removeMember']);
             Route::apiResource('teams', TeamController::class);
 
-            Route::get('my-profile', [EmployeeProfileController::class, 'getMyProfile']);
+            Route::get('my-profile', [StaffMemberProfileController::class, 'getMyProfile']);
             Route::get('my-notifications/unread-count', [NotificationController::class, 'getUnreadCount']);
             Route::get('my-notifications', [NotificationController::class, 'getMyNotifications']);
             Route::post('my-notifications/{notificationId}/mark-as-read', [NotificationController::class, 'markAsRead']);
-            Route::get('my-team', [EmployeeProfileController::class, 'getMyTeam']);
-            Route::get('my-team/members', [EmployeeProfileController::class, 'getMyTeamMembers']);
-            Route::get('my-team/projects', [EmployeeProfileController::class, 'getMyTeamProjects']);
-            Route::get('employees/statistics', [EmployeeProfileController::class, 'getStatistics']);
-            Route::get('employees/{id}/performance-statistics', [EmployeeProfileController::class, 'getPerformanceStatistics']);
-            Route::get('employees/all/paginated', [EmployeeProfileController::class, 'getAllPaginated']);
-            Route::post('employees/check-availability', [EmployeeProfileController::class, 'checkAvailability']);
-            Route::apiResource('employees', EmployeeProfileController::class);
+            Route::get('my-team', [StaffMemberProfileController::class, 'getMyTeam']);
+            Route::get('my-team/members', [StaffMemberProfileController::class, 'getMyTeamMembers']);
+            Route::get('my-team/projects', [StaffMemberProfileController::class, 'getMyTeamProjects']);
+            Route::get('staff-members/statistics', [StaffMemberProfileController::class, 'getStatistics']);
+            Route::get('staff-members/{id}/performance-statistics', [StaffMemberProfileController::class, 'getPerformanceStatistics']);
+            Route::get('staff-members/all/paginated', [StaffMemberProfileController::class, 'getAllPaginated']);
+            Route::post('staff-members/check-availability', [StaffMemberProfileController::class, 'checkAvailability']);
+            Route::apiResource('staff-members', StaffMemberProfileController::class);
 
             Route::get('projects/statistics', [ProjectController::class, 'getStatistics']);
             Route::get('projects/all/paginated', [ProjectController::class, 'getAllPaginated']);

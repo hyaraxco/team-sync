@@ -16,7 +16,7 @@ class LeaveRequestResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'employee_id' => $this->employee_id,
+            'staff_member_id' => $this->staff_member_id,
             'leave_type' => $this->leave_type,
             'type' => $this->leave_type, // alias for frontend compatibility
             'start_date' => $this->start_date,
@@ -36,9 +36,9 @@ class LeaveRequestResource extends JsonResource
             'proof_review_notes' => $this->proof_review_notes,
             'status' => $this->status,
             'approved_by' => $this->approved_by,
-            'employee' => new EmployeeProfileResource($this->whenLoaded('employee')),
-            'approver' => new EmployeeProfileResource($this->whenLoaded('approver')),
-            'proof_reviewer' => new EmployeeProfileResource($this->whenLoaded('proofReviewedBy')),
+            'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
+            'approver' => new StaffMemberProfileResource($this->whenLoaded('approver')),
+            'proof_reviewer' => new StaffMemberProfileResource($this->whenLoaded('proofReviewedBy')),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

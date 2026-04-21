@@ -5,7 +5,7 @@ namespace App\Services\Attendance;
 use App\Models\Attendance;
 use App\Models\AttendancePolicy;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveRequest;
 use App\Services\EmailService;
@@ -118,7 +118,7 @@ class AttendanceClassifier
         }
 
         $effectiveWorkingDays = max(0, count($scheduledDates) - $summary['holiday_days']);
-        $monthlySalary = (float) ($context['employee']->jobInformation?->monthly_salary ?? 0);
+        $monthlySalary = (float) ($context['staffMember']->jobInformation?->monthly_salary ?? 0);
         $dailyRate = $effectiveWorkingDays > 0 ? $monthlySalary / $effectiveWorkingDays : 0;
         $deductionDays = $summary['absent_days'] + $summary['unpaid_leave_days'] + ($summary['half_day_count'] * 0.5);
 
@@ -143,7 +143,7 @@ class AttendanceClassifier
         $trackedDates = [];
 
         $attendanceDates = Attendance::query()
-            ->where('employee_id', $context['employee']->id)
+            ->where('staff_member_id', $context['staffMember']->id)
             ->whereBetween('date', [$startDate->toDateString(), $endDate->toDateString()])
             ->pluck('date');
 
@@ -155,7 +155,7 @@ class AttendanceClassifier
         }
 
         $approvedLeaves = LeaveRequest::query()
-            ->where('employee_id', $context['employee']->id)
+            ->where('staff_member_id', $context['staffMember']->id)
             ->where('status', 'approved')
             ->whereDate('start_date', '<=', $endDate->toDateString())
             ->whereDate('end_date', '>=', $startDate->toDateString())
@@ -221,7 +221,7 @@ class AttendanceClassifier
         }
 
         $attendance = Attendance::query()
-            ->where('employee_id', $context['employee']->id)
+            ->where('staff_member_id', $context['staffMember']->id)
             ->whereDate('date', $date->toDateString())
             ->first();
 
@@ -249,7 +249,7 @@ class AttendanceClassifier
 
         // Auto-present: hybrid employees on WFH days
         if ($context['work_location'] === 'hybrid') {
-            $resolved = $this->hybridScheduleResolver->resolve($context['employee']->id, $date);
+            $resolved = $this->hybridScheduleResolver->resolve($context['staffMember']->id, $date);
             $plannedMode = $resolved['planned_mode'] ?? null;
 
             if ($plannedMode === 'wfh') {
@@ -308,7 +308,7 @@ class AttendanceClassifier
             return false;
         }
 
-        $resolved = $this->hybridScheduleResolver->resolve($attendance->employee_id, $date);
+        $resolved = $this->hybridScheduleResolver->resolve($attendance->staff_member_id, $date);
         $plannedMode = $resolved['planned_mode'] ?? null;
         $actualMode = $attendance->actual_work_mode;
 
@@ -340,7 +340,7 @@ class AttendanceClassifier
 
         $createdMismatch = AttendancePolicyMismatch::query()->create([
             'attendance_id' => $attendance->id,
-            'employee_id' => $attendance->employee_id,
+            'staff_member_id' => $attendance->staff_member_id,
             'mismatch_date' => $date->toDateString(),
             'planned_work_mode' => $plannedMode,
             'actual_work_mode' => $actualMode,
@@ -348,7 +348,7 @@ class AttendanceClassifier
         ]);
 
         $this->emailService->sendAttendanceMismatchCreatedNotification(
-            $createdMismatch->fresh(['employee.user', 'employee.jobInformation'])
+            $createdMismatch->fresh(['staffMember.user', 'staffMember.jobInformation'])
         );
 
         return true;
@@ -357,7 +357,7 @@ class AttendanceClassifier
     private function resolvePayrollValidLeaveForDate(array $context, CarbonInterface $date): ?array
     {
         $leaveRequests = LeaveRequest::query()
-            ->where('employee_id', $context['employee']->id)
+            ->where('staff_member_id', $context['staffMember']->id)
             ->where('status', 'approved')
             ->whereDate('start_date', '<=', $date->toDateString())
             ->whereDate('end_date', '>=', $date->toDateString())
@@ -432,12 +432,12 @@ class AttendanceClassifier
 
     private function buildContext(int $employeeId): array
     {
-        $employee = EmployeeProfile::query()
+        $employee = StaffMemberProfile::query()
             ->with('jobInformation')
             ->find($employeeId);
 
         if (! $employee) {
-            throw (new ModelNotFoundException())->setModel(EmployeeProfile::class, [$employeeId]);
+            throw (new ModelNotFoundException())->setModel(StaffMemberProfile::class, [$employeeId]);
         }
 
         $employmentType = (string) ($employee->jobInformation?->employment_type ?? 'full_time');
@@ -445,7 +445,7 @@ class AttendanceClassifier
         $policy = $this->resolvePolicy($employmentType);
 
         return [
-            'employee' => $employee,
+            'staffMember' => $employee,
             'employment_type' => $employmentType,
             'work_location' => (string) ($employee->jobInformation?->work_location ?? 'office'),
             'policy' => $policy,
@@ -511,7 +511,7 @@ class AttendanceClassifier
         }
 
         $hasUnresolvedMismatch = AttendancePolicyMismatch::query()
-            ->where('employee_id', $context['employee']->id)
+            ->where('staff_member_id', $context['staffMember']->id)
             ->whereBetween('mismatch_date', [$startDate->toDateString(), $endDate->toDateString()])
             ->whereIn('status', AttendancePolicyMismatch::UNRESOLVED_STATUSES)
             ->exists();
