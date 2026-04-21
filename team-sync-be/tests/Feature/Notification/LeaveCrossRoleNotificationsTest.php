@@ -57,7 +57,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         ]);
 
         [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+            'staff',
             'Leave Employee',
             $team->id
         );
@@ -100,7 +100,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
         ]);
 
         [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile(
-            'employee',
+            'staff',
             'Proof Employee',
             $team->id
         );
@@ -138,7 +138,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
     public function test_hr_proof_review_notifies_related_employee(): void
     {
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'Reviewer HR');
-        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Reviewed Employee');
+        [$employeeUser, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Reviewed Employee');
 
         $leaveRequest = LeaveRequest::create([
             'employee_id' => $employeeProfile->id,

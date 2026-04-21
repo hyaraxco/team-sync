@@ -18,7 +18,7 @@ class RolePermissionSeeder extends Seeder
         DB::transaction(function () {
             $manager = Role::firstOrCreate(['name' => 'manager']);
             $hr = Role::firstOrCreate(['name' => 'hr']);
-            $employee = Role::firstOrCreate(['name' => 'employee']);
+            $staff = Role::firstOrCreate(['name' => 'staff']);
             $finance = Role::firstOrCreate(['name' => 'finance']);
 
             $selfServiceBaseline = [
@@ -40,12 +40,12 @@ class RolePermissionSeeder extends Seeder
                 'feedback-give',
             ];
 
-            $employeeSpecific = array_merge($selfServiceBaseline, [
+            $staffSpecific = array_merge($selfServiceBaseline, [
                 'team-view',
             ]);
 
             $manager->syncPermissions(
-                $this->permissionsAllExcept(array_merge($employeeSpecific, [
+                $this->permissionsAllExcept(array_merge($staffSpecific, [
                     'leave-request-menu',
                     'leave-request-create',
                     'leave-request-my-requests',
@@ -64,7 +64,7 @@ class RolePermissionSeeder extends Seeder
             $hr->syncPermissions($this->permissionsByPrefixes([
                 'dashboard-',
                 'team-',
-                'employee-',
+                'staff-member-',
                 'project-',
                 'task-',
                 'attendance-',
@@ -74,7 +74,7 @@ class RolePermissionSeeder extends Seeder
                 'review-',
                 'goal-',
                 'feedback-',
-            ], array_merge($employeeSpecific, [
+            ], array_merge($staffSpecific, [
                 'task-delete',
             ]))->merge(
                 Permission::whereIn('name', [
@@ -85,13 +85,13 @@ class RolePermissionSeeder extends Seeder
                 ])->get()
             )->unique('id')->values());
 
-            $employee->syncPermissions(
+            $staff->syncPermissions(
                 Permission::whereIn('name', [
                     'dashboard-menu',
                     'dashboard-view',
                     'profile-menu',
                     'profile-view',
-                    'employee-list',
+                    'staff-member-list',
                     'team-view',
                     'attendance-my-attendances',
                     'attendance-check-in',
@@ -115,8 +115,8 @@ class RolePermissionSeeder extends Seeder
                 Permission::whereIn('name', [
                     'dashboard-menu',
                     'dashboard-view',
-                    'employee-menu',
-                    'employee-list',
+                    'staff-member-menu',
+                    'staff-member-list',
                     'payroll-menu',
                     'payroll-list',
                     'payroll-edit',

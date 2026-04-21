@@ -189,7 +189,7 @@ class AttendanceCorrectionGuardTest extends TestCase
         ]);
 
         $user = User::query()->findOrFail($employee->user_id);
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 

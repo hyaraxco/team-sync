@@ -61,7 +61,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
         // Check if employee tries to read someone else's request
         /** @var \App\Models\User $user */
         $user = Auth::user();
-        if ($user->hasRole('employee') && $correction->employee_id !== $user->employeeProfile->id) {
+        if ($user->hasRole('staff') && $correction->employee_id !== $user->employeeProfile->id) {
             throw new AuthorizationException("You are not authorized to view this request.");
         }
 

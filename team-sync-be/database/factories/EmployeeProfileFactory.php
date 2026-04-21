@@ -32,7 +32,7 @@ class EmployeeProfileFactory extends Factory
             'user_id' => User::factory()->state([
                 'profile_photo' => $profilePicture,
             ])->afterCreating(function (User $user) {
-                $user->assignRole('employee');
+                $user->assignRole('staff');
             }),
             'code' => $this->generateEmployeeCode(),
             'identity_number' => $this->generateIdentityNumber(),
@@ -105,7 +105,7 @@ class EmployeeProfileFactory extends Factory
             'user_id' => User::factory()->state([
                 'profile_photo' => $profilePicture,
             ])->afterCreating(function (User $user) {
-                $user->assignRole('employee');
+                $user->assignRole('staff');
             }),
         ]);
     }
@@ -122,7 +122,7 @@ class EmployeeProfileFactory extends Factory
             'user_id' => User::factory()->state([
                 'profile_photo' => $profilePicture,
             ])->afterCreating(function (User $user) {
-                $user->assignRole('employee');
+                $user->assignRole('staff');
             }),
         ]);
     }

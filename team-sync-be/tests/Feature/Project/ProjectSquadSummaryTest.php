@@ -65,49 +65,49 @@ class ProjectSquadSummaryTest extends TestCase
         $pmTeam = $this->createTeam('Mobile Product Management');
 
         $frontendA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Frontend A',
             'fe-a@teamsync.test',
             'Frontend Engineer',
             $frontendTeam
         )['profile'];
         $frontendB = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Frontend B',
             'fe-b@teamsync.test',
             'Frontend Engineer',
             $frontendTeam
         )['profile'];
         $backendA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Backend A',
             'be-a@teamsync.test',
             'Backend Engineer',
             $backendTeam
         )['profile'];
         $backendB = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Backend B',
             'be-b@teamsync.test',
             'Backend Engineer',
             $backendTeam
         )['profile'];
         $uiuxA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'UIUX A',
             'uiux-a@teamsync.test',
             'UI/UX Designer',
             $uiuxTeam
         )['profile'];
         $qaA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'QA A',
             'qa-a@teamsync.test',
             'QA Tester',
             $qaTeam
         )['profile'];
         $pmA = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'PM A',
             'pm-a@teamsync.test',
             'Project Manager',
@@ -189,7 +189,7 @@ class ProjectSquadSummaryTest extends TestCase
 
         $assignedTeam = $this->createTeam('Assigned Team');
         $memberProfile = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Project Member',
             'project.member@teamsync.test',
             'Frontend Engineer',
@@ -198,7 +198,7 @@ class ProjectSquadSummaryTest extends TestCase
 
         $outsideTeam = $this->createTeam('Outside Team');
         $outsideUser = $this->createUserWithProfileAndTeam(
-            'employee',
+            'staff',
             'Outside Employee',
             'outside.employee@teamsync.test',
             'QA Tester',

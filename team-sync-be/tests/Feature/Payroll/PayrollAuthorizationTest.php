@@ -183,7 +183,7 @@ class PayrollAuthorizationTest extends TestCase
     public function test_employee_has_no_admin_payroll_access(): void
     {
         Queue::fake();
-        $user = $this->actingAsRole('employee');
+        $user = $this->actingAsRole('staff');
         $payrollDetail = $this->createPayrollDetail();
 
         $this->getJson('/api/v1/payrolls/all/paginated')->assertForbidden();

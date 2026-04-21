@@ -36,7 +36,7 @@ class TaskAssignmentNotificationsTest extends TestCase
     public function test_manager_creating_task_with_assignee_notifies_non_manager_employee(): void
     {
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Task Manager');
-        [$employee, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Task Employee');
+        [$employee, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Task Employee');
         $project = $this->createProject($employeeProfile->id);
 
         Sanctum::actingAs($manager);
@@ -66,8 +66,8 @@ class TaskAssignmentNotificationsTest extends TestCase
     public function test_reassigning_task_notifies_new_assignee_as_reassignment(): void
     {
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Assignment Manager');
-        [$employeeA, $employeeProfileA] = $this->createUserWithRoleAndProfile('employee', 'Employee Alpha');
-        [$employeeB, $employeeProfileB] = $this->createUserWithRoleAndProfile('employee', 'Employee Beta');
+        [$employeeA, $employeeProfileA] = $this->createUserWithRoleAndProfile('staff', 'Employee Alpha');
+        [$employeeB, $employeeProfileB] = $this->createUserWithRoleAndProfile('staff', 'Employee Beta');
         $project = $this->createProject($employeeProfileA->id);
 
         Sanctum::actingAs($manager);
@@ -114,7 +114,7 @@ class TaskAssignmentNotificationsTest extends TestCase
     {
         [$actor] = $this->createUserWithRoleAndProfile('manager', 'Actor Manager');
         [$managerAssignee, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Assignee Manager');
-        [, $employeeProfile] = $this->createUserWithRoleAndProfile('employee', 'Leader Employee');
+        [, $employeeProfile] = $this->createUserWithRoleAndProfile('staff', 'Leader Employee');
         $project = $this->createProject($employeeProfile->id);
 
         Sanctum::actingAs($actor);
@@ -139,8 +139,8 @@ class TaskAssignmentNotificationsTest extends TestCase
     public function test_reassigning_rejected_task_resets_status_to_backlog_and_clears_rejection_metadata(): void
     {
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Workflow Manager');
-        [, $employeeProfileA] = $this->createUserWithRoleAndProfile('employee', 'Owner Employee');
-        [, $employeeProfileB] = $this->createUserWithRoleAndProfile('employee', 'Replacement Employee');
+        [, $employeeProfileA] = $this->createUserWithRoleAndProfile('staff', 'Owner Employee');
+        [, $employeeProfileB] = $this->createUserWithRoleAndProfile('staff', 'Replacement Employee');
         $project = $this->createProject($employeeProfileA->id);
 
         Sanctum::actingAs($manager);

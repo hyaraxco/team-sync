@@ -322,7 +322,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $employeeProfileId = $user->employeeProfile?->id;
         $isManager = $user->hasRole('manager');
         $isHr = $user->hasRole('hr');
-        $isEmployee = $user->hasRole('employee');
+        $isEmployee = $user->hasRole('staff');
         $isReviewerRole = $isManager || $isHr;
         $isPureEmployee = $isEmployee && ! $isReviewerRole;
         $isProjectLeader = $employeeProfileId !== null && $task->project?->project_leader_id === $employeeProfileId;
@@ -450,7 +450,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     {
         $user = Auth::user();
         $isReviewerRole = $user && ($user->hasRole('manager') || $user->hasRole('hr'));
-        $isPureEmployee = $user && $user->hasRole('employee') && ! $isReviewerRole;
+        $isPureEmployee = $user && $user->hasRole('staff') && ! $isReviewerRole;
 
         if (! $isPureEmployee) {
             return;
@@ -491,7 +491,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     {
         $user = Auth::user();
         $isReviewerRole = $user && ($user->hasRole('manager') || $user->hasRole('hr'));
-        $isPureEmployee = $user && $user->hasRole('employee') && ! $isReviewerRole;
+        $isPureEmployee = $user && $user->hasRole('staff') && ! $isReviewerRole;
 
         if (! $isPureEmployee) {
             return;
@@ -544,7 +544,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $isManager = $user->hasRole('manager');
         $isHr = $user->hasRole('hr');
         $isReviewerRole = $isManager || $isHr;
-        $isPureEmployee = $user->hasRole('employee') && ! $isReviewerRole;
+        $isPureEmployee = $user->hasRole('staff') && ! $isReviewerRole;
         $isProjectLeader = $task->project?->project_leader_id === $employeeProfileId;
         $isAssignee = $task->assignee_id === $employeeProfileId;
 
@@ -583,7 +583,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             throw new AuthorizationException('You are not allowed to modify this comment.');
         }
 
-        if ($user->hasRole('employee') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
+        if ($user->hasRole('staff') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
             $this->authorizeTaskCollaboration($task, 'update-comment');
         }
     }
@@ -602,7 +602,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             throw new AuthorizationException('You are not allowed to modify this attachment.');
         }
 
-        if ($user->hasRole('employee') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
+        if ($user->hasRole('staff') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
             $this->authorizeTaskCollaboration($task, 'delete-attachment');
         }
     }

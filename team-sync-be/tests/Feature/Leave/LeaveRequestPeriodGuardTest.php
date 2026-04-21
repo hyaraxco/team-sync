@@ -108,7 +108,7 @@ class LeaveRequestPeriodGuardTest extends TestCase
         ]);
 
         $user = $employee->user;
-        $user->assignRole(Role::findByName('employee', 'sanctum'));
+        $user->assignRole(Role::findByName('staff', 'sanctum'));
 
         Sanctum::actingAs($user);
 
