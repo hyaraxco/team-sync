@@ -280,7 +280,7 @@ watch(
                 { value: 'manager', label: 'Manager' },
                 { value: 'hr', label: 'HR' },
                 { value: 'finance', label: 'Finance' },
-                { value: 'employee', label: 'Employee' },
+                { value: 'staff', label: 'Employee' },
               ]"
               :error="
                 errors?.roles?.join(', ') || errors?.['roles.0']?.join(', ')
