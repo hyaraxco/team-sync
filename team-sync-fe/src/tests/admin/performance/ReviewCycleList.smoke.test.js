@@ -109,7 +109,7 @@ describe("ReviewCycleList smoke", () => {
   });
 
   it("displays loading state", () => {
-    performanceReviewRefs.loading.value = true;
+    performanceReviewRefs.cyclesLoading.value = true;
     const wrapper = factory();
     // View uses a spinner, not text
     expect(wrapper.find(".animate-spin").exists()).toBe(true);
@@ -163,6 +163,6 @@ describe("ReviewCycleList smoke", () => {
       },
     ];
     const wrapper = factory();
-    expect(wrapper.text()).toContain("active");
+    expect(wrapper.text()).toContain("Active");
   });
 });

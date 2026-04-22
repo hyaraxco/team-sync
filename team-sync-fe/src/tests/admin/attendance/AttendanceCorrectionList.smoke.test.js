@@ -32,7 +32,11 @@ vi.mock('pinia', async (importOriginal) => {
   };
 });
 
-// Mock Lucide icons with importOriginal to cover all icons from child components
+vi.mock('@/helpers/permissionHelper', () => ({
+  can: () => true,
+  canOneOf: () => true,
+}));
+
 vi.mock('lucide-vue-next', async (importOriginal) => {
   const actual = await importOriginal();
   return {

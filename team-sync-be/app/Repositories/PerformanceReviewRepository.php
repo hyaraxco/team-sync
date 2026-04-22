@@ -149,15 +149,15 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             'final_rating_label' => $calculated['final_rating_label'],
         ]);
 
-        return $review->fresh()->load(['cycle', 'employee.user', 'reviewer.user', 'responses.section', 'calibrator']);
+        return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator']);
     }
 
     public function calibrateReview(int $reviewId, array $responses, array $data)
     {
         $review = $this->getReviewById($reviewId);
 
-        $currentEmployeeId = auth()->user()->employeeProfile?->id;
-        if ($currentEmployeeId && $review->employee_id == $currentEmployeeId) {
+        $currentStaffId = auth()->user()->staffMemberProfile?->id;
+        if ($currentStaffId && $review->staff_member_id == $currentStaffId) {
             abort(403, 'Cannot calibrate your own review');
         }
 
@@ -183,21 +183,21 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             'completed_at' => now(),
         ]);
 
-        return $review->fresh()->load(['cycle', 'employee.user', 'reviewer.user', 'responses.section', 'calibrator']);
+        return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator']);
     }
 
     public function getReviewsPendingCalibration(array $filters = []): LengthAwarePaginator
     {
-        $query = PerformanceReview::with(['cycle', 'employee.user', 'reviewer.user'])
+        $query = PerformanceReview::with(['cycle', 'staffMember.user', 'reviewer.user'])
             ->where('status', 'pending_calibration');
 
         if (isset($filters['cycle_id'])) {
             $query->where('cycle_id', $filters['cycle_id']);
         }
 
-        $currentEmployeeId = auth()->user()->employeeProfile?->id;
-        if ($currentEmployeeId) {
-            $query->where('employee_id', '!=', $currentEmployeeId);
+        $currentStaffId = auth()->user()->staffMemberProfile?->id;
+        if ($currentStaffId) {
+            $query->where('staff_member_id', '!=', $currentStaffId);
         }
 
         return $query->orderBy('created_at', 'desc')

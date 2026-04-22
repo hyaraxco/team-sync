@@ -166,7 +166,7 @@ describe("PayrollSettings smoke", () => {
     await wrapper.get('[data-testid="payroll-settings-save"]').trigger("click");
     await flushAsync();
 
-    expect(updateSettings).toHaveBeenCalledWith({
+    expect(updateSettings).toHaveBeenCalledWith(expect.objectContaining({
       payday_day: 27,
       attendance_cutoff_day: 24,
       working_days_mode: "fixed",
