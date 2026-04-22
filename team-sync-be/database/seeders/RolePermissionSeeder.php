@@ -86,29 +86,18 @@ class RolePermissionSeeder extends Seeder
             )->unique('id')->values());
 
             $staff->syncPermissions(
-                Permission::whereIn('name', [
+                Permission::whereIn('name', array_merge($selfServiceBaseline, [
                     'dashboard-menu',
                     'dashboard-view',
-                    'profile-menu',
-                    'profile-view',
                     'staff-member-list',
                     'team-view',
-                    'attendance-my-attendances',
-                    'attendance-check-in',
-                    'attendance-check-out',
-                    'attendance-last-attendance',
-                    'attendance-correction-create',
-                    'leave-request-menu',
-                    'leave-request-create',
-                    'leave-request-my-requests',
-                    'payslip-view',
                     'project-menu',
                     'project-list',
                     'task-menu',
                     'task-create',
                     'task-list',
                     'task-edit',
-                ])->get()
+                ]))->get()
             );
 
             $finance->syncPermissions(
