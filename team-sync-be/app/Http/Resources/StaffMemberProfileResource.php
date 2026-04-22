@@ -14,15 +14,20 @@ class StaffMemberProfileResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user();
+        $isOwnProfile = $user && $user->staffMemberProfile && $user->staffMemberProfile->id === $this->id;
+        $canEdit = $user && $user->can('staff-member-edit');
+        $canSeeSensitive = $isOwnProfile || $canEdit;
+
         return [
             'id' => $this->id,
             'user' => new UserResource($this->whenLoaded('user')),
             'code' => $this->code,
-            'identity_number' => $this->identity_number,
-            'npwp' => $this->npwp,
-            'bpjs_ketenagakerjaan' => $this->bpjs_ketenagakerjaan,
-            'bpjs_kesehatan' => $this->bpjs_kesehatan,
-            'ptkp_status' => $this->ptkp_status,
+            'identity_number' => $this->when($canSeeSensitive, $this->identity_number),
+            'npwp' => $this->when($canSeeSensitive, $this->npwp),
+            'bpjs_ketenagakerjaan' => $this->when($canSeeSensitive, $this->bpjs_ketenagakerjaan),
+            'bpjs_kesehatan' => $this->when($canSeeSensitive, $this->bpjs_kesehatan),
+            'ptkp_status' => $this->when($canSeeSensitive, $this->ptkp_status),
             'phone' => $this->phone,
             'date_of_birth' => $this->date_of_birth?->format('Y-m-d'),
             'gender' => $this->gender,
@@ -35,8 +40,8 @@ class StaffMemberProfileResource extends JsonResource
             'postal_code' => $this->postal_code,
 
             'job_information' => new JobInformationResource($this->whenLoaded('jobInformation')),
-            'bank_information' => new BankInformationResource($this->whenLoaded('bankInformation')),
-            'emergency_contacts' => EmergencyContactResource::collection($this->whenLoaded('emergencyContacts')),
+            'bank_information' => $this->when($canSeeSensitive, new BankInformationResource($this->whenLoaded('bankInformation'))),
+            'emergency_contacts' => $this->when($canSeeSensitive, EmergencyContactResource::collection($this->whenLoaded('emergencyContacts'))),
             'team' => new TeamResource($this->whenLoaded('team')),
 
             'created_at' => $this->created_at,

@@ -96,4 +96,60 @@ class StaffMemberProfileEndpointTest extends TestCase
             (int) $employee->jobInformation()->firstOrFail()->team_id
         );
     }
+
+    public function test_it_hides_sensitive_data_for_regular_staff_viewing_other_profiles(): void
+    {
+        $staff = User::where('email', 'agung@teamsync.com')->firstOrFail();
+        $otherProfile = \App\Models\StaffMemberProfile::where('id', '!=', $staff->staffMemberProfile->id)->firstOrFail();
+
+        Sanctum::actingAs($staff);
+
+        $response = $this->getJson('/api/v1/staff-members/' . $otherProfile->id);
+        
+        $response->assertOk()
+            ->assertJsonMissingPath('data.identity_number')
+            ->assertJsonMissingPath('data.npwp')
+            ->assertJsonMissingPath('data.job_information.monthly_salary');
+    }
+
+    public function test_it_exposes_sensitive_data_for_users_viewing_their_own_profile(): void
+    {
+        $staff = User::where('email', 'agung@teamsync.com')->firstOrFail();
+
+        Sanctum::actingAs($staff);
+
+        $response = $this->getJson('/api/v1/my-profile');
+        
+        $response->assertOk()
+            ->assertJsonPath('data.identity_number', $staff->staffMemberProfile->identity_number)
+            ->assertJsonPath('data.job_information.monthly_salary', $staff->staffMemberProfile->jobInformation->monthly_salary);
+    }
+
+    public function test_it_exposes_sensitive_data_for_users_with_staff_member_edit_permission(): void
+    {
+        $hr = User::where('email', 'tasyia@teamsync.com')->firstOrFail();
+        $otherProfile = \App\Models\StaffMemberProfile::where('id', '!=', $hr->staffMemberProfile->id)->firstOrFail();
+
+        Sanctum::actingAs($hr);
+
+        $response = $this->getJson('/api/v1/staff-members/' . $otherProfile->id);
+        
+        $response->assertOk()
+            ->assertJsonPath('data.identity_number', $otherProfile->identity_number)
+            ->assertJsonPath('data.job_information.monthly_salary', $otherProfile->jobInformation->monthly_salary);
+    }
+
+    public function test_it_exposes_salary_for_users_with_payroll_list_permission(): void
+    {
+        $finance = User::where('email', 'dwimeta@teamsync.com')->firstOrFail();
+        $otherProfile = \App\Models\StaffMemberProfile::where('id', '!=', $finance->staffMemberProfile->id)->firstOrFail();
+
+        Sanctum::actingAs($finance);
+
+        $response = $this->getJson('/api/v1/staff-members/' . $otherProfile->id);
+        
+        $response->assertOk()
+            ->assertJsonMissingPath('data.identity_number')
+            ->assertJsonPath('data.job_information.monthly_salary', $otherProfile->jobInformation->monthly_salary);
+    }
 }
