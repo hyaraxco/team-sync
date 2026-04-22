@@ -22,6 +22,8 @@ interface PerformanceReviewRepositoryInterface
     public function submitSelfAssessment(int $reviewId, array $responses, array $data);
     public function submitManagerAssessment(int $reviewId, array $responses, array $data);
     public function calibrateReview(int $reviewId, array $responses, array $data);
+    public function getReviewsPendingCalibration(array $filters = []): \Illuminate\Pagination\LengthAwarePaginator;
+    public function getCalibrationContext(int $reviewId): array;
     
     // Section Management
     public function getActiveSections();

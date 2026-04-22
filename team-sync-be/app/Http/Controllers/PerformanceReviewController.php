@@ -56,6 +56,18 @@ class PerformanceReviewController extends Controller
         return ResponseHelper::jsonResponse(true, 'Manager assessment submitted successfully', $review);
     }
 
+    public function getPendingCalibration(Request $request)
+    {
+        $reviews = $this->repository->getReviewsPendingCalibration($request->all());
+        return ResponseHelper::jsonResponse(true, 'Pending calibration reviews retrieved successfully', $reviews);
+    }
+
+    public function getCalibrationContext(int $id)
+    {
+        $context = $this->repository->getCalibrationContext($id);
+        return ResponseHelper::jsonResponse(true, 'Calibration context retrieved successfully', $context);
+    }
+
     public function calibrateReview(CalibrateReviewRequest $request, int $id)
     {
         $validated = $request->validated();

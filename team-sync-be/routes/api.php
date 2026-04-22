@@ -215,8 +215,12 @@ Route::prefix('v1')
                 // Reviews
                 Route::get('reviews/my-reviews', [PerformanceReviewController::class, 'getMyReviews']);
                 Route::get('reviews/team-reviews', [PerformanceReviewController::class, 'getTeamReviews']);
+                Route::get('reviews/pending-calibration', [PerformanceReviewController::class, 'getPendingCalibration'])
+                    ->middleware(PermissionMiddleware::using(['review-calibrate']));
                 Route::get('reviews/sections', [PerformanceReviewController::class, 'getActiveSections']);
                 Route::get('reviews/{id}', [PerformanceReviewController::class, 'show']);
+                Route::get('reviews/{id}/calibration-context', [PerformanceReviewController::class, 'getCalibrationContext'])
+                    ->middleware(PermissionMiddleware::using(['review-calibrate']));
                 Route::post('reviews/{id}/self-assessment', [PerformanceReviewController::class, 'submitSelfAssessment']);
                 Route::post('reviews/{id}/manager-assessment', [PerformanceReviewController::class, 'submitManagerAssessment']);
                 Route::post('reviews/{id}/calibrate', [PerformanceReviewController::class, 'calibrateReview'])
