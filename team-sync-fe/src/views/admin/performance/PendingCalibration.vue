@@ -264,11 +264,11 @@ onMounted(async () => {
                   <div
                     class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-semibold text-xs"
                   >
-                    {{ review.manager?.full_name?.charAt(0) || "M" }}
+                    {{ review.reviewer?.full_name?.charAt(0) || "M" }}
                   </div>
                   <div>
                     <p class="font-medium text-brand-dark text-sm">
-                      {{ review.manager?.full_name || "Unknown" }}
+                      {{ review.reviewer?.full_name || "Unknown" }}
                     </p>
                   </div>
                 </div>

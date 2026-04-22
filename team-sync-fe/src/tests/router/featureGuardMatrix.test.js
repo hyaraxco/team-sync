@@ -48,6 +48,12 @@ const rolePermissions = {
     "leave-request-create",
     "leave-request-my-requests",
     "payslip-view",
+    "performance-menu",
+    "review-self-submit",
+    "review-manager-submit",
+    "goal-create-own",
+    "goal-assign-team",
+    "feedback-give",
   ],
   hr: [
     "dashboard-menu",
@@ -75,6 +81,14 @@ const rolePermissions = {
     "leave-request-create",
     "leave-request-my-requests",
     "payslip-view",
+    "performance-menu",
+    "review-cycle-manage",
+    "review-calibrate",
+    "review-self-submit",
+    "review-manager-submit",
+    "goal-create-own",
+    "goal-assign-team",
+    "feedback-give",
   ],
   finance: [
     "dashboard-menu",
@@ -107,6 +121,10 @@ const rolePermissions = {
     "payslip-view",
     "project-menu",
     "project-list",
+    "performance-menu",
+    "review-self-submit",
+    "goal-create-own",
+    "feedback-give",
   ],
 };
 
@@ -238,5 +256,44 @@ describe("feature guard matrix", () => {
         routeMeta("staffMember.attendance.my-attendances")
       )
     ).toBe(true);
+  });
+
+  it("enforces role access for performance calibration", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.performance.pending-calibration")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.performance.pending-calibration")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.employee,
+        routeMeta("admin.performance.pending-calibration")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.performance.pending-calibration")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.performance.cycles")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.performance.cycles")
+      )
+    ).toBe(false);
   });
 });

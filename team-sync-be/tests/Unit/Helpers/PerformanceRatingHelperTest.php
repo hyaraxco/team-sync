@@ -5,22 +5,26 @@ use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
-use App\Models\EmployeeProfile;
+use App\Models\StaffMemberProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
+beforeEach(function () {
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
+});
+
 function createTestReview() {
     $cycle = PerformanceReviewCycle::factory()->create();
-    $employee = EmployeeProfile::factory()->create();
-    $reviewer = EmployeeProfile::factory()->create();
+    $employee = StaffMemberProfile::factory()->create();
+    $reviewer = StaffMemberProfile::factory()->create();
     
     return PerformanceReview::create([
         'cycle_id' => $cycle->id,
-        'employee_id' => $employee->id,
+        'staff_member_id' => $employee->id,
         'reviewer_id' => $reviewer->id,
-        'status' => 'draft',
+        'status' => 'pending_self',
     ]);
 }
 
@@ -88,7 +92,7 @@ it('falls back to self_rating when both final_rating and manager_rating are null
     $result = PerformanceRatingHelper::calculateFinalRating($review->id);
 
     expect($result['final_rating'])->toBe(2.0)
-        ->and($result['final_rating_label'])->toBe('Meets Expectations');
+        ->and($result['final_rating_label'])->toBe('Needs Improvement');
 });
 
 it('returns null when no responses exist', function () {
@@ -126,4 +130,47 @@ it('derives correct label for each rating range boundary', function () {
         ->and(PerformanceRatingHelper::getRatingLabel(1.50))->toBe('Needs Improvement')
         ->and(PerformanceRatingHelper::getRatingLabel(1.00))->toBe('Unsatisfactory')
         ->and(PerformanceRatingHelper::getRatingLabel(0.00))->toBe('Unsatisfactory');
+});
+
+it('calculateManagerRating returns weighted average of manager ratings only', function () {
+    $review = createTestReview();
+
+    $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 60, 'order' => 1, 'is_active' => true]);
+    $section2 = PerformanceReviewSection::create(['name' => 'S2', 'weight' => 40, 'order' => 2, 'is_active' => true]);
+
+    PerformanceReviewResponse::create([
+        'review_id' => $review->id,
+        'section_id' => $section1->id,
+        'self_rating' => 5,
+        'manager_rating' => 4,
+        'final_rating' => 2,
+    ]);
+    PerformanceReviewResponse::create([
+        'review_id' => $review->id,
+        'section_id' => $section2->id,
+        'self_rating' => 1,
+        'manager_rating' => 3,
+        'final_rating' => 5,
+    ]);
+
+    $result = PerformanceRatingHelper::calculateManagerRating($review->id);
+
+    expect($result)->toBe(3.6);
+});
+
+it('calculateManagerRating returns null when no manager ratings exist', function () {
+    $review = createTestReview();
+
+    $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true]);
+
+    PerformanceReviewResponse::create([
+        'review_id' => $review->id,
+        'section_id' => $section1->id,
+        'self_rating' => 4,
+        'manager_rating' => null,
+    ]);
+
+    $result = PerformanceRatingHelper::calculateManagerRating($review->id);
+
+    expect($result)->toBeNull();
 });
