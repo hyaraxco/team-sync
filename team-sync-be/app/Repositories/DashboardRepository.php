@@ -238,11 +238,11 @@ class DashboardRepository implements DashboardRepositoryInterface
 
         // Get all active employees with their user info
         $allEmployees = DB::table('staff_member_profiles')
-            ->join('users', 'staff_member_profiles.'user_id', '=', 'users.id')
+            ->join('users', 'staff_member_profiles.user_id', '=', 'users.id')
             ->leftJoin('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
-            ->whereNull('staff_member_profiles.'deleted_at')
+            ->whereNull('staff_member_profiles.deleted_at')
             ->select([
-                'staff_member_profiles.'id as staff_member_id',
+                'staff_member_profiles.id as staff_member_id',
                 'users.name',
                 'users.profile_photo',
                 'job_information.job_title',

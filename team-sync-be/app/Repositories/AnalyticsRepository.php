@@ -427,11 +427,11 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Top Late Employees ──────────────────────────────────────────
             $topLateEmployees = DB::table('attendances')
                 ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'attendances.staff_member_id')
-                ->join('users', 'users.id', '=', 'staff_member_profiles.'user_id')
+                ->join('users', 'users.id', '=', 'staff_member_profiles.user_id')
                 ->whereIn('attendances.staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('attendances.date', [$startDate, $endDate])
                 ->where('attendances.status', 'late')
-                ->groupBy('attendances.staff_member_id', 'users.name', 'staff_member_profiles.'code')
+                ->groupBy('attendances.staff_member_id', 'users.name', 'staff_member_profiles.code')
                 ->selectRaw("
                     attendances.staff_member_id,
                     users.name as employee_name,
@@ -619,11 +619,11 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             // ── Top Leave Takers ────────────────────────────────────────────
             $topLeaveTakers = DB::table('leave_requests')
                 ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'leave_requests.staff_member_id')
-                ->join('users', 'users.id', '=', 'staff_member_profiles.'user_id')
+                ->join('users', 'users.id', '=', 'staff_member_profiles.user_id')
                 ->whereIn('leave_requests.staff_member_id', $filteredEmployeeIds)
                 ->whereBetween('leave_requests.start_date', [$start->toDateString(), $end->toDateString()])
                 ->where('leave_requests.status', 'approved')
-                ->groupBy('leave_requests.staff_member_id', 'users.name', 'staff_member_profiles.'code')
+                ->groupBy('leave_requests.staff_member_id', 'users.name', 'staff_member_profiles.code')
                 ->selectRaw("leave_requests.staff_member_id, users.name, staff_member_profiles.code, SUM(leave_requests.total_days) as total_days, COUNT(*) as request_count")
                 ->orderByDesc('total_days')
                 ->limit(10)
@@ -935,7 +935,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     {
         return DB::table('staff_member_profiles')
             ->select('staff_member_profiles.id')
-            ->whereNull('staff_member_profiles.'deleted_at')
+            ->whereNull('staff_member_profiles.deleted_at')
             ->when($department, function ($q) use ($department) {
                 $q->join('job_information as ji_filter', 'ji_filter.staff_member_id', '=', 'staff_member_profiles.id')
                     ->join('teams as t_filter', 't_filter.id', '=', 'ji_filter.team_id')
@@ -1213,7 +1213,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'payroll_details.staff_member_id')
             ->where('payrolls.status', 'paid')
-            ->whereNull('staff_member_profiles.'deleted_at');
+            ->whereNull('staff_member_profiles.deleted_at');
 
         if ($department) {
             $query->join('job_information', 'job_information.staff_member_id', '=', 'staff_member_profiles.id')
