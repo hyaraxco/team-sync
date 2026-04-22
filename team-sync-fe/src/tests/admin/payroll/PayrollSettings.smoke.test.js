@@ -177,7 +177,7 @@ describe("PayrollSettings smoke", () => {
       note_template: "Alpha {absent_days} | Potongan Rp {deduction}",
       payroll_bank_name: null,
       payroll_bank_code: null,
-    });
+    }));
     expect(toastSuccess).toHaveBeenCalled();
   });
 
