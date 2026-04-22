@@ -7,19 +7,36 @@ use App\Helpers\ResponseHelper;
 use App\Interfaces\PerformanceFeedbackRepositoryInterface;
 use App\Http\Requests\Performance\CreateFeedbackRequest;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
 
-class PerformanceFeedbackController extends Controller
+class PerformanceFeedbackController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            // Viewing feedback (received, given, detail): needs feedback-give as minimum baseline
+            new Middleware(
+                PermissionMiddleware::using('feedback-give'),
+                only: ['getReceivedFeedback', 'getGivenFeedback', 'show', 'acknowledge']
+            ),
+            // Giving feedback
+            new Middleware(
+                PermissionMiddleware::using('feedback-give'),
+                only: ['store']
+            ),
+        ];
+    }
+
     public function __construct(
         private PerformanceFeedbackRepositoryInterface $repository
     ) {}
 
     public function getReceivedFeedback(Request $request)
     {
-        // Don't show private feedback to the employee if they are not the manager/HR (handled by logic inside or around repository depending on rule)
-        // For simplicity, the rule states private is visible to employee and manager.
         $filters = $request->all();
         $feedback = $this->repository->getFeedbackForEmployee(Auth::user()->staffMemberProfile?->id, $filters);
         return ResponseHelper::jsonResponse(true, 'Received feedback retrieved successfully', $feedback);
@@ -41,12 +58,32 @@ class PerformanceFeedbackController extends Controller
     public function show(int $id)
     {
         $feedback = $this->repository->getFeedbackById($id);
+
+        // Ownership check: only the recipient or the giver can view a specific feedback
+        $user = Auth::user();
+        $staffMemberId = $user->staffMemberProfile?->id;
+        $isRecipient = $feedback->staff_member_id === $staffMemberId;
+        $isGiver     = $feedback->giver_id === $staffMemberId;
+
+        if (! $isRecipient && ! $isGiver && ! $user->can('performance-analytics-view')) {
+            return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
+        }
+
         return ResponseHelper::jsonResponse(true, 'Feedback retrieved successfully', $feedback);
     }
 
     public function acknowledge(int $id)
     {
+        $feedback = $this->repository->getFeedbackById($id);
+
+        // Ownership check: only the feedback recipient can acknowledge it
+        $user = Auth::user();
+        if ($feedback->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'You can only acknowledge feedback addressed to you.', null, 403);
+        }
+
         $feedback = $this->repository->acknowledgeFeedback($id);
         return ResponseHelper::jsonResponse(true, 'Feedback acknowledged successfully', $feedback);
     }
 }
+

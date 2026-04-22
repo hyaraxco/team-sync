@@ -9,11 +9,35 @@ use App\Http\Requests\Performance\CreateGoalRequest;
 use App\Http\Requests\Performance\UpdateGoalRequest;
 use App\Http\Requests\Performance\ProgressUpdateGoalRequest;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
 
-class PerformanceGoalController extends Controller
+class PerformanceGoalController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            // My goals / team goals / show / progress: require goal-create-own (everyone with self-service)
+            new Middleware(
+                PermissionMiddleware::using('goal-create-own'),
+                only: ['getMyGoals', 'getProgressUpdates', 'show']
+            ),
+            // Team goals: only those who can assign goals to others
+            new Middleware(
+                PermissionMiddleware::using('goal-assign-team'),
+                only: ['getTeamGoals']
+            ),
+            // Create, update, delete, progress update: require goal-create-own minimum
+            new Middleware(
+                PermissionMiddleware::using('goal-create-own'),
+                only: ['store', 'update', 'destroy', 'addProgressUpdate']
+            ),
+        ];
+    }
+
     public function __construct(
         private PerformanceGoalRepositoryInterface $repository
     ) {}
@@ -40,11 +64,26 @@ class PerformanceGoalController extends Controller
     public function show(int $id)
     {
         $goal = $this->repository->getGoalById($id);
+
+        // Ownership check: staff can only see their own goals unless they can assign team goals
+        $user = Auth::user();
+        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
+        }
+
         return ResponseHelper::jsonResponse(true, 'Goal retrieved successfully', $goal);
     }
 
     public function update(UpdateGoalRequest $request, int $id)
     {
+        $goal = $this->repository->getGoalById($id);
+
+        // Ownership check: only assigner/team managers can update others' goals
+        $user = Auth::user();
+        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'You can only update your own goals.', null, 403);
+        }
+
         $goal = $this->repository->updateGoal($id, $request->validated());
         return ResponseHelper::jsonResponse(true, 'Goal updated successfully', $goal);
     }
@@ -52,6 +91,14 @@ class PerformanceGoalController extends Controller
     public function destroy(int $id)
     {
         try {
+            $goal = $this->repository->getGoalById($id);
+
+            // Ownership check: only assigner/team managers can delete others' goals
+            $user = Auth::user();
+            if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+                return ResponseHelper::jsonResponse(false, 'You can only delete your own goals.', null, 403);
+            }
+
             $this->repository->deleteGoal($id);
             return ResponseHelper::jsonResponse(true, 'Goal deleted successfully');
         } catch (\Exception $e) {
@@ -61,13 +108,30 @@ class PerformanceGoalController extends Controller
 
     public function addProgressUpdate(ProgressUpdateGoalRequest $request, int $id)
     {
+        $goal = $this->repository->getGoalById($id);
+
+        // Ownership check: only the goal owner or a team manager can add progress
+        $user = Auth::user();
+        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'You can only update progress on your own goals.', null, 403);
+        }
+
         $update = $this->repository->addProgressUpdate($id, $request->validated());
         return ResponseHelper::jsonResponse(true, 'Progress update added successfully', $update, 201);
     }
 
     public function getProgressUpdates(int $id)
     {
+        $goal = $this->repository->getGoalById($id);
+
+        // Ownership check: only the goal owner or a team manager can see progress
+        $user = Auth::user();
+        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
+        }
+
         $updates = $this->repository->getProgressUpdates($id);
         return ResponseHelper::jsonResponse(true, 'Progress updates retrieved successfully', $updates);
     }
 }
+
