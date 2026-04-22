@@ -17,7 +17,7 @@ import _ from "lodash";
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
-const { user, loading: authLoading } = storeToRefs(authStore);
+const { user } = storeToRefs(authStore);
 const { logout } = authStore;
 const router = useRouter();
 
@@ -239,10 +239,6 @@ const handleNotificationSelect = async (notification) => {
 };
 
 const handleLogout = async () => {
-  if (authLoading.value) {
-    return;
-  }
-
   isAccountMenuOpen.value = false;
   await logout();
 };
@@ -462,11 +458,10 @@ onUnmounted(() => {
                 type="button"
                 role="menuitem"
                 @click="handleLogout"
-                :disabled="authLoading"
                 class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <LogOutIcon class="w-4 h-4" />
-                {{ authLoading ? "Logging out..." : "Sign Out" }}
+                Sign Out
               </button>
             </div>
           </div>

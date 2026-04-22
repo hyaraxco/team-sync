@@ -7,7 +7,9 @@ axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
 axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
-axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+if (token) {
+    axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+}
 
 axios.interceptors.request.use(
     config => {
@@ -25,6 +27,7 @@ axios.interceptors.response.use(
     error => {
         if (error.response && error.response.status === 401) {
             Cookies.remove('token')
+            delete axios.defaults.headers.common['Authorization']
             if (window.location.pathname !== '/auth/login') {
                 window.location.href = '/auth/login'
             }

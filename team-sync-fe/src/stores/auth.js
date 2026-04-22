@@ -63,17 +63,47 @@ export const useAuthStore = defineStore("auth", {
     async logout() {
       this.loading = true;
 
-      try {
-        await axiosInstance.post("/logout");
-      } catch {
-        // API call may fail (expired token, network error) - that's OK
-      } finally {
-        Cookies.remove("token");
-        this.user = null;
-        this.error = null;
-        this.loading = false;
-        router.push({ name: "login" });
+      const token = this.token;
+      Cookies.remove("token");
+
+      if (axiosInstance?.defaults?.headers?.common) {
+        delete axiosInstance.defaults.headers.common.Authorization;
       }
+
+      const loginRoute = { name: "login" };
+      const loginPath = "/auth/login";
+
+      // Trigger SPA navigation without blocking the logout flow.
+      void router.replace(loginRoute).catch(() => {});
+
+      // Hard redirect fallback prevents "stuck" UI when SPA navigation hangs.
+      if (typeof window !== "undefined") {
+        try {
+          if (window.location.pathname !== loginPath) {
+            window.location.replace(loginPath);
+          }
+        } catch {
+          // Ignore jsdom navigation errors in tests.
+        }
+      }
+
+      this.user = null;
+      this.error = null;
+      this.loading = false;
+
+      if (!token) {
+        return;
+      }
+
+      // Revoke token on server as a best-effort background call.
+      void axiosInstance
+        .post("/logout", null, {
+          timeout: 5000,
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .catch(() => {});
     },
 
     async updateProfile(payload) {
