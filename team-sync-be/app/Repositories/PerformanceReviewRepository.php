@@ -127,7 +127,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     public function submitManagerAssessment(int $reviewId, array $responses, array $data)
     {
         $review = $this->getReviewById($reviewId);
-        
+
         foreach ($responses as $response) {
             PerformanceReviewResponse::updateOrCreate(
                 ['review_id' => $reviewId, 'section_id' => $response['section_id']],
@@ -137,20 +137,30 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ]
             );
         }
-        
+
+        $managerRating = \App\Helpers\PerformanceRatingHelper::calculateManagerRating($reviewId);
+        $calculated = \App\Helpers\PerformanceRatingHelper::calculateFinalRating($reviewId);
+
         $review->update([
             'status' => 'pending_calibration',
             'manager_assessment_submitted_at' => now(),
-            'final_rating' => $data['final_rating'] ?? null,
+            'manager_recommended_rating' => $managerRating,
+            'final_rating' => $calculated['final_rating'],
+            'final_rating_label' => $calculated['final_rating_label'],
         ]);
-        
-        return $review;
+
+        return $review->fresh()->load(['cycle', 'employee.user', 'reviewer.user', 'responses.section', 'calibrator']);
     }
 
     public function calibrateReview(int $reviewId, array $responses, array $data)
     {
         $review = $this->getReviewById($reviewId);
-        
+
+        $currentEmployeeId = auth()->user()->employeeProfile?->id;
+        if ($currentEmployeeId && $review->employee_id == $currentEmployeeId) {
+            abort(403, 'Cannot calibrate your own review');
+        }
+
         if (!empty($responses)) {
             foreach ($responses as $response) {
                 PerformanceReviewResponse::updateOrCreate(
@@ -161,19 +171,94 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 );
             }
         }
-        
+
+        $calculated = \App\Helpers\PerformanceRatingHelper::calculateFinalRating($reviewId);
+
         $review->update([
             'status' => 'completed',
             'calibrated_at' => now(),
             'calibrated_by' => auth()->id(),
-            'final_rating' => $data['final_rating'],
-            'final_rating_label' => $data['final_rating_label'] ?? null,
+            'final_rating' => $calculated['final_rating'],
+            'final_rating_label' => $calculated['final_rating_label'],
             'completed_at' => now(),
         ]);
-        
-        return $review;
+
+        return $review->fresh()->load(['cycle', 'employee.user', 'reviewer.user', 'responses.section', 'calibrator']);
     }
-    
+
+    public function getReviewsPendingCalibration(array $filters = []): LengthAwarePaginator
+    {
+        $query = PerformanceReview::with(['cycle', 'employee.user', 'reviewer.user'])
+            ->where('status', 'pending_calibration');
+
+        if (isset($filters['cycle_id'])) {
+            $query->where('cycle_id', $filters['cycle_id']);
+        }
+
+        $currentEmployeeId = auth()->user()->employeeProfile?->id;
+        if ($currentEmployeeId) {
+            $query->where('employee_id', '!=', $currentEmployeeId);
+        }
+
+        return $query->orderBy('created_at', 'desc')
+            ->paginate($filters['per_page'] ?? 15);
+    }
+
+    public function getCalibrationContext(int $reviewId): array
+    {
+        $review = $this->getReviewById($reviewId);
+        $cycleId = $review->cycle_id;
+
+        $cycleReviews = PerformanceReview::with(['responses.section', 'reviewer.user'])
+            ->where('cycle_id', $cycleId)
+            ->whereNotNull('manager_assessment_submitted_at')
+            ->get();
+
+        $managerStats = [];
+        foreach ($cycleReviews as $r) {
+            $managerId = $r->reviewer_id;
+            $managerName = $r->reviewer?->user?->name ?? 'Unknown';
+
+            if (!isset($managerStats[$managerId])) {
+                $managerStats[$managerId] = [
+                    'manager_name' => $managerName,
+                    'review_count' => 0,
+                    'ratings' => [],
+                ];
+            }
+
+            $managerStats[$managerId]['review_count']++;
+
+            $avgRating = $r->responses->whereNotNull('manager_rating')->avg('manager_rating');
+            if ($avgRating !== null) {
+                $managerStats[$managerId]['ratings'][] = round($avgRating, 2);
+            }
+        }
+
+        $result = [];
+        foreach ($managerStats as $managerId => $stats) {
+            $ratings = $stats['ratings'];
+            $result[] = [
+                'manager_id' => $managerId,
+                'manager_name' => $stats['manager_name'],
+                'review_count' => $stats['review_count'],
+                'avg_rating' => count($ratings) > 0 ? round(array_sum($ratings) / count($ratings), 2) : null,
+                'min_rating' => count($ratings) > 0 ? min($ratings) : null,
+                'max_rating' => count($ratings) > 0 ? max($ratings) : null,
+                'is_current_reviewer' => $managerId == $review->reviewer_id,
+            ];
+        }
+
+        $allRatings = collect($result)->pluck('avg_rating')->filter()->values();
+
+        return [
+            'cycle_name' => $review->cycle->name,
+            'total_reviews_in_cycle' => $cycleReviews->count(),
+            'cycle_avg_rating' => $allRatings->isNotEmpty() ? round($allRatings->avg(), 2) : null,
+            'manager_breakdown' => $result,
+        ];
+    }
+
     /**
      * Ambil data skor tiap karyawan dalam satu cycle untuk perhitungan TOPSIS.
      * Hanya mengambil review dengan status 'completed'.

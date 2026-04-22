@@ -54,6 +54,15 @@ export default [
         },
       },
       {
+        path: "reviews/pending-calibration",
+        name: "admin.performance.pending-calibration",
+        component: () =>
+          import("@/views/admin/performance/PendingCalibration.vue"),
+        meta: {
+          requiredPermission: "review-calibrate",
+        },
+      },
+      {
         path: "reviews/:id",
         name: "admin.performance.review.detail",
         component: () => import("@/views/admin/performance/ReviewDetail.vue"),
