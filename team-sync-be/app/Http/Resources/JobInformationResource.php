@@ -14,6 +14,12 @@ class JobInformationResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $user = $request->user();
+        $isOwnProfile = $user && $user->staffMemberProfile && $user->staffMemberProfile->id === $this->staff_member_id;
+        $canEdit = $user && $user->can('staff-member-edit');
+        $canSeePayroll = $user && $user->can('payroll-list');
+        $canSeeSensitive = $isOwnProfile || $canEdit || $canSeePayroll;
+
         return [
             'id' => $this->id,
             'job_title' => $this->job_title,
@@ -22,7 +28,7 @@ class JobInformationResource extends JsonResource
             'employment_type' => $this->employment_type,
             'work_location' => $this->work_location,
             'start_date' => $this->start_date,
-            'monthly_salary' => $this->monthly_salary,
+            'monthly_salary' => $this->when($canSeeSensitive, $this->monthly_salary),
         ];
     }
 }
