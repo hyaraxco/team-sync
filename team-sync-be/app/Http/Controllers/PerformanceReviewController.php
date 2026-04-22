@@ -9,11 +9,35 @@ use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
 use App\Http\Requests\Performance\SubmitManagerAssessmentRequest;
 use App\Http\Requests\Performance\CalibrateReviewRequest;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
 
-class PerformanceReviewController extends Controller
+class PerformanceReviewController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            // Self-service: view my reviews, sections, show a review, self-assessment
+            new Middleware(
+                PermissionMiddleware::using('review-self-submit'),
+                only: ['getMyReviews', 'getActiveSections', 'show', 'submitSelfAssessment']
+            ),
+            // Team/manager: team reviews + manager assessment
+            new Middleware(
+                PermissionMiddleware::using('review-manager-submit'),
+                only: ['getTeamReviews', 'submitManagerAssessment']
+            ),
+            // Calibration: already guarded in routes, but also enforce at controller level
+            new Middleware(
+                PermissionMiddleware::using('review-calibrate'),
+                only: ['getPendingCalibration', 'getCalibrationContext', 'calibrateReview']
+            ),
+        ];
+    }
+
     public function __construct(
         private PerformanceReviewRepositoryInterface $repository
     ) {}
@@ -33,6 +57,13 @@ class PerformanceReviewController extends Controller
     public function show(int $id)
     {
         $review = $this->repository->getReviewById($id);
+
+        // Ownership check: staff can only view their own review unless they're a manager/HR
+        $user = Auth::user();
+        if (! $user->can('review-manager-submit') && $review->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
+        }
+
         return ResponseHelper::jsonResponse(true, 'Review retrieved successfully', $review);
     }
 
@@ -44,6 +75,14 @@ class PerformanceReviewController extends Controller
 
     public function submitSelfAssessment(SubmitSelfAssessmentRequest $request, int $id)
     {
+        $review = $this->repository->getReviewById($id);
+
+        // Ownership check: only the reviewee themselves can submit self-assessment
+        $user = Auth::user();
+        if ($review->staff_member_id !== $user->staffMemberProfile?->id) {
+            return ResponseHelper::jsonResponse(false, 'You can only submit self-assessment for your own review.', null, 403);
+        }
+
         $validated = $request->validated();
         $review = $this->repository->submitSelfAssessment($id, $validated['responses'], $validated);
         return ResponseHelper::jsonResponse(true, 'Self assessment submitted successfully', $review);
@@ -75,3 +114,4 @@ class PerformanceReviewController extends Controller
         return ResponseHelper::jsonResponse(true, 'Review calibrated successfully', $review);
     }
 }
+
