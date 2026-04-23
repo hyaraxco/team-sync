@@ -64,13 +64,14 @@ describe('GeneratedReviewsList.vue Smoke Test', () => {
           id: 10,
           status: 'pending_self',
           staff_member: {
-            user: { first_name: 'John', last_name: 'Doe' },
+            id: 1,
+            user: { name: 'John Doe' },
             job_information: { job_title: 'Developer' }
           },
           reviewer: {
+            id: 2,
             user: { 
-              first_name: 'Jane', 
-              last_name: 'Smith',
+              name: 'Jane Smith',
               roles: [{ name: 'manager' }]
             }
           }
@@ -102,7 +103,8 @@ describe('GeneratedReviewsList.vue Smoke Test', () => {
           id: 10,
           status: 'pending_self',
           staff_member: {
-            user: { first_name: 'John', last_name: 'Doe' },
+            id: 1,
+            user: { name: 'John Doe' },
             job_information: { job_title: 'Developer' }
           },
           reviewer: null

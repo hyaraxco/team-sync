@@ -676,6 +676,39 @@ watch(currentReview, (newVal) => {
           </MainCard>
         </div>
 
+        <!-- Performance Outcome (visible after calibration) -->
+        <MainCard
+          v-if="review.status === 'completed' && review.outcome_applied_at"
+          class="border-l-4 border-l-emerald-500"
+        >
+          <h4 class="text-sm font-semibold text-brand-dark mb-4 flex items-center gap-2">
+            <StarIcon class="w-4 h-4 text-emerald-600" />
+            Performance Outcome
+          </h4>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
+              <p class="text-xs text-emerald-600 mb-1">Bonus</p>
+              <p class="text-lg font-bold text-emerald-700">{{ review.bonus_months }} mo</p>
+            </div>
+            <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 text-center">
+              <p class="text-xs text-blue-600 mb-1">Salary Increase</p>
+              <p class="text-lg font-bold text-blue-700">{{ review.salary_increase_pct }}%</p>
+            </div>
+            <div class="p-3 rounded-lg border text-center" :class="review.promotion_eligible ? 'bg-purple-50 border-purple-100' : 'bg-gray-50 border-gray-100'">
+              <p class="text-xs mb-1" :class="review.promotion_eligible ? 'text-purple-600' : 'text-gray-500'">Promotion</p>
+              <p class="text-lg font-bold" :class="review.promotion_eligible ? 'text-purple-700' : 'text-gray-400'">
+                {{ review.promotion_eligible ? 'Eligible' : 'N/A' }}
+              </p>
+            </div>
+            <div class="p-3 rounded-lg border text-center" :class="review.pip_required ? 'bg-red-50 border-red-100' : 'bg-gray-50 border-gray-100'">
+              <p class="text-xs mb-1" :class="review.pip_required ? 'text-red-600' : 'text-gray-500'">PIP</p>
+              <p class="text-lg font-bold" :class="review.pip_required ? 'text-red-700' : 'text-gray-400'">
+                {{ review.pip_required ? 'Required' : 'Not Required' }}
+              </p>
+            </div>
+          </div>
+        </MainCard>
+
         <!-- Goal & Feedback Summary (visible for pending_calibration / completed) -->
         <MainCard
           v-if="['pending_calibration', 'completed'].includes(reviewStatus)"

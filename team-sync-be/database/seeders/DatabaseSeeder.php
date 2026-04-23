@@ -28,9 +28,10 @@ class DatabaseSeeder extends Seeder
             AttendancePolicySeeder::class,
             LeaveEntitlementSeeder::class,
 
-            // 3. Seed performance review sections
+            // 3. Seed performance review sections & outcome rules
             PerformanceReviewSectionSeeder::class,
             PerformanceDataSeeder::class,
+            PerformanceOutcomeRuleSeeder::class,
 
             // 4. Seed employee profiles with complete data (User, Profile, Job, Bank, Emergency Contacts)
             // StaffMemberProfileSeeder::class,

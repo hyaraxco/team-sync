@@ -29,7 +29,12 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getCycleById(int $id)
     {
-        return PerformanceReviewCycle::findOrFail($id);
+        return PerformanceReviewCycle::with([
+            'reviews.staffMember.user', 
+            'reviews.reviewer.user.roles',
+            'reviews.staffMember.jobInformation',
+            'reviews.reviewer.jobInformation'
+        ])->findOrFail($id);
     }
 
     public function createCycle(array $data)
@@ -86,7 +91,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getReviewById(int $id)
     {
-        return PerformanceReview::with(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator'])
+        return PerformanceReview::with(['cycle', 'staffMember.user', 'reviewer.user.roles', 'responses.section', 'calibrator', 'outcomeRule'])
             ->findOrFail($id);
     }
 
@@ -183,7 +188,10 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             'completed_at' => now(),
         ]);
 
-        return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator']);
+        $outcomeService = app(\App\Services\Performance\PerformanceOutcomeService::class);
+        $review = $outcomeService->applyOutcome($review);
+
+        return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator', 'outcomeRule']);
     }
 
     public function getReviewsPendingCalibration(array $filters = []): LengthAwarePaginator

@@ -54,7 +54,7 @@ watch(
     serverOptions.value.page = 1;
     fetchData();
   }, 300),
-  { deep: true }
+  { deep: true },
 );
 
 const handlePageChange = (page) => {
@@ -102,13 +102,16 @@ const formatDate = (date) => {
 };
 
 const totalEarnings = computed(() => {
-  return payslips.value.reduce((sum, slip) => sum + (slip.gross_salary || 0), 0);
+  return payslips.value.reduce(
+    (sum, slip) => sum + (slip.gross_salary || 0),
+    0,
+  );
 });
 
 const totalDeductions = computed(() => {
   return payslips.value.reduce(
     (sum, slip) => sum + (slip.total_deductions || 0),
-    0
+    0,
   );
 });
 
@@ -127,7 +130,7 @@ const averageNetSalary = computed(() => {
 const latestPayslip = computed(() => payslips.value[0] ?? null);
 
 const availableYears = computed(() =>
-  Array.from({ length: 6 }, (_, index) => currentYear - index)
+  Array.from({ length: 6 }, (_, index) => currentYear - index),
 );
 
 const clearSearch = () => {
@@ -148,9 +151,13 @@ const clearSearch = () => {
       class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 rounded-[24px] p-6 md:p-8 text-white mb-6"
       data-testid="my-payroll-highlight"
     >
-      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+      <div
+        class="flex flex-col md:flex-row md:items-center md:justify-between gap-6"
+      >
         <div>
-          <p class="text-white/70 text-sm font-medium mb-2">Latest paid payroll</p>
+          <p class="text-white/70 text-sm font-medium mb-2">
+            Latest paid payroll
+          </p>
           <h3 class="text-3xl font-extrabold mb-2">
             {{ formatDate(latestPayslip.period) }}
           </h3>
@@ -196,7 +203,9 @@ const clearSearch = () => {
         <p class="text-brand-dark text-xl font-extrabold">
           {{ formatCurrency(totalEarnings) }}
         </p>
-        <p class="text-success text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
+        <p class="text-success text-sm font-medium mt-1">
+          Loaded for {{ filters.year }}
+        </p>
       </div>
 
       <div
@@ -213,7 +222,9 @@ const clearSearch = () => {
         <p class="text-brand-dark text-xl font-extrabold">
           {{ formatCurrency(totalDeductions) }}
         </p>
-        <p class="text-danger text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
+        <p class="text-danger text-sm font-medium mt-1">
+          Loaded for {{ filters.year }}
+        </p>
       </div>
 
       <div
@@ -226,11 +237,15 @@ const clearSearch = () => {
             <TrendingUp class="w-6 h-6 text-blue-600" />
           </div>
         </div>
-        <p class="text-brand-dark text-sm font-medium mb-2">Average Net Salary</p>
+        <p class="text-brand-dark text-sm font-medium mb-2">
+          Average Net Salary
+        </p>
         <p class="text-brand-dark text-xl font-extrabold">
           {{ formatCurrency(averageNetSalary) }}
         </p>
-        <p class="text-brand-light text-sm font-medium mt-1">Across loaded periods</p>
+        <p class="text-brand-light text-sm font-medium mt-1">
+          Across loaded periods
+        </p>
       </div>
     </div>
 
@@ -287,7 +302,8 @@ const clearSearch = () => {
       <div class="mb-6">
         <h3 class="text-[#0C1C3C] font-bold text-xl">All Payroll Periods</h3>
         <p class="text-gray-600 text-sm mt-1">
-          Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} payroll periods
+          Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} payroll
+          periods
         </p>
       </div>
 
@@ -309,18 +325,24 @@ const clearSearch = () => {
             </div>
             <span
               class="px-3 py-1 text-xs font-semibold rounded-full"
-              :class="payslip.status === 'paid'
-                ? 'bg-green-100 text-green-800'
-                : 'bg-yellow-100 text-yellow-800'"
+              :class="
+                payslip.status === 'paid'
+                  ? 'bg-green-100 text-green-800'
+                  : 'bg-yellow-100 text-yellow-800'
+              "
             >
-              {{ payslip.status === 'paid' ? 'Paid' : payslip.status || 'Paid' }}
+              {{
+                payslip.status === "paid" ? "Paid" : payslip.status || "Paid"
+              }}
             </span>
           </div>
 
           <div class="mb-4">
             <div class="flex items-center gap-2 mb-2">
               <Calendar class="w-4 h-4 text-gray-400" />
-              <p class="text-brand-dark font-bold">{{ formatDate(payslip.period) }}</p>
+              <p class="text-brand-dark font-bold">
+                {{ formatDate(payslip.period) }}
+              </p>
             </div>
             <p class="text-brand-light text-sm mb-2">
               Payment date:
@@ -367,7 +389,8 @@ const clearSearch = () => {
         <FileText class="w-16 h-16 mx-auto mb-4 text-gray-300" />
         <p class="text-lg font-semibold">No payroll history found</p>
         <p class="text-sm">
-          Your payroll periods for {{ filters.year }} will appear here once they are processed.
+          Your payroll periods for {{ filters.year }} will appear here once they
+          are processed.
         </p>
       </div>
 

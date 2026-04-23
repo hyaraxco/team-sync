@@ -43,29 +43,29 @@ const router = useRouter();
 const staffMemberStore = useStaffMemberStore();
 const { loading, performanceStatistics, success } = storeToRefs(staffMemberStore);
 
-const employee = ref<any>(null);
+const staffMember = ref<any>(null);
 const showDeleteModal = ref(false);
 
-// Load employee data
-const loadEmployee = async () => {
+// Load staff member data
+const loadStaffMember = async () => {
   try {
-    const employeeId = route.params.id as string;
-    employee.value = await staffMemberStore.fetchStaffMember(employeeId);
+    const staffMemberId = route.params.id as string;
+    staffMember.value = await staffMemberStore.fetchStaffMember(staffMemberId);
     // Load performance statistics
-    await staffMemberStore.fetchPerformanceStatistics(employeeId);
+    await staffMemberStore.fetchPerformanceStatistics(staffMemberId);
   } catch (error) {
-    console.error("Error loading employee:", error);
+    console.error("Error loading staff member:", error);
     router.push({ name: "admin.staffMembers" });
   }
 };
 
 
 const statusText = computed(() => {
-  return getJobStatusText(employee.value?.job_information?.status);
+  return getJobStatusText(staffMember.value?.job_information?.status);
 });
 
 // Actions
-const editEmployee = () => {
+const editStaffMember = () => {
   router.push({
     name: "admin.staffMembers.edit",
     params: { id: route.params.id },
@@ -78,17 +78,17 @@ const shareProfile = () => {
   toast.success("Link Copied", "Profile link copied to clipboard!");
 };
 
-const backupEmployee = () => {
+const backupStaffMember = () => {
   if (
     confirm(
-      `Create backup for ${employee.value?.user?.name}? This will download all employee data.`
+      `Create backup for ${staffMember.value?.user?.name}? This will download all staff member data.`
     )
   ) {
     toast.info("Coming Soon", "Backup feature will be implemented soon.");
   }
 };
 
-const handleDeleteEmployee = async () => {
+const handleDeleteStaffMember = async () => {
   try {
     await staffMemberStore.deleteStaffMember(route.params.id as string);
     if (success.value) {
@@ -99,7 +99,7 @@ const handleDeleteEmployee = async () => {
 };
 
 onMounted(() => {
-  loadEmployee();
+  loadStaffMember();
 });
 </script>
 
@@ -110,20 +110,20 @@ onMounted(() => {
         class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
       ></div>
       <p class="text-brand-dark text-lg font-medium">
-        Loading employee data...
+        Loading staff member data...
       </p>
     </div>
   </div>
 
-  <div v-else-if="employee">
-    <!-- Employee Header -->
+  <div v-else-if="staffMember">
+    <!-- Staff Member Header -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
       <div class="flex items-center gap-6">
         <div class="relative">
           <img
-            :src="employee.user?.profile_photo"
-            v-if="employee.user?.profile_photo"
-            alt="Employee"
+            :src="staffMember.user?.profile_photo"
+            v-if="staffMember.user?.profile_photo"
+            alt="Staff Member"
             class="w-32 h-32 rounded-full object-cover"
           />
           <div
@@ -142,28 +142,28 @@ onMounted(() => {
         <div class="flex-1">
           <div class="flex items-center gap-4 mb-2">
             <h1 class="text-brand-dark text-3xl font-extrabold">
-              {{ employee.user?.name }}
+              {{ staffMember.user?.name }}
             </h1>
           </div>
           <p class="text-brand-light text-lg mb-3">
-            {{ employee.job_information?.job_title }}
+            {{ staffMember.job_information?.job_title }}
           </p>
           <div class="flex items-center gap-6 text-base text-gray-600">
             <div class="flex items-center gap-2">
               <Building class="w-4 h-4" />
               <span>{{
-                capitalize(employee.job_information?.work_location)
+                capitalize(staffMember.job_information?.work_location)
               }}</span>
             </div>
             <div class="flex items-center gap-2">
               <User class="w-4 h-4" />
-              <span>{{ employee.code }}</span>
+              <span>{{ staffMember.code }}</span>
             </div>
             <div class="flex items-center gap-2">
               <Calendar class="w-4 h-4" />
               <span
                 >Joined
-                {{ formatDate(employee.job_information?.start_date) }}</span
+                {{ formatDate(staffMember.job_information?.start_date) }}</span
               >
             </div>
           </div>
@@ -171,7 +171,7 @@ onMounted(() => {
         <div class="flex gap-3">
           <button
             v-if="can('staff-member-edit')"
-            @click="editEmployee"
+            @click="editStaffMember"
             class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
           >
             <Edit class="w-4 h-4 text-white" />
@@ -318,19 +318,19 @@ onMounted(() => {
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Team</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ staffMember.team?.name || "-" }}
+              {{ staffMember.job_information?.team?.name || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Team Members</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ staffMember.team?.members_count || 0 }} members
+              {{ staffMember.job_information?.team?.members_count || 0 }} members
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Team Status</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(staffMember.team?.status) }}
+              {{ capitalize(staffMember.job_information?.team?.status) }}
             </span>
           </div>
         </div>
@@ -346,26 +346,26 @@ onMounted(() => {
           </div>
           <div>
             <h3 class="text-brand-dark text-lg font-bold">Contact Details</h3>
-            <p class="text-brand-light text-sm">How to reach this employee</p>
+            <p class="text-brand-light text-sm">How to reach this staff member</p>
           </div>
         </div>
         <div class="space-y-4">
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Email</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.user?.email }}
+              {{ staffMember.user?.email }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Phone</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.phone }}
+              {{ staffMember.phone }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Identity Number</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.identity_number }}
+              {{ staffMember.identity_number }}
             </span>
           </div>
         </div>
@@ -393,37 +393,37 @@ onMounted(() => {
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Date of Birth</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ formatDate(employee.date_of_birth) }}
+              {{ formatDate(staffMember.date_of_birth) }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Place of Birth</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.place_of_birth }}
+              {{ staffMember.place_of_birth }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Gender</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(employee.gender) }}
+              {{ capitalize(staffMember.gender) }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Religion</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(employee.religion) || "-" }}
+              {{ capitalize(staffMember.religion) || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Marital Status</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(employee.marital_status) || "-" }}
+              {{ capitalize(staffMember.marital_status) || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Blood Type</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.blood_type || "-" }}
+              {{ staffMember.blood_type || "-" }}
             </span>
           </div>
         </div>
@@ -447,32 +447,32 @@ onMounted(() => {
         <div
           class="space-y-4"
           v-if="
-            employee.emergency_contacts &&
-            employee.emergency_contacts.length > 0
+            staffMember.emergency_contacts &&
+            staffMember.emergency_contacts.length > 0
           "
         >
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Contact Name</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.emergency_contacts[0].full_name }}
+              {{ staffMember.emergency_contacts[0].full_name }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Relationship</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(employee.emergency_contacts[0].relationship) }}
+              {{ capitalize(staffMember.emergency_contacts[0].relationship) }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Phone</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.emergency_contacts[0].phone }}
+              {{ staffMember.emergency_contacts[0].phone }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Email</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.emergency_contacts[0].email || "-" }}
+              {{ staffMember.emergency_contacts[0].email || "-" }}
             </span>
           </div>
         </div>
@@ -507,19 +507,19 @@ onMounted(() => {
             <span
               class="text-brand-dark text-base font-medium text-right max-w-[60%]"
             >
-              {{ employee.address }}
+              {{ staffMember.address }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">City</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.city }}
+              {{ staffMember.city }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Post Code</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.postal_code }}
+              {{ staffMember.postal_code }}
             </span>
           </div>
         </div>
@@ -546,43 +546,43 @@ onMounted(() => {
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">NPWP</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.npwp || "-" }}
+              {{ staffMember.npwp || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">BPJS Ketenagakerjaan</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.bpjs_ketenagakerjaan || "-" }}
+              {{ staffMember.bpjs_ketenagakerjaan || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">BPJS Kesehatan</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.bpjs_kesehatan || "-" }}
+              {{ staffMember.bpjs_kesehatan || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">PTKP Status</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.ptkp_status || "-" }}
+              {{ staffMember.ptkp_status || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Employment Type</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(employee.job_information?.employment_type) }}
+              {{ capitalize(staffMember.job_information?.employment_type) }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Start Date</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ formatDate(employee.job_information?.start_date) }}
+              {{ formatDate(staffMember.job_information?.start_date) }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Monthly Salary</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ formatCurrency(employee.job_information?.monthly_salary) }}
+              {{ formatCurrency(staffMember.job_information?.monthly_salary) }}
             </span>
           </div>
         </div>
@@ -610,9 +610,9 @@ onMounted(() => {
         </div>
         <div class="space-y-4">
           <div class="flex justify-between items-center">
-            <span class="text-brand-light text-base">Employee ID</span>
+            <span class="text-brand-light text-base">Staff Member ID</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.code }}
+              {{ staffMember.code }}
             </span>
           </div>
         </div>
@@ -635,19 +635,19 @@ onMounted(() => {
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Bank Name</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(employee.bank_information?.bank_name) }}
+              {{ capitalize(staffMember.bank_information?.bank_name) }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Account Number</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.bank_information?.account_number }}
+              {{ staffMember.bank_information?.account_number }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Account Holder</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ employee.bank_information?.account_holder_name }}
+              {{ staffMember.bank_information?.account_holder_name }}
             </span>
           </div>
 
@@ -678,13 +678,13 @@ onMounted(() => {
             Delete Staff Member Profile
           </h4>
           <p class="text-brand-light text-sm">
-            Permanently remove this employee and all associated data. This
+            Permanently remove this staff member and all associated data. This
             action cannot be undone.
           </p>
         </div>
         <div class="flex gap-3">
           <button
-            @click="backupEmployee"
+            @click="backupStaffMember"
             class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
           >
             <Download class="w-4 h-4" />
@@ -703,12 +703,12 @@ onMounted(() => {
     <ConfirmationModal
       :show="showDeleteModal"
       title="Delete Staff Member"
-      :message="`Are you sure you want to delete '${employee.user?.name}'? This action cannot be undone.`"
+      :message="`Are you sure you want to delete '${staffMember.user?.name}'? This action cannot be undone.`"
       confirmText="Delete Staff Member"
       cancelText="Cancel"
       type="danger"
       :loading="loading"
-      @confirm="handleDeleteEmployee"
+      @confirm="handleDeleteStaffMember"
       @cancel="showDeleteModal = false"
     />
   </div>

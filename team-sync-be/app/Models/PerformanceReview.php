@@ -25,6 +25,12 @@ class PerformanceReview extends Model
         'calibrated_by',
         'completed_at',
         'acknowledged_by_employee_at',
+        'outcome_rule_id',
+        'bonus_months',
+        'salary_increase_pct',
+        'promotion_eligible',
+        'pip_required',
+        'outcome_applied_at',
     ];
 
     protected $casts = [
@@ -35,6 +41,11 @@ class PerformanceReview extends Model
         'acknowledged_by_employee_at' => 'datetime',
         'manager_recommended_rating' => 'decimal:2',
         'final_rating' => 'decimal:2',
+        'bonus_months' => 'decimal:2',
+        'salary_increase_pct' => 'decimal:2',
+        'promotion_eligible' => 'boolean',
+        'pip_required' => 'boolean',
+        'outcome_applied_at' => 'datetime',
     ];
 
     public function cycle(): BelongsTo
@@ -60,5 +71,10 @@ class PerformanceReview extends Model
     public function responses(): HasMany
     {
         return $this->hasMany(PerformanceReviewResponse::class, 'review_id');
+    }
+
+    public function outcomeRule(): BelongsTo
+    {
+        return $this->belongsTo(PerformanceOutcomeRule::class, 'outcome_rule_id');
     }
 }

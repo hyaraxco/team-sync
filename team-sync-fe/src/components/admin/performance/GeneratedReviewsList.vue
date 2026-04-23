@@ -86,7 +86,7 @@ const assignReviewer = async () => {
 };
 
 const getAvatarUrl = (user) => {
-    return user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.first_name || 'U')}+${encodeURIComponent(user?.last_name || '')}&background=random`;
+    return user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=random`;
 };
 </script>
 
@@ -136,7 +136,7 @@ const getAvatarUrl = (user) => {
                 <img :src="getAvatarUrl(review.staff_member?.user)" class="w-8 h-8 rounded-full bg-gray-100" />
                 <div>
                   <p class="text-sm font-medium text-brand-dark">
-                    {{ review.staff_member?.user?.first_name }} {{ review.staff_member?.user?.last_name }}
+                    {{ review.staff_member?.user?.name || `Staff #${review.staff_member?.id}` }}
                   </p>
                   <p class="text-xs text-brand-light">{{ review.staff_member?.job_information?.job_title || 'No Title' }}</p>
                 </div>
@@ -147,7 +147,7 @@ const getAvatarUrl = (user) => {
                 <img :src="getAvatarUrl(review.reviewer?.user)" class="w-8 h-8 rounded-full bg-gray-100" />
                 <div>
                   <p class="text-sm font-medium text-brand-dark">
-                    {{ review.reviewer?.user?.first_name }} {{ review.reviewer?.user?.last_name }}
+                    {{ review.reviewer?.user?.name || `Staff #${review.reviewer?.id}` }}
                   </p>
                   <p class="text-xs text-brand-light">
                     <!-- Badging rule here P4-13 -->
@@ -197,7 +197,7 @@ const getAvatarUrl = (user) => {
           <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
             <p class="text-xs text-brand-light mb-1">Reviewee:</p>
             <p class="text-sm font-medium text-brand-dark">
-              {{ selectedReview?.staff_member?.user?.first_name }} {{ selectedReview?.staff_member?.user?.last_name }}
+              {{ selectedReview?.staff_member?.user?.name || `Staff #${selectedReview?.staff_member?.id}` }}
             </p>
           </div>
           
@@ -206,7 +206,7 @@ const getAvatarUrl = (user) => {
             <select v-model="selectedReviewerId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-primary focus:border-brand-primary">
               <option value="" disabled>-- Select a staff member --</option>
               <option v-for="staff in staffMembers" :key="staff.id" :value="staff.id">
-                {{ staff.user?.first_name }} {{ staff.user?.last_name }} ({{ staff.job_information?.job_title || 'No Title' }})
+                {{ staff.user?.name || `Staff #${staff.id}` }} ({{ staff.job_information?.job_title || 'No Title' }})
               </option>
             </select>
           </div>

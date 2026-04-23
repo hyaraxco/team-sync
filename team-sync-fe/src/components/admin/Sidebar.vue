@@ -17,6 +17,7 @@ import {
   MessageSquareIcon,
   StarIcon,
   ScaleIcon,
+  AwardIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
@@ -324,6 +325,26 @@ const onNavigate = () => emit("navigate");
               class="text-brand-dark text-base font-medium"
               :class="{ 'text-brand-white': $route.name?.startsWith('admin.performance.cycles') }"
               >Review Cycles</span
+            >
+          </RouterLink>
+
+          <RouterLink
+            v-if="can('review-cycle-manage')"
+            :to="{ name: 'admin.performance.outcome-rules' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.outcome-rules',
+            }"
+            @click="onNavigate"
+          >
+            <AwardIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.outcome-rules' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.outcome-rules' }"
+              >Outcome Rules</span
             >
           </RouterLink>
 

@@ -73,7 +73,7 @@ class GenerateReviewsFeatureTest extends TestCase
 
     public function test_hr_can_auto_generate_reviews()
     {
-        $cycle = PerformanceReviewCycle::factory()->create();
+        $cycle = PerformanceReviewCycle::factory()->active()->create();
 
         $response = $this->actingAs($this->hrAdmin)
             ->postJson("/api/v1/performance/cycles/{$cycle->id}/generate-reviews");
@@ -104,7 +104,7 @@ class GenerateReviewsFeatureTest extends TestCase
 
     public function test_hr_can_manually_assign_reviewer()
     {
-        $cycle = PerformanceReviewCycle::factory()->create();
+        $cycle = PerformanceReviewCycle::factory()->active()->create();
 
         // Create a review manually or via generation
         $review = \App\Models\PerformanceReview::create([

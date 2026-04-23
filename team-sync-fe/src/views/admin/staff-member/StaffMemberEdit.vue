@@ -115,33 +115,33 @@ const extractRoleValue = (roles: any) => {
   return firstRole?.name || "";
 };
 
-// Load employee data
-const loadEmployeeData = async () => {
+// Load staff member data
+const loadStaffMemberData = async () => {
   try {
-    const employeeId = route.params.id as string;
-    const employee = await staffMemberStore.fetchStaffMember(employeeId);
+    const staffMemberId = route.params.id as string;
+    const staffMember = await staffMemberStore.fetchStaffMember(staffMemberId);
 
-    if (employee) {
-      const jobInformation = employee.job_information || {};
-      const bankInformation = employee.bank_information || {};
+    if (staffMember) {
+      const jobInformation = staffMember.job_information || {};
+      const bankInformation = staffMember.bank_information || {};
 
       // Step 1 - Personal Information
-      step1Data.value.name = employee.user?.name || "";
-      step1Data.value.email = employee.user?.email || "";
-      step1Data.value.identity_number = employee.identity_number || "";
-      step1Data.value.phone = employee.phone || "";
+      step1Data.value.name = staffMember.user?.name || "";
+      step1Data.value.email = staffMember.user?.email || "";
+      step1Data.value.identity_number = staffMember.identity_number || "";
+      step1Data.value.phone = staffMember.phone || "";
       step1Data.value.date_of_birth = formatDateForInput(
-        employee.date_of_birth,
+        staffMember.date_of_birth,
       );
-      step1Data.value.religion = employee.religion || "";
-      step1Data.value.marital_status = employee.marital_status || "";
-      step1Data.value.blood_type = employee.blood_type || "";
-      step1Data.value.place_of_birth = employee.place_of_birth || "";
-      step1Data.value.gender = employee.gender || "";
-      step1Data.value.address = employee.address || "";
-      step1Data.value.city = employee.city || "";
-      step1Data.value.postal_code = employee.postal_code || "";
-      step1Data.value.profile_photo_url = employee.user?.profile_photo || "";
+      step1Data.value.religion = staffMember.religion || "";
+      step1Data.value.marital_status = staffMember.marital_status || "";
+      step1Data.value.blood_type = staffMember.blood_type || "";
+      step1Data.value.place_of_birth = staffMember.place_of_birth || "";
+      step1Data.value.gender = staffMember.gender || "";
+      step1Data.value.address = staffMember.address || "";
+      step1Data.value.city = staffMember.city || "";
+      step1Data.value.postal_code = staffMember.postal_code || "";
+      step1Data.value.profile_photo_url = staffMember.user?.profile_photo || "";
 
       // Step 2 - Job Information & Bank Information
       step2Data.value.job_title = jobInformation.job_title || "";
@@ -161,11 +161,11 @@ const loadEmployeeData = async () => {
       step2Data.value.account_number = bankInformation.account_number || "";
       step2Data.value.account_holder_name =
         bankInformation.account_holder_name || "";
-      step2Data.value.npwp = employee.npwp || "";
-      step2Data.value.bpjs_ketenagakerjaan = employee.bpjs_ketenagakerjaan || "";
-      step2Data.value.bpjs_kesehatan = employee.bpjs_kesehatan || "";
-      step2Data.value.ptkp_status = employee.ptkp_status || "";
-      step2Data.value.role = extractRoleValue(employee.user?.roles);
+      step2Data.value.npwp = staffMember.npwp || "";
+      step2Data.value.bpjs_ketenagakerjaan = staffMember.bpjs_ketenagakerjaan || "";
+      step2Data.value.bpjs_kesehatan = staffMember.bpjs_kesehatan || "";
+      step2Data.value.ptkp_status = staffMember.ptkp_status || "";
+      step2Data.value.role = extractRoleValue(staffMember.user?.roles);
 
       // Reset emergency contact values before applying loaded data.
       step3Data.value.emergency_contact_name = "";
@@ -175,10 +175,10 @@ const loadEmployeeData = async () => {
 
       // Step 3 - Emergency Contact
       if (
-        employee.emergency_contacts &&
-        employee.emergency_contacts.length > 0
+        staffMember.emergency_contacts &&
+        staffMember.emergency_contacts.length > 0
       ) {
-        const contact = employee.emergency_contacts[0];
+        const contact = staffMember.emergency_contacts[0];
         step3Data.value.emergency_contact_name = contact.full_name || "";
         step3Data.value.emergency_contact_relationship =
           contact.relationship || "";
@@ -187,7 +187,7 @@ const loadEmployeeData = async () => {
       }
     }
   } catch (err) {
-    console.error("Error loading employee data:", err);
+    console.error("Error loading staff member data:", err);
     router.push({ name: "admin.staffMembers" });
   }
 };
@@ -262,13 +262,13 @@ const handleSubmit = async () => {
       );
     }
 
-    const employeeId = route.params.id as string;
-    await staffMemberStore.updateStaffMember(employeeId, formData);
+    const staffMemberId = route.params.id as string;
+    await staffMemberStore.updateStaffMember(staffMemberId, formData);
 
-    // Redirect to employee list on success
+    // Redirect to staff member list on success
     router.push({ name: "admin.staffMembers" });
   } catch (err) {
-    console.error("Error updating employee:", err);
+    console.error("Error updating staff member:", err);
     // Show error modal when validation fails
     if (error.value) {
       showErrorModal.value = true;
@@ -283,7 +283,7 @@ const closeErrorModal = () => {
 watch(
   () => route.params.id,
   () => {
-    loadEmployeeData();
+    loadStaffMemberData();
   },
   { immediate: true },
 );
@@ -328,7 +328,7 @@ watch(
           <p class="text-brand-dark text-sm font-medium">
             {{
               currentStep === 4
-                ? "Ready to update this employee?"
+                ? "Ready to update this staff member?"
                 : `Step ${currentStep} of ${totalSteps}`
             }}
           </p>
@@ -394,7 +394,7 @@ watch(
           >
             <Save class="w-4 h-4 text-white" />
             <span class="text-brand-white text-sm sm:text-base font-semibold whitespace-nowrap">
-              {{ loading ? "Updating..." : "Update Employee" }}
+              {{ loading ? "Updating..." : "Update Staff Member" }}
             </span>
           </button>
         </div>

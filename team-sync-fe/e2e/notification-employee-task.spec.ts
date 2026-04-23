@@ -85,7 +85,7 @@ test.describe.serial("Employee task assignment notifications", () => {
     const managerApi = await createApiContext(managerToken);
 
     const employeesData = await expectApiSuccess<EmployeeListPayload>(
-      await managerApi.get("employees/all/paginated?row_per_page=50"),
+      await managerApi.get("staff-members/all/paginated?row_per_page=50"),
       "Fetch employee list"
     );
 

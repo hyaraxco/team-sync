@@ -4,8 +4,8 @@ import { handleError } from "@/helpers/errorHelper";
 
 export const useStaffMemberStore = defineStore("staffMember", {
     state: () => ({
-        employees: [],
-        latestEmployees: [],
+        staffMembers: [],
+        latestStaffMembers: [],
         statistics: {
             total: 0,
             added_this_month: 0,
