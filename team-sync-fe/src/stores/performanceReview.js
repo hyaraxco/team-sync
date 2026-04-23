@@ -142,6 +142,33 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
       }
     },
 
+    async generateReviews(cycleId) {
+      this.cyclesLoading = true;
+      this.error = null;
+      try {
+        const response = await axiosInstance.post(`/performance/cycles/${cycleId}/generate-reviews`);
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.cyclesLoading = false;
+      }
+    },
+
+    async assignReviewer(reviewId, reviewerId) {
+      this.error = null;
+      try {
+        const response = await axiosInstance.put(`/performance/reviews/${reviewId}/assign-reviewer`, {
+          reviewer_id: reviewerId
+        });
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      }
+    },
+
     // Reviews
     async fetchMyReviews(filters = {}) {
       this.reviewsLoading = true;
