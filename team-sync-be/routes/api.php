@@ -221,6 +221,8 @@ Route::prefix('v1')
                 Route::get('reviews/{id}', [PerformanceReviewController::class, 'show']);
                 Route::get('reviews/{id}/calibration-context', [PerformanceReviewController::class, 'getCalibrationContext'])
                     ->middleware(PermissionMiddleware::using(['review-calibrate']));
+                Route::get('reviews/{id}/validate-readiness', [PerformanceReviewController::class, 'validateReadiness'])
+                    ->middleware(PermissionMiddleware::using(['review-calibrate']));
                 Route::post('reviews/{id}/self-assessment', [PerformanceReviewController::class, 'submitSelfAssessment']);
                 Route::post('reviews/{id}/manager-assessment', [PerformanceReviewController::class, 'submitManagerAssessment']);
                 Route::post('reviews/{id}/calibrate', [PerformanceReviewController::class, 'calibrateReview'])

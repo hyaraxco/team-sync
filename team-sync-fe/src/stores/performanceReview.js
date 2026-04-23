@@ -27,6 +27,10 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
     calibrationContext: null,
     calibrationContextLoading: false,
 
+    // Readiness Validation
+    readinessResult: null,
+    readinessLoading: false,
+
     // TOPSIS Ranking
     topsisResult: null,
     topsisLoading: false,
@@ -322,6 +326,23 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
         throw error;
       } finally {
         this.calibrationContextLoading = false;
+      }
+    },
+
+    async fetchValidateReadiness(reviewId) {
+      this.readinessLoading = true;
+      this.readinessResult = null;
+      try {
+        const response = await axiosInstance.get(
+          `/performance/reviews/${reviewId}/validate-readiness`,
+        );
+        this.readinessResult = response.data.data;
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.readinessLoading = false;
       }
     },
 

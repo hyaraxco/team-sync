@@ -33,7 +33,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
             // Calibration: already guarded in routes, but also enforce at controller level
             new Middleware(
                 PermissionMiddleware::using('review-calibrate'),
-                only: ['getPendingCalibration', 'getCalibrationContext', 'calibrateReview']
+                only: ['getPendingCalibration', 'getCalibrationContext', 'calibrateReview', 'validateReadiness']
             ),
         ];
     }
@@ -113,5 +113,112 @@ class PerformanceReviewController extends Controller implements HasMiddleware
         $review = $this->repository->calibrateReview($id, $validated['responses'] ?? [], $validated);
         return ResponseHelper::jsonResponse(true, 'Review calibrated successfully', $review);
     }
-}
 
+    /**
+     * Validate review readiness before calibration finalize.
+     *
+     * Checks if the review has enough data for meaningful TOPSIS calculation:
+     * - C1/C2: manager has rated all active sections
+     * - C3/C4: employee has goals within the cycle period
+     * - C5: employee has received feedback within the cycle period
+     *
+     * Returns warnings (proceed-able) and blockers (must fix first).
+     *
+     * GET /api/v1/performance/reviews/{id}/validate-readiness
+     */
+    public function validateReadiness(int $id)
+    {
+        $review = $this->repository->getReviewById($id);
+        $cycle = $review->cycle;
+
+        $warnings = [];
+        $blockers = [];
+
+        // Blocker: Review must be at least pending_calibration
+        if (!in_array($review->status, ['pending_calibration', 'completed'])) {
+            $blockers[] = [
+                'code' => 'STATUS_NOT_READY',
+                'message' => 'Review belum siap dikalibrasi. Status saat ini: ' . $review->status,
+            ];
+        }
+
+        // Blocker: Manager assessment must be submitted
+        if (!$review->manager_assessment_submitted_at) {
+            $blockers[] = [
+                'code' => 'MANAGER_ASSESSMENT_MISSING',
+                'message' => 'Manager belum mengisi assessment untuk review ini.',
+            ];
+        }
+
+        // C1/C2 Check: Are all active sections rated by manager?
+        $activeSections = $this->repository->getActiveSections();
+        $ratedSectionIds = $review->responses
+            ->whereNotNull('manager_rating')
+            ->pluck('section_id')
+            ->toArray();
+        $missingSections = $activeSections->filter(fn($s) => !in_array($s->id, $ratedSectionIds));
+
+        if ($missingSections->isNotEmpty()) {
+            $warnings[] = [
+                'code' => 'INCOMPLETE_SECTION_RATINGS',
+                'message' => 'Manager belum menilai ' . $missingSections->count() . ' section: ' .
+                    $missingSections->pluck('name')->join(', '),
+                'criteria_affected' => ['C1', 'C2'],
+            ];
+        }
+
+        // C3/C4 Check: Does employee have goals?
+        $goalCount = \App\Models\PerformanceGoal::where('staff_member_id', $review->staff_member_id)
+            ->where(function ($q) use ($review, $cycle) {
+                $q->where('linked_review_id', $review->id)
+                  ->orWhereBetween('created_at', [
+                      $cycle->start_date . ' 00:00:00',
+                      $cycle->end_date . ' 23:59:59',
+                  ]);
+            })
+            ->count();
+
+        if ($goalCount === 0) {
+            $warnings[] = [
+                'code' => 'NO_GOALS',
+                'message' => 'Karyawan tidak memiliki goal dalam periode ini. C3 dan C4 akan bernilai 0.',
+                'criteria_affected' => ['C3', 'C4'],
+            ];
+        }
+
+        // C5 Check: Does employee have feedback?
+        $feedbackCount = \App\Models\PerformanceFeedback::where('staff_member_id', $review->staff_member_id)
+            ->where('feedback_type', 'positive')
+            ->whereBetween('created_at', [
+                $cycle->start_date . ' 00:00:00',
+                $cycle->end_date . ' 23:59:59',
+            ])
+            ->count();
+
+        if ($feedbackCount === 0) {
+            $warnings[] = [
+                'code' => 'NO_POSITIVE_FEEDBACK',
+                'message' => 'Karyawan tidak memiliki feedback positif dalam periode ini. C5 akan bernilai 0.',
+                'criteria_affected' => ['C5'],
+            ];
+        }
+
+        $isReady = empty($blockers);
+        $hasWarnings = !empty($warnings);
+
+        return ResponseHelper::jsonResponse(true, $isReady
+            ? ($hasWarnings ? 'Review siap dikalibrasi tetapi ada warning.' : 'Review siap dikalibrasi.')
+            : 'Review belum siap dikalibrasi.', [
+            'review_id' => $id,
+            'is_ready' => $isReady,
+            'has_warnings' => $hasWarnings,
+            'blockers' => $blockers,
+            'warnings' => $warnings,
+            'summary' => [
+                'sections_rated' => count($ratedSectionIds) . '/' . $activeSections->count(),
+                'goals_count' => $goalCount,
+                'positive_feedback_count' => $feedbackCount,
+            ],
+        ]);
+    }
+}

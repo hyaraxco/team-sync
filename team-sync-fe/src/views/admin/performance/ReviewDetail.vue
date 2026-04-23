@@ -36,6 +36,8 @@ const {
   success,
   calibrationContext,
   calibrationContextLoading,
+  readinessResult,
+  readinessLoading,
 } = storeToRefs(reviewStore);
 
 const reviewId = computed(() => route.params.id);
@@ -281,6 +283,17 @@ const handleConfirm = async () => {
   else if (confirmAction.value === "calibrate") await submitCalibration();
 };
 
+// Readiness-aware calibration opener
+const openCalibrateConfirm = async () => {
+  // Fetch readiness before showing confirm modal
+  try {
+    await reviewStore.fetchValidateReadiness(reviewId.value);
+  } catch {
+    // If readiness check fails, proceed anyway
+  }
+  openConfirmModal("calibrate");
+};
+
 const submitSelfAssessment = async () => {
   submitting.value = true;
   try {
@@ -329,6 +342,13 @@ const submitCalibration = async () => {
 
 // Confirmation modal text
 const confirmModalConfig = computed(() => {
+  const readiness = readinessResult.value;
+  const warningMessages = readiness?.warnings?.map((w) => `⚠️ ${w.message}`).join('\n') || '';
+  const blockerMessages = readiness?.blockers?.map((b) => `🚫 ${b.message}`).join('\n') || '';
+  const summaryText = readiness?.summary
+    ? `\n\nData Summary:\n• Sections rated: ${readiness.summary.sections_rated}\n• Goals: ${readiness.summary.goals_count}\n• Positive feedback: ${readiness.summary.positive_feedback_count}`
+    : '';
+
   const configs = {
     self: {
       title: "Submit Self Assessment",
@@ -343,10 +363,13 @@ const confirmModalConfig = computed(() => {
       type: "warning",
     },
     calibrate: {
-      title: "Finalize Calibration",
-      message:
-        "Are you sure you want to finalize this review? The final rating will be locked.",
-      type: "warning",
+      title: readiness?.has_warnings ? "⚠️ Finalize Calibration — Warnings Detected" : "Finalize Calibration",
+      message: blockerMessages
+        ? `Cannot finalize:\n${blockerMessages}`
+        : warningMessages
+          ? `${warningMessages}${summaryText}\n\nProceed with finalize despite warnings?`
+          : `Are you sure you want to finalize this review? The final rating will be locked.${summaryText}`,
+      type: readiness?.blockers?.length ? "danger" : readiness?.has_warnings ? "warning" : "warning",
     },
   };
   return configs[confirmAction.value] || configs.self;
@@ -1427,7 +1450,7 @@ watch(currentReview, (newVal) => {
               <!-- Submit Button -->
               <div class="flex justify-end pt-2">
                 <button
-                  @click="openConfirmModal('calibrate')"
+                  @click="openCalibrateConfirm()"
                   :disabled="!isCalibrationValid || submitting"
                   class="px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all"
                   :class="
