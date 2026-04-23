@@ -10,6 +10,7 @@ import {
 import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useToast } from "@/composables/useToast";
+import { can } from "@/helpers/permissionHelper";
 
 const toast = useToast();
 import { useRoute, useRouter } from "vue-router";
@@ -169,6 +170,7 @@ onMounted(() => {
         </div>
         <div class="flex gap-3">
           <button
+            v-if="can('staff-member-edit')"
             @click="editEmployee"
             class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
           >
@@ -653,8 +655,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Danger Zone -->
-    <div class="bg-white border border-[#FEE2E2] rounded-[16px] p-6">
+    <!-- Danger Zone (only for users with delete permission) -->
+    <div v-if="can('staff-member-delete')" class="bg-white border border-[#FEE2E2] rounded-[16px] p-6">
       <div class="flex items-center gap-3 mb-6">
         <div
           class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center"

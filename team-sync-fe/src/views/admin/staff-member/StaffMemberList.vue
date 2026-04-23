@@ -87,6 +87,7 @@ onMounted(async () => {
       </div>
       <div class="flex items-center gap-[10px]">
         <button
+          v-if="can('staff-member-create')"
           class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2"
         >
           <Upload class="w-4 h-4 text-gray-600" />
