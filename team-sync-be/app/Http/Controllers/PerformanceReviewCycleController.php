@@ -53,6 +53,10 @@ class PerformanceReviewCycleController extends Controller
     {
         $cycle = $this->repository->getCycleById($id);
 
+        if (in_array($cycle->status, ['completed', 'archived'])) {
+            return ResponseHelper::jsonResponse(false, 'Cannot generate reviews for a completed or archived cycle', null, 422);
+        }
+
         // Get active staff members (excluding those who already have a review for this cycle)
         $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
         
