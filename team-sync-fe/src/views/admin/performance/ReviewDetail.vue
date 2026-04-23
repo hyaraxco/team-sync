@@ -53,7 +53,11 @@ const calibrationForm = ref({});
 const tabs = [
   { id: "overview", label: "Overview", icon: FileTextIcon },
   { id: "self-assessment", label: "Self Assessment", icon: UserIcon },
-  { id: "manager-assessment", label: "Manager Assessment", icon: UserCheckIcon },
+  {
+    id: "manager-assessment",
+    label: "Manager Assessment",
+    icon: UserCheckIcon,
+  },
   { id: "calibration", label: "Calibration", icon: ScaleIcon },
 ];
 
@@ -64,8 +68,7 @@ const roleNames = computed(() =>
 const hasRole = (role) => roleNames.value.includes(role);
 const currentEmployeeId = computed(
   () =>
-    authStore.user?.employee_profile?.id ||
-    authStore.user?.employeeProfile?.id,
+    authStore.user?.employee_profile?.id || authStore.user?.employeeProfile?.id,
 );
 
 // Review data helpers
@@ -151,7 +154,6 @@ const isDeadlinePassed = (deadline) => {
 const canSubmitSelfAssessment = computed(() => {
   return (
     reviewStatus.value === "pending_self" &&
-    (hasRole("staff") || hasRole("manager")) &&
     currentEmployeeId.value === review.value?.staff_member_id
   );
 });
@@ -240,7 +242,8 @@ const calculatedFinalRating = computed(() => {
   for (const section of displaySections.value) {
     const response = getResponseForSection(section.id);
     const calibrationOverride = calibrationForm.value[section.id]?.rating;
-    const effectiveRating = calibrationOverride || response?.manager_rating || response?.self_rating;
+    const effectiveRating =
+      calibrationOverride || response?.manager_rating || response?.self_rating;
     if (effectiveRating && section.weight) {
       weightedSum += effectiveRating * parseFloat(section.weight);
       totalWeight += parseFloat(section.weight);
@@ -301,11 +304,7 @@ const submitManagerAssessment = async () => {
       rating: managerAssessmentForm.value[section.id]?.rating,
       comments: managerAssessmentForm.value[section.id]?.comments || null,
     }));
-    await reviewStore.submitManagerAssessment(
-      reviewId.value,
-      responses,
-      null,
-    );
+    await reviewStore.submitManagerAssessment(reviewId.value, responses, null);
     await reviewStore.fetchReviewById(reviewId.value);
   } finally {
     submitting.value = false;
@@ -321,10 +320,7 @@ const submitCalibration = async () => {
         rating: calibrationForm.value[section.id]?.rating || null,
       }))
       .filter((r) => r.rating);
-    await reviewStore.calibrateReview(
-      reviewId.value,
-      responses,
-    );
+    await reviewStore.calibrateReview(reviewId.value, responses);
     await reviewStore.fetchReviewById(reviewId.value);
   } finally {
     submitting.value = false;
@@ -365,15 +361,17 @@ onMounted(async () => {
   ]);
   initFormData();
 
-  // Fetch calibration context if review is pending calibration
-  if (currentReview.value?.status === 'pending_calibration') {
+  if (
+    currentReview.value?.status === "pending_calibration" &&
+    canCalibrate.value
+  ) {
     reviewStore.fetchCalibrationContext(reviewId.value);
   }
 });
 
 watch(currentReview, (newVal) => {
   initFormData();
-  if (newVal?.status === 'pending_calibration') {
+  if (newVal?.status === "pending_calibration" && canCalibrate.value) {
     reviewStore.fetchCalibrationContext(reviewId.value);
   }
 });
@@ -487,7 +485,7 @@ watch(currentReview, (newVal) => {
             </p>
             <p class="text-sm text-blue-700">
               Please complete the manager assessment for
-              {{ review.employee?.full_name }}
+              {{ (review.staff_member ?? review.employee)?.full_name }}
               <span v-if="review.cycle?.manager_assessment_deadline">
                 before
                 {{ formatDate(review.cycle.manager_assessment_deadline) }}
@@ -534,15 +532,21 @@ watch(currentReview, (newVal) => {
               <div
                 class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white font-semibold text-lg"
               >
-                {{ review.employee?.full_name?.charAt(0) || "?" }}
+                {{
+                  (review.staff_member ?? review.employee)?.full_name?.charAt(
+                    0,
+                  ) || "?"
+                }}
               </div>
               <div>
                 <p class="text-sm text-brand-light">Employee</p>
                 <p class="text-lg font-semibold text-brand-dark">
-                  {{ review.employee?.full_name || "-" }}
+                  {{
+                    (review.staff_member ?? review.employee)?.full_name || "-"
+                  }}
                 </p>
                 <p class="text-sm text-brand-light">
-                  {{ review.employee?.email || "" }}
+                  {{ (review.staff_member ?? review.employee)?.email || "" }}
                 </p>
               </div>
             </div>
@@ -811,12 +815,8 @@ watch(currentReview, (newVal) => {
 
               <!-- Readonly Display -->
               <template v-else>
-                <div
-                  v-if="getResponseForSection(section.id)?.self_rating"
-                >
-                  <p class="text-sm font-medium text-brand-dark mb-1">
-                    Rating
-                  </p>
+                <div v-if="getResponseForSection(section.id)?.self_rating">
+                  <p class="text-sm font-medium text-brand-dark mb-1">Rating</p>
                   <div class="flex items-center gap-2">
                     <div class="flex gap-1">
                       <div
@@ -824,8 +824,7 @@ watch(currentReview, (newVal) => {
                         :key="n"
                         class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
                         :class="
-                          n <=
-                          getResponseForSection(section.id)?.self_rating
+                          n <= getResponseForSection(section.id)?.self_rating
                             ? 'bg-brand-primary text-white'
                             : 'bg-gray-100 text-gray-400'
                         "
@@ -910,9 +909,9 @@ watch(currentReview, (newVal) => {
                 :key="'summary-' + section.id"
                 class="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border"
               >
-                <span class="text-xs text-brand-light">{{
-                  section.name
-                }}:</span>
+                <span class="text-xs text-brand-light"
+                  >{{ section.name }}:</span
+                >
                 <span
                   class="text-sm font-semibold"
                   :class="
@@ -921,9 +920,7 @@ watch(currentReview, (newVal) => {
                     )?.color
                   "
                 >
-                  {{
-                    getResponseForSection(section.id)?.self_rating || "-"
-                  }}
+                  {{ getResponseForSection(section.id)?.self_rating || "-" }}
                 </span>
               </div>
             </div>
@@ -1029,9 +1026,7 @@ watch(currentReview, (newVal) => {
 
               <!-- Readonly Display -->
               <template v-else>
-                <div
-                  v-if="getResponseForSection(section.id)?.manager_rating"
-                >
+                <div v-if="getResponseForSection(section.id)?.manager_rating">
                   <p class="text-sm font-medium text-brand-dark mb-1">
                     Manager Rating
                   </p>
@@ -1042,8 +1037,7 @@ watch(currentReview, (newVal) => {
                         :key="n"
                         class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
                         :class="
-                          n <=
-                          getResponseForSection(section.id)?.manager_rating
+                          n <= getResponseForSection(section.id)?.manager_rating
                             ? 'bg-blue-500 text-white'
                             : 'bg-gray-100 text-gray-400'
                         "
@@ -1067,14 +1061,10 @@ watch(currentReview, (newVal) => {
                     </span>
                   </div>
                   <p
-                    v-if="
-                      getResponseForSection(section.id)?.manager_comments
-                    "
+                    v-if="getResponseForSection(section.id)?.manager_comments"
                     class="text-sm text-brand-light mt-2 p-3 bg-gray-50 rounded-lg"
                   >
-                    {{
-                      getResponseForSection(section.id)?.manager_comments
-                    }}
+                    {{ getResponseForSection(section.id)?.manager_comments }}
                   </p>
                 </div>
                 <div v-else class="text-sm text-brand-light italic">
@@ -1096,9 +1086,12 @@ watch(currentReview, (newVal) => {
               <div class="flex items-center gap-4">
                 <p
                   class="text-3xl font-bold"
-                  :class="getRatingLabel(calculatedManagerRating)?.color || 'text-gray-400'"
+                  :class="
+                    getRatingLabel(calculatedManagerRating)?.color ||
+                    'text-gray-400'
+                  "
                 >
-                  {{ calculatedManagerRating || '-' }}
+                  {{ calculatedManagerRating || "-" }}
                 </p>
                 <span
                   v-if="calculatedManagerRating"
@@ -1203,16 +1196,12 @@ watch(currentReview, (newVal) => {
                 </div>
 
                 <!-- Manager Rating -->
-                <div
-                  class="p-3 bg-blue-50 border border-blue-100 rounded-lg"
-                >
+                <div class="p-3 bg-blue-50 border border-blue-100 rounded-lg">
                   <p class="text-xs font-medium text-blue-700 mb-2">
                     Manager Assessment
                   </p>
                   <div
-                    v-if="
-                      getResponseForSection(section.id)?.manager_rating
-                    "
+                    v-if="getResponseForSection(section.id)?.manager_rating"
                     class="flex items-center gap-2"
                   >
                     <span class="text-lg font-bold text-blue-800"
@@ -1230,14 +1219,10 @@ watch(currentReview, (newVal) => {
                     Not submitted
                   </p>
                   <p
-                    v-if="
-                      getResponseForSection(section.id)?.manager_comments
-                    "
+                    v-if="getResponseForSection(section.id)?.manager_comments"
                     class="text-xs text-blue-700 mt-2"
                   >
-                    "{{
-                      getResponseForSection(section.id)?.manager_comments
-                    }}"
+                    "{{ getResponseForSection(section.id)?.manager_comments }}"
                   </p>
                 </div>
               </div>
@@ -1255,9 +1240,7 @@ watch(currentReview, (newVal) => {
                     @click="
                       calibrationForm[section.id] = {
                         rating:
-                          calibrationForm[section.id]?.rating === n
-                            ? null
-                            : n,
+                          calibrationForm[section.id]?.rating === n ? null : n,
                       }
                     "
                     class="w-10 h-10 rounded-lg border-2 flex items-center justify-center font-semibold transition-all text-sm"
@@ -1273,9 +1256,7 @@ watch(currentReview, (newVal) => {
               </div>
 
               <!-- Readonly calibrated rating -->
-              <div
-                v-else-if="getResponseForSection(section.id)?.final_rating"
-              >
+              <div v-else-if="getResponseForSection(section.id)?.final_rating">
                 <p class="text-sm font-medium text-brand-dark mb-1">
                   Calibrated Rating
                 </p>
@@ -1286,8 +1267,7 @@ watch(currentReview, (newVal) => {
                       :key="n"
                       class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
                       :class="
-                        n <=
-                        getResponseForSection(section.id)?.final_rating
+                        n <= getResponseForSection(section.id)?.final_rating
                           ? 'bg-purple-500 text-white'
                           : 'bg-gray-100 text-gray-400'
                       "
@@ -1309,14 +1289,18 @@ watch(currentReview, (newVal) => {
                   Projected Final Rating
                 </h3>
                 <p class="text-sm text-brand-light mt-1">
-                  Auto-calculated from weighted section ratings. Adjust section overrides above to see changes.
+                  Auto-calculated from weighted section ratings. Adjust section
+                  overrides above to see changes.
                 </p>
                 <div class="mt-3 flex items-center gap-4">
                   <p
                     class="text-4xl font-bold"
-                    :class="getRatingLabel(calculatedFinalRating)?.color || 'text-gray-400'"
+                    :class="
+                      getRatingLabel(calculatedFinalRating)?.color ||
+                      'text-gray-400'
+                    "
                   >
-                    {{ calculatedFinalRating || '-' }}
+                    {{ calculatedFinalRating || "-" }}
                   </p>
                   <span
                     v-if="calculatedFinalRating"
@@ -1329,17 +1313,26 @@ watch(currentReview, (newVal) => {
               </div>
 
               <!-- Manager's Recommended Rating -->
-              <div v-if="review.manager_recommended_rating" class="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                <p class="text-sm font-medium text-blue-700">Manager's Recommended Rating</p>
+              <div
+                v-if="review.manager_recommended_rating"
+                class="p-4 bg-blue-50 border border-blue-200 rounded-xl"
+              >
+                <p class="text-sm font-medium text-blue-700">
+                  Manager's Recommended Rating
+                </p>
                 <div class="flex items-center gap-3 mt-2">
                   <p class="text-2xl font-bold text-blue-800">
                     {{ Number(review.manager_recommended_rating).toFixed(2) }}
                   </p>
                   <span
                     class="px-2 py-1 text-xs font-medium rounded-full border"
-                    :class="getRatingLabel(review.manager_recommended_rating)?.bg"
+                    :class="
+                      getRatingLabel(review.manager_recommended_rating)?.bg
+                    "
                   >
-                    {{ getRatingLabel(review.manager_recommended_rating)?.label }}
+                    {{
+                      getRatingLabel(review.manager_recommended_rating)?.label
+                    }}
                   </span>
                 </div>
               </div>
@@ -1349,44 +1342,86 @@ watch(currentReview, (newVal) => {
                 <h4 class="text-sm font-semibold text-brand-dark mb-3">
                   Cross-Manager Normalization Context
                 </h4>
-                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
+                <div
+                  class="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3"
+                >
                   <div class="flex items-center justify-between">
                     <span class="text-sm text-brand-light">Cycle</span>
-                    <span class="text-sm font-medium text-brand-dark">{{ calibrationContext.cycle_name }}</span>
+                    <span class="text-sm font-medium text-brand-dark">{{
+                      calibrationContext.cycle_name
+                    }}</span>
                   </div>
                   <div class="flex items-center justify-between">
-                    <span class="text-sm text-brand-light">Total Reviews in Cycle</span>
-                    <span class="text-sm font-medium text-brand-dark">{{ calibrationContext.total_reviews_in_cycle }}</span>
+                    <span class="text-sm text-brand-light"
+                      >Total Reviews in Cycle</span
+                    >
+                    <span class="text-sm font-medium text-brand-dark">{{
+                      calibrationContext.total_reviews_in_cycle
+                    }}</span>
                   </div>
                   <div class="flex items-center justify-between">
-                    <span class="text-sm text-brand-light">Cycle Average Rating</span>
-                    <span class="text-sm font-bold text-brand-dark">{{ calibrationContext.cycle_avg_rating || '-' }}</span>
+                    <span class="text-sm text-brand-light"
+                      >Cycle Average Rating</span
+                    >
+                    <span class="text-sm font-bold text-brand-dark">{{
+                      calibrationContext.cycle_avg_rating || "-"
+                    }}</span>
                   </div>
-                  <div v-if="calibrationContext.manager_breakdown?.length" class="mt-3 pt-3 border-t border-gray-200">
-                    <p class="text-xs font-semibold text-brand-dark mb-2 uppercase tracking-wider">Manager Breakdown</p>
+                  <div
+                    v-if="calibrationContext.manager_breakdown?.length"
+                    class="mt-3 pt-3 border-t border-gray-200"
+                  >
+                    <p
+                      class="text-xs font-semibold text-brand-dark mb-2 uppercase tracking-wider"
+                    >
+                      Manager Breakdown
+                    </p>
                     <div class="space-y-2">
                       <div
                         v-for="manager in calibrationContext.manager_breakdown"
                         :key="manager.manager_id"
                         class="flex items-center justify-between p-2 rounded-lg"
-                        :class="manager.is_current_reviewer ? 'bg-blue-50 border border-blue-200' : 'bg-white'"
+                        :class="
+                          manager.is_current_reviewer
+                            ? 'bg-blue-50 border border-blue-200'
+                            : 'bg-white'
+                        "
                       >
                         <div class="flex items-center gap-2">
-                          <span class="text-sm text-brand-dark">{{ manager.manager_name }}</span>
-                          <span v-if="manager.is_current_reviewer" class="text-xs text-blue-600 font-medium">(This reviewer)</span>
+                          <span class="text-sm text-brand-dark">{{
+                            manager.manager_name
+                          }}</span>
+                          <span
+                            v-if="manager.is_current_reviewer"
+                            class="text-xs text-blue-600 font-medium"
+                            >(This reviewer)</span
+                          >
                         </div>
                         <div class="flex items-center gap-3 text-sm">
-                          <span class="text-brand-light">{{ manager.review_count }} reviews</span>
-                          <span class="font-semibold text-brand-dark">Avg: {{ manager.avg_rating || '-' }}</span>
-                          <span class="text-xs text-brand-light">{{ manager.min_rating }}-{{ manager.max_rating }}</span>
+                          <span class="text-brand-light"
+                            >{{ manager.review_count }} reviews</span
+                          >
+                          <span class="font-semibold text-brand-dark"
+                            >Avg: {{ manager.avg_rating || "-" }}</span
+                          >
+                          <span class="text-xs text-brand-light"
+                            >{{ manager.min_rating }}-{{
+                              manager.max_rating
+                            }}</span
+                          >
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              <div v-else-if="calibrationContextLoading" class="flex justify-center py-4">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+              <div
+                v-else-if="calibrationContextLoading"
+                class="flex justify-center py-4"
+              >
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"
+                ></div>
               </div>
 
               <!-- Submit Button -->
@@ -1397,8 +1432,8 @@ watch(currentReview, (newVal) => {
                   class="px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all"
                   :class="
                     isCalibrationValid && !submitting
-                      ? 'bg-purple-600 text-white hover:bg-purple-700'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                      ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                      : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
                   "
                 >
                   <ScaleIcon class="w-4 h-4" />
@@ -1409,9 +1444,7 @@ watch(currentReview, (newVal) => {
           </MainCard>
 
           <!-- Readonly final result for completed reviews -->
-          <MainCard
-            v-if="reviewStatus === 'completed' && review.final_rating"
-          >
+          <MainCard v-if="reviewStatus === 'completed' && review.final_rating">
             <div class="text-center py-4">
               <CheckCircleIcon
                 class="w-12 h-12 text-emerald-500 mx-auto mb-3"
@@ -1434,10 +1467,7 @@ watch(currentReview, (newVal) => {
                   getRatingLabel(review.final_rating)?.label
                 }}
               </span>
-              <p
-                v-if="review.calibrator"
-                class="text-sm text-brand-light mt-3"
-              >
+              <p v-if="review.calibrator" class="text-sm text-brand-light mt-3">
                 Calibrated by {{ review.calibrator.name }} on
                 {{ formatDate(review.calibrated_at) }}
               </p>

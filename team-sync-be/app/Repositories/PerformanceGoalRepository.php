@@ -57,6 +57,16 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
     public function updateGoal(int $id, array $data)
     {
         $goal = $this->getGoalById($id);
+
+        // Auto-set completed_at when status changes to 'completed'
+        if (isset($data['status']) && $data['status'] === 'completed' && $goal->status !== 'completed') {
+            $data['completed_at'] = now();
+        }
+        // Clear completed_at if status reverts from completed
+        if (isset($data['status']) && $data['status'] !== 'completed' && $goal->status === 'completed') {
+            $data['completed_at'] = null;
+        }
+
         $goal->update($data);
         return $goal;
     }
@@ -91,6 +101,14 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
         }
         if (isset($data['new_status'])) {
             $goalUpdates['status'] = $data['new_status'];
+            // Auto-set completed_at when status changes to 'completed'
+            if ($data['new_status'] === 'completed' && $goal->status !== 'completed') {
+                $goalUpdates['completed_at'] = now();
+            }
+            // Clear completed_at if status reverts from completed
+            if ($data['new_status'] !== 'completed' && $goal->status === 'completed') {
+                $goalUpdates['completed_at'] = null;
+            }
         }
         if (isset($data['completion_percentage'])) {
             $goalUpdates['completion_percentage'] = $data['completion_percentage'];

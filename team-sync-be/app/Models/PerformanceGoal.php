@@ -25,6 +25,7 @@ class PerformanceGoal extends Model
         'due_date',
         'status',
         'completion_percentage',
+        'completed_at',
         'created_by',
         'assigned_by',
         'linked_review_id',
@@ -35,6 +36,7 @@ class PerformanceGoal extends Model
         'due_date' => 'date',
         'weight' => 'decimal:2',
         'completion_percentage' => 'integer',
+        'completed_at' => 'datetime',
     ];
 
     public function staffMember(): BelongsTo
