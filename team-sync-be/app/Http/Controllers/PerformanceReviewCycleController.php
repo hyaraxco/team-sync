@@ -7,12 +7,15 @@ use App\Helpers\ResponseHelper;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Http\Requests\Performance\CreateReviewCycleRequest;
 use App\Http\Requests\Performance\UpdateReviewCycleRequest;
+use App\Models\StaffMemberProfile;
+use App\Services\Performance\ReviewerResolverService;
 use Illuminate\Http\Request;
 
 class PerformanceReviewCycleController extends Controller
 {
     public function __construct(
-        private PerformanceReviewRepositoryInterface $repository
+        private PerformanceReviewRepositoryInterface $repository,
+        private ReviewerResolverService $reviewerResolverService
     ) {}
 
     public function index(Request $request)
@@ -44,5 +47,38 @@ class PerformanceReviewCycleController extends Controller
     {
         $this->repository->deleteCycle($id);
         return ResponseHelper::jsonResponse(true, 'Review cycle deleted successfully', null, 200);
+    }
+
+    public function generateReviews(int $id)
+    {
+        $cycle = $this->repository->getCycleById($id);
+
+        // Get active staff members (excluding those who already have a review for this cycle)
+        $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
+        
+        $staffMembers = StaffMemberProfile::whereHas('jobInformation', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->whereNotIn('id', $existingReviewStaffIds)
+            ->get();
+
+        $assignments = $this->reviewerResolverService->resolveMany($staffMembers);
+
+        $createdCount = 0;
+        foreach ($staffMembers as $staffMember) {
+            $reviewerId = $assignments[$staffMember->id];
+            
+            $this->repository->createReview([
+                'cycle_id' => $cycle->id,
+                'staff_member_id' => $staffMember->id,
+                'reviewer_id' => $reviewerId,
+                'status' => 'pending_self',
+            ]);
+            $createdCount++;
+        }
+
+        return ResponseHelper::jsonResponse(true, "Successfully generated reviews for {$createdCount} employees", [
+            'generated_count' => $createdCount
+        ], 200);
     }
 }

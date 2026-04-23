@@ -8,6 +8,7 @@ use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
 use App\Http\Requests\Performance\SubmitManagerAssessmentRequest;
 use App\Http\Requests\Performance\CalibrateReviewRequest;
+use App\Http\Requests\Performance\AssignReviewerRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -34,6 +35,10 @@ class PerformanceReviewController extends Controller implements HasMiddleware
             new Middleware(
                 PermissionMiddleware::using('review-calibrate'),
                 only: ['getPendingCalibration', 'getCalibrationContext', 'calibrateReview', 'validateReadiness']
+            ),
+            new Middleware(
+                PermissionMiddleware::using('review-assign-reviewer'),
+                only: ['assignReviewer']
             ),
         ];
     }
@@ -220,5 +225,11 @@ class PerformanceReviewController extends Controller implements HasMiddleware
                 'positive_feedback_count' => $feedbackCount,
             ],
         ]);
+    }
+
+    public function assignReviewer(AssignReviewerRequest $request, int $id)
+    {
+        $review = $this->repository->updateReview($id, ['reviewer_id' => $request->validated('reviewer_id')]);
+        return ResponseHelper::jsonResponse(true, 'Reviewer assigned successfully', $review, 200);
     }
 }

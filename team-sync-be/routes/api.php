@@ -209,6 +209,7 @@ Route::prefix('v1')
                 // Review Cycles (HR only)
                 Route::middleware(PermissionMiddleware::using(['review-cycle-manage']))->group(function () {
                     Route::apiResource('cycles', PerformanceReviewCycleController::class);
+                    Route::post('cycles/{id}/generate-reviews', [PerformanceReviewCycleController::class, 'generateReviews']);
                     Route::get('cycles/{id}/topsis-ranking', [PerformanceTopsisController::class, 'ranking']);
                 });
 
@@ -227,6 +228,8 @@ Route::prefix('v1')
                 Route::post('reviews/{id}/manager-assessment', [PerformanceReviewController::class, 'submitManagerAssessment']);
                 Route::post('reviews/{id}/calibrate', [PerformanceReviewController::class, 'calibrateReview'])
                     ->middleware(PermissionMiddleware::using(['review-calibrate']));
+                Route::put('reviews/{id}/assign-reviewer', [PerformanceReviewController::class, 'assignReviewer'])
+                    ->middleware(PermissionMiddleware::using(['review-assign-reviewer']));
 
                 // Goals
                 Route::get('goals/my-goals', [PerformanceGoalController::class, 'getMyGoals']);

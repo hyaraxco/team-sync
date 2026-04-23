@@ -59,6 +59,7 @@ class RolePermissionSeeder extends Seeder
                     // HR-only: Manager should NOT calibrate or manage review cycles
                     'review-calibrate',
                     'review-cycle-manage',
+                    'review-assign-reviewer',
                     // HR-only: Manager should NOT create/edit/delete staff members (view-only)
                     'staff-member-create',
                     'staff-member-edit',
