@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Award,
   AlertCircle,
+  AlertTriangle,
   CheckCircle2,
   RefreshCw,
   ChevronDown,
@@ -37,8 +38,8 @@ const weights = ref({
 });
 
 const weightLabels = {
-  avg_manager_rating: "Manager Rating",
-  final_rating: "Final Rating",
+  avg_manager_rating: "Competency Score",
+  final_rating: "KPI Score",
   avg_goal_completion: "Goal Completion %",
   goal_completion_ratio: "Goal Completion Ratio",
   positive_feedback_count: "Positive Feedback",
@@ -99,6 +100,18 @@ const labelColor = (label) => {
 };
 
 const scoreBarWidth = (score) => `${Math.round(score * 100)}%`;
+
+/** Check if an employee's TOPSIS data is incomplete (goals/feedback = 0) */
+const getIncompleteWarnings = (item) => {
+  const warnings = [];
+  if (item.raw_scores.avg_goal_completion === 0 && item.raw_scores.goal_completion_ratio === 0) {
+    warnings.push("Goals data unavailable");
+  }
+  if (item.raw_scores.positive_feedback_count === 0) {
+    warnings.push("No feedback received");
+  }
+  return warnings;
+};
 
 const toggleRow = (employeeId) => {
   if (expandedRows.value.has(employeeId)) {
@@ -387,6 +400,16 @@ onMounted(async () => {
                     <td class="py-4 px-3">
                       <p class="font-semibold text-brand-dark">{{ item.employee_name }}</p>
                       <p v-if="item.department" class="text-xs text-brand-light">{{ item.department }}</p>
+                      <!-- Incomplete Data Badge -->
+                      <div
+                        v-if="getIncompleteWarnings(item).length > 0"
+                        class="flex items-center gap-1 mt-1"
+                      >
+                        <AlertTriangle class="w-3 h-3 text-amber-500 flex-shrink-0" />
+                        <span class="text-[10px] text-amber-600 leading-tight">
+                          {{ getIncompleteWarnings(item).join(' · ') }}
+                        </span>
+                      </div>
                     </td>
                     <!-- C1-C5 raw scores -->
                     <td class="py-4 px-2 text-center text-sm text-brand-dark">
