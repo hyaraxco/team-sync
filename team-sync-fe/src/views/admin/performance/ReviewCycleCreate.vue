@@ -161,6 +161,18 @@ const createCycle = async () => {
           </div>
         </div>
 
+        <div class="p-4 bg-blue-50 border border-blue-100 rounded-lg">
+          <h3 class="text-sm font-semibold text-blue-900 mb-2">Reviewer Assignment Rules</h3>
+          <p class="text-sm text-blue-800 mb-3">
+            Reviewers will be automatically assigned when you generate reviews for this cycle based on the system rules.
+          </p>
+          <ul class="list-disc pl-5 text-sm text-blue-800 space-y-1">
+            <li><strong>Staff members</strong> are reviewed by their Team Manager (same team preference).</li>
+            <li><strong>Managers</strong> are reviewed by HR Admins.</li>
+            <li>If no matching role is found, the reviewer will be left empty and can be manually assigned later.</li>
+          </ul>
+        </div>
+
         <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
           <button
             type="submit"

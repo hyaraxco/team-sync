@@ -590,10 +590,18 @@ watch(currentReview, (newVal) => {
               </div>
               <div>
                 <p class="text-sm text-brand-light">Reviewer</p>
-                <p class="text-lg font-semibold text-brand-dark">
-                  {{ review.reviewer?.full_name || "-" }}
-                </p>
-                <p class="text-sm text-brand-light">
+                <div class="flex items-center gap-2">
+                  <p class="text-lg font-semibold text-brand-dark">
+                    {{ review.reviewer?.full_name || "-" }}
+                  </p>
+                  <span
+                    v-if="review.reviewer?.user?.roles?.length"
+                    class="px-2 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700 border border-blue-200"
+                  >
+                    {{ review.reviewer.user.roles[0].name }}
+                  </span>
+                </div>
+                <p class="text-sm text-brand-light mt-0.5">
                   {{ review.reviewer?.email || "" }}
                 </p>
               </div>

@@ -19,6 +19,7 @@ import {
 } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
+import GeneratedReviewsList from "@/components/admin/performance/GeneratedReviewsList.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -144,6 +145,10 @@ const resetWeights = () => {
 
 const goBack = () => router.push({ name: "admin.performance.cycles" });
 
+const fetchCycleData = async () => {
+  await reviewStore.fetchCycleById(cycleId);
+};
+
 // ── Init ──────────────────────────────────────────────────────────────────────
 onMounted(async () => {
   await reviewStore.fetchCycleById(cycleId);
@@ -243,6 +248,11 @@ onMounted(async () => {
         </p>
       </MainCard>
     </div>
+
+    <!-- ── Generated Reviews List ───────────────────────────────────────────── -->
+    <template v-if="currentCycle">
+      <GeneratedReviewsList :cycle="currentCycle" @refresh="fetchCycleData" />
+    </template>
 
     <!-- ── TOPSIS Section (hanya jika completed) ─────────────────────────── -->
     <template v-if="currentCycle">
