@@ -441,10 +441,10 @@ const handleSubmit = async () => {
     // Redirect to success page on success
     router.push({ name: "admin.staffMembers.success" });
   } catch (err) {
-    console.error("Error creating employee:", err);
+    console.error("Error creating staff member:", err);
     const validationErrors = err?.response?.data?.errors;
     if (validationErrors) {
-      console.error("Employee validation errors:", validationErrors);
+      console.error("Staff member validation errors:", validationErrors);
       goToErrorStep(validationErrors);
     }
     // Show error modal when validation fails
@@ -500,7 +500,7 @@ const closeErrorModal = () => {
           <p class="text-brand-dark text-sm font-medium">
             {{
               currentStep === 4
-                ? "Ready to add this employee?"
+                ? "Ready to add this staff member?"
                 : `Step ${currentStep} of ${totalSteps}`
             }}
           </p>

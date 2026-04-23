@@ -36,6 +36,17 @@ export default [
         },
       },
 
+      // Outcome Rules (HR only)
+      {
+        path: "outcome-rules",
+        name: "admin.performance.outcome-rules",
+        component: () =>
+          import("@/views/admin/performance/OutcomeRulesSettings.vue"),
+        meta: {
+          requiredPermission: "review-cycle-manage",
+        },
+      },
+
       // Reviews
       {
         path: "reviews/my-reviews",

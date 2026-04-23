@@ -22,7 +22,7 @@ export const loginAsRole = async (page: Page, role: RoleName) => {
   } catch {
     const currentUrl = page.url();
     const inlineError = await page
-      .locator('[data-testid="login-error"], .text-red-500, .alert-danger')
+      .locator('[data-testid="login-error"], .text-red-500, .alert-danger, .text-red-700, [role="alert"]')
       .first()
       .textContent()
       .catch(() => null);

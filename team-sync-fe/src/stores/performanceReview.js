@@ -35,6 +35,10 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
     topsisResult: null,
     topsisLoading: false,
 
+    // Outcome Rules
+    outcomeRules: [],
+    outcomeRulesLoading: false,
+
     // Pagination
     pagination: {
       current_page: 1,
@@ -397,6 +401,58 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
         throw error;
       } finally {
         this.topsisLoading = false;
+      }
+    },
+
+    async fetchOutcomeRules() {
+      this.outcomeRulesLoading = true;
+      this.error = null;
+      try {
+        const response = await axiosInstance.get('/performance/outcome-rules');
+        this.outcomeRules = response.data.data;
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.outcomeRulesLoading = false;
+      }
+    },
+
+    async createOutcomeRule(data) {
+      this.error = null;
+      try {
+        const response = await axiosInstance.post('/performance/outcome-rules', data);
+        this.outcomeRules.push(response.data.data);
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      }
+    },
+
+    async updateOutcomeRule(id, data) {
+      this.error = null;
+      try {
+        const response = await axiosInstance.put(`/performance/outcome-rules/${id}`, data);
+        const index = this.outcomeRules.findIndex(r => r.id === id);
+        if (index !== -1) this.outcomeRules[index] = response.data.data;
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      }
+    },
+
+    async deleteOutcomeRule(id) {
+      this.error = null;
+      try {
+        await axiosInstance.delete(`/performance/outcome-rules/${id}`);
+        this.outcomeRules = this.outcomeRules.filter(r => r.id !== id);
+        return true;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
       }
     },
 

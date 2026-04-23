@@ -149,7 +149,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     );
     await expect(page.getByText("Payroll Draft Review")).toBeVisible();
     await expect(page.getByText("Mark as Paid")).toHaveCount(0);
-    await expect(page.getByText("Total Employees")).toHaveCount(0);
+    await expect(page.getByText("Total Staff Members")).toHaveCount(0);
 
     await page.goto("/admin/payroll/create");
     await expect(page).toHaveURL(/\/admin\/payroll\/create$/);
@@ -179,7 +179,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
 
     await loginAsRole(page, "finance");
     await expect(page.getByTestId("sidebar-section-personal")).toBeVisible();
-    await expect(page.getByText("Request Leave")).toBeVisible();
+    await expect(page.getByText("Total Payroll Cost")).toBeVisible();
 
     await page.goto("/admin/payroll/create");
     await expect(page).toHaveURL(/\/admin\/dashboard$/);
@@ -194,7 +194,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await page.goto("/admin/payroll");
     await page.getByTestId("payroll-settings-link").click();
     await expect(page).toHaveURL(/\/admin\/payroll\/settings$/);
-    await expect(page.getByText("Payroll Settings")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Payroll Settings" })).toBeVisible();
     await page.getByTestId("payroll-settings-back").click();
     await expect(page).toHaveURL(/\/admin\/payroll$/);
 
@@ -205,7 +205,8 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await expect(page.getByTestId("payroll-export-excel")).toBeVisible();
     await expect(page.getByTestId("payroll-approve")).toBeVisible();
     await expect(page.getByTestId("payroll-mark-as-paid")).toHaveCount(0);
-    await expect(page.getByText("Total Employees")).toBeVisible();
+    await expect(page.getByText("Total Staff Members")).toBeVisible();
+    await page.getByTestId("tab-activity").click();
     await expect(
       page.getByRole("heading", { name: "Payroll Activity" })
     ).toBeVisible();
@@ -246,6 +247,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await expect(page.getByTestId("payroll-resend-notifications")).toBeVisible();
     await page.getByTestId("payroll-resend-notifications").click();
     await page.getByTestId("payroll-confirm-resend-notifications").click();
+    await page.getByTestId("tab-activity").click();
     await expect(
       page
         .getByTestId("payroll-activity-list")
@@ -300,7 +302,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await expectRedirectToDashboard(page, "/admin/payroll");
     await expectRedirectToDashboard(page, "/admin/payroll/create");
     await expectRedirectToDashboard(page, "/admin/attendances");
-    await expectRedirectToDashboard(page, "/admin/employees");
+    await expectRedirectToDashboard(page, "/admin/staff-members");
     await expectRedirectToDashboard(page, "/admin/teams");
 
     await captureEvidence(page, "employee-my-payroll.png");

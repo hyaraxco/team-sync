@@ -43,8 +43,13 @@ test.describe.serial("Performance Reviewer Override Journey", () => {
     const modalHeading = page.getByRole("heading", { name: "Assign Reviewer" });
     await expect(modalHeading).toBeVisible();
 
-    // Select a reviewer from the dropdown
     const selectReviewer = page.locator("select");
+    
+    // Wait for the options to be populated (at least one valid option beyond the placeholder)
+    // There are 4 staff members in minimal seeder + 1 placeholder = 5 options
+    await expect(selectReviewer.locator('option')).toHaveCount(5, { timeout: 15_000 });
+    
+    // Select a reviewer from the dropdown
     await selectReviewer.waitFor({ state: "visible" });
     
     // Choose the second option (first real staff member after disabled placeholder)

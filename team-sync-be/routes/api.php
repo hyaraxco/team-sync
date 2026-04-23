@@ -20,6 +20,7 @@ use App\Http\Controllers\PerformanceFeedbackController;
 use App\Http\Controllers\PerformanceGoalController;
 use App\Http\Controllers\PerformanceReviewController;
 use App\Http\Controllers\PerformanceReviewCycleController;
+use App\Http\Controllers\PerformanceOutcomeRuleController;
 use App\Http\Controllers\PerformanceTopsisController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTaskController;
@@ -211,6 +212,7 @@ Route::prefix('v1')
                     Route::apiResource('cycles', PerformanceReviewCycleController::class);
                     Route::post('cycles/{id}/generate-reviews', [PerformanceReviewCycleController::class, 'generateReviews']);
                     Route::get('cycles/{id}/topsis-ranking', [PerformanceTopsisController::class, 'ranking']);
+                    Route::apiResource('outcome-rules', PerformanceOutcomeRuleController::class);
                 });
 
                 // Reviews
