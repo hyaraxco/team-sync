@@ -229,6 +229,12 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
     public function assignReviewer(AssignReviewerRequest $request, int $id)
     {
+        $review = $this->repository->getReviewById($id);
+        
+        if (in_array($review->status, ['completed', 'pending_calibration'])) {
+            return ResponseHelper::jsonResponse(false, 'Cannot reassign reviewer for a review that is already completed or pending calibration', null, 422);
+        }
+
         $review = $this->repository->updateReview($id, ['reviewer_id' => $request->validated('reviewer_id')]);
         return ResponseHelper::jsonResponse(true, 'Reviewer assigned successfully', $review, 200);
     }
