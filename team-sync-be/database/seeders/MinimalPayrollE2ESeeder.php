@@ -57,6 +57,29 @@ class MinimalPayrollE2ESeeder extends Seeder
             $this->resetPayrollMonth($payrollMonth);
             $this->seedAttendanceForActiveEmployeesForMonth($payrollMonth);
 
+            // Create an empty Performance Review Cycle for E2E testing (ID 1)
+            \App\Models\PerformanceReviewCycle::updateOrCreate(
+                ['name' => 'E2E Review Cycle P4'],
+                [
+                    'cycle_type' => 'quarterly',
+                    'start_date' => now()->startOfMonth(),
+                    'end_date' => now()->addMonths(3)->endOfMonth(),
+                    'review_period_start' => now()->startOfMonth(),
+                    'review_period_end' => now()->addMonths(3)->endOfMonth(),
+                    'status' => 'active',
+                    'created_by' => StaffMemberProfile::whereHas('user', fn($q) => $q->role('hr'))->first()->user_id ?? 1,
+                ]
+            );
+
+            // Create basic reviewer rules so HR can generate reviews properly
+            \App\Models\ReviewerRule::firstOrCreate([
+                'reviewee_role' => 'staff',
+                'reviewer_role' => 'manager',
+            ], [
+                'priority' => 1,
+                'is_active' => true,
+            ]);
+
             $this->command?->info(sprintf(
                 'Minimal payroll E2E data ready for %s. Accounts: HR tasyia@teamsync.com, Manager yudhis@teamsync.com, Employee agung@teamsync.com, Finance dwimeta@teamsync.com (password: teamsync). Use HR to generate the draft, then Finance to review and mark it as paid.',
                 $payrollMonth->format('F Y')
