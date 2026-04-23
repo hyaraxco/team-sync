@@ -247,14 +247,14 @@ onMounted(async () => {
                   <div
                     class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-semibold"
                   >
-                    {{ review.employee?.full_name?.charAt(0) || "E" }}
+                    {{ (review.staff_member ?? review.employee)?.full_name?.charAt(0) || "E" }}
                   </div>
                   <div>
                     <p class="font-medium text-brand-dark">
-                      {{ review.employee?.full_name || "Unknown" }}
+                      {{ (review.staff_member ?? review.employee)?.full_name || "Unknown" }}
                     </p>
                     <p class="text-sm text-brand-light">
-                      {{ review.employee?.email || "-" }}
+                      {{ (review.staff_member ?? review.employee)?.email || "-" }}
                     </p>
                   </div>
                 </div>

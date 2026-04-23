@@ -263,12 +263,20 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
      * Ambil data skor tiap karyawan dalam satu cycle untuk perhitungan TOPSIS.
      * Hanya mengambil review dengan status 'completed'.
      *
+     * Kriteria TOPSIS:
+     *   C1 = Competency Score (weighted avg dari section dengan topsis_category = 'competency')
+     *   C2 = KPI Score (weighted avg dari section dengan topsis_category = 'kpi')
+     *        Jika HR mengisi final_rating (calibrated), gunakan nilainya; jika tidak, pakai manager_rating
+     *   C3 = Goal Completion % (dari goals employee dalam periode cycle)
+     *   C4 = Goal Completion Ratio / On-Time (goals selesai tepat waktu)
+     *   C5 = Positive Feedback Count (feedback positif dalam periode cycle)
+     *
      * @return array  Array of candidates dengan 5 nilai kriteria siap hitung TOPSIS
      */
     public function getEmployeeScoresForCycle(int $cycleId): array
     {
-        // C1 & C2: Dari performance_reviews + review_responses
-        $reviewScores = PerformanceReview::with(['staffMember.jobInformation.team', 'responses'])
+        // Eager-load responses with their section (including topsis_category)
+        $reviewScores = PerformanceReview::with(['staffMember.jobInformation.team', 'responses.section'])
             ->where('cycle_id', $cycleId)
             ->where('status', 'completed')
             ->get();
@@ -277,28 +285,79 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             return [];
         }
 
+        // Pre-load section weights and categories
+        $sections = PerformanceReviewSection::where('is_active', true)->get()->keyBy('id');
+
         $candidates = [];
         foreach ($reviewScores as $review) {
             $employeeId = $review->staff_member_id;
 
-            // C1: Rata-rata manager_rating dari semua section responses
-            $avgManagerRating = $review->responses
-                ->whereNotNull('manager_rating')
-                ->avg('manager_rating') ?? 0;
+            // C1 & C2: Calculate weighted averages per topsis_category
+            $competencyWeightedSum = 0;
+            $competencyTotalWeight = 0;
+            $kpiWeightedSum = 0;
+            $kpiTotalWeight = 0;
 
-            // C2: Final rating setelah kalibrasi
-            $finalRating = (float) ($review->final_rating ?? 0);
+            foreach ($review->responses as $response) {
+                $section = $response->section ?? $sections->get($response->section_id);
+                if (!$section || ($section->topsis_category ?? 'kpi') === 'excluded') {
+                    continue;
+                }
 
-            // C3 & C4: Dari performance_goals yang linked ke review ini
-            $goals = \App\Models\PerformanceGoal::where('linked_review_id', $review->id)->get();
+                $weight = (float) $section->weight;
 
-            $avgGoalCompletion   = $goals->isNotEmpty() ? $goals->avg('completion_percentage') : 0;
-            $totalGoals          = $goals->count();
-            $completedGoals      = $goals->where('status', 'completed')->count();
-            $goalCompletionRatio = $totalGoals > 0 ? ($completedGoals / $totalGoals) : 0;
+                // For KPI sections: use calibrated (final_rating) if available, else manager_rating
+                // For competency sections: use manager_rating (competency is not typically calibrated)
+                if (($section->topsis_category ?? 'kpi') === 'kpi') {
+                    $score = $response->final_rating !== null
+                        ? (float) $response->final_rating
+                        : (float) ($response->manager_rating ?? 0);
+                    $kpiWeightedSum += $score * $weight;
+                    $kpiTotalWeight += $weight;
+                } else {
+                    // competency
+                    $score = (float) ($response->manager_rating ?? 0);
+                    $competencyWeightedSum += $score * $weight;
+                    $competencyTotalWeight += $weight;
+                }
+            }
 
-            // C5: Jumlah positive feedback yang diterima selama periode cycle
-            $cycle = $review->cycle ?? \App\Models\PerformanceReviewCycle::find($cycleId);
+            // C1: Competency Score (normalized to 1-5 scale)
+            $c1CompetencyScore = $competencyTotalWeight > 0
+                ? $competencyWeightedSum / $competencyTotalWeight
+                : 0;
+
+            // C2: KPI Score (normalized to 1-5 scale)
+            $c2KpiScore = $kpiTotalWeight > 0
+                ? $kpiWeightedSum / $kpiTotalWeight
+                : 0;
+
+            // C3 & C4: From performance_goals within the cycle period
+            $cycle = $review->cycle ?? PerformanceReviewCycle::find($cycleId);
+            $goals = \App\Models\PerformanceGoal::where('staff_member_id', $employeeId)
+                ->where(function ($q) use ($review, $cycle) {
+                    // Goals linked to this review OR created within the cycle period
+                    $q->where('linked_review_id', $review->id)
+                      ->orWhereBetween('created_at', [
+                          $cycle->start_date . ' 00:00:00',
+                          $cycle->end_date . ' 23:59:59',
+                      ]);
+                })
+                ->get();
+
+            $totalGoals = $goals->count();
+            $completedGoals = $goals->where('status', 'completed')->count();
+            $avgGoalCompletion = $totalGoals > 0 ? ($completedGoals / $totalGoals) * 100 : 0;
+
+            // C4: On-time ratio (goals completed before or on due_date)
+            $onTimeGoals = $goals->where('status', 'completed')
+                ->filter(function ($g) {
+                    return $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date;
+                })
+                ->count();
+            $goalCompletionRatio = $completedGoals > 0 ? ($onTimeGoals / $completedGoals) : 0;
+
+            // C5: Positive feedback count within cycle period
             $positiveFeedbackCount = \App\Models\PerformanceFeedback::where('staff_member_id', $employeeId)
                 ->where('feedback_type', 'positive')
                 ->whereBetween('created_at', [
@@ -308,18 +367,18 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ->count();
 
             $candidates[] = [
-                'staff_member_id'             => $employeeId,
+                'staff_member_id'         => $employeeId,
                 'employee_name'           => $review->staffMember->full_name ?? 'Unknown',
                 'department'              => $review->staffMember->jobInformation->department ?? null,
                 'team'                    => $review->staffMember->jobInformation->team->name ?? null,
                 'review_id'               => $review->id,
                 'review_status'           => $review->status,
-                // Kriteria TOPSIS
-                'avg_manager_rating'      => round((float) $avgManagerRating, 4),
-                'final_rating'            => $finalRating,
-                'avg_goal_completion'     => round((float) $avgGoalCompletion, 4),
-                'goal_completion_ratio'   => round((float) $goalCompletionRatio, 4),
-                'positive_feedback_count' => (int) $positiveFeedbackCount,
+                // Kriteria TOPSIS (renamed for clarity)
+                'avg_manager_rating'      => round($c1CompetencyScore, 4),  // C1: Competency Score
+                'final_rating'            => round($c2KpiScore, 4),         // C2: KPI Score
+                'avg_goal_completion'     => round((float) $avgGoalCompletion, 4),   // C3
+                'goal_completion_ratio'   => round((float) $goalCompletionRatio, 4), // C4
+                'positive_feedback_count' => (int) $positiveFeedbackCount,           // C5
             ];
         }
 

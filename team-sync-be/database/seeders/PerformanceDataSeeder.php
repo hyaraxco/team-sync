@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Helpers\PerformanceRatingHelper;
 use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
@@ -18,9 +19,10 @@ class PerformanceDataSeeder extends Seeder
         $manager = User::where('email', 'yudhis@teamsync.com')->first();
         $employee = User::where('email', 'agung@teamsync.com')->first();
         $hr = User::where('email', 'tasyia@teamsync.com')->first();
+        $finance = User::where('email', 'dwimeta@teamsync.com')->first();
 
-        if (! $manager || ! $employee || ! $hr) {
-            $this->command->warn('Required users not found. Run ManagerSeeder, EmployeeSeeder, and HrSeeder first.');
+        if (! $manager || ! $employee || ! $hr || ! $finance) {
+            $this->command->warn('Required users not found. Run ManagerSeeder, EmployeeSeeder, HrSeeder, and FinanceSeeder first.');
 
             return;
         }
@@ -28,8 +30,9 @@ class PerformanceDataSeeder extends Seeder
         $managerProfile = $manager->staffMemberProfile;
         $staffMemberProfile = $employee->staffMemberProfile;
         $hrProfile = $hr->staffMemberProfile;
+        $financeProfile = $finance->staffMemberProfile;
 
-        if (! $managerProfile || ! $staffMemberProfile || ! $hrProfile) {
+        if (! $managerProfile || ! $staffMemberProfile || ! $hrProfile || ! $financeProfile) {
             $this->command->warn('Employee profiles not found for required users.');
 
             return;
@@ -98,7 +101,6 @@ class PerformanceDataSeeder extends Seeder
                 'status' => 'pending_calibration',
                 'self_assessment_submitted_at' => Carbon::now()->subDays(10),
                 'manager_assessment_submitted_at' => Carbon::now()->subDays(3),
-                'final_rating' => 3.80,
             ]
         );
 
@@ -114,6 +116,24 @@ class PerformanceDataSeeder extends Seeder
                 ]
             );
         }
+
+        // Auto-calculate final_rating + manager_recommended_rating
+        $calculated = PerformanceRatingHelper::calculateFinalRating($review3->id);
+        $managerRating = PerformanceRatingHelper::calculateManagerRating($review3->id);
+        $review3->update([
+            'final_rating' => $calculated['final_rating'],
+            'final_rating_label' => $calculated['final_rating_label'],
+            'manager_recommended_rating' => $managerRating,
+        ]);
+
+        // Review 5: Finance Dwimeta - pending_self (finance can test self-assessment)
+        $review5 = PerformanceReview::updateOrCreate(
+            ['cycle_id' => $cycle->id, 'staff_member_id' => $financeProfile->id],
+            [
+                'reviewer_id' => $managerProfile->id,
+                'status' => 'pending_self',
+            ]
+        );
 
         // Create a second completed cycle for history
         $completedCycle = PerformanceReviewCycle::updateOrCreate(
@@ -140,8 +160,6 @@ class PerformanceDataSeeder extends Seeder
                 'status' => 'completed',
                 'self_assessment_submitted_at' => Carbon::parse('2026-01-10'),
                 'manager_assessment_submitted_at' => Carbon::parse('2026-01-25'),
-                'final_rating' => 4.20,
-                'final_rating_label' => 'Exceeds Expectations',
                 'calibrated_at' => Carbon::parse('2026-02-10'),
                 'calibrated_by' => $hr->id,
                 'completed_at' => Carbon::parse('2026-02-10'),
@@ -164,8 +182,17 @@ class PerformanceDataSeeder extends Seeder
             );
         }
 
+        // Auto-calculate final_rating for completed review
+        $calculated = PerformanceRatingHelper::calculateFinalRating($review4->id);
+        $managerRating = PerformanceRatingHelper::calculateManagerRating($review4->id);
+        $review4->update([
+            'final_rating' => $calculated['final_rating'],
+            'final_rating_label' => $calculated['final_rating_label'],
+            'manager_recommended_rating' => $managerRating,
+        ]);
+
         $this->command->info('Performance data seeded successfully:');
-        $this->command->info("- Cycle: {$cycle->name} (active) with 3 reviews");
+        $this->command->info("- Cycle: {$cycle->name} (active) with 4 reviews (Agung, Yudhis, Tasyia, Dwimeta)");
         $this->command->info("- Cycle: {$completedCycle->name} (completed) with 1 review");
     }
 }

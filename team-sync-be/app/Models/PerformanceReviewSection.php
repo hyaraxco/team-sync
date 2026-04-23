@@ -13,6 +13,7 @@ class PerformanceReviewSection extends Model
         'name',
         'description',
         'weight',
+        'topsis_category',
         'order',
         'is_active',
     ];

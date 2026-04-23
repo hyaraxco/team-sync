@@ -9,10 +9,10 @@ namespace App\Services;
  * kinerja komprehensif dalam satu review cycle.
  *
  * Kriteria (semua Benefit — semakin besar semakin baik):
- *   C1 - avg_manager_rating       : rata-rata penilaian manager per section (1-5)
- *   C2 - final_rating             : rating final setelah kalibrasi (1-5)
- *   C3 - avg_goal_completion      : rata-rata persentase penyelesaian goal (0-100)
- *   C4 - goal_completion_ratio    : rasio goal berstatus completed (0-1)
+ *   C1 - avg_manager_rating       : Competency Score — weighted avg dari section competency (1-5)
+ *   C2 - final_rating             : KPI Score — weighted avg dari section KPI, calibrated jika ada (1-5)
+ *   C3 - avg_goal_completion      : Goal Completion % (0-100)
+ *   C4 - goal_completion_ratio    : On-Time Goal Ratio — goals selesai sebelum deadline (0-1)
  *   C5 - positive_feedback_count  : jumlah feedback positif yang diterima
  *
  * Langkah-langkah:

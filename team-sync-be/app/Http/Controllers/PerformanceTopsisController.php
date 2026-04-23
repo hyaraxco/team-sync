@@ -12,11 +12,11 @@ class PerformanceTopsisController extends Controller
 {
     /** Bobot default jika HR tidak menentukan bobot sendiri */
     private const DEFAULT_WEIGHTS = [
-        'avg_manager_rating'      => 0.35,
-        'final_rating'            => 0.30,
-        'avg_goal_completion'     => 0.20,
-        'goal_completion_ratio'   => 0.10,
-        'positive_feedback_count' => 0.05,
+        'avg_manager_rating'      => 0.30,  // C1: Competency Score
+        'final_rating'            => 0.30,  // C2: KPI Score
+        'avg_goal_completion'     => 0.20,  // C3: Goal Completion %
+        'goal_completion_ratio'   => 0.10,  // C4: On-Time Goal Ratio
+        'positive_feedback_count' => 0.10,  // C5: Positive Feedback Count
     ];
 
     public function __construct(
@@ -30,11 +30,11 @@ class PerformanceTopsisController extends Controller
      * GET /api/v1/performance/cycles/{id}/topsis-ranking
      *
      * Query params (optional):
-     *   - w_avg_manager_rating      : float (0-1)
-     *   - w_final_rating            : float (0-1)
-     *   - w_avg_goal_completion     : float (0-1)
-     *   - w_goal_completion_ratio   : float (0-1)
-     *   - w_positive_feedback_count : float (0-1)
+     *   - w_avg_manager_rating      : float (0-1) — C1: Competency Score weight
+     *   - w_final_rating            : float (0-1) — C2: KPI Score weight
+     *   - w_avg_goal_completion     : float (0-1) — C3: Goal Completion weight
+     *   - w_goal_completion_ratio   : float (0-1) — C4: On-Time Ratio weight
+     *   - w_positive_feedback_count : float (0-1) — C5: Positive Feedback weight
      *
      * Total bobot harus = 1.0 (jika tidak, akan dinormalisasi otomatis).
      */

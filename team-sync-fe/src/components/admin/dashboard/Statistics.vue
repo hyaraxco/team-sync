@@ -19,12 +19,12 @@ onMounted(() => {
   dashboardStore.fetchStatistics();
 });
 
-// Computed properties for statistics
-const employees = computed(() => dashboardStore.statistics.staffMembers);
-const teams = computed(() => dashboardStore.statistics.teams);
-const attendance = computed(() => dashboardStore.statistics.attendance);
-const tasks = computed(() => dashboardStore.statistics.tasks);
-const projects = computed(() => dashboardStore.statistics.projects);
+// Computed properties for statistics with safe defaults
+const employees = computed(() => dashboardStore.statistics?.staffMembers ?? dashboardStore.statistics?.employees ?? { total: 0, active: 0, new_hires: 0 });
+const teams = computed(() => dashboardStore.statistics?.teams ?? { total: 0, new_teams: 0 });
+const attendance = computed(() => dashboardStore.statistics?.attendance ?? { rate: 0, change: 0 });
+const tasks = computed(() => dashboardStore.statistics?.tasks ?? { completed: 0, total: 0, completion_rate: 0 });
+const projects = computed(() => dashboardStore.statistics?.projects ?? { active: 0, total: 0 });
 const loading = computed(() => dashboardStore.loading);
 </script>
 
