@@ -276,7 +276,7 @@ onMounted(async () => {
               <th
                 class="text-left py-3 px-4 text-sm font-semibold text-brand-dark"
               >
-                Final Rating
+                Overall Score
               </th>
               <th
                 class="text-right py-3 px-4 text-sm font-semibold text-brand-dark"

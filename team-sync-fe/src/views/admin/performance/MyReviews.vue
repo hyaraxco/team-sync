@@ -203,7 +203,7 @@ onMounted(async () => {
 
               <div>
                 <p class="text-xs text-brand-light uppercase tracking-wide">
-                  Final Rating
+                  Overall Score
                 </p>
                 <div class="flex items-center gap-2 mt-1">
                   <span
