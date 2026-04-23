@@ -110,6 +110,7 @@ class PermissionSeeder extends Seeder
 
         'review' => [
             'calibrate',
+            'assign-reviewer',
         ],
 
         'goal-create' => [
