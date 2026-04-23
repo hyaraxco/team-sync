@@ -56,6 +56,9 @@ class RolePermissionSeeder extends Seeder
                     'payroll-delete',
                     'payroll-process',
                     'payroll-statistics',
+                    // HR-only: Manager should NOT calibrate or manage review cycles
+                    'review-calibrate',
+                    'review-cycle-manage',
                 ]))->merge(
                     Permission::whereIn('name', $selfServiceBaseline)->get()
                 )->unique('id')->values()
@@ -76,6 +79,8 @@ class RolePermissionSeeder extends Seeder
                 'feedback-',
             ], array_merge($staffSpecific, [
                 'task-delete',
+                // Manager-only: HR should NOT see Team Reviews
+                'review-manager-submit',
             ]))->merge(
                 Permission::whereIn('name', [
                     'payroll-menu',
