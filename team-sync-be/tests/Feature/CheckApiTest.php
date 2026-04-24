@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\User;
+use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -12,7 +13,7 @@ class CheckApiTest extends TestCase
 
     public function test_api_format()
     {
-        $this->seed(\Database\Seeders\MinimalPayrollE2ESeeder::class);
+        $this->seed(MinimalPayrollE2ESeeder::class);
         $user = User::where('email', 'tasyia@teamsync.com')->first();
         $this->actingAs($user);
         $response = $this->get('/api/v1/staff-members');

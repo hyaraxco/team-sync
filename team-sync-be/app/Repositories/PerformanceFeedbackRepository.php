@@ -53,6 +53,7 @@ class PerformanceFeedbackRepository implements PerformanceFeedbackRepositoryInte
     {
         $feedback = $this->getFeedbackById($id);
         $feedback->update(['acknowledged_at' => now()]);
+
         return $feedback;
     }
 }

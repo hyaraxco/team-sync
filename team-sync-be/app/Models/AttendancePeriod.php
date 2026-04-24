@@ -10,7 +10,9 @@ class AttendancePeriod extends Model
     use HasFactory;
 
     public const STATUS_OPEN = 'open';
+
     public const STATUS_REVIEW = 'review';
+
     public const STATUS_LOCKED = 'locked';
 
     protected $fillable = [

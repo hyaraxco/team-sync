@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\AttendanceCorrection;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -47,7 +48,7 @@ class AttendanceCorrectionNeedsApproval extends Notification implements ShouldQu
             ->subject('Pengajuan Koreksi Absen Menunggu Persetujuan')
             ->greeting('Halo '.$notifiable->name.',')
             ->line($requesterLabel.' mengajukan koreksi absen dan membutuhkan persetujuan kamu.')
-            ->line('Tanggal: '.\Carbon\Carbon::parse($this->date)->format('d M Y'))
+            ->line('Tanggal: '.Carbon::parse($this->date)->format('d M Y'))
             ->line('Alasan: '.$this->reason)
             ->action('Tinjau Pengajuan Koreksi', url('/admin/attendance-corrections'))
             ->line('Silakan review pengajuan ini di halaman corrections.');

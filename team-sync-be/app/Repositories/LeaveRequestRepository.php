@@ -11,6 +11,7 @@ use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Models\User;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
 use Carbon\Carbon;
@@ -260,7 +261,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
     private function getManageableEmployeeIdsForManager(): ?array
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
         if (! $user || ! $user->hasRole('manager')) {
             return null;

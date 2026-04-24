@@ -139,7 +139,7 @@ class RolePermissionSeeder extends Seeder
     {
         return Permission::where(function ($q) use ($prefixes) {
             foreach ($prefixes as $prefix) {
-                $q->orWhere('name', 'like', $prefix . '%');
+                $q->orWhere('name', 'like', $prefix.'%');
             }
         })->when(! empty($except), function ($q) use ($except) {
             $q->whereNotIn('name', $except);

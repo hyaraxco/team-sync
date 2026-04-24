@@ -7,17 +7,18 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
 use App\Models\Payroll;
-use App\Models\PayrollAdjustment;
 use App\Models\PayrollActivityLog;
+use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
 use App\Models\PayrollSetting;
 use App\Models\PayrollSettingVersion;
+use App\Models\StaffMemberProfile;
+use App\Models\User;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
@@ -49,9 +50,13 @@ class PayrollRepository implements PayrollRepositoryInterface
     private const HIGH_HALF_DAY_TREND_RATIO = 0.1;
 
     protected EmailService $emailService;
+
     protected PayrollActivityLogger $activityLogger;
+
     protected AttendanceClassifier $attendanceClassifier;
+
     protected AttendancePeriodService $attendancePeriodService;
+
     protected TaxCalculationService $taxCalculationService;
 
     public function __construct(
@@ -60,8 +65,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         AttendanceClassifier $attendanceClassifier,
         AttendancePeriodService $attendancePeriodService,
         TaxCalculationService $taxCalculationService
-    )
-    {
+    ) {
         $this->emailService = $emailService;
         $this->activityLogger = $activityLogger;
         $this->attendanceClassifier = $attendanceClassifier;
@@ -78,9 +82,9 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->when($search, function ($query) use ($search) {
                 $query->whereHas('payrollDetails.staffMember', function ($q) use ($search) {
                     $q->whereHas('user', function ($userQuery) use ($search) {
-                        $userQuery->where('name', 'like', '%' . $search . '%');
+                        $userQuery->where('name', 'like', '%'.$search.'%');
                     })
-                        ->orWhere('code', 'like', '%' . $search . '%');
+                        ->orWhere('code', 'like', '%'.$search.'%');
                 });
             })
             ->orderBy('salary_month', 'desc');
@@ -342,7 +346,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             );
 
             DB::afterCommit(function () use ($payroll, $actorId) {
-                $actorName = $actorId ? \App\Models\User::find($actorId)?->name : null;
+                $actorName = $actorId ? User::find($actorId)?->name : null;
                 $this->emailService->sendPayrollDraftCreatedNotification($payroll, $actorName);
             });
 
@@ -507,7 +511,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             );
 
             DB::afterCommit(function () use ($payroll, $actorId) {
-                $actorName = $actorId ? \App\Models\User::find($actorId)?->name : null;
+                $actorName = $actorId ? User::find($actorId)?->name : null;
                 $this->emailService->sendPayrollApprovedNotification($payroll, $actorName);
             });
 
@@ -706,7 +710,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->map(function (PayrollNotificationDelivery $delivery) use ($attemptCountByDetail) {
                 $attemptCount = (int) ($attemptCountByDetail->get($delivery->payroll_detail_id) ?? 0);
                 $payslipPath = $delivery->payroll_detail_id
-                    ? '/admin/my-payroll/' . (int) $delivery->payroll_detail_id
+                    ? '/admin/my-payroll/'.(int) $delivery->payroll_detail_id
                     : null;
 
                 return [
@@ -793,7 +797,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function getAnalytics(int $months = 6): array
     {
         $months = max(1, min(24, $months));
-        $cacheKey = CacheConstants::CACHE_KEY_PAYROLL_ANALYTICS . $months . '_' . now()->format('Y-m-d-H');
+        $cacheKey = CacheConstants::CACHE_KEY_PAYROLL_ANALYTICS.$months.'_'.now()->format('Y-m-d-H');
 
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($months) {
             $periodRows = Payroll::query()
@@ -891,7 +895,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function getPayrollStatistics(string $payrollId)
     {
         // Cache key for payroll-specific statistics
-        $cacheKey = CacheConstants::CACHE_KEY_PAYROLL_STATISTICS . $payrollId . '_' . now()->format('Y-m-d-H');
+        $cacheKey = CacheConstants::CACHE_KEY_PAYROLL_STATISTICS.$payrollId.'_'.now()->format('Y-m-d-H');
 
         // Cache for 1 hour
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($payrollId) {

@@ -6,7 +6,6 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
-use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -36,7 +35,7 @@ class PayslipAccessTest extends TestCase
 
         Sanctum::actingAs($employee);
 
-        $this->getJson('/api/v1/my-payslips?year=' . now()->year)
+        $this->getJson('/api/v1/my-payslips?year='.now()->year)
             ->assertOk()
             ->assertJsonFragment(['id' => $employeePayslip->id])
             ->assertJsonMissing(['id' => $otherPayslip->id]);
@@ -91,7 +90,7 @@ class PayslipAccessTest extends TestCase
 
             Sanctum::actingAs($user);
 
-            $this->getJson('/api/v1/my-payslips?year=' . now()->year)
+            $this->getJson('/api/v1/my-payslips?year='.now()->year)
                 ->assertOk()
                 ->assertJsonFragment(['id' => $ownPayslip->id])
                 ->assertJsonMissing(['id' => $otherPayslip->id]);
@@ -120,8 +119,8 @@ class PayslipAccessTest extends TestCase
 
                 if ($attendance) {
                     $attendance->update([
-                        'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
-                        'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',
+                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
+                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
                         'status' => 'present',
                         'notes' => 'Admin role payslip test attendance',
                     ]);
@@ -129,8 +128,8 @@ class PayslipAccessTest extends TestCase
                     Attendance::create([
                         'staff_member_id' => $staffMemberProfile->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
-                        'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',
+                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
+                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
                         'status' => 'present',
                         'notes' => 'Admin role payslip test attendance',
                     ]);

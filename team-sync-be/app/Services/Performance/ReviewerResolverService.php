@@ -4,6 +4,7 @@ namespace App\Services\Performance;
 
 use App\Models\ReviewerRule;
 use App\Models\StaffMemberProfile;
+use Illuminate\Support\Collection;
 
 class ReviewerResolverService
 {
@@ -17,18 +18,18 @@ class ReviewerResolverService
      * 4. Prefer same-team lead, fall back to any user with that role
      * 5. Return null if no match (HR must assign manually)
      *
-     * @param StaffMemberProfile $staffMember The employee being reviewed
+     * @param  StaffMemberProfile  $staffMember  The employee being reviewed
      * @return StaffMemberProfile|null The suggested reviewer, or null for manual assignment
      */
     public function resolve(StaffMemberProfile $staffMember): ?StaffMemberProfile
     {
         $user = $staffMember->user;
-        if (!$user) {
+        if (! $user) {
             return null;
         }
 
         $revieweeRole = $user->getRoleNames()->first();
-        if (!$revieweeRole) {
+        if (! $revieweeRole) {
             return null;
         }
 
@@ -62,12 +63,12 @@ class ReviewerResolverService
         if ($teamIds->isNotEmpty()) {
             $teamReviewer = StaffMemberProfile::whereHas('user', function ($q) use ($reviewerRole, $staffMember) {
                 $q->role($reviewerRole)
-                  ->where('id', '!=', $staffMember->user_id);
+                    ->where('id', '!=', $staffMember->user_id);
             })
-            ->whereHas('teams', function ($q) use ($teamIds) {
-                $q->whereIn('teams.id', $teamIds);
-            })
-            ->first();
+                ->whereHas('teams', function ($q) use ($teamIds) {
+                    $q->whereIn('teams.id', $teamIds);
+                })
+                ->first();
 
             if ($teamReviewer) {
                 return $teamReviewer;
@@ -77,14 +78,14 @@ class ReviewerResolverService
         // 2. Fallback: any user with the reviewer role
         return StaffMemberProfile::whereHas('user', function ($q) use ($reviewerRole, $staffMember) {
             $q->role($reviewerRole)
-              ->where('id', '!=', $staffMember->user_id);
+                ->where('id', '!=', $staffMember->user_id);
         })->first();
     }
 
     /**
      * Batch-resolve reviewers for multiple staff members.
      *
-     * @param \Illuminate\Support\Collection $staffMembers Collection of StaffMemberProfile
+     * @param  Collection  $staffMembers  Collection of StaffMemberProfile
      * @return array<int, int|null> Map of staff_member_id => reviewer_staff_member_id (or null)
      */
     public function resolveMany($staffMembers): array
@@ -94,6 +95,7 @@ class ReviewerResolverService
             $reviewer = $this->resolve($staffMember);
             $assignments[$staffMember->id] = $reviewer?->id;
         }
+
         return $assignments;
     }
 }

@@ -42,6 +42,7 @@ class ReviewCycleControllerTest extends TestCase
         $role = Role::findByName($roleName, 'sanctum');
         $user->assignRole($role);
         Sanctum::actingAs($user);
+
         return $user;
     }
 

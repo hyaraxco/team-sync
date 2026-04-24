@@ -4,11 +4,11 @@ namespace Tests\Feature\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\HybridWorkSchedule;
 use App\Models\JobInformation;
 use App\Models\LeaveRequest;
+use App\Models\StaffMemberProfile;
 use App\Services\Attendance\AttendanceClassifier;
 use Database\Seeders\AttendancePolicySeeder;
 use Database\Seeders\LeaveEntitlementSeeder;

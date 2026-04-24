@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\DTOs\Performance\FeedbackDto;
 use App\Helpers\ResponseHelper;
-use App\Interfaces\PerformanceFeedbackRepositoryInterface;
 use App\Http\Requests\Performance\CreateFeedbackRequest;
+use App\Interfaces\PerformanceFeedbackRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Middleware\PermissionMiddleware;
-
 
 class PerformanceFeedbackController extends Controller implements HasMiddleware
 {
@@ -39,12 +38,14 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
     {
         $filters = $request->all();
         $feedback = $this->repository->getFeedbackForEmployee(Auth::user()->staffMemberProfile?->id, $filters);
+
         return ResponseHelper::jsonResponse(true, 'Received feedback retrieved successfully', $feedback);
     }
 
     public function getGivenFeedback(Request $request)
     {
         $feedback = $this->repository->getFeedbackGivenByUser(Auth::user()->staffMemberProfile?->id, $request->all());
+
         return ResponseHelper::jsonResponse(true, 'Given feedback retrieved successfully', $feedback);
     }
 
@@ -52,6 +53,7 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
     {
         $dto = FeedbackDto::fromRequest($request->validated());
         $feedback = $this->repository->createFeedback($dto->toArray());
+
         return ResponseHelper::jsonResponse(true, 'Feedback created successfully', $feedback, 201);
     }
 
@@ -63,7 +65,7 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
         $user = Auth::user();
         $staffMemberId = $user->staffMemberProfile?->id;
         $isRecipient = $feedback->staff_member_id === $staffMemberId;
-        $isGiver     = $feedback->giver_id === $staffMemberId;
+        $isGiver = $feedback->giver_id === $staffMemberId;
 
         if (! $isRecipient && ! $isGiver && ! $user->can('performance-analytics-view')) {
             return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
@@ -83,7 +85,7 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
         }
 
         $feedback = $this->repository->acknowledgeFeedback($id);
+
         return ResponseHelper::jsonResponse(true, 'Feedback acknowledged successfully', $feedback);
     }
 }
-

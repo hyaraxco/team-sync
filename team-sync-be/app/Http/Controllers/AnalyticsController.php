@@ -36,7 +36,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Executive summary retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -50,7 +50,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Workforce analytics retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -65,7 +65,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance analytics retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -79,7 +79,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave analytics retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -93,7 +93,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Payroll analytics retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -107,7 +107,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Project analytics retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -122,7 +122,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Turnover rate retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -135,7 +135,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Average tenure retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -149,7 +149,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'New hire trends retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -164,7 +164,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance compliance rate retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -178,7 +178,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance patterns retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -192,7 +192,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Remote/office ratio retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -207,7 +207,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave utilization rate retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -221,7 +221,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave balance trends retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -234,7 +234,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Peak leave periods retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -249,7 +249,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Payroll cost trends retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -262,7 +262,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Salary distribution retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -276,7 +276,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Deduction analysis retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -290,7 +290,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Project timeline adherence retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -304,7 +304,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Task velocity retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -317,7 +317,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Overdue trends retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -332,7 +332,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team performance summary retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -345,7 +345,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Company performance summary retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -358,7 +358,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Rating distribution retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -372,7 +372,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Goal completion rate retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -386,7 +386,7 @@ class AnalyticsController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Feedback metrics retrieved successfully', $data, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
         }
     }
 }

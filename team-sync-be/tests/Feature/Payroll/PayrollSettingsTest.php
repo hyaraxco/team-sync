@@ -4,11 +4,11 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollSetting;
 use App\Models\PayrollSettingVersion;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
@@ -16,8 +16,8 @@ use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PayrollSettingsTest extends TestCase

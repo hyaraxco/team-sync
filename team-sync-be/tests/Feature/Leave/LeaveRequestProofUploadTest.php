@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Leave;
 
-use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -12,8 +12,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class LeaveRequestProofUploadTest extends TestCase

@@ -1,10 +1,9 @@
 <?php
 
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);

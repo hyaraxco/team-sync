@@ -10,12 +10,17 @@ class PayrollAdjustment extends Model
     use HasFactory;
 
     public const STATUS_PENDING = 'pending';
+
     public const STATUS_APPROVED = 'approved';
+
     public const STATUS_APPLIED = 'applied';
 
     public const KIND_PAID_LEAVE_REVERSAL = 'paid_leave_reversal';
+
     public const KIND_PAID_LEAVE_CREDIT = 'paid_leave_credit';
+
     public const KIND_ABSENCE_CORRECTION_CREDIT = 'absence_correction_credit';
+
     public const KIND_ABSENCE_CORRECTION_DEDUCTION = 'absence_correction_deduction';
 
     protected $fillable = [

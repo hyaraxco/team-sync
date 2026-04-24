@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\LeaveRequest;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -37,8 +38,8 @@ class LeaveRequestCreated extends Notification implements ShouldQueue
      */
     public function toMail(object $notifiable): MailMessage
     {
-        $startDate = \Carbon\Carbon::parse((string) $this->leaveRequest->start_date)->format('d M Y');
-        $endDate = \Carbon\Carbon::parse((string) $this->leaveRequest->end_date)->format('d M Y');
+        $startDate = Carbon::parse((string) $this->leaveRequest->start_date)->format('d M Y');
+        $endDate = Carbon::parse((string) $this->leaveRequest->end_date)->format('d M Y');
 
         return (new MailMessage)
             ->subject('Permohonan Cuti Sedang Diproses')

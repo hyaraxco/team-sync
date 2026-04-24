@@ -4,8 +4,8 @@ namespace Database\Seeders;
 
 use App\Models\BankInformation;
 use App\Models\EmergencyContact;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
+use App\Models\StaffMemberProfile;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -54,9 +54,9 @@ class StaffMemberProfileSeeder extends Seeder
         $endTime = microtime(true);
         $duration = round($endTime - $startTime, 2);
 
-        $this->command->info('✓ Successfully created ' . StaffMemberProfile::count() . ' employees with complete data!');
+        $this->command->info('✓ Successfully created '.StaffMemberProfile::count().' employees with complete data!');
         $this->command->info("✓ Time taken: {$duration} seconds");
-        $this->command->info('✓ Average: ' . round($totalEmployees / $duration, 2) . ' employees/second');
+        $this->command->info('✓ Average: '.round($totalEmployees / $duration, 2).' employees/second');
     }
 
     /**

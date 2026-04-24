@@ -29,7 +29,7 @@ class TaxCalculationServiceTest extends TestCase
     {
         parent::setUp();
         $this->seedTaxData();
-        $this->service = new TaxCalculationService();
+        $this->service = new TaxCalculationService;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -303,10 +303,19 @@ class TaxCalculationServiceTest extends TestCase
 
     private function getApplicableBracketRate(float $pkp): float
     {
-        if ($pkp <= 60_000_000) return 5.0;
-        if ($pkp <= 250_000_000) return 15.0;
-        if ($pkp <= 500_000_000) return 25.0;
-        if ($pkp <= 5_000_000_000) return 30.0;
+        if ($pkp <= 60_000_000) {
+            return 5.0;
+        }
+        if ($pkp <= 250_000_000) {
+            return 15.0;
+        }
+        if ($pkp <= 500_000_000) {
+            return 25.0;
+        }
+        if ($pkp <= 5_000_000_000) {
+            return 30.0;
+        }
+
         return 35.0;
     }
 

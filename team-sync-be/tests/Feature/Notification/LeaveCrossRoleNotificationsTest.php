@@ -3,8 +3,8 @@
 namespace Tests\Feature\Notification;
 
 use App\Models\AttendancePeriod;
-use App\Models\StaffMemberProfile;
 use App\Models\LeaveRequest;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;

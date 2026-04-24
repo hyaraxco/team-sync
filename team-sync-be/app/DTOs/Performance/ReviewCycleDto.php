@@ -1,11 +1,8 @@
 <?php
 
 namespace App\DTOs\Performance;
- 
+
 use Illuminate\Support\Facades\Auth;
- 
-
-
 
 class ReviewCycleDto
 {
@@ -51,11 +48,21 @@ class ReviewCycleDto
             'review_period_end' => $this->review_period_end,
         ];
 
-        if ($this->status !== null) $array['status'] = $this->status;
-        if ($this->self_assessment_deadline !== null) $array['self_assessment_deadline'] = $this->self_assessment_deadline;
-        if ($this->manager_assessment_deadline !== null) $array['manager_assessment_deadline'] = $this->manager_assessment_deadline;
-        if ($this->calibration_deadline !== null) $array['calibration_deadline'] = $this->calibration_deadline;
-        if ($this->created_by !== null) $array['created_by'] = $this->created_by;
+        if ($this->status !== null) {
+            $array['status'] = $this->status;
+        }
+        if ($this->self_assessment_deadline !== null) {
+            $array['self_assessment_deadline'] = $this->self_assessment_deadline;
+        }
+        if ($this->manager_assessment_deadline !== null) {
+            $array['manager_assessment_deadline'] = $this->manager_assessment_deadline;
+        }
+        if ($this->calibration_deadline !== null) {
+            $array['calibration_deadline'] = $this->calibration_deadline;
+        }
+        if ($this->created_by !== null) {
+            $array['created_by'] = $this->created_by;
+        }
 
         return $array;
     }

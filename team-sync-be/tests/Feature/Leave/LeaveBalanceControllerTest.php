@@ -9,7 +9,6 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class LeaveBalanceControllerTest extends TestCase
@@ -33,7 +32,7 @@ class LeaveBalanceControllerTest extends TestCase
     {
         // Create a user without an employee profile
         $user = User::factory()->create();
-        
+
         // Give them the explicit permission needed to pass the controller middleware
         $user->givePermissionTo('leave-request-my-requests');
 
@@ -50,7 +49,7 @@ class LeaveBalanceControllerTest extends TestCase
         $response->assertJson([
             'success' => false,
             'message' => 'Employee profile not found.',
-            'data' => []
+            'data' => [],
         ]);
     }
 }

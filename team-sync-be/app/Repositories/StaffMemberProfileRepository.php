@@ -7,13 +7,13 @@ use App\DTOs\EmergencyContactDto;
 use App\DTOs\StaffMemberProfileDto;
 use App\Interfaces\BankInformationRepositoryInterface;
 use App\Interfaces\EmergencyContactRepositoryInterface;
-use App\Interfaces\StaffMemberProfileRepositoryInterface;
 use App\Interfaces\JobInformationRepositoryInterface;
+use App\Interfaces\StaffMemberProfileRepositoryInterface;
 use App\Interfaces\UserRepositoryInterface;
 use App\Models\BankInformation;
 use App\Models\EmergencyContact;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\TeamMember;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
@@ -179,7 +179,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
 
             // Clear statistics cache
             $this->clearEmployeeStatisticsCache();
-            
+
             $employee = $employee->load(['user', 'jobInformation', 'bankInformation', 'emergencyContacts']);
             $employee->searchable();
 
@@ -204,7 +204,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
 
             // Clear statistics cache
             $this->clearEmployeeStatisticsCache();
-            
+
             $employee->searchable();
 
             return $employee;

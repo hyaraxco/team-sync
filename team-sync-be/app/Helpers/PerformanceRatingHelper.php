@@ -35,7 +35,7 @@ class PerformanceRatingHelper
 
         foreach ($responses as $response) {
             $section = $response->section;
-            if (!$section || !$section->is_active) {
+            if (! $section || ! $section->is_active) {
                 continue;
             }
 
@@ -82,7 +82,7 @@ class PerformanceRatingHelper
 
         foreach ($responses as $response) {
             $section = $response->section;
-            if (!$section || !$section->is_active || $response->manager_rating === null) {
+            if (! $section || ! $section->is_active || $response->manager_rating === null) {
                 continue;
             }
 

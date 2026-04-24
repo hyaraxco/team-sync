@@ -10,11 +10,15 @@ use Illuminate\Support\Collection;
 class TaxCalculationService
 {
     protected ?Collection $taxBrackets = null;
+
     protected ?Collection $bpjsRates = null;
+
     protected ?Collection $ptkpAmounts = null;
 
     protected const JABATAN_RATE = 0.05;
+
     protected const JABATAN_MAX_ANNUAL = 6_000_000;
+
     protected const JABATAN_MAX_MONTHLY = 500_000;
 
     public function __construct()
@@ -158,7 +162,7 @@ class TaxCalculationService
                 'ptkp_amount' => round($ptkpAmount, 2),
                 'pkp' => round($pkpRoundedDown, 2),
                 'pph21_annual' => round($pph21Annual, 2),
-            ]
+            ],
         ];
     }
 }

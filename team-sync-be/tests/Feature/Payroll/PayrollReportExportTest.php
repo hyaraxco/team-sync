@@ -2,17 +2,18 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\StaffMemberProfile;
+use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PayrollReportExportTest extends TestCase
@@ -91,7 +92,7 @@ class PayrollReportExportTest extends TestCase
         $this->actingAsRole('finance');
         $this->createPayrollWithDetail('2026-05-01', 'paid', '2026-05-28');
 
-        $repository = app(\App\Interfaces\PayrollRepositoryInterface::class);
+        $repository = app(PayrollRepositoryInterface::class);
         $rows = $repository->getPayrollReportRows([
             'report_type' => 'detail',
             'status' => 'paid',
@@ -113,7 +114,7 @@ class PayrollReportExportTest extends TestCase
         $this->actingAsRole('finance');
         $this->createPayrollWithDetail('2026-05-01', 'paid', '2026-05-28');
 
-        $repository = app(\App\Interfaces\PayrollRepositoryInterface::class);
+        $repository = app(PayrollRepositoryInterface::class);
         $rows = $repository->getPayrollReportRows([
             'report_type' => 'summary',
             'status' => 'all',
@@ -135,7 +136,7 @@ class PayrollReportExportTest extends TestCase
         $this->createPayrollWithDetail('2026-05-01', 'pending');
         $this->createPayrollWithDetail('2026-06-01', 'paid', '2026-06-28');
 
-        $repository = app(\App\Interfaces\PayrollRepositoryInterface::class);
+        $repository = app(PayrollRepositoryInterface::class);
         $paidRows = $repository->getPayrollReportRows([
             'report_type' => 'summary',
             'status' => 'paid',
@@ -155,7 +156,7 @@ class PayrollReportExportTest extends TestCase
         $this->createPayrollWithDetail('2026-04-01', 'paid', '2026-04-28');
         $this->createPayrollWithDetail('2026-05-01', 'paid', '2026-05-28');
 
-        $repository = app(\App\Interfaces\PayrollRepositoryInterface::class);
+        $repository = app(PayrollRepositoryInterface::class);
         $rows = $repository->getPayrollReportRows([
             'report_type' => 'summary',
             'status' => 'all',
@@ -201,4 +202,3 @@ class PayrollReportExportTest extends TestCase
         ]);
     }
 }
-

@@ -3,9 +3,9 @@
 namespace Tests\Feature\Attendance;
 
 use App\Models\AttendancePolicy;
-use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\JobInformation;
+use App\Models\StaffMemberProfile;
 use App\Services\Attendance\WorkingDaysCalculator;
 use Database\Seeders\AttendancePolicySeeder;
 use Database\Seeders\RoleSeeder;

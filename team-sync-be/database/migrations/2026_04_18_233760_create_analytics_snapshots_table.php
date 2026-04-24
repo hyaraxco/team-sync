@@ -19,7 +19,7 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamp('calculated_at');
             $table->timestamps();
-            
+
             $table->index(['metric_type', 'metric_name', 'period_type', 'period_start'], 'idx_analytics_metric_period');
         });
     }

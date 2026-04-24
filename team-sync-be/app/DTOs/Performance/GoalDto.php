@@ -1,9 +1,8 @@
 <?php
 
 namespace App\DTOs\Performance;
- 
+
 use Illuminate\Support\Facades\Auth;
- 
 
 class GoalDto
 {
@@ -37,7 +36,7 @@ class GoalDto
             $data['target_value'] ?? null,
             $data['current_value'] ?? null,
             $data['unit'] ?? null,
-            isset($data['weight']) ? (float)$data['weight'] : null,
+            isset($data['weight']) ? (float) $data['weight'] : null,
             $data['start_date'],
             $data['due_date'],
             $data['status'] ?? 'not_started',
@@ -58,17 +57,39 @@ class GoalDto
             'due_date' => $this->due_date,
         ];
 
-        if ($this->description !== null) $array['description'] = $this->description;
-        if ($this->category !== null) $array['category'] = $this->category;
-        if ($this->target_value !== null) $array['target_value'] = $this->target_value;
-        if ($this->current_value !== null) $array['current_value'] = $this->current_value;
-        if ($this->unit !== null) $array['unit'] = $this->unit;
-        if ($this->weight !== null) $array['weight'] = $this->weight;
-        if ($this->status !== null) $array['status'] = $this->status;
-        if ($this->completion_percentage !== null) $array['completion_percentage'] = $this->completion_percentage;
-        if ($this->created_by !== null) $array['created_by'] = $this->created_by;
-        if ($this->assigned_by !== null) $array['assigned_by'] = $this->assigned_by;
-        if ($this->linked_review_id !== null) $array['linked_review_id'] = $this->linked_review_id;
+        if ($this->description !== null) {
+            $array['description'] = $this->description;
+        }
+        if ($this->category !== null) {
+            $array['category'] = $this->category;
+        }
+        if ($this->target_value !== null) {
+            $array['target_value'] = $this->target_value;
+        }
+        if ($this->current_value !== null) {
+            $array['current_value'] = $this->current_value;
+        }
+        if ($this->unit !== null) {
+            $array['unit'] = $this->unit;
+        }
+        if ($this->weight !== null) {
+            $array['weight'] = $this->weight;
+        }
+        if ($this->status !== null) {
+            $array['status'] = $this->status;
+        }
+        if ($this->completion_percentage !== null) {
+            $array['completion_percentage'] = $this->completion_percentage;
+        }
+        if ($this->created_by !== null) {
+            $array['created_by'] = $this->created_by;
+        }
+        if ($this->assigned_by !== null) {
+            $array['assigned_by'] = $this->assigned_by;
+        }
+        if ($this->linked_review_id !== null) {
+            $array['linked_review_id'] = $this->linked_review_id;
+        }
 
         return $array;
     }

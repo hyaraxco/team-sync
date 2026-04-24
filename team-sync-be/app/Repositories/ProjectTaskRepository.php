@@ -5,9 +5,9 @@ namespace App\Repositories;
 use App\DTOs\ProjectTaskDto;
 use App\Enums\TaskStatus;
 use App\Interfaces\ProjectTaskRepositoryInterface;
+use App\Models\ProjectTask;
 use App\Models\ProjectTaskAttachment;
 use App\Models\ProjectTaskComment;
-use App\Models\ProjectTask;
 use App\Models\ProjectTaskStatusLog;
 use App\Models\TeamMember;
 use App\Services\EmailService;
@@ -251,7 +251,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task = $this->getById($taskId);
 
         if (! Schema::hasTable('project_task_status_logs')) {
-            return new Collection();
+            return new Collection;
         }
 
         return $task->statusLogs()

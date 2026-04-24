@@ -4,12 +4,12 @@ namespace Tests\Feature\Notification;
 
 use App\Models\Attendance;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\StaffMemberProfile;
 use App\Models\HybridWorkSchedule;
 use App\Models\Project;
 use App\Models\ProjectTask;
-use App\Models\TeamMember;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
+use App\Models\TeamMember;
 use App\Models\User;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\Attendance\AttendancePolicyMismatchLifecycleService;
@@ -19,6 +19,7 @@ use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -136,7 +137,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         ])->assertCreated();
 
         $this->post('/api/v1/project-tasks/'.$task->id.'/attachments', [
-            'file' => \Illuminate\Http\UploadedFile::fake()->create('proof.txt', 12, 'text/plain'),
+            'file' => UploadedFile::fake()->create('proof.txt', 12, 'text/plain'),
         ], ['Accept' => 'application/json'])->assertCreated();
 
         $managerPayload = $this->getNotifications($managerUser);
@@ -482,7 +483,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
         Sanctum::actingAs($hrUser);
 
         $this->post('/api/v1/project-tasks/'.$qaTaskId.'/attachments', [
-            'file' => \Illuminate\Http\UploadedFile::fake()->create('lp3es-uat-checklist.txt', 12, 'text/plain'),
+            'file' => UploadedFile::fake()->create('lp3es-uat-checklist.txt', 12, 'text/plain'),
         ], ['Accept' => 'application/json'])->assertCreated();
 
         Sanctum::actingAs($frontendUser);

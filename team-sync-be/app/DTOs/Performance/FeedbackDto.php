@@ -1,9 +1,8 @@
 <?php
 
 namespace App\DTOs\Performance;
- 
+
 use Illuminate\Support\Facades\Auth;
- 
 
 class FeedbackDto
 {
@@ -40,8 +39,12 @@ class FeedbackDto
             'is_private' => $this->is_private,
         ];
 
-        if ($this->category !== null) $array['category'] = $this->category;
-        if ($this->linked_goal_id !== null) $array['linked_goal_id'] = $this->linked_goal_id;
+        if ($this->category !== null) {
+            $array['category'] = $this->category;
+        }
+        if ($this->linked_goal_id !== null) {
+            $array['linked_goal_id'] = $this->linked_goal_id;
+        }
 
         return $array;
     }

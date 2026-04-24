@@ -8,6 +8,7 @@ use App\Models\PerformanceReviewCycle;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Services\Performance\PerformanceOutcomeService;
+use Database\Seeders\PerformanceOutcomeRuleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -20,8 +21,8 @@ class PerformanceOutcomeServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new PerformanceOutcomeService();
-        $this->seed(\Database\Seeders\PerformanceOutcomeRuleSeeder::class);
+        $this->service = new PerformanceOutcomeService;
+        $this->seed(PerformanceOutcomeRuleSeeder::class);
     }
 
     private function createReview(array $overrides = []): PerformanceReview

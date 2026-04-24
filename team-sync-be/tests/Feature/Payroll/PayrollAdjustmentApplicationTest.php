@@ -6,11 +6,11 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
-use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
@@ -19,8 +19,8 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PayrollAdjustmentApplicationTest extends TestCase

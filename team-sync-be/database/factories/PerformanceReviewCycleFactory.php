@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\PerformanceReviewCycle;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PerformanceReviewCycle>
+ * @extends Factory<PerformanceReviewCycle>
  */
 class PerformanceReviewCycleFactory extends Factory
 {
@@ -23,7 +24,7 @@ class PerformanceReviewCycleFactory extends Factory
         $endDate = fake()->dateTimeBetween($startDate, '+1 year');
         $reviewStart = fake()->dateTimeBetween($startDate, $endDate);
         $reviewEnd = fake()->dateTimeBetween($reviewStart, $endDate);
-        
+
         return [
             'name' => fake()->randomElement([
                 'Q1 2026 Performance Review',
@@ -41,7 +42,7 @@ class PerformanceReviewCycleFactory extends Factory
             'manager_assessment_deadline' => fake()->optional()->dateTimeBetween($reviewStart, $reviewEnd),
             'calibration_deadline' => fake()->optional()->dateTimeBetween($reviewStart, $reviewEnd),
             'status' => fake()->randomElement(['draft', 'active', 'completed', 'cancelled']),
-            'created_by' => \App\Models\User::factory(),
+            'created_by' => User::factory(),
         ];
     }
 

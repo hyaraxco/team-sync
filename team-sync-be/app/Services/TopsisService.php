@@ -37,19 +37,19 @@ class TopsisService
 
     /** Semua kriteria adalah Benefit (true = benefit, false = cost) */
     private const CRITERIA_TYPES = [
-        'avg_manager_rating'     => true,
-        'final_rating'           => true,
-        'avg_goal_completion'    => true,
-        'goal_completion_ratio'  => true,
+        'avg_manager_rating' => true,
+        'final_rating' => true,
+        'avg_goal_completion' => true,
+        'goal_completion_ratio' => true,
         'positive_feedback_count' => true,
     ];
 
     /**
      * Jalankan algoritma TOPSIS lengkap.
      *
-     * @param  array  $candidates   Array of ['staff_member_id', 'employee_name', 'department', 'C1'...'C5']
-     * @param  array  $weights      Bobot tiap kriteria ['avg_manager_rating' => 0.35, ...]
-     * @return array  Hasil ranking beserta detail kalkulasi tiap langkah
+     * @param  array  $candidates  Array of ['staff_member_id', 'employee_name', 'department', 'C1'...'C5']
+     * @param  array  $weights  Bobot tiap kriteria ['avg_manager_rating' => 0.35, ...]
+     * @return array Hasil ranking beserta detail kalkulasi tiap langkah
      */
     public function calculate(array $candidates, array $weights): array
     {
@@ -101,6 +101,7 @@ class TopsisService
                 $matrix[$idx][$criterion] = (float) ($candidate[$criterion] ?? 0);
             }
         }
+
         return $matrix;
     }
 
@@ -144,6 +145,7 @@ class TopsisService
                 $weighted[$idx][$criterion] = $w * $row[$criterion];
             }
         }
+
         return $weighted;
     }
 
@@ -180,10 +182,10 @@ class TopsisService
     {
         $distances = [];
         foreach ($weighted as $idx => $row) {
-            $sumPlus  = 0.0;
+            $sumPlus = 0.0;
             $sumMinus = 0.0;
             foreach (self::CRITERIA as $criterion) {
-                $sumPlus  += ($row[$criterion] - $idealPositive[$criterion]) ** 2;
+                $sumPlus += ($row[$criterion] - $idealPositive[$criterion]) ** 2;
                 $sumMinus += ($row[$criterion] - $idealNegative[$criterion]) ** 2;
             }
             $distances[$idx] = [
@@ -191,6 +193,7 @@ class TopsisService
                 'distance_negative' => sqrt($sumMinus),
             ];
         }
+
         return $distances;
     }
 
@@ -203,11 +206,12 @@ class TopsisService
     {
         $scores = [];
         foreach ($distances as $idx => $dist) {
-            $dPlus  = $dist['distance_positive'];
+            $dPlus = $dist['distance_positive'];
             $dMinus = $dist['distance_negative'];
-            $total  = $dPlus + $dMinus;
+            $total = $dPlus + $dMinus;
             $scores[$idx] = $total > 0 ? ($dMinus / $total) : 0.0;
         }
+
         return $scores;
     }
 
@@ -228,21 +232,21 @@ class TopsisService
         $ranking = [];
         foreach ($candidates as $idx => $candidate) {
             $ranking[] = [
-                'staff_member_id'          => $candidate['staff_member_id'],
-                'employee_name'        => $candidate['employee_name'],
-                'department'           => $candidate['department'] ?? null,
-                'raw_scores'           => $matrix[$idx],
-                'normalized_scores'    => $normalized[$idx],
-                'weighted_scores'      => $weighted[$idx],
-                'distance_positive'    => round($distances[$idx]['distance_positive'], 6),
-                'distance_negative'    => round($distances[$idx]['distance_negative'], 6),
+                'staff_member_id' => $candidate['staff_member_id'],
+                'employee_name' => $candidate['employee_name'],
+                'department' => $candidate['department'] ?? null,
+                'raw_scores' => $matrix[$idx],
+                'normalized_scores' => $normalized[$idx],
+                'weighted_scores' => $weighted[$idx],
+                'distance_positive' => round($distances[$idx]['distance_positive'], 6),
+                'distance_negative' => round($distances[$idx]['distance_negative'], 6),
                 'closeness_coefficient' => round($scores[$idx], 6),
-                'label'                => $this->getRatingLabel($scores[$idx]),
+                'label' => $this->getRatingLabel($scores[$idx]),
             ];
         }
 
         // Urutkan berdasarkan closeness_coefficient tertinggi
-        usort($ranking, fn($a, $b) => $b['closeness_coefficient'] <=> $a['closeness_coefficient']);
+        usort($ranking, fn ($a, $b) => $b['closeness_coefficient'] <=> $a['closeness_coefficient']);
 
         // Tambahkan nomor rank
         foreach ($ranking as $rank => &$item) {
@@ -250,12 +254,12 @@ class TopsisService
         }
 
         return [
-            'weights'        => $weights,
+            'weights' => $weights,
             'ideal_positive' => $idealPositive,
             'ideal_negative' => $idealNegative,
-            'criteria'       => self::CRITERIA,
+            'criteria' => self::CRITERIA,
             'criteria_types' => self::CRITERIA_TYPES,
-            'ranking'        => $ranking,
+            'ranking' => $ranking,
             'total_candidates' => count($candidates),
         ];
     }
@@ -267,12 +271,12 @@ class TopsisService
     {
         if (empty($candidates)) {
             return [
-                'weights'          => $weights,
-                'ideal_positive'   => [],
-                'ideal_negative'   => [],
-                'criteria'         => self::CRITERIA,
-                'criteria_types'   => self::CRITERIA_TYPES,
-                'ranking'          => [],
+                'weights' => $weights,
+                'ideal_positive' => [],
+                'ideal_negative' => [],
+                'criteria' => self::CRITERIA,
+                'criteria_types' => self::CRITERIA_TYPES,
+                'ranking' => [],
                 'total_candidates' => 0,
             ];
         }
@@ -284,23 +288,23 @@ class TopsisService
         }
 
         return [
-            'weights'          => $weights,
-            'ideal_positive'   => $rawScores,
-            'ideal_negative'   => array_fill_keys(self::CRITERIA, 0),
-            'criteria'         => self::CRITERIA,
-            'criteria_types'   => self::CRITERIA_TYPES,
-            'ranking'          => [[
-                'rank'                  => 1,
-                'staff_member_id'           => $candidate['staff_member_id'],
-                'employee_name'         => $candidate['employee_name'],
-                'department'            => $candidate['department'] ?? null,
-                'raw_scores'            => $rawScores,
-                'normalized_scores'     => $rawScores,
-                'weighted_scores'       => $rawScores,
-                'distance_positive'     => 0.0,
-                'distance_negative'     => 1.0,
+            'weights' => $weights,
+            'ideal_positive' => $rawScores,
+            'ideal_negative' => array_fill_keys(self::CRITERIA, 0),
+            'criteria' => self::CRITERIA,
+            'criteria_types' => self::CRITERIA_TYPES,
+            'ranking' => [[
+                'rank' => 1,
+                'staff_member_id' => $candidate['staff_member_id'],
+                'employee_name' => $candidate['employee_name'],
+                'department' => $candidate['department'] ?? null,
+                'raw_scores' => $rawScores,
+                'normalized_scores' => $rawScores,
+                'weighted_scores' => $rawScores,
+                'distance_positive' => 0.0,
+                'distance_negative' => 1.0,
                 'closeness_coefficient' => 1.0,
-                'label'                 => $this->getRatingLabel(1.0),
+                'label' => $this->getRatingLabel(1.0),
             ]],
             'total_candidates' => 1,
         ];
@@ -311,10 +315,19 @@ class TopsisService
      */
     private function getRatingLabel(float $score): string
     {
-        if ($score >= 0.80) return 'Outstanding';
-        if ($score >= 0.65) return 'Exceeds Expectations';
-        if ($score >= 0.50) return 'Meets Expectations';
-        if ($score >= 0.35) return 'Needs Improvement';
+        if ($score >= 0.80) {
+            return 'Outstanding';
+        }
+        if ($score >= 0.65) {
+            return 'Exceeds Expectations';
+        }
+        if ($score >= 0.50) {
+            return 'Meets Expectations';
+        }
+        if ($score >= 0.35) {
+            return 'Needs Improvement';
+        }
+
         return 'Unsatisfactory';
     }
 }

@@ -5,22 +5,25 @@ namespace App\Repositories;
 use App\Interfaces\AttendanceCorrectionRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
+use App\Models\User;
 use App\Services\Attendance\AttendanceClassifier;
+use App\Services\EmailService;
+use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Services\EmailService;
 
 class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryInterface
 {
     private AttendanceClassifier $attendanceClassifier;
+
     private EmailService $emailService;
 
     public function __construct(AttendanceClassifier $attendanceClassifier, EmailService $emailService)
     {
-         $this->attendanceClassifier = $attendanceClassifier;
-         $this->emailService = $emailService;
+        $this->attendanceClassifier = $attendanceClassifier;
+        $this->emailService = $emailService;
     }
 
     public function getAllPaginated(?string $search, int $rowPerPage, ?string $status = null)
@@ -42,7 +45,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
     public function getMyCorrections()
     {
         $employeeId = Auth::user()->staffMemberProfile->id;
-        
+
         return AttendanceCorrection::query()
             ->with(['attendance'])
             ->where('staff_member_id', $employeeId)
@@ -54,15 +57,15 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
     {
         $correction = AttendanceCorrection::with(['staffMember.user', 'attendance', 'reviewer'])->find($id);
 
-        if (!$correction) {
-            throw new ModelNotFoundException("Attendance Correction not found.");
+        if (! $correction) {
+            throw new ModelNotFoundException('Attendance Correction not found.');
         }
 
         // Check if employee tries to read someone else's request
-        /** @var \App\Models\User $user */
+        /** @var User $user */
         $user = Auth::user();
         if ($user->hasRole('staff') && $correction->staff_member_id !== $user->staffMemberProfile->id) {
-            throw new AuthorizationException("You are not authorized to view this request.");
+            throw new AuthorizationException('You are not authorized to view this request.');
         }
 
         return $correction;
@@ -71,19 +74,19 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
     public function store(array $data)
     {
         $attendance = Attendance::with('attendancePeriod')->find($data['attendance_id']);
-        
-        if (!$attendance) {
-            throw new ModelNotFoundException("Attendance record not found.");
+
+        if (! $attendance) {
+            throw new ModelNotFoundException('Attendance record not found.');
         }
 
         if ($attendance->attendancePeriod && $attendance->attendancePeriod->status === 'locked') {
-            throw new \Exception("Pengajuan koreksi tidak dapat diproses karena periode absensi untuk tanggal tersebut sudah ditutup atau dikunci oleh HR.");
+            throw new \Exception('Pengajuan koreksi tidak dapat diproses karena periode absensi untuk tanggal tersebut sudah ditutup atau dikunci oleh HR.');
         }
 
         $employeeId = Auth::user()->staffMemberProfile->id;
 
         if ($attendance->staff_member_id !== $employeeId) {
-             throw new AuthorizationException("You are not authorized to request correction for this attendance.");
+            throw new AuthorizationException('You are not authorized to request correction for this attendance.');
         }
 
         return DB::transaction(function () use ($data, $attendance, $employeeId) {
@@ -92,7 +95,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
                 ->first();
 
             if ($existingPending) {
-                 throw new \Exception("You already have a pending correction request for this attendance.");
+                throw new \Exception('You already have a pending correction request for this attendance.');
             }
 
             $correction = AttendanceCorrection::create([
@@ -120,13 +123,13 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             $correction = $this->getById($id);
 
             if ($correction->status !== 'pending') {
-                 throw new \Exception("This request has already been processed.");
+                throw new \Exception('This request has already been processed.');
             }
 
             $attendance = $correction->attendance;
 
             if ($attendance->attendancePeriod && $attendance->attendancePeriod->status === 'locked') {
-                throw new \Exception("Koreksi tidak dapat disetujui karena periode absensi untuk tanggal tersebut sudah ditutup atau dikunci oleh HR.");
+                throw new \Exception('Koreksi tidak dapat disetujui karena periode absensi untuk tanggal tersebut sudah ditutup atau dikunci oleh HR.');
             }
 
             $correction->update([
@@ -138,10 +141,10 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             // Apply changes to attendance record
             $attendanceData = [];
             if ($correction->requested_check_in) {
-                 $attendanceData['check_in'] = $correction->requested_check_in;
+                $attendanceData['check_in'] = $correction->requested_check_in;
             }
             if ($correction->requested_check_out) {
-                 $attendanceData['check_out'] = $correction->requested_check_out;
+                $attendanceData['check_out'] = $correction->requested_check_out;
             }
 
             if (! empty($attendanceData)) {
@@ -152,16 +155,16 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             // Recalculate worked_minutes from the refreshed model
             $workedMinutes = 0;
             if ($attendance->check_in && $attendance->check_out) {
-                $workedMinutes = max(0, \Carbon\Carbon::parse($attendance->check_in)
-                    ->diffInMinutes(\Carbon\Carbon::parse($attendance->check_out)));
+                $workedMinutes = max(0, Carbon::parse($attendance->check_in)
+                    ->diffInMinutes(Carbon::parse($attendance->check_out)));
             }
 
             // Re-classify attendance to get the correct status
             $classification = $this->attendanceClassifier->classify($attendance->staff_member_id, $attendance->date);
 
             $attendance->update([
-                 'status' => $classification['status'],
-                 'worked_minutes' => $workedMinutes,
+                'status' => $classification['status'],
+                'worked_minutes' => $workedMinutes,
             ]);
 
             DB::afterCommit(function () use ($correction) {
@@ -178,7 +181,7 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             $correction = $this->getById($id);
 
             if ($correction->status !== 'pending') {
-                 throw new \Exception("This request has already been processed.");
+                throw new \Exception('This request has already been processed.');
             }
 
             $correction->update([

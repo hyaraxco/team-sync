@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\EmergencyContact;
 use App\Models\StaffMemberProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\EmergencyContact>
+ * @extends Factory<EmergencyContact>
  */
 class EmergencyContactFactory extends Factory
 {

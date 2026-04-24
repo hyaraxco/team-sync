@@ -36,6 +36,7 @@ class EmployeeIdentitySeeder extends Seeder
 
         if ($employees->isEmpty()) {
             $this->command->info('All employees already have ptkp_status set. Skipping.');
+
             return;
         }
 
@@ -52,13 +53,13 @@ class EmployeeIdentitySeeder extends Seeder
             DB::table('employee_profiles')
                 ->where('id', $emp->id)
                 ->update([
-                    'npwp'                  => $npwp,
-                    'bpjs_ketenagakerjaan'  => $bpjsTk,
-                    'bpjs_kesehatan'        => $bpjsKes,
-                    'ptkp_status'           => $ptkp,
-                    'religion'              => $emp->religion ?? $this->religionPool[$i % count($this->religionPool)],
-                    'marital_status'        => $emp->marital_status ?? $this->maritalPool[$i % count($this->maritalPool)],
-                    'blood_type'            => $emp->blood_type ?? $this->bloodPool[$i % count($this->bloodPool)],
+                    'npwp' => $npwp,
+                    'bpjs_ketenagakerjaan' => $bpjsTk,
+                    'bpjs_kesehatan' => $bpjsKes,
+                    'ptkp_status' => $ptkp,
+                    'religion' => $emp->religion ?? $this->religionPool[$i % count($this->religionPool)],
+                    'marital_status' => $emp->marital_status ?? $this->maritalPool[$i % count($this->maritalPool)],
+                    'blood_type' => $emp->blood_type ?? $this->bloodPool[$i % count($this->bloodPool)],
                 ]);
 
             $this->command->line("  [{$emp->id}] PTKP={$ptkp} | NPWP={$npwp} | BPJS-TK={$bpjsTk}");
@@ -75,18 +76,19 @@ class EmployeeIdentitySeeder extends Seeder
         // Format: XX.XXX.XXX.X-XXX.XXX
         $base = str_pad($seq, 6, '0', STR_PAD_LEFT);
         $checkDigit = $seq % 10;
+
         return "8{$base[0]}.{$base[1]}{$base[2]}{$base[3]}.{$base[4]}{$base[5]}{$checkDigit}-{$base[0]}{$base[1]}{$base[2]}.000";
     }
 
     private function generateBpjsTk(int $seq): string
     {
         // Format: 10 digit
-        return str_pad('10' . $seq, 10, '0', STR_PAD_RIGHT);
+        return str_pad('10'.$seq, 10, '0', STR_PAD_RIGHT);
     }
 
     private function generateBpjsKes(int $seq): string
     {
         // Format: 13 digit
-        return str_pad('0001' . $seq, 13, '0', STR_PAD_RIGHT);
+        return str_pad('0001'.$seq, 13, '0', STR_PAD_RIGHT);
     }
 }
