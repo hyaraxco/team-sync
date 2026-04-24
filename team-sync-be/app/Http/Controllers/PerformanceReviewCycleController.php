@@ -68,22 +68,28 @@ class PerformanceReviewCycleController extends Controller
             // Get active staff members (excluding those who already have a review for this cycle)
             $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
 
-            $staffMembers = StaffMemberProfile::whereHas('jobInformation', function ($q) {
-                $q->where('status', 'active');
-            })
+            $staffMembers = StaffMemberProfile::with('jobInformation')
+                ->whereHas('jobInformation', function ($q) {
+                    $q->where('status', 'active');
+                })
                 ->whereNotIn('id', $existingReviewStaffIds)
                 ->get();
 
             $assignments = $this->reviewerResolverService->resolveMany($staffMembers);
 
+            // Fetch default template as fallback
+            $defaultTemplateId = \App\Models\PerformanceReviewTemplate::where('is_default', true)->first()?->id;
+
             $createdCount = 0;
             foreach ($staffMembers as $staffMember) {
                 $reviewerId = $assignments[$staffMember->id];
+                $templateId = $staffMember->jobInformation?->review_template_id ?? $defaultTemplateId;
 
                 $this->repository->createReview([
                     'cycle_id' => $cycle->id,
                     'staff_member_id' => $staffMember->id,
                     'reviewer_id' => $reviewerId,
+                    'review_template_id' => $templateId,
                     'status' => 'pending_self',
                 ]);
                 $createdCount++;

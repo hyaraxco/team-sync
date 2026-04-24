@@ -22,12 +22,25 @@ class PerformanceRatingHelper
      */
     public static function calculateFinalRating(int $reviewId): array
     {
+        $review = \App\Models\PerformanceReview::find($reviewId);
+        if (!$review) {
+            return ['final_rating' => null, 'final_rating_label' => null];
+        }
+
         $responses = PerformanceReviewResponse::with('section')
             ->where('review_id', $reviewId)
             ->get();
 
         if ($responses->isEmpty()) {
             return ['final_rating' => null, 'final_rating_label' => null];
+        }
+
+        $templateWeights = [];
+        if ($review->review_template_id) {
+            $templateWeights = \DB::table('review_template_sections')
+                ->where('template_id', $review->review_template_id)
+                ->pluck('weight', 'section_id')
+                ->toArray();
         }
 
         $totalWeight = 0.0;
@@ -47,7 +60,7 @@ class PerformanceRatingHelper
                 continue;
             }
 
-            $weight = (float) $section->weight;
+            $weight = (float) ($templateWeights[$section->id] ?? $section->weight);
             $weightedSum += $effectiveRating * $weight;
             $totalWeight += $weight;
         }
@@ -69,12 +82,25 @@ class PerformanceRatingHelper
      */
     public static function calculateManagerRating(int $reviewId): ?float
     {
+        $review = \App\Models\PerformanceReview::find($reviewId);
+        if (!$review) {
+            return null;
+        }
+
         $responses = PerformanceReviewResponse::with('section')
             ->where('review_id', $reviewId)
             ->get();
 
         if ($responses->isEmpty()) {
             return null;
+        }
+
+        $templateWeights = [];
+        if ($review->review_template_id) {
+            $templateWeights = \DB::table('review_template_sections')
+                ->where('template_id', $review->review_template_id)
+                ->pluck('weight', 'section_id')
+                ->toArray();
         }
 
         $totalWeight = 0.0;
@@ -86,7 +112,7 @@ class PerformanceRatingHelper
                 continue;
             }
 
-            $weight = (float) $section->weight;
+            $weight = (float) ($templateWeights[$section->id] ?? $section->weight);
             $weightedSum += $response->manager_rating * $weight;
             $totalWeight += $weight;
         }

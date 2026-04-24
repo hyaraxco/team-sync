@@ -213,6 +213,7 @@ Route::prefix('v1')
                     Route::post('cycles/{id}/generate-reviews', [PerformanceReviewCycleController::class, 'generateReviews']);
                     Route::get('cycles/{id}/topsis-ranking', [PerformanceTopsisController::class, 'ranking']);
                     Route::apiResource('outcome-rules', PerformanceOutcomeRuleController::class);
+                    Route::apiResource('templates', PerformanceReviewTemplateController::class);
                 });
 
                 // Reviews

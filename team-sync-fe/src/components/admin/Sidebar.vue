@@ -348,6 +348,26 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
+          <RouterLink
+            v-if="can('review-cycle-manage')"
+            :to="{ name: 'admin.performance.templates' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.performance.templates',
+            }"
+            @click="onNavigate"
+          >
+            <FileTextIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{ 'text-white': $route.name === 'admin.performance.templates' }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{ 'text-brand-white': $route.name === 'admin.performance.templates' }"
+              >Review Templates</span
+            >
+          </RouterLink>
+
           <!-- 3. My Reviews (personal) -->
           <RouterLink
             :to="{ name: 'admin.performance.my-reviews' }"
