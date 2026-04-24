@@ -176,3 +176,60 @@ it('calculateManagerRating returns null when no manager ratings exist', function
 
     expect($result)->toBeNull();
 });
+
+it('uses template weights instead of global section weights when template is present', function () {
+    // 1. Setup Template and Sections
+    $template = \App\Models\PerformanceReviewTemplate::create([
+        'name' => 'Engineering Template',
+        'is_active' => true
+    ]);
+
+    // Section 1: Global weight 50, Template weight 80
+    $section1 = PerformanceReviewSection::create([
+        'name' => 'Technical Skills',
+        'weight' => 50,
+        'order' => 1,
+        'is_active' => true
+    ]);
+    
+    // Section 2: Global weight 50, Template weight 20
+    $section2 = PerformanceReviewSection::create([
+        'name' => 'Soft Skills',
+        'weight' => 50,
+        'order' => 2,
+        'is_active' => true
+    ]);
+
+    // Attach to template with custom weights
+    $template->sections()->attach($section1->id, ['weight' => 80]);
+    $template->sections()->attach($section2->id, ['weight' => 20]);
+
+    // 2. Create Review linked to template
+    $review = createTestReview();
+    $review->update(['review_template_id' => $template->id]);
+
+    // 3. Create Responses (Rating 5 for both)
+    PerformanceReviewResponse::create([
+        'review_id' => $review->id,
+        'section_id' => $section1->id,
+        'manager_rating' => 5,
+    ]);
+
+    PerformanceReviewResponse::create([
+        'review_id' => $review->id,
+        'section_id' => $section2->id,
+        'manager_rating' => 2,
+    ]);
+
+    /**
+     * Calculation with Template Weights (80 & 20):
+     * (5 * 80 + 2 * 20) / (80 + 20) = (400 + 40) / 100 = 4.4
+     * 
+     * Calculation with Global Weights (50 & 50):
+     * (5 * 50 + 2 * 50) / (50 + 50) = (250 + 100) / 100 = 3.5
+     */
+
+    $result = PerformanceRatingHelper::calculateFinalRating($review->id);
+
+    expect($result['final_rating'])->toBe(4.4);
+});

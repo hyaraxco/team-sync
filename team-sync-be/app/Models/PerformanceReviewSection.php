@@ -22,4 +22,17 @@ class PerformanceReviewSection extends Model
         'weight' => 'decimal:2',
         'is_active' => 'boolean',
     ];
+
+    /**
+     * Get the templates that include this section.
+     */
+    public function templates()
+    {
+        return $this->belongsToMany(
+            PerformanceReviewTemplate::class,
+            'review_template_sections',
+            'section_id',
+            'template_id'
+        )->withPivot('weight')->withTimestamps();
+    }
 }

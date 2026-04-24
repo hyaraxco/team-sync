@@ -31,6 +31,7 @@ class PerformanceReview extends Model
         'promotion_eligible',
         'pip_required',
         'outcome_applied_at',
+        'review_template_id',
     ];
 
     protected $casts = [
@@ -76,5 +77,10 @@ class PerformanceReview extends Model
     public function outcomeRule(): BelongsTo
     {
         return $this->belongsTo(PerformanceOutcomeRule::class, 'outcome_rule_id');
+    }
+
+    public function reviewTemplate(): BelongsTo
+    {
+        return $this->belongsTo(PerformanceReviewTemplate::class, 'review_template_id');
     }
 }

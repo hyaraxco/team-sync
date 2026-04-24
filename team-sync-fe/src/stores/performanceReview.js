@@ -39,6 +39,10 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
     outcomeRules: [],
     outcomeRulesLoading: false,
 
+    // Templates
+    templates: [],
+    templatesLoading: false,
+
     // Pagination
     pagination: {
       current_page: 1,
@@ -453,6 +457,78 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
       } catch (error) {
         this.error = handleError(error);
         throw error;
+      }
+    },
+
+    // Templates
+    async fetchTemplates() {
+      this.templatesLoading = true;
+      this.error = null;
+      try {
+        const response = await axiosInstance.get('/performance/templates');
+        this.templates = response.data.data;
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.templatesLoading = false;
+      }
+    },
+
+    async fetchTemplateById(id) {
+      this.templatesLoading = true;
+      try {
+        const response = await axiosInstance.get(`/performance/templates/${id}`);
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.templatesLoading = false;
+      }
+    },
+
+    async createTemplate(data) {
+      this.templatesLoading = true;
+      try {
+        const response = await axiosInstance.post('/performance/templates', data);
+        this.templates.push(response.data.data);
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.templatesLoading = false;
+      }
+    },
+
+    async updateTemplate(id, data) {
+      this.templatesLoading = true;
+      try {
+        const response = await axiosInstance.put(`/performance/templates/${id}`, data);
+        const index = this.templates.findIndex(t => t.id === id);
+        if (index !== -1) this.templates[index] = response.data.data;
+        return response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.templatesLoading = false;
+      }
+    },
+
+    async deleteTemplate(id) {
+      this.templatesLoading = true;
+      try {
+        await axiosInstance.delete(`/performance/templates/${id}`);
+        this.templates = this.templates.filter(t => t.id !== id);
+        return true;
+      } catch (error) {
+        this.error = handleError(error);
+        throw error;
+      } finally {
+        this.templatesLoading = false;
       }
     },
 

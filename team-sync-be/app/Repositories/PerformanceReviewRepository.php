@@ -300,12 +300,23 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             return [];
         }
 
-        // Pre-load section weights and categories
+        // Fetch all templates used in this cycle to cache weights
+        $templateIds = $reviewScores->pluck('review_template_id')->filter()->unique();
+        $templateWeights = [];
+        foreach ($templateIds as $templateId) {
+            $templateWeights[$templateId] = \DB::table('review_template_sections')
+                ->where('template_id', $templateId)
+                ->pluck('weight', 'section_id')
+                ->toArray();
+        }
+
+        // Pre-load section weights and categories (fallback)
         $sections = PerformanceReviewSection::where('is_active', true)->get()->keyBy('id');
 
         $candidates = [];
         foreach ($reviewScores as $review) {
             $employeeId = $review->staff_member_id;
+            $reviewTemplateId = $review->review_template_id;
 
             // C1 & C2: Calculate weighted averages per topsis_category
             $competencyWeightedSum = 0;
@@ -319,7 +330,8 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                     continue;
                 }
 
-                $weight = (float) $section->weight;
+                // Use template weight if available, otherwise fallback to global section weight
+                $weight = (float) ($templateWeights[$reviewTemplateId][$section->id] ?? $section->weight);
 
                 // For KPI sections: use calibrated (final_rating) if available, else manager_rating
                 // For competency sections: use manager_rating (competency is not typically calibrated)

@@ -19,6 +19,7 @@ class JobInformation extends Model
         'work_location',
         'start_date',
         'monthly_salary',
+        'review_template_id',
     ];
 
     protected function casts(): array
@@ -42,5 +43,10 @@ class JobInformation extends Model
     public function attendancePolicy()
     {
         return $this->hasOne(AttendancePolicy::class, 'employment_type', 'employment_type');
+    }
+
+    public function reviewTemplate()
+    {
+        return $this->belongsTo(PerformanceReviewTemplate::class, 'review_template_id');
     }
 }

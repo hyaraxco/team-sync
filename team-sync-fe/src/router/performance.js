@@ -47,6 +47,17 @@ export default [
         },
       },
 
+      // Review Templates (HR only)
+      {
+        path: "templates",
+        name: "admin.performance.templates",
+        component: () =>
+          import("@/views/admin/performance/TemplateManagement.vue"),
+        meta: {
+          requiredPermission: "review-cycle-manage",
+        },
+      },
+
       // Reviews
       {
         path: "reviews/my-reviews",
