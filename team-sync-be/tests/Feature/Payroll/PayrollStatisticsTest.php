@@ -2,9 +2,10 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\StaffMemberProfile;
+use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
@@ -13,8 +14,8 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PayrollStatisticsTest extends TestCase
@@ -87,7 +88,7 @@ class PayrollStatisticsTest extends TestCase
             ['original' => 8000000, 'final' => 7800000],
         ]);
 
-        $repository = app(\App\Interfaces\PayrollRepositoryInterface::class);
+        $repository = app(PayrollRepositoryInterface::class);
         $data = $repository->getStatistics();
 
         // paid_payrolls counts all paid in the current year (2026)

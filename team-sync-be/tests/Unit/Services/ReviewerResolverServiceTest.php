@@ -20,8 +20,7 @@ class ReviewerResolverServiceTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new ReviewerResolverService();
-
+        $this->service = new ReviewerResolverService;
         // Create required roles
         Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
         Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'sanctum']);

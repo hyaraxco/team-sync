@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Notification;
 
-use App\Models\StaffMemberProfile;
 use App\Models\Project;
 use App\Models\ProjectTask;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;

@@ -2,11 +2,15 @@
 
 namespace App\Repositories;
 
+use App\Helpers\PerformanceRatingHelper;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
-use App\Models\PerformanceReviewCycle;
+use App\Models\PerformanceFeedback;
+use App\Models\PerformanceGoal;
 use App\Models\PerformanceReview;
-use App\Models\PerformanceReviewSection;
+use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
+use App\Models\PerformanceReviewSection;
+use App\Services\Performance\PerformanceOutcomeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class PerformanceReviewRepository implements PerformanceReviewRepositoryInterface
@@ -18,7 +22,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        
+
         if (isset($filters['cycle_type'])) {
             $query->where('cycle_type', $filters['cycle_type']);
         }
@@ -30,10 +34,10 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     public function getCycleById(int $id)
     {
         return PerformanceReviewCycle::with([
-            'reviews.staffMember.user', 
+            'reviews.staffMember.user',
             'reviews.reviewer.user.roles',
             'reviews.staffMember.jobInformation',
-            'reviews.reviewer.jobInformation'
+            'reviews.reviewer.jobInformation',
         ])->findOrFail($id);
     }
 
@@ -46,12 +50,14 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     {
         $cycle = $this->getCycleById($id);
         $cycle->update($data);
+
         return $cycle;
     }
 
     public function deleteCycle(int $id): bool
     {
         $cycle = $this->getCycleById($id);
+
         return $cycle->delete();
     }
 
@@ -59,11 +65,11 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     {
         $query = PerformanceReview::with(['cycle', 'reviewer.user'])
             ->where('staff_member_id', $employeeId);
-            
+
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        
+
         if (isset($filters['cycle_id'])) {
             $query->where('cycle_id', $filters['cycle_id']);
         }
@@ -76,11 +82,11 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     {
         $query = PerformanceReview::with(['cycle', 'staffMember.user'])
             ->where('reviewer_id', $managerId);
-            
+
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        
+
         if (isset($filters['cycle_id'])) {
             $query->where('cycle_id', $filters['cycle_id']);
         }
@@ -104,13 +110,14 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     {
         $review = $this->getReviewById($id);
         $review->update($data);
+
         return $review;
     }
 
     public function submitSelfAssessment(int $reviewId, array $responses, array $data)
     {
         $review = $this->getReviewById($reviewId);
-        
+
         foreach ($responses as $response) {
             PerformanceReviewResponse::updateOrCreate(
                 ['review_id' => $reviewId, 'section_id' => $response['section_id']],
@@ -120,12 +127,12 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ]
             );
         }
-        
+
         $review->update([
             'status' => 'pending_manager',
             'self_assessment_submitted_at' => now(),
         ]);
-        
+
         return $review;
     }
 
@@ -143,8 +150,8 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             );
         }
 
-        $managerRating = \App\Helpers\PerformanceRatingHelper::calculateManagerRating($reviewId);
-        $calculated = \App\Helpers\PerformanceRatingHelper::calculateFinalRating($reviewId);
+        $managerRating = PerformanceRatingHelper::calculateManagerRating($reviewId);
+        $calculated = PerformanceRatingHelper::calculateFinalRating($reviewId);
 
         $review->update([
             'status' => 'pending_calibration',
@@ -166,7 +173,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             abort(403, 'Cannot calibrate your own review');
         }
 
-        if (!empty($responses)) {
+        if (! empty($responses)) {
             foreach ($responses as $response) {
                 PerformanceReviewResponse::updateOrCreate(
                     ['review_id' => $reviewId, 'section_id' => $response['section_id']],
@@ -177,7 +184,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             }
         }
 
-        $calculated = \App\Helpers\PerformanceRatingHelper::calculateFinalRating($reviewId);
+        $calculated = PerformanceRatingHelper::calculateFinalRating($reviewId);
 
         $review->update([
             'status' => 'completed',
@@ -188,7 +195,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             'completed_at' => now(),
         ]);
 
-        $outcomeService = app(\App\Services\Performance\PerformanceOutcomeService::class);
+        $outcomeService = app(PerformanceOutcomeService::class);
         $review = $outcomeService->applyOutcome($review);
 
         return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator', 'outcomeRule']);
@@ -227,7 +234,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             $managerId = $r->reviewer_id;
             $managerName = $r->reviewer?->user?->name ?? 'Unknown';
 
-            if (!isset($managerStats[$managerId])) {
+            if (! isset($managerStats[$managerId])) {
                 $managerStats[$managerId] = [
                     'manager_name' => $managerName,
                     'review_count' => 0,
@@ -279,7 +286,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
      *   C4 = Goal Completion Ratio / On-Time (goals selesai tepat waktu)
      *   C5 = Positive Feedback Count (feedback positif dalam periode cycle)
      *
-     * @return array  Array of candidates dengan 5 nilai kriteria siap hitung TOPSIS
+     * @return array Array of candidates dengan 5 nilai kriteria siap hitung TOPSIS
      */
     public function getEmployeeScoresForCycle(int $cycleId): array
     {
@@ -308,7 +315,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
             foreach ($review->responses as $response) {
                 $section = $response->section ?? $sections->get($response->section_id);
-                if (!$section || ($section->topsis_category ?? 'kpi') === 'excluded') {
+                if (! $section || ($section->topsis_category ?? 'kpi') === 'excluded') {
                     continue;
                 }
 
@@ -342,14 +349,14 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
             // C3 & C4: From performance_goals within the cycle period
             $cycle = $review->cycle ?? PerformanceReviewCycle::find($cycleId);
-            $goals = \App\Models\PerformanceGoal::where('staff_member_id', $employeeId)
+            $goals = PerformanceGoal::where('staff_member_id', $employeeId)
                 ->where(function ($q) use ($review, $cycle) {
                     // Goals linked to this review OR created within the cycle period
                     $q->where('linked_review_id', $review->id)
-                      ->orWhereBetween('created_at', [
-                          $cycle->start_date . ' 00:00:00',
-                          $cycle->end_date . ' 23:59:59',
-                      ]);
+                        ->orWhereBetween('created_at', [
+                            $cycle->start_date.' 00:00:00',
+                            $cycle->end_date.' 23:59:59',
+                        ]);
                 })
                 ->get();
 
@@ -366,26 +373,26 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             $goalCompletionRatio = $completedGoals > 0 ? ($onTimeGoals / $completedGoals) : 0;
 
             // C5: Positive feedback count within cycle period
-            $positiveFeedbackCount = \App\Models\PerformanceFeedback::where('staff_member_id', $employeeId)
+            $positiveFeedbackCount = PerformanceFeedback::where('staff_member_id', $employeeId)
                 ->where('feedback_type', 'positive')
                 ->whereBetween('created_at', [
-                    $cycle->start_date . ' 00:00:00',
-                    $cycle->end_date   . ' 23:59:59',
+                    $cycle->start_date.' 00:00:00',
+                    $cycle->end_date.' 23:59:59',
                 ])
                 ->count();
 
             $candidates[] = [
-                'staff_member_id'         => $employeeId,
-                'employee_name'           => $review->staffMember->full_name ?? 'Unknown',
-                'department'              => $review->staffMember->jobInformation->department ?? null,
-                'team'                    => $review->staffMember->jobInformation->team->name ?? null,
-                'review_id'               => $review->id,
-                'review_status'           => $review->status,
+                'staff_member_id' => $employeeId,
+                'employee_name' => $review->staffMember->full_name ?? 'Unknown',
+                'department' => $review->staffMember->jobInformation->department ?? null,
+                'team' => $review->staffMember->jobInformation->team->name ?? null,
+                'review_id' => $review->id,
+                'review_status' => $review->status,
                 // Kriteria TOPSIS (renamed for clarity)
-                'avg_manager_rating'      => round($c1CompetencyScore, 4),  // C1: Competency Score
-                'final_rating'            => round($c2KpiScore, 4),         // C2: KPI Score
-                'avg_goal_completion'     => round((float) $avgGoalCompletion, 4),   // C3
-                'goal_completion_ratio'   => round((float) $goalCompletionRatio, 4), // C4
+                'avg_manager_rating' => round($c1CompetencyScore, 4),  // C1: Competency Score
+                'final_rating' => round($c2KpiScore, 4),         // C2: KPI Score
+                'avg_goal_completion' => round((float) $avgGoalCompletion, 4),   // C3
+                'goal_completion_ratio' => round((float) $goalCompletionRatio, 4), // C4
                 'positive_feedback_count' => (int) $positiveFeedbackCount,           // C5
             ];
         }

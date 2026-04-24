@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use App\DTOs\Performance\GoalDto;
 use App\Helpers\ResponseHelper;
-use App\Interfaces\PerformanceGoalRepositoryInterface;
 use App\Http\Requests\Performance\CreateGoalRequest;
-use App\Http\Requests\Performance\UpdateGoalRequest;
 use App\Http\Requests\Performance\ProgressUpdateGoalRequest;
+use App\Http\Requests\Performance\UpdateGoalRequest;
+use App\Interfaces\PerformanceGoalRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
 use Spatie\Permission\Middleware\PermissionMiddleware;
-
 
 class PerformanceGoalController extends Controller implements HasMiddleware
 {
@@ -45,12 +44,14 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     public function getMyGoals(Request $request)
     {
         $goals = $this->repository->getGoalsForEmployee(Auth::user()->staffMemberProfile?->id, $request->all());
+
         return ResponseHelper::jsonResponse(true, 'My goals retrieved successfully', $goals);
     }
 
     public function getTeamGoals(Request $request)
     {
         $goals = $this->repository->getGoalsForManager(Auth::user()->staffMemberProfile?->id, $request->all());
+
         return ResponseHelper::jsonResponse(true, 'Team goals retrieved successfully', $goals);
     }
 
@@ -58,6 +59,7 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     {
         $dto = GoalDto::fromRequest($request->validated());
         $goal = $this->repository->createGoal($dto->toArray());
+
         return ResponseHelper::jsonResponse(true, 'Goal created successfully', $goal, 201);
     }
 
@@ -85,6 +87,7 @@ class PerformanceGoalController extends Controller implements HasMiddleware
         }
 
         $goal = $this->repository->updateGoal($id, $request->validated());
+
         return ResponseHelper::jsonResponse(true, 'Goal updated successfully', $goal);
     }
 
@@ -100,6 +103,7 @@ class PerformanceGoalController extends Controller implements HasMiddleware
             }
 
             $this->repository->deleteGoal($id);
+
             return ResponseHelper::jsonResponse(true, 'Goal deleted successfully');
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
@@ -117,6 +121,7 @@ class PerformanceGoalController extends Controller implements HasMiddleware
         }
 
         $update = $this->repository->addProgressUpdate($id, $request->validated());
+
         return ResponseHelper::jsonResponse(true, 'Progress update added successfully', $update, 201);
     }
 
@@ -131,7 +136,7 @@ class PerformanceGoalController extends Controller implements HasMiddleware
         }
 
         $updates = $this->repository->getProgressUpdates($id);
+
         return ResponseHelper::jsonResponse(true, 'Progress updates retrieved successfully', $updates);
     }
 }
-

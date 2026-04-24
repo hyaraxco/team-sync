@@ -10,9 +10,9 @@ use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
 use App\Models\Project;
+use App\Models\ProjectTask;
 use App\Models\ProjectTaskAttachment;
 use App\Models\ProjectTaskComment;
-use App\Models\ProjectTask;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
@@ -752,8 +752,7 @@ class EmailService
     public function sendPayrollPaidNotifications(
         int $payrollId,
         string $triggerType = PayrollNotificationDelivery::TRIGGER_AUTO_PAID
-    ): void
-    {
+    ): void {
         Payroll::findOrFail($payrollId);
 
         $payrollDetails = PayrollDetail::where('payroll_id', $payrollId)

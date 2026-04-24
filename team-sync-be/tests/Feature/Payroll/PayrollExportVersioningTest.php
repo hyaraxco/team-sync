@@ -3,11 +3,11 @@
 namespace Tests\Feature\Payroll;
 
 use App\Exports\PayrollExport;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;

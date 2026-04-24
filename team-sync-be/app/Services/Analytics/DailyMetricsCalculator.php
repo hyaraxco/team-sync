@@ -15,7 +15,7 @@ class DailyMetricsCalculator
     public function calculateDailyMetrics(?string $date = null): void
     {
         $date = $date ?? Carbon::yesterday()->toDateString();
-        
+
         Log::info("Starting daily metrics calculation for {$date}");
 
         try {
@@ -29,7 +29,7 @@ class DailyMetricsCalculator
             Log::info("Daily metrics calculation completed successfully for {$date}");
         } catch (\Throwable $e) {
             DB::rollBack();
-            Log::error("Daily metrics calculation failed for {$date}: " . $e->getMessage());
+            Log::error("Daily metrics calculation failed for {$date}: ".$e->getMessage());
             throw $e;
         }
     }
@@ -228,6 +228,6 @@ class DailyMetricsCalculator
             $start->addDay();
         }
 
-        Log::info("Range calculation completed");
+        Log::info('Range calculation completed');
     }
 }

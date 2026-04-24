@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Attendance;
 
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
+use App\Models\StaffMemberProfile;
 use App\Services\Attendance\LeaveEntitlementValidator;
 use Database\Seeders\AttendancePolicySeeder;
 use Database\Seeders\LeaveEntitlementSeeder;

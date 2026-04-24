@@ -23,7 +23,7 @@ return new class extends Migration
             $table->timestamp('completed_at')->nullable();
             $table->timestamp('acknowledged_by_employee_at')->nullable();
             $table->timestamps();
-            
+
             $table->unique(['cycle_id', 'employee_id']);
         });
     }

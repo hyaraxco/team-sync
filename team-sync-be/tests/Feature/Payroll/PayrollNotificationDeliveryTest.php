@@ -2,12 +2,11 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
-use App\Notifications\PayrollPaid;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -15,8 +14,8 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PayrollNotificationDeliveryTest extends TestCase
@@ -119,7 +118,7 @@ class PayrollNotificationDeliveryTest extends TestCase
         $this->assertCount(1, $latestByEmployee);
         $this->assertSame(2, $latestByEmployee[0]['attempt_count']);
         $this->assertSame(
-            '/admin/my-payroll/' . $detail->id,
+            '/admin/my-payroll/'.$detail->id,
             $latestByEmployee[0]['payslip_path']
         );
     }

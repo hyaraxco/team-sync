@@ -6,6 +6,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
@@ -79,7 +80,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
             ->count());
     }
 
-    private function resolveBusinessDaysInMonth(\Carbon\Carbon $month): int
+    private function resolveBusinessDaysInMonth(Carbon $month): int
     {
         $cursor = $month->copy()->startOfMonth();
         $monthEnd = $month->copy()->endOfMonth();

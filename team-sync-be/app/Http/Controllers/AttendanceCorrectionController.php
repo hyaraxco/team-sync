@@ -3,9 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
-use App\Http\Resources\PaginateResource;
 use App\Interfaces\AttendanceCorrectionRepositoryInterface;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -55,6 +53,7 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
     {
         try {
             $corrections = $this->repository->getMyCorrections();
+
             return ResponseHelper::jsonResponse(true, 'My Corrections Retrieved Successfully', $corrections, 200);
         } catch (\Throwable $e) {
             return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
@@ -65,6 +64,7 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
     {
         try {
             $correction = $this->repository->getById($id);
+
             return ResponseHelper::jsonResponse(true, 'Correction Retrieved Successfully', $correction, 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Correction Not Found', null, 404);
@@ -84,6 +84,7 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
         try {
             $correction = $this->repository->store($data);
+
             return ResponseHelper::jsonResponse(true, 'Correction Requested Successfully', $correction, 201);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
@@ -95,11 +96,12 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
     public function approve(Request $request, string $id)
     {
         $data = $request->validate([
-            'review_notes' => 'nullable|string'
+            'review_notes' => 'nullable|string',
         ]);
 
         try {
             $correction = $this->repository->approve($id, $data);
+
             return ResponseHelper::jsonResponse(true, 'Correction Approved Successfully', $correction, 200);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
@@ -111,11 +113,12 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
     public function reject(Request $request, string $id)
     {
         $data = $request->validate([
-            'review_notes' => 'required|string'
+            'review_notes' => 'required|string',
         ]);
 
         try {
             $correction = $this->repository->reject($id, $data);
+
             return ResponseHelper::jsonResponse(true, 'Correction Rejected Successfully', $correction, 200);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);

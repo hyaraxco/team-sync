@@ -3,6 +3,7 @@
 namespace Tests\Feature\Performance;
 
 use App\Models\JobInformation;
+use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
 use App\Models\ReviewerRule;
 use App\Models\StaffMemberProfile;
@@ -17,8 +18,11 @@ class GenerateReviewsFeatureTest extends TestCase
     use RefreshDatabase;
 
     private User $hrAdmin;
+
     private StaffMemberProfile $hrProfile;
+
     private StaffMemberProfile $manager;
+
     private StaffMemberProfile $staff;
 
     protected function setUp(): void
@@ -107,7 +111,7 @@ class GenerateReviewsFeatureTest extends TestCase
         $cycle = PerformanceReviewCycle::factory()->active()->create();
 
         // Create a review manually or via generation
-        $review = \App\Models\PerformanceReview::create([
+        $review = PerformanceReview::create([
             'cycle_id' => $cycle->id,
             'staff_member_id' => $this->staff->id,
             'reviewer_id' => null, // no reviewer

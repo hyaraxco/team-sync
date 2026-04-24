@@ -13,10 +13,10 @@ use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Enums\TeamStatus;
 use App\Enums\WorkLocation;
-use App\Models\StaffMemberProfile;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\ProjectTeam;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
@@ -49,7 +49,7 @@ class MobileDevelopmentDummySeeder extends Seeder
     }
 
     /**
-     * @param array<int, array<string, mixed>> $employeeBlueprints
+     * @param  array<int, array<string, mixed>>  $employeeBlueprints
      * @return array<string, Team>
      */
     private function seedTeams(array $teamBlueprints, array $employeeBlueprints): array
@@ -86,8 +86,8 @@ class MobileDevelopmentDummySeeder extends Seeder
     }
 
     /**
-     * @param array<int, array<string, mixed>> $employeeBlueprints
-     * @param array<string, Team> $teamsByStream
+     * @param  array<int, array<string, mixed>>  $employeeBlueprints
+     * @param  array<string, Team>  $teamsByStream
      * @return array<string, array<int, array<string, mixed>>>
      */
     private function seedEmployees(array $employeeBlueprints, array $teamsByStream): array
@@ -173,8 +173,8 @@ class MobileDevelopmentDummySeeder extends Seeder
     }
 
     /**
-     * @param array<string, Team> $teamsByStream
-     * @param array<string, array<int, array<string, mixed>>> $profilesByStream
+     * @param  array<string, Team>  $teamsByStream
+     * @param  array<string, array<int, array<string, mixed>>>  $profilesByStream
      */
     private function assignTeamLeads(array $teamsByStream, array $profilesByStream): void
     {
@@ -214,7 +214,7 @@ class MobileDevelopmentDummySeeder extends Seeder
     }
 
     /**
-     * @param array<string, Team> $teamsByStream
+     * @param  array<string, Team>  $teamsByStream
      */
     private function attachTeamsToProject(Project $project, array $teamsByStream): void
     {
@@ -236,7 +236,7 @@ class MobileDevelopmentDummySeeder extends Seeder
     }
 
     /**
-     * @param array<string, array<int, array<string, mixed>>> $profilesByStream
+     * @param  array<string, array<int, array<string, mixed>>>  $profilesByStream
      */
     private function seedProjectTasks(Project $project, array $profilesByStream): void
     {

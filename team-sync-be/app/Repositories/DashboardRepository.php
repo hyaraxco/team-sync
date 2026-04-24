@@ -14,7 +14,7 @@ class DashboardRepository implements DashboardRepositoryInterface
 {
     public function getStatistics()
     {
-        $cacheKey = CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS . now()->format('Y-m-d-H');
+        $cacheKey = CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS.now()->format('Y-m-d-H');
 
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () {
             $currentMonth = now()->month;
@@ -146,7 +146,7 @@ class DashboardRepository implements DashboardRepositoryInterface
 
     public function getEmployeeStatistics(int $employeeId)
     {
-        $cacheKey = CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS . 'employee_' . $employeeId . '_' . now()->format('Y-m-d-H');
+        $cacheKey = CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS.'employee_'.$employeeId.'_'.now()->format('Y-m-d-H');
 
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($employeeId) {
             $startOfMonth = now()->startOfMonth();
@@ -229,7 +229,7 @@ class DashboardRepository implements DashboardRepositoryInterface
      */
     public function clearDashboardCache(): void
     {
-        cache()->forget(CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS . now()->format('Y-m-d-H'));
+        cache()->forget(CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS.now()->format('Y-m-d-H'));
     }
 
     public function getTodayAttendanceOverview(): array

@@ -2,8 +2,8 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\BloodType;
 use App\Enums\BankName;
+use App\Enums\BloodType;
 use App\Enums\EmploymentType;
 use App\Enums\Gender;
 use App\Enums\JobStatus;
@@ -11,6 +11,7 @@ use App\Enums\MaritalStatus;
 use App\Enums\PtkpStatus;
 use App\Enums\Religion;
 use App\Enums\WorkLocation;
+use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -19,7 +20,7 @@ class StaffMemberProfileStoreRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {

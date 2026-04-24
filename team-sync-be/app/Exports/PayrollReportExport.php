@@ -15,8 +15,7 @@ class PayrollReportExport implements FromCollection, ShouldAutoSize, WithHeading
         private readonly array $columns,
         private readonly array $headings,
         private readonly string $title = 'Payroll Report'
-    ) {
-    }
+    ) {}
 
     public function collection(): Collection
     {

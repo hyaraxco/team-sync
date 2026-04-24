@@ -4,6 +4,7 @@ namespace Tests\Feature\Performance;
 
 use App\Models\PerformanceOutcomeRule;
 use App\Models\User;
+use Database\Seeders\PerformanceOutcomeRuleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
@@ -36,6 +37,7 @@ class OutcomeRuleControllerTest extends TestCase
         $role = Role::findByName($roleName, 'sanctum');
         $user->assignRole($role);
         Sanctum::actingAs($user);
+
         return $user;
     }
 
@@ -55,7 +57,7 @@ class OutcomeRuleControllerTest extends TestCase
     public function test_hr_can_list_outcome_rules(): void
     {
         $this->actingAsRole('HR');
-        $this->seed(\Database\Seeders\PerformanceOutcomeRuleSeeder::class);
+        $this->seed(PerformanceOutcomeRuleSeeder::class);
 
         $response = $this->getJson('/api/v1/performance/outcome-rules');
 

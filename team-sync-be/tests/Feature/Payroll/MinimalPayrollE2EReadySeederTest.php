@@ -28,7 +28,7 @@ class MinimalPayrollE2EReadySeederTest extends TestCase
         $employee = User::where('email', 'agung@teamsync.com')->firstOrFail();
         Sanctum::actingAs($employee);
 
-        $this->getJson('/api/v1/my-payslips?year=' . now()->year)
+        $this->getJson('/api/v1/my-payslips?year='.now()->year)
             ->assertOk()
             ->assertJsonFragment(['employee_email' => 'agung@teamsync.com']);
     }

@@ -10,7 +10,10 @@ use App\Models\AttendancePolicyMismatch;
 use App\Models\JobInformation;
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Models\User;
 use App\Services\Attendance\AttendancePeriodService;
+use App\Services\Attendance\LeaveBalanceService;
+use App\Services\Attendance\WorkingDaysCalculator;
 use App\Services\EmailService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -50,9 +53,9 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             })
             ->orderBy('created_at', 'desc');
 
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
-        if ($user && $user->hasRole('manager') && !$user->hasRole('hr')) {
+        if ($user && $user->hasRole('manager') && ! $user->hasRole('hr')) {
             $manageableIds = $this->getManageableEmployeeIdsForManager();
             if (empty($manageableIds)) {
                 $query->whereRaw('1 = 0');
@@ -112,7 +115,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         // Calculate actual working days (excludes weekends & holidays) up to today
         $totalWorkingDays = 0;
         try {
-            $calculator = app(\App\Services\Attendance\WorkingDaysCalculator::class);
+            $calculator = app(WorkingDaysCalculator::class);
             $totalWorkingDays = $calculator->calculateForEmployee(
                 $employeeId,
                 $startOfMonth,
@@ -146,7 +149,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         // Leave balance: annual leave remaining days (most relevant for daily use)
         $leaveBalance = 0;
         try {
-            $leaveService = app(\App\Services\Attendance\LeaveBalanceService::class);
+            $leaveService = app(LeaveBalanceService::class);
             $balances = $leaveService->getEmployeeBalances($employeeId);
             $annualLeave = $balances->firstWhere('leave_type', 'annual_leave');
             $leaveBalance = $annualLeave ? (int) $annualLeave['remaining_days'] : (int) $balances->sum('remaining_days');
@@ -429,7 +432,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function authorizeManagerScopeForMismatch(AttendancePolicyMismatch $mismatch): void
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('manager')) {
@@ -445,7 +448,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function authorizeHrForMismatchResolution(): void
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('hr')) {
@@ -466,7 +469,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function getManageableEmployeeIdsForManager(): array
     {
-        /** @var \App\Models\User|null $user */
+        /** @var User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('manager')) {

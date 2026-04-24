@@ -165,8 +165,7 @@ class MyNotificationsTest extends TestCase
         string $title,
         CarbonImmutable $createdAt,
         ?CarbonImmutable $readAt = null
-    ): string
-    {
+    ): string {
         $notificationId = (string) Str::uuid();
 
         $user->notifications()->create([

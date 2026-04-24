@@ -5,7 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class AttendanceCorrection extends Model {
+class AttendanceCorrection extends Model
+{
     use HasFactory;
 
     protected $fillable = [
@@ -21,7 +22,8 @@ class AttendanceCorrection extends Model {
         'review_notes',
     ];
 
-    protected function casts(): array {
+    protected function casts(): array
+    {
         return [
             'original_check_in' => 'datetime',
             'original_check_out' => 'datetime',
@@ -30,15 +32,18 @@ class AttendanceCorrection extends Model {
         ];
     }
 
-    public function attendance() {
+    public function attendance()
+    {
         return $this->belongsTo(Attendance::class);
     }
 
-    public function staffMember() {
+    public function staffMember()
+    {
         return $this->belongsTo(StaffMemberProfile::class);
     }
 
-    public function reviewer() {
+    public function reviewer()
+    {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
 }

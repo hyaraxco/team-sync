@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\JobInformation;
 use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JobInformation>
+ * @extends Factory<JobInformation>
  */
 class JobInformationFactory extends Factory
 {
@@ -73,7 +74,7 @@ class JobInformationFactory extends Factory
      */
     public function active(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'active',
         ]);
     }
@@ -83,7 +84,7 @@ class JobInformationFactory extends Factory
      */
     public function probation(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'status' => 'probation',
             'start_date' => fake()->dateTimeBetween('-3 months', 'now'),
         ]);
@@ -94,7 +95,7 @@ class JobInformationFactory extends Factory
      */
     public function fullTime(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'employment_type' => 'full_time',
         ]);
     }
@@ -104,7 +105,7 @@ class JobInformationFactory extends Factory
      */
     public function remote(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'work_location' => 'remote',
         ]);
     }
@@ -114,7 +115,7 @@ class JobInformationFactory extends Factory
      */
     public function forEmployee(StaffMemberProfile $employee): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'staff_member_id' => $employee->id,
         ]);
     }
@@ -124,7 +125,7 @@ class JobInformationFactory extends Factory
      */
     public function forTeam(Team $team): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'team_id' => $team->id,
         ]);
     }

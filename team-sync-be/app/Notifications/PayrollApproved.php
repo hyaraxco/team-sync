@@ -14,6 +14,7 @@ class PayrollApproved extends Notification implements ShouldQueue
     use Queueable;
 
     protected Payroll $payroll;
+
     protected ?string $actorName;
 
     /**
@@ -43,12 +44,12 @@ class PayrollApproved extends Notification implements ShouldQueue
         $monthStr = Carbon::parse($this->payroll->salary_month)->format('F Y');
 
         $message = (new MailMessage)
-            ->subject('Payroll ' . $monthStr . ' Telah Disetujui')
-            ->greeting('Halo ' . $notifiable->name . ',')
-            ->line('Draft payroll untuk periode **' . $monthStr . '** telah disetujui oleh tim Finance dan siap untuk dibayarkan.');
+            ->subject('Payroll '.$monthStr.' Telah Disetujui')
+            ->greeting('Halo '.$notifiable->name.',')
+            ->line('Draft payroll untuk periode **'.$monthStr.'** telah disetujui oleh tim Finance dan siap untuk dibayarkan.');
 
         if ($this->actorName) {
-            $message->line('Disetujui oleh: ' . $this->actorName);
+            $message->line('Disetujui oleh: '.$this->actorName);
         }
 
         return $message
@@ -66,7 +67,7 @@ class PayrollApproved extends Notification implements ShouldQueue
         return [
             'category' => 'payroll',
             'title' => 'Payroll Approved',
-            'body' => 'The payroll draft for ' . Carbon::parse($this->payroll->salary_month)->format('F Y') . ' has been approved by Finance.',
+            'body' => 'The payroll draft for '.Carbon::parse($this->payroll->salary_month)->format('F Y').' has been approved by Finance.',
             'action_url' => '/admin/payroll/'.$this->payroll->id,
             'payroll_id' => $this->payroll->id,
             'salary_month' => $this->payroll->salary_month,

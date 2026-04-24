@@ -4,12 +4,9 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\BpjsRate;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\PayrollSetting;
-use App\Models\PtkpAmount;
-use App\Models\TaxBracket;
+use App\Models\StaffMemberProfile;
 use Carbon\Carbon;
 use Database\Seeders\BpjsRateSeeder;
 use Database\Seeders\PermissionSeeder;
@@ -242,12 +239,12 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
             $cursor = $startDate->copy();
             while ($cursor->lte($endDate)) {
-                if (!$cursor->isWeekend()) {
+                if (! $cursor->isWeekend()) {
                     Attendance::create([
                         'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
-                        'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',
+                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
+                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
                         'status' => 'present',
                         'notes' => 'Tax BPJS integration test',
                     ]);

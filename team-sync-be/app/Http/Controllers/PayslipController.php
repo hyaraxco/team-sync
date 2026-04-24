@@ -16,9 +16,7 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PayslipController extends Controller implements HasMiddleware
 {
-    public function __construct(private PayslipPdfService $payslipPdfService)
-    {
-    }
+    public function __construct(private PayslipPdfService $payslipPdfService) {}
 
     public static function middleware()
     {
@@ -54,7 +52,7 @@ class PayslipController extends Controller implements HasMiddleware
                 $query->whereYear('payrolls.salary_month', $year);
             })
             ->when($validated['search'] ?? null, function ($query, $search) {
-                $query->where('payrolls.salary_month', 'like', '%' . $search . '%');
+                $query->where('payrolls.salary_month', 'like', '%'.$search.'%');
             })
             ->orderByDesc('payrolls.salary_month');
 
@@ -84,11 +82,11 @@ class PayslipController extends Controller implements HasMiddleware
         try {
             $payslip = $this->findOwnedPayslip($request, $id);
             $pdf = $this->payslipPdfService->render($payslip);
-            $filename = 'payslip-' . $payslip->getKey() . '.pdf';
+            $filename = 'payslip-'.$payslip->getKey().'.pdf';
 
             return response($pdf, 200, [
                 'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
             ]);
         } catch (ModelNotFoundException) {
             return ResponseHelper::jsonResponse(false, 'Payslip Not Found', null, 404);
@@ -100,7 +98,7 @@ class PayslipController extends Controller implements HasMiddleware
         $staffMemberProfile = $request->user()?->staffMemberProfile;
 
         if (! $staffMemberProfile) {
-            throw (new ModelNotFoundException())->setModel(PayrollDetail::class);
+            throw (new ModelNotFoundException)->setModel(PayrollDetail::class);
         }
 
         $payslip = PayrollDetail::with([

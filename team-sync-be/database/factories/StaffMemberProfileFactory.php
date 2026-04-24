@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StaffMemberProfile>
+ * @extends Factory<StaffMemberProfile>
  */
 class StaffMemberProfileFactory extends Factory
 {
@@ -100,7 +101,7 @@ class StaffMemberProfileFactory extends Factory
     {
         $profilePicture = $this->getProfilePictureByGender('male');
 
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'gender' => 'male',
             'user_id' => User::factory()->state([
                 'profile_photo' => $profilePicture,
@@ -117,7 +118,7 @@ class StaffMemberProfileFactory extends Factory
     {
         $profilePicture = $this->getProfilePictureByGender('female');
 
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'gender' => 'female',
             'user_id' => User::factory()->state([
                 'profile_photo' => $profilePicture,
@@ -132,7 +133,7 @@ class StaffMemberProfileFactory extends Factory
      */
     public function senior(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'date_of_birth' => fake()->dateTimeBetween('-55 years', '-40 years'),
         ]);
     }
@@ -142,7 +143,7 @@ class StaffMemberProfileFactory extends Factory
      */
     public function junior(): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'date_of_birth' => fake()->dateTimeBetween('-30 years', '-22 years'),
         ]);
     }
@@ -152,7 +153,7 @@ class StaffMemberProfileFactory extends Factory
      */
     public function forUser(User $user): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'user_id' => $user->id,
         ]);
     }

@@ -10,7 +10,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -42,11 +41,11 @@ class AnalyticsExportController extends Controller implements HasMiddleware
             $teamId = $request->input('team_id') ? (int) $request->input('team_id') : null;
 
             $sheets = $this->buildSheets($tab, $period, $department, $teamId);
-            $filename = 'analytics-' . $tab . '-' . now()->format('Y-m-d') . '.xlsx';
+            $filename = 'analytics-'.$tab.'-'.now()->format('Y-m-d').'.xlsx';
 
             return Excel::download(new AnalyticsMultiSheetExport($sheets), $filename);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Export failed: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Export failed: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -62,7 +61,7 @@ class AnalyticsExportController extends Controller implements HasMiddleware
             $teamId = $request->input('team_id') ? (int) $request->input('team_id') : null;
 
             $data = $this->fetchData($tab, $period, $department, $teamId);
-            $filename = 'analytics-' . $tab . '-' . now()->format('Y-m-d') . '.pdf';
+            $filename = 'analytics-'.$tab.'-'.now()->format('Y-m-d').'.pdf';
 
             $pdf = Pdf::loadView('exports.analytics-pdf', [
                 'tab' => $tab,
@@ -76,7 +75,7 @@ class AnalyticsExportController extends Controller implements HasMiddleware
 
             return $pdf->download($filename);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Export failed: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Export failed: '.$e->getMessage(), null, 500);
         }
     }
 

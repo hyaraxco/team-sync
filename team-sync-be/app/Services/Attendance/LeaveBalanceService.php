@@ -3,10 +3,10 @@
 namespace App\Services\Attendance;
 
 use App\Models\AttendancePolicy;
-use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
+use App\Models\StaffMemberProfile;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
@@ -23,7 +23,7 @@ class LeaveBalanceService
     public function getEmployeeBalances(int $employeeId, ?string $asOfDate = null): Collection
     {
         $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);
-        if (!$employee) {
+        if (! $employee) {
             return collect();
         }
 
@@ -107,6 +107,7 @@ class LeaveBalanceService
             ->get()
             ->contains(function (HolidayCalendar $holiday) use ($employmentType) {
                 $appliesTo = $holiday->applies_to;
+
                 return $appliesTo === null || in_array($employmentType, $appliesTo, true);
             });
     }

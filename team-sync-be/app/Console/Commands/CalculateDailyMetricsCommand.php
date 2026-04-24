@@ -36,8 +36,9 @@ class CalculateDailyMetricsCommand extends Command
                 $start = $this->option('start');
                 $end = $this->option('end');
 
-                if (!$start || !$end) {
+                if (! $start || ! $end) {
                     $this->error('Both --start and --end dates are required for range calculation');
+
                     return SymfonyCommand::FAILURE;
                 }
 
@@ -47,7 +48,7 @@ class CalculateDailyMetricsCommand extends Command
             } else {
                 $date = $this->option('date');
                 $dateStr = $date ?: 'yesterday';
-                
+
                 $this->info("Calculating daily metrics for {$dateStr}...");
                 $calculator->calculateDailyMetrics($date);
                 $this->info('Daily metrics calculated successfully');
@@ -55,8 +56,9 @@ class CalculateDailyMetricsCommand extends Command
 
             return SymfonyCommand::SUCCESS;
         } catch (\Throwable $e) {
-            $this->error('Failed to calculate metrics: ' . $e->getMessage());
+            $this->error('Failed to calculate metrics: '.$e->getMessage());
             $this->error($e->getTraceAsString());
+
             return SymfonyCommand::FAILURE;
         }
     }

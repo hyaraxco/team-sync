@@ -18,7 +18,7 @@ return new class extends Migration
             $table->text('manager_comments')->nullable();
             $table->tinyInteger('final_rating')->nullable()->comment('1-5 scale, after calibration');
             $table->timestamps();
-            
+
             $table->unique(['review_id', 'section_id']);
         });
     }

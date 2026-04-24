@@ -151,11 +151,11 @@ return [
             'prefix' => env('REDIS_PREFIX', Str::slug((string) env('APP_NAME', 'laravel')).'-database-'),
             'persistent' => env('REDIS_PERSISTENT', false),
             // Avoid referencing Redis constants when ext-redis is unavailable.
-            'serializer' => class_exists(\Redis::class)
-                ? (extension_loaded('igbinary') ? \Redis::SERIALIZER_IGBINARY : \Redis::SERIALIZER_PHP)
+            'serializer' => class_exists(Redis::class)
+                ? (extension_loaded('igbinary') ? Redis::SERIALIZER_IGBINARY : Redis::SERIALIZER_PHP)
                 : null,
-            'compression' => class_exists(\Redis::class)
-                ? (extension_loaded('lz4') ? \Redis::COMPRESSION_LZ4 : \Redis::COMPRESSION_NONE)
+            'compression' => class_exists(Redis::class)
+                ? (extension_loaded('lz4') ? Redis::COMPRESSION_LZ4 : Redis::COMPRESSION_NONE)
                 : null,
         ],
 

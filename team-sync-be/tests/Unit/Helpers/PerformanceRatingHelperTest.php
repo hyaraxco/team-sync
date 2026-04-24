@@ -7,19 +7,21 @@ use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\StaffMemberProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
-    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
+    Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
 });
 
-function createTestReview() {
+function createTestReview()
+{
     $cycle = PerformanceReviewCycle::factory()->create();
     $employee = StaffMemberProfile::factory()->create();
     $reviewer = StaffMemberProfile::factory()->create();
-    
+
     return PerformanceReview::create([
         'cycle_id' => $cycle->id,
         'staff_member_id' => $employee->id,
@@ -30,7 +32,7 @@ function createTestReview() {
 
 it('calculates weighted average correctly with all sections rated', function () {
     $review = createTestReview();
-    
+
     $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 40, 'order' => 1, 'is_active' => true]);
     $section2 = PerformanceReviewSection::create(['name' => 'S2', 'weight' => 30, 'order' => 2, 'is_active' => true]);
     $section3 = PerformanceReviewSection::create(['name' => 'S3', 'weight' => 30, 'order' => 3, 'is_active' => true]);
@@ -49,23 +51,23 @@ it('calculates weighted average correctly with all sections rated', function () 
 
 it('falls back to manager_rating when final_rating is null', function () {
     $review = createTestReview();
-    
+
     $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 50, 'order' => 1, 'is_active' => true]);
     $section2 = PerformanceReviewSection::create(['name' => 'S2', 'weight' => 50, 'order' => 2, 'is_active' => true]);
 
     PerformanceReviewResponse::create([
-        'review_id' => $review->id, 
-        'section_id' => $section1->id, 
+        'review_id' => $review->id,
+        'section_id' => $section1->id,
         'final_rating' => null,
         'manager_rating' => 3.0,
-        'self_rating' => 5.0
+        'self_rating' => 5.0,
     ]);
     PerformanceReviewResponse::create([
-        'review_id' => $review->id, 
-        'section_id' => $section2->id, 
+        'review_id' => $review->id,
+        'section_id' => $section2->id,
         'final_rating' => null,
         'manager_rating' => 4.0,
-        'self_rating' => 2.0
+        'self_rating' => 2.0,
     ]);
 
     // (3.0 * 50) + (4.0 * 50) = 150 + 200 = 350
@@ -78,15 +80,15 @@ it('falls back to manager_rating when final_rating is null', function () {
 
 it('falls back to self_rating when both final_rating and manager_rating are null', function () {
     $review = createTestReview();
-    
+
     $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true]);
 
     PerformanceReviewResponse::create([
-        'review_id' => $review->id, 
-        'section_id' => $section1->id, 
+        'review_id' => $review->id,
+        'section_id' => $section1->id,
         'final_rating' => null,
         'manager_rating' => null,
-        'self_rating' => 2.0
+        'self_rating' => 2.0,
     ]);
 
     $result = PerformanceRatingHelper::calculateFinalRating($review->id);
@@ -106,7 +108,7 @@ it('returns null when no responses exist', function () {
 
 it('handles sections with different weights correctly', function () {
     $review = createTestReview();
-    
+
     $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 50, 'order' => 1, 'is_active' => true]);
     $section2 = PerformanceReviewSection::create(['name' => 'S2', 'weight' => 30, 'order' => 2, 'is_active' => true]);
     $section3 = PerformanceReviewSection::create(['name' => 'S3', 'weight' => 20, 'order' => 3, 'is_active' => true]);

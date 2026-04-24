@@ -4,11 +4,9 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
-use App\Models\Payroll;
 use App\Models\PayrollSetting;
-use App\Models\User;
+use App\Models\StaffMemberProfile;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;

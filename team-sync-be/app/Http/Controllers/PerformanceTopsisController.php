@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Services\TopsisService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -12,10 +13,10 @@ class PerformanceTopsisController extends Controller
 {
     /** Bobot default jika HR tidak menentukan bobot sendiri */
     private const DEFAULT_WEIGHTS = [
-        'avg_manager_rating'      => 0.30,  // C1: Competency Score
-        'final_rating'            => 0.30,  // C2: KPI Score
-        'avg_goal_completion'     => 0.20,  // C3: Goal Completion %
-        'goal_completion_ratio'   => 0.10,  // C4: On-Time Goal Ratio
+        'avg_manager_rating' => 0.30,  // C1: Competency Score
+        'final_rating' => 0.30,  // C2: KPI Score
+        'avg_goal_completion' => 0.20,  // C3: Goal Completion %
+        'goal_completion_ratio' => 0.10,  // C4: On-Time Goal Ratio
         'positive_feedback_count' => 0.10,  // C5: Positive Feedback Count
     ];
 
@@ -55,11 +56,11 @@ class PerformanceTopsisController extends Controller
                     false,
                     'Tidak ada data review yang completed dalam cycle ini. TOPSIS membutuhkan minimal 1 review berstatus completed.',
                     [
-                        'cycle_id'        => $id,
-                        'cycle_name'      => $cycle->name,
-                        'cycle_status'    => $cycle->status,
+                        'cycle_id' => $id,
+                        'cycle_name' => $cycle->name,
+                        'cycle_status' => $cycle->status,
                         'total_completed' => 0,
-                        'ranking'         => [],
+                        'ranking' => [],
                     ],
                     422
                 );
@@ -70,20 +71,20 @@ class PerformanceTopsisController extends Controller
 
             // 5. Susun response
             return ResponseHelper::jsonResponse(true, 'TOPSIS ranking berhasil dihitung', [
-                'cycle_id'    => $id,
-                'cycle_name'  => $cycle->name,
-                'cycle_type'  => $cycle->cycle_type,
+                'cycle_id' => $id,
+                'cycle_name' => $cycle->name,
+                'cycle_type' => $cycle->cycle_type,
                 'cycle_status' => $cycle->status,
                 'review_period' => [
                     'start' => $cycle->review_period_start,
-                    'end'   => $cycle->review_period_end,
+                    'end' => $cycle->review_period_end,
                 ],
                 ...$result,
             ]);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Review cycle tidak ditemukan', null, 404);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Gagal menghitung TOPSIS: ' . $e->getMessage(), null, 500);
+            return ResponseHelper::jsonResponse(false, 'Gagal menghitung TOPSIS: '.$e->getMessage(), null, 500);
         }
     }
 
@@ -94,16 +95,16 @@ class PerformanceTopsisController extends Controller
     private function resolveWeights(Request $request): array
     {
         $keys = [
-            'avg_manager_rating'      => 'w_avg_manager_rating',
-            'final_rating'            => 'w_final_rating',
-            'avg_goal_completion'     => 'w_avg_goal_completion',
-            'goal_completion_ratio'   => 'w_goal_completion_ratio',
+            'avg_manager_rating' => 'w_avg_manager_rating',
+            'final_rating' => 'w_final_rating',
+            'avg_goal_completion' => 'w_avg_goal_completion',
+            'goal_completion_ratio' => 'w_goal_completion_ratio',
             'positive_feedback_count' => 'w_positive_feedback_count',
         ];
 
-        $hasCustomWeights = collect($keys)->some(fn($param) => $request->has($param));
+        $hasCustomWeights = collect($keys)->some(fn ($param) => $request->has($param));
 
-        if (!$hasCustomWeights) {
+        if (! $hasCustomWeights) {
             return self::DEFAULT_WEIGHTS;
         }
 

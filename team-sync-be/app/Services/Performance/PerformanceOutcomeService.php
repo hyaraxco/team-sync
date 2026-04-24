@@ -15,7 +15,7 @@ class PerformanceOutcomeService
 
         $rule = PerformanceOutcomeRule::findForRating((float) $review->final_rating);
 
-        if (!$rule) {
+        if (! $rule) {
             return $review;
         }
 

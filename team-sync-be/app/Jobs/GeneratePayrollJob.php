@@ -8,12 +8,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
 
-class GeneratePayrollJob implements ShouldQueue, ShouldBeUnique
+class GeneratePayrollJob implements ShouldBeUnique, ShouldQueue
 {
     use Queueable;
 
     public string $salaryMonth;
+
     public ?int $initiatedBy;
+
     public int $uniqueFor = 3600;
 
     /**

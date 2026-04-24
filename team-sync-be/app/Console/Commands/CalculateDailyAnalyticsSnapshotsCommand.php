@@ -36,10 +36,12 @@ class CalculateDailyAnalyticsSnapshotsCommand extends Command
         try {
             $calculator->calculateDailyMetrics($date->toDateString());
             $this->info('✓ Daily analytics snapshots calculated successfully');
+
             return SymfonyCommand::SUCCESS;
         } catch (\Exception $e) {
             $this->error('✗ Failed to calculate daily analytics snapshots');
             $this->error($e->getMessage());
+
             return SymfonyCommand::FAILURE;
         }
     }

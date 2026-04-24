@@ -5,9 +5,9 @@ namespace App\Services\Attendance;
 use App\Models\Attendance;
 use App\Models\AttendancePolicy;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\StaffMemberProfile;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveRequest;
+use App\Models\StaffMemberProfile;
 use App\Services\EmailService;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
@@ -437,7 +437,7 @@ class AttendanceClassifier
             ->find($employeeId);
 
         if (! $employee) {
-            throw (new ModelNotFoundException())->setModel(StaffMemberProfile::class, [$employeeId]);
+            throw (new ModelNotFoundException)->setModel(StaffMemberProfile::class, [$employeeId]);
         }
 
         $employmentType = (string) ($employee->jobInformation?->employment_type ?? 'full_time');

@@ -720,24 +720,45 @@ watch(currentReview, (newVal) => {
           <div v-if="readinessLoading" class="flex justify-center py-4">
             <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-primary"></div>
           </div>
-          <div v-else-if="readinessResult?.summary" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div v-else-if="readinessResult?.summary" class="grid grid-cols-2 md:grid-cols-5 gap-3">
+            <!-- Sections Rated -->
             <div class="p-3 bg-blue-50 rounded-lg">
               <p class="text-xs text-blue-600 uppercase tracking-wide font-medium">Sections Rated</p>
               <p class="text-2xl font-bold text-blue-800 mt-1">
                 {{ readinessResult.summary.sections_rated }}
               </p>
             </div>
+            <!-- Goals Total -->
             <div class="p-3 rounded-lg" :class="readinessResult.summary.goals_count > 0 ? 'bg-emerald-50' : 'bg-amber-50'">
               <p class="text-xs uppercase tracking-wide font-medium" :class="readinessResult.summary.goals_count > 0 ? 'text-emerald-600' : 'text-amber-600'">
-                Goals in Period
+                Goals Total
               </p>
               <p class="text-2xl font-bold mt-1" :class="readinessResult.summary.goals_count > 0 ? 'text-emerald-800' : 'text-amber-800'">
                 {{ readinessResult.summary.goals_count }}
               </p>
               <p v-if="readinessResult.summary.goals_count === 0" class="text-xs text-amber-600 mt-1">
-                ⚠️ C3 & C4 will be 0 in TOPSIS
+                ⚠️ C3 & C4 = 0
               </p>
             </div>
+            <!-- Goals Completed -->
+            <div class="p-3 rounded-lg" :class="readinessResult.summary.goals_completed > 0 ? 'bg-emerald-50' : 'bg-gray-50'">
+              <p class="text-xs uppercase tracking-wide font-medium" :class="readinessResult.summary.goals_completed > 0 ? 'text-emerald-600' : 'text-gray-500'">
+                Goals Completed
+              </p>
+              <p class="text-2xl font-bold mt-1" :class="readinessResult.summary.goals_completed > 0 ? 'text-emerald-800' : 'text-gray-400'">
+                {{ readinessResult.summary.goals_completed ?? 0 }}
+              </p>
+            </div>
+            <!-- Goals On-Time -->
+            <div class="p-3 rounded-lg" :class="readinessResult.summary.goals_on_time > 0 ? 'bg-teal-50' : 'bg-gray-50'">
+              <p class="text-xs uppercase tracking-wide font-medium" :class="readinessResult.summary.goals_on_time > 0 ? 'text-teal-600' : 'text-gray-500'">
+                Goals On-Time
+              </p>
+              <p class="text-2xl font-bold mt-1" :class="readinessResult.summary.goals_on_time > 0 ? 'text-teal-800' : 'text-gray-400'">
+                {{ readinessResult.summary.goals_on_time ?? 0 }}
+              </p>
+            </div>
+            <!-- Positive Feedback -->
             <div class="p-3 rounded-lg" :class="readinessResult.summary.positive_feedback_count > 0 ? 'bg-purple-50' : 'bg-amber-50'">
               <p class="text-xs uppercase tracking-wide font-medium" :class="readinessResult.summary.positive_feedback_count > 0 ? 'text-purple-600' : 'text-amber-600'">
                 Positive Feedback
@@ -746,7 +767,7 @@ watch(currentReview, (newVal) => {
                 {{ readinessResult.summary.positive_feedback_count }}
               </p>
               <p v-if="readinessResult.summary.positive_feedback_count === 0" class="text-xs text-amber-600 mt-1">
-                ⚠️ C5 will be 0 in TOPSIS
+                ⚠️ C5 = 0
               </p>
             </div>
           </div>

@@ -5,9 +5,8 @@ namespace App\Repositories;
 use App\Interfaces\PerformanceGoalRepositoryInterface;
 use App\Models\PerformanceGoal;
 use App\Models\PerformanceGoalUpdate;
-use Illuminate\Support\Facades\Auth;
-
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
 {
@@ -19,7 +18,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);
         }
-        
+
         if (isset($filters['goal_type'])) {
             $query->where('goal_type', $filters['goal_type']);
         }
@@ -68,6 +67,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
         }
 
         $goal->update($data);
+
         return $goal;
     }
 
@@ -76,15 +76,16 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
         $goal = $this->getGoalById($id);
         // Add logic to check if it can be deleted (e.g., not linked to a completed review)
         if ($goal->linkedReview && $goal->linkedReview->status === 'completed') {
-            throw new \Exception("Cannot delete a goal linked to a completed performance review.");
+            throw new \Exception('Cannot delete a goal linked to a completed performance review.');
         }
+
         return $goal->delete();
     }
 
     public function addProgressUpdate(int $goalId, array $data)
     {
         $goal = $this->getGoalById($goalId);
-        
+
         $updateData = array_merge($data, [
             'goal_id' => $goalId,
             'updated_by' => Auth::id(),
@@ -113,9 +114,9 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
         if (isset($data['completion_percentage'])) {
             $goalUpdates['completion_percentage'] = $data['completion_percentage'];
         }
-        
-        if (!empty($goalUpdates)) {
-             $goal->update($goalUpdates);
+
+        if (! empty($goalUpdates)) {
+            $goal->update($goalUpdates);
         }
 
         return $update;
@@ -123,7 +124,7 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
 
     public function getProgressUpdates(int $goalId)
     {
-         return PerformanceGoalUpdate::with('updater')
+        return PerformanceGoalUpdate::with('updater')
             ->where('goal_id', $goalId)
             ->orderBy('created_at', 'desc')
             ->get();

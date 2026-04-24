@@ -4,12 +4,12 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
-use App\Models\StaffMemberProfile;
 use App\Models\JobInformation;
 use App\Models\Payroll;
 use App\Models\PayrollActivityLog;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Notifications\PayrollPaid;
 use Carbon\Carbon;
@@ -19,8 +19,8 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
-use Spatie\Permission\PermissionRegistrar;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class PayrollAuditTrailTest extends TestCase
@@ -267,7 +267,7 @@ class PayrollAuditTrailTest extends TestCase
             ->assertJsonPath('data.latest_by_employee.0.delivery_status', PayrollNotificationDelivery::STATUS_SENT)
             ->assertJsonPath(
                 'data.latest_by_employee.0.payslip_path',
-                '/admin/my-payroll/' . $payroll->payrollDetails->first()->id
+                '/admin/my-payroll/'.$payroll->payrollDetails->first()->id
             );
 
         $this->assertDatabaseHas('payroll_activity_logs', [

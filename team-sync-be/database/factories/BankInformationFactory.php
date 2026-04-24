@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\BankInformation;
 use App\Models\StaffMemberProfile;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\BankInformation>
+ * @extends Factory<BankInformation>
  */
 class BankInformationFactory extends Factory
 {
@@ -51,7 +52,7 @@ class BankInformationFactory extends Factory
      */
     public function bank(string $bankKey): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'bank_name' => $bankKey,
         ]);
     }
@@ -61,7 +62,7 @@ class BankInformationFactory extends Factory
      */
     public function forEmployee(StaffMemberProfile $employee): static
     {
-        return $this->state(fn(array $attributes) => [
+        return $this->state(fn (array $attributes) => [
             'staff_member_id' => $employee->id,
             'account_holder_name' => $employee->user->name ?? fake()->name(),
         ]);

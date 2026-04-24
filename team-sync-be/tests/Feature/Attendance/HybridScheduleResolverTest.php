@@ -2,10 +2,10 @@
 
 namespace Tests\Feature\Attendance;
 
-use App\Models\StaffMemberProfile;
 use App\Models\HybridScheduleOverride;
 use App\Models\HybridWorkSchedule;
 use App\Models\JobInformation;
+use App\Models\StaffMemberProfile;
 use App\Services\Attendance\HybridScheduleResolver;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;

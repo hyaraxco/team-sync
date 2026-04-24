@@ -3,10 +3,12 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
-use App\Models\StaffMemberProfile;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
+use App\Models\PerformanceReviewCycle;
+use App\Models\ReviewerRule;
+use App\Models\StaffMemberProfile;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -58,7 +60,7 @@ class MinimalPayrollE2ESeeder extends Seeder
             $this->seedAttendanceForActiveEmployeesForMonth($payrollMonth);
 
             // Create an empty Performance Review Cycle for E2E testing (ID 1)
-            \App\Models\PerformanceReviewCycle::updateOrCreate(
+            PerformanceReviewCycle::updateOrCreate(
                 ['name' => 'E2E Review Cycle P4'],
                 [
                     'cycle_type' => 'quarterly',
@@ -67,12 +69,12 @@ class MinimalPayrollE2ESeeder extends Seeder
                     'review_period_start' => now()->startOfMonth(),
                     'review_period_end' => now()->addMonths(3)->endOfMonth(),
                     'status' => 'active',
-                    'created_by' => StaffMemberProfile::whereHas('user', fn($q) => $q->role('hr'))->first()->user_id ?? 1,
+                    'created_by' => StaffMemberProfile::whereHas('user', fn ($q) => $q->role('hr'))->first()->user_id ?? 1,
                 ]
             );
 
             // Create basic reviewer rules so HR can generate reviews properly
-            \App\Models\ReviewerRule::firstOrCreate([
+            ReviewerRule::firstOrCreate([
                 'reviewee_role' => 'staff',
                 'reviewer_role' => 'manager',
             ], [

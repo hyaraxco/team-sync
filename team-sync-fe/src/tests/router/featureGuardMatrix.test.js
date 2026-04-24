@@ -296,4 +296,54 @@ describe("feature guard matrix", () => {
       )
     ).toBe(false);
   });
+
+  // P6: outcome-rules route — HR only via review-cycle-manage
+  it("enforces role access for performance outcome-rules (P6)", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.performance.outcome-rules")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.performance.outcome-rules")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.staff,
+        routeMeta("admin.performance.outcome-rules")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.performance.outcome-rules")
+      )
+    ).toBe(false);
+  });
+
+  // P4: review cycle detail — HR can view (review-cycle-manage), Manager cannot
+  it("enforces role access for performance cycle detail (P4)", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.performance.cycles.detail")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.performance.cycles.detail")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.staff,
+        routeMeta("admin.performance.cycles.detail")
+      )
+    ).toBe(false);
+  });
 });

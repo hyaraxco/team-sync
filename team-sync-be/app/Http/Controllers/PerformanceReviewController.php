@@ -2,19 +2,21 @@
 
 namespace App\Http\Controllers;
 
-use App\DTOs\Performance\PerformanceReviewDto;
 use App\Helpers\ResponseHelper;
-use App\Interfaces\PerformanceReviewRepositoryInterface;
-use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
-use App\Http\Requests\Performance\SubmitManagerAssessmentRequest;
-use App\Http\Requests\Performance\CalibrateReviewRequest;
 use App\Http\Requests\Performance\AssignReviewerRequest;
+use App\Http\Requests\Performance\CalibrateReviewRequest;
+use App\Http\Requests\Performance\SubmitManagerAssessmentRequest;
+use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
+use App\Interfaces\PerformanceReviewRepositoryInterface;
+use App\Models\PerformanceFeedback;
+use App\Models\PerformanceGoal;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
-
 
 class PerformanceReviewController extends Controller implements HasMiddleware
 {
@@ -50,12 +52,14 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     public function getMyReviews(Request $request)
     {
         $reviews = $this->repository->getReviewsForEmployee(Auth::user()->staffMemberProfile?->id, $request->all());
+
         return ResponseHelper::jsonResponse(true, 'My reviews retrieved successfully', $reviews);
     }
 
     public function getTeamReviews(Request $request)
     {
         $reviews = $this->repository->getReviewsForManager(Auth::user()->staffMemberProfile?->id, $request->all());
+
         return ResponseHelper::jsonResponse(true, 'Team reviews retrieved successfully', $reviews);
     }
 
@@ -75,6 +79,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     public function getActiveSections()
     {
         $sections = $this->repository->getActiveSections();
+
         return ResponseHelper::jsonResponse(true, 'Active sections retrieved successfully', $sections);
     }
 
@@ -90,6 +95,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
         $validated = $request->validated();
         $review = $this->repository->submitSelfAssessment($id, $validated['responses'], $validated);
+
         return ResponseHelper::jsonResponse(true, 'Self assessment submitted successfully', $review);
     }
 
@@ -97,18 +103,21 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     {
         $validated = $request->validated();
         $review = $this->repository->submitManagerAssessment($id, $validated['responses'], $validated);
+
         return ResponseHelper::jsonResponse(true, 'Manager assessment submitted successfully', $review);
     }
 
     public function getPendingCalibration(Request $request)
     {
         $reviews = $this->repository->getReviewsPendingCalibration($request->all());
+
         return ResponseHelper::jsonResponse(true, 'Pending calibration reviews retrieved successfully', $reviews);
     }
 
     public function getCalibrationContext(int $id)
     {
         $context = $this->repository->getCalibrationContext($id);
+
         return ResponseHelper::jsonResponse(true, 'Calibration context retrieved successfully', $context);
     }
 
@@ -116,6 +125,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     {
         $validated = $request->validated();
         $review = $this->repository->calibrateReview($id, $validated['responses'] ?? [], $validated);
+
         return ResponseHelper::jsonResponse(true, 'Review calibrated successfully', $review);
     }
 
@@ -133,109 +143,139 @@ class PerformanceReviewController extends Controller implements HasMiddleware
      */
     public function validateReadiness(int $id)
     {
-        $review = $this->repository->getReviewById($id);
-        $cycle = $review->cycle;
+        try {
+            $review = $this->repository->getReviewById($id);
+            $cycle = $review->cycle;
 
-        $warnings = [];
-        $blockers = [];
+            $warnings = [];
+            $blockers = [];
 
-        // Blocker: Review must be at least pending_calibration
-        if (!in_array($review->status, ['pending_calibration', 'completed'])) {
-            $blockers[] = [
-                'code' => 'STATUS_NOT_READY',
-                'message' => 'Review belum siap dikalibrasi. Status saat ini: ' . $review->status,
-            ];
+            // Blocker: Review must be at least pending_calibration
+            if (! in_array($review->status, ['pending_calibration', 'completed'])) {
+                $blockers[] = [
+                    'code' => 'STATUS_NOT_READY',
+                    'message' => 'Review belum siap dikalibrasi. Status saat ini: '.$review->status,
+                ];
+            }
+
+            // Blocker: Manager assessment must be submitted
+            if (! $review->manager_assessment_submitted_at) {
+                $blockers[] = [
+                    'code' => 'MANAGER_ASSESSMENT_MISSING',
+                    'message' => 'Manager belum mengisi assessment untuk review ini.',
+                ];
+            }
+
+            // C1/C2 Check: Are all active sections rated by manager?
+            $activeSections = $this->repository->getActiveSections();
+            $ratedSectionIds = $review->responses
+                ->whereNotNull('manager_rating')
+                ->pluck('section_id')
+                ->toArray();
+            $missingSections = $activeSections->filter(fn ($s) => ! in_array($s->id, $ratedSectionIds));
+
+            if ($missingSections->isNotEmpty()) {
+                $warnings[] = [
+                    'code' => 'INCOMPLETE_SECTION_RATINGS',
+                    'message' => 'Manager belum menilai '.$missingSections->count().' section: '.
+                        $missingSections->pluck('name')->join(', '),
+                    'criteria_affected' => ['C1', 'C2'],
+                ];
+            }
+
+            // C3/C4 Check: Does employee have goals?
+            $goals = PerformanceGoal::where('staff_member_id', $review->staff_member_id)
+                ->where(function ($q) use ($review, $cycle) {
+                    $q->where('linked_review_id', $review->id)
+                        ->orWhere(function ($dateQ) use ($cycle) {
+                            $dateQ->whereBetween('start_date', [
+                                $cycle->start_date,
+                                $cycle->end_date,
+                            ])->orWhereBetween('created_at', [
+                                $cycle->start_date.' 00:00:00',
+                                $cycle->end_date.' 23:59:59',
+                            ]);
+                        });
+                })
+                ->get(['id', 'status', 'completed_at', 'due_date']);
+
+            $goalCount = $goals->count();
+            $goalsCompleted = $goals->where('status', 'completed')->count();
+            $goalsOnTime = $goals->where('status', 'completed')
+                ->filter(fn ($g) => $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date)
+                ->count();
+
+            if ($goalCount === 0) {
+                $warnings[] = [
+                    'code' => 'NO_GOALS',
+                    'message' => 'Karyawan tidak memiliki goal dalam periode ini. C3 dan C4 akan bernilai 0.',
+                    'criteria_affected' => ['C3', 'C4'],
+                ];
+            }
+
+            // C5 Check: Does employee have feedback?
+            $feedbackCount = PerformanceFeedback::where('staff_member_id', $review->staff_member_id)
+                ->where('feedback_type', 'positive')
+                ->whereBetween('created_at', [
+                    $cycle->start_date.' 00:00:00',
+                    $cycle->end_date.' 23:59:59',
+                ])
+                ->count();
+
+            if ($feedbackCount === 0) {
+                $warnings[] = [
+                    'code' => 'NO_POSITIVE_FEEDBACK',
+                    'message' => 'Karyawan tidak memiliki feedback positif dalam periode ini. C5 akan bernilai 0.',
+                    'criteria_affected' => ['C5'],
+                ];
+            }
+
+            $isReady = empty($blockers);
+            $hasWarnings = ! empty($warnings);
+
+            return ResponseHelper::jsonResponse(true, $isReady
+                ? ($hasWarnings ? 'Review siap dikalibrasi tetapi ada warning.' : 'Review siap dikalibrasi.')
+                : 'Review belum siap dikalibrasi.', [
+                    'review_id' => $id,
+                    'is_ready' => $isReady,
+                    'has_warnings' => $hasWarnings,
+                    'blockers' => $blockers,
+                    'warnings' => $warnings,
+                    'summary' => [
+                        'sections_rated' => count($ratedSectionIds).'/'.$activeSections->count(),
+                        'goals_count' => $goalCount,
+                        'goals_completed' => $goalsCompleted,
+                        'goals_on_time' => $goalsOnTime,
+                        'positive_feedback_count' => $feedbackCount,
+                    ],
+                ]);
+        } catch (ModelNotFoundException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('validateReadiness error: '.$e->getMessage());
+
+            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan pada server saat memvalidasi kesiapan.', null, 500);
         }
-
-        // Blocker: Manager assessment must be submitted
-        if (!$review->manager_assessment_submitted_at) {
-            $blockers[] = [
-                'code' => 'MANAGER_ASSESSMENT_MISSING',
-                'message' => 'Manager belum mengisi assessment untuk review ini.',
-            ];
-        }
-
-        // C1/C2 Check: Are all active sections rated by manager?
-        $activeSections = $this->repository->getActiveSections();
-        $ratedSectionIds = $review->responses
-            ->whereNotNull('manager_rating')
-            ->pluck('section_id')
-            ->toArray();
-        $missingSections = $activeSections->filter(fn($s) => !in_array($s->id, $ratedSectionIds));
-
-        if ($missingSections->isNotEmpty()) {
-            $warnings[] = [
-                'code' => 'INCOMPLETE_SECTION_RATINGS',
-                'message' => 'Manager belum menilai ' . $missingSections->count() . ' section: ' .
-                    $missingSections->pluck('name')->join(', '),
-                'criteria_affected' => ['C1', 'C2'],
-            ];
-        }
-
-        // C3/C4 Check: Does employee have goals?
-        $goalCount = \App\Models\PerformanceGoal::where('staff_member_id', $review->staff_member_id)
-            ->where(function ($q) use ($review, $cycle) {
-                $q->where('linked_review_id', $review->id)
-                  ->orWhereBetween('created_at', [
-                      $cycle->start_date . ' 00:00:00',
-                      $cycle->end_date . ' 23:59:59',
-                  ]);
-            })
-            ->count();
-
-        if ($goalCount === 0) {
-            $warnings[] = [
-                'code' => 'NO_GOALS',
-                'message' => 'Karyawan tidak memiliki goal dalam periode ini. C3 dan C4 akan bernilai 0.',
-                'criteria_affected' => ['C3', 'C4'],
-            ];
-        }
-
-        // C5 Check: Does employee have feedback?
-        $feedbackCount = \App\Models\PerformanceFeedback::where('staff_member_id', $review->staff_member_id)
-            ->where('feedback_type', 'positive')
-            ->whereBetween('created_at', [
-                $cycle->start_date . ' 00:00:00',
-                $cycle->end_date . ' 23:59:59',
-            ])
-            ->count();
-
-        if ($feedbackCount === 0) {
-            $warnings[] = [
-                'code' => 'NO_POSITIVE_FEEDBACK',
-                'message' => 'Karyawan tidak memiliki feedback positif dalam periode ini. C5 akan bernilai 0.',
-                'criteria_affected' => ['C5'],
-            ];
-        }
-
-        $isReady = empty($blockers);
-        $hasWarnings = !empty($warnings);
-
-        return ResponseHelper::jsonResponse(true, $isReady
-            ? ($hasWarnings ? 'Review siap dikalibrasi tetapi ada warning.' : 'Review siap dikalibrasi.')
-            : 'Review belum siap dikalibrasi.', [
-            'review_id' => $id,
-            'is_ready' => $isReady,
-            'has_warnings' => $hasWarnings,
-            'blockers' => $blockers,
-            'warnings' => $warnings,
-            'summary' => [
-                'sections_rated' => count($ratedSectionIds) . '/' . $activeSections->count(),
-                'goals_count' => $goalCount,
-                'positive_feedback_count' => $feedbackCount,
-            ],
-        ]);
     }
 
     public function assignReviewer(AssignReviewerRequest $request, int $id)
     {
-        $review = $this->repository->getReviewById($id);
-        
-        if (in_array($review->status, ['completed', 'pending_calibration'])) {
-            return ResponseHelper::jsonResponse(false, 'Cannot reassign reviewer for a review that is already completed or pending calibration', null, 422);
-        }
+        try {
+            $review = $this->repository->getReviewById($id);
 
-        $review = $this->repository->updateReview($id, ['reviewer_id' => $request->validated('reviewer_id')]);
-        return ResponseHelper::jsonResponse(true, 'Reviewer assigned successfully', $review, 200);
+            if (in_array($review->status, ['completed', 'pending_calibration'])) {
+                return ResponseHelper::jsonResponse(false, 'Cannot reassign reviewer for a review that is already completed or pending calibration', null, 422);
+            }
+
+            $review = $this->repository->updateReview($id, ['reviewer_id' => $request->validated('reviewer_id')]);
+
+            return ResponseHelper::jsonResponse(true, 'Reviewer assigned successfully', $review, 200);
+        } catch (ModelNotFoundException $e) {
+            throw $e;
+        } catch (\Exception $e) {
+            Log::error('assignReviewer error: '.$e->getMessage());
+
+            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan pada server saat assign reviewer.', null, 500);
+        }
     }
 }

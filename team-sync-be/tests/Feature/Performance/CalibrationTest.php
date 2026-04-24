@@ -21,20 +21,23 @@ beforeEach(function () {
     $role->givePermissionTo('review-calibrate');
 });
 
-function actingAsHR() {
+function actingAsHR()
+{
     $user = User::factory()->create();
     $employee = StaffMemberProfile::factory()->create(['user_id' => $user->id]);
     $role = Role::findByName('hr', 'sanctum');
     $user->assignRole($role);
     Sanctum::actingAs($user);
+
     return ['user' => $user, 'staff' => $employee];
 }
 
-function createReviewForCalibration($employeeId = null, $status = 'pending_calibration', $reviewerId = null) {
+function createReviewForCalibration($employeeId = null, $status = 'pending_calibration', $reviewerId = null)
+{
     $cycle = PerformanceReviewCycle::factory()->create();
     $employee = $employeeId ? StaffMemberProfile::find($employeeId) : StaffMemberProfile::factory()->create();
     $reviewer = $reviewerId ? StaffMemberProfile::find($reviewerId) : StaffMemberProfile::factory()->create();
-    
+
     return PerformanceReview::create([
         'cycle_id' => $cycle->id,
         'staff_member_id' => $employee->id,
@@ -48,12 +51,12 @@ it('hr can calibrate another employee review', function () {
     $review = createReviewForCalibration();
 
     $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/calibrate", [
-        'responses' => []
+        'responses' => [],
     ]);
 
     $response->assertOk()
         ->assertJsonFragment(['status' => 'completed']);
-        
+
     $this->assertDatabaseHas('performance_reviews', [
         'id' => $review->id,
         'status' => 'completed',
@@ -66,7 +69,7 @@ it('hr cannot calibrate their own review', function () {
     $review = createReviewForCalibration($hr['staff']->id);
 
     $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/calibrate", [
-        'responses' => []
+        'responses' => [],
     ]);
 
     $response->assertForbidden();
@@ -75,7 +78,7 @@ it('hr cannot calibrate their own review', function () {
 it('calibration auto-calculates final_rating', function () {
     actingAsHR();
     $review = createReviewForCalibration();
-    
+
     $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 60, 'order' => 1, 'is_active' => true]);
     $section2 = PerformanceReviewSection::create(['name' => 'S2', 'weight' => 40, 'order' => 2, 'is_active' => true]);
 
@@ -83,11 +86,11 @@ it('calibration auto-calculates final_rating', function () {
         'responses' => [
             ['section_id' => $section1->id, 'rating' => 4.0],
             ['section_id' => $section2->id, 'rating' => 3.0],
-        ]
+        ],
     ]);
 
     $response->assertOk();
-    
+
     $this->assertDatabaseHas('performance_reviews', [
         'id' => $review->id,
         'final_rating' => 3.6,
@@ -97,13 +100,13 @@ it('calibration auto-calculates final_rating', function () {
 it('calibration auto-derives final_rating_label', function () {
     actingAsHR();
     $review = createReviewForCalibration();
-    
+
     $section1 = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true]);
 
     $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/calibrate", [
         'responses' => [
             ['section_id' => $section1->id, 'rating' => 5],
-        ]
+        ],
     ]);
 
     $response->assertOk();
@@ -147,16 +150,16 @@ it('pending calibration endpoint excludes hr own review', function () {
 
 it('calibration context returns cross-manager stats', function () {
     actingAsHR();
-    
+
     $cycle = PerformanceReviewCycle::factory()->create();
     $section = PerformanceReviewSection::create(['name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true]);
-    
+
     $user1 = User::factory()->create(['name' => 'Manager One']);
     $manager1 = StaffMemberProfile::factory()->create(['user_id' => $user1->id]);
-    
+
     $user2 = User::factory()->create(['name' => 'Manager Two']);
     $manager2 = StaffMemberProfile::factory()->create(['user_id' => $user2->id]);
-    
+
     $review1 = PerformanceReview::create([
         'cycle_id' => $cycle->id,
         'staff_member_id' => StaffMemberProfile::factory()->create()->id,
@@ -165,7 +168,7 @@ it('calibration context returns cross-manager stats', function () {
         'manager_assessment_submitted_at' => now(),
     ]);
     PerformanceReviewResponse::create(['review_id' => $review1->id, 'section_id' => $section->id, 'manager_rating' => 4.0]);
-    
+
     $review2 = PerformanceReview::create([
         'cycle_id' => $cycle->id,
         'staff_member_id' => StaffMemberProfile::factory()->create()->id,
@@ -174,7 +177,7 @@ it('calibration context returns cross-manager stats', function () {
         'manager_assessment_submitted_at' => now(),
     ]);
     PerformanceReviewResponse::create(['review_id' => $review2->id, 'section_id' => $section->id, 'manager_rating' => 3.0]);
-    
+
     $review3 = PerformanceReview::create([
         'cycle_id' => $cycle->id,
         'staff_member_id' => StaffMemberProfile::factory()->create()->id,

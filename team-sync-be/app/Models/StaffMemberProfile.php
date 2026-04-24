@@ -16,8 +16,6 @@ class StaffMemberProfile extends Model
 {
     use HasFactory, Searchable, SoftDeletes;
 
-
-
     protected $appends = ['full_name', 'email'];
 
     protected $fillable = [

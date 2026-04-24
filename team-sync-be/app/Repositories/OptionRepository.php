@@ -10,9 +10,9 @@ use App\Enums\LeaveType;
 use App\Enums\MaritalStatus;
 use App\Enums\PtkpStatus;
 use App\Enums\Religion;
+use App\Enums\SkillLevel;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
-use App\Enums\SkillLevel;
 use App\Enums\WorkLocation;
 use App\Interfaces\OptionRepositoryInterface;
 

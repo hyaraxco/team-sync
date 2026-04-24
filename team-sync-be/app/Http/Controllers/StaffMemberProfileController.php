@@ -6,9 +6,9 @@ use App\Enums\WorkLocation;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\StaffMemberProfileStoreRequest;
 use App\Http\Requests\StaffMemberProfileUpdateRequest;
-use App\Http\Resources\StaffMemberProfileResource;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\StaffMemberProfileResource;
 use App\Http\Resources\TeamMemberResource;
 use App\Http\Resources\TeamResource;
 use App\Interfaces\StaffMemberProfileRepositoryInterface;
@@ -119,7 +119,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
 
         $errors = [];
 
-        if (!empty($payload['email'])) {
+        if (! empty($payload['email'])) {
             $emailExists = User::query()->where('email', $payload['email'])->exists();
 
             if ($emailExists) {
@@ -127,7 +127,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             }
         }
 
-        if (!empty($payload['identity_number'])) {
+        if (! empty($payload['identity_number'])) {
             $identityExists = StaffMemberProfile::query()
                 ->where('identity_number', $payload['identity_number'])
                 ->exists();
@@ -137,7 +137,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             }
         }
 
-        if (!empty($errors)) {
+        if (! empty($errors)) {
             return response()->json([
                 'success' => false,
                 'message' => 'Validation failed.',

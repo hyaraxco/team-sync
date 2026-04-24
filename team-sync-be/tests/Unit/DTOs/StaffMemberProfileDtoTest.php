@@ -3,9 +3,7 @@
 namespace Tests\Unit\DTOs;
 
 use App\DTOs\StaffMemberProfileDto;
-use App\Models\BankInformation;
 use App\Models\StaffMemberProfile;
-use App\Models\JobInformation;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;

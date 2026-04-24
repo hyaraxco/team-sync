@@ -29,7 +29,9 @@ class PerformanceReviewDto
             'reviewer_id' => $this->reviewer_id,
         ];
 
-        if ($this->status !== null) $array['status'] = $this->status;
+        if ($this->status !== null) {
+            $array['status'] = $this->status;
+        }
 
         return $array;
     }

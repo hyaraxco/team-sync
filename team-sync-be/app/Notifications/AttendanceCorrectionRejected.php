@@ -3,6 +3,7 @@
 namespace App\Notifications;
 
 use App\Models\AttendanceCorrection;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -12,8 +13,7 @@ class AttendanceCorrectionRejected extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    public function __construct(protected AttendanceCorrection $correction)
-    {}
+    public function __construct(protected AttendanceCorrection $correction) {}
 
     /**
      * @return array<int, string>
@@ -25,7 +25,7 @@ class AttendanceCorrectionRejected extends Notification implements ShouldQueue
 
     public function toMail(object $notifiable): MailMessage
     {
-        $date = \Carbon\Carbon::parse(optional($this->correction->attendance)->date)->format('d M Y');
+        $date = Carbon::parse(optional($this->correction->attendance)->date)->format('d M Y');
 
         return (new MailMessage)
             ->subject('Pengajuan Koreksi Absen Ditolak')

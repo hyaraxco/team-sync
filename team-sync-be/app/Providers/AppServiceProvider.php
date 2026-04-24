@@ -5,9 +5,10 @@ namespace App\Providers;
 use App\Interfaces\OptionRepositoryInterface;
 use App\Repositories\OptionRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Notifications\Messages\MailMessage;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\URL;
+use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -34,8 +35,8 @@ class AppServiceProvider extends ServiceProvider
     {
         ResetPassword::toMailUsing(function (object $notifiable, string $token) {
             $url = config('app.frontend_url', 'http://localhost:5173')
-                . '/auth/reset-password?token=' . $token
-                . '&email=' . urlencode($notifiable->getEmailForPasswordReset());
+                .'/auth/reset-password?token='.$token
+                .'&email='.urlencode($notifiable->getEmailForPasswordReset());
 
             return (new MailMessage)
                 ->subject('Reset Your TeamSync Password')
@@ -46,7 +47,7 @@ class AppServiceProvider extends ServiceProvider
                 ->line('If you did not request a password reset, no further action is required.');
         });
 
-        \Illuminate\Auth\Notifications\VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
+        VerifyEmail::toMailUsing(function (object $notifiable, string $url) {
             $verificationUrl = URL::temporarySignedRoute(
                 'verification.verify',
                 now()->addMinutes(60),
