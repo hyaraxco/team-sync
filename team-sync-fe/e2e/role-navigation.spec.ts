@@ -25,7 +25,7 @@ test.describe.serial("Role-based navigation and access control", () => {
     await loginAsRole(page, "employee");
 
     // Dashboard loads with welcome message
-    await expect(page.locator("h2")).toContainText("Welcome back");
+    await expect(page.getByRole("heading", { name: /Welcome back/ })).toBeVisible();
     await captureEvidence(page, "staff-dashboard.png");
 
     // Self-service: My Profile
@@ -98,7 +98,7 @@ test.describe.serial("Role-based navigation and access control", () => {
     await loginAsRole(page, "manager");
 
     // Dashboard
-    await expect(page.locator("h2, h1")).toContainText(/Dashboard|Welcome/);
+    await expect(page.getByRole("heading", { name: /Dashboard|Welcome/ })).toBeVisible();
     await captureEvidence(page, "manager-dashboard.png");
 
     // Employees (view-only)
