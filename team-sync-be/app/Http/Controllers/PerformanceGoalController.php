@@ -106,7 +106,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Goal deleted successfully');
         } catch (\Exception $e) {
-            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
+            \Illuminate\Support\Facades\Log::warning('PerformanceGoalController::destroy: ' . $e->getMessage());
+            return ResponseHelper::jsonResponse(false, 'Failed to delete goal. It may be linked to a completed review.', null, 400);
         }
     }
 

@@ -167,6 +167,7 @@ class PayrollController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, $readiness['message'], $readiness, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -190,6 +191,7 @@ class PayrollController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -228,6 +230,7 @@ class PayrollController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -252,6 +255,7 @@ class PayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Detail Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -276,6 +280,7 @@ class PayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -299,6 +304,7 @@ class PayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -331,6 +337,7 @@ class PayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -355,6 +362,7 @@ class PayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -409,10 +417,9 @@ class PayrollController extends Controller implements HasMiddleware
             $analytics = $this->payrollRepository->getAnalytics((int) ($validated['months'] ?? 6));
 
             return ResponseHelper::jsonResponse(true, 'Payroll Analytics Retrieved Successfully', $analytics, 200);
-        } catch (
-            \Throwable $e
-        ) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollController::getAnalytics error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 

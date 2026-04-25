@@ -205,6 +205,7 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Member Added Successfully', $member, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('TeamController::addMember domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -224,6 +225,7 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Member Removed Successfully', $member, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('TeamController::removeMember domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
