@@ -100,13 +100,13 @@ const formatDate = (dateStr) => dateStr ? formatDateShort(dateStr) : '-';
             <td class="py-4 px-6">
               <div class="flex items-center gap-3">
                 <img
-                  :src="attendance.employee?.user?.profile_photo || DEFAULT_AVATAR"
+                  :src="attendance.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                   class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
                   alt="Profile"
                 />
                 <div>
-                  <p class="text-sm font-semibold text-brand-dark">{{ attendance.employee?.user?.name }}</p>
-                  <p class="text-xs text-brand-light">{{ attendance.employee?.staff_member_id }}</p>
+                  <p class="text-sm font-semibold text-brand-dark">{{ attendance.staff_member?.user?.name }}</p>
+                  <p class="text-xs text-brand-light">{{ attendance.staff_member?.staff_member_id }}</p>
                 </div>
               </div>
             </td>
@@ -159,12 +159,12 @@ const formatDate = (dateStr) => dateStr ? formatDateShort(dateStr) : '-';
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
             <img
-              :src="attendance.employee?.user?.profile_photo || DEFAULT_AVATAR"
+              :src="attendance.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
               class="w-10 h-10 rounded-full object-cover shadow-sm"
               alt="Profile"
             />
             <div>
-              <p class="text-sm font-semibold text-brand-dark">{{ attendance.employee?.user?.name }}</p>
+              <p class="text-sm font-semibold text-brand-dark">{{ attendance.staff_member?.user?.name }}</p>
               <p class="text-xs text-brand-light">{{ formatDate(attendance.date) }}</p>
             </div>
           </div>

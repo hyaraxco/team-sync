@@ -273,7 +273,7 @@ describe("feature guard matrix", () => {
     ).toBe(false);
     expect(
       hasRoutePermissionAccess(
-        rolePermissions.employee,
+        rolePermissions.staff,
         routeMeta("admin.performance.pending-calibration")
       )
     ).toBe(false);

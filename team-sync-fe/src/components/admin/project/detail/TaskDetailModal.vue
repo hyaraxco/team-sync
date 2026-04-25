@@ -668,7 +668,7 @@ watch(
                       <div class="flex items-start justify-between gap-3">
                         <div>
                           <p class="text-sm font-semibold text-gray-900">
-                            {{ comment.employee?.user?.name || "Unknown" }}
+                            {{ comment.staff_member?.user?.name || "Unknown" }}
                           </p>
                           <p class="text-xs text-gray-500">
                             {{ formatDateTime(comment.created_at) }}
@@ -820,7 +820,7 @@ watch(
                           {{ attachment.file_name }}
                         </a>
                         <p class="text-xs text-gray-500 mt-1">
-                          {{ attachment.employee?.user?.name || "Unknown" }}
+                          {{ attachment.staff_member?.user?.name || "Unknown" }}
                           • {{ formatDateTime(attachment.created_at) }}
                         </p>
                       </div>

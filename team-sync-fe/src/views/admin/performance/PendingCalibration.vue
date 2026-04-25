@@ -36,8 +36,8 @@ const filteredReviews = computed(() => {
     const query = searchQuery.value.toLowerCase();
     reviews = reviews.filter(
       (r) =>
-        r.employee?.full_name?.toLowerCase().includes(query) ||
-        r.employee?.email?.toLowerCase().includes(query),
+        r.staff_member?.full_name?.toLowerCase().includes(query) ||
+        r.staff_member?.email?.toLowerCase().includes(query),
     );
   }
 
@@ -247,14 +247,14 @@ onMounted(async () => {
                   <div
                     class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-semibold"
                   >
-                    {{ (review.staff_member ?? review.employee)?.full_name?.charAt(0) || "E" }}
+                    {{ review.staff_member?.full_name?.charAt(0) || "E" }}
                   </div>
                   <div>
                     <p class="font-medium text-brand-dark">
-                      {{ (review.staff_member ?? review.employee)?.full_name || "Unknown" }}
+                      {{ review.staff_member?.full_name || "Unknown" }}
                     </p>
                     <p class="text-sm text-brand-light">
-                      {{ (review.staff_member ?? review.employee)?.email || "-" }}
+                      {{ review.staff_member?.email || "-" }}
                     </p>
                   </div>
                 </div>

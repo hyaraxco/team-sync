@@ -99,14 +99,14 @@ const getStatusClass = (status) => {
 
 const getMemberStatus = (member) => {
   if (member.left_at) return "Left";
-  const sm = member.staff_member || member.employee;
+  const sm = member.staff_member;
   const isLeader = sm?.user?.id === team.value?.leader?.id;
   return isLeader ? "Lead" : "Active";
 };
 
 const getMemberStatusClass = (member) => {
   if (member.left_at) return "bg-[#F3F4F6] text-[#374151]";
-  const sm = member.staff_member || member.employee;
+  const sm = member.staff_member;
   const isLeader = sm?.user?.id === team.value?.leader?.id;
   return isLeader
     ? "bg-[#FEF3C7] text-[#92400E]"
@@ -361,10 +361,10 @@ onMounted(async () => {
               <div class="relative">
                 <img
                   :src="
-                    (member.staff_member || member.employee)?.user?.profile_photo ||
+                    member.staff_member?.user?.profile_photo ||
                     DEFAULT_AVATAR
                   "
-                  :alt="(member.staff_member || member.employee)?.user?.name"
+                  :alt="member.staff_member?.user?.name"
                   class="w-[100px] h-[100px] rounded-full object-cover mb-3"
                 />
                 <span
@@ -377,10 +377,10 @@ onMounted(async () => {
             </div>
             <div class="text-center mb-3">
               <h4 class="text-brand-dark text-lg font-bold">
-                {{ (member.staff_member || member.employee)?.user?.name || "N/A" }}
+                {{ member.staff_member?.user?.name || "N/A" }}
               </h4>
               <p class="text-brand-light text-base">
-                {{ (member.staff_member || member.employee)?.job_information?.job_title || (member.staff_member || member.employee)?.jobInformation?.job_title || "N/A" }}
+                {{ member.staff_member?.job_information?.job_title || member.staff_member?.jobInformation?.job_title || "N/A" }}
               </p>
             </div>
             <div class="space-y-1 mb-3">

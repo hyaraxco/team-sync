@@ -58,7 +58,7 @@ describe("StaffMemberTeam smoke", () => {
       {
         id: 1,
         joined_at: "2026-04-01T00:00:00.000000Z",
-        employee: {
+        staff_member: {
           user: { id: 1, name: "Yudhis" },
           jobInformation: { job_title: "Manager" },
         },

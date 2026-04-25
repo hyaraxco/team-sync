@@ -295,12 +295,12 @@ const fetchPayrollDetails = async (page = 1) => {
 
     employees.value =
       response.data?.map((detail) => ({
-        id: detail.employee?.id,
-        name: detail.employee?.user?.name || "N/A",
-        staff_member_id: detail.employee?.code || detail.employee?.id,
-        position: detail.employee?.job_information?.job_title || "N/A",
-        department: detail.employee?.job_information?.team?.name || "N/A",
-        profile_photo: detail.employee?.user?.profile_photo || null,
+        id: detail.staff_member?.id,
+        name: detail.staff_member?.user?.name || "N/A",
+        staff_member_id: detail.staff_member?.code || detail.staff_member?.id,
+        position: detail.staff_member?.job_information?.job_title || "N/A",
+        department: detail.staff_member?.job_information?.team?.name || "N/A",
+        profile_photo: detail.staff_member?.user?.profile_photo || null,
         total_work_days: Number(detail.effective_working_days || fallbackWorkingDays),
         attended_days: detail.attended_days || 0,
         sick_days: detail.sick_days || 0,
@@ -312,11 +312,11 @@ const fetchPayrollDetails = async (page = 1) => {
         net_salary: parseFloat(detail.final_salary) || 0,
         status: payroll.value?.status === "paid" ? "paid" : "pending",
         notes: detail.notes,
-        bank_name: detail.employee?.bank_information?.bank_name || "N/A",
+        bank_name: detail.staff_member?.bank_information?.bank_name || "N/A",
         account_number:
-          detail.employee?.bank_information?.account_number || "N/A",
+          detail.staff_member?.bank_information?.account_number || "N/A",
         account_holder_name:
-          detail.employee?.bank_information?.account_holder_name || "N/A",
+          detail.staff_member?.bank_information?.account_holder_name || "N/A",
       })) || [];
 
     // Update pagination meta from response

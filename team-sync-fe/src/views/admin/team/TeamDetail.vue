@@ -66,7 +66,7 @@ const availableEmployees = computed(() => {
     return staffMembers.value;
   }
 
-  const memberIds = team.value.members.map((member) => member.employee.id);
+  const memberIds = team.value.members.map((member) => member.staff_member.id);
   return staffMembers.value.filter((employee) => !memberIds.includes(employee.id));
 });
 
@@ -114,7 +114,7 @@ const handleAddMember = async (employee) => {
 const handleRemoveMember = async (member) => {
   try {
     removingMember.value = true;
-    await removeMember(id, member.employee.id);
+    await removeMember(id, member.staff_member.id);
     await handleFetchTeam();
   } catch (error) {
     console.error("Failed to remove member:", error);
@@ -429,10 +429,10 @@ watch(
         <div class="flex flex-col items-center mb-3">
           <div class="relative">
             <img
-              :src="member.employee.user?.profile_photo"
+              :src="member.staff_member.user?.profile_photo"
               alt="Team Member"
               class="w-[100px] h-[100px] rounded-full object-cover mb-3"
-              v-if="member.employee.user?.profile_photo"
+              v-if="member.staff_member.user?.profile_photo"
             />
             <div
               class="w-12 h-12 rounded-[12px] flex items-center justify-center bg-gray-100"
@@ -444,10 +444,10 @@ watch(
         </div>
         <div class="text-center mb-3">
           <h4 class="text-brand-dark text-lg font-bold">
-            {{ member.employee.user.name }}
+            {{ member.staff_member.user.name }}
           </h4>
           <p class="text-brand-light text-base">
-            {{ member.employee.job_information.job_title }}
+            {{ member.staff_member.job_information.job_title }}
           </p>
         </div>
         <div class="space-y-1 mb-3">
@@ -458,7 +458,7 @@ watch(
           <div class="flex items-center gap-2 text-sm text-gray-500">
             <Clock class="w-4 h-4" />
             <span
-              >{{ member.employee.job_information.experience }} years
+              >{{ member.staff_member.job_information.experience }} years
               experience</span
             >
           </div>
@@ -466,7 +466,7 @@ watch(
         <RouterLink
           :to="{
             name: 'admin.staffMembers.detail',
-            params: { id: member.employee.id },
+            params: { id: member.staff_member.id },
           }"
           class="w-full border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
         >
@@ -655,7 +655,7 @@ watch(
     :show="showRemoveMemberModal"
     title="Remove Member"
     :message="`Are you sure you want to remove '${
-      memberToRemove?.employee?.user?.name || ''
+      memberToRemove?.staff_member?.user?.name || ''
     }' from this team?`"
     confirmText="Remove"
     cancelText="Cancel"

@@ -507,7 +507,7 @@ describe("PayrollDetail smoke", () => {
     fetchPayrollDetails.mockResolvedValue({
       data: [
         {
-          employee: {
+          staff_member: {
             id: 99,
             code: "EMP099",
             user: {

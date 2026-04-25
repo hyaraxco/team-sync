@@ -513,7 +513,7 @@ watch(currentReview, (newVal) => {
             </p>
             <p class="text-sm text-blue-700">
               Please complete the manager assessment for
-              {{ (review.staff_member ?? review.employee)?.full_name }}
+              {{ review.staff_member?.full_name }}
               <span v-if="review.cycle?.manager_assessment_deadline">
                 before
                 {{ formatDate(review.cycle.manager_assessment_deadline) }}
@@ -561,20 +561,16 @@ watch(currentReview, (newVal) => {
                 class="w-12 h-12 bg-brand-primary rounded-full flex items-center justify-center text-white font-semibold text-lg"
               >
                 {{
-                  (review.staff_member ?? review.employee)?.full_name?.charAt(
-                    0,
-                  ) || "?"
+                  review.staff_member?.full_name?.charAt(0) || "?"
                 }}
               </div>
               <div>
                 <p class="text-sm text-brand-light">Employee</p>
                 <p class="text-lg font-semibold text-brand-dark">
-                  {{
-                    (review.staff_member ?? review.employee)?.full_name || "-"
-                  }}
+                  {{ review.staff_member?.full_name || "-" }}
                 </p>
                 <p class="text-sm text-brand-light">
-                  {{ (review.staff_member ?? review.employee)?.email || "" }}
+                  {{ review.staff_member?.email || "" }}
                 </p>
               </div>
             </div>
