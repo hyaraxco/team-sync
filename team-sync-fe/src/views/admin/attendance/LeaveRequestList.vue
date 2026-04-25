@@ -207,12 +207,12 @@ onMounted(() => {
                 <td class="py-4 px-4">
                   <div class="flex items-center gap-3">
                     <img
-                      :src="request.employee?.user?.profile_photo || DEFAULT_AVATAR"
+                      :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                       alt="Avatar"
                       class="w-10 h-10 rounded-full object-cover"
                     />
                     <div>
-                      <p class="text-sm font-semibold text-brand-dark">{{ request.employee?.user?.name }}</p>
+                      <p class="text-sm font-semibold text-brand-dark">{{ request.staff_member?.user?.name }}</p>
                     </div>
                   </div>
                 </td>
@@ -305,9 +305,9 @@ onMounted(() => {
                         'px-2 py-1 text-xs rounded truncate cursor-pointer',
                         req.status === 'approved' ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800 border border-amber-200 border-dashed'
                     ]"
-                    :title="req.employee?.user?.name + ' - ' + req.type"
+                    :title="req.staff_member?.user?.name + ' - ' + req.type"
                  >
-                     {{ req.employee?.user?.name }}
+                     {{ req.staff_member?.user?.name }}
                  </div>
              </div>
           </div>

@@ -172,13 +172,13 @@ const onRejectAction = (req) => {
             <td class="py-4 px-4">
               <div class="flex items-center gap-3">
                 <img
-                  :src="correction.employee?.user?.profile_photo || DEFAULT_AVATAR"
+                  :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                   alt="Avatar"
                   class="w-10 h-10 rounded-full object-cover"
                 />
                 <div>
-                  <p class="text-sm font-semibold text-brand-dark">{{ correction.employee?.user?.name }}</p>
-                  <p class="text-xs text-brand-light">{{ correction.employee?.staff_member_id }}</p>
+                  <p class="text-sm font-semibold text-brand-dark">{{ correction.staff_member?.user?.name }}</p>
+                  <p class="text-xs text-brand-light">{{ correction.staff_member?.staff_member_id }}</p>
                 </div>
               </div>
             </td>
@@ -253,7 +253,7 @@ const onRejectAction = (req) => {
     </div>
     <div v-if="selectedApproveCorrection" class="mb-6 space-y-3">
         <div class="border border-[#DCDEDD] rounded-[12px] p-4 text-sm">
-           <p class="font-bold text-brand-dark mb-2">{{ selectedApproveCorrection.employee?.user?.name }}</p>
+           <p class="font-bold text-brand-dark mb-2">{{ selectedApproveCorrection.staff_member?.user?.name }}</p>
            <p><strong>Date:</strong> {{ selectedApproveCorrection.attendance ? formatDateShort(selectedApproveCorrection.attendance.date) : '-' }}</p>
            <p><strong>Requested In:</strong> {{ formatTime(selectedApproveCorrection.requested_check_in) }}</p>
            <p><strong>Requested Out:</strong> {{ formatTime(selectedApproveCorrection.requested_check_out) }}</p>
@@ -301,10 +301,10 @@ const onRejectAction = (req) => {
         <!-- Details Card -->
         <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm mb-5 shadow-sm">
            <div class="flex items-center gap-3 mb-3 border-b border-gray-200 pb-3">
-             <img :src="selectedRejectCorrection.employee?.user?.profile_photo || DEFAULT_AVATAR" class="w-10 h-10 rounded-full object-cover" />
+             <img :src="selectedRejectCorrection.staff_member?.user?.profile_photo || DEFAULT_AVATAR" class="w-10 h-10 rounded-full object-cover" />
              <div>
-               <p class="font-bold text-gray-900">{{ selectedRejectCorrection.employee?.user?.name }}</p>
-               <p class="text-xs text-gray-500">{{ selectedRejectCorrection.employee?.staff_member_id }}</p>
+               <p class="font-bold text-gray-900">{{ selectedRejectCorrection.staff_member?.user?.name }}</p>
+               <p class="text-xs text-gray-500">{{ selectedRejectCorrection.staff_member?.staff_member_id }}</p>
              </div>
            </div>
            <div class="grid grid-cols-2 gap-y-2">

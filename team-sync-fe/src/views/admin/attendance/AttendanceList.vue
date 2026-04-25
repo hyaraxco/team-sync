@@ -376,16 +376,16 @@ onMounted(async () => {
           >
             <img
               :src="
-                request.employee?.user?.profile_photo ||
+                request.staff_member?.user?.profile_photo ||
                 DEFAULT_AVATAR
               "
-              :alt="request.employee?.user?.name"
+              :alt="request.staff_member?.user?.name"
               class="w-12 h-12 rounded-full object-cover"
             />
             <div class="flex-1">
               <div class="flex items-center gap-2 mb-2">
                 <h4 class="text-brand-dark text-sm font-semibold">
-                  {{ request.employee?.user?.name }}
+                  {{ request.staff_member?.user?.name }}
                 </h4>
               </div>
               <div class="flex items-center gap-2">
@@ -468,16 +468,16 @@ onMounted(async () => {
           >
             <img
               :src="
-                correction.employee?.user?.profile_photo ||
+                correction.staff_member?.user?.profile_photo ||
                 DEFAULT_AVATAR
               "
-              :alt="correction.employee?.user?.name"
+              :alt="correction.staff_member?.user?.name"
               class="w-12 h-12 rounded-full object-cover"
             />
             <div class="flex-1 min-w-0">
               <div class="flex items-center gap-2 mb-1">
                 <h4 class="text-brand-dark text-sm font-semibold truncate">
-                  {{ correction.employee?.user?.name }}
+                  {{ correction.staff_member?.user?.name }}
                 </h4>
               </div>
               <p class="text-brand-light text-xs truncate max-w-[200px]">
@@ -533,7 +533,7 @@ onMounted(async () => {
       <div v-if="selectedApproveRequest" class="mb-6 space-y-3">
         <div class="border border-[#DCDEDD] rounded-[12px] p-4">
           <p class="text-brand-dark text-sm font-semibold mb-2">
-            {{ selectedApproveRequest.employee?.user?.name }}
+            {{ selectedApproveRequest.staff_member?.user?.name }}
           </p>
           <div class="flex items-center gap-2 mb-2">
             <StatusBadge type="leave-type" :value="selectedApproveRequest.type" />
@@ -594,7 +594,7 @@ onMounted(async () => {
       <div v-if="selectedRejectRequest" class="mb-6 space-y-3">
         <div class="border border-[#DCDEDD] rounded-[12px] p-4">
           <p class="text-brand-dark text-sm font-semibold mb-2">
-            {{ selectedRejectRequest.employee?.user?.name }}
+            {{ selectedRejectRequest.staff_member?.user?.name }}
           </p>
           <div class="flex items-center gap-2 mb-2">
             <StatusBadge type="leave-type" :value="selectedRejectRequest.type" />

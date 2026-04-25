@@ -5,7 +5,6 @@ const token = Cookies.get('token')
 
 axios.defaults.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api/v1'
 axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest'
-axios.defaults.headers.common['Content-Type'] = 'application/json'
 axios.defaults.headers.common['Accept'] = 'application/json'
 if (token) {
     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`

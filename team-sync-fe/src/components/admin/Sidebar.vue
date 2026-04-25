@@ -135,7 +135,7 @@ const onNavigate = () => emit("navigate");
             :to="{ name: 'admin.staffMembers' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
-              'nav-link-active': $route.name?.startsWith('admin.employee'),
+              'nav-link-active': $route.name?.startsWith('admin.staffMember'),
             }"
             v-if="can('staff-member-menu')"
             @click="onNavigate"
@@ -143,13 +143,13 @@ const onNavigate = () => emit("navigate");
             <UsersIcon
               class="w-5 h-5 text-gray-600"
               :class="{
-                'text-white': $route.name?.startsWith('admin.employee'),
+                'text-white': $route.name?.startsWith('admin.staffMember'),
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
-                'text-brand-white': $route.name?.startsWith('admin.employee'),
+                'text-brand-white': $route.name?.startsWith('admin.staffMember'),
               }"
               >Employees</span
             >

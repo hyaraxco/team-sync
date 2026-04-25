@@ -132,7 +132,7 @@ describe("MyReviews smoke", () => {
         cycle: { name: "Q1 2026 Review" },
         cycle_id: 1,
         status: "pending_self",
-        employee: { full_name: "John Doe" },
+        staff_member: { full_name: "John Doe" },
       },
     ];
     const wrapper = factory();
