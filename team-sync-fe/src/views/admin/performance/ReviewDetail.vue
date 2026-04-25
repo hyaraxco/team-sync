@@ -391,8 +391,8 @@ onMounted(async () => {
     reviewStore.fetchCalibrationContext(reviewId.value);
   }
 
-  // Auto-fetch readiness data for Performance Data Summary card
-  if (['pending_calibration', 'completed'].includes(currentReview.value?.status)) {
+  // Auto-fetch readiness data for Performance Data Summary card (HR/calibrator only)
+  if (['pending_calibration', 'completed'].includes(currentReview.value?.status) && hasRole('hr')) {
     reviewStore.fetchValidateReadiness(reviewId.value).catch(() => {});
   }
 });

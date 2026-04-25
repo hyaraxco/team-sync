@@ -374,7 +374,8 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
         this.readinessResult = response.data.data;
         return response.data.data;
       } catch (error) {
-        this.error = handleError(error);
+        // Best-effort fetch — don't pollute store error state (e.g., 403 for non-HR users)
+        console.error("fetchValidateReadiness failed:", error?.response?.status);
         throw error;
       } finally {
         this.readinessLoading = false;
@@ -535,6 +536,10 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
     resetState() {
       this.error = null;
       this.success = false;
+      this.readinessResult = null;
+      this.readinessLoading = false;
+      this.calibrationContext = null;
+      this.calibrationContextLoading = false;
     },
   },
 });
