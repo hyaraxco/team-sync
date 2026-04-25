@@ -33,10 +33,15 @@ class DatabaseSeeder extends Seeder
             PerformanceDataSeeder::class,
             PerformanceOutcomeRuleSeeder::class,
 
-            // 4. Seed employee profiles with complete data (User, Profile, Job, Bank, Emergency Contacts)
-            // StaffMemberProfileSeeder::class,
+            // 4. Seed additional users, teams, projects with complete relational data
+            DemoDataSeeder::class,
 
-            // 4. Seed teams and assign employees to teams (requires employees to exist)
+            // 5. Seed review templates (requires sections to exist)
+            PerformanceReviewTemplateSeeder::class,
+            ReviewerRuleSeeder::class,
+
+            // Legacy seeders (disabled — replaced by DemoDataSeeder)
+            // StaffMemberProfileSeeder::class,
             // TeamSeeder::class,
         ]);
     }
