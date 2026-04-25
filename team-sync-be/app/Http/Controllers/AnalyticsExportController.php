@@ -45,7 +45,8 @@ class AnalyticsExportController extends Controller implements HasMiddleware
 
             return Excel::download(new AnalyticsMultiSheetExport($sheets), $filename);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Export failed: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AnalyticsExportController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -75,7 +76,8 @@ class AnalyticsExportController extends Controller implements HasMiddleware
 
             return $pdf->download($filename);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Export failed: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AnalyticsExportController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 

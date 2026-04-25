@@ -140,6 +140,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             'user',
             'user.roles',
             'jobInformation.team.leader',
+            'jobInformation.reviewTemplate',
             'jobInformation.team' => function ($query) {
                 $query->withCount('members');
             },
@@ -262,6 +263,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             'staff_member_id' => $employeeId,
             'job_title' => $data['job_title'] ?? null,
             'team_id' => $data['team_id'] ?? null,
+            'review_template_id' => $data['review_template_id'] ?? null,
             'status' => $data['status'] ?? null,
             'employment_type' => $data['employment_type'] ?? null,
             'work_location' => $data['work_location'] ?? null,
@@ -328,6 +330,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
         $fields = [
             'job_title',
             'team_id',
+            'review_template_id',
             'status',
             'employment_type',
             'work_location',

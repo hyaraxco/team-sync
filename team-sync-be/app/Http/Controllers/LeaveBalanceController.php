@@ -37,7 +37,8 @@ class LeaveBalanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave balances retrieved successfully.', $balances, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('LeaveBalanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 }

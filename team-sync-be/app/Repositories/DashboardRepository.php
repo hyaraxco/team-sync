@@ -119,6 +119,15 @@ class DashboardRepository implements DashboardRepositoryInterface
                 ])
                 ->first();
 
+            // Performance outcome stats from completed reviews
+            $outcomeStats = DB::table('performance_reviews')
+                ->where('status', 'completed')
+                ->selectRaw("
+                    COUNT(CASE WHEN promotion_eligible = 1 THEN 1 END) as promotion_eligible_count,
+                    COUNT(CASE WHEN pip_required = 1 THEN 1 END) as pip_required_count
+                ")
+                ->first();
+
             return [
                 'employees' => [
                     'total' => (int) $employeeTeamStats->total_employees,
@@ -139,6 +148,10 @@ class DashboardRepository implements DashboardRepositoryInterface
                 'projects' => [
                     'active' => (int) $projectStats->active_projects,
                     'new_projects' => (int) $projectStats->new_projects_this_month,
+                ],
+                'performance' => [
+                    'promotion_eligible' => (int) ($outcomeStats->promotion_eligible_count ?? 0),
+                    'pip_required'       => (int) ($outcomeStats->pip_required_count ?? 0),
                 ],
             ];
         });

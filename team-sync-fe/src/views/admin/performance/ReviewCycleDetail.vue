@@ -177,8 +177,8 @@ onMounted(async () => {
               {{ currentCycle.name }}
             </h1>
             <StatusBadge
-              :status="cycleStatusConfig[currentCycle.status]?.label"
-              :color="cycleStatusConfig[currentCycle.status]?.color"
+              :value="currentCycle.status"
+              :label="cycleStatusConfig[currentCycle.status]?.label"
             />
             <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium">
               {{ cycleTypeLabel[currentCycle.cycle_type] }}

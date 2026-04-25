@@ -150,8 +150,8 @@ onMounted(async () => {
                 {{ cycle.name }}
               </h3>
               <StatusBadge
-                :status="statusConfig[cycle.status]?.label"
-                :color="statusConfig[cycle.status]?.color"
+                :value="cycle.status"
+                :label="statusConfig[cycle.status]?.label"
               />
               <span
                 class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-sm font-medium"

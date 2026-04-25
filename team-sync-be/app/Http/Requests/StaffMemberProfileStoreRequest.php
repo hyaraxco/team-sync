@@ -58,6 +58,7 @@ class StaffMemberProfileStoreRequest extends FormRequest
             // Job Information fields
             'job_title' => ['required', 'string', 'max:255'],
             'team_id' => ['nullable', 'exists:teams,id'],
+            'review_template_id' => ['nullable', 'exists:performance_review_templates,id'],
             'status' => ['required', 'string', 'in:'.implode(',', array_column(JobStatus::cases(), 'value'))],
             'employment_type' => ['required', 'string', 'in:'.implode(',', array_column(EmploymentType::cases(), 'value'))],
             'work_location' => ['required', 'string', 'in:'.implode(',', array_column(WorkLocation::cases(), 'value'))],
@@ -108,6 +109,7 @@ class StaffMemberProfileStoreRequest extends FormRequest
             // Job Information attributes
             'job_title' => 'Job Title',
             'team_id' => 'Team',
+            'review_template_id' => 'Performance Template',
             'status' => 'Job Status',
             'employment_type' => 'Employment Type',
             'work_location' => 'Work Location',

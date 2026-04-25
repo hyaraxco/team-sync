@@ -258,8 +258,8 @@ onMounted(async () => {
               </span>
             </div>
             <StatusBadge
-              :status="statusConfig[goal.status]?.label"
-              :color="statusConfig[goal.status]?.color"
+              :value="goal.status"
+              :label="statusConfig[goal.status]?.label"
             />
           </div>
         </div>

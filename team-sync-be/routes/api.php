@@ -19,6 +19,7 @@ use App\Http\Controllers\PerformanceFeedbackController;
 use App\Http\Controllers\PerformanceGoalController;
 use App\Http\Controllers\PerformanceOutcomeRuleController;
 use App\Http\Controllers\PerformanceReviewController;
+use App\Http\Controllers\PerformanceReviewTemplateController;
 use App\Http\Controllers\PerformanceReviewCycleController;
 use App\Http\Controllers\PerformanceTopsisController;
 use App\Http\Controllers\ProjectController;

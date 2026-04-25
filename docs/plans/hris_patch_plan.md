@@ -906,7 +906,7 @@ describe('Menu Permission Guard', () => {
 - [ ] Akses langsung via URL ke `/pending-calibration` oleh Manager → redirect ke dashboard
 - [ ] Akses langsung via URL ke `/review-cycles` oleh Manager → redirect ke dashboard
 - [ ] Menu `Employees` muncul untuk Manager tapi tombol Edit/Delete/Invite disembunyikan
-- [ ] Semua test case di P8-5 passed
+- [x] Semua test case di P8-5 passed
 
 ### Urutan Pengerjaan P8
 ```

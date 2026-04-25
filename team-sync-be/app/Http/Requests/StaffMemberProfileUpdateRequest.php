@@ -66,6 +66,7 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             // Job Information fields
             'job_title' => ['sometimes', 'required', 'string', 'max:255'],
             'team_id' => ['nullable', 'exists:teams,id'],
+            'review_template_id' => ['nullable', 'exists:performance_review_templates,id'],
             'status' => ['sometimes', 'required', 'string', 'in:'.implode(',', array_column(JobStatus::cases(), 'value'))],
             'employment_type' => ['sometimes', 'required', 'string', 'in:'.implode(',', array_column(EmploymentType::cases(), 'value'))],
             'work_location' => ['sometimes', 'required', 'string', 'in:'.implode(',', array_column(WorkLocation::cases(), 'value'))],
@@ -118,6 +119,7 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             // Job Information attributes
             'job_title' => 'Job Title',
             'team' => 'Team',
+            'review_template_id' => 'Performance Template',
             'status' => 'Job Status',
             'employment_type' => 'Employment Type',
             'work_location' => 'Work Location',

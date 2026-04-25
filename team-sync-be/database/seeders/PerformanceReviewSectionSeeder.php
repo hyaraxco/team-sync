@@ -45,6 +45,13 @@ class PerformanceReviewSectionSeeder extends Seeder
                 'topsis_category' => 'competency',
                 'order' => 5,
             ],
+            [
+                'name' => 'Team Performance Score',
+                'description' => 'Evaluates the manager\'s ability to drive team results, develop talent, and maintain high-performing teams. Applicable to Manager templates only.',
+                'weight' => 20.00,
+                'topsis_category' => 'kpi',
+                'order' => 6,
+            ],
         ];
 
         foreach ($sections as $section) {

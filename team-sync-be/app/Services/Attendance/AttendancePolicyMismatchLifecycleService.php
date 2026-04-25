@@ -60,7 +60,12 @@ class AttendancePolicyMismatchLifecycleService
                 $start,
                 $asOf
             );
-        } catch (\Throwable) {
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Failed to calculate working days for mismatch escalation.', [
+                'mismatch_id' => $mismatch->id,
+                'staff_member_id' => $mismatch->staff_member_id,
+                'error' => $e->getMessage()
+            ]);
             return false;
         }
 

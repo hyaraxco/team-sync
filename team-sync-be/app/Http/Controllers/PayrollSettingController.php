@@ -35,7 +35,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -56,7 +57,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -109,7 +111,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 }

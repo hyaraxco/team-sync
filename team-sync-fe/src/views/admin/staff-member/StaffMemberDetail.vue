@@ -574,6 +574,12 @@ onMounted(() => {
             </span>
           </div>
           <div class="flex justify-between items-center">
+            <span class="text-brand-light text-base">Performance Template</span>
+            <span class="text-brand-dark text-base font-medium">
+              {{ staffMember.job_information?.review_template?.name ?? 'Default Template' }}
+            </span>
+          </div>
+          <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Start Date</span>
             <span class="text-brand-dark text-base font-medium">
               {{ formatDate(staffMember.job_information?.start_date) }}
