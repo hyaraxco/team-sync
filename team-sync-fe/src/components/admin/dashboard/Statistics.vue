@@ -4,8 +4,7 @@ import {
   TrendingUpIcon,
   UsersIcon,
   CalendarCheckIcon,
-  CheckSquareIcon,
-  FolderIcon,
+  AlertTriangleIcon,
   StarIcon,
 } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";
@@ -23,8 +22,7 @@ onMounted(() => {
 const employees = computed(() => dashboardStore.statistics?.staffMembers ?? dashboardStore.statistics?.employees ?? { total: 0, active: 0, new_hires: 0 });
 const teams = computed(() => dashboardStore.statistics?.teams ?? { total: 0, new_teams: 0 });
 const attendance = computed(() => dashboardStore.statistics?.attendance ?? { rate: 0, change: 0 });
-const tasks = computed(() => dashboardStore.statistics?.tasks ?? { completed: 0, total: 0, completion_rate: 0 });
-const projects = computed(() => dashboardStore.statistics?.projects ?? { active: 0, total: 0 });
+const performance = computed(() => dashboardStore.statistics?.performance ?? { promotion_eligible: 0, pip_required: 0 });
 const loading = computed(() => dashboardStore.loading);
 </script>
 
@@ -81,25 +79,25 @@ const loading = computed(() => dashboardStore.loading);
     <QuickActions />
 
     <!-- Row 2 Stats Cards -->
-    <!-- Tasks Completed (below Total Staff Members) -->
+    <!-- Promotion Eligible -->
     <StatsCard
-      title="Tasks Completed"
-      :value="tasks.completed"
-      :subtitle="`${tasks.change >= 0 ? '+' : ''}${tasks.change} from yesterday`"
-      :subtitleColor="tasks.change >= 0 ? 'text-success' : 'text-danger'"
-      iconName="CheckSquareIcon"
+      title="Promotion Eligible"
+      :value="performance.promotion_eligible"
+      subtitle="From completed reviews"
+      subtitleColor="text-purple-600"
+      iconName="TrendingUpIcon"
       colorScheme="purple"
       :loading="loading"
     />
 
-    <!-- Active Projects (below Attendance Rate) -->
+    <!-- PIP Required -->
     <StatsCard
-      title="Active Projects"
-      :value="projects.active"
-      :subtitle="`+${projects.new_projects} new projects`"
-      subtitleColor="text-success"
-      iconName="FolderIcon"
-      colorScheme="orange"
+      title="PIP Required"
+      :value="performance.pip_required"
+      subtitle="Need improvement plan"
+      :subtitleColor="performance.pip_required > 0 ? 'text-danger' : 'text-success'"
+      iconName="AlertTriangleIcon"
+      colorScheme="red"
       :loading="loading"
     />
   </div>

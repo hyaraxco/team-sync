@@ -1,10 +1,14 @@
 <script setup>
-import { ref } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import { Calendar, ArrowLeft } from "lucide-vue-next";
+import { Calendar, ArrowLeft, Layout } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
+import { usePerformanceReviewStore } from "@/stores/performanceReview";
+import { storeToRefs } from "pinia";
 
 const router = useRouter();
+const reviewStore = usePerformanceReviewStore();
+const { templates, templatesLoading } = storeToRefs(reviewStore);
 
 const formData = ref({
   name: "",
@@ -16,6 +20,12 @@ const formData = ref({
   self_assessment_deadline: "",
   manager_assessment_deadline: "",
   calibration_deadline: "",
+  template_id: "",
+});
+
+const defaultTemplateId = computed(() => {
+  const defaultTpl = templates.value?.find((t) => t.is_default);
+  return defaultTpl?.id || "";
 });
 
 const goBack = () => {
@@ -26,6 +36,13 @@ const createCycle = async () => {
   // TODO: Implement cycle creation
   console.log("Creating cycle:", formData.value);
 };
+
+onMounted(async () => {
+  await reviewStore.fetchTemplates();
+  if (!formData.value.template_id && defaultTemplateId.value) {
+    formData.value.template_id = defaultTemplateId.value;
+  }
+});
 </script>
 
 <template>
@@ -76,6 +93,30 @@ const createCycle = async () => {
             <option value="annual">Annual</option>
             <option value="probation">Probation</option>
           </select>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-brand-dark mb-2">
+            <Layout class="w-4 h-4 inline-block mr-1 -mt-0.5" />
+            Assessment Template
+          </label>
+          <select
+            v-model="formData.template_id"
+            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+          >
+            <option value="">— Use default section weights —</option>
+            <option
+              v-for="tpl in templates"
+              :key="tpl.id"
+              :value="tpl.id"
+            >
+              {{ tpl.name }}{{ tpl.is_default ? ' ★ Default' : '' }}
+              {{ tpl.sections_count ? `(${tpl.sections_count} sections)` : '' }}
+            </option>
+          </select>
+          <p class="mt-1 text-xs text-brand-light">
+            Templates define which sections are evaluated and their weight distribution.
+          </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

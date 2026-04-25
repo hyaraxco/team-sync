@@ -84,7 +84,8 @@ class PerformanceTopsisController extends Controller
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Review cycle tidak ditemukan', null, 404);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Gagal menghitung TOPSIS: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('PerformanceTopsisController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 

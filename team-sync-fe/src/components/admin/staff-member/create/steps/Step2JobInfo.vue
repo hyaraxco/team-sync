@@ -18,11 +18,13 @@ import {
   SearchX,
   Users,
   ShieldCheck,
+  LayoutTemplate,
 } from "lucide-vue-next";
 import { ref, computed, onMounted, watch } from "vue";
 import { useTeamStore } from "@/stores/team";
 import { useOptionStore } from "@/stores/option";
 import { usePayrollStore } from "@/stores/payroll";
+import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { storeToRefs } from "pinia";
 import RightSidebarStep2 from "@/components/admin/staff-member/create/RightSidebarStep2.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
@@ -59,6 +61,15 @@ const { employmentTypes, jobStatuses, workLocations } =
 const payrollStore = usePayrollStore();
 const { settings: payrollSettings } = storeToRefs(payrollStore);
 const loadingPayrollSettings = ref(true);
+
+// Performance Templates — optional picker per employee
+const performanceStore = usePerformanceReviewStore();
+const templateOptions = computed(() =>
+  (performanceStore.templates ?? []).map((t: any) => ({
+    value: t.id,
+    label: t.name + (t.is_default ? ' (Default)' : ''),
+  }))
+);
 
 const companyBankName = computed(
   () => payrollSettings.value?.payroll_bank_name || null,
@@ -140,7 +151,7 @@ onMounted(async () => {
     optionStore.fetchEmploymentTypes(),
     optionStore.fetchJobStatuses(),
     optionStore.fetchWorkLocations(),
-
+    performanceStore.fetchTemplates(),
     payrollSettingsFetch,
   ]);
 
@@ -419,6 +430,26 @@ watch(
                 <CalendarPlus class="h-5 w-5 text-gray-400" />
               </template>
             </Input>
+          </div>
+
+          <!-- Performance Template (optional) -->
+          <div class="mb-4">
+            <Select
+              id="review_template_id"
+              name="review_template_id"
+              v-model="form.review_template_id"
+              label="Performance Template"
+              placeholder="Use default template"
+              :options="templateOptions"
+              :error="errors?.review_template_id?.join(', ')"
+            >
+              <template #icon>
+                <LayoutTemplate class="h-5 w-5 text-gray-400" />
+              </template>
+            </Select>
+            <p class="text-brand-light text-xs mt-1">
+              Determines which review sections and weights apply to this employee
+            </p>
           </div>
 
           <div class="mb-4">

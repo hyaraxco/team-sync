@@ -45,7 +45,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Corrections Retrieved Successfully', $corrections, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -56,7 +57,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'My Corrections Retrieved Successfully', $corrections, 200);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -69,7 +71,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Correction Not Found', null, 404);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -89,7 +92,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -106,7 +110,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -123,7 +128,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error: '.$e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 }

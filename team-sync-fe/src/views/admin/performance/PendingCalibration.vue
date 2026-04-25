@@ -292,8 +292,8 @@ onMounted(async () => {
               </td>
               <td class="py-4 px-4">
                 <StatusBadge
-                  :status="statusConfig[review.status]?.label"
-                  :color="statusConfig[review.status]?.color"
+                  :value="review.status"
+                  :label="statusConfig[review.status]?.label"
                 />
                 <p class="text-xs text-brand-light mt-1">
                   {{ statusConfig[review.status]?.action }}

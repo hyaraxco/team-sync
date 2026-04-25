@@ -25,6 +25,10 @@ export const useDashboardStore = defineStore("dashboard", {
                 active: 0,
                 new_projects: 0,
             },
+            performance: {
+                promotion_eligible: 0,
+                pip_required: 0,
+            },
         },
         loading: false,
         error: null,
