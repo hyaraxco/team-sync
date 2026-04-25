@@ -40,6 +40,9 @@ class DatabaseSeeder extends Seeder
             PerformanceReviewTemplateSeeder::class,
             ReviewerRuleSeeder::class,
 
+            // 6. Seed interaction data (attendance, goals, feedback, tasks, leave, payroll settings)
+            DemoInteractionSeeder::class,
+
             // Legacy seeders (disabled — replaced by DemoDataSeeder)
             // StaffMemberProfileSeeder::class,
             // TeamSeeder::class,
