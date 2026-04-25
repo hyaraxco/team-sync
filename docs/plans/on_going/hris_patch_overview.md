@@ -1,8 +1,8 @@
 # HRIS Performance Patch — Implementation Overview
 
-> **Last Updated:** 2026-04-25 13:17 WIB
-> **Sources:** [hris_patch_plan.md](file:///Users/hyarax/Documents/project/team-sync/docs/plans/hris_patch_plan.md) · [hris_patch_gap_analysis.md](file:///Users/hyarax/Documents/project/team-sync/hris_patch_gap_analysis.md) · Conversations `cdeb5b79`, `20445b81`, `3afea29a`
-> **Branch:** `main` (HEAD: `6b908cb` + uncommitted G1/G5/G6 fixes)
+> **Last Updated:** 2026-04-26 04:00 WIB
+> **Sources:** [hris_patch_plan.md](../archive/hris_patch_plan.md) · [hris_patch_gap_analysis.md](../archive/hris_patch_gap_analysis.md) · Conversations `cdeb5b79`, `20445b81`, `3afea29a`
+> **Branch:** `main` (HEAD: `e86b0b5`)
 
 ---
 
@@ -166,14 +166,17 @@
 
 ## Cross-Cutting Fixes
 
-| Fix | File | Description |
-|-----|------|-------------|
-| Error handling logging | [AttendancePolicyMismatchLifecycleService.php](file:///Users/hyarax/Documents/project/team-sync/team-sync-be/app/Services/Attendance/AttendancePolicyMismatchLifecycleService.php) | Empty `catch` → logs context |
-| Error handling security | [PerformanceGoalController.php](file:///Users/hyarax/Documents/project/team-sync/team-sync-be/app/Http/Controllers/PerformanceGoalController.php) | `$e->getMessage()` exposed → generic + server log |
-| Template controller security | [PerformanceReviewTemplateController.php](file:///Users/hyarax/Documents/project/team-sync/team-sync-be/app/Http/Controllers/PerformanceReviewTemplateController.php) | `store()` exposed `$e->getMessage()` → generic message |
+| Fix | File(s) | Description |
+|-----|---------|-------------|
+| Error handling logging | `AttendancePolicyMismatchLifecycleService.php` | Empty `catch` → logs context |
+| Error handling security | `PerformanceGoalController.php` | `$e->getMessage()` exposed → generic + server log |
+| Template controller security | `PerformanceReviewTemplateController.php` | `store()` exposed `$e->getMessage()` → generic message |
 | Template controller 404/500 | Same file | `show()`/`update()`/`destroy()` → `ModelNotFoundException` for 404 vs generic `\Exception` for 500 |
 | Orphan test cleanup | `tests/Feature/Feature/` | Deleted duplicate directory |
 | Debug test cleanup | `CheckApiTest.php` | Deleted `dump()` test |
+| **Full-stack error handling standardization** | 8 BE controllers + 2 FE files | Eliminated all unsafe 500 `getMessage()` leaks; added `Log::warning` for 21 domain exception points; replaced FE empty catches with `console.error` |
+| **Error handling regression tests** | 3 new test files (Auth, Payroll, Performance) | 9 tests verifying API responses never leak raw exception text |
+| **Docs restructure** | `docs/` folder | Reorganized into `plans/on_going`, `plans/archive`, `testing/be`, `testing/fe`, `references/` |
 
 ---
 
@@ -181,8 +184,8 @@
 
 | Suite | Tests | Status |
 |-------|-------|--------|
-| **Pest (BE)** | 289+ tests (+ 10 new P7 template tests) | ✅ Passed (DB-dependent tests pending Docker) |
-| **Vitest (FE)** | **193 tests (36 files)** | ✅ All passed |
+| **Pest (BE)** | **308 tests (1413 assertions)** | ✅ All passed |
+| **Vitest (FE)** | **199 tests (37 files)** | ✅ All passed |
 | **Playwright (E2E)** | **10 tests** (8 existing + 2 new template tests) | ✅ All passed |
 
 ### Known Test Noise (Not Failures)
@@ -218,10 +221,11 @@ f436860  test: seed performance cycle in E2E seeder
 88da920  feat(P6): performance outcome rules
 6c99b95  chore: complete sprint 3, prepare sprint 4
 6b908cb  feat(P7): role-based review templates
---- uncommitted ---
-fix(P7): Team Performance Score section + Manager template weights (G1)
-fix(security): TemplateController error handling — generic messages, ModelNotFoundException (G5/G6)
-feat(P7): PerformanceReviewTemplateSeeder, template picker, smoke + E2E tests
+3366e45  feat(hris): complete Sprint 1 security hardening and bugfixes
+5eed8f0  chore: archive completed plans and clean up test artifacts
+d3a317f  chore(docs): restructure docs folder — plans/testing/references
+4232b2a  fix(security): standardize error handling across full stack
+e86b0b5  test(security): add error handling regression tests (9 tests)
 ```
 
 ---
@@ -242,4 +246,4 @@ feat(P7): PerformanceReviewTemplateSeeder, template picker, smoke + E2E tests
 
 ## Conclusion
 
-**All 8 patches (P1–P8) are fully implemented** across Sprints 1–4 with comprehensive test coverage (193 FE Vitest + 289+ BE Pest + 10 E2E Playwright). Only 2 non-blocking UI enhancements remain for Sprint 5 (dashboard widget + job info picker). Error handling has been hardened across all controllers. The system is ready for production use.
+**All 8 patches (P1–P8) are fully implemented** across Sprints 1–5 with comprehensive test coverage (199 FE Vitest + 308 BE Pest + 10 E2E Playwright). All deferred UI items (P6-5 dashboard widget, P7-9 job info picker) have been finalized. Error handling has been standardized across all controllers with 9 regression tests guarding the policy. Documentation has been restructured into `plans/`, `testing/`, and `references/`. The system is ready for production use.
