@@ -62,8 +62,8 @@ class PerformanceReviewTemplateController extends Controller
                 return ResponseHelper::jsonResponse(true, 'Template created successfully', $template->load('sections'), 201);
             });
         } catch (\Exception $e) {
-            Log::error('Template store error: ' . $e->getMessage());
-            return ResponseHelper::jsonResponse(false, 'Failed to create template: ' . $e->getMessage(), null, 500);
+            Log::error('Template store error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Failed to create template', null, 500);
         }
     }
 

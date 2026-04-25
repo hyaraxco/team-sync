@@ -90,6 +90,7 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Correction Requested Successfully', $correction, 201);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceCorrectionController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -108,6 +109,7 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Correction Approved Successfully', $correction, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceCorrectionController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -126,6 +128,7 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Correction Rejected Successfully', $correction, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceCorrectionController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);

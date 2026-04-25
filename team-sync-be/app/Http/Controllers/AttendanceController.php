@@ -126,6 +126,7 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Check-in Successful', new AttendanceResource($attendance), 201);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -142,6 +143,7 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Check-out Successful', new AttendanceResource($attendance), 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -173,6 +175,7 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Policy Mismatch Acknowledged Successfully', $mismatch, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -189,6 +192,7 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Policy Mismatch Resolved Successfully', $mismatch, 200);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);

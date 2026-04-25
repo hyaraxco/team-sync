@@ -39,7 +39,8 @@ class AuthController extends Controller
 
             return ResponseHelper::jsonResponse(true, 'Profile Retrieved Successfully', new UserResource($user), 200);
         } catch (\Exception $e) {
-            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AuthController::me error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -50,7 +51,8 @@ class AuthController extends Controller
 
             return ResponseHelper::jsonResponse(true, 'Logout Successful', new UserResource($user), 200);
         } catch (\Exception $e) {
-            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 500);
+            \Illuminate\Support\Facades\Log::error('AuthController::logout error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
@@ -72,8 +74,13 @@ class AuthController extends Controller
             return ResponseHelper::jsonResponse(true, 'Profile Updated Successfully', new UserResource($user), 200);
         } catch (\Exception $e) {
             $status = $e->getCode() ?: 500;
+            $message = $status < 500 ? $e->getMessage() : 'Internal Server Error';
 
-            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, $status);
+            if ($status >= 500) {
+                \Illuminate\Support\Facades\Log::error('AuthController::updateProfile error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            }
+
+            return ResponseHelper::jsonResponse(false, $message, null, $status);
         }
     }
 }

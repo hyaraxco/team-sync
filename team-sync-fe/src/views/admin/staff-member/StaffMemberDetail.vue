@@ -95,7 +95,9 @@ const handleDeleteStaffMember = async () => {
       showDeleteModal.value = false;
       router.push({ name: "admin.staffMembers" });
     }
-  } catch (error) {}
+  } catch (error) {
+    console.error("Failed to delete staff member:", error);
+  }
 };
 
 onMounted(() => {

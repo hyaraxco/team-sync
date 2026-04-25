@@ -101,6 +101,7 @@ class LeaveRequestController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave Request Created Successfully', new LeaveRequestResource($leaveRequest), 201);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -172,6 +173,7 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
@@ -195,6 +197,7 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);

@@ -323,6 +323,7 @@ const fetchMyStatistics = async () => {
       leave_balance: data.leave_balance ?? null,
     };
   } catch (error) {
+    console.error("Failed to fetch employee statistics:", error);
   } finally {
     statsLoading.value = false;
   }
