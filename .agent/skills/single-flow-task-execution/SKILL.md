@@ -1,6 +1,6 @@
 ---
 name: single-flow-task-execution
-description: Use when executing implementation plans, handling multiple independent tasks, or doing structured task-by-task development with review gates in Antigravity.
+description: Use when executing implementation plans, handling multiple independent tasks, or doing structured task-by-task development with review gates
 ---
 
 # Single-Flow Task Execution
@@ -9,18 +9,17 @@ Execute plans by working through one task at a time with two-stage review after 
 
 **Core principle:** One task at a time + two-stage review (spec then quality) = high quality, disciplined iteration.
 
-## Antigravity Execution Model
+## Execution Model
 
-Antigravity does NOT support parallel coding subagents. All work happens in a single execution thread.
+All work happens in a single execution thread. No parallel task dispatch.
 
 **Rules:**
 
 1. **One active task only** — never work on multiple tasks simultaneously.
 2. **One execution thread only** — no parallel dispatch.
-3. **No parallel coding subagents** — Antigravity does not have `Task(...)`.
-4. **Browser automation** may use `browser_subagent` in isolated steps.
-5. **Track progress** by updating `<project-root>/docs/plans/task.md` at each state change (table-only tracker).
-6. **Use `task_boundary`** to clearly delineate each unit of work.
+3. **Sequential execution** — complete one task fully before starting the next.
+4. **Browser automation** may use the `Task` tool in isolated steps when needed.
+5. **Track progress** by updating task tracker at each state change.
 
 ## When to Use
 
@@ -59,7 +58,7 @@ digraph when_to_use {
 **vs. Executing Plans (worktree-based):**
 
 - Same session (no context switch)
-- Fresh `task_boundary` per task (clean scope)
+- Clean scope per task
 - Two-stage review after each task: spec compliance first, then code quality
 - Faster iteration (no human-in-loop between tasks)
 
@@ -81,7 +80,7 @@ digraph process {
         "Run code quality review (./code-quality-reviewer-prompt.md)" [shape=box];
         "Code quality approved?" [shape=diamond];
         "Fix quality issues" [shape=box];
-        "Mark task complete in docs/plans/task.md" [shape=box];
+        "Mark task complete" [shape=box];
     }
 
     "Read plan, extract all tasks with full text, note context" [shape=box];
@@ -102,8 +101,8 @@ digraph process {
     "Run code quality review (./code-quality-reviewer-prompt.md)" -> "Code quality approved?";
     "Code quality approved?" -> "Fix quality issues" [label="no"];
     "Fix quality issues" -> "Run code quality review (./code-quality-reviewer-prompt.md)" [label="re-review"];
-    "Code quality approved?" -> "Mark task complete in docs/plans/task.md" [label="yes"];
-    "Mark task complete in docs/plans/task.md" -> "More tasks remain?";
+    "Code quality approved?" -> "Mark task complete" [label="yes"];
+    "Mark task complete" -> "More tasks remain?";
     "More tasks remain?" -> "Execute implementation (./implementer-prompt.md)" [label="yes"];
     "More tasks remain?" -> "Run final code review for entire implementation" [label="no"];
     "Run final code review for entire implementation" -> "Use finishing-a-development-branch skill";
@@ -150,32 +149,31 @@ After all tasks:
 For each task, prepare:
 
 ```
-task_boundary:
-  description: "Implement Task N: [task name]"
-  prompt: |
-    ## Task Description
-    [FULL TEXT of task from plan — paste it here]
+## Task N: [task name]
 
-    ## Context
-    [Where this fits, dependencies, architectural context]
+### Task Description
+[FULL TEXT of task from plan — paste it here]
 
-    ## Constraints
-    - Only modify [specific files/directories]
-    - Follow existing patterns in the codebase
-    - Write tests for new functionality
+### Context
+[Where this fits, dependencies, architectural context]
 
-    ## Verification
-    - Run: [specific test command]
-    - Expected: [what success looks like]
+### Constraints
+- Only modify [specific files/directories]
+- Follow existing patterns in the codebase
+- Write tests for new functionality
+
+### Verification
+- Run: [specific test command]
+- Expected: [what success looks like]
 ```
 
-**Key:** Provide full task text and context upfront. Don't make the task boundary re-read the plan file.
+**Key:** Provide full task text and context upfront.
 
 ## Review Templates
 
 This skill includes prompt templates for structured reviews:
 
-- **`./implementer-prompt.md`** — Template for implementation task boundaries
+- **`./implementer-prompt.md`** — Template for implementation tasks
 - **`./spec-reviewer-prompt.md`** — Template for spec compliance review (did we build what was requested?)
 - **`./code-quality-reviewer-prompt.md`** — Template for code quality review (is it well-built?)
 
@@ -188,8 +186,6 @@ At logical boundaries (after each task, at major milestones), report:
 - **What changed** — files modified, features implemented
 - **What verification ran** — test results, lint results
 - **What remains** — remaining tasks, known issues
-
-Update `docs/plans/task.md` with current status.
 
 ## Common Mistakes
 
@@ -208,85 +204,10 @@ Update `docs/plans/task.md` with current status.
 - **Bad:** No constraints — task might refactor everything
 - **Good:** "Only modify src/auth/ directory"
 
-**Output:**
-
-- **Bad:** "Fix it" — no visibility into what changed
-- **Good:** "Report: root cause, changes made, test results"
-
 **Reviews:**
 
 - **Bad:** "It works, move on" — quality debt
 - **Good:** Implement then spec review then quality review then next task
-
-## Example Workflow
-
-```
-You: I'm using single-flow-task-execution to execute this plan.
-
-[Read plan file: docs/plans/feature-plan.md]
-[Extract all 5 tasks with full text and context]
-[Update docs/plans/task.md with all tasks as 'not_started']
-
---- Task 1: Hook installation script ---
-
-[Prepare task brief with full text + context]
-[Execute implementation following ./implementer-prompt.md structure]
-
-Questions: "Should the hook be installed at user or system level?"
-Answer: "User level (~/.config/superpowers/hooks/)"
-
-Implementation:
-  - Implemented install-hook command
-  - Added tests, 5/5 passing
-  - Self-review: Found I missed --force flag, added it
-  - Committed
-
-[Run spec compliance review following ./spec-reviewer-prompt.md]
-Spec review: Spec compliant — all requirements met, nothing extra
-
-[Run code quality review following ./code-quality-reviewer-prompt.md]
-Code review: Strengths: Good test coverage, clean. Issues: None. Approved.
-
-[Mark Task 1 complete in docs/plans/task.md]
-
---- Task 2: Recovery modes ---
-
-[Prepare task brief with full text + context]
-[Execute implementation]
-
-Implementation:
-  - Added verify/repair modes
-  - 8/8 tests passing
-  - Self-review: All good
-  - Committed
-
-[Run spec compliance review]
-Spec review: Issues found:
-  - Missing: Progress reporting (spec says "report every 100 items")
-  - Extra: Added --json flag (not requested)
-
-[Fix issues: remove --json flag, add progress reporting]
-[Run spec compliance review again]
-Spec review: Spec compliant now
-
-[Run code quality review]
-Code review: Issue (Important): Magic number (100) should be a constant
-
-[Fix: extract PROGRESS_INTERVAL constant]
-[Run code quality review again]
-Code review: Approved
-
-[Mark Task 2 complete in docs/plans/task.md]
-
-... [Continue through remaining tasks] ...
-
-[After all tasks complete]
-[Run final code review on entire implementation]
-Final review: All requirements met, ready to merge
-
-[Use finishing-a-development-branch skill]
-Done!
-```
 
 ## Red Flags
 
@@ -296,18 +217,9 @@ Done!
 - Skip reviews (spec compliance OR code quality)
 - Proceed with unfixed review issues
 - Work on multiple tasks simultaneously
-- Skip scene-setting context (task needs to understand where it fits)
-- Accept "close enough" on spec compliance (reviewer found issues = not done)
-- Skip review loops (reviewer found issues = fix = review again)
-- Let self-review replace actual review (both are needed)
+- Accept "close enough" on spec compliance
 - **Start code quality review before spec compliance passes** (wrong order)
 - Move to next task while either review has open issues
-
-**If you have questions about requirements:**
-
-- Ask clearly and wait for answers
-- Don't guess or make assumptions
-- Better to ask upfront than rework later
 
 **If reviewer finds issues:**
 
@@ -320,31 +232,10 @@ Done!
 
 Before claiming all work is done:
 
-1. Ensure all task entries in `docs/plans/task.md` are `done` or `cancelled`
+1. Ensure all tasks are marked `done` or `cancelled`
 2. Run full test/validation command
 3. Verify no regressions across all tasks
 4. Summarize evidence (test output, review approvals)
-
-## Advantages
-
-**Structured execution:**
-
-- Clear task boundaries prevent scope creep
-- Review gates catch issues early (cheaper than debugging later)
-- Progress tracking provides visibility
-
-**Quality gates:**
-
-- Self-review catches obvious issues before handoff
-- Two-stage review: spec compliance prevents over/under-building, code quality ensures maintainability
-- Review loops ensure fixes actually work
-
-**Efficiency:**
-
-- Provide full task text upfront (no re-reading plan files)
-- Controller curates exactly what context is needed
-- Questions surfaced before work begins (not after)
-- Sequential execution avoids conflicts between tasks
 
 ## Integration
 
@@ -362,4 +253,4 @@ Before claiming all work is done:
 
 **Alternative workflow:**
 
-- **executing-plans** — Use for worktree-based parallel session execution
+- **executing-plans** — Use for worktree-based batch execution

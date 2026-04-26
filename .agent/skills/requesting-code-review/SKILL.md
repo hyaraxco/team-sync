@@ -34,7 +34,7 @@ HEAD_SHA=$(git rev-parse HEAD)
 
 **2. Run structured code review checklist:**
 
-Use `requesting-code-review/code-reviewer.md` template and review the diff against requirements. In Antigravity single-flow mode, do not dispatch generic coding agents.
+Use the `code-reviewer.md` template in this directory and review the diff against requirements.
 
 **Placeholders:**
 
@@ -112,4 +112,4 @@ You: [Fix progress indicators]
 - Show code/tests that prove it works
 - Request clarification
 
-See template at: requesting-code-review/code-reviewer.md
+See template at: code-reviewer.md in this directory.

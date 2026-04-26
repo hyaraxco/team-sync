@@ -143,30 +143,4 @@ digraph STYLE_GUIDE {
         "Is it a state?" -> "Use ellipse" [label="yes"];
         "Is it a state?" -> "Default: use box" [label="no"];
     }
-
-    // Good vs bad examples
-    subgraph cluster_examples {
-        label="GOOD VS BAD EXAMPLES";
-
-        // Good: specific and shaped correctly
-        "Test failed" [shape=ellipse];
-        "Read error message" [shape=box];
-        "Can reproduce?" [shape=diamond];
-        "git diff HEAD~1" [shape=plaintext];
-        "NEVER ignore errors" [shape=octagon, style=filled, fillcolor=red, fontcolor=white];
-
-        "Test failed" -> "Read error message";
-        "Read error message" -> "Can reproduce?";
-        "Can reproduce?" -> "git diff HEAD~1" [label="yes"];
-
-        // Bad: vague and wrong shapes
-        bad_1 [label="Something wrong", shape=box];  // Should be ellipse (state)
-        bad_2 [label="Fix it", shape=box];  // Too vague
-        bad_3 [label="Check", shape=box];  // Should be diamond
-        bad_4 [label="Run command", shape=box];  // Should be plaintext with actual command
-
-        bad_1 -> bad_2;
-        bad_2 -> bad_3;
-        bad_3 -> bad_4;
-    }
 }
