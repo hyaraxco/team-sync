@@ -79,6 +79,7 @@ const leaveForm = ref({
   end_date: "",
   reason: "",
   emergency_contact: "",
+  proof_file: null,
 });
 
 // Computed
@@ -156,7 +157,20 @@ const closeLeaveRequestModal = () => {
     end_date: "",
     reason: "",
     emergency_contact: "",
+    proof_file: null,
   };
+};
+
+const handleProofFileChange = (event) => {
+  const file = event.target.files[0];
+  if (file) {
+    if (file.size > 5 * 1024 * 1024) {
+      toast.warning("File Too Large", "Proof file must be less than 5MB.");
+      event.target.value = "";
+      return;
+    }
+    leaveForm.value.proof_file = file;
+  }
 };
 
 const submitLeaveRequest = async () => {
@@ -185,11 +199,20 @@ const submitLeaveRequest = async () => {
 
   const totalDays = totalDaysCalculated.value;
 
+  if (leaveForm.value.leave_type === 'sick' && !leaveForm.value.proof_file) {
+    toast.warning("Missing Proof", "A medical certificate or proof is required for sick leave.");
+    return;
+  }
+
   try {
-    await createLeaveRequest({
+    const createdRequest = await createLeaveRequest({
       ...leaveForm.value,
       total_days: totalDays,
     });
+
+    if (leaveForm.value.leave_type === 'sick' && leaveForm.value.proof_file) {
+      await leaveRequestStore.uploadProof(createdRequest.id, leaveForm.value.proof_file);
+    }
 
     submittedLeaveData.value = {
       leave_type: leaveForm.value.leave_type,
@@ -453,6 +476,66 @@ onMounted(async () => {
       v-if="activeSection === 'overview'"
       class="grid grid-cols-1 lg:grid-cols-2 gap-6"
     >
+      <!-- Leave Balances (Full Width) -->
+      <div
+        v-if="canViewMyLeaveRequests"
+        class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6 mb-2"
+      >
+        <div class="flex items-center justify-between mb-6">
+          <div class="flex items-center gap-3">
+            <div
+              class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center"
+            >
+              <CalendarCheck class="w-6 h-6 text-blue-600" />
+            </div>
+            <div>
+              <h3 class="text-brand-dark text-lg font-bold">
+                Leave Entitlements
+              </h3>
+              <p class="text-brand-light text-sm">Your remaining leave quotas</p>
+            </div>
+          </div>
+        </div>
+
+        <div v-if="leaveLoading" class="text-center py-4">
+          <p class="text-brand-light">Loading...</p>
+        </div>
+
+        <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div
+            v-for="balance in myLeaveBalances"
+            :key="balance.leave_type"
+            class="border border-[#DCDEDD] rounded-[16px] p-4 bg-gray-50 flex flex-col"
+          >
+             <h4 class="text-brand-dark text-base font-semibold mb-1">
+               {{ formatLeaveType(balance.leave_type) }}
+             </h4>
+             <span class="text-xs text-brand-light mb-3 block capitalize">{{ balance.quota_scope }} Quota</span>
+             
+             <div class="mt-auto">
+                 <div v-if="balance.quota_days !== null">
+                     <div class="flex justify-between items-end mb-1">
+                         <span class="text-3xl font-bold text-brand-dark">{{ balance.remaining_days }}</span>
+                         <span class="text-sm font-medium text-brand-light pb-1">/ {{ balance.quota_days }} left</span>
+                     </div>
+                     <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
+                         <div class="bg-blue-600 h-1.5 rounded-full" :style="{ width: `${(balance.remaining_days / balance.quota_days) * 100}%` }"></div>
+                     </div>
+                 </div>
+                 <div v-else>
+                     <span class="text-xl font-bold text-brand-dark">Unlimited</span>
+                     <p class="text-sm text-brand-light mt-1">{{ balance.used_days }} day(s) used</p>
+                 </div>
+             </div>
+          </div>
+          <EmptyState
+            v-if="!leaveLoading && myLeaveBalances.length === 0"
+            icon="CalendarX"
+            title="No entitlements found"
+          />
+        </div>
+      </div>
+
       <!-- Recent Attendance -->
       <div
         v-if="canViewMyLeaveRequests"
@@ -961,6 +1044,22 @@ onMounted(async () => {
                       class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                       placeholder="Phone number for emergency contact"
                     />
+                  </div>
+
+                  <!-- Proof of Sickness -->
+                  <div v-if="leaveForm.leave_type === 'sick'">
+                    <label
+                      class="block text-sm font-medium text-gray-700 mb-1.5"
+                      >Medical Certificate / Proof *</label
+                    >
+                    <input
+                      type="file"
+                      @change="handleProofFileChange"
+                      accept=".pdf,.jpg,.jpeg,.png"
+                      required
+                      class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 text-sm font-medium text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                    />
+                    <p class="text-xs text-brand-light mt-1.5">Max size: 5MB. Formats: PDF, JPG, PNG.</p>
                   </div>
                 </div>
               </div>
