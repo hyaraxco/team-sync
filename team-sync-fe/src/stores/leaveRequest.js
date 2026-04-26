@@ -171,5 +171,46 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
                 this.loading = false;
             }
         },
+
+        async uploadProof(id, file) {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                const formData = new FormData();
+                formData.append('proof_file', file);
+                
+                const response = await axiosInstance.post(`leave-requests/${id}/proof`, formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                });
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async reviewProof(id, payload) {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.post(`leave-requests/${id}/proof-review`, payload);
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
     }
 })
