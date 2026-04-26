@@ -211,7 +211,14 @@ const submitLeaveRequest = async () => {
     });
 
     if (leaveForm.value.leave_type === 'sick' && leaveForm.value.proof_file) {
-      await leaveRequestStore.uploadProof(createdRequest.id, leaveForm.value.proof_file);
+      try {
+        await leaveRequestStore.uploadProof(createdRequest.id, leaveForm.value.proof_file);
+      } catch (uploadError) {
+        toast.warning(
+          "Proof Upload Failed",
+          "Your sick leave was submitted, but the medical certificate failed to upload. You may need to provide it to HR separately."
+        );
+      }
     }
 
     submittedLeaveData.value = {
@@ -532,6 +539,7 @@ onMounted(async () => {
             v-if="!leaveLoading && myLeaveBalances.length === 0"
             icon="CalendarX"
             title="No entitlements found"
+            class="col-span-full"
           />
         </div>
       </div>
