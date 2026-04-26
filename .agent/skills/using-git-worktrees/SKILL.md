@@ -27,23 +27,24 @@ ls -d worktrees 2>/dev/null      # Alternative
 
 **If found:** Use that directory. If both exist, `.worktrees` wins.
 
-### 2. Check AGENTS.md
+### 2. Check Project Configuration
 
 ```bash
-grep -i "worktree.*director" .agent/AGENTS.md 2>/dev/null
+# Check for worktree directory preference in project config
+grep -i "worktree.*director" AGENTS.md 2>/dev/null
 ```
 
 **If preference specified:** Use it without asking.
 
 ### 3. Ask User
 
-If no directory exists and no AGENTS.md preference:
+If no directory exists and no config preference:
 
 ```
 No worktree directory found. Where should I create worktrees?
 
 1. .worktrees/ (project-local, hidden)
-2. ~/.config/superpowers/worktrees/<project-name>/ (global location)
+2. ~/.config/opencode/worktrees/<project-name>/ (global location)
 
 Which would you prefer?
 ```
@@ -61,7 +62,7 @@ git check-ignore -q .worktrees 2>/dev/null || git check-ignore -q worktrees 2>/d
 
 **If NOT ignored:**
 
-Per Jesse's rule "Fix broken things immediately":
+Fix broken things immediately:
 
 1. Add appropriate line to .gitignore
 2. Commit the change
@@ -69,7 +70,7 @@ Per Jesse's rule "Fix broken things immediately":
 
 **Why critical:** Prevents accidentally committing worktree contents to repository.
 
-### For Global Directory (~/.config/superpowers/worktrees)
+### For Global Directory (~/.config/opencode/worktrees)
 
 No .gitignore verification needed - outside project entirely.
 
@@ -89,8 +90,8 @@ case $LOCATION in
   .worktrees|worktrees)
     path="$LOCATION/$BRANCH_NAME"
     ;;
-  ~/.config/superpowers/worktrees/*)
-    path="~/.config/superpowers/worktrees/$project/$BRANCH_NAME"
+  ~/.config/opencode/worktrees/*)
+    path="~/.config/opencode/worktrees/$project/$BRANCH_NAME"
     ;;
 esac
 
@@ -149,7 +150,7 @@ Ready to implement <feature-name>
 | `.worktrees/` exists       | Use it (verify ignored)             |
 | `worktrees/` exists        | Use it (verify ignored)             |
 | Both exist                 | Use `.worktrees/`                   |
-| Neither exists             | Check `.agent/AGENTS.md` → Ask user |
+| Neither exists             | Check project config → Ask user     |
 | Directory not ignored      | Add to .gitignore + commit          |
 | Tests fail during baseline | Report failures + ask               |
 | No package.json/Cargo.toml | Skip dependency install             |
@@ -164,7 +165,7 @@ Ready to implement <feature-name>
 ### Assuming directory location
 
 - **Problem:** Creates inconsistency, violates project conventions
-- **Fix:** Follow priority: existing > `.agent/AGENTS.md` > ask
+- **Fix:** Follow priority: existing > project config > ask
 
 ### Proceeding with failing tests
 
@@ -187,7 +188,7 @@ You: I'm using the using-git-worktrees skill to set up an isolated workspace.
 [Run npm install]
 [Run npm test - 47 passing]
 
-Worktree ready at /Users/jesse/myproject/.worktrees/auth
+Worktree ready at /Users/user/myproject/.worktrees/auth
 Tests passing (47 tests, 0 failures)
 Ready to implement auth feature
 ```
@@ -200,11 +201,11 @@ Ready to implement auth feature
 - Skip baseline test verification
 - Proceed with failing tests without asking
 - Assume directory location when ambiguous
-- Skip `.agent/AGENTS.md` check
+- Skip project config check
 
 **Always:**
 
-- Follow directory priority: existing > `.agent/AGENTS.md` > ask
+- Follow directory priority: existing > project config > ask
 - Verify directory is ignored for project-local
 - Auto-detect and run project setup
 - Verify clean test baseline

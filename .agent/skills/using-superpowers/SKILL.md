@@ -1,6 +1,6 @@
 ---
 name: using-superpowers
-description: Use when starting any conversation - establishes how to find and use skills, requiring skill loading via view_file before ANY response including clarifying questions
+description: Use when starting any task - establishes how to find and use skills, requiring skill loading before ANY response including clarifying questions
 ---
 
 <EXTREMELY-IMPORTANT>
@@ -13,9 +13,9 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 
 ## How to Access Skills
 
-**In Antigravity:** Use `view_file` to load a skill from `.agent/skills/<skill-name>/SKILL.md` (or `~/.gemini/skills/<skill-name>/SKILL.md` when needed). When you load a skill, follow it directly.
+**In OpenCode:** Use the `skill` tool to load a skill by name. Skills are discovered automatically from `.agents/skills/<skill-name>/SKILL.md` and `~/.agents/skills/<skill-name>/SKILL.md`. When you load a skill, follow it directly.
 
-**In other environments:** Check your platform's documentation for how skills are loaded.
+**Loading a skill:** `skill({ name: "skill-name" })`
 
 # Using Skills
 
@@ -26,34 +26,32 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 ```dot
 digraph skill_flow {
     "User message received" [shape=doublecircle];
-    "About to EnterPlanMode?" [shape=doublecircle];
+    "About to plan?" [shape=doublecircle];
     "Already brainstormed?" [shape=diamond];
     "Invoke brainstorming skill" [shape=box];
     "Might any skill apply?" [shape=diamond];
-    "Load skill via view_file" [shape=box];
+    "Load skill" [shape=box];
     "Announce: 'Using [skill] to [purpose]'" [shape=box];
     "Has checklist?" [shape=diamond];
-    "Update project-root docs/plans/task.md per checklist item" [shape=box];
+    "Track checklist items" [shape=box];
     "Follow skill exactly" [shape=box];
     "Respond (including clarifications)" [shape=doublecircle];
 
-    "About to EnterPlanMode?" -> "Already brainstormed?";
+    "About to plan?" -> "Already brainstormed?";
     "Already brainstormed?" -> "Invoke brainstorming skill" [label="no"];
     "Already brainstormed?" -> "Might any skill apply?" [label="yes"];
     "Invoke brainstorming skill" -> "Might any skill apply?";
 
     "User message received" -> "Might any skill apply?";
-    "Might any skill apply?" -> "Load skill via view_file" [label="yes, even 1%"];
+    "Might any skill apply?" -> "Load skill" [label="yes, even 1%"];
     "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
-    "Load skill via view_file" -> "Announce: 'Using [skill] to [purpose]'";
+    "Load skill" -> "Announce: 'Using [skill] to [purpose]'";
     "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
-    "Has checklist?" -> "Update project-root docs/plans/task.md per checklist item" [label="yes"];
+    "Has checklist?" -> "Track checklist items" [label="yes"];
     "Has checklist?" -> "Follow skill exactly" [label="no"];
-    "Update project-root docs/plans/task.md per checklist item" -> "Follow skill exactly";
+    "Track checklist items" -> "Follow skill exactly";
 }
 ```
-
-If the tracker file is missing, create `<project-root>/docs/plans/task.md` as a table-only task list.
 
 ## Red Flags
 
@@ -79,7 +77,7 @@ These thoughts mean STOP—you're rationalizing:
 When multiple skills could apply, use this order:
 
 1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
-2. **Implementation skills second** (frontend-design, mcp-builder) - these guide execution
+2. **Implementation skills second** (frontend-design, laravel-specialist) - these guide execution
 
 "Let's build X" → brainstorming first, then implementation skills.
 "Fix this bug" → debugging first, then domain-specific skills.

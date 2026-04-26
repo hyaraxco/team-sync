@@ -1,5 +1,8 @@
 # Payroll Role E2E QA Runbook
 
+> [!NOTE]
+> **Executable Test**: [PayrollRoleJourneyTest.php](../../../team-sync-be/tests/Feature/Payroll/PayrollRoleJourneyTest.php)
+
 ## Tujuan
 - Memverifikasi fitur payroll berjalan sesuai role `manager`, `hr`, `finance`, dan `employee`.
 - Memastikan status payroll konsisten dari draft `pending` sampai `paid`.

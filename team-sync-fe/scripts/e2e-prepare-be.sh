@@ -75,3 +75,5 @@ fi
 
 "${compose_cmd[@]}" exec -T web php artisan migrate:fresh
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=MinimalPayrollE2ESeeder
+"${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceReviewSectionSeeder
+"${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceDataSeeder

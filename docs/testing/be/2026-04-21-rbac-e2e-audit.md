@@ -1,5 +1,8 @@
 # Audit E2E RBAC — Team Sync
 
+> [!NOTE]
+> **Executable Test**: [RolePermissionMatrixTest.php](../../../team-sync-be/tests/Unit/RolePermissionMatrixTest.php)
+
 _Tanggal: 2026-04-21_
 _Auditor: Project Manager (static code analysis)_
 _Scope: Seluruh fitur, 4 role (Employee, Finance, HR, Manager)_

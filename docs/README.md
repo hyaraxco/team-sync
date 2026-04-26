@@ -32,10 +32,18 @@ docs/
 Completed plans and designs, sorted by date. See [plans/archive/](plans/archive/).
 
 ## Testing
+### Test Documentation
 | File | Domain |
 |------|--------|
 | [payroll-role-e2e-qa.md](testing/be/payroll-role-e2e-qa.md) | Payroll QA runbook |
 | [2026-04-21-rbac-e2e-audit.md](testing/be/2026-04-21-rbac-e2e-audit.md) | RBAC E2E audit |
+
+### Executable Tests (Code)
+| Type | Location |
+|------|----------|
+| Backend (Pest) | [team-sync-be/tests](../team-sync-be/tests/) |
+| Frontend (E2E) | [team-sync-fe/e2e](../team-sync-fe/e2e/) |
+| Frontend (Unit) | [team-sync-fe/src/tests](../team-sync-fe/src/tests/) |
 
 ## References
 | File | Description |
