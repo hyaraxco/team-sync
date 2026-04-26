@@ -22,6 +22,10 @@ use App\Http\Controllers\PerformanceReviewController;
 use App\Http\Controllers\PerformanceReviewTemplateController;
 use App\Http\Controllers\PerformanceReviewCycleController;
 use App\Http\Controllers\PerformanceTopsisController;
+use App\Http\Controllers\AttendancePeriodController;
+use App\Http\Controllers\HybridWorkScheduleController;
+use App\Http\Controllers\HybridScheduleOverrideController;
+use App\Http\Controllers\HolidayCalendarController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\StaffMemberProfileController;
@@ -141,6 +145,28 @@ Route::prefix('v1')
 
             // Project Tasks by project
             Route::get('projects/{id}/tasks', [ProjectTaskController::class, 'getByProject']);
+
+            // Attendance Periods
+            Route::apiResource('attendance-periods', AttendancePeriodController::class)
+                ->only(['index', 'store'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+
+            // Hybrid Work Schedules
+            Route::get('hybrid-schedules', [HybridWorkScheduleController::class, 'index'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+            Route::get('my-hybrid-schedule', [HybridWorkScheduleController::class, 'mySchedule']);
+
+            Route::post('hybrid-schedule-overrides', [HybridScheduleOverrideController::class, 'store']);
+            Route::post('hybrid-schedule-overrides/{hybridScheduleOverride}/approve', [HybridScheduleOverrideController::class, 'approve'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+            Route::post('hybrid-schedule-overrides/{hybridScheduleOverride}/reject', [HybridScheduleOverrideController::class, 'reject'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+
+            // Holiday Calendars
+            Route::apiResource('holiday-calendars', HolidayCalendarController::class)
+                ->except(['index'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+            Route::get('holiday-calendars', [HolidayCalendarController::class, 'index']);
 
             // Options routes
             Route::get('options/departments', [OptionController::class, 'getDepartments']);
