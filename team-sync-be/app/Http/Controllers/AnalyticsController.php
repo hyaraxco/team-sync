@@ -342,6 +342,111 @@ class AnalyticsController extends Controller implements HasMiddleware
         }
     }
 
+    // Gap-fill Analytics Endpoints (from spec audit)
+    public function getWorkforceDemographics(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getWorkforceDemographicsEndpoint(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Workforce demographics retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getAttendanceCorrectionFrequency(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getAttendanceCorrectionFrequency(
+                $request->input('period', '6m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Attendance correction frequency retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getLeaveApprovalTurnaround(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getLeaveApprovalTurnaround(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Leave approval turnaround retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getLeaveTypeDistribution(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getLeaveTypeDistribution(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Leave type distribution retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getPayrollCostPerEmployee(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getPayrollCostPerEmployee(
+                $request->input('period', '12m'),
+                $request->input('department'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Payroll cost per employee retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getPayrollProcessingTime(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getPayrollProcessingTime(
+                $request->input('period', '12m'),
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Payroll processing time retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getProjectResourceUtilization(Request $request)
+    {
+        try {
+            $data = $this->analyticsRepository->getProjectResourceUtilization(
+                $request->input('period', '6m'),
+                $request->input('team_id') ? (int) $request->input('team_id') : null,
+            );
+
+            return ResponseHelper::jsonResponse(true, 'Project resource utilization retrieved successfully', $data, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AnalyticsController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
     // Performance Management Analytics
     public function getTeamPerformanceSummary(Request $request)
     {

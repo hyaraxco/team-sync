@@ -246,6 +246,15 @@ Route::prefix('v1')
                 Route::get('projects/task-velocity', [AnalyticsController::class, 'getTaskVelocity']);
                 Route::get('projects/overdue-trends', [AnalyticsController::class, 'getOverdueTrends']);
 
+                // Gap-fill endpoints (from spec audit)
+                Route::get('workforce/demographics', [AnalyticsController::class, 'getWorkforceDemographics']);
+                Route::get('attendance/correction-frequency', [AnalyticsController::class, 'getAttendanceCorrectionFrequency']);
+                Route::get('leave/approval-turnaround', [AnalyticsController::class, 'getLeaveApprovalTurnaround']);
+                Route::get('leave/type-distribution', [AnalyticsController::class, 'getLeaveTypeDistribution']);
+                Route::get('payroll/cost-per-employee', [AnalyticsController::class, 'getPayrollCostPerEmployee']);
+                Route::get('payroll/processing-time', [AnalyticsController::class, 'getPayrollProcessingTime']);
+                Route::get('project/resource-utilization', [AnalyticsController::class, 'getProjectResourceUtilization']);
+
                 // Performance Management
                 Route::get('performance/team-summary', [AnalyticsController::class, 'getTeamPerformanceSummary']);
                 Route::get('performance/company-summary', [AnalyticsController::class, 'getCompanyPerformanceSummary']);

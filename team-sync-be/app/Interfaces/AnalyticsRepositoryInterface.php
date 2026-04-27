@@ -50,6 +50,21 @@ interface AnalyticsRepositoryInterface
     // Snapshot retrieval helper
     public function getSnapshotMetric(string $metricType, string $metricName, string $periodType, string $startDate, string $endDate): ?array;
 
+    // Gap-fill Analytics Methods (from spec audit)
+    public function getWorkforceDemographicsEndpoint(string $period, ?string $department): array;
+
+    public function getAttendanceCorrectionFrequency(string $period, ?string $department): array;
+
+    public function getLeaveApprovalTurnaround(string $period, ?string $department): array;
+
+    public function getLeaveTypeDistribution(string $period, ?string $department): array;
+
+    public function getPayrollCostPerEmployee(string $period, ?string $department): array;
+
+    public function getPayrollProcessingTime(string $period): array;
+
+    public function getProjectResourceUtilization(string $period, ?int $teamId): array;
+
     // Performance Management Analytics
     public function getTeamPerformanceSummary(int $teamId, ?int $cycleId = null): array;
 
