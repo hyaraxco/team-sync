@@ -121,7 +121,7 @@ const canManageAssignee = computed(
 const canEditDueDate = computed(
   () => (hasRole("manager") || hasRole("hr")) && !isReviewPhaseLocked.value
 );
-const canDeleteTask = computed(() => hasRole("manager"));
+const canDeleteTask = computed(() => hasRole("manager") || hasRole("hr"));
 const canReviewTask = computed(
   () => hasRole("manager") || hasRole("hr") || isProjectLeader.value
 );
@@ -167,13 +167,21 @@ const isEmployeeEditableState = computed(() =>
   ["in_progress", "rejected"].includes(normalizedTaskStatus.value)
 );
 
+const isTaskTerminal = computed(() =>
+  ["done", "cancelled"].includes(normalizedTaskStatus.value)
+);
+
 const canCollaborateTask = computed(() => {
+  if (isTaskTerminal.value) {
+    return false;
+  }
+
   if (hasRole("manager") || hasRole("hr") || isProjectLeader.value) {
     return true;
   }
 
   if (hasRole("staff")) {
-    return isOwnAssignedTask.value && isEmployeeEditableState.value;
+    return isOwnAssignedTask.value;
   }
 
   return false;
@@ -184,9 +192,13 @@ const canMutateEntityOwner = (ownerId) => {
     return false;
   }
 
+  if (isTaskTerminal.value) {
+    return false;
+  }
+
   return (
     !hasRole("staff") ||
-    (isOwnAssignedTask.value && isEmployeeEditableState.value)
+    isOwnAssignedTask.value
   );
 };
 
@@ -743,7 +755,7 @@ watch(
                           :placeholder="
                             canCollaborateTask
                               ? 'Write a comment...'
-                              : 'Comment is locked for this task status'
+                              : 'Comments are locked on completed/cancelled tasks'
                           "
                           rows="3"
                           :disabled="!canCollaborateTask || isSubmittingComment"

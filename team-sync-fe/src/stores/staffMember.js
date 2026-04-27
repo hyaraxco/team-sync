@@ -84,7 +84,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.post('employees', payload, {
+                const response = await axiosInstance.post('staff-members', payload, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     }
