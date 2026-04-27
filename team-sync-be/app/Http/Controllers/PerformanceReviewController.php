@@ -10,7 +10,9 @@ use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
+use App\Notifications\Performance\ReviewSubmittedForCalibration;
 use App\Notifications\Performance\ReviewSubmittedForManager;
+use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -114,6 +116,19 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     {
         $validated = $request->validated();
         $review = $this->repository->submitManagerAssessment($id, $validated['responses'], $validated);
+
+        // Notify HR users that the review is ready for calibration
+        $review->load(['cycle', 'staffMember.user']);
+        $hrUsers = User::role('hr')->get();
+        $managerName = Auth::user()->name ?? 'Manager';
+        foreach ($hrUsers as $hrUser) {
+            $hrUser->notify(new ReviewSubmittedForCalibration(
+                reviewId: $review->id,
+                employeeName: $review->staffMember?->user?->name ?? 'Employee',
+                managerName: $managerName,
+                cycleName: $review->cycle?->name ?? 'Review Cycle',
+            ));
+        }
 
         return ResponseHelper::jsonResponse(true, 'Manager assessment submitted successfully', $review);
     }
