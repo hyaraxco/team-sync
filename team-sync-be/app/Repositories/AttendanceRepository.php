@@ -156,7 +156,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as present_days,
                 COUNT(CASE WHEN status = 'sick' THEN 1 END) as sick_days,
                 COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
-                AVG(TIMESTAMPDIFF(MINUTE, check_in, check_out)) as avg_minutes
+                AVG({$this->minuteDiffExpression('check_in', 'check_out')}) as avg_minutes
             ")
             ->first();
 
@@ -531,6 +531,21 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         return array_values(array_unique(array_merge($fromTeamMembers, $fromJobInformation)));
     }
 
+    /**
+     * Generate a DB-agnostic SQL expression for minute difference between two datetime columns.
+     * MySQL uses TIMESTAMPDIFF, SQLite uses strftime-based subtraction.
+     */
+    private function minuteDiffExpression(string $startCol, string $endCol): string
+    {
+        $driver = DB::connection()->getDriverName();
+
+        if ($driver === 'sqlite') {
+            return "(strftime('%s', {$endCol}) - strftime('%s', {$startCol})) / 60";
+        }
+
+        return "TIMESTAMPDIFF(MINUTE, {$startCol}, {$endCol})";
+    }
+
     public function getEmployeeStatistics(string $employeeId, array $filters)
     {
         $startOfMonth = isset($filters['month'])
@@ -565,7 +580,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 COUNT(CASE WHEN status = 'half_day' THEN 1 END) as half_day_count,
                 COUNT(CASE WHEN status = 'sick' THEN 1 END) as sick_days,
                 COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
-                AVG(TIMESTAMPDIFF(MINUTE, check_in, check_out)) as avg_minutes
+                AVG({$this->minuteDiffExpression('check_in', 'check_out')}) as avg_minutes
             ")
             ->first();
 
