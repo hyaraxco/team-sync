@@ -82,7 +82,9 @@ const {
     await loadStatistics();
   },
 });
+const loadingStatistics = ref(false);
 const loadStatistics = async () => {
+  loadingStatistics.value = true;
   try {
     const data = await attendanceStore.fetchAdminStatistics();
     statistics.value = {
@@ -100,6 +102,8 @@ const loadStatistics = async () => {
   } catch (error) {
     console.error("Error loading statistics:", error);
     // Keep the default values from the initial ref
+  } finally {
+    loadingStatistics.value = false;
   }
 };
 
@@ -274,7 +278,7 @@ onMounted(async () => {
           subtitleColor="text-danger"
           iconName="XCircle"
           colorScheme="red"
-          :loading="loadingAttendances"
+          :loading="loadingStatistics"
         />
 
         <!-- Late Arrivals -->
@@ -285,7 +289,7 @@ onMounted(async () => {
           subtitleColor="text-warning"
           iconName="Clock"
           colorScheme="orange"
-          :loading="loadingAttendances"
+          :loading="loadingStatistics"
         />
       </div>
 
@@ -299,7 +303,7 @@ onMounted(async () => {
           subtitleColor="text-brand-light"
           iconName="CalendarX"
           colorScheme="yellow"
-          :loading="loadingAttendances"
+          :loading="loadingStatistics"
         />
 
         <!-- Remote Workers -->
@@ -310,7 +314,7 @@ onMounted(async () => {
           subtitleColor="text-brand-light"
           iconName="Laptop"
           colorScheme="purple"
-          :loading="loadingAttendances"
+          :loading="loadingStatistics"
         />
       </div>
 
@@ -324,7 +328,7 @@ onMounted(async () => {
           :subtitleColor="statistics.rate_change >= 0 ? 'text-success' : 'text-danger'"
           iconName="TrendingUp"
           colorScheme="blue"
-          :loading="loadingAttendances"
+          :loading="loadingStatistics"
         />
 
         <!-- Pending Requests -->
@@ -335,7 +339,7 @@ onMounted(async () => {
           subtitleColor="text-warning"
           iconName="Clock4"
           colorScheme="orange"
-          :loading="loadingAttendances"
+          :loading="loadingStatistics"
         />
       </div>
     </div>

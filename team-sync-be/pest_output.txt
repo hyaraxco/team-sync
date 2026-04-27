@@ -1,0 +1,341 @@
+
+   PASS  Tests\Unit\DTOs\StaffMemberProfileDtoTest
+  ✓ from array maps required and optional fields                         0.44s  
+  ✓ to array preserves serializable payload shape                        0.01s  
+  ✓ from array for update falls back to existing profile values          0.03s  
+
+   PASS  Tests\Unit\Enums\EmploymentTypeTest
+  ✓ label returns human readable text
+  ✓ to array returns value and label
+
+   PASS  Tests\Unit\Enums\SkillLevelTest
+  ✓ label returns human readable text
+  ✓ to array returns value and label
+
+   PASS  Tests\Unit\Helpers\PerformanceRatingHelperTest
+  ✓ it calculates weighted average correctly with all sections rated     0.02s  
+  ✓ it falls back to manager_rating when final_rating is null            0.01s  
+  ✓ it falls back to self_rating when both final_rating and manager_rat… 0.01s  
+  ✓ it returns null when no responses exist                              0.01s  
+  ✓ it handles sections with different weights correctly                 0.01s  
+  ✓ it derives correct label for each rating range boundary              0.01s  
+  ✓ it calculateManagerRating returns weighted average of manager ratin… 0.01s  
+  ✓ it calculateManagerRating returns null when no manager ratings exis… 0.01s  
+  ✓ it uses template weights instead of global section weights when tem… 0.01s  
+
+   PASS  Tests\Unit\Helpers\ResponseHelperTest
+  ✓ json response wraps payload with expected shape                      0.02s  
+  ✓ json response supports null data                                     0.01s  
+
+   PASS  Tests\Unit\Models\PayrollSettingTest
+  ✓ defaults return expected baseline configuration                      0.01s  
+  ✓ current creates default settings once                                0.01s  
+  ✓ resolve active version creates initial snapshot                      0.01s  
+  ✓ resolve active version reuses existing snapshot when unchanged       0.01s  
+  ✓ resolve active version creates new snapshot when versioned fields c… 0.01s  
+
+   PASS  Tests\Unit\RolePermissionMatrixTest
+  ✓ it ensures manager role has view-only access to staff members        0.05s  
+  ✓ it ensures hr role has full access to staff members                  0.05s  
+  ✓ it ensures manager role does not have review calibration and manage… 0.04s  
+
+   PASS  Tests\Unit\Services\Payroll\TaxCalculationServiceTest
+  ✓ pph21 zero for income below ptkp                                     0.01s  
+  ✓ pph21 applies 5 percent bracket for low pkp                          0.01s  
+  ✓ pph21 applies 15 percent bracket for mid pkp                         0.01s  
+  ✓ pph21 applies correct progressive calculation                        0.01s  
+  ✓ pph21 high earner hits 25 percent bracket                            0.01s  
+  ✓ pph21 married status produces lower tax                              0.01s  
+  ✓ pph21 null ptkp status defaults to tk0                               0.01s  
+  ✓ pph21 k1 status has lower tax than k0                                0.02s  
+  ✓ pph21 no npwp applies 20 percent surcharge                           0.01s  
+  ✓ pph21 has npwp flag is returned                                      0.01s  
+  ✓ bpjs jp component capped at max salary base                          0.01s  
+  ✓ bpjs kesehatan capped at max salary base                             0.01s  
+  ✓ bpjs salary below cap not capped                                     0.01s  
+  ✓ bpjs employer share greater than employee share                      0.01s  
+  ✓ bpjs jkk jkm are employer only                                       0.01s  
+  ✓ bpjs breakdown keys are present                                      0.01s  
+  ✓ bpjs total equals sum of breakdown                                   0.01s  
+  ✓ pph21 result contains all meta keys                                  0.01s  
+  ✓ biaya jabatan capped at 500k monthly                                 0.01s  
+
+   PASS  Tests\Unit\Services\PerformanceOutcomeServiceTest
+  ✓ applies outstanding outcome                                          0.02s  
+  ✓ applies exceeds expectations outcome                                 0.01s  
+  ✓ applies meets expectations outcome                                   0.01s  
+  ✓ applies pip for needs improvement                                    0.01s  
+  ✓ applies pip for unsatisfactory                                       0.01s  
+  ✓ returns unchanged when no final rating                               0.01s  
+  ✓ returns unchanged when no matching rule                              0.01s  
+
+   PASS  Tests\Unit\Services\ReviewerResolverServiceTest
+  ✓ resolves to manager in same team if rule exists                      0.02s  
+  ✓ resolves to any manager if no same team manager                      0.02s  
+  ✓ returns null if no matching reviewer role exists                     0.01s  
+  ✓ respects rule priority                                               0.01s  
+  ✓ resolve many returns assignments array                               0.02s  
+
+   PASS  Tests\Unit\TopsisServiceTest
+  ✓ it returns empty ranking when no candidates provided
+  ✓ it ranks single candidate as rank 1 with coefficient 1.0
+  ✓ it ranks high performer above low performer with two candidates
+  ✓ it sorts five candidates by closeness coefficient descending
+  ✓ it handles identical scores without NaN or Infinity
+  ✓ it handles all-zero values in one criterion column
+  ✓ it produces different rankings when weights change
+  ✓ it assigns correct labels based on closeness coefficient boundaries
+  ✓ it returns complete output structure with all required keys
+
+   PASS  Tests\Unit\Unit\RolePermissionMatrixTest
+  ✓ example
+
+   PASS  Tests\Feature\Attendance\AttendanceClassifierTest
+  ✓ holiday has higher priority than attendance                          0.03s  
+  ✓ approved valid paid leave is classified as leave type                0.02s  
+  ✓ ineligible leave falls back to absent                                0.02s  
+  ✓ on time check in is classified as present                            0.03s  
+  ✓ check in within grace period is classified as late                   0.02s  
+  ✓ check in beyond grace with enough minutes is half day                0.02s  
+  ✓ check in beyond grace with null worked minutes is absent             0.02s  
+  ✓ hybrid mismatch sets flag and creates mismatch record                0.09s  
+
+   PASS  Tests\Feature\Attendance\AttendanceCorrectionGuardTest
+  ✓ employee cannot check out when period is review                      0.08s  
+  ✓ employee cannot check in when period is review                       0.05s  
+  ✓ employee cannot check out when period is locked                      0.05s  
+  ✓ employee cannot check in when period is locked                       0.05s  
+
+   PASS  Tests\Feature\Attendance\AttendanceFoundationSeederTest
+  ✓ attendance policy seeder creates default policy rows                 0.01s  
+  ✓ leave entitlement seeder creates expected matrix                     0.02s  
+  ✓ minimal payroll e2e seeder also bootstraps attendance foundation da… 0.09s  
+
+   PASS  Tests\Feature\Attendance\AttendancePeriodLifecycleTest
+  ✓ sync command creates open period for current month with default cut… 0.03s  
+  ✓ sync command moves open period to review after cutoff                0.02s  
+  ✓ generate payroll locks period and assigns attendance period referen… 0.07s  
+
+   PASS  Tests\Feature\Attendance\HybridScheduleResolverTest
+  ✓ override takes priority over base schedule                           0.01s  
+  ✓ base schedule is used when no override exists                        0.01s  
+  ✓ non hybrid employee returns null planned mode                        0.01s  
+  ✓ hybrid employee without schedule returns none source                 0.01s  
+
+   PASS  Tests\Feature\Attendance\LeaveEntitlementValidatorTest
+  ✓ annual leave exceeding quota is invalid                              0.02s  
+  ✓ sick leave without attachment is invalid                             0.02s  
+  ✓ leave type not eligible for employment type is invalid               0.02s  
+  ✓ emergency leave without reason is invalid                            0.02s  
+  ✓ valid leave passes validation                                        0.02s  
+
+   PASS  Tests\Feature\Attendance\WorkingDaysCalculatorTest
+  ✓ part time effective working days is not reduced by tuesday holiday   0.02s  
+  ✓ full time effective working days is reduced by same tuesday holiday  0.02s  
+  ✓ holiday applies to full time only does not affect part time          0.02s  
+  ✓ scheduled holiday on part time monday reduces effective working day… 0.02s  
+
+   PASS  Tests\Feature\AttendancePeriodTest
+  ✓ can fetch all attendance periods                                     0.02s  
+  ✓ can generate new attendance period                                   0.01s  
+
+   PASS  Tests\Feature\Auth\ErrorHandlingSafetyTest
+  ✓ me endpoint does not leak exception message                          0.01s  
+  ✓ logout endpoint does not leak exception message                      0.01s  
+  ✓ update profile 500 does not leak exception message                   0.01s  
+  ✓ update profile domain error returns safe message                     0.01s  
+  ✓ login invalid credentials does not leak internals                    0.22s  
+
+   PASS  Tests\Feature\Auth\PasswordResetAndEmailVerificationTest
+  ✓ forgot password sends reset link notification                        0.22s  
+  ✓ reset password updates password and invalidates old token            0.03s  
+  ✓ reset password rejects invalid token                                 0.23s  
+  ✓ authenticated user can request verification email                    0.02s  
+  ✓ guest can request verification email by email                        0.01s  
+  ✓ signed verification link marks email as verified                     0.02s  
+  ✓ invalid verification link redirects with invalid status              0.01s  
+
+   PASS  Tests\Feature\Commands\PreparePayrollQaCommandTest
+  ✓ qa payroll ready command seeds and checks successfully               0.25s  
+
+   PASS  Tests\Feature\Employee\DualRoleSelfServiceAccessTest
+  ✓ internal admin roles can access personal attendance and leave endpo… 0.15s  
+
+   PASS  Tests\Feature\HolidayCalendarTest
+  ✓ requires authentication to access holidays                           0.01s  
+  ✓ allows user with permission to view holidays                         0.01s  
+  ✓ forbids normal user from managing holidays                           0.01s  
+  ✓ allows admin to create a holiday                                     0.01s  
+  ✓ validates holiday creation data                                      0.01s  
+  ✓ allows admin to update a holiday                                     0.01s  
+  ✓ allows admin to delete a holiday                                     0.01s  
+
+   PASS  Tests\Feature\HybridWorkScheduleTest
+  ✓ can fetch all hybrid schedules as admin                              0.02s  
+  ✓ employee can fetch their own schedule                                0.01s  
+  ✓ can request schedule override                                        0.01s  
+  ✓ admin can approve override                                           0.02s  
+  ✓ admin can reject override                                            0.02s  
+
+   PASS  Tests\Feature\Leave\LeaveBalanceControllerTest
+  ✓ get my balances gracefully handles user without employee profile     0.05s  
+
+   PASS  Tests\Feature\Leave\LeaveRequestPeriodGuardTest
+  ✓ employee cannot submit leave request when period is review           0.05s  
+  ✓ employee cannot submit leave request when period is locked           0.05s  
+
+   PASS  Tests\Feature\Leave\LeaveRequestProofReviewAdjustmentTest
+  ✓ hr approved sick proof creates post lock adjustment without duplica… 0.07s  
+  ✓ hr approved sick proof does not create adjustment when source perio… 0.06s  
+  ✓ hr approved sick proof skips locked default target period            0.06s  
+  ✓ hr approved sick proof keeps existing applied adjustment immutable   0.06s  
+
+   PASS  Tests\Feature\Leave\LeaveRequestProofUploadTest
+  ✓ employee can upload sick leave proof for own request                 0.06s  
+  ✓ employee cannot upload proof for other employee leave request        0.05s  
+  ✓ employee cannot upload proof for non sick leave request              0.05s  
+
+   PASS  Tests\Feature\Notification\LeaveCrossRoleNotificationsTest
+  ✓ employee leave submission notifies related manager and hr            0.08s  
+  ✓ employee proof upload notifies related manager and hr                0.07s  
+  ✓ hr proof review notifies related employee                            0.06s  
+
+   PASS  Tests\Feature\Notification\MyNotificationsTest
+  ✓ unauthenticated user cannot access my notifications endpoint         0.01s  
+  ✓ unauthenticated user cannot access my notifications unread count en… 0.01s  
+  ✓ it returns latest notifications for authenticated user with default… 0.01s  
+  ✓ it respects custom limit parameter                                   0.01s  
+  ✓ it validates limit parameter range                                   0.01s  
+  ✓ it returns unread count for authenticated user only                  0.01s  
+  ✓ unauthenticated user cannot mark notification as read                0.01s  
+  ✓ authenticated user can mark own notification as read                 0.01s  
+  ✓ user cannot mark another users notification as read                  0.01s  
+
+   FAIL  Tests\Feature\Notification\ProjectTeamAttendanceNotificationsTest
+  ⨯ employee moving task to review notifies project leader               0.06s  
+  ✓ manager adding team member notifies employee                         0.06s  
+  ⨯ task comment and attachment notify related stakeholders              0.05s  
+  ✓ team status change notifies related employee members                 0.07s  
+  ✓ employee check in and check out send notifications                   0.07s  
+  ✓ mismatch acknowledge and resolve notify employee                     0.08s  
+  ✓ mismatch created notifies employee and manager once                  0.07s  
+  ⨯ lp3es mobile project flow notifies all participating employees acro… 0.12s  
+  ✓ mismatch escalation notifies employee and hr reviewer                0.05s  
+
+   FAIL  Tests\Feature\Notification\TaskAssignmentNotificationsTest
+  ⨯ manager creating task with assignee notifies non manager employee    0.05s  
+  ⨯ reassigning task notifies new assignee as reassignment               0.05s  
+  ⨯ assignment notification is not sent to manager assignee              0.06s  
+  ⨯ reassigning rejected task resets status to backlog and clears rejec… 0.05s  
+
+   PASS  Tests\Feature\Payroll\ErrorHandlingSafetyTest
+  ✓ analytics endpoint does not leak throwable message                   0.05s  
+  ✓ domain exception returns business message not internals              0.05s  
+
+   PASS  Tests\Feature\Payroll\MinimalPayrollE2EReadySeederTest
+  ✓ ready seeder creates paid payroll and employee can see it            0.25s  
+
+   PASS  Tests\Feature\Payroll\MinimalPayrollE2ESeederTest
+  ✓ minimal payroll e2e seeder prepares a payroll ready dataset          0.21s  
+  ✓ minimal payroll e2e seeder can be run twice without duplicate atten… 0.14s  
+
+   PASS  Tests\Feature\Payroll\PayrollAdjustmentApplicationTest
+  ✓ generate payroll applies approved adjustments and marks them applie… 0.13s  
+
+   PASS  Tests\Feature\Payroll\PayrollAnalyticsTest
+  ✓ finance can retrieve latest six payroll analytics periods            0.06s  
+  ✓ analytics returns empty trends when no approved or paid payrolls ex… 0.05s  
+
+   PASS  Tests\Feature\Payroll\PayrollAuditTrailTest
+  ✓ repository logs update approve and mark as paid events               0.06s  
+  ✓ repository logs generated event for new payroll draft                0.11s  
+  ✓ export endpoints create audit trail entries                          0.10s  
+  ✓ activity logs endpoint returns entries in descending order with act… 0.05s  
+  ✓ finance can resend notifications for paid payroll and log the event  0.05s  
+  ✓ resend notifications requires paid payroll                           0.05s  
+  ✓ mark paid then resend sends two notifications for same employee      0.06s  
+  ✓ finance can reopen paid payroll and activity log captures reason     0.05s  
+
+   PASS  Tests\Feature\Payroll\PayrollAuthorizationTest
+  ✓ hr can generate payroll but cannot edit process or view statistics   0.16s  
+  ✓ finance can edit process and view statistics but cannot generate     0.09s  
+  ✓ manager has no payroll access                                        0.06s  
+  ✓ employee has no admin payroll access                                 0.06s  
+
+   PASS  Tests\Feature\Payroll\PayrollCalculationTest
+  ✓ rounding mode floor rounds salary down                               0.12s  
+  ✓ rounding mode ceil rounds salary up                                  0.10s  
+  ✓ rounding mode none preserves exact value                             0.10s  
+  ✓ deduction formula applies absent deduction rate                      0.12s  
+  ✓ zero salary employee produces zero final salary                      0.10s  
+  ✓ payroll detail captures attendance breakdown                         0.10s  
+
+   PASS  Tests\Feature\Payroll\PayrollDetailUpdateTest
+  ✓ finance can update notes and final salary on pending payroll         0.05s  
+  ✓ cannot update detail on approved payroll                             0.05s  
+  ✓ cannot update detail on paid payroll                                 0.05s  
+  ✓ partial update with only notes succeeds                              0.05s  
+  ✓ update detail creates audit log                                      0.05s  
+  ✓ update detail then approve then pay preserves edited salary          0.07s  
+
+   PASS  Tests\Feature\Payroll\PayrollExportVersioningTest
+  ✓ export uses settings version working days when detail value is miss… 0.02s  
+  ✓ export prefers effective working days from detail when available     0.01s  
+  ✓ export uses safe default for legacy payroll without settings versio… 0.01s  
+
+   PASS  Tests\Feature\Payroll\PayrollGenerateRulesTest
+  ✓ hr cannot generate payroll for a future month                        0.08s  
+  ✓ hr cannot generate duplicate payroll period                          0.08s  
+  ✓ hr cannot generate current month before cutoff                       0.08s  
+  ✓ hr cannot generate payroll when attendance is not ready              0.08s  
+  ✓ hr can generate payroll for a valid month after cutoff               0.10s  
+  ✓ generate endpoint dispatches single unique job when requests overla… 0.11s  
+  ✓ generate endpoint dispatches single unique job for same month from…  0.11s  
+  ✓ same month job can be redispatched after unique lock is released     0.03s  
+  ✓ generate payroll job has deterministic unique key per salary month   0.03s  
+  ✓ generate payroll job unique key does not vary by initiated by user   0.03s  
+  ✓ generate payroll job logs error context and rethrows exception on f… 0.04s  
+  ✓ generate readiness endpoint returns reason for invalid period        0.09s  
+  ✓ hr cannot generate payroll when period is not in review              0.08s  
+  ✓ generate readiness returns period not in review when period is lock… 0.09s  
+  ✓ generate readiness returns employees blocked when pending leave exi… 0.10s  
+  ✓ generate readiness blocks when scheduled days are uncovered          0.10s  
+  ✓ readiness dashboard returns ready warning and blocked employee brea… 0.14s  
+
+   PASS  Tests\Feature\Payroll\PayrollNotificationDeliveryTest
+  ✓ delivery summary returns correct counts                              0.05s  
+  ✓ delivery summary groups latest by employee                           0.05s  
+  ✓ delivery summary empty when no records                               0.05s  
+  ✓ delivery summary includes skipped status                             0.05s  
+
+   PASS  Tests\Feature\Payroll\PayrollReconciliationTest
+  ✓ reconciliation endpoint flags missing bank info as critical          0.05s  
+  ✓ mark as paid is blocked when critical reconciliation issue exists    0.05s  
+  ✓ warning reconciliation issues do not block mark as paid without cri… 0.05s  
+  ✓ reconciliation endpoint supports server side filters without affect… 0.05s  
+
+   PASS  Tests\Feature\Payroll\PayrollReopenCycleTest
+  ✓ reopen approved then re approve and mark paid full cycle             0.05s  
+  ✓ reopen paid then re approve and re pay preserves detail data         0.06s  
+  ✓ reopen then edit detail then re approve                              0.05s  
+  ✓ cannot reopen processing payroll                                     0.05s  
+  ✓ reopen reason is captured in audit log                               0.05s  
+  ✓ sequential reopen on pending payroll is rejected                     0.05s  
+
+Fatal error: Allowed memory size of 134217728 bytes exhausted (tried to allocate 16777248 bytes) in /Users/hyarax/Documents/project/team-sync/team-sync-be/vendor/maennchen/zipstream-php/src/File.php on line 334
+
+  [41;1m Pest\Exceptions\FatalException [49;22m
+
+[39;1m  Allowed memory size of 134217728 bytes exhausted (tried to allocate 16777248 bytes)[39;22m
+
+  at [32mvendor/maennchen/zipstream-php/src/File.php[39m:[32m334[39m
+    330▕                 ($this->exactSize ?? PHP_INT_MAX) - $this->uncompressedSize,
+    331▕                 self::CHUNKED_READ_BLOCK_SIZE
+    332▕             );
+    333▕ 
+  ➜ 334▕             $data = fread($this->unpackStream(), $readLength);
+    335▕ 
+    336▕             if ($data === false) {
+    337▕                 throw new ResourceActionException('fread', $this->unpackStream());
+    338▕             }
+

@@ -87,8 +87,14 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
     public function getMyLeaveRequests()
     {
+        $profileId = Auth::user()->staffMemberProfile?->getKey();
+
+        if (! $profileId) {
+            return collect();
+        }
+
         return LeaveRequest::with(['staffMember.user', 'approver.user'])
-            ->where('staff_member_id', Auth::user()->staffMemberProfile->getKey())
+            ->where('staff_member_id', $profileId)
             ->whereDate('created_at', '>=', now()->subDays(6)->startOfDay())
             ->whereDate('created_at', '<=', now()->endOfDay())
             ->orderBy('created_at', 'desc')
@@ -100,6 +106,23 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         return DB::transaction(function () use ($data) {
             $startDate = Carbon::parse($data['start_date']);
             $endDate = Carbon::parse($data['end_date']);
+
+            // Check for overlapping leave requests
+            $overlap = LeaveRequest::where('staff_member_id', $data['staff_member_id'])
+                ->whereIn('status', ['pending', 'approved'])
+                ->where(function ($query) use ($startDate, $endDate) {
+                    $query->whereBetween('start_date', [$startDate, $endDate])
+                        ->orWhereBetween('end_date', [$startDate, $endDate])
+                        ->orWhere(function ($q) use ($startDate, $endDate) {
+                            $q->where('start_date', '<=', $startDate)
+                                ->where('end_date', '>=', $endDate);
+                        });
+                })
+                ->exists();
+
+            if ($overlap) {
+                throw new \Exception('There is an overlapping leave request for this period.');
+            }
 
             $cursor = $startDate->copy()->startOfDay();
             while ($cursor->lessThanOrEqualTo($endDate)) {
@@ -131,9 +154,14 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         return DB::transaction(function () use ($id) {
             $leaveRequest = $this->getById($id);
 
+            $approverProfileId = Auth::user()->staffMemberProfile?->getKey();
+            if (! $approverProfileId) {
+                throw new \Exception('Your user account is not linked to a staff profile. Approval failed.');
+            }
+
             $data = [
                 'status' => 'approved',
-                'approved_by' => Auth::user()->staffMemberProfile->getKey(),
+                'approved_by' => $approverProfileId,
             ];
 
             $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
@@ -152,9 +180,14 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         return DB::transaction(function () use ($id) {
             $leaveRequest = $this->getById($id);
 
+            $approverProfileId = Auth::user()->staffMemberProfile?->getKey();
+            if (! $approverProfileId) {
+                throw new \Exception('Your user account is not linked to a staff profile. Rejection failed.');
+            }
+
             $data = [
                 'status' => 'rejected',
-                'approved_by' => Auth::user()->staffMemberProfile->getKey(),
+                'approved_by' => $approverProfileId,
             ];
 
             $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
@@ -430,5 +463,28 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         }
 
         return $periodDays;
+    }
+    public function getCalendarData(string $month)
+    {
+        $startOfMonth = Carbon::parse($month)->startOfMonth();
+        $endOfMonth = Carbon::parse($month)->endOfMonth();
+
+        $query = LeaveRequest::with(['staffMember.user'])
+            ->where(function ($query) use ($startOfMonth, $endOfMonth) {
+                $query->where('start_date', '<=', $endOfMonth)
+                    ->where('end_date', '>=', $startOfMonth);
+            })
+            ->where('status', 'approved');
+
+        $manageableEmployeeIds = $this->getManageableEmployeeIdsForManager();
+        if (is_array($manageableEmployeeIds)) {
+            if (empty($manageableEmployeeIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('staff_member_id', $manageableEmployeeIds);
+            }
+        }
+
+        return $query->get();
     }
 }

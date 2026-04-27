@@ -98,8 +98,14 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     public function getMyAttendances(): Collection
     {
+        $profileId = Auth::user()->staffMemberProfile?->id;
+
+        if (! $profileId) {
+            return new Collection();
+        }
+
         return Attendance::with(['staffMember.user'])
-            ->where('staff_member_id', Auth::user()->staffMemberProfile->id)
+            ->where('staff_member_id', $profileId)
             ->whereDate('date', '>=', now()->subDays(6)->startOfDay())
             ->whereDate('date', '<=', now()->endOfDay())
             ->orderBy('date', 'desc')
@@ -108,7 +114,17 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     public function getMyAttendanceStatistics()
     {
-        $employeeId = Auth::user()->staffMemberProfile->id;
+        $employeeId = Auth::user()->staffMemberProfile?->id;
+        if (! $employeeId) {
+            return [
+                'total_days' => 0,
+                'present_days' => 0,
+                'sick_days' => 0,
+                'absent_days' => 0,
+                'avg_hours' => 0,
+                'leave_balance' => 0,
+            ];
+        }
         $startOfMonth = now()->startOfMonth();
         $today = now();
 
@@ -169,8 +185,14 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     public function getLastAttendanceByEmployee(): ?Attendance
     {
+        $profileId = Auth::user()->staffMemberProfile?->id;
+
+        if (! $profileId) {
+            return null;
+        }
+
         return Attendance::with(['staffMember.user'])
-            ->where('staff_member_id', Auth::user()->staffMemberProfile->id)
+            ->where('staff_member_id', $profileId)
             ->whereBetween('date', [
                 now()->startOfDay(),
                 now()->endOfDay(),
@@ -185,7 +207,12 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 throw new \Exception('Attendance period is no longer open for check-in.');
             }
 
-            $existingAttendance = Attendance::where('staff_member_id', Auth::user()->staffMemberProfile->id)
+            $profileId = Auth::user()->staffMemberProfile?->id;
+            if (! $profileId) {
+                throw new \Exception('Your user account is not linked to a staff profile. Check-in failed.');
+            }
+
+            $existingAttendance = Attendance::where('staff_member_id', $profileId)
                 ->whereBetween('date', [
                     now()->startOfDay(),
                     now()->endOfDay(),
@@ -223,7 +250,12 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 throw new \Exception('Attendance period is no longer open for check-out.');
             }
 
-            $attendance = Attendance::where('staff_member_id', Auth::user()->staffMemberProfile->id)
+            $profileId = Auth::user()->staffMemberProfile?->id;
+            if (! $profileId) {
+                throw new \Exception('Your user account is not linked to a staff profile. Check-out failed.');
+            }
+
+            $attendance = Attendance::where('staff_member_id', $profileId)
                 ->whereBetween('date', [
                     now()->startOfDay(),
                     now()->endOfDay(),

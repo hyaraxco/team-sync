@@ -123,8 +123,8 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
         >
           <div class="relative">
             <img
-              v-if="staffMember.profile_photo"
-              :src="staffMember.profile_photo"
+              v-if="employee.profile_photo"
+              :src="employee.profile_photo"
               :alt="employee.name"
               class="w-8 h-8 rounded-full object-cover"
             />
@@ -165,8 +165,8 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
           >
             <div class="relative">
               <img
-                v-if="staffMember.profile_photo"
-                :src="staffMember.profile_photo"
+                v-if="employee.profile_photo"
+                :src="employee.profile_photo"
                 :alt="employee.name"
                 class="w-8 h-8 rounded-full object-cover grayscale"
               />

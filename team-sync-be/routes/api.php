@@ -105,13 +105,14 @@ Route::prefix('v1')
             Route::post('attendance-corrections/{id}/approve', [AttendanceCorrectionController::class, 'approve']);
             Route::post('attendance-corrections/{id}/reject', [AttendanceCorrectionController::class, 'reject']);
 
-            Route::apiResource('leave-requests', LeaveRequestController::class)->only(['index', 'show', 'store']);
             Route::get('leave-requests/all/paginated', [LeaveRequestController::class, 'getAllPaginated']);
+            Route::get('leave-requests/all/calendar', [LeaveRequestController::class, 'getCalendarRequests']);
             Route::get('my-leave-requests', [LeaveRequestController::class, 'getMyLeaveRequests']);
             Route::post('leave-requests/approve/{id}', [LeaveRequestController::class, 'approve']);
             Route::post('leave-requests/reject/{id}', [LeaveRequestController::class, 'reject']);
             Route::post('leave-requests/{id}/proof', [LeaveRequestController::class, 'uploadProof']);
             Route::post('leave-requests/{id}/proof-review', [LeaveRequestController::class, 'reviewProof']);
+            Route::apiResource('leave-requests', LeaveRequestController::class)->only(['index', 'show', 'store']);
 
             // Leave Balance routes
             Route::get('my-leave-balances', [LeaveBalanceController::class, 'getMyBalances']);

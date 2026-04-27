@@ -27,7 +27,7 @@ class LeaveRequestController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['leave-request-list']), only: ['index', 'getAllPaginated', 'show']),
+            new Middleware(PermissionMiddleware::using(['leave-request-list']), only: ['index', 'getAllPaginated', 'show', 'getCalendarRequests']),
             new Middleware(PermissionMiddleware::using(['leave-request-create']), only: ['store', 'uploadProof']),
             new Middleware(PermissionMiddleware::using(['leave-request-approve']), only: ['approve', 'reject', 'reviewProof']),
             new Middleware(PermissionMiddleware::using(['leave-request-my-requests']), only: ['getMyLeaveRequests']),
@@ -199,6 +199,21 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (\Exception $e) {
             \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+    public function getCalendarRequests(Request $request)
+    {
+        $request->validate([
+            'month' => 'required|string|regex:/^\d{4}-\d{2}$/',
+        ]);
+
+        try {
+            $leaveRequests = $this->leaveRequestRepository->getCalendarData($request->month);
+
+            return ResponseHelper::jsonResponse(true, 'Calendar Data Retrieved Successfully', LeaveRequestResource::collection($leaveRequests), 200);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
