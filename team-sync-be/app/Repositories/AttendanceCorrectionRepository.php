@@ -44,7 +44,13 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
     public function getMyCorrections()
     {
-        $employeeId = Auth::user()->staffMemberProfile->id;
+        $profileId = Auth::user()->staffMemberProfile?->id;
+
+        if (! $profileId) {
+            return collect();
+        }
+
+        $employeeId = $profileId;
 
         return AttendanceCorrection::query()
             ->with(['attendance'])
@@ -64,7 +70,9 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
         // Check if employee tries to read someone else's request
         /** @var User $user */
         $user = Auth::user();
-        if ($user->hasRole('staff') && $correction->staff_member_id !== $user->staffMemberProfile->id) {
+        $profileId = $user->staffMemberProfile?->id;
+
+        if ($user->hasRole('staff') && $profileId && $correction->staff_member_id !== $profileId) {
             throw new AuthorizationException('You are not authorized to view this request.');
         }
 
@@ -83,7 +91,13 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
             throw new \Exception('Pengajuan koreksi tidak dapat diproses karena periode absensi untuk tanggal tersebut sudah ditutup atau dikunci oleh HR.');
         }
 
-        $employeeId = Auth::user()->staffMemberProfile->id;
+        $profileId = Auth::user()->staffMemberProfile?->id;
+
+        if (! $profileId) {
+            throw new \Exception('Your user account is not linked to a staff profile. Correction failed.');
+        }
+
+        $employeeId = $profileId;
 
         if ($attendance->staff_member_id !== $employeeId) {
             throw new AuthorizationException('You are not authorized to request correction for this attendance.');

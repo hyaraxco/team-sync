@@ -42,4 +42,6 @@ interface LeaveRequestRepositoryInterface
         string $id,
         array $data
     );
+
+    public function getCalendarData(string $month);
 }

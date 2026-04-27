@@ -257,7 +257,7 @@ const preloadExistingPayrollMonths = async () => {
 const refreshGenerateReadiness = async () => {
   const salaryMonth = form.value.salary_month;
 
-  if (!salaryMonth) {
+  if (!salaryMonth || !/^\d{4}-\d{2}$/.test(salaryMonth)) {
     readiness.value = null;
     readinessDashboard.value = null;
     return;
@@ -364,7 +364,7 @@ onMounted(async () => {
 watch(
   () => form.value.salary_month,
   async (newMonth) => {
-    if (!newMonth) return;
+    if (!newMonth || !/^\d{4}-\d{2}$/.test(newMonth)) return;
 
     await refreshGenerateReadiness();
 

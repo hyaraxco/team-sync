@@ -44,10 +44,15 @@ class ProjectRepository implements ProjectRepositoryInterface
             ->orderByDesc('created_at');
 
         if (Auth::user()->hasRole('staff')) {
-            $employeeId = Auth::user()->staffMemberProfile->id;
+            $profile = Auth::user()->staffMemberProfile;
+            if (! $profile) {
+                return $query;
+            }
+
+            $employeeId = $profile->id;
 
             // Get team ID from JobInformation
-            $jobInfoTeamId = Auth::user()->staffMemberProfile->jobInformation->team_id ?? null;
+            $jobInfoTeamId = $profile->jobInformation->team_id ?? null;
 
             // Get all team IDs that the employee is currently a member of (not left)
             $teamMemberIds = TeamMember::where('staff_member_id', $employeeId)
