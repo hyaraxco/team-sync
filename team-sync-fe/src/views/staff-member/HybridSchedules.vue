@@ -1,0 +1,119 @@
+<template>
+  <div class="hybrid-schedules-container min-h-screen bg-neutral-900 text-neutral-100 p-8">
+    <div class="max-w-6xl mx-auto space-y-8 relative">
+      <!-- Decorative Background Blur -->
+      <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-cyan-600/20 rounded-full blur-[120px] pointer-events-none"></div>
+      
+      <!-- Header Section -->
+      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+        <div class="space-y-2">
+          <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
+            Hybrid Schedule
+          </h1>
+          <p class="text-neutral-400 font-light tracking-wide max-w-xl">
+            View your default weekly schedule and request day-specific overrides.
+          </p>
+        </div>
+        <button class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300 shadow-lg shadow-white/10">
+          Request Override
+        </button>
+      </header>
+
+      <!-- Main Content -->
+      <div class="relative z-10 space-y-8">
+        
+        <!-- Error State -->
+        <div v-if="error" class="p-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 flex items-center gap-3">
+          <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+          <p>Failed to load schedule. The service might be temporarily unavailable.</p>
+        </div>
+
+        <!-- Loading State -->
+        <div v-else-if="loading" class="flex justify-center p-16 border border-white/5 rounded-3xl bg-white/[0.02]">
+          <svg class="animate-spin w-8 h-8 text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+        </div>
+
+        <!-- Schedule Content -->
+        <div v-else class="grid gap-8 lg:grid-cols-2">
+          
+          <!-- Base Weekly Schedule -->
+          <div class="space-y-4">
+            <h2 class="text-xl font-light mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+              Base Schedule
+            </h2>
+            <div class="grid gap-3">
+              <div v-for="(location, day) in schedule.base_schedule" :key="day" 
+                   class="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-colors">
+                <span class="font-medium text-white capitalize">{{ day }}</span>
+                <span 
+                  class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border"
+                  :class="location === 'office' ? 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400' : 'bg-purple-500/10 border-purple-500/20 text-purple-400'"
+                >
+                  {{ location }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Upcoming Overrides -->
+          <div class="space-y-4">
+            <h2 class="text-xl font-light mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+              Overrides & Exceptions
+            </h2>
+            
+            <div v-if="!schedule.overrides?.length" class="text-center p-8 border border-dashed border-white/10 rounded-2xl bg-white/[0.01] text-neutral-500">
+              <p class="font-light italic">No overrides requested.</p>
+            </div>
+            
+            <div v-else class="space-y-3">
+              <div v-for="override in schedule.overrides" :key="override.id" 
+                   class="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                <div class="flex justify-between items-start mb-2">
+                  <div>
+                    <p class="font-medium text-white">{{ override.date }}</p>
+                    <p class="text-sm text-neutral-400">Change to: <span class="text-white">{{ override.requested_location }}</span></p>
+                  </div>
+                  <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    {{ override.status }}
+                  </span>
+                </div>
+                <p class="text-xs text-neutral-500 italic mt-2 border-t border-white/5 pt-2">Reason: {{ override.reason }}</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, onMounted } from 'vue';
+import { useHybridScheduleStore } from '@/stores/hybridSchedule';
+
+const scheduleStore = useHybridScheduleStore();
+const schedule = ref({ base_schedule: {}, overrides: [] });
+const loading = ref(true);
+const error = ref(false);
+
+onMounted(async () => {
+  try {
+    const response = await scheduleStore.fetchMySchedule();
+    schedule.value = response?.data || { base_schedule: {}, overrides: [] };
+  } catch (err) {
+    console.error('Failed to load schedule', err);
+    error.value = true;
+  } finally {
+    loading.value = false;
+  }
+});
+</script>
+
+<style scoped>
+.font-display {
+  font-family: 'Outfit', 'Inter', sans-serif;
+}
+</style>
