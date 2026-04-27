@@ -530,4 +530,53 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
         return array_values(array_unique(array_merge($fromTeamMembers, $fromJobInformation)));
     }
+
+    public function getEmployeeStatistics(string $employeeId, array $filters)
+    {
+        $startOfMonth = isset($filters['month'])
+            ? Carbon::parse($filters['month'])->startOfMonth()
+            : now()->startOfMonth();
+        $endOfMonth = $startOfMonth->copy()->endOfMonth();
+        $endDate = $endOfMonth->isFuture() ? now() : $endOfMonth;
+
+        $totalWorkingDays = 0;
+        try {
+            $calculator = app(WorkingDaysCalculator::class);
+            $totalWorkingDays = $calculator->calculateForEmployee(
+                (int) $employeeId,
+                $startOfMonth,
+                $endDate
+            );
+        } catch (\Throwable) {
+            $cursor = $startOfMonth->copy();
+            while ($cursor->lte($endDate)) {
+                if ($cursor->isWeekday()) {
+                    $totalWorkingDays++;
+                }
+                $cursor->addDay();
+            }
+        }
+
+        $stats = Attendance::where('staff_member_id', $employeeId)
+            ->whereBetween('date', [$startOfMonth, $endDate])
+            ->selectRaw("
+                COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as present_days,
+                COUNT(CASE WHEN status = 'late' THEN 1 END) as late_days,
+                COUNT(CASE WHEN status = 'half_day' THEN 1 END) as half_day_count,
+                COUNT(CASE WHEN status = 'sick' THEN 1 END) as sick_days,
+                COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
+                AVG(TIMESTAMPDIFF(MINUTE, check_in, check_out)) as avg_minutes
+            ")
+            ->first();
+
+        return [
+            'total_days' => $totalWorkingDays,
+            'present_days' => (int) $stats->present_days,
+            'late_days' => (int) $stats->late_days,
+            'half_day_count' => (int) $stats->half_day_count,
+            'sick_days' => (int) $stats->sick_days,
+            'absent_days' => (int) $stats->absent_days,
+            'avg_hours' => $stats->avg_minutes ? round($stats->avg_minutes / 60, 1) : 0,
+        ];
+    }
 }

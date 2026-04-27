@@ -7,9 +7,11 @@ use App\Http\Requests\AttendanceCheckInRequest;
 use App\Http\Requests\AttendanceCheckOutRequest;
 use App\Http\Requests\AttendancePolicyMismatchAcknowledgeRequest;
 use App\Http\Requests\AttendancePolicyMismatchResolveRequest;
+use App\Http\Resources\AttendancePolicyMismatchResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\PaginateResource;
 use App\Interfaces\AttendanceRepositoryInterface;
+use App\Models\AttendancePolicyMismatch;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -28,7 +30,7 @@ class AttendanceController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['attendance-list']), only: ['index', 'getAllPaginated', 'show', 'getStatistics']),
+            new Middleware(PermissionMiddleware::using(['attendance-list']), only: ['index', 'getAllPaginated', 'show', 'getStatistics', 'getPolicyMismatches', 'getEmployeeStatistics']),
             new Middleware(PermissionMiddleware::using(['attendance-check-in']), only: ['checkIn']),
             new Middleware(PermissionMiddleware::using(['attendance-check-out']), only: ['checkOut']),
             new Middleware(PermissionMiddleware::using(['attendance-last-attendance']), only: ['getLastAttendance']),
@@ -211,6 +213,50 @@ class AttendanceController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Attendance Retrieved Successfully', new AttendanceResource($attendance), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Attendance Not Found', null, 404);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * Get paginated policy mismatches for admin dashboard.
+     */
+    public function getPolicyMismatches(Request $request)
+    {
+        try {
+            $query = AttendancePolicyMismatch::with(['staffMember', 'attendance'])
+                ->orderBy('mismatch_date', 'desc');
+
+            if ($request->has('status')) {
+                $query->where('status', $request->status);
+            }
+
+            $mismatches = $query->paginate($request->get('per_page', 15));
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Policy Mismatches Retrieved Successfully',
+                PaginateResource::make($mismatches, AttendancePolicyMismatchResource::class),
+                200
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * Get attendance statistics for a specific employee (admin view).
+     */
+    public function getEmployeeStatistics(Request $request, string $employeeId)
+    {
+        try {
+            $statistics = $this->attendanceRepository->getEmployeeStatistics($employeeId, $request->all());
+
+            return ResponseHelper::jsonResponse(true, 'Employee Attendance Statistics Retrieved Successfully', $statistics, 200);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);

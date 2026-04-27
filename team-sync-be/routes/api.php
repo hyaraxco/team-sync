@@ -23,6 +23,9 @@ use App\Http\Controllers\PerformanceReviewTemplateController;
 use App\Http\Controllers\PerformanceReviewCycleController;
 use App\Http\Controllers\PerformanceTopsisController;
 use App\Http\Controllers\AttendancePeriodController;
+use App\Http\Controllers\AttendancePolicyController;
+use App\Http\Controllers\LeaveEntitlementController;
+use App\Http\Controllers\PayrollAdjustmentController;
 use App\Http\Controllers\HybridWorkScheduleController;
 use App\Http\Controllers\HybridScheduleOverrideController;
 use App\Http\Controllers\HolidayCalendarController;
@@ -93,6 +96,8 @@ Route::prefix('v1')
             Route::get('attendances/last-attendance', [AttendanceController::class, 'getLastAttendance']);
             Route::post('attendances/check-in', [AttendanceController::class, 'checkIn']);
             Route::post('attendances/check-out', [AttendanceController::class, 'checkOut']);
+            Route::get('attendances/employee/{id}/statistics', [AttendanceController::class, 'getEmployeeStatistics']);
+            Route::get('attendance-policy-mismatches', [AttendanceController::class, 'getPolicyMismatches']);
             Route::post('attendance-policy-mismatches/{id}/acknowledge', [AttendanceController::class, 'acknowledgePolicyMismatch']);
             Route::post('attendance-policy-mismatches/{id}/resolve', [AttendanceController::class, 'resolvePolicyMismatch']);
             Route::apiResource('attendances', AttendanceController::class)->only(['index', 'show']);
@@ -149,13 +154,29 @@ Route::prefix('v1')
 
             // Attendance Periods
             Route::apiResource('attendance-periods', AttendancePeriodController::class)
-                ->only(['index', 'store'])
+                ->only(['index', 'store', 'update'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+
+            // Payroll Adjustments
+            Route::get('payroll-adjustments', [PayrollAdjustmentController::class, 'index'])
+                ->middleware(PermissionMiddleware::using('payroll-menu'));
+            Route::post('payroll-adjustments/{id}/approve', [PayrollAdjustmentController::class, 'approve'])
+                ->middleware(PermissionMiddleware::using('payroll-menu'));
+
+            // Attendance Policies & Leave Entitlements
+            Route::apiResource('attendance-policies', AttendancePolicyController::class)
+                ->only(['index', 'update'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
+            
+            Route::apiResource('leave-entitlements', LeaveEntitlementController::class)
+                ->only(['index', 'update'])
                 ->middleware(PermissionMiddleware::using('attendance-menu'));
 
             // Hybrid Work Schedules
             Route::get('hybrid-schedules', [HybridWorkScheduleController::class, 'index'])
                 ->middleware(PermissionMiddleware::using('attendance-menu'));
             Route::get('my-hybrid-schedule', [HybridWorkScheduleController::class, 'mySchedule']);
+            Route::get('my-hybrid-overrides', [HybridWorkScheduleController::class, 'myOverrides']);
 
             Route::post('hybrid-schedule-overrides', [HybridScheduleOverrideController::class, 'store']);
             Route::post('hybrid-schedule-overrides/{hybridScheduleOverride}/approve', [HybridScheduleOverrideController::class, 'approve'])
