@@ -34,7 +34,7 @@ class ReviewSubmittedForCalibration extends Notification implements ShouldQueue
             'category' => 'performance',
             'title' => 'Review Siap Dikalibrasi',
             'body' => "Review untuk {$this->employeeName} oleh {$this->managerName} siap dikalibrasi (siklus \"{$this->cycleName}\").",
-            'action_url' => "/performance/reviews/{$this->reviewId}",
+            'action_url' => '/admin/performance/reviews/pending-calibration',
             'review_id' => $this->reviewId,
             'employee_name' => $this->employeeName,
             'manager_name' => $this->managerName,

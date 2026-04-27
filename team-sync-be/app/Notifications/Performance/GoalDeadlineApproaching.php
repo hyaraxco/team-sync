@@ -34,7 +34,7 @@ class GoalDeadlineApproaching extends Notification implements ShouldQueue
             'category' => 'performance',
             'title' => 'Deadline Goal Mendekat',
             'body' => "Goal \"{$this->goalTitle}\" akan jatuh tempo dalam {$this->daysRemaining} hari ({$this->dueDate}).",
-            'action_url' => '/performance/goals',
+            'action_url' => "/admin/performance/goals/{$this->goalId}",
             'goal_id' => $this->goalId,
             'goal_title' => $this->goalTitle,
             'due_date' => $this->dueDate,

@@ -33,7 +33,7 @@ class GoalAssigned extends Notification implements ShouldQueue
             'category' => 'performance',
             'title' => 'Goal Baru Ditugaskan',
             'body' => "{$this->assignedByName} menugaskan goal baru: \"{$this->goalTitle}\"",
-            'action_url' => '/performance/goals',
+            'action_url' => "/admin/performance/goals/{$this->goalId}",
             'goal_id' => $this->goalId,
             'goal_title' => $this->goalTitle,
             'assigned_by' => $this->assignedByName,
