@@ -10,6 +10,7 @@ use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
+use App\Notifications\Performance\ReviewCalibrated;
 use App\Notifications\Performance\ReviewSubmittedForCalibration;
 use App\Notifications\Performance\ReviewSubmittedForManager;
 use App\Models\User;
@@ -151,6 +152,17 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     {
         $validated = $request->validated();
         $review = $this->repository->calibrateReview($id, $validated['responses'] ?? [], $validated);
+
+        // Notify the employee that their review has been calibrated
+        $review->load(['staffMember.user', 'cycle', 'outcomeRule']);
+        if ($review->staffMember?->user) {
+            $review->staffMember->user->notify(new ReviewCalibrated(
+                reviewId: $review->id,
+                cycleName: $review->cycle?->name ?? 'Review Cycle',
+                finalRating: (float) ($review->final_rating ?? 0),
+                outcome: $review->outcomeRule?->outcome_label,
+            ));
+        }
 
         return ResponseHelper::jsonResponse(true, 'Review calibrated successfully', $review);
     }
