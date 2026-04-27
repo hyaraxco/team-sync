@@ -41,4 +41,42 @@ class AttendancePeriodController extends Controller
             'data' => $period,
         ], 201);
     }
+
+    public function update(Request $request, string $id): JsonResponse
+    {
+        $data = $request->validate([
+            'status' => 'required|string|in:' . AttendancePeriod::STATUS_OPEN . ',' . AttendancePeriod::STATUS_REVIEW . ',' . AttendancePeriod::STATUS_LOCKED,
+        ]);
+
+        $period = AttendancePeriod::findOrFail($id);
+
+        // Validation for status transitions
+        if ($period->status === AttendancePeriod::STATUS_LOCKED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Cannot change status of a locked period.',
+            ], 422);
+        }
+
+        if ($period->status === AttendancePeriod::STATUS_OPEN && $data['status'] === AttendancePeriod::STATUS_LOCKED) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Must move to review before locking.',
+            ], 422);
+        }
+
+        $updateData = ['status' => $data['status']];
+        
+        if ($data['status'] === AttendancePeriod::STATUS_LOCKED) {
+            $updateData['locked_at'] = now();
+        }
+
+        $period->update($updateData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Attendance period status updated successfully.',
+            'data' => $period,
+        ]);
+    }
 }

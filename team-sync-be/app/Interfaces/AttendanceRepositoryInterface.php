@@ -33,4 +33,6 @@ interface AttendanceRepositoryInterface
     public function acknowledgePolicyMismatch(string $id, array $data);
 
     public function resolvePolicyMismatch(string $id, array $data);
+
+    public function getEmployeeStatistics(string $employeeId, array $filters);
 }

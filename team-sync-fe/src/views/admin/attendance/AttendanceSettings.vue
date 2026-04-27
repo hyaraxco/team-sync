@@ -20,7 +20,7 @@
       <!-- Tabs Navigation -->
       <nav class="relative z-10 flex gap-8 border-b border-white/5" aria-label="Tabs">
         <button 
-          v-for="tab in ['Attendance Policies', 'Holiday Calendars']" 
+          v-for="tab in ['Attendance Policies', 'Leave Entitlements', 'Holiday Calendars']" 
           :key="tab"
           @click="activeTab = tab"
           class="pb-4 text-sm font-medium tracking-wider uppercase transition-all duration-300 relative group"
@@ -37,38 +37,98 @@
       <!-- Tab Content: Attendance Policies -->
       <transition name="fade" mode="out-in">
         <section v-if="activeTab === 'Attendance Policies'" key="policies" class="relative z-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <!-- Policy Card -->
-          <div class="policy-card group p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10">
-            <div class="flex justify-between items-start mb-6">
-              <h3 class="text-xl font-medium">Standard Hours</h3>
-              <span class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-white/10 text-neutral-300">Default</span>
+            <div v-if="policyStore.loading" class="text-neutral-400 p-8 flex justify-center w-full col-span-full">
+              Loading policies...
+            </div>
+            <div v-else-if="policyStore.error" class="text-rose-400 p-8 flex justify-center w-full col-span-full">
+              {{ policyStore.error }}
             </div>
             
-            <div class="space-y-4">
-              <div class="flex justify-between items-center border-b border-white/5 pb-2">
-                <span class="text-neutral-400 font-light">Late Grace Period</span>
-                <span class="font-medium text-purple-400">15 mins</span>
-              </div>
-              <div class="flex justify-between items-center border-b border-white/5 pb-2">
-                <span class="text-neutral-400 font-light">Half Day Max</span>
-                <span class="font-medium text-blue-400">4 hours</span>
-              </div>
-              <div class="flex justify-between items-center border-b border-white/5 pb-2">
-                <span class="text-neutral-400 font-light">Required Work Days</span>
-                <span class="font-medium text-white">Mon - Fri</span>
-              </div>
-            </div>
+            <template v-else>
+              <div v-for="policy in policyStore.policies" :key="policy.id" class="policy-card group p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10">
+                <div class="flex justify-between items-start mb-6">
+                  <h3 class="text-xl font-medium capitalize">{{ policy.employment_type.replace('_', ' ') }}</h3>
+                  <span class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-white/10 text-neutral-300">Policy</span>
+                </div>
+                
+                <div class="space-y-4 text-sm">
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-neutral-400 font-light">Work Hours</span>
+                    <span class="font-medium text-purple-400">{{ policy.work_start_time.substring(0,5) }} - {{ policy.work_end_time.substring(0,5) }}</span>
+                  </div>
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-neutral-400 font-light">Late Grace Period</span>
+                    <span class="font-medium text-rose-400">{{ policy.late_grace_minutes }} mins</span>
+                  </div>
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-neutral-400 font-light">Half Day Min</span>
+                    <span class="font-medium text-blue-400">{{ policy.half_day_min_hours }} hours</span>
+                  </div>
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-neutral-400 font-light">Required Work Days</span>
+                    <span class="font-medium text-white">{{ policy.work_days_per_week }} days/week</span>
+                  </div>
+                </div>
 
-            <button class="w-full mt-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm tracking-wide font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50">
-              Edit Policy
-            </button>
-          </div>
+                <button class="w-full mt-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm tracking-wide font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+                  Edit Policy
+                </button>
+              </div>
+            </template>
 
           <!-- Add New Policy Card -->
           <button class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-white/20 text-neutral-400 hover:text-white hover:border-white/50 hover:bg-white/5 transition-all duration-500 min-h-[300px]">
             <svg class="w-12 h-12 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
             <span class="font-medium tracking-wide">Create Custom Policy</span>
           </button>
+        </section>
+
+        <!-- Tab Content: Leave Entitlements -->
+        <section v-else-if="activeTab === 'Leave Entitlements'" key="entitlements" class="relative z-10 space-y-6">
+          <div class="flex justify-between items-center">
+            <h2 class="text-2xl font-light">Leave Quotas & Rules</h2>
+          </div>
+
+          <div v-if="entitlementStore.loading" class="text-neutral-400 p-8 flex justify-center w-full">
+            Loading entitlements...
+          </div>
+          <div v-else-if="entitlementStore.error" class="text-rose-400 p-8 flex justify-center w-full">
+            {{ entitlementStore.error }}
+          </div>
+          
+          <div v-else v-for="(group, type) in entitlementStore.groupedEntitlements" :key="type" class="mb-8">
+            <h3 class="text-xl font-medium capitalize mb-4 text-purple-300">{{ type.replace('_', ' ') }}</h3>
+            <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <div v-for="entitlement in group" :key="entitlement.id" class="policy-card p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all duration-300">
+                <div class="flex justify-between items-start mb-4">
+                  <h4 class="text-lg font-medium capitalize">{{ entitlement.leave_type.replace('_', ' ') }}</h4>
+                  <span v-if="!entitlement.is_eligible" class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Ineligible</span>
+                  <span v-else-if="entitlement.is_paid" class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Paid</span>
+                  <span v-else class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded bg-amber-500/20 text-amber-300 border border-amber-500/30">Unpaid</span>
+                </div>
+                
+                <div class="space-y-3 text-sm">
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-neutral-400 font-light">Quota</span>
+                    <span class="font-medium text-white" v-if="entitlement.quota_scope === 'unlimited' || entitlement.quota_scope === 'unpaid'">Unlimited</span>
+                    <span class="font-medium text-white" v-else>{{ entitlement.quota_days }} days ({{ entitlement.quota_scope }})</span>
+                  </div>
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2" v-if="entitlement.carry_over_max_days > 0">
+                    <span class="text-neutral-400 font-light">Max Carry Over</span>
+                    <span class="font-medium text-blue-400">{{ entitlement.carry_over_max_days }} days</span>
+                  </div>
+                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                    <span class="text-neutral-400 font-light">Requires Proof</span>
+                    <span class="font-medium" :class="entitlement.requires_attachment ? 'text-rose-400' : 'text-neutral-500'">{{ entitlement.requires_attachment ? 'Yes' : 'No' }}</span>
+                  </div>
+                </div>
+
+                <button class="w-full mt-6 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs tracking-wide font-medium transition-all">
+                  Edit Rules
+                </button>
+              </div>
+            </div>
+          </div>
         </section>
 
         <!-- Tab Content: Holiday Calendars -->
@@ -126,15 +186,23 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useHolidayCalendarStore } from '@/stores/holidayCalendar';
+import { useAttendancePolicyStore } from '@/stores/attendancePolicy';
+import { useLeaveEntitlementStore } from '@/stores/leaveEntitlement';
 
 const activeTab = ref('Attendance Policies');
 const holidayStore = useHolidayCalendarStore();
+const policyStore = useAttendancePolicyStore();
+const entitlementStore = useLeaveEntitlementStore();
 
 onMounted(async () => {
   try {
-    await holidayStore.fetchAllPaginated();
+    await Promise.all([
+      holidayStore.fetchAllPaginated(),
+      policyStore.fetchPolicies(),
+      entitlementStore.fetchEntitlements()
+    ]);
   } catch (error) {
-    console.error('Failed to load holidays', error);
+    console.error('Failed to load settings data', error);
   }
 });
 </script>

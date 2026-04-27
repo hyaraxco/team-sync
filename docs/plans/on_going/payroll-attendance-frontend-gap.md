@@ -1,62 +1,72 @@
-# GAP ANALYSIS: Payroll & Attendance Phase 1 (Frontend Missing)
+# GAP ANALYSIS: Payroll & Attendance Phase 1 (Frontend)
 
-> **Date:** 2026-04-26
+> **Date:** 2026-04-26 (updated 2026-04-27)
 > **Context:** Audit of `docs/plans/` vs Codebase
+> **Status:** ⚠️ PARTIALLY RESOLVED — See remaining gaps below
 
 ## Executive Summary
-After auditing the `docs/plans` directory and comparing the Business Requirements (BE) to the Functional Requirements (FE), a **significant gap** was identified in the **Attendance for Fair Payroll Phase 1** implementation. 
+After auditing the `docs/plans` directory and comparing the Business Requirements (BE) to the Functional Requirements (FE), a **significant gap** was identified in the **Attendance for Fair Payroll Phase 1** implementation.
 
-While the Backend (BE) has successfully implemented the foundation (migrations, logic, calculators, and API endpoints) defined in `payroll-attendance-spec.md` and `payroll-attendance-plans.md` (Milestones 1-12), **there is absolutely no Frontend (FE) UI to support these features.**
+While the Backend (BE) had implemented the foundation (migrations, logic, calculators) defined in `payroll-attendance-spec.md` and `payroll-attendance-plans.md`, there were missing Frontend views and missing Backend API controllers.
 
-The `payroll-attendance-plans.md` sequence entirely omitted Frontend milestones, causing a direct gap where the Backend is ready, but users (HR, Finance, Managers, Staff) cannot interact with the new systems.
+**On 2026-04-26**, a sprint was executed (conversation `b7180c83`) that created FE views and BE API controllers to close the major gaps. The sprint was merged to `main` as `b9b1f28`.
 
 ---
 
-## Identified Missing Frontend Scopes
+## ✅ Resolved Items (Merged to main)
 
-### 1. Attendance Policies (`attendance_policies`)
-- **BE Status:** Models and seeders are implemented, BUT the API controllers and routes (`routes/api.php`) are **missing**.
-- **FE Gap:** No UI for HR/Finance to view or edit `attendance_policies` (e.g., configuring late grace minutes, half-day hour limits, working days per employment type).
+### 1. Holiday Calendars (`holiday_calendars`)
+- **BE:** `HolidayCalendarController` — CRUD API with permission middleware ✅
+- **FE:** `AttendanceSettings.vue` — Holiday Calendars tab ✅
+- **Store:** `holidayCalendar.js` ✅
 
-### 2. Holiday Calendars (`holiday_calendars`)
-- **BE Status:** Models, tables, and `WorkingDaysCalculator` are implemented, BUT the API controllers and routes (`routes/api.php`) are **missing**.
-- **FE Gap:** No UI for HR to view, create, or manage Company or National holidays, nor specify which employment types they apply to.
+### 2. Hybrid Work Schedules (`hybrid_work_schedules` & `hybrid_schedule_overrides`)
+- **BE:** `HybridWorkScheduleController` — `index`, `mySchedule` endpoints ✅
+- **FE:** `HybridSchedules.vue` — Staff schedule view with override requests ✅
+- **Store:** `hybridSchedule.js` ✅
 
-### 3. Hybrid Work Schedules (`hybrid_work_schedules` & `hybrid_schedule_overrides`)
-- **BE Status:** Migrations, logic, and `HybridScheduleResolver` are implemented, BUT the API controllers and routes (`routes/api.php`) are **missing**.
-- **FE Gap:** 
-  - No UI for Staff/Managers to set up base weekly hybrid schedules (office vs. remote days).
-  - No UI for Staff to request a daily override/swap.
-  - No UI for Managers to approve/reject schedule overrides.
+### 3. Attendance Policy Mismatches (`attendance_policy_mismatches`)
+- **BE:** Controller methods (`acknowledgePolicyMismatch`, `resolvePolicyMismatch`) already existed ✅
+- **FE:** `PolicyMismatches.vue` — Mismatch dashboard with Acknowledge/Resolve actions ✅
+- **Store:** `attendance.js` — added mismatch endpoints ✅
 
-### 4. Attendance Policy Mismatches (`attendance_policy_mismatches`)
-- **BE Status:** Controller methods (`acknowledgePolicyMismatch`, `resolvePolicyMismatch`), detector logic, and cron job for auto-escalation are implemented.
-- **FE Gap:** 
-  - No UI/Dashboard for Managers to review and acknowledge daily attendance mismatches (e.g., employee scheduled for "office" but worked "remote").
-  - No UI for HR to resolve escalated mismatches.
+### 4. Attendance Periods (`attendance_periods`)
+- **BE:** `AttendancePeriodController` — CRUD API ✅
+- **FE:** `AttendancePeriods.vue` — Period monitoring + readiness workspace ✅
+- **Store:** `attendancePeriod.js` ✅
 
-### 5. Attendance Periods (`attendance_periods`)
-- **BE Status:** Cron jobs (`attendance-periods:sync`) and transition logics (`open` → `review` → `locked`) are implemented, BUT the API controllers and routes (`routes/api.php`) are **missing**.
-- **FE Gap:** No UI for HR/Finance to monitor the active period's status, trigger manual cutoffs, or view the readiness workspace before generating payroll.
+### 5. Leave Entitlements — Sick Proofs
+- **FE:** `LeaveRequestList.vue` — Proof upload, proof review UI ✅
+- **BE:** Sick leave proof endpoints already existed ✅
 
-### 6. Leave Entitlements & Sick Proofs (`leave_entitlements`)
-- **BE Status:** Sick leave logic requiring proofs is implemented.
-- **FE Gap:** 
-  - No UI for uploading medical certificates (proof attachments) during sick leave requests.
-  - No UI for HR to review and approve/reject these sick proofs.
-  - No UI to view current leave quotas/entitlement configurations.
+### 6. Payroll Adjustments Visibility
+- **FE:** `PayrollDetail` — adjustments section ✅ (needs final verification)
 
-### 7. Payroll Adjustments (`payroll_adjustments`)
-- **BE Status:** BE logic to handle post-lock corrections and apply delta amounts to the next period.
-- **FE Gap:** No UI for Finance to review pending adjustments or see the explicit adjustments breakdown in the next month's generated payslip.
+---
+
+## 🔴 Remaining Gaps (Still Open)
+
+### GAP-A: Attendance Policies — No API Controller
+- **BE Status:** `AttendancePolicy` model and seeder exist, BUT there is **no `AttendancePolicyController`** and no API routes in `routes/api.php`.
+- **FE Status:** `AttendanceSettings.vue` has an "Attendance Policies" tab, but it cannot load or save data.
+- **Impact:** HR cannot configure `late_grace_minutes`, `half_day_min_hours`, `work_days_per_week`, etc. per employment type.
+- **Spec Violation:** "Fairness by configuration, not by hardcode" — currently hardcoded in seeder.
+
+### GAP-B: Leave Entitlements — No API Controller, No FE Config
+- **BE Status:** `LeaveEntitlement` model, seeder (28 rows), and `LeaveEntitlementValidator` service exist. BUT there is **no `LeaveEntitlementController`** and no API routes.
+- **FE Status:** No UI for viewing or managing leave entitlement configurations.
+- **Impact:** HR cannot view or modify leave quotas, carry-over rules, or attachment requirements.
+- **Spec Violation:** Same as GAP-A — leave rules are seeded once and immutable from UI.
+
+### GAP-C: Indonesian Holiday Seed Data — FE Only
+- **Status:** Indonesian 2026 holidays are seeded as mock data in the FE `holidayCalendar.js` store (DEV/TEST fallback). They are NOT seeded in the BE `HolidayCalendarSeeder`.
+- **Impact:** Production deployments will have no holidays unless HR manually creates them.
 
 ---
 
 ## Recommended Next Steps
 
-To close this gap, we need to author a **Payroll & Attendance Frontend Implementation Plan** containing the missing milestones:
-1. **Hybrid Schedule Management UI**
-2. **Attendance Mismatches & Exceptions Dashboard**
-3. **Leave Entitlements & Proof Review UI**
-4. **Attendance Periods & Payroll Readiness UI**
-5. **System Configuration UI (Holidays, Policies)**
+1. **Create `AttendancePolicyController`** — `GET` (index) + `PUT` (update per employment type)
+2. **Create `LeaveEntitlementController`** — `GET` (index, grouped by employment type) + `PUT` (update)
+3. **Create `HolidayCalendarSeeder`** with Indonesian 2026 national holidays
+4. **Add Leave Entitlements tab** to `AttendanceSettings.vue`

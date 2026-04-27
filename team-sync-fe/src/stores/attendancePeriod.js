@@ -51,7 +51,7 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get(`payroll/readiness`, { params: { period_id: periodId } });
+                const response = await axiosInstance.get(`payrolls/generate-readiness`, { params: { period_id: periodId } });
                 this.readinessSummary = response.data.data;
                 return response.data.data;
             } catch (error) {
