@@ -10,6 +10,7 @@ use App\Http\Requests\Performance\SubmitSelfAssessmentRequest;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
+use App\Notifications\Performance\ReviewSubmittedForManager;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -95,6 +96,16 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
         $validated = $request->validated();
         $review = $this->repository->submitSelfAssessment($id, $validated['responses'], $validated);
+
+        // Notify the reviewer (manager) that self-assessment has been submitted
+        $review->load(['reviewer.user', 'cycle']);
+        if ($review->reviewer?->user) {
+            $review->reviewer->user->notify(new ReviewSubmittedForManager(
+                reviewId: $review->id,
+                employeeName: $user->name ?? 'Employee',
+                cycleName: $review->cycle?->name ?? 'Review Cycle',
+            ));
+        }
 
         return ResponseHelper::jsonResponse(true, 'Self assessment submitted successfully', $review);
     }
