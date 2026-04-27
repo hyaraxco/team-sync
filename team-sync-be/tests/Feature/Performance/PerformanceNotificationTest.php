@@ -420,4 +420,41 @@ class PerformanceNotificationTest extends TestCase
 
         Notification::assertSentTo($employeeUser, ReviewCycleStarted::class);
     }
+
+    public function test_review_submitted_for_manager_notification_sent_on_self_assessment(): void
+    {
+        Notification::fake();
+
+        [$managerUser, $managerProfile] = $this->createUserWithProfile('manager');
+        [$employeeUser, $employeeProfile] = $this->createUserWithProfile('staff');
+
+        // Give employee the review-self-submit permission
+        Permission::firstOrCreate(['name' => 'review-self-submit', 'guard_name' => 'sanctum']);
+        $staffRole = Role::findByName('staff', 'sanctum');
+        $staffRole->givePermissionTo('review-self-submit');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $cycle = PerformanceReviewCycle::factory()->active()->create();
+        $section = \App\Models\PerformanceReviewSection::create([
+            'name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true,
+        ]);
+
+        $review = PerformanceReview::create([
+            'cycle_id' => $cycle->id,
+            'staff_member_id' => $employeeProfile->id,
+            'reviewer_id' => $managerProfile->id,
+            'status' => 'pending_self',
+        ]);
+
+        Sanctum::actingAs($employeeUser);
+
+        $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/self-assessment", [
+            'responses' => [
+                ['section_id' => $section->id, 'rating' => 4, 'comments' => 'Good'],
+            ],
+        ]);
+        $response->assertStatus(200);
+
+        Notification::assertSentTo($managerUser, ReviewSubmittedForManager::class);
+    }
 }
