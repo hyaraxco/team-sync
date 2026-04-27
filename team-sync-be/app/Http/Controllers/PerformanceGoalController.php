@@ -8,7 +8,6 @@ use App\Http\Requests\Performance\CreateGoalRequest;
 use App\Http\Requests\Performance\ProgressUpdateGoalRequest;
 use App\Http\Requests\Performance\UpdateGoalRequest;
 use App\Interfaces\PerformanceGoalRepositoryInterface;
-use App\Models\StaffMemberProfile;
 use App\Notifications\Performance\GoalAssigned;
 use App\Notifications\Performance\GoalProgressUpdated;
 use Illuminate\Http\Request;
@@ -63,17 +62,15 @@ class PerformanceGoalController extends Controller implements HasMiddleware
         $dto = GoalDto::fromRequest($request->validated());
         $goal = $this->repository->createGoal($dto->toArray());
 
-        // Dispatch notification if goal is assigned to someone else
-        $currentStaffId = Auth::user()->staffMemberProfile?->id;
-        if ($goal->staff_member_id && $goal->staff_member_id !== $currentStaffId) {
-            $recipientProfile = StaffMemberProfile::with('user')->find($goal->staff_member_id);
-            if ($recipientProfile?->user) {
-                $recipientProfile->user->notify(new GoalAssigned(
-                    goalId: $goal->id,
-                    goalTitle: $goal->title,
-                    assignedByName: Auth::user()->name ?? 'Manager',
-                ));
-            }
+        // Notify the assigned staff member when a manager assigns a goal to them
+        $goal->load(['staffMember.user']);
+        $assigner = Auth::user();
+        if ($goal->staffMember?->user && $goal->staff_member_id !== $assigner->staffMemberProfile?->id) {
+            $goal->staffMember->user->notify(new GoalAssigned(
+                goalId: $goal->id,
+                goalTitle: $goal->title,
+                assignedByName: $assigner->name ?? 'Manager',
+            ));
         }
 
         return ResponseHelper::jsonResponse(true, 'Goal created successfully', $goal, 201);
@@ -139,14 +136,15 @@ class PerformanceGoalController extends Controller implements HasMiddleware
 
         $update = $this->repository->addProgressUpdate($id, $request->validated());
 
-        // Notify the goal assigner (manager) about the progress update
-        $goal->load('assigner.user');
-        if ($goal->assigner?->user && $goal->assigner->id !== $user->staffMemberProfile?->id) {
+        // Notify the goal assigner/manager about progress update
+        $goal->load(['assigner.user']);
+        $updater = Auth::user();
+        if ($goal->assigner?->user && $goal->assigner->user->id !== $updater->id) {
             $goal->assigner->user->notify(new GoalProgressUpdated(
                 goalId: $goal->id,
                 goalTitle: $goal->title,
-                employeeName: $user->name ?? 'Employee',
-                progressPercentage: (int) $request->validated('completion_percentage', 0),
+                employeeName: $updater->name ?? 'Employee',
+                progressPercentage: (int) ($request->validated()['completion_percentage'] ?? $goal->completion_percentage ?? 0),
             ));
         }
 
