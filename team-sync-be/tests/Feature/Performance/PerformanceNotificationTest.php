@@ -545,4 +545,67 @@ class PerformanceNotificationTest extends TestCase
         // Employee should receive the calibrated notification
         Notification::assertSentTo($employeeUser, ReviewCalibrated::class);
     }
+
+    // ─── Goal Progress Updated ───────────────────────────────────────
+
+    public function test_goal_progress_updated_notification_uses_database_channel_only(): void
+    {
+        $notification = new \App\Notifications\Performance\GoalProgressUpdated(
+            goalId: 1,
+            goalTitle: 'Complete OKRs',
+            employeeName: 'Jane Employee',
+            progressPercentage: 75,
+        );
+
+        $channels = $notification->via(new \stdClass);
+        $this->assertEquals(['database'], $channels);
+    }
+
+    public function test_goal_progress_updated_notification_has_correct_structure(): void
+    {
+        $notification = new \App\Notifications\Performance\GoalProgressUpdated(
+            goalId: 42,
+            goalTitle: 'Complete OKRs',
+            employeeName: 'Jane Employee',
+            progressPercentage: 75,
+        );
+
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('performance', $data['category']);
+        $this->assertArrayHasKey('title', $data);
+        $this->assertStringContainsString('Jane Employee', $data['body']);
+        $this->assertEquals('/admin/performance/goals/42', $data['action_url']);
+        $this->assertEquals(42, $data['goal_id']);
+    }
+
+    public function test_goal_progress_updated_notification_sent_to_manager_on_progress_update(): void
+    {
+        Notification::fake();
+
+        [$managerUser, $managerProfile] = $this->createUserWithProfile('manager');
+        [$employeeUser, $employeeProfile] = $this->createUserWithProfile('staff');
+
+        // Manager assigned the goal to employee
+        $goal = PerformanceGoal::create([
+            'staff_member_id' => $employeeProfile->id,
+            'assigned_by' => $managerProfile->id,
+            'created_by' => $managerProfile->id, // Add this
+            'title' => 'Complete Q2 OKRs',
+            'goal_type' => 'okr',
+            'start_date' => now()->toDateString(),
+            'due_date' => now()->addMonths(3)->toDateString(),
+            'status' => 'in_progress',
+        ]);
+
+        Sanctum::actingAs($employeeUser);
+
+        $response = $this->postJson("/api/v1/performance/goals/{$goal->id}/update-progress", [
+            'update_type' => 'progress',
+            'completion_percentage' => 75,
+            'notes' => 'Making good progress',
+        ]);
+        $response->assertStatus(201); // Repository returns 201
+
+        Notification::assertSentTo($managerUser, \App\Notifications\Performance\GoalProgressUpdated::class);
+    }
 }

@@ -10,6 +10,7 @@ use App\Http\Requests\Performance\UpdateGoalRequest;
 use App\Interfaces\PerformanceGoalRepositoryInterface;
 use App\Models\StaffMemberProfile;
 use App\Notifications\Performance\GoalAssigned;
+use App\Notifications\Performance\GoalProgressUpdated;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -137,6 +138,17 @@ class PerformanceGoalController extends Controller implements HasMiddleware
         }
 
         $update = $this->repository->addProgressUpdate($id, $request->validated());
+
+        // Notify the goal assigner (manager) about the progress update
+        $goal->load('assigner.user');
+        if ($goal->assigner?->user && $goal->assigner->id !== $user->staffMemberProfile?->id) {
+            $goal->assigner->user->notify(new GoalProgressUpdated(
+                goalId: $goal->id,
+                goalTitle: $goal->title,
+                employeeName: $user->name ?? 'Employee',
+                progressPercentage: (int) $request->validated('completion_percentage', 0),
+            ));
+        }
 
         return ResponseHelper::jsonResponse(true, 'Progress update added successfully', $update, 201);
     }
