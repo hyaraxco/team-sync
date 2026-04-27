@@ -22,16 +22,17 @@ docs/
 | [analytics-spec.md](plans/on_going/analytics-spec.md) | Analytics | Spec |
 | [payroll-attendance-spec.md](plans/on_going/payroll-attendance-spec.md) | Payroll × Attendance | Spec |
 | [payroll-attendance-plans.md](plans/on_going/payroll-attendance-plans.md) | Payroll × Attendance | Milestone Plan |
-| [payroll-attendance-frontend-gap.md](plans/on_going/payroll-attendance-frontend-gap.md) | Payroll × Attendance | Gap Analysis |
 | [2026-04-26-payroll-attendance-fe-plan.md](plans/on_going/2026-04-26-payroll-attendance-fe-plan.md) | Payroll × Attendance | FE Sprint Plan |
 | [performance-management-spec.md](plans/on_going/performance-management-spec.md) | Performance | Spec |
 | [performance-analytics-implementation-plan.md](plans/on_going/performance-analytics-implementation-plan.md) | Performance × Analytics | Implementation |
 | [payroll-phase-3-plan.md](plans/on_going/payroll-phase-3-plan.md) | Payroll | Plan |
+| [implementation_plan.md](../../.gemini/antigravity/brain/615436da-e722-40c4-a916-7961013d76f4/implementation_plan.md) | Gap Closure | Implementation |
 
 ### Archive
 Completed plans and designs, sorted by date. See [plans/archive/](plans/archive/).
 
 Notable completed items:
+- `2026-04-27-payroll-attendance-frontend-gap-archived.md` — Superseded by Phase A-D implementation
 - `2026-04-26-payroll-phase-2-backlog-plan.md` — All 7 items complete
 - `2026-04-26-hris-patch-overview.md` — All 8 patches (P1–P8) complete
 - `2026-04-26-error-handling-standardization.md` — Full-stack error handling done
@@ -44,6 +45,7 @@ Notable completed items:
 | [payroll-role-e2e-qa.md](testing/be/payroll-role-e2e-qa.md) | Payroll QA runbook |
 | [2026-04-21-rbac-e2e-audit.md](testing/be/2026-04-21-rbac-e2e-audit.md) | RBAC E2E audit |
 | [manual-testing-guide.md](testing/fe/manual-testing-guide.md) | Frontend manual testing guide |
+| [FE Test Index](testing/fe/) | Frontend unit & smoke tests |
 
 ### Executable Tests (Code)
 | Type | Location |

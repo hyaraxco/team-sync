@@ -24,29 +24,24 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
      */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $query = PayrollAdjustment::with(['staffMember', 'sourcePeriod', 'targetPeriod', 'requestedBy', 'approvedBy'])
-                ->orderBy('created_at', 'desc');
+        $query = PayrollAdjustment::with(['staffMember', 'sourcePeriod', 'targetPeriod'])
+            ->orderBy('created_at', 'desc');
 
-            if ($request->has('status')) {
-                $query->where('status', $request->status);
-            }
-
-            if ($request->has('target_period_id')) {
-                $query->where('target_period_id', $request->target_period_id);
-            }
-
-            if ($request->has('staff_member_id')) {
-                $query->where('staff_member_id', $request->staff_member_id);
-            }
-
-            $adjustments = $query->paginate($request->get('per_page', 15));
-
-            return ResponseHelper::jsonResponse(true, 'Payroll Adjustments Retrieved Successfully', $adjustments, 200);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollAdjustmentController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        if ($request->has('status')) {
+            $query->where('status', $request->status);
         }
+
+        if ($request->has('target_period_id')) {
+            $query->where('target_period_id', $request->target_period_id);
+        }
+
+        if ($request->has('staff_member_id')) {
+            $query->where('staff_member_id', $request->staff_member_id);
+        }
+
+        $adjustments = $query->paginate($request->get('per_page', 15));
+
+        return ResponseHelper::jsonResponse(true, 'Payroll Adjustments Retrieved Successfully', $adjustments, 200);
     }
 
     /**
@@ -58,25 +53,16 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
             'notes' => 'nullable|string',
         ]);
 
-        try {
-            $adjustment = PayrollAdjustment::findOrFail($id);
+        $adjustment = PayrollAdjustment::findOrFail($id);
 
-            if ($adjustment->status !== PayrollAdjustment::STATUS_PENDING) {
-                return ResponseHelper::jsonResponse(false, 'Only pending adjustments can be approved', null, 400);
-            }
-
-            $adjustment->update([
-                'status' => PayrollAdjustment::STATUS_APPROVED,
-                'approved_by' => $request->user()->staffMemberProfile?->id,
-                'approved_at' => now(),
-            ]);
-
-            return ResponseHelper::jsonResponse(true, 'Payroll Adjustment Approved Successfully', $adjustment->fresh(['approvedBy']), 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return ResponseHelper::jsonResponse(false, 'Adjustment Not Found', null, 404);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollAdjustmentController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        if ($adjustment->status !== PayrollAdjustment::STATUS_PENDING) {
+            return ResponseHelper::jsonResponse(false, 'Only pending adjustments can be approved', null, 400);
         }
+
+        $adjustment->update([
+            'status' => PayrollAdjustment::STATUS_APPROVED,
+        ]);
+
+        return ResponseHelper::jsonResponse(true, 'Payroll Adjustment Approved Successfully', $adjustment->fresh(), 200);
     }
 }
