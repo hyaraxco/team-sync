@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             PtkpAmountSeeder::class,
             AttendancePolicySeeder::class,
             LeaveEntitlementSeeder::class,
+            HolidayCalendarSeeder::class,
 
             // 3. Seed performance review sections & outcome rules
             PerformanceReviewSectionSeeder::class,

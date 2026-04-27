@@ -63,7 +63,7 @@ Ini urutan yang harus dikerjakan Codex. **Setiap milestone harus selesai dan hij
 
 ---
 
-### Milestone 1 — Foundation Migrations
+### Milestone 1 — Foundation Migrations [COMPLETED]
 
 **Scope:** Buat semua tabel baru sebagai database migrations, tanpa logic apapun.
 
@@ -106,7 +106,7 @@ Only schema. One migration file per entity.
 
 ---
 
-### Milestone 2 — Model Layer + Seed Data
+### Milestone 2 — Model Layer + Seed Data [COMPLETED]
 
 **Scope:** Buat model files dengan associations dan validations. Seed default policy per employment type.
 
@@ -129,7 +129,7 @@ exactly as defined in the SPEC tables. Do not invent values not in SPEC.
 
 ---
 
-### Milestone 3 — Holiday Calendar + Effective Working Days Calculator
+### Milestone 3 — Holiday Calendar + Effective Working Days Calculator [COMPLETED]
 
 **Scope:** Logic untuk menghitung `effective_working_days` per employee per periode, dengan join ke `holiday_calendars` dan `attendance_policies.default_working_weekdays`.
 
@@ -167,7 +167,7 @@ Write unit tests for all 3 test cases in PLANS.md Milestone 3 before implementin
 
 ---
 
-### Milestone 4 — Hybrid Schedule Resolver
+### Milestone 4 — Hybrid Schedule Resolver [COMPLETED]
 
 **Scope:** Logic untuk menentukan `planned_work_mode` seorang employee pada tanggal tertentu, dengan membaca `hybrid_work_schedules` dan `hybrid_schedule_overrides`.
 
@@ -195,7 +195,7 @@ Write unit tests for all 4 test cases in PLANS.md Milestone 4.
 
 ---
 
-### Milestone 5 — Attendance Classification Engine
+### Milestone 5 — Attendance Classification Engine [COMPLETED]
 
 **Scope:** Core logic klasifikasi status harian per employee per tanggal. Bergantung pada Milestone 2, 3, 4.
 
@@ -230,7 +230,7 @@ Write one test per rule branch before implementing.
 
 ---
 
-### Milestone 6 — Attendance Period Management
+### Milestone 6 — Attendance Period Management [COMPLETED]
 
 **Scope:** Logic lifecycle `open → review → locked`, auto-create via cron, dan correction window enforcement.
 
@@ -259,7 +259,7 @@ Write tests for each transition and guard.
 
 ---
 
-### Milestone 7 — Leave Entitlement Validator
+### Milestone 7 — Leave Entitlement Validator [COMPLETED]
 
 **Scope:** Service yang memvalidasi apakah suatu leave request sah untuk employee berdasarkan entitlement, quota, dan sick proof requirement.
 
@@ -293,7 +293,7 @@ Write tests for all 5 acceptance criteria cases.
 
 ---
 
-### Milestone 8 — Payroll Calculation Engine
+### Milestone 8 — Payroll Calculation Engine [COMPLETED]
 
 **Scope:** Formula kalkulasi gaji dari hasil classification, dengan breakdown lengkap. Bergantung pada semua milestone sebelumnya.
 
@@ -329,7 +329,7 @@ Write tests for all 5 acceptance criteria. Test part-time separately.
 
 ---
 
-### Milestone 9 — Post-Lock Payroll Adjustments
+### Milestone 9 — Post-Lock Payroll Adjustments [COMPLETED]
 
 **Scope:** Logic membuat `payroll_adjustments` setelah period locked, dan logic payroll draft bulan berikutnya menarik adjustments tersebut.
 
@@ -360,7 +360,7 @@ Nov payroll has adjustment section with correct amount_delta.
 
 ---
 
-### Milestone 10 — Readiness Workspace API
+### Milestone 10 — Readiness Workspace API [COMPLETED]
 
 **Scope:** Endpoint yang mengembalikan readiness status per employee per periode untuk HR workspace.
 
@@ -390,7 +390,7 @@ Write integration tests for all 3 employee status scenarios.
 
 ---
 
-### Milestone 11 — Mismatch Lifecycle + Auto Escalation
+### Milestone 11 — Mismatch Lifecycle + Auto Escalation [COMPLETED]
 
 **Scope:** Lifecycle management untuk `attendance_policy_mismatches` termasuk auto-escalation setelah 3 hari kerja.
 
@@ -418,7 +418,7 @@ Write tests for each transition including auto-escalation timing.
 
 ---
 
-### Milestone 12 — E2E Integration Tests
+### Milestone 12 — E2E Integration Tests [COMPLETED]
 
 **Scope:** Full flow tests yang cover semua E2E scenarios dari SPEC test plan.
 
