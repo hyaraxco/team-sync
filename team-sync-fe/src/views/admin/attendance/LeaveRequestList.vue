@@ -7,7 +7,7 @@ import { useConfirmAction } from '@/composables/useConfirmAction';
 import { useSearchFilter } from '@/composables/useSearchFilter';
 import { useToast } from '@/composables/useToast';
 import { formatDateShort, formatTime } from '@/utils/dateUtils';
-import { Check, X, ClipboardList, CalendarDays, List, ChevronLeft, ChevronRight } from 'lucide-vue-next';
+import { Check, X, ClipboardList, CalendarDays, List, ChevronLeft, ChevronRight, FileSearch, ExternalLink } from 'lucide-vue-next';
 import SearchFilter from '@/components/common/SearchFilter.vue';
 import Pagination from '@/components/admin/team/Pagination.vue';
 import EmptyState from '@/components/common/EmptyState.vue';
@@ -125,6 +125,49 @@ const confirmReject = () =>
       await store.rejectLeaveRequest(request.id);
   });
 
+// ---- PROOF REVIEW WORKFLOW ----
+const proofReviewForm = ref({
+    status: 'approved',
+    notes: ''
+});
+
+const {
+  isModalOpen: showReviewProofModalState,
+  selectedItem: selectedProofRequest,
+  isProcessing: processingProofReview,
+  openModal: showReviewProofModal,
+  closeModal: closeReviewProofModal,
+  confirmAction: doReviewProof,
+} = useConfirmAction({
+  onSuccess: async () => {
+    toast.success('Proof Reviewed', 'Sick leave proof has been reviewed.');
+    if (activeTab.value === 'list') {
+       await fetchData();
+    } else {
+       await fetchMonthData();
+    }
+  },
+});
+
+const confirmReviewProof = () =>
+  doReviewProof(async (request) => {
+      await store.reviewProof(request.id, {
+          proof_review_status: proofReviewForm.value.status,
+          proof_review_notes: proofReviewForm.value.notes
+      });
+  });
+
+const openReviewProof = (request) => {
+    proofReviewForm.value = { status: 'approved', notes: '' };
+    showReviewProofModal(request);
+};
+
+const getProofUrl = (path) => {
+  if (!path) return '#';
+  const baseUrl = import.meta.env.VITE_API_BASE_URL.replace('/api/v1', '');
+  return `${baseUrl}/storage/${path}`;
+};
+
 onMounted(() => {
     fetchData();
 });
@@ -179,6 +222,7 @@ onMounted(() => {
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Employee</th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Date</th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Reason & Type</th>
+                <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Proof</th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Status</th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Actions</th>
               </tr>
@@ -225,21 +269,48 @@ onMounted(() => {
                     <p class="text-sm text-brand-dark max-w-[200px] truncate" :title="request.reason">{{ request.reason }}</p>
                 </td>
                 <td class="py-4 px-4">
+                    <div v-if="request.type === 'sick'" class="flex flex-col gap-1">
+                        <a v-if="request.proof_file_path" :href="getProofUrl(request.proof_file_path)" target="_blank" class="text-xs text-blue-600 hover:underline flex items-center gap-1">
+                            <ExternalLink class="w-3 h-3" /> View Proof
+                        </a>
+                        <span v-else class="text-xs text-gray-500 italic">No proof</span>
+                        
+                        <div v-if="request.proof_file_path" class="mt-1">
+                            <span :class="['text-xs px-2 py-0.5 rounded', request.proof_review_status === 'approved' ? 'bg-green-100 text-green-700' : request.proof_review_status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700']">
+                                {{ request.proof_review_status || 'pending' }}
+                            </span>
+                        </div>
+                    </div>
+                    <span v-else class="text-xs text-gray-400">-</span>
+                </td>
+                <td class="py-4 px-4">
                     <StatusBadge type="leave-status" :value="request.status" />
                 </td>
                 <td class="py-4 px-4">
-                   <div class="flex items-center gap-2" v-if="request.status === 'pending'">
+                   <div class="flex items-center gap-2" v-if="request.status === 'pending' || (request.type === 'sick' && request.proof_file_path && request.proof_review_status === 'pending')">
                       <button
+                        v-if="request.status === 'pending'"
                         @click="showApproveModal(request)"
+                        title="Approve Leave"
                         class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:bg-blue-50 transition-all duration-300 px-3 py-2"
                       >
                         <Check class="w-4 h-4 text-green-600" />
                       </button>
                       <button
+                        v-if="request.status === 'pending'"
                         @click="showRejectModal(request)"
+                        title="Reject Leave"
                         class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
                       >
                         <X class="w-4 h-4 text-red-600" />
+                      </button>
+                      <button
+                        v-if="request.type === 'sick' && request.proof_file_path && request.proof_review_status === 'pending'"
+                        @click="openReviewProof(request)"
+                        title="Review Proof"
+                        class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-yellow-500 hover:bg-yellow-50 transition-all duration-300 px-3 py-2"
+                      >
+                        <FileSearch class="w-4 h-4 text-yellow-600" />
                       </button>
                    </div>
                    <div v-else class="text-xs text-brand-light">-</div>
@@ -345,6 +416,42 @@ onMounted(() => {
         <button @click="closeRejectModal" :disabled="processingReject" class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300">Cancel</button>
         <button @click="confirmReject" :disabled="processingReject" class="flex-1 px-4 py-3 bg-red-600 text-white rounded-[12px] text-sm font-semibold hover:bg-red-700 transition-all duration-300">
           {{ processingReject ? "Rejecting..." : "Reject" }}
+        </button>
+      </div>
+    </template>
+  </ModalWrapper>
+
+  <!-- Review Proof Modal -->
+  <ModalWrapper :show="showReviewProofModalState" title="Review Sick Leave Proof" maxWidth="md" @close="closeReviewProofModal">
+    <div class="mb-4">
+      <p class="text-brand-light text-sm mb-4">Please review the medical certificate for this sick leave request.</p>
+      
+      <div v-if="selectedProofRequest?.proof_file_path" class="mb-4 p-3 bg-gray-50 border rounded flex justify-between items-center">
+         <span class="text-sm font-medium text-gray-700">{{ selectedProofRequest.proof_file_name }}</span>
+         <a :href="getProofUrl(selectedProofRequest.proof_file_path)" target="_blank" class="text-blue-600 hover:underline text-sm flex items-center gap-1">
+             <ExternalLink class="w-4 h-4" /> View File
+         </a>
+      </div>
+
+      <div class="space-y-4">
+          <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Decision *</label>
+              <select v-model="proofReviewForm.status" class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9]">
+                  <option value="approved">Approve Proof</option>
+                  <option value="rejected">Reject Proof</option>
+              </select>
+          </div>
+          <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Notes</label>
+              <textarea v-model="proofReviewForm.notes" rows="3" class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9] resize-none" placeholder="Add any notes about this proof..."></textarea>
+          </div>
+      </div>
+    </div>
+    <template #footer>
+      <div class="flex gap-3">
+        <button @click="closeReviewProofModal" :disabled="processingProofReview" class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300">Cancel</button>
+        <button @click="confirmReviewProof" :disabled="processingProofReview" class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-[12px] text-sm font-semibold hover:bg-opacity-90 transition-all duration-300">
+          {{ processingProofReview ? "Submitting..." : "Submit Review" }}
         </button>
       </div>
     </template>
