@@ -497,4 +497,52 @@ class PerformanceNotificationTest extends TestCase
         // HR user should receive the calibration notification
         Notification::assertSentTo($hrUser, ReviewSubmittedForCalibration::class);
     }
+
+    public function test_review_calibrated_notification_sent_on_calibration(): void
+    {
+        Notification::fake();
+
+        [$hrUser] = $this->createUserWithProfile('hr');
+        [$managerUser, $managerProfile] = $this->createUserWithProfile('manager');
+        [$employeeUser, $employeeProfile] = $this->createUserWithProfile('staff');
+
+        // HR needs permission
+        Permission::firstOrCreate(['name' => 'review-calibrate', 'guard_name' => 'sanctum']);
+        $hrRole = Role::findByName('hr', 'sanctum');
+        $hrRole->givePermissionTo('review-calibrate');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $cycle = PerformanceReviewCycle::factory()->active()->create();
+        $section = \App\Models\PerformanceReviewSection::create([
+            'name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true,
+        ]);
+
+        $review = PerformanceReview::create([
+            'cycle_id' => $cycle->id,
+            'staff_member_id' => $employeeProfile->id,
+            'reviewer_id' => $managerProfile->id,
+            'status' => 'pending_calibration',
+            'self_assessment_submitted_at' => now(),
+            'manager_assessment_submitted_at' => now(),
+        ]);
+
+        // Create a response so calibration has data
+        \App\Models\PerformanceReviewResponse::create([
+            'review_id' => $review->id,
+            'section_id' => $section->id,
+            'manager_rating' => 4,
+        ]);
+
+        Sanctum::actingAs($hrUser);
+
+        $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/calibrate", [
+            'responses' => [
+                ['section_id' => $section->id, 'rating' => 4],
+            ],
+        ]);
+        $response->assertStatus(200);
+
+        // Employee should receive the calibrated notification
+        Notification::assertSentTo($employeeUser, ReviewCalibrated::class);
+    }
 }
