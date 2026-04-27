@@ -8,6 +8,8 @@ use App\Http\Requests\Performance\CreateGoalRequest;
 use App\Http\Requests\Performance\ProgressUpdateGoalRequest;
 use App\Http\Requests\Performance\UpdateGoalRequest;
 use App\Interfaces\PerformanceGoalRepositoryInterface;
+use App\Models\StaffMemberProfile;
+use App\Notifications\Performance\GoalAssigned;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -59,6 +61,19 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     {
         $dto = GoalDto::fromRequest($request->validated());
         $goal = $this->repository->createGoal($dto->toArray());
+
+        // Dispatch notification if goal is assigned to someone else
+        $currentStaffId = Auth::user()->staffMemberProfile?->id;
+        if ($goal->staff_member_id && $goal->staff_member_id !== $currentStaffId) {
+            $recipientProfile = StaffMemberProfile::with('user')->find($goal->staff_member_id);
+            if ($recipientProfile?->user) {
+                $recipientProfile->user->notify(new GoalAssigned(
+                    goalId: $goal->id,
+                    goalTitle: $goal->title,
+                    assignedByName: Auth::user()->name ?? 'Manager',
+                ));
+            }
+        }
 
         return ResponseHelper::jsonResponse(true, 'Goal created successfully', $goal, 201);
     }

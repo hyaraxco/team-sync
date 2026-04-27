@@ -1832,6 +1832,295 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         ];
     }
 
+    // ─── Gap-fill Analytics Methods (from spec audit) ─────────────────
+
+    public function getWorkforceDemographicsEndpoint(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'workforce_demographics_'.md5(json_encode([$period, $department])).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+
+            return [
+                'period' => ['start' => $parsed['start']->toDateString(), 'end' => $parsed['end']->toDateString(), 'label' => $parsed['label']],
+                ...$this->getWorkforceDemographics($filteredEmployeeIds),
+            ];
+        });
+    }
+
+    public function getAttendanceCorrectionFrequency(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'correction_frequency_'.md5(json_encode([$period, $department])).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+            $startDate = $parsed['start']->toDateString();
+            $endDate = $parsed['end']->toDateString();
+
+            $correctionTrend = DB::table('attendance_corrections')
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->selectRaw("
+                    DATE_FORMAT(created_at, '%Y-%m') as month_key,
+                    COUNT(*) as total,
+                    COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
+                    COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
+                    COUNT(CASE WHEN status = 'pending' THEN 1 END) as pending
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(function ($row) {
+                    $approvalRate = $row->total > 0
+                        ? round(($row->approved / $row->total) * 100, 1)
+                        : 0;
+
+                    return [
+                        'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                        'total' => (int) $row->total,
+                        'approved' => (int) $row->approved,
+                        'rejected' => (int) $row->rejected,
+                        'pending' => (int) $row->pending,
+                        'approval_rate' => $approvalRate,
+                    ];
+                })
+                ->values()
+                ->all();
+
+            $topRequesters = DB::table('attendance_corrections')
+                ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'attendance_corrections.staff_member_id')
+                ->join('users', 'users.id', '=', 'staff_member_profiles.user_id')
+                ->whereIn('attendance_corrections.staff_member_id', $filteredEmployeeIds)
+                ->whereBetween('attendance_corrections.created_at', [$startDate, $endDate])
+                ->groupBy('attendance_corrections.staff_member_id', 'users.name', 'staff_member_profiles.code')
+                ->selectRaw('attendance_corrections.staff_member_id, users.name, staff_member_profiles.code, COUNT(*) as correction_count')
+                ->orderByDesc('correction_count')
+                ->limit(10)
+                ->get()
+                ->map(fn ($r) => [
+                    'employee_name' => $r->name,
+                    'employee_code' => $r->code,
+                    'correction_count' => (int) $r->correction_count,
+                ])
+                ->values()
+                ->all();
+
+            return [
+                'period' => ['start' => $startDate, 'end' => $endDate, 'label' => $parsed['label']],
+                'correction_trend' => $correctionTrend,
+                'top_requesters' => $topRequesters,
+            ];
+        });
+    }
+
+    public function getLeaveApprovalTurnaround(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'leave_turnaround_'.md5(json_encode([$period, $department])).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+            $startDate = $parsed['start']->toDateString();
+            $endDate = $parsed['end']->toDateString();
+
+            $turnaroundByMonth = DB::table('leave_requests')
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$startDate, $endDate])
+                ->whereIn('status', ['approved', 'rejected'])
+                ->whereNotNull('updated_at')
+                ->selectRaw("
+                    DATE_FORMAT(start_date, '%Y-%m') as month_key,
+                    ROUND(AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)), 1) as avg_hours,
+                    MIN(TIMESTAMPDIFF(HOUR, created_at, updated_at)) as min_hours,
+                    MAX(TIMESTAMPDIFF(HOUR, created_at, updated_at)) as max_hours,
+                    COUNT(*) as total_processed
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'avg_hours' => (float) $r->avg_hours,
+                    'min_hours' => (int) $r->min_hours,
+                    'max_hours' => (int) $r->max_hours,
+                    'total_processed' => (int) $r->total_processed,
+                ])
+                ->values()
+                ->all();
+
+            return [
+                'period' => ['start' => $startDate, 'end' => $endDate, 'label' => $parsed['label']],
+                'turnaround_by_month' => $turnaroundByMonth,
+            ];
+        });
+    }
+
+    public function getLeaveTypeDistribution(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'leave_type_dist_'.md5(json_encode([$period, $department])).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+            $startDate = $parsed['start']->toDateString();
+            $endDate = $parsed['end']->toDateString();
+
+            $distribution = DB::table('leave_requests')
+                ->whereIn('staff_member_id', $filteredEmployeeIds)
+                ->whereBetween('start_date', [$startDate, $endDate])
+                ->selectRaw('leave_type, COUNT(*) as count, COALESCE(SUM(total_days), 0) as total_days')
+                ->groupBy('leave_type')
+                ->orderByDesc('count')
+                ->get()
+                ->map(fn ($r) => [
+                    'type' => $r->leave_type,
+                    'count' => (int) $r->count,
+                    'total_days' => (int) $r->total_days,
+                ])
+                ->values()
+                ->all();
+
+            return [
+                'period' => ['start' => $startDate, 'end' => $endDate, 'label' => $parsed['label']],
+                'distribution' => $distribution,
+            ];
+        });
+    }
+
+    public function getPayrollCostPerEmployee(string $period, ?string $department): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'payroll_cost_per_emp_'.md5(json_encode([$period, $department])).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $department) {
+            $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
+            $startDate = $parsed['start']->toDateString();
+            $endDate = $parsed['end']->toDateString();
+
+            $costPerEmployee = DB::table('payroll_details')
+                ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+                ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereBetween('payrolls.salary_month', [$startDate, $endDate])
+                ->selectRaw("
+                    DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
+                    COALESCE(SUM(payroll_details.final_salary), 0) as total_cost,
+                    COUNT(DISTINCT payroll_details.staff_member_id) as employee_count,
+                    ROUND(COALESCE(SUM(payroll_details.final_salary), 0) / NULLIF(COUNT(DISTINCT payroll_details.staff_member_id), 0), 2) as cost_per_employee
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'total_cost' => round((float) $r->total_cost, 2),
+                    'employee_count' => (int) $r->employee_count,
+                    'cost_per_employee' => round((float) $r->cost_per_employee, 2),
+                ])
+                ->values()
+                ->all();
+
+            return [
+                'period' => ['start' => $startDate, 'end' => $endDate, 'label' => $parsed['label']],
+                'cost_per_employee_trend' => $costPerEmployee,
+            ];
+        });
+    }
+
+    public function getPayrollProcessingTime(string $period): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'payroll_processing_time_'.md5($period).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed) {
+            $startDate = $parsed['start']->toDateString();
+            $endDate = $parsed['end']->toDateString();
+
+            $processingTime = DB::table('payrolls')
+                ->whereIn('status', ['approved', 'paid'])
+                ->whereBetween('salary_month', [$startDate, $endDate])
+                ->whereNotNull('approved_at')
+                ->selectRaw("
+                    DATE_FORMAT(salary_month, '%Y-%m') as month_key,
+                    ROUND(AVG(TIMESTAMPDIFF(HOUR, created_at, approved_at)), 1) as avg_hours_to_approve,
+                    COUNT(*) as total_payrolls
+                ")
+                ->groupBy('month_key')
+                ->orderBy('month_key')
+                ->get()
+                ->map(fn ($r) => [
+                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'avg_hours_to_approve' => (float) $r->avg_hours_to_approve,
+                    'total_payrolls' => (int) $r->total_payrolls,
+                ])
+                ->values()
+                ->all();
+
+            return [
+                'period' => ['start' => $startDate, 'end' => $endDate, 'label' => $parsed['label']],
+                'processing_time_trend' => $processingTime,
+            ];
+        });
+    }
+
+    public function getProjectResourceUtilization(string $period, ?int $teamId): array
+    {
+        $parsed = $this->parsePeriod($period);
+        $cacheKey = CacheConstants::CACHE_KEY_ANALYTICS_PREFIX.'project_resource_util_'.md5(json_encode([$period, $teamId])).'_'.now()->format('Y-m-d-H');
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed, $teamId) {
+            $startDate = $parsed['start']->toDateString();
+            $endDate = $parsed['end']->toDateString();
+
+            $query = DB::table('teams')
+                ->where('teams.status', 'active')
+                ->when($teamId, fn ($q) => $q->where('teams.id', $teamId))
+                ->leftJoin('team_members', function ($join) {
+                    $join->on('team_members.team_id', '=', 'teams.id')
+                        ->whereNull('team_members.left_at');
+                })
+                ->leftJoin('project_tasks', function ($join) use ($startDate, $endDate) {
+                    $join->on('project_tasks.assignee_id', '=', 'team_members.staff_member_id')
+                        ->where(function ($q) use ($startDate, $endDate) {
+                            $q->whereBetween('project_tasks.created_at', [$startDate, $endDate])
+                                ->orWhere(function ($q2) use ($startDate, $endDate) {
+                                    $q2->where('project_tasks.start_date', '<=', $endDate)
+                                        ->where(function ($q3) use ($startDate) {
+                                            $q3->whereNull('project_tasks.due_date')
+                                                ->orWhere('project_tasks.due_date', '>=', $startDate);
+                                        });
+                                });
+                        });
+                })
+                ->groupBy('teams.id', 'teams.name')
+                ->selectRaw("
+                    teams.name as team_name,
+                    COUNT(DISTINCT team_members.staff_member_id) as total_members,
+                    COUNT(DISTINCT CASE WHEN project_tasks.id IS NOT NULL THEN team_members.staff_member_id END) as members_with_tasks,
+                    COUNT(project_tasks.id) as total_tasks,
+                    ROUND(AVG(CASE WHEN project_tasks.id IS NOT NULL THEN 1 ELSE 0 END) * 100, 1) as utilization_rate
+                ")
+                ->orderByDesc('utilization_rate')
+                ->get()
+                ->map(fn ($r) => [
+                    'team_name' => $r->team_name,
+                    'total_members' => (int) $r->total_members,
+                    'members_with_tasks' => (int) $r->members_with_tasks,
+                    'total_tasks' => (int) $r->total_tasks,
+                    'utilization_rate' => (float) $r->utilization_rate,
+                ])
+                ->values()
+                ->all();
+
+            return [
+                'period' => ['start' => $startDate, 'end' => $endDate, 'label' => $parsed['label']],
+                'team_utilization' => $query,
+            ];
+        });
+    }
+
     private function getTeamPerformanceData(Carbon $start, Carbon $end, ?string $department, ?int $teamId): array
     {
         return DB::table('teams')

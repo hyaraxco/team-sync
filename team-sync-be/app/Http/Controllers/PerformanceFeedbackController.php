@@ -6,10 +6,13 @@ use App\DTOs\Performance\FeedbackDto;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\Performance\CreateFeedbackRequest;
 use App\Interfaces\PerformanceFeedbackRepositoryInterface;
+use App\Models\StaffMemberProfile;
+use App\Notifications\Performance\FeedbackReceived;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceFeedbackController extends Controller implements HasMiddleware
@@ -53,6 +56,18 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
     {
         $dto = FeedbackDto::fromRequest($request->validated());
         $feedback = $this->repository->createFeedback($dto->toArray());
+
+        // Dispatch notification to the feedback recipient
+        $recipientProfile = StaffMemberProfile::with('user')->find($feedback->staff_member_id);
+        if ($recipientProfile?->user) {
+            $giverName = Auth::user()->name ?? 'Someone';
+            $recipientProfile->user->notify(new FeedbackReceived(
+                feedbackId: $feedback->id,
+                giverName: $giverName,
+                feedbackType: $feedback->feedback_type,
+                contentPreview: Str::limit($feedback->content, 80),
+            ));
+        }
 
         return ResponseHelper::jsonResponse(true, 'Feedback created successfully', $feedback, 201);
     }
