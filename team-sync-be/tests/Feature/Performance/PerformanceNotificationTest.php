@@ -294,4 +294,88 @@ class PerformanceNotificationTest extends TestCase
         $this->assertEquals(1, $data['review_id']);
         $this->assertEquals(4.5, $data['final_rating']);
     }
+
+    // ─── Deep Link Validation ───────────────────────────────────────
+
+    public function test_feedback_received_action_url_matches_fe_route(): void
+    {
+        $notification = new FeedbackReceived(
+            feedbackId: 1,
+            giverName: 'John',
+            feedbackType: 'positive',
+            contentPreview: 'Great work',
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/feedback/received', $data['action_url']);
+    }
+
+    public function test_goal_assigned_action_url_deep_links_to_goal_detail(): void
+    {
+        $notification = new GoalAssigned(
+            goalId: 42,
+            goalTitle: 'Complete OKRs',
+            assignedByName: 'Manager',
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/goals/42', $data['action_url']);
+    }
+
+    public function test_goal_deadline_approaching_action_url_deep_links_to_goal_detail(): void
+    {
+        $notification = new GoalDeadlineApproaching(
+            goalId: 42,
+            goalTitle: 'Complete OKRs',
+            dueDate: '2026-05-01',
+            daysRemaining: 3,
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/goals/42', $data['action_url']);
+    }
+
+    public function test_review_cycle_started_action_url_matches_fe_route(): void
+    {
+        $notification = new ReviewCycleStarted(
+            cycleId: 1,
+            cycleName: '2026 Annual',
+            startDate: '2026-01-01',
+            endDate: '2026-12-31',
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/reviews/my-reviews', $data['action_url']);
+    }
+
+    public function test_review_submitted_for_manager_action_url_deep_links_to_review(): void
+    {
+        $notification = new ReviewSubmittedForManager(
+            reviewId: 99,
+            employeeName: 'Jane',
+            cycleName: '2026 Annual',
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/reviews/99', $data['action_url']);
+    }
+
+    public function test_review_submitted_for_calibration_action_url_targets_pending_calibration(): void
+    {
+        $notification = new ReviewSubmittedForCalibration(
+            reviewId: 99,
+            employeeName: 'Jane',
+            managerName: 'John',
+            cycleName: '2026 Annual',
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/reviews/pending-calibration', $data['action_url']);
+    }
+
+    public function test_review_calibrated_action_url_deep_links_to_review(): void
+    {
+        $notification = new ReviewCalibrated(
+            reviewId: 99,
+            cycleName: '2026 Annual',
+            finalRating: 4.5,
+            outcome: 'Exceeds',
+        );
+        $data = $notification->toArray(new \stdClass);
+        $this->assertEquals('/admin/performance/reviews/99', $data['action_url']);
+    }
 }

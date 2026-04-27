@@ -36,7 +36,7 @@ class FeedbackReceived extends Notification implements ShouldQueue
             'category' => 'performance',
             'title' => "Feedback {$typeLabel} Diterima",
             'body' => "{$this->giverName} memberikan feedback {$typeLabel} untuk Anda: \"{$this->contentPreview}\"",
-            'action_url' => '/performance/feedback',
+            'action_url' => '/admin/performance/feedback/received',
             'feedback_id' => $this->feedbackId,
             'giver_name' => $this->giverName,
             'feedback_type' => $this->feedbackType,

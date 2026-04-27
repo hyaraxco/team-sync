@@ -33,7 +33,7 @@ class ReviewSubmittedForManager extends Notification implements ShouldQueue
             'category' => 'performance',
             'title' => 'Self-Assessment Diterima',
             'body' => "{$this->employeeName} telah mengirimkan self-assessment untuk siklus \"{$this->cycleName}\". Silakan lakukan penilaian.",
-            'action_url' => "/performance/reviews/{$this->reviewId}",
+            'action_url' => "/admin/performance/reviews/{$this->reviewId}",
             'review_id' => $this->reviewId,
             'employee_name' => $this->employeeName,
             'cycle_name' => $this->cycleName,

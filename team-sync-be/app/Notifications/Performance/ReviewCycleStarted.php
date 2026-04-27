@@ -34,7 +34,7 @@ class ReviewCycleStarted extends Notification implements ShouldQueue
             'category' => 'performance',
             'title' => 'Siklus Review Dimulai',
             'body' => "Siklus review \"{$this->cycleName}\" telah dimulai (periode {$this->startDate} s/d {$this->endDate}).",
-            'action_url' => '/performance/reviews',
+            'action_url' => '/admin/performance/reviews/my-reviews',
             'cycle_id' => $this->cycleId,
             'cycle_name' => $this->cycleName,
             'start_date' => $this->startDate,
