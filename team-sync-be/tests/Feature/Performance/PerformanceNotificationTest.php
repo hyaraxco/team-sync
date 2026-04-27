@@ -2,11 +2,13 @@
 
 namespace Tests\Feature\Performance;
 
+use App\Models\JobInformation;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
 use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewTemplate;
+use App\Models\ReviewerRule;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Notifications\Performance\FeedbackReceived;
@@ -22,6 +24,7 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -377,5 +380,44 @@ class PerformanceNotificationTest extends TestCase
         );
         $data = $notification->toArray(new \stdClass);
         $this->assertEquals('/admin/performance/reviews/99', $data['action_url']);
+    }
+
+    // ─── Wiring Integration Tests ────────────────────────────────────
+
+    public function test_review_cycle_started_notification_sent_when_reviews_generated(): void
+    {
+        Notification::fake();
+
+        // Setup HR user with review-cycle-manage permission
+        [$hrUser] = $this->createUserWithProfile('hr');
+        Permission::firstOrCreate(['name' => 'review-cycle-manage', 'guard_name' => 'sanctum']);
+        Permission::firstOrCreate(['name' => 'review-assign-reviewer', 'guard_name' => 'sanctum']);
+        $hrRole = Role::findByName('hr', 'sanctum');
+        $hrRole->givePermissionTo(['review-cycle-manage', 'review-assign-reviewer']);
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Setup employee with active job info
+        [$employeeUser, $employeeProfile] = $this->createUserWithProfile('staff');
+        JobInformation::factory()->create([
+            'staff_member_id' => $employeeProfile->id,
+            'status' => 'active',
+        ]);
+
+        // Setup reviewer rule so generation doesn't fail
+        ReviewerRule::create([
+            'reviewee_role' => 'staff',
+            'reviewer_role' => 'hr',
+            'priority' => 1,
+            'is_active' => true,
+        ]);
+
+        $cycle = PerformanceReviewCycle::factory()->active()->create();
+
+        Sanctum::actingAs($hrUser);
+
+        $response = $this->postJson("/api/v1/performance/cycles/{$cycle->id}/generate-reviews");
+        $response->assertStatus(200);
+
+        Notification::assertSentTo($employeeUser, ReviewCycleStarted::class);
     }
 }

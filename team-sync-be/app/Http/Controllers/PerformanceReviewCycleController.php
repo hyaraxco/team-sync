@@ -8,6 +8,7 @@ use App\Http\Requests\Performance\CreateReviewCycleRequest;
 use App\Http\Requests\Performance\UpdateReviewCycleRequest;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Models\StaffMemberProfile;
+use App\Notifications\Performance\ReviewCycleStarted;
 use App\Services\Performance\ReviewerResolverService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -93,6 +94,16 @@ class PerformanceReviewCycleController extends Controller
                     'status' => 'pending_self',
                 ]);
                 $createdCount++;
+
+                // Notify employee that a review cycle has started
+                if ($staffMember->user) {
+                    $staffMember->user->notify(new ReviewCycleStarted(
+                        cycleId: $cycle->id,
+                        cycleName: $cycle->name,
+                        startDate: $cycle->start_date->format('Y-m-d'),
+                        endDate: $cycle->end_date->format('Y-m-d'),
+                    ));
+                }
             }
 
             return ResponseHelper::jsonResponse(true, "Successfully generated reviews for {$createdCount} employees", [
