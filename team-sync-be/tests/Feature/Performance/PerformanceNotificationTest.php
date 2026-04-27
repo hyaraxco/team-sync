@@ -457,4 +457,44 @@ class PerformanceNotificationTest extends TestCase
 
         Notification::assertSentTo($managerUser, ReviewSubmittedForManager::class);
     }
+
+    public function test_review_submitted_for_calibration_notification_sent_on_manager_assessment(): void
+    {
+        Notification::fake();
+
+        [$hrUser] = $this->createUserWithProfile('hr');
+        [$managerUser, $managerProfile] = $this->createUserWithProfile('manager');
+        [$employeeUser, $employeeProfile] = $this->createUserWithProfile('staff');
+
+        // Manager needs permission
+        Permission::firstOrCreate(['name' => 'review-manager-submit', 'guard_name' => 'sanctum']);
+        $managerRole = Role::findByName('manager', 'sanctum');
+        $managerRole->givePermissionTo('review-manager-submit');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        $cycle = PerformanceReviewCycle::factory()->active()->create();
+        $section = \App\Models\PerformanceReviewSection::create([
+            'name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true,
+        ]);
+
+        $review = PerformanceReview::create([
+            'cycle_id' => $cycle->id,
+            'staff_member_id' => $employeeProfile->id,
+            'reviewer_id' => $managerProfile->id,
+            'status' => 'pending_manager',
+            'self_assessment_submitted_at' => now(),
+        ]);
+
+        Sanctum::actingAs($managerUser);
+
+        $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/manager-assessment", [
+            'responses' => [
+                ['section_id' => $section->id, 'rating' => 4, 'comments' => 'Good'],
+            ],
+        ]);
+        $response->assertStatus(200);
+
+        // HR user should receive the calibration notification
+        Notification::assertSentTo($hrUser, ReviewSubmittedForCalibration::class);
+    }
 }
