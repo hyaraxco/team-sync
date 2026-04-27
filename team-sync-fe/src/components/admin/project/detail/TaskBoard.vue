@@ -4,6 +4,7 @@ import { ListChecks, Plus, Search } from "lucide-vue-next";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useTaskStore } from "@/stores/task";
 import { useAuthStore } from "@/stores/auth";
+import { can } from "@/helpers/permissionHelper";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import TaskCard from "./TaskCard.vue";
@@ -54,7 +55,7 @@ const currentEmployeeId = computed(
     authStore.user?.employee_profile?.id || authStore.user?.employeeProfile?.id
 );
 
-const canCreateTask = computed(() => hasRole("manager") || hasRole("hr"));
+const canCreateTask = computed(() => can("task-create"));
 
 const normalizeStatus = (status) => (status === "pending" ? "todo" : status);
 

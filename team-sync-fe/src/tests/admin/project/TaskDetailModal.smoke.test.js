@@ -137,10 +137,10 @@ describe("TaskDetailModal smoke", () => {
     expect(wrapper.text()).not.toContain("Delete Task");
   });
 
-  it("locks employee collaboration on review status", async () => {
+  it("locks employee collaboration on done status", async () => {
     const wrapper = factory(
       makeTask({
-        status: "review",
+        status: "done",
         assignee_id: 100,
       }),
       {
@@ -152,7 +152,7 @@ describe("TaskDetailModal smoke", () => {
 
     await wrapper.vm.$nextTick();
 
-    const commentTextarea = wrapper.find('textarea[placeholder="Comment is locked for this task status"]');
+    const commentTextarea = wrapper.find('textarea[placeholder="Comments are locked on completed/cancelled tasks"]');
     expect(commentTextarea.exists()).toBe(true);
     expect(commentTextarea.attributes("disabled")).toBeDefined();
   });

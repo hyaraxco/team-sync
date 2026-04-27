@@ -557,13 +557,13 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
                 throw new AuthorizationException('You can only collaborate on your own assigned tasks.');
             }
 
-            $editableStatuses = [
-                TaskStatus::IN_PROGRESS->value,
-                TaskStatus::REJECTED->value,
+            $lockedStatuses = [
+                TaskStatus::DONE->value,
+                TaskStatus::CANCELLED->value,
             ];
 
             $currentStatus = $this->normalizeStatusForWorkflow((string) $task->status);
-            if (! in_array($currentStatus, $editableStatuses, true)) {
+            if (in_array($currentStatus, $lockedStatuses, true)) {
                 throw new AuthorizationException('Task is locked for this action in current status.');
             }
         }

@@ -305,21 +305,6 @@ export const usePayrollStore = defineStore("payroll", {
             }
         },
 
-        async deletePayroll(id) {
-            this.loading = true;
-
-            try {
-                const response = await axiosInstance.delete(`/payrolls/${id}`);
-
-                this.success = response.data.message;
-            } catch (error) {
-                this.error = handleError(error);
-                throw error;
-            } finally {
-                this.loading = false;
-            }
-        },
-
         async fetchMyPayslips(params) {
             this.loading = true;
 

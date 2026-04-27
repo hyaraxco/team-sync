@@ -79,15 +79,32 @@ describe("TaskBoard smoke", () => {
   });
 
   it("shows create button for manager", () => {
-    mockUser.value = { roles: [{ name: "manager" }] };
+    mockUser.value = {
+      roles: [{ name: "manager" }],
+      permissions: ["task-create", "task-list", "task-edit", "task-delete"],
+    };
 
     const wrapper = factory();
 
     expect(wrapper.text()).toContain("Create New Task");
   });
 
-  it("hides create button for employee", () => {
-    mockUser.value = { roles: [{ name: "staff" }] };
+  it("shows create button for staff with task-create permission", () => {
+    mockUser.value = {
+      roles: [{ name: "staff" }],
+      permissions: ["task-create", "task-list", "task-edit"],
+    };
+
+    const wrapper = factory();
+
+    expect(wrapper.text()).toContain("Create New Task");
+  });
+
+  it("hides create button for user without task-create permission", () => {
+    mockUser.value = {
+      roles: [{ name: "finance" }],
+      permissions: ["payroll-list"],
+    };
 
     const wrapper = factory();
 
