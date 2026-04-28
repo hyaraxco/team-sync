@@ -6,11 +6,21 @@ use App\Helpers\ResponseHelper;
 use App\Models\PerformanceReviewTemplate;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class PerformanceReviewTemplateController extends Controller
+class PerformanceReviewTemplateController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('review-cycle-manage')),
+        ];
+    }
+
     /**
      * Display a listing of the resource.
      */
