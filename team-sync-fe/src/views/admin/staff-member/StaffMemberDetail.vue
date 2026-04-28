@@ -30,7 +30,6 @@ import {
   MapPin,
   Briefcase,
   FileText,
-  Download,
   Trash2,
   Building,
   User,
@@ -54,7 +53,12 @@ const loadStaffMember = async () => {
     // Load performance statistics
     await staffMemberStore.fetchPerformanceStatistics(staffMemberId);
   } catch (error) {
-    console.error("Error loading staff member:", error);
+    toast.error(
+      "Failed to load staff member",
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load staff member.",
+    );
     router.push({ name: "admin.staffMembers" });
   }
 };
@@ -78,16 +82,6 @@ const shareProfile = () => {
   toast.success("Link Copied", "Profile link copied to clipboard!");
 };
 
-const backupStaffMember = () => {
-  if (
-    confirm(
-      `Create backup for ${staffMember.value?.user?.name}? This will download all staff member data.`
-    )
-  ) {
-    toast.info("Coming Soon", "Backup feature will be implemented soon.");
-  }
-};
-
 const handleDeleteStaffMember = async () => {
   try {
     await staffMemberStore.deleteStaffMember(route.params.id as string);
@@ -96,7 +90,12 @@ const handleDeleteStaffMember = async () => {
       router.push({ name: "admin.staffMembers" });
     }
   } catch (error) {
-    console.error("Failed to delete staff member:", error);
+    toast.error(
+      "Failed to delete staff member",
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to delete staff member.",
+    );
   }
 };
 
@@ -691,13 +690,6 @@ onMounted(() => {
           </p>
         </div>
         <div class="flex gap-3">
-          <button
-            @click="backupStaffMember"
-            class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-          >
-            <Download class="w-4 h-4" />
-            Backup Data
-          </button>
           <button
             @click="showDeleteModal = true"
             class="bg-red-600 border border-red-700 text-white py-3 px-6 rounded-[8px] font-semibold hover:bg-red-700 transition-colors flex items-center gap-2"

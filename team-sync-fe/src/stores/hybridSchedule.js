@@ -57,17 +57,6 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
                 this.mySchedule = response.data.data;
                 return response.data;
             } catch (error) {
-                if (import.meta.env.DEV || import.meta.env.TEST) {
-                    console.warn('[MOCK DATA] Returning mock hybrid schedule due to API failure.');
-                    const mockData = {
-                        base_schedule: { monday: 'office', tuesday: 'remote', wednesday: 'office', thursday: 'office', friday: 'remote' },
-                        overrides: [
-                            { id: 1, date: '2026-04-28', requested_location: 'Remote', status: 'Pending', reason: 'Waiting for plumbing repair' }
-                        ]
-                    };
-                    this.mySchedule = mockData;
-                    return { data: mockData };
-                }
                 this.error = handleError(error);
                 throw error;
             } finally {
