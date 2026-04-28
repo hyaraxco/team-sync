@@ -2,8 +2,10 @@
 import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceGoalStore } from "@/stores/performanceGoal";
+import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import { useToast } from "@/composables/useToast";
+import { useConfirmAction } from "@/composables/useConfirmAction";
 import { can } from "@/helpers/permissionHelper";
 import {
     Target,
@@ -15,6 +17,9 @@ import {
     AlertTriangle,
     XCircle,
     X,
+    MoreVertical,
+    Pencil,
+    Trash2,
 } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
@@ -22,6 +27,7 @@ import StatusBadge from "@/components/common/StatusBadge.vue";
 
 const router = useRouter();
 const goalStore = usePerformanceGoalStore();
+const authStore = useAuthStore();
 const { myGoals, goalsLoading } = storeToRefs(goalStore);
 const toast = useToast();
 
@@ -29,6 +35,8 @@ const selectedType = ref("all");
 const selectedStatus = ref("all");
 const showCreateModal = ref(false);
 const createLoading = ref(false);
+const editingGoalId = ref(null);
+const openActionMenuId = ref(null);
 
 const defaultCreateForm = () => ({
     title: "",
@@ -44,6 +52,20 @@ const defaultCreateForm = () => ({
 const createForm = ref(defaultCreateForm());
 
 const canCreateGoal = computed(() => can("goal-create-own"));
+const currentEmployeeId = computed(
+    () =>
+        authStore.user?.employee_profile?.id ||
+        authStore.user?.employeeProfile?.id ||
+        null
+);
+const isEditMode = computed(() => editingGoalId.value !== null);
+
+const {
+    openModal,
+    closeModal,
+    confirmAction,
+    error: confirmActionError,
+} = useConfirmAction();
 
 const filteredGoals = computed(() => {
     let goals = myGoals.value;
@@ -108,17 +130,107 @@ const viewGoal = (goalId) => {
     });
 };
 
+const toDateInputValue = (value) => {
+    if (!value) {
+        return "";
+    }
+
+    const parsedDate = new Date(value);
+
+    if (Number.isNaN(parsedDate.getTime())) {
+        return "";
+    }
+
+    return parsedDate.toISOString().split("T")[0];
+};
+
+const canManageGoal = (goal) => {
+    if (!goal || !currentEmployeeId.value) {
+        return false;
+    }
+
+    if (goal.staff_member_id !== currentEmployeeId.value) {
+        return false;
+    }
+
+    return !["completed", "cancelled"].includes(goal.status);
+};
+
 const createGoal = () => {
+    editingGoalId.value = null;
     createForm.value = defaultCreateForm();
     showCreateModal.value = true;
 };
 
+const editGoal = (goal) => {
+    if (!canManageGoal(goal)) {
+        return;
+    }
+
+    editingGoalId.value = goal.id;
+    createForm.value = {
+        title: goal.title || "",
+        description: goal.description || "",
+        goal_type: goal.goal_type || "okr",
+        category: goal.category || "",
+        start_date: toDateInputValue(goal.start_date),
+        due_date: toDateInputValue(goal.due_date),
+        target_value: goal.target_value ?? "",
+        unit: goal.unit || "",
+    };
+    openActionMenuId.value = null;
+    showCreateModal.value = true;
+};
+
+const toggleActionMenu = (goalId) => {
+    openActionMenuId.value = openActionMenuId.value === goalId ? null : goalId;
+};
+
 const closeCreateModal = () => {
     showCreateModal.value = false;
+    editingGoalId.value = null;
     createForm.value = defaultCreateForm();
 };
 
-const submitCreateGoal = async () => {
+const deleteGoal = async (goal) => {
+    if (!canManageGoal(goal)) {
+        return;
+    }
+
+    openModal(goal);
+
+    const isConfirmed = window.confirm(
+        `Delete goal \"${goal.title}\"? This action cannot be undone.`
+    );
+
+    if (!isConfirmed) {
+        closeModal();
+        return;
+    }
+
+    try {
+        await confirmAction(async (selectedGoal) => {
+            await goalStore.deleteGoal(selectedGoal.id);
+        });
+
+        if (confirmActionError.value) {
+            throw confirmActionError.value;
+        }
+
+        toast.success("Goal deleted successfully");
+    } catch (error) {
+        toast.error(
+            "Failed to delete goal",
+            error?.response?.data?.message ||
+                error?.message ||
+                "Please try again"
+        );
+    } finally {
+        openActionMenuId.value = null;
+    }
+};
+
+const submitGoal = async () => {
     if (!createForm.value.title || !createForm.value.goal_type) {
         toast.warning("Title and goal type are required");
         return;
@@ -135,13 +247,19 @@ const submitCreateGoal = async () => {
                     : Number(createForm.value.target_value),
         };
 
-        await goalStore.createGoal(payload);
-        await goalStore.fetchMyGoals();
-        toast.success("Goal created successfully");
+        if (isEditMode.value) {
+            await goalStore.updateGoal(editingGoalId.value, payload);
+            toast.success("Goal updated successfully");
+        } else {
+            await goalStore.createGoal(payload);
+            await goalStore.fetchMyGoals();
+            toast.success("Goal created successfully");
+        }
+
         closeCreateModal();
     } catch (error) {
         toast.error(
-            "Failed to create goal",
+            isEditMode.value ? "Failed to update goal" : "Failed to create goal",
             error?.response?.data?.message ||
                 error?.message ||
                 "Please try again"
@@ -230,12 +348,44 @@ onMounted(async () => {
                 @click="viewGoal(goal.id)"
             >
                 <div class="absolute top-4 right-4">
-                    <span
-                        class="px-3 py-1 rounded-full text-xs font-semibold"
-                        :class="getTypeColor(goal.goal_type)"
-                    >
-                        {{ goalTypes.find((t) => t.value === goal.goal_type)?.label }}
-                    </span>
+                    <div class="flex items-center gap-2">
+                        <span
+                            class="px-3 py-1 rounded-full text-xs font-semibold"
+                            :class="getTypeColor(goal.goal_type)"
+                        >
+                            {{ goalTypes.find((t) => t.value === goal.goal_type)?.label }}
+                        </span>
+
+                        <div v-if="canManageGoal(goal)" class="relative">
+                            <button
+                                class="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                                @click.stop="toggleActionMenu(goal.id)"
+                            >
+                                <MoreVertical class="w-4 h-4 text-brand-light" />
+                            </button>
+
+                            <div
+                                v-if="openActionMenuId === goal.id"
+                                class="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10"
+                                @click.stop
+                            >
+                                <button
+                                    class="w-full px-3 py-2 text-sm text-left text-brand-dark hover:bg-gray-50 flex items-center gap-2"
+                                    @click.stop="editGoal(goal)"
+                                >
+                                    <Pencil class="w-4 h-4" />
+                                    Edit
+                                </button>
+                                <button
+                                    class="w-full px-3 py-2 text-sm text-left text-red-600 hover:bg-red-50 flex items-center gap-2"
+                                    @click.stop="deleteGoal(goal)"
+                                >
+                                    <Trash2 class="w-4 h-4" />
+                                    Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="space-y-4">
@@ -337,7 +487,9 @@ onMounted(async () => {
         >
             <MainCard class="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-xl font-bold text-brand-dark">Create Goal</h2>
+                    <h2 class="text-xl font-bold text-brand-dark">
+                        {{ isEditMode ? "Edit Goal" : "Create Goal" }}
+                    </h2>
                     <button
                         class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
                         @click="closeCreateModal"
@@ -346,7 +498,7 @@ onMounted(async () => {
                     </button>
                 </div>
 
-                <form class="space-y-4" @submit.prevent="submitCreateGoal">
+                <form class="space-y-4" @submit.prevent="submitGoal">
                     <div>
                         <label class="block text-sm font-medium text-brand-dark mb-2"
                             >Title</label
@@ -462,7 +614,15 @@ onMounted(async () => {
                             :disabled="createLoading"
                             class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors disabled:opacity-50"
                         >
-                            {{ createLoading ? "Creating..." : "Create Goal" }}
+                            {{
+                                createLoading
+                                    ? isEditMode
+                                        ? "Updating..."
+                                        : "Creating..."
+                                    : isEditMode
+                                      ? "Update Goal"
+                                      : "Create Goal"
+                            }}
                         </button>
                     </div>
                 </form>
