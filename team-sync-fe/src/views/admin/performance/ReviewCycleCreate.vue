@@ -3,12 +3,18 @@ import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
 import { Calendar, ArrowLeft, Layout } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
+import Alert from "@/components/common/Alert.vue";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
+import { useToast } from "@/composables/useToast";
 import { storeToRefs } from "pinia";
 
 const router = useRouter();
 const reviewStore = usePerformanceReviewStore();
-const { templates, templatesLoading } = storeToRefs(reviewStore);
+const toast = useToast();
+const { templates, templatesLoading, cyclesLoading } = storeToRefs(reviewStore);
+
+const errorMessage = ref("");
+const submitting = ref(false);
 
 const formData = ref({
   name: "",
@@ -28,13 +34,55 @@ const defaultTemplateId = computed(() => {
   return defaultTpl?.id || "";
 });
 
+const isFormValid = computed(() => {
+  return (
+    !!formData.value.name.trim() &&
+    !!formData.value.cycle_type &&
+    !!formData.value.start_date &&
+    !!formData.value.end_date &&
+    !!formData.value.review_period_start &&
+    !!formData.value.review_period_end
+  );
+});
+
 const goBack = () => {
   router.push({ name: "admin.performance.cycles" });
 };
 
+const parseErrorMessage = (error) => {
+  const storeError = reviewStore.error;
+  if (storeError && typeof storeError === "object") {
+    return Object.values(storeError).flat().join(". ");
+  }
+  return storeError || error?.response?.data?.message || "Failed to create review cycle.";
+};
+
 const createCycle = async () => {
-  // TODO: Implement cycle creation
-  console.log("Creating cycle:", formData.value);
+  if (!isFormValid.value || submitting.value) {
+    return;
+  }
+
+  errorMessage.value = "";
+  submitting.value = true;
+
+  try {
+    const payload = { ...formData.value };
+    // Send template_id as integer or null
+    payload.template_id = payload.template_id ? parseInt(payload.template_id) : null;
+
+    await reviewStore.createCycle(payload);
+
+    toast.success(
+      "Review cycle created",
+      `"${formData.value.name}" has been created successfully.`,
+    );
+    router.push({ name: "admin.performance.cycles" });
+  } catch (error) {
+    errorMessage.value = parseErrorMessage(error);
+    toast.error("Failed to create cycle", errorMessage.value);
+  } finally {
+    submitting.value = false;
+  }
 };
 
 onMounted(async () => {
@@ -62,6 +110,13 @@ onMounted(async () => {
         </p>
       </div>
     </div>
+
+    <Alert
+      v-if="errorMessage"
+      type="danger"
+      title="Unable to create review cycle"
+      :message="errorMessage"
+    />
 
     <!-- Form -->
     <MainCard>
@@ -217,13 +272,15 @@ onMounted(async () => {
         <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
           <button
             type="submit"
-            class="px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
+            :disabled="!isFormValid || submitting"
+            class="px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            Create Cycle
+            {{ submitting ? "Creating..." : "Create Cycle" }}
           </button>
           <button
             type="button"
-            class="px-6 py-3 bg-gray-100 text-brand-dark rounded-lg hover:bg-gray-200 transition-colors"
+            :disabled="submitting"
+            class="px-6 py-3 bg-gray-100 text-brand-dark rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
             @click="goBack"
           >
             Cancel

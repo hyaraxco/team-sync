@@ -2,6 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceFeedbackStore } from "@/stores/performanceFeedback";
+import { useToast } from "@/composables/useToast";
 import {
   MessageSquare,
   ThumbsUp,
@@ -15,6 +16,7 @@ import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 
 const feedbackStore = usePerformanceFeedbackStore();
+const toast = useToast();
 const { receivedFeedback, feedbackLoading } = storeToRefs(feedbackStore);
 
 const selectedType = ref("all");
@@ -63,7 +65,10 @@ const acknowledgeFeedback = async (feedbackId) => {
   try {
     await feedbackStore.acknowledgeFeedback(feedbackId);
   } catch (error) {
-    console.error("Failed to acknowledge feedback:", error);
+    toast.error(
+      "Failed to acknowledge feedback",
+      feedbackStore.error || error?.response?.data?.message || "Please try again.",
+    );
   }
 };
 

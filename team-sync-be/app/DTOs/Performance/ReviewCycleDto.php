@@ -17,6 +17,7 @@ class ReviewCycleDto
         public readonly ?string $self_assessment_deadline,
         public readonly ?string $manager_assessment_deadline,
         public readonly ?string $calibration_deadline,
+        public readonly ?int $template_id,
         public readonly ?int $created_by
     ) {}
 
@@ -33,6 +34,7 @@ class ReviewCycleDto
             $data['self_assessment_deadline'] ?? null,
             $data['manager_assessment_deadline'] ?? null,
             $data['calibration_deadline'] ?? null,
+            isset($data['template_id']) ? (int) $data['template_id'] : null,
             Auth::id() ?? $data['created_by'] ?? null
         );
     }
@@ -59,6 +61,9 @@ class ReviewCycleDto
         }
         if ($this->calibration_deadline !== null) {
             $array['calibration_deadline'] = $this->calibration_deadline;
+        }
+        if ($this->template_id !== null) {
+            $array['template_id'] = $this->template_id;
         }
         if ($this->created_by !== null) {
             $array['created_by'] = $this->created_by;
