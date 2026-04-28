@@ -8,9 +8,19 @@ use App\Services\TopsisService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class PerformanceTopsisController extends Controller
+class PerformanceTopsisController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('review-cycle-manage')),
+        ];
+    }
+
     /** Bobot default jika HR tidak menentukan bobot sendiri */
     private const DEFAULT_WEIGHTS = [
         'avg_manager_rating' => 0.30,  // C1: Competency Score
