@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { storeToRefs } from "pinia";
 import { ArrowRight, ArrowLeft, UserPlus } from "lucide-vue-next";
+import { useToast } from "@/composables/useToast";
 
 import Step1PersonalInfo from "@/components/admin/staff-member/create/steps/Step1PersonalInfo.vue";
 import Step2JobInfo from "@/components/admin/staff-member/create/steps/Step2JobInfo.vue";
@@ -13,6 +14,7 @@ import ErrorModal from "@/components/admin/staff-member/create/ErrorModal.vue";
 
 const router = useRouter();
 const staffMemberStore = useStaffMemberStore();
+const toast = useToast();
 const { loading, error } = storeToRefs(staffMemberStore);
 
 // Modal state
@@ -441,10 +443,20 @@ const handleSubmit = async () => {
     // Redirect to success page on success
     router.push({ name: "admin.staffMembers.success" });
   } catch (err) {
-    console.error("Error creating staff member:", err);
+    toast.error(
+      "Failed to create staff member",
+      error.value ||
+        err?.response?.data?.message ||
+        "Failed to create staff member.",
+    );
     const validationErrors = err?.response?.data?.errors;
     if (validationErrors) {
-      console.error("Staff member validation errors:", validationErrors);
+      toast.error(
+        "Failed to create staff member",
+        error.value ||
+          err?.response?.data?.message ||
+          "Failed to create staff member.",
+      );
       goToErrorStep(validationErrors);
     }
     // Show error modal when validation fails

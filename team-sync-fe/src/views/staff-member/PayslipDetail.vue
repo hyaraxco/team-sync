@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { usePayrollStore } from "@/stores/payroll";
 import { useAuthStore } from "@/stores/auth";
+import { useToast } from "@/composables/useToast";
 import {
   ArrowLeft,
   Download,
@@ -23,6 +24,7 @@ const route = useRoute();
 const router = useRouter();
 const payrollStore = usePayrollStore();
 const authStore = useAuthStore();
+const toast = useToast();
 
 const payslip = ref(null);
 const loading = ref(true);
@@ -32,7 +34,12 @@ onMounted(async () => {
   try {
     payslip.value = await payrollStore.fetchMyPayslip(route.params.id);
   } catch (error) {
-    console.error("Error fetching payslip:", error);
+    toast.error(
+      "Failed to load payslip",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payslip.",
+    );
   } finally {
     loading.value = false;
   }
@@ -48,7 +55,12 @@ const handleDownload = async () => {
     link.click();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("Error downloading payslip:", error);
+    toast.error(
+      "Download failed",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to download payslip.",
+    );
   }
 };
 

@@ -26,12 +26,14 @@ import _ from "lodash";
 import TaskBoard from "@/components/admin/project/detail/TaskBoard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
+import { useToast } from "@/composables/useToast";
 
 const route = useRoute();
 const id = route.params.id;
 
 const projectStore = useProjectStore();
 const { fetchProject, fetchProjectSquadSummary } = projectStore;
+const toast = useToast();
 
 const project = ref({});
 const squadSummary = ref(null);
@@ -93,7 +95,12 @@ const handleFetchProject = async () => {
       router.push({ name: "admin.projects" });
     }
   } catch (error) {
-    console.error("Error fetching project:", error);
+    toast.error(
+      "Failed to load project",
+      projectStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load project.",
+    );
     project.value = {};
   }
 };

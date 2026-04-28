@@ -93,8 +93,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useHybridScheduleStore } from '@/stores/hybridSchedule';
+import { useToast } from '@/composables/useToast';
 
 const scheduleStore = useHybridScheduleStore();
+const toast = useToast();
 const schedule = ref({ base_schedule: {}, overrides: [] });
 const loading = ref(true);
 const error = ref(false);
@@ -104,7 +106,10 @@ onMounted(async () => {
     const response = await scheduleStore.fetchMySchedule();
     schedule.value = response?.data || { base_schedule: {}, overrides: [] };
   } catch (err) {
-    console.error('Failed to load schedule', err);
+    toast.error(
+      'Failed to load schedule',
+      scheduleStore.error || err?.response?.data?.message || 'Failed to load schedule.',
+    );
     error.value = true;
   } finally {
     loading.value = false;
