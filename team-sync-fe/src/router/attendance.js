@@ -64,6 +64,22 @@ export default [
         },
     },
     {
+        path: 'holiday-calendar',
+        name: 'admin.attendance.holidays',
+        component: () => import('@/views/admin/attendance/HolidayCalendar.vue'),
+        meta: {
+            requiredPermission: 'attendance-menu',
+        },
+    },
+    {
+        path: 'hybrid-schedules',
+        name: 'admin.attendance.hybrid-schedules',
+        component: () => import('@/views/admin/attendance/HybridScheduleList.vue'),
+        meta: {
+            requiredPermission: 'attendance-menu',
+        },
+    },
+    {
         path: 'attendance/my-attendances',
         name: 'staffMember.attendance.my-attendances',
         component: MyAttendance,
