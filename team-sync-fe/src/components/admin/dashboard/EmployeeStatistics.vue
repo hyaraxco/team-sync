@@ -18,7 +18,7 @@ import QuickActions from "./QuickActions.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import MainCard from "@/components/common/MainCard.vue";
 import { useAuthStore } from "@/stores/auth";
-import { axiosInstance } from "@/plugins/axios";
+import { useDashboardStore } from "@/stores/dashboard";
 import { useTaskStore } from "@/stores/task";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { useNotificationStore } from "@/stores/notifications";
@@ -28,6 +28,7 @@ import { getTimeAgo } from "@/utils/dateUtils";
 const authStore = useAuthStore();
 const router = useRouter();
 const notificationStore = useNotificationStore();
+const dashboardStore = useDashboardStore();
 
 const statistics = ref({
   attendance_rate: 0,
@@ -299,8 +300,7 @@ const fetchRecentActivities = async () => {
 const fetchMyStatistics = async () => {
   statsLoading.value = true;
   try {
-    const response = await axiosInstance.get("/dashboard/my-statistics");
-    const data = response.data?.data || {};
+    const data = await dashboardStore.fetchMyStatistics();
 
     const attendance = data.attendance || {};
     const tasks = data.tasks || {};

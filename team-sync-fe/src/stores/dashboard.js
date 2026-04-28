@@ -34,9 +34,27 @@ export const useDashboardStore = defineStore("dashboard", {
         error: null,
         todayAttendance: null,
         todayAttendanceLoading: false,
+        myStatistics: null,
+        myStatisticsLoading: false,
     }),
 
     actions: {
+        async fetchMyStatistics() {
+            this.myStatisticsLoading = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get('/dashboard/my-statistics');
+                this.myStatistics = response.data.data;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.myStatisticsLoading = false;
+            }
+        },
+
         async fetchStatistics() {
             this.loading = true;
             this.error = null;

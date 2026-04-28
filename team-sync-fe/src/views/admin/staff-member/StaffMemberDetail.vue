@@ -456,25 +456,25 @@ onMounted(() => {
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Contact Name</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ staffMember.emergency_contacts[0].full_name }}
+              {{ staffMember.emergency_contacts?.[0]?.full_name || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Relationship</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ capitalize(staffMember.emergency_contacts[0].relationship) }}
+              {{ capitalize(staffMember.emergency_contacts?.[0]?.relationship) || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Phone</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ staffMember.emergency_contacts[0].phone }}
+              {{ staffMember.emergency_contacts?.[0]?.phone || "-" }}
             </span>
           </div>
           <div class="flex justify-between items-center">
             <span class="text-brand-light text-base">Email</span>
             <span class="text-brand-dark text-base font-medium">
-              {{ staffMember.emergency_contacts[0].email || "-" }}
+              {{ staffMember.emergency_contacts?.[0]?.email || "-" }}
             </span>
           </div>
         </div>

@@ -188,6 +188,28 @@ const getResponseForSection = (sectionId) => {
   return review.value?.responses?.find((r) => r.section_id === sectionId);
 };
 
+const getSelfAssessmentForm = (sectionId) => {
+  if (!selfAssessmentForm.value[sectionId]) {
+    selfAssessmentForm.value[sectionId] = {
+      rating: null,
+      comments: "",
+    };
+  }
+
+  return selfAssessmentForm.value[sectionId];
+};
+
+const getManagerAssessmentForm = (sectionId) => {
+  if (!managerAssessmentForm.value[sectionId]) {
+    managerAssessmentForm.value[sectionId] = {
+      rating: null,
+      comments: "",
+    };
+  }
+
+  return managerAssessmentForm.value[sectionId];
+};
+
 // Initialize form data from existing responses
 const initFormData = () => {
   if (!review.value) return;
@@ -403,6 +425,14 @@ watch(currentReview, (newVal) => {
     reviewStore.fetchCalibrationContext(reviewId.value);
   }
 });
+
+watch(
+  displaySections,
+  () => {
+    initFormData();
+  },
+  { deep: true },
+);
 </script>
 
 <template>
@@ -594,7 +624,7 @@ watch(currentReview, (newVal) => {
                     v-if="review.reviewer?.user?.roles?.length"
                     class="px-2 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700 border border-blue-200"
                   >
-                    {{ review.reviewer.user.roles[0].name }}
+                    {{ review.reviewer?.user?.roles?.[0]?.name }}
                   </span>
                 </div>
                 <p class="text-sm text-brand-light mt-0.5">
@@ -912,10 +942,10 @@ watch(currentReview, (newVal) => {
                       v-for="n in 5"
                       :key="n"
                       type="button"
-                      @click="selfAssessmentForm[section.id].rating = n"
+                      @click="getSelfAssessmentForm(section.id).rating = n"
                       class="w-12 h-12 rounded-lg border-2 flex items-center justify-center font-semibold transition-all"
                       :class="
-                        selfAssessmentForm[section.id]?.rating === n
+                        getSelfAssessmentForm(section.id).rating === n
                           ? 'border-brand-primary bg-brand-primary text-white'
                           : 'border-gray-200 text-brand-dark hover:border-brand-primary'
                       "
@@ -925,8 +955,8 @@ watch(currentReview, (newVal) => {
                   </div>
                   <p class="text-xs text-brand-light mt-1">
                     {{
-                      selfAssessmentForm[section.id]?.rating
-                        ? getRatingLabel(selfAssessmentForm[section.id].rating)
+                      getSelfAssessmentForm(section.id).rating
+                        ? getRatingLabel(getSelfAssessmentForm(section.id).rating)
                             ?.label
                         : "Select a rating (1-5)"
                     }}
@@ -937,7 +967,7 @@ watch(currentReview, (newVal) => {
                     >Comments (Optional)</label
                   >
                   <textarea
-                    v-model="selfAssessmentForm[section.id].comments"
+                    v-model="getSelfAssessmentForm(section.id).comments"
                     rows="3"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent resize-none"
                     placeholder="Share your thoughts on your performance in this area..."
@@ -1122,10 +1152,10 @@ watch(currentReview, (newVal) => {
                       v-for="n in 5"
                       :key="n"
                       type="button"
-                      @click="managerAssessmentForm[section.id].rating = n"
+                      @click="getManagerAssessmentForm(section.id).rating = n"
                       class="w-12 h-12 rounded-lg border-2 flex items-center justify-center font-semibold transition-all"
                       :class="
-                        managerAssessmentForm[section.id]?.rating === n
+                        getManagerAssessmentForm(section.id).rating === n
                           ? 'border-brand-primary bg-brand-primary text-white'
                           : 'border-gray-200 text-brand-dark hover:border-brand-primary'
                       "
@@ -1135,9 +1165,9 @@ watch(currentReview, (newVal) => {
                   </div>
                   <p class="text-xs text-brand-light mt-1">
                     {{
-                      managerAssessmentForm[section.id]?.rating
+                      getManagerAssessmentForm(section.id).rating
                         ? getRatingLabel(
-                            managerAssessmentForm[section.id].rating,
+                            getManagerAssessmentForm(section.id).rating,
                           )?.label
                         : "Select a rating (1-5)"
                     }}
@@ -1148,7 +1178,7 @@ watch(currentReview, (newVal) => {
                     >Manager Comments (Optional)</label
                   >
                   <textarea
-                    v-model="managerAssessmentForm[section.id].comments"
+                    v-model="getManagerAssessmentForm(section.id).comments"
                     rows="3"
                     class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent resize-none"
                     placeholder="Provide your assessment and feedback..."
