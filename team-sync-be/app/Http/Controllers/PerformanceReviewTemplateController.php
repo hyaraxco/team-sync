@@ -3,17 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
-use App\Models\PerformanceReviewTemplate;
+use App\Interfaces\PerformanceReviewRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceReviewTemplateController extends Controller implements HasMiddleware
 {
+    public function __construct(private PerformanceReviewRepositoryInterface $repository) {}
+
     public static function middleware(): array
     {
         return [
@@ -27,7 +28,7 @@ class PerformanceReviewTemplateController extends Controller implements HasMiddl
     public function index(): JsonResponse
     {
         try {
-            $templates = PerformanceReviewTemplate::withCount('sections')->get();
+            $templates = $this->repository->getTemplates();
             
             return ResponseHelper::jsonResponse(true, 'Templates retrieved successfully', $templates);
         } catch (\Exception $e) {
@@ -52,25 +53,14 @@ class PerformanceReviewTemplateController extends Controller implements HasMiddl
         ]);
 
         try {
-            return DB::transaction(function () use ($validated) {
-                // If this is set as default, unset others
-                if ($validated['is_default'] ?? false) {
-                    PerformanceReviewTemplate::where('is_default', true)->update(['is_default' => false]);
-                }
+            $template = $this->repository->createTemplate([
+                'name' => $validated['name'],
+                'description' => $validated['description'] ?? null,
+                'is_active' => $validated['is_active'] ?? true,
+                'is_default' => $validated['is_default'] ?? false,
+            ], $validated['sections']);
 
-                $template = PerformanceReviewTemplate::create([
-                    'name' => $validated['name'],
-                    'description' => $validated['description'] ?? null,
-                    'is_active' => $validated['is_active'] ?? true,
-                    'is_default' => $validated['is_default'] ?? false,
-                ]);
-
-                foreach ($validated['sections'] as $section) {
-                    $template->sections()->attach($section['id'], ['weight' => $section['weight']]);
-                }
-
-                return ResponseHelper::jsonResponse(true, 'Template created successfully', $template->load('sections'), 201);
-            });
+            return ResponseHelper::jsonResponse(true, 'Template created successfully', $template, 201);
         } catch (\Exception $e) {
             Log::error('Template store error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Failed to create template', null, 500);
@@ -83,7 +73,7 @@ class PerformanceReviewTemplateController extends Controller implements HasMiddl
     public function show(int $id): JsonResponse
     {
         try {
-            $template = PerformanceReviewTemplate::with('sections')->findOrFail($id);
+            $template = $this->repository->getTemplateById($id);
             return ResponseHelper::jsonResponse(true, 'Template retrieved successfully', $template);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, 'Template not found', null, 404);
@@ -106,27 +96,13 @@ class PerformanceReviewTemplateController extends Controller implements HasMiddl
         ]);
 
         try {
-            $template = PerformanceReviewTemplate::findOrFail($id);
+            $template = $this->repository->updateTemplate(
+                $id,
+                array_diff_key($validated, ['sections' => true]),
+                $validated['sections'] ?? null
+            );
 
-            return DB::transaction(function () use ($validated, $template) {
-                if ($validated['is_default'] ?? false) {
-                    PerformanceReviewTemplate::where('id', '!=', $template->id)
-                        ->where('is_default', true)
-                        ->update(['is_default' => false]);
-                }
-
-                $template->update($validated);
-
-                if (isset($validated['sections'])) {
-                    $syncData = [];
-                    foreach ($validated['sections'] as $section) {
-                        $syncData[$section['id']] = ['weight' => $section['weight']];
-                    }
-                    $template->sections()->sync($syncData);
-                }
-
-                return ResponseHelper::jsonResponse(true, 'Template updated successfully', $template->load('sections'));
-            });
+            return ResponseHelper::jsonResponse(true, 'Template updated successfully', $template);
         } catch (\Exception $e) {
             Log::error('Template update error: ' . $e->getMessage());
             return ResponseHelper::jsonResponse(false, 'Failed to update template', null, 500);
@@ -139,15 +115,15 @@ class PerformanceReviewTemplateController extends Controller implements HasMiddl
     public function destroy(int $id): JsonResponse
     {
         try {
-            $template = PerformanceReviewTemplate::findOrFail($id);
-            
-            // Check if template is in use
-            if ($template->performanceReviews()->exists()) {
+            $this->repository->deleteTemplate($id);
+
+            return ResponseHelper::jsonResponse(true, 'Template deleted successfully');
+        } catch (\RuntimeException $e) {
+            if ($e->getMessage() === 'Cannot delete template that is already used in reviews') {
                 return ResponseHelper::jsonResponse(false, 'Cannot delete template that is already used in reviews', null, 422);
             }
 
-            $template->delete();
-            return ResponseHelper::jsonResponse(true, 'Template deleted successfully');
+            return ResponseHelper::jsonResponse(false, 'Failed to delete template', null, 500);
         } catch (\Exception $e) {
             return ResponseHelper::jsonResponse(false, 'Failed to delete template', null, 500);
         }

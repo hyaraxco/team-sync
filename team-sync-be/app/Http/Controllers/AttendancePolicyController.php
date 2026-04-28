@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
-use App\Models\AttendancePolicy;
+use App\Interfaces\AttendanceRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -12,6 +12,8 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class AttendancePolicyController extends Controller implements HasMiddleware
 {
+    public function __construct(private AttendanceRepositoryInterface $repository) {}
+
     public static function middleware()
     {
         return [
@@ -25,7 +27,7 @@ class AttendancePolicyController extends Controller implements HasMiddleware
     public function index(): JsonResponse
     {
         try {
-            $policies = AttendancePolicy::orderBy('employment_type')->get();
+            $policies = $this->repository->getAttendancePolicies();
 
             return ResponseHelper::jsonResponse(true, 'Attendance Policies Retrieved Successfully', $policies, 200);
         } catch (\Throwable $e) {
@@ -51,10 +53,9 @@ class AttendancePolicyController extends Controller implements HasMiddleware
         ]);
 
         try {
-            $policy = AttendancePolicy::findOrFail($id);
-            $policy->update($data);
+            $policy = $this->repository->updateAttendancePolicy($id, $data);
 
-            return ResponseHelper::jsonResponse(true, 'Attendance Policy Updated Successfully', $policy->fresh(), 200);
+            return ResponseHelper::jsonResponse(true, 'Attendance Policy Updated Successfully', $policy, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Attendance Policy Not Found', null, 404);
         } catch (\Throwable $e) {

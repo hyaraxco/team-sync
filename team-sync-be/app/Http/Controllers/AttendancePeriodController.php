@@ -3,15 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendancePeriod\CreateAttendancePeriodRequest;
+use App\Interfaces\AttendanceRepositoryInterface;
 use App\Models\AttendancePeriod;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class AttendancePeriodController extends Controller
 {
+    public function __construct(private AttendanceRepositoryInterface $repository) {}
+
     public function index(Request $request): JsonResponse
     {
-        $periods = AttendancePeriod::orderBy('start_date', 'desc')->paginate($request->get('per_page', 15));
+        $periods = $this->repository->getAttendancePeriodsPaginated((int) $request->get('per_page', 15));
 
         return response()->json([
             'success' => true,
@@ -21,7 +24,7 @@ class AttendancePeriodController extends Controller
 
     public function store(CreateAttendancePeriodRequest $request): JsonResponse
     {
-        $hasOpenPeriod = AttendancePeriod::where('status', AttendancePeriod::STATUS_OPEN)->exists();
+        $hasOpenPeriod = $this->repository->hasOpenAttendancePeriod();
         
         if ($hasOpenPeriod) {
             return response()->json([
@@ -30,7 +33,7 @@ class AttendancePeriodController extends Controller
             ], 422);
         }
 
-        $period = AttendancePeriod::create(array_merge(
+        $period = $this->repository->createAttendancePeriod(array_merge(
             $request->validated(),
             ['status' => AttendancePeriod::STATUS_OPEN]
         ));
@@ -48,7 +51,7 @@ class AttendancePeriodController extends Controller
             'status' => 'required|string|in:' . AttendancePeriod::STATUS_OPEN . ',' . AttendancePeriod::STATUS_REVIEW . ',' . AttendancePeriod::STATUS_LOCKED,
         ]);
 
-        $period = AttendancePeriod::findOrFail($id);
+        $period = $this->repository->findAttendancePeriodOrFail($id);
 
         // Validation for status transitions
         if ($period->status === AttendancePeriod::STATUS_LOCKED) {
@@ -71,7 +74,7 @@ class AttendancePeriodController extends Controller
             $updateData['locked_at'] = now();
         }
 
-        $period->update($updateData);
+        $period = $this->repository->updateAttendancePeriod($id, $updateData);
 
         return response()->json([
             'success' => true,

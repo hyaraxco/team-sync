@@ -6,6 +6,8 @@ use App\Constants\CacheConstants;
 use App\DTOs\AttendanceDto;
 use App\Interfaces\AttendanceRepositoryInterface;
 use App\Models\Attendance;
+use App\Models\AttendancePeriod;
+use App\Models\AttendancePolicy;
 use App\Models\AttendancePolicyMismatch;
 use App\Models\JobInformation;
 use App\Models\Team;
@@ -460,6 +462,58 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     public function clearAttendanceCache(): void
     {
         cache()->forget(CacheConstants::CACHE_KEY_ATTENDANCE_STATISTICS.now()->format('Y-m-d-H'));
+    }
+
+    public function getAttendancePeriodsPaginated(int $perPage)
+    {
+        return AttendancePeriod::query()
+            ->orderBy('start_date', 'desc')
+            ->paginate($perPage);
+    }
+
+    public function hasOpenAttendancePeriod(): bool
+    {
+        return AttendancePeriod::query()
+            ->where('status', AttendancePeriod::STATUS_OPEN)
+            ->exists();
+    }
+
+    public function createAttendancePeriod(array $data)
+    {
+        return AttendancePeriod::query()->create($data);
+    }
+
+    public function findAttendancePeriodOrFail(string $id)
+    {
+        return AttendancePeriod::query()->findOrFail($id);
+    }
+
+    public function updateAttendancePeriod(string $id, array $data)
+    {
+        $period = AttendancePeriod::query()->findOrFail($id);
+        $period->update($data);
+
+        return $period;
+    }
+
+    public function getAttendancePolicies()
+    {
+        return AttendancePolicy::query()
+            ->orderBy('employment_type')
+            ->get();
+    }
+
+    public function findAttendancePolicyOrFail(string $id)
+    {
+        return AttendancePolicy::query()->findOrFail($id);
+    }
+
+    public function updateAttendancePolicy(string $id, array $data)
+    {
+        $policy = AttendancePolicy::query()->findOrFail($id);
+        $policy->update($data);
+
+        return $policy->fresh();
     }
 
     private function authorizeManagerScopeForMismatch(AttendancePolicyMismatch $mismatch): void

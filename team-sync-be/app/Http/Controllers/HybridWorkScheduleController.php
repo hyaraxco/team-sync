@@ -2,16 +2,17 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\HybridScheduleOverride;
-use App\Models\HybridWorkSchedule;
+use App\Interfaces\HybridWorkScheduleRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 
 class HybridWorkScheduleController extends Controller
 {
+    public function __construct(private HybridWorkScheduleRepositoryInterface $repository) {}
+
     public function index(Request $request): JsonResponse
     {
-        $schedules = HybridWorkSchedule::paginate($request->get('per_page', 15));
+        $schedules = $this->repository->getSchedulesPaginated((int) $request->get('per_page', 15));
 
         return response()->json([
             'success' => true,
@@ -27,7 +28,7 @@ class HybridWorkScheduleController extends Controller
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
-        $schedule = HybridWorkSchedule::where('staff_member_id', $profile->id)->first();
+        $schedule = $this->repository->getScheduleByStaffMemberId((int) $profile->id);
 
         return response()->json([
             'success' => true,
@@ -46,9 +47,10 @@ class HybridWorkScheduleController extends Controller
             return response()->json(['success' => false, 'message' => 'Profile not found'], 404);
         }
 
-        $overrides = HybridScheduleOverride::where('staff_member_id', $profile->id)
-            ->orderBy('date', 'desc')
-            ->paginate($request->get('per_page', 15));
+        $overrides = $this->repository->getOverridesByStaffMemberIdPaginated(
+            (int) $profile->id,
+            (int) $request->get('per_page', 15)
+        );
 
         return response()->json([
             'success' => true,

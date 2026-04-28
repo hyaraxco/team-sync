@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
-use App\Models\LeaveEntitlement;
+use App\Interfaces\LeaveEntitlementRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -12,6 +12,8 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class LeaveEntitlementController extends Controller implements HasMiddleware
 {
+    public function __construct(private LeaveEntitlementRepositoryInterface $repository) {}
+
     public static function middleware()
     {
         return [
@@ -25,13 +27,7 @@ class LeaveEntitlementController extends Controller implements HasMiddleware
     public function index(Request $request): JsonResponse
     {
         try {
-            $query = LeaveEntitlement::orderBy('employment_type')->orderBy('leave_type');
-
-            if ($request->has('employment_type')) {
-                $query->where('employment_type', $request->employment_type);
-            }
-
-            $entitlements = $query->get();
+            $entitlements = $this->repository->getAll($request->has('employment_type') ? $request->employment_type : null);
 
             // Group by employment_type for easier FE consumption
             $grouped = $entitlements->groupBy('employment_type');
@@ -65,10 +61,9 @@ class LeaveEntitlementController extends Controller implements HasMiddleware
         ]);
 
         try {
-            $entitlement = LeaveEntitlement::findOrFail($id);
-            $entitlement->update($data);
+            $entitlement = $this->repository->update($id, $data);
 
-            return ResponseHelper::jsonResponse(true, 'Leave Entitlement Updated Successfully', $entitlement->fresh(), 200);
+            return ResponseHelper::jsonResponse(true, 'Leave Entitlement Updated Successfully', $entitlement, 200);
         } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Entitlement Not Found', null, 404);
         } catch (\Throwable $e) {
