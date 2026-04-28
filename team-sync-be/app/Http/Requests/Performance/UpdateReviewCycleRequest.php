@@ -24,6 +24,7 @@ class UpdateReviewCycleRequest extends FormRequest
             'self_assessment_deadline' => 'nullable|date|after_or_equal:start_date|before_or_equal:end_date',
             'manager_assessment_deadline' => 'nullable|date|after_or_equal:self_assessment_deadline|before_or_equal:end_date',
             'calibration_deadline' => 'nullable|date|after_or_equal:manager_assessment_deadline|before_or_equal:end_date',
+            'template_id' => 'nullable|integer|exists:performance_review_templates,id',
         ];
     }
 }

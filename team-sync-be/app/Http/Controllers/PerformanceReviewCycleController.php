@@ -98,7 +98,7 @@ class PerformanceReviewCycleController extends Controller implements HasMiddlewa
                 if ($reviewerId === $staffMember->id) {
                     $reviewerId = null;
                 }
-                $templateId = $staffMember->jobInformation?->review_template_id ?? $defaultTemplateId;
+                $templateId = $staffMember->jobInformation?->review_template_id ?? $cycle->template_id ?? $defaultTemplateId;
 
                 $this->repository->createReview([
                     'cycle_id' => $cycle->id,
