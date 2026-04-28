@@ -35,4 +35,20 @@ interface AttendanceRepositoryInterface
     public function resolvePolicyMismatch(string $id, array $data);
 
     public function getEmployeeStatistics(string $employeeId, array $filters);
+
+    public function getAttendancePeriodsPaginated(int $perPage);
+
+    public function hasOpenAttendancePeriod(): bool;
+
+    public function createAttendancePeriod(array $data);
+
+    public function findAttendancePeriodOrFail(string $id);
+
+    public function updateAttendancePeriod(string $id, array $data);
+
+    public function getAttendancePolicies();
+
+    public function findAttendancePolicyOrFail(string $id);
+
+    public function updateAttendancePolicy(string $id, array $data);
 }

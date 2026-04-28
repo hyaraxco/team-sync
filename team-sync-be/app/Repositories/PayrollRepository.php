@@ -1038,6 +1038,64 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->get();
     }
 
+    public function getMyPayslipsPaginated(
+        int $staffMemberId,
+        ?string $search,
+        ?int $year,
+        int $rowPerPage
+    ) {
+        return PayrollDetail::query()
+            ->select('payroll_details.*')
+            ->with([
+                'payroll',
+                'staffMember.user',
+                'staffMember.jobInformation.team',
+            ])
+            ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
+            ->where('staff_member_id', $staffMemberId)
+            ->where('payrolls.status', 'paid')
+            ->when($year, function ($query, $yearValue) {
+                $query->whereYear('payrolls.salary_month', $yearValue);
+            })
+            ->when($search, function ($query, $searchValue) {
+                $query->where('payrolls.salary_month', 'like', '%'.$searchValue.'%');
+            })
+            ->orderByDesc('payrolls.salary_month')
+            ->paginate($rowPerPage);
+    }
+
+    public function findOwnedPaidPayslipOrFail(string $id, int $staffMemberId)
+    {
+        $payslip = PayrollDetail::with([
+            'payroll',
+            'staffMember.user',
+            'staffMember.jobInformation.team',
+            'staffMember.bankInformation',
+        ])
+            ->where('id', $id)
+            ->where('staff_member_id', $staffMemberId)
+            ->whereHas('payroll', function ($query) {
+                $query->where('status', 'paid');
+            })
+            ->firstOrFail();
+
+        $targetPeriodId = $payslip->payroll?->attendance_period_id;
+        $appliedAdjustments = collect();
+
+        if ($targetPeriodId) {
+            $appliedAdjustments = PayrollAdjustment::query()
+                ->where('staff_member_id', $payslip->staff_member_id)
+                ->where('target_period_id', $targetPeriodId)
+                ->where('status', PayrollAdjustment::STATUS_APPLIED)
+                ->orderBy('id')
+                ->get();
+        }
+
+        $payslip->setRelation('appliedAdjustments', $appliedAdjustments);
+
+        return $payslip;
+    }
+
     private function buildGenerateReadiness(Carbon $month): array
     {
         $settings = PayrollSetting::current();
