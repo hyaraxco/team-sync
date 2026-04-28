@@ -22,6 +22,7 @@ class PerformanceReviewCycle extends Model
         'self_assessment_deadline',
         'manager_assessment_deadline',
         'calibration_deadline',
+        'template_id',
         'created_by',
     ];
 
@@ -34,6 +35,11 @@ class PerformanceReviewCycle extends Model
         'manager_assessment_deadline' => 'date',
         'calibration_deadline' => 'date',
     ];
+
+    public function template(): BelongsTo
+    {
+        return $this->belongsTo(PerformanceReviewTemplate::class, 'template_id');
+    }
 
     public function creator(): BelongsTo
     {

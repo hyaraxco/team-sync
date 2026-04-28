@@ -8,6 +8,7 @@ const {
   performanceFeedbackRefs,
   authRefs,
   routerLinkStub,
+  toastMocks,
 } = vi.hoisted(() => ({
   routeState: {
     name: "admin.performance.feedback-received",
@@ -46,10 +47,20 @@ const {
     props: ["to"],
     template: '<a class="router-link-stub"><slot /></a>',
   },
+  toastMocks: {
+    success: vi.fn(),
+    error: vi.fn(),
+    warning: vi.fn(),
+    info: vi.fn(),
+  },
 }));
 
 vi.mock("@/stores/performanceFeedback", () => ({
   usePerformanceFeedbackStore: () => performanceFeedbackStoreMock,
+}));
+
+vi.mock("@/composables/useToast", () => ({
+  useToast: () => toastMocks,
 }));
 
 vi.mock("@/stores/auth", () => ({
