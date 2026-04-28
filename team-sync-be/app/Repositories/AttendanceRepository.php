@@ -55,7 +55,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             })
             ->orderBy('created_at', 'desc');
 
-        /** @var User|null $user */
         $user = Auth::user();
         if ($user && $user->hasRole('manager') && ! $user->hasRole('hr')) {
             $manageableIds = $this->getManageableEmployeeIdsForManager();
@@ -83,8 +82,8 @@ class AttendanceRepository implements AttendanceRepositoryInterface
     ): LengthAwarePaginator {
         $query = $this->getAll(
             $search,
-            null, // date
-            null, // limit
+            null,
+            null,
             false
         );
 
@@ -130,7 +129,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         $startOfMonth = now()->startOfMonth();
         $today = now();
 
-        // Calculate actual working days (excludes weekends & holidays) up to today
+        // Calculate actual working days up to today
         $totalWorkingDays = 0;
         try {
             $calculator = app(WorkingDaysCalculator::class);
@@ -140,7 +139,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 $today
             );
         } catch (\Throwable) {
-            // Fallback: count weekdays (Mon-Fri) up to today
             $totalWorkingDays = 0;
             $cursor = $startOfMonth->copy();
             while ($cursor->lte($today)) {
@@ -164,7 +162,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
         $avgHours = $stats->avg_minutes ? round($stats->avg_minutes / 60, 1) : 0;
 
-        // Leave balance: annual leave remaining days (most relevant for daily use)
+        // Leave balance: annual leave remaining days
         $leaveBalance = 0;
         try {
             $leaveService = app(LeaveBalanceService::class);
@@ -354,7 +352,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             $lastWeekStart = now()->subWeek()->startOfWeek()->format('Y-m-d');
             $lastWeekEnd = now()->subWeek()->endOfWeek()->format('Y-m-d');
 
-            // Single optimized query for attendance stats (today & yesterday)
+            // Single optimized query for attendance stats
             $attendanceStats = DB::table('attendances')
                 ->selectRaw("
                     COUNT(CASE
@@ -518,7 +516,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function authorizeManagerScopeForMismatch(AttendancePolicyMismatch $mismatch): void
     {
-        /** @var User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('manager')) {
@@ -534,7 +531,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function authorizeHrForMismatchResolution(): void
     {
-        /** @var User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('hr')) {
@@ -555,7 +551,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
 
     private function getManageableEmployeeIdsForManager(): array
     {
-        /** @var User|null $user */
         $user = Auth::user();
 
         if (! $user || ! $user->hasRole('manager')) {

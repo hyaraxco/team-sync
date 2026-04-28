@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, computed } from "vue";
 import { RouterLink } from "vue-router";
 import { useStaffMemberStore } from "@/stores/staffMember";
@@ -38,25 +38,8 @@ const authStore = useAuthStore();
 const toast = useToast();
 const { loading, performanceStatistics, error } = storeToRefs(staffMemberStore);
 
-type AuthEmployeeProfile = {
-  user?: {
-    name?: string;
-    email?: string;
-    profile_photo?: string | null;
-  };
-  emergency_contacts?: unknown[];
-  [key: string]: unknown;
-};
-
-type AuthUser = {
-  name?: string;
-  email?: string;
-  profile_photo?: string | null;
-  employee_profile?: AuthEmployeeProfile | null;
-};
-
-const profile = ref<any>(null);
-const authUser = computed(() => authStore.user as AuthUser | null);
+const profile = ref(null);
+const authUser = computed(() => authStore.user);
 
 const loadProfile = async () => {
   try {
@@ -97,55 +80,6 @@ const fallbackProfile = computed(() => {
 const resolvedProfile = computed(() => profile.value || fallbackProfile.value);
 const hasDetailedProfile = computed(() => Boolean(profile.value));
 
-// Dummy tasks
-const latestTasks = ref([
-  {
-    id: 1,
-    title: "API Integration for User Dashboard",
-    description: "Integrate REST APIs for the new user dashboard features...",
-    status: "In Progress",
-    statusClass: "bg-[#FEF3C7] text-[#D97706]",
-    dueDate: "Jan 30, 2024",
-    project: "Dashboard Project",
-  },
-  {
-    id: 2,
-    title: "Database Schema Optimization",
-    description: "Review and optimize database queries for improved...",
-    status: "Waiting",
-    statusClass: "bg-[#EBF8FF] text-[#1E40AF]",
-    dueDate: "Feb 5, 2024",
-    project: "Performance Project",
-  },
-  {
-    id: 3,
-    title: "Code Review for Payment Module",
-    description: "Review payment processing code and provide feedback on...",
-    status: "Completed",
-    statusClass: "bg-[#F0FDF4] text-[#166534]",
-    dueDate: "Completed: Jan 25, 2024",
-    project: "Payment Project",
-  },
-  {
-    id: 4,
-    title: "Unit Tests for Authentication",
-    description: "Write comprehensive unit tests for the new authentication...",
-    status: "In Progress",
-    statusClass: "bg-[#FEF3C7] text-[#D97706]",
-    dueDate: "Feb 1, 2024",
-    project: "Security Project",
-  },
-  {
-    id: 5,
-    title: "Documentation Update",
-    description: "Update technical documentation for the new feature...",
-    status: "Waiting",
-    statusClass: "bg-[#EBF8FF] text-[#1E40AF]",
-    dueDate: "Feb 8, 2024",
-    project: "Documentation Project",
-  },
-]);
-
 onMounted(() => {
   loadProfile();
 });
@@ -165,7 +99,6 @@ onMounted(() => {
       profile is unavailable.
     </div>
 
-    <!-- Employee Header -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
       <div class="flex items-center gap-6">
         <div class="relative">
@@ -249,11 +182,8 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Content Grid -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-start">
-      <!-- Left Column -->
       <div class="space-y-6">
-        <!-- Personal Information -->
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
@@ -311,7 +241,6 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Location Details -->
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
@@ -369,7 +298,6 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Emergency Contact -->
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
@@ -424,9 +352,7 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Right Column -->
       <div class="space-y-6">
-        <!-- Employment Details -->
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
           <div class="flex items-center gap-3 mb-4">
             <div
@@ -485,7 +411,6 @@ onMounted(() => {
           </div>
         </div>
 
-        <!-- Team Information -->
         <div
           class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 h-fit"
           v-if="resolvedProfile?.team"
@@ -512,7 +437,6 @@ onMounted(() => {
             </button>
           </div>
 
-          <!-- Team Header -->
           <div
             class="flex items-center gap-4 mb-4 p-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-[16px]"
           >
@@ -542,7 +466,6 @@ onMounted(() => {
             </div>
           </div>
 
-          <!-- Team Details -->
           <div class="space-y-3">
             <div class="flex justify-between items-center">
               <span class="text-brand-light text-base">Team Lead</span>
@@ -563,58 +486,6 @@ onMounted(() => {
               <span class="text-brand-dark text-base font-medium"
                 >{{ resolvedProfile.team.members_count || 0 }} members</span
               >
-            </div>
-          </div>
-        </div>
-
-        <!-- Latest 5 Tasks Assigned -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
-          <div class="flex items-center justify-between mb-4">
-            <div class="flex items-center gap-3">
-              <div
-                class="w-12 h-12 bg-orange-50 rounded-[12px] flex items-center justify-center"
-              >
-                <ListChecks class="w-6 h-6 text-orange-600" />
-              </div>
-              <div>
-                <h3 class="text-brand-dark text-lg font-bold">Latest Tasks</h3>
-                <p class="text-brand-light text-sm">Recently assigned tasks</p>
-              </div>
-            </div>
-            <button class="text-[#0C51D9] text-sm font-medium hover:underline">
-              View All
-            </button>
-          </div>
-
-          <div class="space-y-4">
-            <div
-              v-for="task in latestTasks"
-              :key="task.id"
-              class="border border-[#DCDEDD] rounded-[12px] p-4 hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
-            >
-              <div class="flex items-start justify-between mb-2">
-                <h4 class="text-brand-dark text-base font-semibold">
-                  {{ task.title }}
-                </h4>
-                <span
-                  :class="task.statusClass"
-                  class="px-2 py-1 rounded-md text-xs font-semibold flex-shrink-0"
-                  >{{ task.status }}</span
-                >
-              </div>
-              <p class="text-brand-light text-sm mb-3">
-                {{ task.description }}
-              </p>
-              <div class="flex items-center gap-4 text-xs text-gray-600">
-                <div class="flex items-center gap-1">
-                  <Calendar class="w-3 h-3" />
-                  <span>{{ task.dueDate }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <Folder class="w-3 h-3" />
-                  <span>{{ task.project }}</span>
-                </div>
-              </div>
             </div>
           </div>
         </div>

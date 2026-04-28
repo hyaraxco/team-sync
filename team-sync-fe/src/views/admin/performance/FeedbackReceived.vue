@@ -79,7 +79,6 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-6">
-    <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
         <h1 class="text-3xl font-bold text-brand-dark">Feedback Received</h1>
@@ -89,7 +88,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Filters -->
     <MainCard>
       <div class="flex flex-wrap gap-4">
         <div class="flex-1 min-w-[200px]">
@@ -127,21 +125,18 @@ onMounted(async () => {
       </div>
     </MainCard>
 
-    <!-- Loading State -->
     <div v-if="feedbackLoading" class="flex justify-center items-center py-12">
       <div
         class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
       ></div>
     </div>
 
-    <!-- Feedback Timeline -->
     <div v-else-if="filteredFeedback.length > 0" class="space-y-4">
       <div
         v-for="(feedback, index) in filteredFeedback"
         :key="feedback.id"
         class="relative"
       >
-        <!-- Timeline Line -->
         <div
           v-if="index < filteredFeedback.length - 1"
           class="absolute left-6 top-16 bottom-0 w-0.5 bg-gray-200"
@@ -150,7 +145,6 @@ onMounted(async () => {
         <MainCard
           class="relative hover:shadow-lg transition-shadow duration-200"
         >
-          <!-- Feedback Type Icon -->
           <div
             class="absolute left-0 top-6 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white"
             :class="feedbackTypeConfig[feedback.feedback_type]?.color"
@@ -163,7 +157,6 @@ onMounted(async () => {
           </div>
 
           <div class="ml-16">
-            <!-- Header -->
             <div class="flex items-start justify-between mb-3">
               <div class="flex-1">
                 <div class="flex items-center gap-3 mb-1">
@@ -209,7 +202,6 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- Acknowledge Button -->
               <button
                 v-if="!feedback.acknowledged_at"
                 class="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
@@ -227,14 +219,12 @@ onMounted(async () => {
               </div>
             </div>
 
-            <!-- Feedback Content -->
             <div class="bg-gray-50 rounded-lg p-4 border border-gray-100">
               <p class="text-brand-dark leading-relaxed whitespace-pre-wrap">
                 {{ feedback.content }}
               </p>
             </div>
 
-            <!-- Acknowledged Info -->
             <div
               v-if="feedback.acknowledged_at"
               class="mt-3 text-xs text-brand-light"
@@ -247,7 +237,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Empty State -->
     <EmptyState
       v-else
       icon="MessageSquare"

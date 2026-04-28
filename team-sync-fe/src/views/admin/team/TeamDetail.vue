@@ -62,7 +62,6 @@ const removingMember = ref(false);
 const showRemoveMemberModal = ref(false);
 const memberToRemove = ref(null);
 
-// Filter staffMembers yang belum menjadi member
 const availableEmployees = computed(() => {
   if (!team.value.members || !Array.isArray(team.value.members)) {
     return staffMembers.value;
@@ -178,9 +177,7 @@ watch(
   <Chart :team="team" />
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <!-- Team Lead Information -->
     <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
-      <!-- Header Section -->
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
           <div
@@ -202,7 +199,6 @@ watch(
       </div>
 
       <div class="flex flex-col gap-4" v-if="team.leader">
-        <!-- Team Lead Profile -->
         <div class="border border-[#DCDEDD] rounded-[12px] p-4 mb-4">
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-4">
@@ -241,7 +237,6 @@ watch(
           </div>
         </div>
 
-        <!-- Contact Information -->
         <div class="space-y-3">
           <h5 class="text-brand-dark text-sm font-semibold mb-3">
             Contact Information
@@ -282,7 +277,6 @@ watch(
           </div>
         </div>
 
-        <!-- Action Buttons -->
         <div class="flex gap-2 mt-4 pt-4 border-t border-[#DCDEDD]">
           <button
             class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
@@ -314,7 +308,6 @@ watch(
       </div>
     </div>
 
-    <!-- Team Settings -->
     <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
       <div class="flex items-center gap-3 mb-6">
         <div
@@ -349,7 +342,6 @@ watch(
         </div>
       </div>
 
-      <!-- Banner Image -->
       <div class="mt-4">
         <img
           src="https://images.unsplash.com/photo-1557804506-669a67965ba0"
@@ -390,7 +382,6 @@ watch(
     </div>
   </div>
 
-  <!-- Team Members Section -->
   <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6 mb-6">
     <div class="flex items-center justify-between mb-6">
       <div class="flex items-center gap-3">
@@ -421,11 +412,9 @@ watch(
       </div>
     </div>
 
-    <!-- Members Grid -->
     <div
       class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4"
     >
-      <!-- Team Member 1 -->
       <div
         class="relative border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4"
         v-for="member in team.members"
@@ -491,9 +480,7 @@ watch(
     </div>
   </div>
 
-  <!-- Team Activity Row -->
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-    <!-- Team Activity -->
     <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
       <div class="flex items-center gap-3 mb-6">
         <div
@@ -548,12 +535,11 @@ watch(
             <span class="text-sm font-medium">Training</span>
           </div>
         </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Team Resources -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
-      <div class="flex items-center gap-3 mb-6">
+      <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+        <div class="flex items-center gap-3 mb-6">
         <div
           class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center"
         >
@@ -615,7 +601,6 @@ watch(
     </div>
   </div>
 
-  <!-- Danger Zone -->
   <div class="bg-white border border-[#FEE2E2] rounded-[16px] p-6">
     <div class="flex items-center gap-3 mb-6">
       <div
@@ -650,7 +635,6 @@ watch(
     </div>
   </div>
 
-  <!-- Confirmation Modal -->
   <ConfirmationModal
     :show="showDeleteModal"
     title="Disband Team"
@@ -677,7 +661,6 @@ watch(
     @cancel="showRemoveMemberModal = false"
   />
 
-  <!-- Add Member Modal -->
   <div
     class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center"
     v-if="showAddMemberModal"
@@ -685,7 +668,6 @@ watch(
     <div
       class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden"
     >
-      <!-- Modal Header -->
       <div class="p-6 border-b border-[#DCDEDD]">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-3">
@@ -711,7 +693,6 @@ watch(
         </div>
       </div>
 
-      <!-- Search Bar -->
       <div class="p-6 border-b border-[#DCDEDD]">
         <div class="relative">
           <div
@@ -728,10 +709,8 @@ watch(
         </div>
       </div>
 
-      <!-- Employees List -->
       <div class="p-6 overflow-y-auto max-h-96">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Employee Option -->
           <div
             class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
             v-for="employee in availableEmployees"
@@ -768,7 +747,6 @@ watch(
           </div>
         </div>
 
-        <!-- No Results Message -->
         <EmptyState
           v-if="availableEmployees.length === 0"
           icon="SearchX"

@@ -53,7 +53,6 @@ class AttendancePeriodController extends Controller
 
         $period = $this->repository->findAttendancePeriodOrFail($id);
 
-        // Validation for status transitions
         if ($period->status === AttendancePeriod::STATUS_LOCKED) {
             return response()->json([
                 'success' => false,

@@ -161,7 +161,6 @@ const getAdjustmentStatusClass = (status) => {
 
 <template>
   <div>
-    <!-- Header Actions -->
     <div class="flex items-center justify-between mb-6 print:hidden">
       <button
         @click="router.back()"
@@ -192,7 +191,6 @@ const getAdjustmentStatusClass = (status) => {
       </div>
     </div>
 
-    <!-- Payslip Content -->
     <div
       class="bg-white border border-[#DCDEDD] rounded-[20px] p-8 max-w-4xl mx-auto"
     >
@@ -201,7 +199,6 @@ const getAdjustmentStatusClass = (status) => {
       </div>
 
       <div v-else-if="payslip">
-        <!-- Header -->
         <div class="border-b-2 border-gray-200 pb-6 mb-6">
           <div class="flex items-start justify-between">
             <div>
@@ -258,7 +255,6 @@ const getAdjustmentStatusClass = (status) => {
           </div>
         </div>
 
-        <!-- Employee Information -->
         <div class="grid grid-cols-2 gap-6 mb-8">
           <div>
             <h3 class="text-sm font-semibold text-gray-500 mb-4">
@@ -335,9 +331,7 @@ const getAdjustmentStatusClass = (status) => {
           </div>
         </div>
 
-        <!-- Salary Breakdown -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <!-- Earnings -->
           <div class="bg-green-50 rounded-[16px] p-6">
             <div class="flex items-center gap-2 mb-4">
               <TrendingUp class="w-5 h-5 text-green-600" />
@@ -381,7 +375,6 @@ const getAdjustmentStatusClass = (status) => {
             </div>
           </div>
 
-          <!-- Deductions -->
           <div class="bg-red-50 rounded-[16px] p-6">
             <div class="flex items-center gap-2 mb-4">
               <TrendingDown class="w-5 h-5 text-red-600" />
@@ -506,7 +499,6 @@ const getAdjustmentStatusClass = (status) => {
           </div>
         </div>
 
-        <!-- Net Salary -->
         <div
           class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-[20px] p-6 text-white"
         >
@@ -527,13 +519,11 @@ const getAdjustmentStatusClass = (status) => {
           </div>
         </div>
 
-        <!-- Notes -->
         <div v-if="payslip.notes" class="mt-6 p-4 bg-gray-50 rounded-[12px]">
           <p class="text-sm font-semibold text-gray-700 mb-2">Payroll Notes</p>
           <p class="text-sm text-gray-600">{{ payslip.notes }}</p>
         </div>
 
-        <!-- Footer -->
         <div class="mt-8 pt-6 border-t border-gray-200 text-center">
           <p class="text-xs text-gray-500">
             This is a computer-generated payslip and does not require a

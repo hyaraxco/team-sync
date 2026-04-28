@@ -36,9 +36,6 @@ class HybridWorkScheduleController extends Controller
         ]);
     }
 
-    /**
-     * Get the authenticated user's hybrid schedule override requests.
-     */
     public function myOverrides(Request $request): JsonResponse
     {
         $profile = $request->user()->staffMemberProfile;
