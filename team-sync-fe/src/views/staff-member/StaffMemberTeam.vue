@@ -13,11 +13,13 @@ import {
   CheckCircle,
 } from "lucide-vue-next";
 import { useStaffMemberStore } from "@/stores/staffMember";
+import { useToast } from "@/composables/useToast";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import CardList from "@/components/admin/project/list/CardList.vue";
 import { formatDate as formatDateUtil } from "@/utils/dateUtils.js";
 
 const staffMemberStore = useStaffMemberStore();
+const toast = useToast();
 const team = ref(null);
 const members = ref([]);
 const projects = ref([]);
@@ -55,7 +57,12 @@ const loadTeam = async () => {
     team.value = await staffMemberStore.fetchMyTeam();
     return true;
   } catch (error) {
-    console.error("Error loading team:", error);
+    toast.error(
+      "Failed to load team",
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load team.",
+    );
     team.value = null;
     teamUnavailableMessage.value = extractErrorMessage(error);
     return false;
@@ -70,7 +77,12 @@ const loadMembers = async () => {
   try {
     members.value = await staffMemberStore.fetchMyTeamMembers();
   } catch (error) {
-    console.error("Error loading team members:", error);
+    toast.error(
+      "Failed to load team members",
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load team members.",
+    );
   } finally {
     loadingMembers.value = false;
   }
@@ -82,7 +94,12 @@ const loadProjects = async () => {
   try {
     projects.value = await staffMemberStore.fetchMyTeamProjects();
   } catch (error) {
-    console.error("Error loading team projects:", error);
+    toast.error(
+      "Failed to load team projects",
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load team projects.",
+    );
   } finally {
     loadingProjects.value = false;
   }

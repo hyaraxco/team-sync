@@ -19,9 +19,11 @@ import {
 import Pagination from "@/components/admin/team/Pagination.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import MainCard from "@/components/common/MainCard.vue";
+import { useToast } from "@/composables/useToast";
 
 const router = useRouter();
 const payrollStore = usePayrollStore();
+const toast = useToast();
 const { payslips, meta, loading } = storeToRefs(payrollStore);
 const { fetchMyPayslips, downloadPayslip } = payrollStore;
 
@@ -78,7 +80,12 @@ const handleDownload = async (id) => {
     link.click();
     window.URL.revokeObjectURL(url);
   } catch (error) {
-    console.error("Error downloading payslip:", error);
+    toast.error(
+      "Download failed",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to download payslip.",
+    );
   }
 };
 

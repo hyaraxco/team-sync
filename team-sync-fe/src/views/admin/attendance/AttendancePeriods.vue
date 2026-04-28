@@ -137,8 +137,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useAttendancePeriodStore } from '@/stores/attendancePeriod';
+import { useToast } from '@/composables/useToast';
 
 const periodStore = useAttendancePeriodStore();
+const toast = useToast();
 const selectedPeriod = ref(null);
 
 const selectPeriod = (period) => {
@@ -150,7 +152,10 @@ onMounted(async () => {
   try {
     await periodStore.fetchAllPaginated();
   } catch (error) {
-    console.error('Failed to load periods', error);
+    toast.error(
+      'Failed to load attendance periods',
+      periodStore.error || error?.response?.data?.message || 'Failed to load periods.',
+    );
   }
 });
 </script>

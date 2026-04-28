@@ -38,9 +38,11 @@ import Chart from "@/components/admin/team/detail/Chart.vue";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { Search, SearchX, ChevronDown, X } from "lucide-vue-next";
 import EmptyState from "@/components/common/EmptyState.vue";
+import { useToast } from "@/composables/useToast";
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 const id = route.params.id;
 
 const teamStore = useTeamStore();
@@ -105,7 +107,12 @@ const handleAddMember = async (employee) => {
 
     closeAddMemberModal();
   } catch (error) {
-    console.error("Failed to add member:", error);
+    toast.error(
+      "Failed to add member",
+      teamStore.error ||
+        error?.response?.data?.message ||
+        "Failed to add member.",
+    );
   } finally {
     addingMember.value = false;
   }
@@ -117,7 +124,12 @@ const handleRemoveMember = async (member) => {
     await removeMember(id, member.staff_member.id);
     await handleFetchTeam();
   } catch (error) {
-    console.error("Failed to remove member:", error);
+    toast.error(
+      "Failed to remove member",
+      teamStore.error ||
+        error?.response?.data?.message ||
+        "Failed to remove member.",
+    );
   } finally {
     removingMember.value = false;
   }

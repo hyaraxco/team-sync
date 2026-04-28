@@ -4,6 +4,7 @@ import { useRouter, useRoute } from "vue-router";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { storeToRefs } from "pinia";
 import { ArrowRight, ArrowLeft, Save } from "lucide-vue-next";
+import { useToast } from "@/composables/useToast";
 
 import Step1PersonalInfo from "@/components/admin/staff-member/create/steps/Step1PersonalInfo.vue";
 import Step2JobInfo from "@/components/admin/staff-member/create/steps/Step2JobInfo.vue";
@@ -14,6 +15,7 @@ import ErrorModal from "@/components/admin/staff-member/create/ErrorModal.vue";
 const router = useRouter();
 const route = useRoute();
 const staffMemberStore = useStaffMemberStore();
+const toast = useToast();
 const { loading, error } = storeToRefs(staffMemberStore);
 
 // Modal state
@@ -187,7 +189,12 @@ const loadStaffMemberData = async () => {
       }
     }
   } catch (err) {
-    console.error("Error loading staff member data:", err);
+    toast.error(
+      "Failed to load staff member",
+      staffMemberStore.error ||
+        err?.response?.data?.message ||
+        "Failed to load staff member data.",
+    );
     router.push({ name: "admin.staffMembers" });
   }
 };
@@ -268,7 +275,12 @@ const handleSubmit = async () => {
     // Redirect to staff member list on success
     router.push({ name: "admin.staffMembers" });
   } catch (err) {
-    console.error("Error updating staff member:", err);
+    toast.error(
+      "Failed to update staff member",
+      staffMemberStore.error ||
+        err?.response?.data?.message ||
+        "Failed to update staff member.",
+    );
     // Show error modal when validation fails
     if (error.value) {
       showErrorModal.value = true;
