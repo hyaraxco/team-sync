@@ -125,10 +125,10 @@ describe("ReviewCycleCreate smoke", () => {
 
         await wrapper.find('input[type="text"]').setValue("Q1 2026 Review");
         const dateInputs = wrapper.findAll('input[type="date"]');
-        await dateInputs[0].setValue("2026-01-01"); // review_period_start
-        await dateInputs[1].setValue("2026-03-31"); // review_period_end
-        await dateInputs[2].setValue("2026-04-01"); // start_date
-        await dateInputs[3].setValue("2026-04-30"); // end_date
+        await dateInputs[0].setValue("2026-01-01");
+        await dateInputs[1].setValue("2026-03-31");
+        await dateInputs[2].setValue("2026-04-01");
+        await dateInputs[3].setValue("2026-04-30");
 
         await wrapper.find("form").trigger("submit");
         await flushAsync();

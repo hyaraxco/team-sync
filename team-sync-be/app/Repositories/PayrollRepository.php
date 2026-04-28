@@ -2051,16 +2051,12 @@ class PayrollRepository implements PayrollRepositoryInterface
         return $deductionAmount / $originalSalary;
     }
 
-    /**
-     * Calculate working days (exclude weekends: Saturday & Sunday)
-     */
     private function calculateWorkingDays(Carbon $startDate, Carbon $endDate): int
     {
         $workingDays = 0;
         $currentDate = $startDate->copy();
 
         while ($currentDate->lte($endDate)) {
-            // Check if not weekend (Saturday = 6, Sunday = 0)
             if (! $currentDate->isWeekend()) {
                 $workingDays++;
             }

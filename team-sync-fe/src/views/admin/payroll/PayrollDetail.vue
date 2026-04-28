@@ -167,9 +167,6 @@ const {
     await fetchPayrollActivityLogs();
     toast.success("Payment Complete", "Payroll marked as paid successfully!");
   },
-  onError: () => {
-    toast.error("Payment Failed", "Failed to mark payroll as paid. Please try again.");
-  },
 });
 
 const {
@@ -189,9 +186,6 @@ const {
     await fetchPayrollActivityLogs();
     toast.success("Payroll Approved", "Payroll approved and ready for payment.");
   },
-  onError: () => {
-    toast.error("Approval Failed", "Failed to approve payroll. Please try again.");
-  },
 });
 
 const {
@@ -207,12 +201,6 @@ const {
     toast.success(
       "Notifications Resent",
       "Payroll notifications were resent successfully."
-    );
-  },
-  onError: () => {
-    toast.error(
-      "Resend Failed",
-      "Failed to resend payroll notifications. Please try again."
     );
   },
 });
@@ -240,9 +228,6 @@ const {
       "Payroll Reopened",
       "Payroll was moved back to pending so corrections can be applied."
     );
-  },
-  onError: () => {
-    toast.error("Reopen Failed", "Failed to reopen payroll. Please try again.");
   },
 });
 
@@ -441,11 +426,10 @@ onMounted(async () => {
   }
   await fetchPayrollNotificationDeliveries();
   await fetchPayrollReconciliation();
-  await fetchPayrollDetails(1);
+    await fetchPayrollDetails(1);
   await fetchPayrollActivityLogs();
 });
 
-// Server-side filtering is now handled by the API
 const filteredEmployees = computed(() => employees.value);
 
 // Watch for search query changes with debounce
@@ -708,7 +692,6 @@ const handleApprovePayroll = () => {
 
 <template>
   <div class="space-y-6">
-    <!-- Back Button -->
     <button @click="router.back()"
       class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-2">
       <ArrowLeft class="w-4 h-4 text-gray-600" />
@@ -716,9 +699,7 @@ const handleApprovePayroll = () => {
     </button>
 
     <template v-if="hasPayrollStatistics">
-      <!-- Payroll Summary Cards -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <!-- Total Staff Members Card -->
         <div
           class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6">
           <div class="flex items-center justify-between">
@@ -735,7 +716,6 @@ const handleApprovePayroll = () => {
           </div>
         </div>
 
-        <!-- Total Payroll Amount Card -->
         <div
           class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6">
           <div class="flex items-center justify-between">
@@ -752,7 +732,6 @@ const handleApprovePayroll = () => {
           </div>
         </div>
 
-        <!-- Average Salary Card -->
         <div
           class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6">
           <div class="flex items-center justify-between">
@@ -773,7 +752,6 @@ const handleApprovePayroll = () => {
           </div>
         </div>
 
-        <!-- Processing Date Card -->
         <div
           class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6">
           <div class="flex items-center justify-between">
@@ -839,7 +817,6 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <!-- Tab Navigation -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mt-2 mb-6" data-testid="payroll-tabs">
       <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
         <button
@@ -897,7 +874,6 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <!-- Staff Member Details Section -->
     <div v-show="activeTab === 'employees'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
@@ -912,7 +888,6 @@ const handleApprovePayroll = () => {
           </div>
         </div>
 
-        <!-- Search and Filter -->
         <div class="flex items-center gap-3">
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -931,10 +906,9 @@ const handleApprovePayroll = () => {
             <option value="HR Manager">HR Manager</option>
             <option value="Finance">Finance</option>
           </select>
-        </div>
+          </div>
       </div>
 
-      <!-- Employee Table -->
       <div class="overflow-x-auto">
         <table class="w-full">
           <thead>
@@ -1069,7 +1043,6 @@ const handleApprovePayroll = () => {
         </table>
       </div>
 
-      <!-- Pagination -->
       <div v-if="employees.length > 0" class="mt-6">
         <Pagination :meta="pagination" :loading="loadingDetails" @page-change="handlePageChange"
           @per-page-change="handlePerPageChange" />
@@ -1359,7 +1332,6 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <!-- Action Buttons -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
       <div class="flex items-center justify-between">
         <div>

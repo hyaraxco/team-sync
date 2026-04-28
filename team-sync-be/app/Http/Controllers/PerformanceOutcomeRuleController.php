@@ -26,89 +26,53 @@ class PerformanceOutcomeRuleController extends Controller implements HasMiddlewa
 
     public function index()
     {
-        try {
-            $rules = $this->repository->getOutcomeRules();
+        $rules = $this->repository->getOutcomeRules();
 
-            return ResponseHelper::jsonResponse(
-                true,
-                'Outcome rules retrieved successfully',
-                PerformanceOutcomeRuleResource::collection($rules)
-            );
-        } catch (\Exception $e) {
-            Log::error('OutcomeRule index error: '.$e->getMessage());
-
-            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan saat mengambil aturan.', null, 500);
-        }
+        return ResponseHelper::jsonResponse(
+            true,
+            'Outcome rules retrieved successfully',
+            PerformanceOutcomeRuleResource::collection($rules)
+        );
     }
 
     public function store(StoreOutcomeRuleRequest $request)
     {
-        try {
-            $rule = $this->repository->createOutcomeRule($request->validated());
+        $rule = $this->repository->createOutcomeRule($request->validated());
 
-            return ResponseHelper::jsonResponse(
-                true,
-                'Outcome rule created successfully',
-                new PerformanceOutcomeRuleResource($rule),
-                201
-            );
-        } catch (\Exception $e) {
-            Log::error('OutcomeRule store error: '.$e->getMessage());
-
-            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan saat membuat aturan.', null, 500);
-        }
+        return ResponseHelper::jsonResponse(
+            true,
+            'Outcome rule created successfully',
+            new PerformanceOutcomeRuleResource($rule),
+            201
+        );
     }
 
     public function show(int $id)
     {
-        try {
-            $rule = $this->repository->getOutcomeRuleById($id);
+        $rule = $this->repository->getOutcomeRuleById($id);
 
-            return ResponseHelper::jsonResponse(
-                true,
-                'Outcome rule retrieved successfully',
-                new PerformanceOutcomeRuleResource($rule)
-            );
-        } catch (ModelNotFoundException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            Log::error('OutcomeRule show error: '.$e->getMessage());
-
-            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan saat mengambil aturan.', null, 500);
-        }
+        return ResponseHelper::jsonResponse(
+            true,
+            'Outcome rule retrieved successfully',
+            new PerformanceOutcomeRuleResource($rule)
+        );
     }
 
     public function update(UpdateOutcomeRuleRequest $request, int $id)
     {
-        try {
-            $rule = $this->repository->updateOutcomeRule($id, $request->validated());
+        $rule = $this->repository->updateOutcomeRule($id, $request->validated());
 
-            return ResponseHelper::jsonResponse(
-                true,
-                'Outcome rule updated successfully',
-                new PerformanceOutcomeRuleResource($rule)
-            );
-        } catch (ModelNotFoundException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            Log::error('OutcomeRule update error: '.$e->getMessage());
-
-            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan saat memperbarui aturan.', null, 500);
-        }
+        return ResponseHelper::jsonResponse(
+            true,
+            'Outcome rule updated successfully',
+            new PerformanceOutcomeRuleResource($rule)
+        );
     }
 
     public function destroy(int $id)
     {
-        try {
-            $this->repository->deleteOutcomeRule($id);
+        $this->repository->deleteOutcomeRule($id);
 
-            return ResponseHelper::jsonResponse(true, 'Outcome rule deleted successfully');
-        } catch (ModelNotFoundException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            Log::error('OutcomeRule destroy error: '.$e->getMessage());
-
-            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan saat menghapus aturan.', null, 500);
-        }
+        return ResponseHelper::jsonResponse(true, 'Outcome rule deleted successfully');
     }
 }

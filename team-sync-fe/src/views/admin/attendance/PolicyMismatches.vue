@@ -1,10 +1,8 @@
 <template>
   <div class="policy-mismatches-container min-h-screen bg-neutral-900 text-neutral-100 p-8">
     <div class="max-w-7xl mx-auto space-y-8 relative">
-      <!-- Decorative Background Blur -->
       <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-rose-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       
-      <!-- Header Section -->
       <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
         <div class="space-y-2">
           <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
@@ -16,27 +14,22 @@
         </div>
       </header>
 
-      <!-- Main Content -->
       <div class="relative z-10 space-y-6">
-        <!-- Error State -->
         <div v-if="error" class="p-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 flex items-center gap-3">
           <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
           <p>Failed to load mismatches. The API endpoint might be missing or under construction.</p>
         </div>
 
-        <!-- Loading State -->
         <div v-else-if="loading" class="flex justify-center p-16 border border-white/5 rounded-3xl bg-white/[0.02]">
           <svg class="animate-spin w-8 h-8 text-rose-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         </div>
 
-        <!-- Empty State -->
         <div v-else-if="!mismatches.length" class="text-center p-16 border border-dashed border-white/10 rounded-3xl bg-white/[0.01] text-neutral-500">
           <svg class="w-16 h-16 mx-auto mb-4 opacity-50 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           <p class="font-light text-lg">No pending policy mismatches.</p>
           <p class="text-sm mt-1">All attendance logs match their scheduled locations.</p>
         </div>
 
-        <!-- Data Table -->
         <div v-else class="overflow-x-auto rounded-3xl border border-white/10 bg-white/[0.02] backdrop-blur-xl shadow-2xl">
           <table class="w-full text-left border-collapse">
             <thead>

@@ -17,16 +17,13 @@ const staffMemberStore = useStaffMemberStore();
 const toast = useToast();
 const { loading, error } = storeToRefs(staffMemberStore);
 
-// Modal state
 const showErrorModal = ref(false);
 
-// Inject step management from layout
 const currentStep = inject<any>("currentStep");
 const totalSteps = inject<any>("totalSteps");
 const nextStep = inject<any>("nextStep");
 const previousStep = inject<any>("previousStep");
 
-// Form data for Step 1
 const step1Data = ref({
   name: "",
   email: "",
@@ -47,7 +44,6 @@ const step1Data = ref({
   profile_photo_url: "",
 });
 
-// Form data for Step 2
 const step2Data = ref({
   job_title: "",
   team_id: "",
@@ -66,7 +62,6 @@ const step2Data = ref({
   role: "",
 });
 
-// Form data for Step 3
 const step3Data = ref({
   emergency_contact_name: "",
   emergency_contact_relationship: "",
@@ -370,7 +365,6 @@ const goToErrorStep = (validationErrors: Record<string, any>) => {
   }
 };
 
-// Form submission
 const handleSubmit = async () => {
   try {
     const formData = new FormData();
@@ -395,7 +389,6 @@ const handleSubmit = async () => {
       formData.append("profile_photo", step1Data.value.profile_photo);
     }
 
-    // Step 2 data (Job Information & Bank Information)
     formData.append("job_title", step2Data.value.job_title);
     appendIfNotEmpty(formData, "team_id", step2Data.value.team_id);
     formData.append("status", step2Data.value.status);
@@ -417,8 +410,6 @@ const handleSubmit = async () => {
       formData.append("roles[]", step2Data.value.role);
     }
 
-    // Step 3 data (Emergency Contacts & Additional Info)
-    // Emergency contacts as array (required format by API)
     formData.append(
       "emergency_contacts[0][full_name]",
       step3Data.value.emergency_contact_name,
@@ -473,7 +464,6 @@ const closeErrorModal = () => {
 
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-6">
-    <!-- Step 1: Personal Information -->
     <Step1PersonalInfo
       v-if="currentStep === 1"
       v-model="step1Data"
@@ -483,21 +473,18 @@ const closeErrorModal = () => {
       @identity-number-blur="handleIdentityNumberBlur"
     />
 
-    <!-- Step 2: Job Information -->
     <Step2JobInfo
       v-if="currentStep === 2"
       v-model="step2Data"
       :errors="error"
     />
 
-    <!-- Step 3: Emergency Contact -->
     <Step3EmergencyContact
       v-if="currentStep === 3"
       v-model="step3Data"
       :errors="error"
     />
 
-    <!-- Step 4: Preview -->
     <Step4Preview
       v-if="currentStep === 4"
       :step1Data="step1Data"
@@ -505,7 +492,6 @@ const closeErrorModal = () => {
       :step3Data="step3Data"
     />
 
-    <!-- Form Navigation -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
       <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div class="min-w-0">
@@ -586,6 +572,5 @@ const closeErrorModal = () => {
     </div>
   </form>
 
-  <!-- Error Modal -->
   <ErrorModal :show="showErrorModal" @close="closeErrorModal" />
 </template>

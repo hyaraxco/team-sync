@@ -69,66 +69,58 @@ class PerformanceReviewCycleController extends Controller implements HasMiddlewa
 
     public function generateReviews(int $id)
     {
-        try {
-            $cycle = $this->repository->getCycleById($id);
+        $cycle = $this->repository->getCycleById($id);
 
-            if (in_array($cycle->status, ['completed', 'archived'])) {
-                return ResponseHelper::jsonResponse(false, 'Cannot generate reviews for a completed or archived cycle', null, 422);
-            }
-
-            // Get active staff members (excluding those who already have a review for this cycle)
-            $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
-
-            $staffMembers = StaffMemberProfile::with('jobInformation')
-                ->whereHas('jobInformation', function ($q) {
-                    $q->where('status', 'active');
-                })
-                ->whereNotIn('id', $existingReviewStaffIds)
-                ->get();
-
-            $assignments = $this->reviewerResolverService->resolveMany($staffMembers);
-
-            // Fetch default template as fallback
-            $defaultTemplateId = \App\Models\PerformanceReviewTemplate::where('is_default', true)->first()?->id;
-
-            $createdCount = 0;
-            foreach ($staffMembers as $staffMember) {
-                $reviewerId = $assignments[$staffMember->id];
-                // Guard: prevent self-review assignment
-                if ($reviewerId === $staffMember->id) {
-                    $reviewerId = null;
-                }
-                $templateId = $staffMember->jobInformation?->review_template_id ?? $cycle->template_id ?? $defaultTemplateId;
-
-                $this->repository->createReview([
-                    'cycle_id' => $cycle->id,
-                    'staff_member_id' => $staffMember->id,
-                    'reviewer_id' => $reviewerId,
-                    'review_template_id' => $templateId,
-                    'status' => 'pending_self',
-                ]);
-                $createdCount++;
-
-                // Notify employee that a review cycle has started
-                if ($staffMember->user) {
-                    $staffMember->user->notify(new ReviewCycleStarted(
-                        cycleId: $cycle->id,
-                        cycleName: $cycle->name,
-                        startDate: $cycle->start_date->format('Y-m-d'),
-                        endDate: $cycle->end_date->format('Y-m-d'),
-                    ));
-                }
-            }
-
-            return ResponseHelper::jsonResponse(true, "Successfully generated reviews for {$createdCount} employees", [
-                'generated_count' => $createdCount,
-            ], 200);
-        } catch (ModelNotFoundException $e) {
-            throw $e;
-        } catch (\Exception $e) {
-            Log::error('generateReviews error: '.$e->getMessage());
-
-            return ResponseHelper::jsonResponse(false, 'Terjadi kesalahan pada server saat meng-generate review.', null, 500);
+        if (in_array($cycle->status, ['completed', 'archived'])) {
+            return ResponseHelper::jsonResponse(false, 'Cannot generate reviews for a completed or archived cycle', null, 422);
         }
+
+        // Get active staff members (excluding those who already have a review for this cycle)
+        $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
+
+        $staffMembers = StaffMemberProfile::with('jobInformation')
+            ->whereHas('jobInformation', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->whereNotIn('id', $existingReviewStaffIds)
+            ->get();
+
+        $assignments = $this->reviewerResolverService->resolveMany($staffMembers);
+
+        // Fetch default template as fallback
+        $defaultTemplateId = \App\Models\PerformanceReviewTemplate::where('is_default', true)->first()?->id;
+
+        $createdCount = 0;
+        foreach ($staffMembers as $staffMember) {
+            $reviewerId = $assignments[$staffMember->id];
+            // Guard: prevent self-review assignment
+            if ($reviewerId === $staffMember->id) {
+                $reviewerId = null;
+            }
+            $templateId = $staffMember->jobInformation?->review_template_id ?? $cycle->template_id ?? $defaultTemplateId;
+
+            $this->repository->createReview([
+                'cycle_id' => $cycle->id,
+                'staff_member_id' => $staffMember->id,
+                'reviewer_id' => $reviewerId,
+                'review_template_id' => $templateId,
+                'status' => 'pending_self',
+            ]);
+            $createdCount++;
+
+            // Notify employee that a review cycle has started
+            if ($staffMember->user) {
+                $staffMember->user->notify(new ReviewCycleStarted(
+                    cycleId: $cycle->id,
+                    cycleName: $cycle->name,
+                    startDate: $cycle->start_date->format('Y-m-d'),
+                    endDate: $cycle->end_date->format('Y-m-d'),
+                ));
+            }
+        }
+
+        return ResponseHelper::jsonResponse(true, "Successfully generated reviews for {$createdCount} employees", [
+            'generated_count' => $createdCount,
+        ], 200);
     }
 }

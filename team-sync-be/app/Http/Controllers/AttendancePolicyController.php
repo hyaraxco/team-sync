@@ -21,24 +21,13 @@ class AttendancePolicyController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * List all attendance policies (one per employment type).
-     */
     public function index(): JsonResponse
     {
-        try {
-            $policies = $this->repository->getAttendancePolicies();
+        $policies = $this->repository->getAttendancePolicies();
 
-            return ResponseHelper::jsonResponse(true, 'Attendance Policies Retrieved Successfully', $policies, 200);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendancePolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
-        }
+        return ResponseHelper::jsonResponse(true, 'Attendance Policies Retrieved Successfully', $policies, 200);
     }
 
-    /**
-     * Update an attendance policy by ID.
-     */
     public function update(Request $request, string $id): JsonResponse
     {
         $data = $request->validate([
@@ -52,15 +41,8 @@ class AttendancePolicyController extends Controller implements HasMiddleware
             'warning_absent_pct' => 'sometimes|numeric|min:0|max:100',
         ]);
 
-        try {
-            $policy = $this->repository->updateAttendancePolicy($id, $data);
+        $policy = $this->repository->updateAttendancePolicy($id, $data);
 
-            return ResponseHelper::jsonResponse(true, 'Attendance Policy Updated Successfully', $policy, 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return ResponseHelper::jsonResponse(false, 'Attendance Policy Not Found', null, 404);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendancePolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
-        }
+        return ResponseHelper::jsonResponse(true, 'Attendance Policy Updated Successfully', $policy, 200);
     }
 }

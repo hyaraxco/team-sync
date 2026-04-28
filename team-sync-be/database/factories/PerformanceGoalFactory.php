@@ -37,7 +37,7 @@ class PerformanceGoalFactory extends Factory
             'completion_percentage' => $completionPercentage,
             'completed_at' => $status === 'completed' ? fake()->dateTimeBetween($startDate, 'now') : null,
             'created_by' => User::factory(),
-            'assigned_by' => fake()->optional(0.7)->passthrough(StaffMemberProfile::factory()),
+            'assigned_by' => rand(1, 10) <= 7 ? StaffMemberProfile::factory() : null,
             'linked_review_id' => null,
         ];
     }

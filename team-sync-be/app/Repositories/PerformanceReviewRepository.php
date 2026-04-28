@@ -177,7 +177,6 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     {
         $review = $this->getReviewById($reviewId);
 
-        /** @var User|null $authUser */
         $authUser = Auth::user();
         $currentStaffId = $authUser?->staffMemberProfile?->id;
         if ($currentStaffId && $review->staff_member_id == $currentStaffId) {
@@ -221,7 +220,6 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             $query->where('cycle_id', $filters['cycle_id']);
         }
 
-        /** @var User|null $authUser */
         $authUser = Auth::user();
         $currentStaffId = $authUser?->staffMemberProfile?->id;
         if ($currentStaffId) {

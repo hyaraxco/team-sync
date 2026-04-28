@@ -56,7 +56,6 @@ const pendingCorrections = ref([]);
 const loadingLeaveRequests = ref(false);
 const loadingCorrections = ref(false);
 
-// Modal state
 const {
   isModalOpen: showApproveModalState,
   selectedItem: selectedApproveRequest,
@@ -108,7 +107,6 @@ const loadStatistics = async () => {
         error?.response?.data?.message ||
         "Failed to load statistics.",
     );
-    // Keep the default values from the initial ref
   } finally {
     loadingStatistics.value = false;
   }
@@ -152,8 +150,6 @@ const loadCorrections = async () => {
 const formatDate = (date) => (date ? formatDateShort(date) : "N/A");
 const formatTime = (time) => (time ? formatTimeUtil(time) : "N/A");
 
-// Use shared helpers
-
 const confirmApprove = () =>
   doApprove((req) => leaveRequestStore.approveLeaveRequest(req.id));
 
@@ -171,7 +167,6 @@ onMounted(async () => {
 
 <template>
   <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Header Area -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
        <div>
            <h2 class="text-2xl font-bold text-brand-dark">Attendance Overview</h2>
@@ -179,7 +174,6 @@ onMounted(async () => {
        </div>
     </div>
 
-    <!-- Navigation Hub -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
       <RouterLink
         :to="{ name: 'admin.attendance.records' }"
@@ -224,15 +218,11 @@ onMounted(async () => {
       </RouterLink>
     </div>
 
-    <!-- Main Content Area -->
-    <!-- Stats Cards Layout -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-      <!-- Total Present Today - Highlighted Card -->
       <div
         class="main-card rounded-[20px] border border-[#0B1042] relative overflow-hidden p-5"
       >
         <div class="flex flex-col justify-center h-full relative z-10">
-          <!-- Trending Badge -->
           <div class="flex items-center gap-2 mb-3">
             <div
               class="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm"
@@ -265,7 +255,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Additional Info -->
           <div class="flex items-center gap-3 mt-auto">
             <div class="flex items-center gap-1">
               <div
@@ -285,9 +274,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Stacked Cards Column -->
       <div class="flex flex-col gap-4">
-        <!-- Absent Today -->
         <StatsCard
           title="Absent Today"
           :value="statistics.absent_today || 0"
@@ -298,7 +285,6 @@ onMounted(async () => {
           :loading="loadingStatistics"
         />
 
-        <!-- Late Arrivals -->
         <StatsCard
           title="Late Arrivals"
           :value="statistics.late_today || 0"
@@ -310,9 +296,7 @@ onMounted(async () => {
         />
       </div>
 
-      <!-- Stacked Cards Column 2 -->
       <div class="flex flex-col gap-4">
-        <!-- On Leave -->
         <StatsCard
           title="On Leave"
           :value="statistics.on_leave_today || 0"
@@ -323,7 +307,6 @@ onMounted(async () => {
           :loading="loadingStatistics"
         />
 
-        <!-- Remote Workers -->
         <StatsCard
           title="Remote Workers"
           :value="statistics.remote_today || 0"
@@ -335,9 +318,7 @@ onMounted(async () => {
         />
       </div>
 
-      <!-- Stacked Cards Column 3 -->
       <div class="flex flex-col gap-4">
-        <!-- Attendance Rate -->
         <StatsCard
           title="Attendance Rate"
           :value="`${statistics.attendance_rate || 0}%`"
@@ -348,7 +329,6 @@ onMounted(async () => {
           :loading="loadingStatistics"
         />
 
-        <!-- Pending Requests -->
         <StatsCard
           title="Pending Requests"
           :value="statistics.pending_requests || 0"
@@ -361,12 +341,10 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Content Grid -->
     <div :class="[
       'grid grid-cols-1 gap-6',
       (can('leave-request-list') && can('attendance-correction-list')) ? 'lg:grid-cols-2' : ''
     ]">
-      <!-- Latest Leave Requests -->
       <div v-if="can('leave-request-list')" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
@@ -447,7 +425,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Empty State -->
           <div
             v-if="!loadingLeaveRequests && leaveRequests.length === 0"
             class="text-center py-12"
@@ -460,7 +437,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Pending Corrections -->
       <div v-if="can('attendance-correction-list')" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">
@@ -517,7 +493,6 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Empty State -->
           <div
             v-if="!loadingCorrections && pendingCorrections.length === 0"
             class="text-center py-12 flex flex-col items-center"
@@ -531,7 +506,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Approve Modal -->
     <ModalWrapper
       :show="showApproveModalState"
       title="Approve Leave Request"
@@ -592,7 +566,6 @@ onMounted(async () => {
       </template>
     </ModalWrapper>
 
-    <!-- Reject Modal -->
     <ModalWrapper
       :show="showRejectModalState"
       title="Reject Leave Request"

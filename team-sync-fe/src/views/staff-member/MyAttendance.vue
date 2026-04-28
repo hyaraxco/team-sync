@@ -23,7 +23,6 @@ import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
 import { useAuthStore } from "@/stores/auth";
 
-// Utils
 import {
   formatDateShort,
   formatDateLong,
@@ -64,7 +63,6 @@ const optionStore = useOptionStore();
 const { leaveTypes } = storeToRefs(optionStore);
 const { fetchLeaveTypes } = optionStore;
 
-// State
 const showLeaveRequestModal = ref(false);
 const showLeaveDetailsModal = ref(false);
 const showSuccessModal = ref(false);
@@ -348,7 +346,6 @@ const setActiveSection = (sectionId) => {
   activeSection.value = sectionId;
 };
 
-// Lifecycle
 onMounted(async () => {
   const requests = [fetchLeaveTypes()];
 
@@ -376,7 +373,6 @@ onMounted(async () => {
 
 <template>
   <div class="p-5">
-    <!-- Banner Section -->
     <div
       class="relative rounded-[20px] mb-6 overflow-hidden h-[200px]"
       style="
@@ -385,10 +381,8 @@ onMounted(async () => {
         background-position: center;
       "
     >
-      <!-- Dark Overlay -->
       <div class="absolute inset-0 bg-black/40"></div>
 
-      <!-- Banner Content -->
       <div class="relative z-10 p-6 h-full flex flex-col justify-center">
         <div class="flex items-center gap-4">
           <div
@@ -405,9 +399,7 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Overlapped Action Buttons -->
       <div class="absolute bottom-4 right-6 flex items-center gap-[10px] z-10">
-        <!-- Auto-present badge for remote employees -->
         <div
           v-if="isRemote"
           class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-[8px] border border-green-300 px-4 py-3 flex items-center gap-2 shadow-lg"
@@ -446,7 +438,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Stats Cards -->
     <AttendanceStatsCards
       :statistics="statistics"
       :pending-requests-count="pendingRequestsCount"
@@ -479,12 +470,10 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Content Grid -->
     <div
       v-if="activeSection === 'overview'"
       class="grid grid-cols-1 lg:grid-cols-2 gap-6"
     >
-      <!-- Leave Balances (Full Width) -->
       <div
         v-if="canViewMyLeaveRequests"
         class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6 mb-2"
@@ -545,7 +534,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Recent Attendance -->
       <div
         v-if="canViewMyLeaveRequests"
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6"
@@ -656,7 +644,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Leave Requests -->
       <div
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6"
       >
@@ -897,7 +884,6 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Leave Request Modal -->
     <Teleport to="body">
       <div
         v-if="showLeaveRequestModal"
@@ -907,7 +893,6 @@ onMounted(async () => {
         <div
           class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-3xl mx-4 max-h-[90vh] overflow-hidden"
         >
-          <!-- Modal Header -->
           <div class="p-6 border-b border-[#DCDEDD]">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
@@ -935,13 +920,10 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Modal Content -->
           <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
             <form @submit.prevent="submitLeaveRequest" class="space-y-6">
-              <!-- Leave Information Section -->
               <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <!-- Leave Type -->
                   <div class="md:col-span-2">
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -963,7 +945,6 @@ onMounted(async () => {
                     </select>
                   </div>
 
-                  <!-- Start Date -->
                   <div>
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -978,7 +959,6 @@ onMounted(async () => {
                     />
                   </div>
 
-                  <!-- End Date -->
                   <div>
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -993,7 +973,6 @@ onMounted(async () => {
                     />
                   </div>
 
-                  <!-- Total Days -->
                   <div class="md:col-span-2">
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -1023,10 +1002,8 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- Reason Section -->
               <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
                 <div class="space-y-4">
-                  <!-- Reason -->
                   <div>
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -1041,7 +1018,6 @@ onMounted(async () => {
                     ></textarea>
                   </div>
 
-                  <!-- Emergency Contact -->
                   <div>
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -1055,7 +1031,6 @@ onMounted(async () => {
                     />
                   </div>
 
-                  <!-- Proof of Sickness -->
                   <div v-if="leaveForm.leave_type === 'sick'">
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
@@ -1073,7 +1048,6 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- Form Actions -->
               <div class="flex items-center gap-4">
                 <button
                   type="button"
@@ -1099,7 +1073,6 @@ onMounted(async () => {
       </div>
     </Teleport>
 
-    <!-- Leave Details Modal -->
     <Teleport to="body">
       <div
         v-if="showLeaveDetailsModal && selectedLeaveRequest"
@@ -1109,7 +1082,6 @@ onMounted(async () => {
         <div
           class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden"
         >
-          <!-- Modal Header -->
           <div class="p-6 border-b border-[#DCDEDD]">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
@@ -1137,13 +1109,10 @@ onMounted(async () => {
             </div>
           </div>
 
-          <!-- Modal Content -->
           <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
             <div class="space-y-6">
-              <!-- Leave Information Section -->
               <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                  <!-- Leave Type -->
                   <div>
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1158,7 +1127,6 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <!-- Status -->
                   <div>
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1178,7 +1146,6 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <!-- Start Date -->
                   <div>
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1193,7 +1160,6 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <!-- End Date -->
                   <div>
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1208,7 +1174,6 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <!-- Total Days -->
                   <div class="md:col-span-2">
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1242,10 +1207,8 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- Reason Section -->
               <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
                 <div class="space-y-4">
-                  <!-- Reason -->
                   <div>
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1260,7 +1223,6 @@ onMounted(async () => {
                     </div>
                   </div>
 
-                  <!-- Request Date -->
                   <div>
                     <label
                       class="block text-brand-dark text-base font-semibold mb-2"
@@ -1277,7 +1239,6 @@ onMounted(async () => {
                 </div>
               </div>
 
-              <!-- Action Buttons -->
               <div class="flex items-center justify-end gap-4">
                 <button
                   type="button"
@@ -1295,7 +1256,6 @@ onMounted(async () => {
       </div>
     </Teleport>
 
-    <!-- Success Modal -->
     <LeaveRequestSuccessModal
       :show="showSuccessModal"
       :leave-data="submittedLeaveData"

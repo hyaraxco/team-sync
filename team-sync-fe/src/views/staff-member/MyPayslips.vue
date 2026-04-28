@@ -147,7 +147,6 @@ const clearSearch = () => {
 
 <template>
   <div>
-    <!-- Header Section -->
     <div class="mb-6">
       <h2 class="text-[#0C1C3C] font-bold text-2xl mb-2">My Payroll</h2>
       <p class="text-gray-600">View and download your payroll history</p>
@@ -185,7 +184,6 @@ const clearSearch = () => {
       </div>
     </div>
 
-    <!-- Statistics Cards -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
       <MainCard
         title="Payroll Periods"
@@ -256,7 +254,6 @@ const clearSearch = () => {
       </div>
     </div>
 
-    <!-- Search Section -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-4">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">
@@ -304,7 +301,6 @@ const clearSearch = () => {
       </div>
     </div>
 
-    <!-- Payroll Grid -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6">
       <div class="mb-6">
         <h3 class="text-[#0C1C3C] font-bold text-xl">All Payroll Periods</h3>
@@ -401,7 +397,6 @@ const clearSearch = () => {
         </p>
       </div>
 
-      <!-- Pagination -->
       <Pagination
         :meta="meta"
         :loading="loading"

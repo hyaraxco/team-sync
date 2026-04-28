@@ -60,29 +60,21 @@ class PayslipController extends Controller implements HasMiddleware
 
     public function show(Request $request, string $id)
     {
-        try {
-            $payslip = $this->findOwnedPayslip($request, $id);
+        $payslip = $this->findOwnedPayslip($request, $id);
 
-            return ResponseHelper::jsonResponse(true, 'Payslip Retrieved Successfully', new PayslipResource($payslip), 200);
-        } catch (ModelNotFoundException) {
-            return ResponseHelper::jsonResponse(false, 'Payslip Not Found', null, 404);
-        }
+        return ResponseHelper::jsonResponse(true, 'Payslip Retrieved Successfully', new PayslipResource($payslip), 200);
     }
 
     public function download(Request $request, string $id)
     {
-        try {
-            $payslip = $this->findOwnedPayslip($request, $id);
-            $pdf = $this->payslipPdfService->render($payslip);
-            $filename = 'payslip-'.$payslip->getKey().'.pdf';
+        $payslip = $this->findOwnedPayslip($request, $id);
+        $pdf = $this->payslipPdfService->render($payslip);
+        $filename = 'payslip-'.$payslip->getKey().'.pdf';
 
-            return response($pdf, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="'.$filename.'"',
-            ]);
-        } catch (ModelNotFoundException) {
-            return ResponseHelper::jsonResponse(false, 'Payslip Not Found', null, 404);
-        }
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'attachment; filename="'.$filename.'"',
+        ]);
     }
 
     private function findOwnedPayslip(Request $request, string $id): PayrollDetail
