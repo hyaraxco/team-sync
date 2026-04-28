@@ -31,7 +31,7 @@ class ProjectFactory extends Factory
             'description' => fake()->optional()->paragraph(),
             'photo' => fake()->optional()->randomElement(['projects/alpha.webp', 'projects/beta.webp', 'projects/gamma.webp']),
             'budget' => fake()->optional(0.7)->randomFloat(2, 1000000, 500000000),
-            'project_leader_id' => fake()->optional(0.8)->passthrough(StaffMemberProfile::factory()),
+            'project_leader_id' => rand(1, 10) <= 8 ? StaffMemberProfile::factory() : null,
         ];
     }
 }

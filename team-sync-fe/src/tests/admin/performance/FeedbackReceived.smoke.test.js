@@ -124,7 +124,6 @@ describe("FeedbackReceived smoke", () => {
   it("displays loading state", () => {
     performanceFeedbackRefs.feedbackLoading.value = true;
     const wrapper = factory();
-    // View uses a spinner, not text
     expect(wrapper.find(".animate-spin").exists()).toBe(true);
   });
 

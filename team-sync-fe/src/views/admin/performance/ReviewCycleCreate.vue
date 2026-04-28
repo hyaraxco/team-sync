@@ -95,7 +95,6 @@ onMounted(async () => {
 
 <template>
   <div class="space-y-6">
-    <!-- Header -->
     <div class="flex items-center gap-4">
       <button
         class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -118,7 +117,6 @@ onMounted(async () => {
       :message="errorMessage"
     />
 
-    <!-- Form -->
     <MainCard>
       <form @submit.prevent="createCycle" class="space-y-6">
         <div>

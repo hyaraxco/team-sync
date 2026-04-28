@@ -45,7 +45,6 @@ const { loading, performanceStatistics, success } = storeToRefs(staffMemberStore
 const staffMember = ref<any>(null);
 const showDeleteModal = ref(false);
 
-// Load staff member data
 const loadStaffMember = async () => {
   try {
     const staffMemberId = route.params.id as string;
@@ -68,7 +67,6 @@ const statusText = computed(() => {
   return getJobStatusText(staffMember.value?.job_information?.status);
 });
 
-// Actions
 const editStaffMember = () => {
   router.push({
     name: "admin.staffMembers.edit",
@@ -117,7 +115,6 @@ onMounted(() => {
   </div>
 
   <div v-else-if="staffMember">
-    <!-- Staff Member Header -->
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
       <div class="flex items-center gap-6">
         <div class="relative">
@@ -191,7 +188,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Performance Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       <div
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
@@ -298,9 +294,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Information Cards Row 1 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Team Information -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -337,7 +331,6 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Contact Details -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -373,9 +366,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Information Cards Row 2 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Personal Information -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -430,7 +421,6 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Emergency Contact -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -485,9 +475,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Information Cards Row 3 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Address Information -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -526,7 +514,6 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Employment Details -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -596,9 +583,7 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Information Cards Row 4 -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-      <!-- Administrative Information -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -625,7 +610,6 @@ onMounted(() => {
         </div>
       </div>
 
-      <!-- Bank Information -->
       <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -662,7 +646,6 @@ onMounted(() => {
       </div>
     </div>
 
-    <!-- Danger Zone (only for users with delete permission) -->
     <div v-if="can('staff-member-delete')" class="bg-white border border-[#FEE2E2] rounded-[16px] p-6">
       <div class="flex items-center gap-3 mb-6">
         <div

@@ -25,7 +25,7 @@ class ProjectTaskFactory extends Factory
             'project_id' => Project::factory(),
             'name' => fake()->sentence(3),
             'description' => fake()->optional()->paragraph(),
-            'assignee_id' => fake()->optional(0.8)->passthrough(StaffMemberProfile::factory()),
+            'assignee_id' => rand(1, 10) <= 8 ? StaffMemberProfile::factory() : null,
             'priority' => fake()->randomElement(array_column(TaskPriority::cases(), 'value')),
             'status' => $status,
             'rejected_reason' => $isRejected ? fake()->sentence() : null,

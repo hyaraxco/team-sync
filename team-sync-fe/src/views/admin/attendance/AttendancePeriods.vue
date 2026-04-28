@@ -1,10 +1,8 @@
 <template>
   <div class="attendance-periods-container min-h-screen bg-neutral-900 text-neutral-100 p-8">
     <div class="max-w-7xl mx-auto space-y-8 relative">
-      <!-- Decorative Background Blur -->
       <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       
-      <!-- Header Section -->
       <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
         <div class="space-y-2">
           <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
@@ -19,9 +17,7 @@
         </button>
       </header>
 
-      <!-- Main Content -->
       <div class="relative z-10 grid gap-8 lg:grid-cols-3">
-        <!-- Periods List -->
         <div class="lg:col-span-2 space-y-4">
           <h2 class="text-xl font-light mb-4">Period History</h2>
           
@@ -78,7 +74,6 @@
           </div>
         </div>
 
-        <!-- Readiness Workspace -->
         <div class="lg:col-span-1">
           <div class="sticky top-8 p-6 rounded-3xl bg-neutral-800/50 backdrop-blur-xl border border-white/10 shadow-2xl">
             <h2 class="text-xl font-light mb-6 flex items-center gap-2">

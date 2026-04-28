@@ -19,7 +19,7 @@ export const useAttendanceStore = defineStore("attendance", {
             total_working_days: 0,
             on_time_percentage: 0,
             total_hours_worked: 0,
-            leave_balance: 12,
+            leave_balance: 0,
             tasks_completed: 0,
             active_projects: 0,
         },
@@ -59,7 +59,6 @@ export const useAttendanceStore = defineStore("attendance", {
 
                 this.todayAttendance = response.data.data;
             } catch (error) {
-                // If 404, it means no attendance today, set to null
                 if (error.response?.status === 404) {
                     this.todayAttendance = null;
                 } else {
@@ -156,7 +155,7 @@ export const useAttendanceStore = defineStore("attendance", {
                     total_working_days: data.total_working_days || 0,
                     on_time_percentage: data.on_time_percentage || 0,
                     total_hours_worked: data.total_hours_worked || 0,
-                    leave_balance: data.leave_balance || 12,
+                    leave_balance: data.leave_balance || 0,
                     tasks_completed: data.tasks_completed || 0,
                     active_projects: data.active_projects || 0,
                 };

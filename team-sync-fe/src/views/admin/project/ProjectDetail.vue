@@ -142,9 +142,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Project Information Section -->
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-    <!-- Project Details Card -->
     <div
       class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6"
     >
@@ -180,9 +178,8 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Project Image -->
       <div
-        class="w-full bg-gradient-to-br from-blue-100 to-purple-100 relative overflow-hidden rounded-[12px] mb-6"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
         <img
           :src="project.photo"
@@ -199,7 +196,6 @@ onMounted(async () => {
           </h4>
         </div>
 
-        <!-- About Project Section -->
         <div>
           <h5 class="text-brand-dark text-base font-semibold mb-3">
             About Project
@@ -211,7 +207,6 @@ onMounted(async () => {
           </div>
         </div>
 
-        <!-- Assigned Teams Section -->
         <div>
           <h5 class="text-brand-dark text-base font-semibold mb-3">
             Assigned Teams
@@ -286,9 +281,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <!-- Right Sidebar -->
     <div class="space-y-4">
-      <!-- Project Leader Card -->
       <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 h-fit">
         <div class="flex items-center gap-3 mb-4">
           <div
@@ -338,7 +331,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Progress Card -->
       <div
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
@@ -461,7 +453,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Start Date Card -->
       <div
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
@@ -481,7 +472,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- End Date Card -->
       <div
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >
@@ -501,7 +491,6 @@ onMounted(async () => {
         </div>
       </div>
 
-      <!-- Duration Card -->
       <div
         class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
       >

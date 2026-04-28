@@ -1,11 +1,9 @@
 <template>
   <div class="attendance-settings-container min-h-screen bg-neutral-900 text-neutral-100 p-8">
     <div class="max-w-7xl mx-auto space-y-8 relative">
-      <!-- Decorative Background Blur -->
       <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div class="absolute bottom-0 left-0 -ml-32 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <!-- Header Section -->
       <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
         <div class="space-y-2">
           <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
@@ -34,7 +32,6 @@
         </button>
       </nav>
 
-      <!-- Tab Content: Attendance Policies -->
       <transition name="fade" mode="out-in">
         <section v-if="activeTab === 'Attendance Policies'" key="policies" class="relative z-10 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <div v-if="policyStore.loading" class="text-neutral-400 p-8 flex justify-center w-full col-span-full">
@@ -76,14 +73,12 @@
               </div>
             </template>
 
-          <!-- Add New Policy Card -->
           <button class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-white/20 text-neutral-400 hover:text-white hover:border-white/50 hover:bg-white/5 transition-all duration-500 min-h-[300px]">
             <svg class="w-12 h-12 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
             <span class="font-medium tracking-wide">Create Custom Policy</span>
           </button>
         </section>
 
-        <!-- Tab Content: Leave Entitlements -->
         <section v-else-if="activeTab === 'Leave Entitlements'" key="entitlements" class="relative z-10 space-y-6">
           <div class="flex justify-between items-center">
             <h2 class="text-2xl font-light">Leave Quotas & Rules</h2>
@@ -131,7 +126,6 @@
           </div>
         </section>
 
-        <!-- Tab Content: Holiday Calendars -->
         <section v-else-if="activeTab === 'Holiday Calendars'" key="holidays" class="relative z-10 space-y-6">
           <div class="flex justify-between items-center">
             <h2 class="text-2xl font-light">Upcoming Holidays</h2>

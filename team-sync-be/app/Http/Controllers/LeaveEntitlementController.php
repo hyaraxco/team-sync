@@ -21,30 +21,19 @@ class LeaveEntitlementController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * List all leave entitlements, optionally filtered by employment_type.
-     */
     public function index(Request $request): JsonResponse
     {
-        try {
-            $entitlements = $this->repository->getAll($request->has('employment_type') ? $request->employment_type : null);
+        $entitlements = $this->repository->getAll($request->has('employment_type') ? $request->employment_type : null);
 
-            // Group by employment_type for easier FE consumption
-            $grouped = $entitlements->groupBy('employment_type');
+        // Group by employment_type for easier FE consumption
+        $grouped = $entitlements->groupBy('employment_type');
 
-            return ResponseHelper::jsonResponse(true, 'Leave Entitlements Retrieved Successfully', [
-                'items' => $entitlements,
-                'grouped' => $grouped,
-            ], 200);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveEntitlementController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
-        }
+        return ResponseHelper::jsonResponse(true, 'Leave Entitlements Retrieved Successfully', [
+            'items' => $entitlements,
+            'grouped' => $grouped,
+        ], 200);
     }
 
-    /**
-     * Update a leave entitlement by ID.
-     */
     public function update(Request $request, string $id): JsonResponse
     {
         $data = $request->validate([
@@ -60,15 +49,8 @@ class LeaveEntitlementController extends Controller implements HasMiddleware
             'max_attachment_size_kb' => 'sometimes|nullable|integer|min:0',
         ]);
 
-        try {
-            $entitlement = $this->repository->update($id, $data);
+        $entitlement = $this->repository->update($id, $data);
 
-            return ResponseHelper::jsonResponse(true, 'Leave Entitlement Updated Successfully', $entitlement, 200);
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
-            return ResponseHelper::jsonResponse(false, 'Leave Entitlement Not Found', null, 404);
-        } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveEntitlementController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
-        }
+        return ResponseHelper::jsonResponse(true, 'Leave Entitlement Updated Successfully', $entitlement, 200);
     }
 }
