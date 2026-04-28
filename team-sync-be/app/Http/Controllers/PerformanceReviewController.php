@@ -115,6 +115,12 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
     public function submitManagerAssessment(SubmitManagerAssessmentRequest $request, int $id)
     {
+        $review = $this->repository->getReviewById($id);
+        $currentStaffId = Auth::user()->staffMemberProfile?->id;
+        if ($review->reviewer_id !== $currentStaffId) {
+            return ResponseHelper::jsonResponse(false, 'Only the assigned reviewer can submit manager assessment.', null, 403);
+        }
+
         $validated = $request->validated();
         $review = $this->repository->submitManagerAssessment($id, $validated['responses'], $validated);
 
@@ -303,6 +309,10 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
             if (in_array($review->status, ['completed', 'pending_calibration'])) {
                 return ResponseHelper::jsonResponse(false, 'Cannot reassign reviewer for a review that is already completed or pending calibration', null, 422);
+            }
+
+            if ($request->validated('reviewer_id') == $review->staff_member_id) {
+                return ResponseHelper::jsonResponse(false, 'Cannot assign employee as their own reviewer.', null, 422);
             }
 
             $review = $this->repository->updateReview($id, ['reviewer_id' => $request->validated('reviewer_id')]);
