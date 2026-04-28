@@ -8,10 +8,20 @@ use App\Http\Requests\Performance\UpdateOutcomeRuleRequest;
 use App\Http\Resources\PerformanceOutcomeRuleResource;
 use App\Models\PerformanceOutcomeRule;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class PerformanceOutcomeRuleController extends Controller
+class PerformanceOutcomeRuleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('review-cycle-manage')),
+        ];
+    }
+
     public function index()
     {
         try {
