@@ -7,6 +7,7 @@ const {
   staffMemberStoreMock,
   taskStoreMock,
   notificationStoreMock,
+  dashboardStoreMock,
   axiosGetMock,
   routerPushMock,
   routerLinkStub,
@@ -32,6 +33,13 @@ const {
     error: null,
     fetchLatestNotifications: vi.fn(),
   },
+  dashboardStoreMock: {
+    fetchMyStatistics: vi.fn().mockResolvedValue({
+      attendance: { rate: 95, present: 20, absent: 1, late: 0, leave: 1 },
+      tasks: { total: 5, completed: 3, in_progress: 2 },
+      leave: { balance: 10, used: 2 },
+    }),
+  },
   axiosGetMock: vi.fn(),
   routerPushMock: vi.fn(),
   routerLinkStub: {
@@ -56,6 +64,10 @@ vi.mock("@/stores/task", () => ({
 
 vi.mock("@/stores/notifications", () => ({
   useNotificationStore: () => notificationStoreMock,
+}));
+
+vi.mock("@/stores/dashboard", () => ({
+  useDashboardStore: () => dashboardStoreMock,
 }));
 
 vi.mock("@/plugins/axios", () => ({
