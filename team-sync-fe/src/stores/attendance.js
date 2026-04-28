@@ -269,17 +269,6 @@ export const useAttendanceStore = defineStore("attendance", {
                 });
                 return response.data;
             } catch (error) {
-                if (import.meta.env.DEV || import.meta.env.TEST) {
-                    console.warn('[MOCK DATA] Returning mock policy mismatches due to API failure.');
-                    return {
-                        data: {
-                            data: [
-                                { id: 1, employee_name: 'John Doe', date: '2026-04-20', scheduled_location: 'Remote', actual_location: 'Office' },
-                                { id: 2, employee_name: 'Jane Smith', date: '2026-04-21', scheduled_location: 'Office', actual_location: 'Remote' },
-                            ]
-                        }
-                    };
-                }
                 this.error = handleError(error);
                 throw error;
             } finally {
@@ -295,10 +284,6 @@ export const useAttendanceStore = defineStore("attendance", {
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
-                if (import.meta.env.DEV || import.meta.env.TEST) {
-                    console.warn(`[MOCK DATA] Mocked acknowledge for mismatch ${id}`);
-                    return { data: { success: true } };
-                }
                 this.error = handleError(error);
                 throw error;
             } finally {
@@ -314,10 +299,6 @@ export const useAttendanceStore = defineStore("attendance", {
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
-                if (import.meta.env.DEV || import.meta.env.TEST) {
-                    console.warn(`[MOCK DATA] Mocked resolve for mismatch ${id}`);
-                    return { data: { success: true } };
-                }
                 this.error = handleError(error);
                 throw error;
             } finally {
