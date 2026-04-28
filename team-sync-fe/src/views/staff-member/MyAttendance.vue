@@ -234,10 +234,11 @@ const submitLeaveRequest = async () => {
       await fetchMyLeaveRequests();
     }
   } catch (error) {
-    console.error("Failed to submit leave request:", error);
     toast.error(
-      "Submission Failed",
-      "Failed to submit leave request. Please try again.",
+      "Failed to submit leave request",
+      leaveRequestStore.error ||
+        error?.response?.data?.message ||
+        "Failed to submit leave request.",
     );
   }
 };

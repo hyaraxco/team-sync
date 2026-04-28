@@ -12,6 +12,7 @@ import {
   capitalize,
 } from "@/utils/formatUtils.js";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
+import { useToast } from "@/composables/useToast";
 import {
   Edit,
   CheckCircle,
@@ -34,6 +35,7 @@ import {
 
 const staffMemberStore = useStaffMemberStore();
 const authStore = useAuthStore();
+const toast = useToast();
 const { loading, performanceStatistics, error } = storeToRefs(staffMemberStore);
 
 type AuthEmployeeProfile = {
@@ -63,7 +65,12 @@ const loadProfile = async () => {
       await staffMemberStore.fetchPerformanceStatistics(profile.value.id);
     }
   } catch (fetchError) {
-    console.error("Error loading employee profile:", fetchError);
+    toast.error(
+      "Failed to load profile",
+      staffMemberStore.error ||
+        fetchError?.response?.data?.message ||
+        "Failed to load employee profile.",
+    );
   }
 };
 

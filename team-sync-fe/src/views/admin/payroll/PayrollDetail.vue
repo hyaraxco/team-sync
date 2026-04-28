@@ -251,7 +251,12 @@ const fetchPayrollSummary = async () => {
     loading.value = true;
     payroll.value = await payrollStore.fetchPayroll(route.params.id);
   } catch (error) {
-    console.error("Error fetching payroll summary:", error);
+    toast.error(
+      "Failed to load payroll summary",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payroll summary.",
+    );
   } finally {
     loading.value = false;
   }
@@ -262,7 +267,12 @@ const fetchPayrollStatistics = async () => {
     loadingStatistics.value = true;
     payrollStatistics.value = await payrollStore.fetchPayrollStatistics(route.params.id);
   } catch (error) {
-    console.error("Error fetching payroll statistics:", error);
+    toast.error(
+      "Failed to load payroll statistics",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payroll statistics.",
+    );
   } finally {
     loadingStatistics.value = false;
   }
@@ -331,7 +341,12 @@ const fetchPayrollDetails = async (page = 1) => {
       };
     }
   } catch (error) {
-    console.error("Error fetching payroll details:", error);
+    toast.error(
+      "Failed to load payroll details",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payroll details.",
+    );
   } finally {
     loadingDetails.value = false;
   }
@@ -342,7 +357,12 @@ const fetchPayrollActivityLogs = async () => {
     loadingActivityLogs.value = true;
     activityLogs.value = await payrollStore.fetchPayrollActivityLogs(route.params.id);
   } catch (error) {
-    console.error("Error fetching payroll activity logs:", error);
+    toast.error(
+      "Failed to load payroll activity logs",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payroll activity logs.",
+    );
   } finally {
     loadingActivityLogs.value = false;
   }
@@ -367,7 +387,12 @@ const fetchPayrollReconciliation = async () => {
       ? await payrollStore.fetchPayrollReconciliation(route.params.id, filters)
       : await payrollStore.fetchPayrollReconciliation(route.params.id);
   } catch (error) {
-    console.error("Error fetching payroll reconciliation:", error);
+    toast.error(
+      "Failed to load payroll reconciliation",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payroll reconciliation.",
+    );
     reconciliation.value = null;
   } finally {
     loadingReconciliation.value = false;
@@ -386,7 +411,12 @@ const fetchPayrollNotificationDeliveries = async () => {
       route.params.id
     );
   } catch (error) {
-    console.error("Error fetching payroll notification deliveries:", error);
+    toast.error(
+      "Failed to load payroll notification deliveries",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load payroll notification deliveries.",
+    );
     notificationDeliveries.value = null;
   } finally {
     loadingNotificationDeliveries.value = false;
@@ -624,8 +654,12 @@ const exportExcel = async () => {
   try {
     await payrollStore.exportExcel(route.params.id);
   } catch (error) {
-    console.error("Error exporting Excel:", error);
-    toast.error("Export Failed", "Failed to export Excel file. Please try again.");
+    toast.error(
+      "Download failed",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to export Excel file.",
+    );
   }
 };
 

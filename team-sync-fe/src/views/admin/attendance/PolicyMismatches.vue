@@ -89,8 +89,10 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { useAttendanceStore } from '@/stores/attendance';
+import { useToast } from '@/composables/useToast';
 
 const attendanceStore = useAttendanceStore();
+const toast = useToast();
 const mismatches = ref([]);
 const loading = ref(true);
 const error = ref(false);
@@ -100,7 +102,10 @@ onMounted(async () => {
     const response = await attendanceStore.fetchPolicyMismatches();
     mismatches.value = response?.data || [];
   } catch (err) {
-    console.error('Failed to load mismatches', err);
+    toast.error(
+      'Failed to load policy mismatches',
+      attendanceStore.error || err?.response?.data?.message || 'Failed to load mismatches.',
+    );
     error.value = true;
   } finally {
     loading.value = false;

@@ -32,10 +32,12 @@ import { capitalize } from "@/utils/formatUtils.js";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { can } from "@/helpers/permissionHelper";
 import { useConfirmAction } from "@/composables/useConfirmAction";
+import { useToast } from "@/composables/useToast";
 
 const attendanceStore = useAttendanceStore();
 const leaveRequestStore = useLeaveRequestStore();
 const attendanceCorrectionStore = useAttendanceCorrectionStore();
+const toast = useToast();
 
 const statistics = ref({
   present_today: 0,
@@ -100,7 +102,12 @@ const loadStatistics = async () => {
       pending_requests: data?.pending_requests || 0,
     };
   } catch (error) {
-    console.error("Error loading statistics:", error);
+    toast.error(
+      "Failed to load attendance statistics",
+      attendanceStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load statistics.",
+    );
     // Keep the default values from the initial ref
   } finally {
     loadingStatistics.value = false;
@@ -113,7 +120,12 @@ const loadLeaveRequests = async () => {
   try {
     leaveRequests.value = await leaveRequestStore.fetchLatestLeaveRequests(5);
   } catch (error) {
-    console.error("Error loading leave requests:", error);
+    toast.error(
+      "Failed to load leave requests",
+      leaveRequestStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load leave requests.",
+    );
   } finally {
     loadingLeaveRequests.value = false;
   }
@@ -126,7 +138,12 @@ const loadCorrections = async () => {
     await attendanceCorrectionStore.fetchAllPaginated({ status: 'pending', row_per_page: 5, page: 1 });
     pendingCorrections.value = attendanceCorrectionStore.paginatedCorrections || [];
   } catch (error) {
-    console.error("Error loading corrections:", error);
+    toast.error(
+      "Failed to load attendance corrections",
+      attendanceCorrectionStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load corrections.",
+    );
   } finally {
     loadingCorrections.value = false;
   }

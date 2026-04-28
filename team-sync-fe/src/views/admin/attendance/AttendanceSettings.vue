@@ -188,11 +188,13 @@ import { ref, onMounted } from 'vue';
 import { useHolidayCalendarStore } from '@/stores/holidayCalendar';
 import { useAttendancePolicyStore } from '@/stores/attendancePolicy';
 import { useLeaveEntitlementStore } from '@/stores/leaveEntitlement';
+import { useToast } from '@/composables/useToast';
 
 const activeTab = ref('Attendance Policies');
 const holidayStore = useHolidayCalendarStore();
 const policyStore = useAttendancePolicyStore();
 const entitlementStore = useLeaveEntitlementStore();
+const toast = useToast();
 
 onMounted(async () => {
   try {
@@ -202,7 +204,10 @@ onMounted(async () => {
       entitlementStore.fetchEntitlements()
     ]);
   } catch (error) {
-    console.error('Failed to load settings data', error);
+    toast.error(
+      'Failed to load attendance settings',
+      policyStore.error || error?.response?.data?.message || 'Failed to load settings data.',
+    );
   }
 });
 </script>
