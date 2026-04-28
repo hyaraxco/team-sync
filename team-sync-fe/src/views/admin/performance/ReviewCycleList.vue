@@ -3,6 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { useRouter } from "vue-router";
+import { useToast } from "@/composables/useToast";
 import {
   Calendar,
   Plus,
@@ -11,6 +12,8 @@ import {
   Clock,
   CheckCircle2,
   XCircle,
+  Play,
+  Trash2,
 } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
@@ -19,6 +22,7 @@ import StatusBadge from "@/components/common/StatusBadge.vue";
 const router = useRouter();
 const reviewStore = usePerformanceReviewStore();
 const { cycles, cyclesLoading } = storeToRefs(reviewStore);
+const toast = useToast();
 
 const selectedType = ref("all");
 const selectedStatus = ref("all");
@@ -60,6 +64,61 @@ const viewCycle = (cycleId) => {
     name: "admin.performance.cycles.detail",
     params: { id: cycleId },
   });
+};
+
+const canGenerateReviews = (cycle) => {
+  return ["draft", "active"].includes(cycle.status);
+};
+
+const canDeleteCycle = (cycle) => {
+  return cycle.status === "draft";
+};
+
+const handleGenerateReviews = async (cycle) => {
+  if (
+    !confirm(
+      `Generate reviews for "${cycle.name}"? This will create reviews for all active employees.`,
+    )
+  ) {
+    return;
+  }
+
+  try {
+    const result = await reviewStore.generateReviews(cycle.id);
+    toast.success(
+      "Reviews generated",
+      `Created ${result?.generated_count ?? 0} reviews.`,
+    );
+    await reviewStore.fetchCycles();
+  } catch (error) {
+    toast.error(
+      "Failed to generate reviews",
+      reviewStore.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Please try again.",
+    );
+  }
+};
+
+const handleDeleteCycle = async (cycle) => {
+  if (!confirm(`Delete cycle "${cycle.name}"? This action cannot be undone.`)) {
+    return;
+  }
+
+  try {
+    await reviewStore.deleteCycle(cycle.id);
+    toast.success("Cycle deleted successfully");
+    await reviewStore.fetchCycles();
+  } catch (error) {
+    toast.error(
+      "Failed to delete cycle",
+      reviewStore.error ||
+        error?.response?.data?.message ||
+        error?.message ||
+        "Please try again.",
+    );
+  }
 };
 
 onMounted(async () => {
@@ -256,12 +315,30 @@ onMounted(async () => {
           </div>
 
           <div class="ml-4">
-            <button
-              class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
-              @click.stop="viewCycle(cycle.id)"
-            >
-              Manage
-            </button>
+            <div class="flex flex-col gap-2">
+              <button
+                class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
+                @click.stop="viewCycle(cycle.id)"
+              >
+                Manage
+              </button>
+              <button
+                v-if="canGenerateReviews(cycle)"
+                class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                @click.stop="handleGenerateReviews(cycle)"
+              >
+                <Play class="w-4 h-4" />
+                Generate Reviews
+              </button>
+              <button
+                v-if="canDeleteCycle(cycle)"
+                class="px-4 py-2 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors flex items-center justify-center gap-2"
+                @click.stop="handleDeleteCycle(cycle)"
+              >
+                <Trash2 class="w-4 h-4" />
+                Delete
+              </button>
+            </div>
           </div>
         </div>
       </MainCard>
