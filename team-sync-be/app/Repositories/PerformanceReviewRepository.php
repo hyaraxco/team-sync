@@ -103,6 +103,10 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function createReview(array $data)
     {
+        if (isset($data['reviewer_id']) && isset($data['staff_member_id']) && $data['reviewer_id'] == $data['staff_member_id']) {
+            $data['reviewer_id'] = null;
+        }
+
         return PerformanceReview::create($data);
     }
 

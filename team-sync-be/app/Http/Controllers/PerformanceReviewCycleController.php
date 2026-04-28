@@ -12,10 +12,20 @@ use App\Notifications\Performance\ReviewCycleStarted;
 use App\Services\Performance\ReviewerResolverService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Log;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class PerformanceReviewCycleController extends Controller
+class PerformanceReviewCycleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('review-cycle-manage')),
+        ];
+    }
+
     public function __construct(
         private PerformanceReviewRepositoryInterface $repository,
         private ReviewerResolverService $reviewerResolverService
@@ -84,6 +94,10 @@ class PerformanceReviewCycleController extends Controller
             $createdCount = 0;
             foreach ($staffMembers as $staffMember) {
                 $reviewerId = $assignments[$staffMember->id];
+                // Guard: prevent self-review assignment
+                if ($reviewerId === $staffMember->id) {
+                    $reviewerId = null;
+                }
                 $templateId = $staffMember->jobInformation?->review_template_id ?? $defaultTemplateId;
 
                 $this->repository->createReview([

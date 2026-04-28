@@ -8,6 +8,7 @@ use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\User;
+use App\Services\Performance\ReviewerResolverService;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 
@@ -46,6 +47,8 @@ class PerformanceDataSeeder extends Seeder
             return;
         }
 
+        $resolver = app(ReviewerResolverService::class);
+
         // Create one active review cycle
         $cycle = PerformanceReviewCycle::updateOrCreate(
             ['name' => 'Q1 2026 Performance Review'],
@@ -67,7 +70,7 @@ class PerformanceDataSeeder extends Seeder
         $review1 = PerformanceReview::updateOrCreate(
             ['cycle_id' => $cycle->id, 'staff_member_id' => $staffMemberProfile->id],
             [
-                'reviewer_id' => $managerProfile->id,
+                'reviewer_id' => $resolver->resolve($staffMemberProfile)?->id,
                 'status' => 'pending_self',
             ]
         );
@@ -76,7 +79,7 @@ class PerformanceDataSeeder extends Seeder
         $review2 = PerformanceReview::updateOrCreate(
             ['cycle_id' => $cycle->id, 'staff_member_id' => $managerProfile->id],
             [
-                'reviewer_id' => $managerProfile->id,
+                'reviewer_id' => $resolver->resolve($managerProfile)?->id,
                 'status' => 'pending_manager',
                 'self_assessment_submitted_at' => Carbon::now()->subDays(5),
             ]
@@ -97,7 +100,7 @@ class PerformanceDataSeeder extends Seeder
         $review3 = PerformanceReview::updateOrCreate(
             ['cycle_id' => $cycle->id, 'staff_member_id' => $hrProfile->id],
             [
-                'reviewer_id' => $managerProfile->id,
+                'reviewer_id' => $resolver->resolve($hrProfile)?->id,
                 'status' => 'pending_calibration',
                 'self_assessment_submitted_at' => Carbon::now()->subDays(10),
                 'manager_assessment_submitted_at' => Carbon::now()->subDays(3),
@@ -130,7 +133,7 @@ class PerformanceDataSeeder extends Seeder
         $review5 = PerformanceReview::updateOrCreate(
             ['cycle_id' => $cycle->id, 'staff_member_id' => $financeProfile->id],
             [
-                'reviewer_id' => $managerProfile->id,
+                'reviewer_id' => $resolver->resolve($financeProfile)?->id,
                 'status' => 'pending_self',
             ]
         );
@@ -156,7 +159,7 @@ class PerformanceDataSeeder extends Seeder
         $review4 = PerformanceReview::updateOrCreate(
             ['cycle_id' => $completedCycle->id, 'staff_member_id' => $staffMemberProfile->id],
             [
-                'reviewer_id' => $managerProfile->id,
+                'reviewer_id' => $resolver->resolve($staffMemberProfile)?->id,
                 'status' => 'completed',
                 'self_assessment_submitted_at' => Carbon::parse('2026-01-10'),
                 'manager_assessment_submitted_at' => Carbon::parse('2026-01-25'),
