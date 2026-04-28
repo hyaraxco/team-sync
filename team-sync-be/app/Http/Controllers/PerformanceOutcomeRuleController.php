@@ -6,7 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\Performance\StoreOutcomeRuleRequest;
 use App\Http\Requests\Performance\UpdateOutcomeRuleRequest;
 use App\Http\Resources\PerformanceOutcomeRuleResource;
-use App\Models\PerformanceOutcomeRule;
+use App\Interfaces\PerformanceReviewRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -15,6 +15,8 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceOutcomeRuleController extends Controller implements HasMiddleware
 {
+    public function __construct(private PerformanceReviewRepositoryInterface $repository) {}
+
     public static function middleware(): array
     {
         return [
@@ -25,7 +27,7 @@ class PerformanceOutcomeRuleController extends Controller implements HasMiddlewa
     public function index()
     {
         try {
-            $rules = PerformanceOutcomeRule::orderBy('min_rating')->get();
+            $rules = $this->repository->getOutcomeRules();
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -42,7 +44,7 @@ class PerformanceOutcomeRuleController extends Controller implements HasMiddlewa
     public function store(StoreOutcomeRuleRequest $request)
     {
         try {
-            $rule = PerformanceOutcomeRule::create($request->validated());
+            $rule = $this->repository->createOutcomeRule($request->validated());
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -60,7 +62,7 @@ class PerformanceOutcomeRuleController extends Controller implements HasMiddlewa
     public function show(int $id)
     {
         try {
-            $rule = PerformanceOutcomeRule::findOrFail($id);
+            $rule = $this->repository->getOutcomeRuleById($id);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -79,13 +81,12 @@ class PerformanceOutcomeRuleController extends Controller implements HasMiddlewa
     public function update(UpdateOutcomeRuleRequest $request, int $id)
     {
         try {
-            $rule = PerformanceOutcomeRule::findOrFail($id);
-            $rule->update($request->validated());
+            $rule = $this->repository->updateOutcomeRule($id, $request->validated());
 
             return ResponseHelper::jsonResponse(
                 true,
                 'Outcome rule updated successfully',
-                new PerformanceOutcomeRuleResource($rule->fresh())
+                new PerformanceOutcomeRuleResource($rule)
             );
         } catch (ModelNotFoundException $e) {
             throw $e;
@@ -99,8 +100,7 @@ class PerformanceOutcomeRuleController extends Controller implements HasMiddlewa
     public function destroy(int $id)
     {
         try {
-            $rule = PerformanceOutcomeRule::findOrFail($id);
-            $rule->delete();
+            $this->repository->deleteOutcomeRule($id);
 
             return ResponseHelper::jsonResponse(true, 'Outcome rule deleted successfully');
         } catch (ModelNotFoundException $e) {

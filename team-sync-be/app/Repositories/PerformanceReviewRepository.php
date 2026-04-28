@@ -6,12 +6,17 @@ use App\Helpers\PerformanceRatingHelper;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
+use App\Models\PerformanceOutcomeRule;
 use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
+use App\Models\PerformanceReviewTemplate;
+use App\Models\User;
 use App\Services\Performance\PerformanceOutcomeService;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class PerformanceReviewRepository implements PerformanceReviewRepositoryInterface
 {
@@ -172,7 +177,9 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
     {
         $review = $this->getReviewById($reviewId);
 
-        $currentStaffId = auth()->user()->staffMemberProfile?->id;
+        /** @var User|null $authUser */
+        $authUser = Auth::user();
+        $currentStaffId = $authUser?->staffMemberProfile?->id;
         if ($currentStaffId && $review->staff_member_id == $currentStaffId) {
             abort(403, 'Cannot calibrate your own review');
         }
@@ -193,7 +200,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         $review->update([
             'status' => 'completed',
             'calibrated_at' => now(),
-            'calibrated_by' => auth()->id(),
+            'calibrated_by' => $authUser?->id,
             'final_rating' => $calculated['final_rating'],
             'final_rating_label' => $calculated['final_rating_label'],
             'completed_at' => now(),
@@ -214,7 +221,9 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             $query->where('cycle_id', $filters['cycle_id']);
         }
 
-        $currentStaffId = auth()->user()->staffMemberProfile?->id;
+        /** @var User|null $authUser */
+        $authUser = Auth::user();
+        $currentStaffId = $authUser?->staffMemberProfile?->id;
         if ($currentStaffId) {
             $query->where('staff_member_id', '!=', $currentStaffId);
         }
@@ -308,7 +317,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         $templateIds = $reviewScores->pluck('review_template_id')->filter()->unique();
         $templateWeights = [];
         foreach ($templateIds as $templateId) {
-            $templateWeights[$templateId] = \DB::table('review_template_sections')
+            $templateWeights[$templateId] = DB::table('review_template_sections')
                 ->where('template_id', $templateId)
                 ->pluck('weight', 'section_id')
                 ->toArray();
@@ -421,5 +430,103 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         return PerformanceReviewSection::where('is_active', true)
             ->orderBy('order')
             ->get();
+    }
+
+    public function getTemplates()
+    {
+        return PerformanceReviewTemplate::withCount('sections')->get();
+    }
+
+    public function createTemplate(array $data, array $sections)
+    {
+        return DB::transaction(function () use ($data, $sections) {
+            if (($data['is_default'] ?? false) === true) {
+                PerformanceReviewTemplate::query()
+                    ->where('is_default', true)
+                    ->update(['is_default' => false]);
+            }
+
+            $template = PerformanceReviewTemplate::query()->create($data);
+
+            foreach ($sections as $section) {
+                $template->sections()->attach($section['id'], ['weight' => $section['weight']]);
+            }
+
+            return $template->load('sections');
+        });
+    }
+
+    public function getTemplateById(int $id)
+    {
+        return PerformanceReviewTemplate::with('sections')->findOrFail($id);
+    }
+
+    public function updateTemplate(int $id, array $data, ?array $sections = null)
+    {
+        $template = PerformanceReviewTemplate::query()->findOrFail($id);
+
+        return DB::transaction(function () use ($template, $data, $sections) {
+            if (($data['is_default'] ?? false) === true) {
+                PerformanceReviewTemplate::query()
+                    ->where('id', '!=', $template->id)
+                    ->where('is_default', true)
+                    ->update(['is_default' => false]);
+            }
+
+            $template->update($data);
+
+            if ($sections !== null) {
+                $syncData = [];
+                foreach ($sections as $section) {
+                    $syncData[$section['id']] = ['weight' => $section['weight']];
+                }
+                $template->sections()->sync($syncData);
+            }
+
+            return $template->load('sections');
+        });
+    }
+
+    public function deleteTemplate(int $id): bool
+    {
+        $template = PerformanceReviewTemplate::query()->findOrFail($id);
+
+        if ($template->performanceReviews()->exists()) {
+            throw new \RuntimeException('Cannot delete template that is already used in reviews');
+        }
+
+        return (bool) $template->delete();
+    }
+
+    public function getOutcomeRules()
+    {
+        return PerformanceOutcomeRule::query()
+            ->orderBy('min_rating')
+            ->get();
+    }
+
+    public function createOutcomeRule(array $data)
+    {
+        return PerformanceOutcomeRule::query()->create($data);
+    }
+
+    public function getOutcomeRuleById(int $id)
+    {
+        return PerformanceOutcomeRule::query()->findOrFail($id);
+    }
+
+    public function updateOutcomeRule(int $id, array $data)
+    {
+        $rule = PerformanceOutcomeRule::query()->findOrFail($id);
+        $rule->update($data);
+
+        return $rule->fresh();
+    }
+
+    public function deleteOutcomeRule(int $id): bool
+    {
+        $rule = PerformanceOutcomeRule::query()->findOrFail($id);
+
+        return (bool) $rule->delete();
     }
 }

@@ -44,4 +44,26 @@ interface PerformanceReviewRepositoryInterface
 
     // TOPSIS Data
     public function getEmployeeScoresForCycle(int $cycleId): array;
+
+    // Template Management
+    public function getTemplates();
+
+    public function createTemplate(array $data, array $sections);
+
+    public function getTemplateById(int $id);
+
+    public function updateTemplate(int $id, array $data, ?array $sections = null);
+
+    public function deleteTemplate(int $id): bool;
+
+    // Outcome Rule Management
+    public function getOutcomeRules();
+
+    public function createOutcomeRule(array $data);
+
+    public function getOutcomeRuleById(int $id);
+
+    public function updateOutcomeRule(int $id, array $data);
+
+    public function deleteOutcomeRule(int $id): bool;
 }

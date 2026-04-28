@@ -48,4 +48,13 @@ interface PayrollRepositoryInterface
     public function getPayrollReportRows(array $filters);
 
     public function getActivityLogs(string $payrollId);
+
+    public function getMyPayslipsPaginated(
+        int $staffMemberId,
+        ?string $search,
+        ?int $year,
+        int $rowPerPage
+    );
+
+    public function findOwnedPaidPayslipOrFail(string $id, int $staffMemberId);
 }
