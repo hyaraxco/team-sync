@@ -39,22 +39,6 @@ export const useHolidayCalendarStore = defineStore("holidayCalendar", {
                 };
                 return response.data;
             } catch (error) {
-                if (import.meta.env.DEV || import.meta.env.TEST) {
-                    console.warn('[MOCK DATA] Returning mock Indonesian holidays due to API failure.');
-                    const mockData = [
-                        { id: 1, date: '2026-01-01', description: 'Tahun Baru', type: 'national_holiday' },
-                        { id: 2, date: '2026-01-16', description: 'Isra\' Mi\'raj Nabi Muhammad SAW', type: 'national_holiday' },
-                        { id: 3, date: '2026-02-16', description: 'Cuti Bersama Tahun Baru Imlek', type: 'collective_leave' },
-                        { id: 4, date: '2026-02-17', description: 'Tahun Baru Imlek', type: 'national_holiday' },
-                        { id: 5, date: '2026-03-18', description: 'Cuti Bersama Hari Raya Nyepi', type: 'collective_leave' },
-                        { id: 6, date: '2026-03-19', description: 'Hari Raya Nyepi', type: 'national_holiday' },
-                        { id: 7, date: '2026-03-20', description: 'Hari Raya Idul Fitri', type: 'national_holiday' },
-                        { id: 8, date: '2026-03-21', description: 'Hari Raya Idul Fitri', type: 'national_holiday' }
-                    ];
-                    this.paginatedHolidays = mockData;
-                    this.meta = { current_page: 1, last_page: 1, per_page: 10, total: mockData.length };
-                    return { data: { data: mockData, current_page: 1, last_page: 1, total: mockData.length } };
-                }
                 this.error = handleError(error);
                 throw error;
             } finally {
