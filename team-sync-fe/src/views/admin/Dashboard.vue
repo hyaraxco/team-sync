@@ -7,6 +7,7 @@ import SearchSection from "@/components/admin/dashboard/SearchSection.vue";
 import LatestEmployees from "@/components/admin/dashboard/LatestEmployees.vue";
 import LatestTeams from "@/components/admin/dashboard/LatestTeams.vue";
 import TodayAttendanceOverview from "@/components/admin/dashboard/TodayAttendanceOverview.vue";
+import UpcomingMeetings from "@/components/common/UpcomingMeetings.vue";
 
 import PayrollAnalyticsEnhanced from "@/components/admin/analytics/PayrollAnalyticsEnhanced.vue";
 
@@ -61,6 +62,7 @@ const handleSearch = (params) => {
           <LatestTeams :searchParams="searchParams" />
           <TodayAttendanceOverview />
         </div>
+        <UpcomingMeetings />
       </div>
     </template>
   </div>

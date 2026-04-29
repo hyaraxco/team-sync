@@ -38,6 +38,7 @@ class RolePermissionSeeder extends Seeder
                 'review-self-submit',
                 'goal-create-own',
                 'feedback-give',
+                'meeting-menu',
             ];
 
             $staffSpecific = array_merge($selfServiceBaseline, [
@@ -64,6 +65,8 @@ class RolePermissionSeeder extends Seeder
                     'staff-member-create',
                     'staff-member-edit',
                     'staff-member-delete',
+                    'meeting-list',
+                    'meeting-create',
                 ]))->merge(
                     Permission::whereIn('name', $selfServiceBaseline)->get()
                 )->unique('id')->values()
@@ -82,6 +85,7 @@ class RolePermissionSeeder extends Seeder
                 'review-',
                 'goal-',
                 'feedback-',
+                'meeting-',
             ], array_merge($staffSpecific, [
                 'task-delete',
                 // Manager-only: HR should NOT see Team Reviews

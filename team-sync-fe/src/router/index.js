@@ -9,6 +9,7 @@ import VerifyEmailResult from "@/views/auth/VerifyEmailResult.vue";
 import AdminDashboard from "@/views/admin/Dashboard.vue";
 import AdminSettings from "@/views/admin/Settings.vue";
 import teamRoutes from "./team";
+import meetingRoutes from "./meeting";
 import staffMemberRoutes from "./staffMember";
 import StaffMemberCreate from "@/views/admin/staff-member/StaffMemberCreate.vue";
 import StaffMemberEdit from "@/views/admin/staff-member/StaffMemberEdit.vue";
@@ -60,6 +61,7 @@ export const appRoutes = [
         },
       },
       ...teamRoutes,
+      ...meetingRoutes,
       ...staffMemberRoutes,
       ...projectRoutes,
       ...attendanceRoutes,

@@ -18,6 +18,7 @@ import {
   StarIcon,
   ScaleIcon,
   AwardIcon,
+  VideoIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
@@ -180,7 +181,32 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <!-- 5. Attendance (HR/Manager admin) -->
+          <!-- 5. Meetings -->
+          <RouterLink
+            :to="{ name: 'admin.meetings' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name?.startsWith('admin.meeting'),
+            }"
+            v-if="can('meeting-menu')"
+            @click="onNavigate"
+          >
+            <VideoIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name?.startsWith('admin.meeting'),
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name?.startsWith('admin.meeting'),
+              }"
+              >Meetings</span
+            >
+          </RouterLink>
+
+          <!-- 6. Attendance (HR/Manager admin) -->
           <RouterLink
             :to="{ name: 'admin.attendances' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
