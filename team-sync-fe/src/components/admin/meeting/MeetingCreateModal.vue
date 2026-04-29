@@ -14,9 +14,8 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "created"]);
 
-let meetingStore;
-let teamStore;
-
+const meetingStore = useMeetingStore();
+const teamStore = useTeamStore();
 const toast = useToast();
 
 const isSubmitting = ref(false);
