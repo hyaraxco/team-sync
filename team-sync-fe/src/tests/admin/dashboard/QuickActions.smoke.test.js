@@ -94,6 +94,7 @@ describe("QuickActions smoke", () => {
       "Add Staff Member",
       "Create New Team",
       "Process Payroll",
+      "Schedule MeetingComing soon",
     ]);
 
     expect(
@@ -112,6 +113,7 @@ describe("QuickActions smoke", () => {
 
     expect(actions).toEqual([
       "Process Payroll",
+      "Schedule MeetingComing soon",
     ]);
     expect(
       wrapper.find('[data-action-id="process-payroll"]').attributes("data-route-name")
@@ -124,7 +126,7 @@ describe("QuickActions smoke", () => {
     const wrapper = factory();
 
     expect(wrapper.text()).not.toContain("Process Payroll");
-    expect(wrapper.findAll("[data-action-id]")).toHaveLength(0);
+    expect(wrapper.findAll("[data-action-id]")).toHaveLength(1);
   });
 
   it("keeps payroll quick action hidden for manager-style permissions while allowing self-service leave", () => {
@@ -192,11 +194,12 @@ describe("QuickActions smoke", () => {
     }
   );
 
-  it("does not render any placeholder actions", () => {
+  it("renders Schedule Meeting as a disabled placeholder for future feature", () => {
     const wrapper = factory();
     const placeholder = wrapper.find('button[data-action-id="schedule-meeting"]');
 
-    expect(placeholder.exists()).toBe(false);
-    expect(wrapper.text()).not.toContain("Coming soon");
+    expect(placeholder.exists()).toBe(true);
+    expect(placeholder.attributes("disabled")).toBeDefined();
+    expect(placeholder.text()).toContain("Coming soon");
   });
 });

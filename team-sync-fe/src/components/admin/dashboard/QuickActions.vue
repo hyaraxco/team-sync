@@ -6,6 +6,7 @@ import {
   UsersIcon,
   BanknoteIcon,
   CalendarPlusIcon,
+  VideoIcon,
   Clock3Icon,
 } from "lucide-vue-next";
 import { can, canOneOf } from "@/helpers/permissionHelper";
@@ -121,7 +122,14 @@ const actionableActions = computed(() =>
   actionConfigs.filter((action) => action.isVisible())
 );
 
-const visibleActions = computed(() => actionableActions.value);
+const scheduleMeetingPlaceholder = {
+    id: "schedule-meeting",
+    label: "Schedule Meeting",
+    icon: VideoIcon,
+    isPlaceholder: true,
+};
+
+const visibleActions = computed(() => [...actionableActions.value, scheduleMeetingPlaceholder]);
 
 const primaryActionId = computed(() => actionableActions.value[0]?.id ?? null);
 
@@ -196,6 +204,20 @@ onMounted(async () => {
           <span :class="getLabelClasses(action)">{{ resolveLabel(action) }}</span>
         </button>
 
+        <!-- Placeholder (Coming Soon) -->
+        <button
+          v-else-if="action.isPlaceholder"
+          type="button"
+          disabled
+          class="w-full text-left border border-[#DCDEDD] rounded-[16px] bg-gray-50 cursor-not-allowed opacity-70 px-4 py-3 flex items-center gap-2"
+          :data-action-id="action.id"
+        >
+          <component :is="action.icon" class="w-4 h-4 text-gray-400" />
+          <div class="flex items-center justify-between w-full gap-2">
+            <span class="text-brand-dark text-sm font-medium">{{ action.label }}</span>
+            <span class="text-xs font-semibold text-gray-400">Coming soon</span>
+          </div>
+        </button>
 
       </template>
     </div>
