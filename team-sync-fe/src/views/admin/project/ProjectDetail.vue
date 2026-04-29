@@ -21,6 +21,8 @@ import {
   getPriorityColor,
   getProjectStatusColor,
   getProgressColor,
+  TASK_STATUS_ORDER,
+  TASK_STATUS_LABELS,
 } from "@/utils/badgeUtils";
 import _ from "lodash";
 import TaskBoard from "@/components/admin/project/detail/TaskBoard.vue";
@@ -48,15 +50,8 @@ const streamLabelMap = {
   pm: "PM",
   other: "Other",
 };
-const statusOrder = ["todo", "in_progress", "review", "done", "rejected", "cancelled"];
-const statusLabelMap = {
-  todo: "To Do",
-  in_progress: "In Progress",
-  review: "Review",
-  done: "Done",
-  rejected: "Rejected",
-  cancelled: "Cancelled",
-};
+const statusOrder = TASK_STATUS_ORDER;
+const statusLabelMap = TASK_STATUS_LABELS;
 
 const summaryByStream = computed(() => {
   const byStream = squadSummary.value?.headcount?.by_stream ?? {};

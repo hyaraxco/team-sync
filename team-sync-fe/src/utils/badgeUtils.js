@@ -109,6 +109,24 @@ export const getTaskStatusBadgeClass = (status) => {
   return map[status?.toLowerCase()] || "bg-gray-100 text-gray-700";
 };
 
+export const TASK_STATUS_ORDER = [
+  "todo",
+  "in_progress",
+  "review",
+  "done",
+  "rejected",
+  "cancelled",
+];
+
+export const TASK_STATUS_LABELS = {
+  todo: "To Do",
+  in_progress: "In Progress",
+  review: "Review",
+  done: "Done",
+  rejected: "Rejected",
+  cancelled: "Cancelled",
+};
+
 // ─── Payroll Status ───
 export const getPayrollStatusColor = (status) => {
   const colors = {

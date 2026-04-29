@@ -48,11 +48,15 @@ vi.mock("@/utils/formatUtils", () => ({
     formatRupiah: formatRupiahMock,
 }));
 
-vi.mock("@/utils/badgeUtils", () => ({
-    getPriorityColor: () => "bg-yellow-100 text-yellow-700",
-    getProjectStatusColor: () => "bg-green-100 text-green-700",
-    getProgressColor: () => "bg-green-500",
-}));
+vi.mock("@/utils/badgeUtils", async (importOriginal) => {
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        getPriorityColor: () => "bg-yellow-100 text-yellow-700",
+        getProjectStatusColor: () => "bg-green-100 text-green-700",
+        getProgressColor: () => "bg-green-500",
+    };
+});
 
 import ProjectDetail from "@/views/admin/project/ProjectDetail.vue";
 
