@@ -255,7 +255,7 @@ watch(
                   Email Address
                 </p>
                 <p class="text-brand-dark text-sm font-semibold truncate">
-                  {{ team.leader.email }}
+                  {{ team.leader?.email || '-' }}
                 </p>
               </div>
             </div>
@@ -445,10 +445,10 @@ watch(
         </div>
         <div class="text-center mb-3">
           <h4 class="text-brand-dark text-lg font-bold">
-            {{ member.staff_member.user.name }}
+            {{ member.staff_member?.user?.name || '-' }}
           </h4>
           <p class="text-brand-light text-base">
-            {{ member.staff_member.job_information.job_title }}
+            {{ member.staff_member?.job_information?.job_title || '-' }}
           </p>
         </div>
         <div class="space-y-1 mb-3">
