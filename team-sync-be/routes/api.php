@@ -9,6 +9,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\LeaveBalanceController;
 use App\Http\Controllers\LeaveRequestController;
+use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\PasswordResetController;
@@ -59,6 +60,10 @@ Route::prefix('v1')
             Route::post('teams/{team}/add-member', [TeamController::class, 'addMember']);
             Route::post('teams/{team}/remove-member', [TeamController::class, 'removeMember']);
             Route::apiResource('teams', TeamController::class);
+
+            Route::get('meetings/all/paginated', [MeetingController::class, 'getAllPaginated']);
+            Route::get('meetings/upcoming', [MeetingController::class, 'getUpcoming']);
+            Route::apiResource('meetings', MeetingController::class)->only(['index', 'show', 'store']);
 
             Route::get('my-profile', [StaffMemberProfileController::class, 'getMyProfile']);
             Route::get('my-notifications/unread-count', [NotificationController::class, 'getUnreadCount']);

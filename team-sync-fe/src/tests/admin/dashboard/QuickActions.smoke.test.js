@@ -45,6 +45,23 @@ vi.mock("pinia", async (importOriginal) => {
   };
 });
 
+vi.mock("@/stores/team", () => ({
+  useTeamStore: () => ({
+    teams: ref([]),
+    fetchTeams: vi.fn().mockResolvedValue(undefined),
+    fetchTeamsPaginated: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
+vi.mock("@/stores/meeting", () => ({
+  useMeetingStore: () => ({
+    loading: ref(false),
+    error: null,
+    success: null,
+    createMeeting: vi.fn().mockResolvedValue(undefined),
+  }),
+}));
+
 vi.mock("@/composables/useToast", () => ({
   useToast: () => ({
     success: vi.fn(),
@@ -75,6 +92,7 @@ const factory = () =>
     global: {
       stubs: {
         RouterLink: RouterLinkStub,
+        MeetingCreateModal: { template: '<div class="meeting-modal-stub"></div>' },
       },
     },
   });
@@ -85,7 +103,7 @@ describe("QuickActions smoke", () => {
   });
 
   it("shows admin actions in order and promotes the first actionable item", () => {
-    setPermissions(["staff-member-create", "team-create", "payroll-create"]);
+    setPermissions(["staff-member-create", "team-create", "payroll-create", "meeting-create"]);
 
     const wrapper = factory();
     const actions = wrapper.findAll("[data-action-id]").map((node) => node.text().trim());
@@ -94,7 +112,7 @@ describe("QuickActions smoke", () => {
       "Add Staff Member",
       "Create New Team",
       "Process Payroll",
-      "Schedule MeetingComing soon",
+      "Schedule Meeting",
     ]);
 
     expect(
@@ -106,14 +124,14 @@ describe("QuickActions smoke", () => {
   });
 
   it("shows payroll quick action for HR-style draft permissions", () => {
-    setPermissions(["payroll-create"]);
+    setPermissions(["payroll-create", "meeting-create"]);
 
     const wrapper = factory();
     const actions = wrapper.findAll("[data-action-id]").map((node) => node.text().trim());
 
     expect(actions).toEqual([
       "Process Payroll",
-      "Schedule MeetingComing soon",
+      "Schedule Meeting",
     ]);
     expect(
       wrapper.find('[data-action-id="process-payroll"]').attributes("data-route-name")
@@ -126,7 +144,7 @@ describe("QuickActions smoke", () => {
     const wrapper = factory();
 
     expect(wrapper.text()).not.toContain("Process Payroll");
-    expect(wrapper.findAll("[data-action-id]")).toHaveLength(1);
+    expect(wrapper.findAll("[data-action-id]")).toHaveLength(0);
   });
 
   it("keeps payroll quick action hidden for manager-style permissions while allowing self-service leave", () => {
@@ -194,12 +212,12 @@ describe("QuickActions smoke", () => {
     }
   );
 
-  it("renders Schedule Meeting as a disabled placeholder for future feature", () => {
+  it("renders Schedule Meeting as actionable button for users with meeting-create permission", () => {
+    setPermissions(["meeting-create"]);
     const wrapper = factory();
-    const placeholder = wrapper.find('button[data-action-id="schedule-meeting"]');
+    const meetingAction = wrapper.find('[data-action-id="schedule-meeting"]');
 
-    expect(placeholder.exists()).toBe(true);
-    expect(placeholder.attributes("disabled")).toBeDefined();
-    expect(placeholder.text()).toContain("Coming soon");
+    expect(meetingAction.exists()).toBe(true);
+    expect(meetingAction.text()).toContain("Schedule Meeting");
   });
 });

@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\AttendancePolicyMismatch;
 use App\Models\LeaveRequest;
+use App\Models\Meeting;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
@@ -29,6 +30,8 @@ use App\Notifications\LeaveRequestApproved;
 use App\Notifications\LeaveRequestCreated;
 use App\Notifications\LeaveRequestNeedsApproval;
 use App\Notifications\LeaveRequestRejected;
+use App\Notifications\MeetingReminder;
+use App\Notifications\MeetingScheduled;
 use App\Notifications\PayrollApproved;
 use App\Notifications\PayrollDraftCreated;
 use App\Notifications\PayrollPaid;
@@ -48,6 +51,54 @@ use Throwable;
 
 class EmailService
 {
+    public function sendMeetingScheduledNotification(Meeting $meeting, Collection $recipients): void
+    {
+        $meeting->loadMissing(['creator', 'teams']);
+
+        $scheduledAt = (string) optional($meeting->scheduled_at)->format('Y-m-d H:i');
+        $creatorName = (string) ($meeting->creator?->name ?? 'Team Sync');
+        $actionUrl = '/admin/meetings/'.$meeting->id;
+
+        foreach ($recipients as $recipient) {
+            if (! $recipient instanceof User || ! $recipient->email) {
+                continue;
+            }
+
+            $recipient->notify(new MeetingScheduled(
+                meetingId: (int) $meeting->id,
+                title: (string) $meeting->title,
+                scheduledAt: $scheduledAt,
+                location: $meeting->location,
+                creatorName: $creatorName,
+                actionUrl: $actionUrl,
+            ));
+        }
+    }
+
+    public function sendMeetingReminderNotification(Meeting $meeting, Collection $recipients): void
+    {
+        $meeting->loadMissing(['creator', 'teams']);
+
+        $scheduledAt = (string) optional($meeting->scheduled_at)->format('Y-m-d H:i');
+        $creatorName = (string) ($meeting->creator?->name ?? 'Team Sync');
+        $actionUrl = '/admin/meetings/'.$meeting->id;
+
+        foreach ($recipients as $recipient) {
+            if (! $recipient instanceof User || ! $recipient->email) {
+                continue;
+            }
+
+            $recipient->notify(new MeetingReminder(
+                meetingId: (int) $meeting->id,
+                title: (string) $meeting->title,
+                scheduledAt: $scheduledAt,
+                location: $meeting->location,
+                creatorName: $creatorName,
+                actionUrl: $actionUrl,
+            ));
+        }
+    }
+
     public function sendPayslipToEmployee(PayrollDetail $payrollDetail, string $pdfContent): void
     {
         $payrollDetail->loadMissing(['staffMember.user', 'payroll']);
