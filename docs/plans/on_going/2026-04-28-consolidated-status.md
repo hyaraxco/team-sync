@@ -1,9 +1,9 @@
 # Team Sync Pro — Consolidated Project Status
 
 > Single Source of Truth — Menggantikan semua dokumen status sebelumnya
-> Tanggal: 2026-04-29 (updated)
-> Branch: main
-> BE Tests: 432/432 | FE Tests: 497/497 | E2E: 19/19
+> Tanggal: 2026-04-28
+> Branch: feat/notification-wiring-deeplinks
+> BE Tests: 429/429 | FE Tests: 212/212 | E2E: 16/16
 
 ---
 
@@ -58,17 +58,17 @@
 
 ---
 
-## ITEM YANG MASIH OPEN (Updated 2026-04-29)
+## ITEM YANG MASIH OPEN (Verified via Codebase Scan)
 
-### HIGH — FE Performance Views ~~Masih Stub/TODO~~ RESOLVED
+### HIGH — FE Performance Views Masih Stub/TODO
 
-| # | File | Status | Resolution |
-|---|------|--------|------------|
-| 1 | GiveFeedback.vue | DONE | Connected to performanceFeedback store |
-| 2 | TeamGoals.vue | DONE | Fetches data, renders goal cards |
-| 3 | GoalDetail.vue | DONE | Connected to performanceGoal store with progress timeline |
-| 4 | FeedbackGiven.vue | DONE | Lists given feedback from store |
-| 5 | MyGoals.vue | DONE | Create goal modal implemented |
+| # | File | Masalah | Effort |
+|---|------|---------|--------|
+| 1 | views/admin/performance/GiveFeedback.vue | TODO: feedback submission logic belum connect ke store | M |
+| 2 | views/admin/performance/TeamGoals.vue | TODO: placeholder view, belum fetch data | M |
+| 3 | views/admin/performance/GoalDetail.vue | TODO: goal detail + progress timeline belum ada | M |
+| 4 | views/admin/performance/FeedbackGiven.vue | TODO: listing given feedback belum ada | S |
+| 5 | views/admin/performance/MyGoals.vue | TODO: create goal modal belum ada | S |
 
 ### MEDIUM — Backend TODOs (Non-blocking, Optimization)
 
@@ -80,29 +80,34 @@
 
 ### LOW — Nice-to-Have
 
-| # | File | Status | Resolution |
-|---|------|--------|------------|
-| 9 | stores/auth.js | N/A | No TODO exists — Sanctum uses cookie auth, not JWT refresh |
-| 10 | Console.error calls | DONE | 18 toast.error() additions across 5 component files |
+| # | File | Masalah | Effort |
+|---|------|---------|--------|
+| 9 | stores/auth.js | TODO: refresh token rotation | M |
+| 10 | Console.error calls (28 files) | Banyak console.error tanpa user-facing toast | S per file |
 
 ---
 
-## Test Coverage Snapshot (Updated 2026-04-29)
+## Test Coverage Snapshot
 
 | Suite | Tests | Status |
 |-------|-------|--------|
-| Pest (BE) | 432 tests (2014 assertions) | ALL PASS |
-| Vitest (FE) | 497 tests (92 files) | ALL PASS |
-| Playwright (E2E) | 19 tests | ALL PASS |
+| Pest (BE) | 429 tests (2003 assertions) | ALL PASS |
+| Vitest (FE) | 212 tests (43 files) | ALL PASS |
+| Playwright (E2E) | 16 tests | ALL PASS |
 
 ---
 
 ## Rekomendasi Prioritas Selanjutnya
 
 ```
+Immediate (bisa dikerjakan sekarang):
+  #1-5: FE Performance stub views — connect ke existing BE endpoints
+
 Next Sprint:
   #6-7: Payroll optimization (batch + BPJS)
+  #9: Auth refresh token
 
 Deferred:
   #8: PostGIS (butuh infra change)
+  #10: Toast standardization (incremental)
 ```
