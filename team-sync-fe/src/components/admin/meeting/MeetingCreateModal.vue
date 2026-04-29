@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, onMounted, computed } from "vue";
+import { ref, watch, computed } from "vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import { useMeetingStore } from "@/stores/meeting";
 import { useTeamStore } from "@/stores/team";
@@ -53,10 +53,9 @@ const minDateTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
   .toISOString()
   .slice(0, 16);
 
-// Reset form when modal opens
 watch(
   () => props.show,
-  (show) => {
+  async (show) => {
     if (show) {
       formData.value = {
         title: "",
@@ -67,13 +66,11 @@ watch(
         departments: [],
         team_ids: [],
       };
+      await teamStore.fetchTeams();
     }
-  }
+  },
+  { immediate: true }
 );
-
-onMounted(async () => {
-  await teamStore.fetchTeams();
-});
 
 const closeModal = () => {
   emit("close");
