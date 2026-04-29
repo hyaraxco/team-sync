@@ -34,6 +34,9 @@ const factory = () =>
                 PayrollAnalyticsEnhanced: {
                     template: '<div class="payroll-analytics-enhanced-stub"></div>',
                 },
+                UpcomingMeetings: {
+                    template: '<div class="upcoming-meetings-stub"></div>',
+                },
             },
         },
     });

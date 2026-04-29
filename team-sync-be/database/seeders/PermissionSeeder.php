@@ -132,6 +132,12 @@ class PermissionSeeder extends Seeder
         'performance' => [
             'menu',
         ],
+
+        'meeting' => [
+            'menu',
+            'list',
+            'create',
+        ],
     ];
 
     /**
