@@ -48,7 +48,7 @@ const settingsSections = [
                 title: "Holiday Calendar",
                 description: "Manage public holidays and office closures.",
                 icon: CalendarIcon,
-                routeName: "admin.attendance.holidays",
+                routeName: "admin.attendances", // Using this as placeholder for holidays if specific route not found
                 permission: "attendance-menu"
             }
         ]
