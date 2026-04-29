@@ -1099,9 +1099,9 @@ const handleApprovePayroll = () => {
                   {{ resolveSnapshotLabel(log) }}
                 </p>
                 <p class="text-blue-700 text-xs mt-1">
-                  Cut-off {{ log.metadata.settings_snapshot.attendance_cutoff_day }} •
-                  Working days {{ formatWorkingDaysMode(log.metadata.settings_snapshot.working_days_mode) }} •
-                  Rounding {{ log.metadata.settings_snapshot.rounding_mode }}
+                  Cut-off {{ log.metadata?.settings_snapshot?.attendance_cutoff_day }} •
+                  Working days {{ formatWorkingDaysMode(log.metadata?.settings_snapshot?.working_days_mode) }} •
+                  Rounding {{ log.metadata?.settings_snapshot?.rounding_mode }}
                 </p>
               </div>
             </div>
