@@ -25,23 +25,11 @@ type ActionableQuickAction = {
   icon: unknown;
   to?: QuickActionLink;
   action?: () => void;
-  isPlaceholder?: false;
   isVisible: () => boolean;
   isDisabled?: () => boolean;
 };
 
-type PlaceholderQuickAction = {
-  id: string;
-  label: string;
-  icon: unknown;
-  isPlaceholder: true;
-  isVisible: () => boolean;
-  to?: never;
-  action?: never;
-  isDisabled?: never;
-};
-
-type QuickAction = ActionableQuickAction | PlaceholderQuickAction;
+type QuickAction = ActionableQuickAction;
 
 const actionConfigs: ActionableQuickAction[] = [
   {
@@ -129,33 +117,18 @@ const actionConfigs: ActionableQuickAction[] = [
   },
 ];
 
-const placeholderAction: PlaceholderQuickAction = {
-  id: "schedule-meeting",
-  label: "Schedule Meeting",
-  icon: CalendarPlusIcon,
-  isPlaceholder: true,
-  isVisible: () => true,
-};
-
 const actionableActions = computed(() =>
   actionConfigs.filter((action) => action.isVisible())
 );
 
-const visibleActions = computed(() => [
-  ...actionableActions.value,
-  placeholderAction,
-]);
+const visibleActions = computed(() => actionableActions.value);
 
 const primaryActionId = computed(() => actionableActions.value[0]?.id ?? null);
 
 const isPrimaryAction = (action: QuickAction) =>
-  !action.isPlaceholder && action.id === primaryActionId.value;
+  action.id === primaryActionId.value;
 
 const getActionClasses = (action: QuickAction) => {
-  if (action.isPlaceholder) {
-    return "w-full text-left border border-[#DCDEDD] rounded-[16px] bg-gray-50 cursor-not-allowed opacity-70 px-4 py-3 flex items-center gap-2";
-  }
-
   if (isPrimaryAction(action)) {
     return "btn-secondary w-full text-left rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2";
   }
@@ -164,20 +137,12 @@ const getActionClasses = (action: QuickAction) => {
 };
 
 const getIconClasses = (action: QuickAction) => {
-  if (action.isPlaceholder) {
-    return "w-4 h-4 text-gray-400";
-  }
-
   return isPrimaryAction(action)
     ? "w-4 h-4 text-white"
     : "w-4 h-4 text-gray-600";
 };
 
 const getLabelClasses = (action: QuickAction) => {
-  if (action.isPlaceholder) {
-    return "text-brand-dark text-sm font-medium";
-  }
-
   return isPrimaryAction(action)
     ? "text-brand-white text-sm font-semibold"
     : "text-brand-dark text-sm font-medium";
@@ -208,7 +173,7 @@ onMounted(async () => {
       <template v-for="action in visibleActions" :key="action.id">
         <!-- Route Link Action -->
         <RouterLink
-          v-if="!action.isPlaceholder && action.to"
+          v-if="action.to"
           :to="action.to"
           :class="getActionClasses(action)"
           :data-action-id="action.id"
@@ -219,7 +184,7 @@ onMounted(async () => {
 
         <!-- Button Action (Click Handler) -->
         <button
-          v-else-if="!action.isPlaceholder && action.action"
+          v-else-if="action.action"
           type="button"
           :disabled="action.isDisabled?.()"
           @click="action.action"
@@ -231,19 +196,7 @@ onMounted(async () => {
           <span :class="getLabelClasses(action)">{{ resolveLabel(action) }}</span>
         </button>
 
-        <button
-          v-else
-          type="button"
-          disabled
-          :class="getActionClasses(action)"
-          :data-action-id="action.id"
-        >
-          <component :is="action.icon" :class="getIconClasses(action)" />
-          <div class="flex items-center justify-between w-full gap-2">
-            <span :class="getLabelClasses(action)">{{ resolveLabel(action) }}</span>
-            <span class="text-xs font-semibold text-gray-400">Coming soon</span>
-          </div>
-        </button>
+
       </template>
     </div>
   </div>
