@@ -33,6 +33,11 @@ interface LeaveRequestRepositoryInterface
         string $id
     );
 
+    public function bulkAction(
+        array $ids,
+        string $action
+    );
+
     public function uploadProof(
         string $id,
         array $data

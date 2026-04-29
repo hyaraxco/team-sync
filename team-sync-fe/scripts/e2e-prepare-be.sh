@@ -75,5 +75,33 @@ fi
 
 "${compose_cmd[@]}" exec -T web php artisan migrate:fresh
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=MinimalPayrollE2ESeeder
+"${compose_cmd[@]}" exec -T web php artisan attendance-periods:sync
+"${compose_cmd[@]}" exec -T web php artisan tinker --execute="
+use App\Models\AttendancePeriod;
+use App\Models\StaffMemberProfile;
+use App\Models\Attendance;
+
+\$prev = now()->subMonth()->startOfMonth();
+AttendancePeriod::firstOrCreate(
+    ['start_date' => \$prev->toDateString(), 'end_date' => \$prev->copy()->endOfMonth()->toDateString()],
+    ['cutoff_date' => \$prev->copy()->day(25)->toDateString(), 'status' => 'review']
+);
+AttendancePeriod::where('start_date', \$prev->toDateString())->update(['status' => 'review']);
+
+\$cur = now()->startOfMonth();
+AttendancePeriod::where('start_date', \$cur->toDateString())->update(['status' => 'open']);
+
+\$ids = StaffMemberProfile::whereHas('jobInformation', fn(\$q) => \$q->where('status','active'))->pluck('id');
+foreach (\$ids as \$id) {
+    for (\$d = \$prev->copy(); \$d->lte(\$prev->copy()->endOfMonth()); \$d->addDay()) {
+        if (\$d->isWeekday()) {
+            Attendance::firstOrCreate(
+                ['staff_member_id' => \$id, 'date' => \$d->toDateString()],
+                ['check_in' => \$d->copy()->setTime(8,0)->toDateTimeString(), 'check_out' => \$d->copy()->setTime(17,0)->toDateTimeString(), 'status' => 'present', 'worked_minutes' => 540]
+            );
+        }
+    }
+}
+"
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceReviewSectionSeeder
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceDataSeeder

@@ -6,7 +6,7 @@ import { useLeaveRequestStore } from '@/stores/leaveRequest';
 import { useConfirmAction } from '@/composables/useConfirmAction';
 import { useSearchFilter } from '@/composables/useSearchFilter';
 import { useToast } from '@/composables/useToast';
-import { formatDateShort, formatTime } from '@/utils/dateUtils';
+import { formatDateShort } from '@/utils/dateUtils';
 import { Check, X, ClipboardList, CalendarDays, List, ChevronLeft, ChevronRight, FileSearch, ExternalLink } from 'lucide-vue-next';
 import SearchFilter from '@/components/common/SearchFilter.vue';
 import Pagination from '@/components/admin/team/Pagination.vue';
@@ -18,6 +18,8 @@ import { DateTime } from 'luxon';
 const store = useLeaveRequestStore();
 const { leaveRequests, meta, loading, calendarData, error } = storeToRefs(store);
 const toast = useToast();
+const selectedIds = ref([]);
+const processingBulkAction = ref(false);
 
 const activeTab = ref('list'); // 'list' or 'calendar'
 
@@ -77,6 +79,14 @@ watch(activeTab, (newTab) => {
     }
 });
 
+watch(leaveRequests, (requests) => {
+    const pendingIds = (requests || [])
+        .filter((request) => request.status === 'pending')
+        .map((request) => request.id);
+
+    selectedIds.value = selectedIds.value.filter((id) => pendingIds.includes(id));
+}, { deep: false });
+
 // ---- APPROVAL WORKFLOW ----
 const {
   isModalOpen: showApproveModalState,
@@ -124,6 +134,77 @@ const confirmReject = () =>
   doReject(async (request) => {
       await store.rejectLeaveRequest(request.id);
   });
+
+const selectableRequests = computed(() =>
+    (leaveRequests.value || []).filter((request) => request.status === 'pending')
+);
+
+const selectedPendingCount = computed(() => selectedIds.value.length);
+
+const allSelectableSelected = computed(() => {
+    if (!selectableRequests.value.length) {
+        return false;
+    }
+
+    return selectableRequests.value.every((request) => selectedIds.value.includes(request.id));
+});
+
+const toggleSelectAll = (event) => {
+    if (event.target.checked) {
+        selectedIds.value = selectableRequests.value.map((request) => request.id);
+        return;
+    }
+
+    selectedIds.value = [];
+};
+
+const normalizeErrorMessage = (axiosError) => {
+    const responseData = axiosError?.response?.data;
+    const message = responseData?.message;
+    const validationErrors = responseData?.errors;
+
+    if (typeof message === 'string' && message.trim().length > 0) {
+        return message;
+    }
+
+    if (validationErrors && typeof validationErrors === 'object') {
+        const firstError = Object.values(validationErrors).flat()[0];
+        if (typeof firstError === 'string' && firstError.trim().length > 0) {
+            return firstError;
+        }
+    }
+
+    if (typeof error.value === 'string' && error.value.trim().length > 0) {
+        return error.value;
+    }
+
+    return 'Failed to process selected leave requests.';
+};
+
+const runBulkAction = async (action) => {
+    if (!selectedIds.value.length) {
+        toast.warning('No Selection', 'Please select at least one pending leave request.');
+        return;
+    }
+
+    processingBulkAction.value = true;
+
+    try {
+        await store.bulkAction(selectedIds.value, action);
+        const count = selectedIds.value.length;
+        toast.success(
+            action === 'approve' ? 'Approved' : 'Rejected',
+            `${count} leave request${count > 1 ? 's' : ''} ${action === 'approve' ? 'approved' : 'rejected'} successfully.`
+        );
+
+        selectedIds.value = [];
+        await fetchData();
+    } catch (axiosError) {
+        toast.error('Bulk Action Failed', normalizeErrorMessage(axiosError));
+    } finally {
+        processingBulkAction.value = false;
+    }
+};
 
 // ---- PROOF REVIEW WORKFLOW ----
 const proofReviewForm = ref({
@@ -213,12 +294,44 @@ onMounted(() => {
         />
       </div>
 
+      <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <p class="text-sm text-brand-light">
+          {{ selectedPendingCount }} pending request{{ selectedPendingCount > 1 ? 's' : '' }} selected
+        </p>
+        <div class="flex items-center gap-2">
+          <button
+            @click="runBulkAction('approve')"
+            :disabled="loading || processingBulkAction || selectedPendingCount === 0"
+            class="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-[10px] hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {{ processingBulkAction ? 'Processing...' : 'Approve Selected' }}
+          </button>
+          <button
+            @click="runBulkAction('reject')"
+            :disabled="loading || processingBulkAction || selectedPendingCount === 0"
+            class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-[10px] hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            {{ processingBulkAction ? 'Processing...' : 'Reject Selected' }}
+          </button>
+        </div>
+      </div>
+
       <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-5">
         <!-- Table -->
         <div class="overflow-x-auto w-full mb-6">
-          <table class="w-full min-w-[800px]">
+          <table class="w-full min-w-[860px]">
             <thead>
               <tr class="border-y border-[#DCDEDD]">
+                <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm w-[48px]">
+                  <input
+                    type="checkbox"
+                    :checked="allSelectableSelected"
+                    :disabled="loading || !selectableRequests.length || processingBulkAction"
+                    @change="toggleSelectAll"
+                    class="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                    title="Select all pending requests"
+                  />
+                </th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Employee</th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Date</th>
                 <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Reason & Type</th>
@@ -232,13 +345,13 @@ onMounted(() => {
                 v-if="loading"
                 class="border-b border-[#DCDEDD] animate-pulse"
               >
-                 <td colspan="5" class="py-8 text-center text-gray-500">Loading...</td>
+                 <td colspan="8" class="py-8 text-center text-gray-500">Loading...</td>
               </tr>
               <tr
                  v-else-if="!leaveRequests || leaveRequests.length === 0"
                  class="border-b border-[#DCDEDD]"
               >
-                 <td colspan="5" class="py-8">
+                 <td colspan="8" class="py-8">
                      <EmptyState icon="ClipboardList" title="No Requests Found" description="There are no leave requests currently matching filters." />
                  </td>
               </tr>
@@ -248,6 +361,17 @@ onMounted(() => {
                 :key="request.id"
                 class="border-b border-[#DCDEDD] hover:bg-gray-50 transition-colors"
               >
+                <td class="py-4 px-4">
+                  <input
+                    v-if="request.status === 'pending'"
+                    v-model="selectedIds"
+                    type="checkbox"
+                    :value="request.id"
+                    :disabled="loading || processingBulkAction"
+                    class="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                    :aria-label="`Select leave request ${request.id}`"
+                  />
+                </td>
                 <td class="py-4 px-4">
                   <div class="flex items-center gap-3">
                     <img

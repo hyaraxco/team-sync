@@ -6,9 +6,11 @@ const {
     projectStoreMock,
     teamStoreMock,
     staffMemberStoreMock,
+    optionStoreMock,
     projectStoreRefs,
     teamStoreRefs,
     staffMemberStoreRefs,
+    optionStoreRefs,
     routerPushMock,
 } = vi.hoisted(() => ({
     projectStoreMock: {
@@ -20,6 +22,9 @@ const {
     staffMemberStoreMock: {
         fetchStaffMembers: vi.fn(),
     },
+    optionStoreMock: {
+        fetchProjectTaskTemplates: vi.fn(),
+    },
     projectStoreRefs: {
         loading: { __v_isRef: true, value: false },
         error: { __v_isRef: true, value: null },
@@ -30,6 +35,9 @@ const {
     },
     staffMemberStoreRefs: {
         staffMembers: { __v_isRef: true, value: [] },
+    },
+    optionStoreRefs: {
+        projectTaskTemplates: { __v_isRef: true, value: [] },
     },
     routerPushMock: vi.fn(),
 }));
@@ -44,6 +52,10 @@ vi.mock("@/stores/team", () => ({
 
 vi.mock("@/stores/staffMember", () => ({
     useStaffMemberStore: () => staffMemberStoreMock,
+}));
+
+vi.mock("@/stores/option", () => ({
+    useOptionStore: () => optionStoreMock,
 }));
 
 vi.mock("@/router", () => ({
@@ -65,6 +77,9 @@ vi.mock("pinia", async (importOriginal) => {
             }
             if (store === staffMemberStoreMock) {
                 return staffMemberStoreRefs;
+            }
+            if (store === optionStoreMock) {
+                return optionStoreRefs;
             }
             return {};
         },
@@ -118,6 +133,7 @@ describe("ProjectCreate smoke", () => {
         ];
         teamStoreMock.fetchTeams.mockResolvedValue(undefined);
         staffMemberStoreMock.fetchStaffMembers.mockResolvedValue(undefined);
+        optionStoreMock.fetchProjectTaskTemplates.mockResolvedValue(undefined);
     });
 
     it("renders without crashing", () => {
@@ -133,6 +149,7 @@ describe("ProjectCreate smoke", () => {
         expect(staffMemberStoreMock.fetchStaffMembers).toHaveBeenCalledWith({
             limit: 6,
         });
+        expect(optionStoreMock.fetchProjectTaskTemplates).toHaveBeenCalled();
     });
 
     it("opens leader modal when leader selector clicked", async () => {

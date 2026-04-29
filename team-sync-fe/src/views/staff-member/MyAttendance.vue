@@ -11,7 +11,12 @@ import {
   Eye,
   CalendarX,
   PenSquare,
+  List,
+  Grid3x3,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-vue-next";
+import { DateTime } from "luxon";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
 import AttendanceCorrectionsList from "@/components/staff-member/attendance/AttendanceCorrectionsList.vue";
 import AttendanceCorrectionModal from "@/components/staff-member/attendance/AttendanceCorrectionModal.vue";
@@ -71,6 +76,8 @@ const selectedAttendanceForCorrection = ref(null);
 const selectedLeaveRequest = ref(null);
 const submittedLeaveData = ref(null);
 const activeSection = ref("overview");
+const attendanceViewMode = ref("list");
+const calendarMonth = ref(DateTime.now().startOf("month"));
 const leaveForm = ref({
   leave_type: "",
   start_date: "",
@@ -84,6 +91,82 @@ const leaveForm = ref({
 const recentAttendances = computed(() => {
   return attendances.value.slice(0, 7);
 });
+
+const attendanceLegend = [
+  { key: "present", label: "Present", class: "bg-green-500" },
+  { key: "absent", label: "Absent", class: "bg-red-500" },
+  { key: "late", label: "Late", class: "bg-yellow-400" },
+  { key: "leave", label: "Leave", class: "bg-blue-500" },
+];
+
+const calendarMonthLabel = computed(() =>
+  calendarMonth.value.toFormat("LLLL yyyy"),
+);
+
+const monthAttendancesByDate = computed(() => {
+  const monthKey = calendarMonth.value.toFormat("yyyy-MM");
+
+  return attendances.value.reduce((acc, record) => {
+    if (!record?.date) {
+      return acc;
+    }
+
+    const recordDate = DateTime.fromISO(record.date);
+    if (!recordDate.isValid || recordDate.toFormat("yyyy-MM") !== monthKey) {
+      return acc;
+    }
+
+    const normalizedStatus = record.status === "sick" ? "leave" : record.status;
+    acc[record.date] = normalizedStatus;
+    return acc;
+  }, {});
+});
+
+const attendanceCalendarDays = computed(() => {
+  const monthStart = calendarMonth.value.startOf("month");
+  const monthEnd = calendarMonth.value.endOf("month");
+  const leadingDays = monthStart.weekday - 1;
+  const trailingDays = 7 - monthEnd.weekday;
+  const calendarStart = monthStart.minus({ days: leadingDays });
+  const totalDays = leadingDays + monthEnd.day + trailingDays;
+
+  return Array.from({ length: totalDays }, (_, index) => {
+    const date = calendarStart.plus({ days: index });
+    const isoDate = date.toISODate();
+    const status = monthAttendancesByDate.value[isoDate] || null;
+
+    return {
+      isoDate,
+      day: date.day,
+      inCurrentMonth: date.month === calendarMonth.value.month,
+      isToday: date.hasSame(DateTime.now(), "day"),
+      status,
+    };
+  });
+});
+
+const getAttendanceStatusDotClass = (status) => {
+  switch (status) {
+    case "present":
+      return "bg-green-500";
+    case "absent":
+      return "bg-red-500";
+    case "late":
+      return "bg-yellow-400";
+    case "leave":
+      return "bg-blue-500";
+    default:
+      return "bg-gray-300";
+  }
+};
+
+const goToPreviousMonth = () => {
+  calendarMonth.value = calendarMonth.value.minus({ months: 1 }).startOf("month");
+};
+
+const goToNextMonth = () => {
+  calendarMonth.value = calendarMonth.value.plus({ months: 1 }).startOf("month");
+};
 
 const totalDaysCalculated = computed(() => {
   if (!leaveForm.value.start_date || !leaveForm.value.end_date) {
@@ -552,13 +635,33 @@ onMounted(async () => {
               <p class="text-brand-light text-sm">Last 7 days</p>
             </div>
           </div>
+          <div class="border border-[#DCDEDD] rounded-[10px] p-1 flex items-center gap-1">
+            <button
+              type="button"
+              @click="attendanceViewMode = 'list'"
+              class="px-3 py-2 rounded-[8px] text-xs font-semibold flex items-center gap-1.5 transition-all duration-200"
+              :class="attendanceViewMode === 'list' ? 'bg-blue-600 text-white' : 'text-brand-dark hover:bg-gray-100'"
+            >
+              <List class="w-3.5 h-3.5" />
+              List
+            </button>
+            <button
+              type="button"
+              @click="attendanceViewMode = 'calendar'"
+              class="px-3 py-2 rounded-[8px] text-xs font-semibold flex items-center gap-1.5 transition-all duration-200"
+              :class="attendanceViewMode === 'calendar' ? 'bg-blue-600 text-white' : 'text-brand-dark hover:bg-gray-100'"
+            >
+              <Grid3x3 class="w-3.5 h-3.5" />
+              Calendar
+            </button>
+          </div>
         </div>
 
         <div v-if="attendanceLoading" class="text-center py-8">
           <p class="text-brand-light">Loading...</p>
         </div>
 
-        <div v-else class="space-y-3">
+        <div v-else-if="attendanceViewMode === 'list'" class="space-y-3">
           <div
             v-for="record in recentAttendances"
             :key="record.id"
@@ -641,6 +744,64 @@ onMounted(async () => {
             icon="CalendarClock"
             title="No attendance records found"
           />
+        </div>
+
+        <div v-else class="space-y-4">
+          <div class="flex items-center justify-between">
+            <button
+              type="button"
+              @click="goToPreviousMonth"
+              class="w-9 h-9 border border-[#DCDEDD] rounded-[10px] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+            >
+              <ChevronLeft class="w-4 h-4 text-brand-dark" />
+            </button>
+            <p class="text-brand-dark text-base font-bold">{{ calendarMonthLabel }}</p>
+            <button
+              type="button"
+              @click="goToNextMonth"
+              class="w-9 h-9 border border-[#DCDEDD] rounded-[10px] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+            >
+              <ChevronRight class="w-4 h-4 text-brand-dark" />
+            </button>
+          </div>
+
+          <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-brand-light">
+            <div v-for="weekday in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']" :key="weekday" class="py-1">
+              {{ weekday }}
+            </div>
+          </div>
+
+          <div class="grid grid-cols-7 gap-1">
+            <div
+              v-for="day in attendanceCalendarDays"
+              :key="day.isoDate"
+              class="border rounded-[10px] min-h-[62px] px-2 py-1.5 flex flex-col items-start transition-all duration-200"
+              :class="[
+                day.inCurrentMonth ? 'border-[#DCDEDD] bg-white' : 'border-transparent bg-gray-50',
+                day.isToday ? 'ring-1 ring-blue-500' : '',
+              ]"
+            >
+              <span class="text-xs font-semibold" :class="day.inCurrentMonth ? 'text-brand-dark' : 'text-gray-400'">
+                {{ day.day }}
+              </span>
+              <span
+                v-if="day.status"
+                class="mt-1.5 w-2.5 h-2.5 rounded-full"
+                :class="getAttendanceStatusDotClass(day.status)"
+              ></span>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-3 pt-2">
+            <div
+              v-for="legend in attendanceLegend"
+              :key="legend.key"
+              class="flex items-center gap-1.5 text-xs text-brand-dark"
+            >
+              <span class="w-2.5 h-2.5 rounded-full" :class="legend.class"></span>
+              <span>{{ legend.label }}</span>
+            </div>
+          </div>
         </div>
       </div>
 

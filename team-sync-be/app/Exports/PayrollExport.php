@@ -5,8 +5,10 @@ namespace App\Exports;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use Carbon\Carbon;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use Illuminate\Database\Eloquent\Builder;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
 use Maatwebsite\Excel\Concerns\WithEvents;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
@@ -18,17 +20,17 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PayrollExport implements FromCollection, ShouldAutoSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
+class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, WithEvents, WithHeadings, WithMapping, WithStyles, WithTitle
 {
-    protected $payrollId;
+    protected int $payrollId;
 
-    protected $payroll;
+    protected Payroll $payroll;
 
     protected int $fallbackWorkingDays = 22;
 
-    protected $rowNumber = 0;
+    protected int $rowNumber = 0;
 
-    public function __construct($payrollId)
+    public function __construct(int $payrollId)
     {
         $this->payrollId = $payrollId;
         $this->payroll = Payroll::with('payrollSettingVersion')->findOrFail($payrollId);
@@ -36,9 +38,12 @@ class PayrollExport implements FromCollection, ShouldAutoSize, WithEvents, WithH
     }
 
     /**
-     * Get the collection of payroll details
+     * Build query for payroll details.
+     *
+     * Using FromQuery keeps memory usage stable because Laravel Excel
+     * processes rows in chunks instead of loading the full dataset.
      */
-    public function collection()
+    public function query(): Builder
     {
         return PayrollDetail::where('payroll_id', $this->payrollId)
             ->with([
@@ -47,7 +52,15 @@ class PayrollExport implements FromCollection, ShouldAutoSize, WithEvents, WithH
                 'staffMember.bankInformation',
             ])
             ->orderBy('final_salary', 'desc')
-            ->get();
+            ->orderBy('id');
+    }
+
+    /**
+     * Tune chunk size for large exports.
+     */
+    public function chunkSize(): int
+    {
+        return 200;
     }
 
     /**

@@ -265,4 +265,25 @@ class OptionController extends Controller
             );
         }
     }
+
+    public function getProjectTaskTemplates()
+    {
+        try {
+            $templates = $this->optionRepository->getProjectTaskTemplateOptions();
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Project task template options retrieved successfully',
+                $templates,
+                200
+            );
+        } catch (\Throwable $e) {
+            return ResponseHelper::jsonResponse(
+                false,
+                'Failed to retrieve project task template options',
+                null,
+                500
+            );
+        }
+    }
 }
