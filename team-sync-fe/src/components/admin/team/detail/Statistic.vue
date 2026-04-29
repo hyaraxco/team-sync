@@ -4,6 +4,7 @@ import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { onMounted, watch } from "vue";
 import { useTeamStore } from "@/stores/team";
 import { storeToRefs } from "pinia";
+import { useToast } from "@/composables/useToast";
 
 const props = defineProps({
   team: {
@@ -13,6 +14,7 @@ const props = defineProps({
 });
 
 const teamStore = useTeamStore();
+const toast = useToast();
 const { teamStatistics, loadingTeamStatistics } = storeToRefs(teamStore);
 const { fetchTeamStatistics } = teamStore;
 
@@ -22,6 +24,7 @@ const loadStatistics = async () => {
       await fetchTeamStatistics(props.team.id);
     } catch (error) {
       console.error('Failed to load statistics:', error);
+      toast.error("Failed to load statistics. Please try again.");
     }
   }
 };
