@@ -27,8 +27,9 @@ team-sync/
 | API routes | `team-sync-be/routes/api.php` | All under `/api/v1`, Sanctum-guarded |
 | Business logic | `team-sync-be/app/Services/` | Domain-grouped (Payroll/, Attendance/, Performance/, Analytics/) |
 | Data access | `team-sync-be/app/Repositories/` | Interface-bound via `app/Interfaces/` |
-| Models (44) | `team-sync-be/app/Models/` | Eloquent, heavy relations |
+| Models (45) | `team-sync-be/app/Models/` | Eloquent, heavy relations |
 | Notifications (25+) | `team-sync-be/app/Notifications/` | Queued via database driver — **queue worker required** |
+| Add meeting | `team-sync-be/app/Http/Controllers/MeetingController.php` + `team-sync-fe/src/views/admin/meeting/` | |
 | Frontend views | `team-sync-fe/src/views/` | Split: `admin/` vs `staff-member/` |
 | State management | `team-sync-fe/src/stores/` | 21 Pinia stores, one per domain |
 | Routing | `team-sync-fe/src/router/` | Split by domain module (9 files) |
@@ -93,3 +94,4 @@ docker compose up -d queue           # Queue worker via Docker
 - **69 database migrations** — large schema, always use migrations for changes
 - **Spatie permissions**: Role-based access via `spatie/laravel-permission`, middleware applied per-route
 - **ApexCharts**: Registered globally as `VueApexCharts` component for dashboard/analytics charts
+- **Schedule Meeting feature**: HR can broadcast meeting links to divisions/teams via notifications
