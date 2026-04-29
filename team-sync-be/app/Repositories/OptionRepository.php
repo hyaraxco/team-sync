@@ -81,6 +81,27 @@ class OptionRepository implements OptionRepositoryInterface
         return $this->mapEnumToOptions(SkillLevel::cases());
     }
 
+    public function getProjectTaskTemplateOptions(): array
+    {
+        return [
+            [
+                'value' => 'product_mvp',
+                'label' => 'Product MVP',
+                'description' => 'Balanced discovery, build, QA, and launch handoff tasks.',
+            ],
+            [
+                'value' => 'website_delivery',
+                'label' => 'Website Delivery',
+                'description' => 'Planning-to-deployment workflow for website projects.',
+            ],
+            [
+                'value' => 'campaign_launch',
+                'label' => 'Campaign Launch',
+                'description' => 'Creative, execution, and reporting workflow for campaigns.',
+            ],
+        ];
+    }
+
     /**
      * Map enum cases to options array with value and label
      */

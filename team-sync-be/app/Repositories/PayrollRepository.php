@@ -7,6 +7,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicyMismatch;
+use App\Models\BpjsRate;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
@@ -735,6 +736,30 @@ class PayrollRepository implements PayrollRepositoryInterface
             'summary' => $summary,
             'latest_by_employee' => $latestByEmployee,
         ];
+    }
+
+    public function getBpjsRateHistory()
+    {
+        return BpjsRate::query()
+            ->orderByDesc('updated_at')
+            ->orderBy('component')
+            ->get()
+            ->map(function (BpjsRate $rate) {
+                return [
+                    'id' => $rate->id,
+                    'component' => $rate->component,
+                    'description' => $rate->description,
+                    'employee_rate' => (float) $rate->employee_rate,
+                    'employer_rate' => (float) $rate->employer_rate,
+                    'max_salary_base' => $rate->max_salary_base !== null
+                        ? (float) $rate->max_salary_base
+                        : null,
+                    'effective_at' => optional($rate->updated_at)->toIso8601String(),
+                    'created_at' => optional($rate->created_at)->toIso8601String(),
+                    'updated_at' => optional($rate->updated_at)->toIso8601String(),
+                ];
+            })
+            ->values();
     }
 
     public function getStatistics()

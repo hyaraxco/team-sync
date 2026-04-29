@@ -65,6 +65,8 @@ const fallbackSettings = {
 const form = reactive({ ...fallbackSettings });
 const settingsHistory = ref([]);
 const loadingHistory = ref(false);
+const bpjsRateHistory = ref([]);
+const loadingBpjsRateHistory = ref(false);
 const selectedHistoryVersionId = ref(null);
 const activeTab = ref("schedule");
 
@@ -171,6 +173,21 @@ const loadSettingsHistory = async () => {
   }
 };
 
+const loadBpjsRateHistory = async () => {
+  try {
+    loadingBpjsRateHistory.value = true;
+    bpjsRateHistory.value = await payrollStore.fetchBpjsRateHistory();
+  } catch (error) {
+    toast.error(
+      "Failed to load BPJS rate history",
+      payrollStore.error || "Please try again.",
+    );
+    bpjsRateHistory.value = [];
+  } finally {
+    loadingBpjsRateHistory.value = false;
+  }
+};
+
 const formatHistoryDate = (value) => {
   if (!value) {
     return "Unknown date";
@@ -195,6 +212,34 @@ const formatWorkingDaysMode = (mode) => {
   }
 
   return "Unknown";
+};
+
+const formatPercentage = (value) => {
+  return `${Number(value || 0).toFixed(2)}%`;
+};
+
+const formatCurrency = (value) => {
+  if (value === null || value === undefined) {
+    return "No cap";
+  }
+
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(Number(value));
+};
+
+const formatBpjsComponent = (component) => {
+  const labels = {
+    bpjs_kesehatan: "BPJS Kesehatan",
+    jht: "JHT",
+    jkk: "JKK",
+    jkm: "JKM",
+    jp: "JP",
+  };
+
+  return labels[component] || String(component || "-").toUpperCase();
 };
 
 const formatComparisonValue = (field, value) => {
@@ -327,6 +372,7 @@ const handleSubmit = async () => {
 onMounted(() => {
   loadSettings();
   loadSettingsHistory();
+  loadBpjsRateHistory();
 });
 </script>
 
@@ -907,6 +953,103 @@ onMounted(() => {
               </div>
             </template>
           </div>
+
+          <section class="mt-6 border-t border-[#E5E7EB] pt-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div
+                class="w-12 h-12 bg-emerald-50 rounded-[12px] flex items-center justify-center"
+              >
+                <Calculator class="w-6 h-6 text-emerald-600" />
+              </div>
+              <div>
+                <h4 class="text-brand-dark text-lg font-bold">
+                  BPJS Rate History
+                </h4>
+                <p class="text-brand-light text-sm">
+                  Latest BPJS Kesehatan and Ketenagakerjaan rates with effective
+                  dates.
+                </p>
+              </div>
+            </div>
+
+            <div v-if="loadingBpjsRateHistory" class="text-sm text-brand-light">
+              Loading BPJS rate history...
+            </div>
+
+            <div
+              v-else-if="bpjsRateHistory.length === 0"
+              data-testid="payroll-settings-bpjs-history-empty"
+              class="rounded-[12px] border border-dashed border-[#DCDEDD] px-4 py-4 text-sm text-brand-light"
+            >
+              No BPJS rate history is available yet.
+            </div>
+
+            <div
+              v-else
+              data-testid="payroll-settings-bpjs-history-table"
+              class="overflow-x-auto rounded-[12px] border border-[#DCDEDD]"
+            >
+              <table class="min-w-full divide-y divide-[#E5E7EB] text-sm">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th
+                      class="px-4 py-3 text-left font-semibold text-brand-dark whitespace-nowrap"
+                    >
+                      Component
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left font-semibold text-brand-dark whitespace-nowrap"
+                    >
+                      Employee Rate
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left font-semibold text-brand-dark whitespace-nowrap"
+                    >
+                      Employer Rate
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left font-semibold text-brand-dark whitespace-nowrap"
+                    >
+                      Salary Cap
+                    </th>
+                    <th
+                      class="px-4 py-3 text-left font-semibold text-brand-dark whitespace-nowrap"
+                    >
+                      Effective Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-[#F1F5F9] bg-white">
+                  <tr
+                    v-for="rate in bpjsRateHistory"
+                    :key="rate.id"
+                    data-testid="payroll-settings-bpjs-history-row"
+                  >
+                    <td class="px-4 py-3 text-brand-dark">
+                      <p class="font-semibold">
+                        {{ formatBpjsComponent(rate.component) }}
+                      </p>
+                      <p class="text-xs text-brand-light mt-0.5">
+                        {{ rate.description || "-" }}
+                      </p>
+                    </td>
+                    <td class="px-4 py-3 text-brand-dark font-semibold">
+                      {{ formatPercentage(rate.employee_rate) }}
+                    </td>
+                    <td class="px-4 py-3 text-brand-dark font-semibold">
+                      {{ formatPercentage(rate.employer_rate) }}
+                    </td>
+                    <td class="px-4 py-3 text-brand-dark">
+                      {{ formatCurrency(rate.max_salary_base) }}
+                    </td>
+                    <td class="px-4 py-3 text-brand-dark whitespace-nowrap">
+                      {{ formatHistoryDate(rate.effective_at || rate.updated_at) }}
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
       </div>
 

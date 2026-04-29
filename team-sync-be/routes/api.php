@@ -115,6 +115,7 @@ Route::prefix('v1')
             Route::get('my-leave-requests', [LeaveRequestController::class, 'getMyLeaveRequests']);
             Route::post('leave-requests/approve/{id}', [LeaveRequestController::class, 'approve']);
             Route::post('leave-requests/reject/{id}', [LeaveRequestController::class, 'reject']);
+            Route::post('leave-requests/bulk-action', [LeaveRequestController::class, 'bulkAction']);
             Route::post('leave-requests/{id}/proof', [LeaveRequestController::class, 'uploadProof']);
             Route::post('leave-requests/{id}/proof-review', [LeaveRequestController::class, 'reviewProof']);
             Route::apiResource('leave-requests', LeaveRequestController::class)->only(['index', 'show', 'store']);
@@ -127,6 +128,7 @@ Route::prefix('v1')
             Route::get('payrolls/analytics', [PayrollController::class, 'getAnalytics']);
             Route::get('payroll-settings', [PayrollSettingController::class, 'show']);
             Route::get('payroll-settings/history', [PayrollSettingController::class, 'history']);
+            Route::get('payroll-settings/bpjs-rate-history', [PayrollSettingController::class, 'bpjsRateHistory']);
             Route::put('payroll-settings', [PayrollSettingController::class, 'update']);
             Route::get('payrolls/all/paginated', [PayrollController::class, 'getAllPaginated']);
             Route::get('payrolls/export-report', [PayrollController::class, 'exportReport']);
@@ -148,6 +150,7 @@ Route::prefix('v1')
             Route::get('my-payslips', [PayslipController::class, 'index']);
             Route::get('my-payslips/{id}', [PayslipController::class, 'show']);
             Route::get('payslips/{id}/download', [PayslipController::class, 'download']);
+            Route::post('payslips/{id}/email', [PayslipController::class, 'email']);
 
             // Project Tasks by project
             Route::get('projects/{id}/tasks', [ProjectTaskController::class, 'getByProject']);
@@ -203,6 +206,7 @@ Route::prefix('v1')
             Route::get('options/marital-statuses', [OptionController::class, 'getMaritalStatuses']);
             Route::get('options/blood-types', [OptionController::class, 'getBloodTypes']);
             Route::get('options/ptkp-statuses', [OptionController::class, 'getPtkpStatuses']);
+            Route::get('options/project-task-templates', [OptionController::class, 'getProjectTaskTemplates']);
 
             // Dashboard routes
             Route::get('dashboard/statistics', [DashboardController::class, 'getStatistics']);

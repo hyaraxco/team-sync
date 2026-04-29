@@ -34,6 +34,7 @@ import { debounce } from "lodash";
 import { useProjectStore } from "@/stores/project";
 import { useTeamStore } from "@/stores/team";
 import { useStaffMemberStore } from "@/stores/staffMember";
+import { useOptionStore } from "@/stores/option";
 import { storeToRefs } from "pinia";
 import router from "@/router";
 
@@ -49,6 +50,10 @@ const staffMemberStore = useStaffMemberStore();
 const { staffMembers } = storeToRefs(staffMemberStore);
 const { fetchStaffMembers } = staffMemberStore;
 
+const optionStore = useOptionStore();
+const { projectTaskTemplates } = storeToRefs(optionStore);
+const { fetchProjectTaskTemplates } = optionStore;
+
 const form = ref({
   name: "",
   type: "",
@@ -61,6 +66,7 @@ const form = ref({
   photo_url: "",
   budget: "",
   project_leader_id: "",
+  task_template: "",
   teams: [],
 });
 
@@ -112,6 +118,7 @@ onMounted(async () => {
   await fetchStaffMembers({
     limit: 6,
   });
+  await fetchProjectTaskTemplates();
   if (form.value.budget) {
     form.value.budget = formatRupiahInput(form.value.budget);
   }
@@ -456,6 +463,25 @@ watch(
                   <FileText class="h-5 w-5 text-gray-400" />
                 </template>
               </TextArea>
+            </div>
+
+            <!-- Task Template -->
+            <div class="md:col-span-2">
+              <Select
+                id="task_template"
+                name="task_template"
+                v-model="form.task_template"
+                label="Task Template"
+                placeholder="No template (manual task setup)"
+                :options="projectTaskTemplates"
+              >
+                <template #icon>
+                  <ClipboardList class="h-5 w-5 text-gray-400" />
+                </template>
+              </Select>
+              <p class="text-brand-light text-xs mt-1">
+                Selecting a template will auto-create starter tasks after project creation.
+              </p>
             </div>
           </div>
         </div>

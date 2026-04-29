@@ -40,11 +40,43 @@ use App\Notifications\TeamLeadChanged;
 use App\Notifications\TeamMemberAdded;
 use App\Notifications\TeamMemberRemoved;
 use App\Notifications\TeamStatusChanged;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Collection;
+use RuntimeException;
 use Throwable;
 
 class EmailService
 {
+    public function sendPayslipToEmployee(PayrollDetail $payrollDetail, string $pdfContent): void
+    {
+        $payrollDetail->loadMissing(['staffMember.user', 'payroll']);
+
+        $user = $payrollDetail->staffMember?->user;
+
+        if (! $user || ! $user->email) {
+            throw new RuntimeException('Employee email address is unavailable.');
+        }
+
+        $salaryMonth = Carbon::parse($payrollDetail->payroll?->salary_month ?? now())->format('F Y');
+        $filename = 'payslip-'.$payrollDetail->getKey().'.pdf';
+
+        $body = sprintf(
+            '<p>Hello %s,</p><p>Your payslip for <strong>%s</strong> is attached to this email.</p><p>Regards,<br>Team Sync HRIS</p>',
+            e((string) ($user->name ?? 'Employee')),
+            e($salaryMonth)
+        );
+
+        Mail::html($body, function ($message) use ($user, $salaryMonth, $filename, $pdfContent): void {
+            $message
+                ->to($user->email, $user->name)
+                ->subject('Payslip '.$salaryMonth)
+                ->attachData($pdfContent, $filename, [
+                    'mime' => 'application/pdf',
+                ]);
+        });
+    }
+
     public function sendTaskAssignedNotification(
         ProjectTask $task,
         ?string $assignedByName = null,

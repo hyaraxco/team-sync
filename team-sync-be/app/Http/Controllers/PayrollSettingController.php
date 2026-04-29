@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Resources\PayrollSettingResource;
 use App\Http\Resources\PayrollSettingVersionResource;
+use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\PayrollSetting;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -13,10 +14,15 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PayrollSettingController extends Controller implements HasMiddleware
 {
+    public function __construct(
+        private PayrollRepositoryInterface $payrollRepository
+    ) {
+    }
+
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history']),
+            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history', 'bpjsRateHistory']),
             new Middleware(PermissionMiddleware::using(['payroll-edit']), only: ['update']),
         ];
     }
@@ -108,6 +114,23 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 true,
                 'Payroll Settings Updated Successfully',
                 new PayrollSettingResource($setting),
+                200
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function bpjsRateHistory()
+    {
+        try {
+            $history = $this->payrollRepository->getBpjsRateHistory();
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'BPJS Rate History Retrieved Successfully',
+                $history,
                 200
             );
         } catch (\Throwable $e) {

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import { loginAsRole } from "./helpers/auth";
-import { processQueueOnce } from "./helpers/backend";
+import { drainQueue } from "./helpers/backend";
 import { captureEvidence } from "./helpers/evidence";
 
 let payrollIdForJourney: string | null = null;
@@ -131,15 +131,33 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
       ).toBeVisible({
         timeout: 15_000,
       });
-      processQueueOnce();
-      await page.waitForTimeout(3_000);
-      await page.reload();
+      drainQueue();
+
+      // Poll-reload until payroll row appears (queue job may take time)
+      let rowVisible = false;
+      for (let attempt = 0; attempt < 8; attempt++) {
+        await page.waitForTimeout(2_000);
+        await page.reload();
+        try {
+          await expect(page.locator('[data-testid^="payroll-row-"]').first()).toBeVisible({
+            timeout: 5_000,
+          });
+          rowVisible = true;
+          break;
+        } catch {
+          drainQueue(3);
+        }
+      }
+
+      if (!rowVisible) {
+        await page.reload();
+      }
     } else {
       await page.goto("/admin/payroll");
     }
 
     await expect(page.locator('[data-testid^="payroll-row-"]').first()).toBeVisible({
-      timeout: 30_000,
+      timeout: 15_000,
     });
 
     payrollIdForJourney = await extractPayrollIdFromPendingRow(page);

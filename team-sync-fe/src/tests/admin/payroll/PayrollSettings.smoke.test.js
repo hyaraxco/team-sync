@@ -59,6 +59,7 @@ const settingsHistory = [
 
 const fetchSettings = vi.fn().mockResolvedValue(settings.value);
 const fetchSettingsHistory = vi.fn().mockResolvedValue(settingsHistory);
+const fetchBpjsRateHistory = vi.fn().mockResolvedValue([]);
 const updateSettings = vi.fn().mockResolvedValue(settings.value);
 const push = vi.fn();
 const toastSuccess = vi.fn();
@@ -68,6 +69,7 @@ vi.mock("@/stores/payroll", () => ({
   usePayrollStore: () => ({
     fetchSettings,
     fetchSettingsHistory,
+    fetchBpjsRateHistory,
     updateSettings,
     error: null,
   }),
@@ -131,6 +133,7 @@ describe("PayrollSettings smoke", () => {
     };
     fetchSettings.mockClear();
     fetchSettingsHistory.mockClear();
+    fetchBpjsRateHistory.mockClear();
     updateSettings.mockClear();
     push.mockClear();
     toastSuccess.mockClear();
@@ -143,6 +146,7 @@ describe("PayrollSettings smoke", () => {
 
     expect(fetchSettings).toHaveBeenCalledTimes(1);
     expect(fetchSettingsHistory).toHaveBeenCalledTimes(1);
+    expect(fetchBpjsRateHistory).toHaveBeenCalledTimes(1);
     expect(wrapper.text()).toContain("Payroll Settings");
     expect(wrapper.text()).toContain("Updated by Dwimeta");
     expect(wrapper.text()).toContain("Active v3");

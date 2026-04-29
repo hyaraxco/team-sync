@@ -16,6 +16,7 @@ use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -198,6 +199,57 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             });
 
             return $leaveRequest;
+        });
+    }
+
+    public function bulkAction(array $ids, string $action)
+    {
+        return DB::transaction(function () use ($ids, $action) {
+            $approverProfileId = Auth::user()->staffMemberProfile?->getKey();
+            if (! $approverProfileId) {
+                throw new \Exception('Your user account is not linked to a staff profile. Bulk action failed.');
+            }
+
+            $leaveRequestsById = LeaveRequest::with(['staffMember.user', 'approver.user'])
+                ->whereIn('id', $ids)
+                ->lockForUpdate()
+                ->get()
+                ->keyBy('id');
+
+            $updatedLeaveRequests = [];
+
+            foreach ($ids as $id) {
+                $leaveRequest = $leaveRequestsById->get($id);
+
+                if (! $leaveRequest) {
+                    throw new ModelNotFoundException('Leave Request Not Found');
+                }
+
+                $this->authorizeManagerScope($leaveRequest);
+
+                $data = [
+                    'status' => $action === 'approve' ? 'approved' : 'rejected',
+                    'approved_by' => $approverProfileId,
+                ];
+
+                $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
+                $leaveRequest->update($leaveRequestDto->toArray());
+
+                $updatedLeaveRequest = $leaveRequest->fresh(['staffMember.user', 'approver.user']);
+                $updatedLeaveRequests[] = $updatedLeaveRequest;
+
+                DB::afterCommit(function () use ($updatedLeaveRequest, $action) {
+                    if ($action === 'approve') {
+                        $this->emailService->sendLeaveRequestApprovedNotification($updatedLeaveRequest);
+
+                        return;
+                    }
+
+                    $this->emailService->sendLeaveRequestRejectedNotification($updatedLeaveRequest);
+                });
+            }
+
+            return collect($updatedLeaveRequests);
         });
     }
 

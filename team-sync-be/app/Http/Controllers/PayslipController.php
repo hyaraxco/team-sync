@@ -7,24 +7,27 @@ use App\Http\Resources\PaginateResource;
 use App\Http\Resources\PayslipResource;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\PayrollDetail;
+use App\Services\EmailService;
 use App\Services\PayslipPdfService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
+use Throwable;
 
 class PayslipController extends Controller implements HasMiddleware
 {
     public function __construct(
         private PayslipPdfService $payslipPdfService,
+        private EmailService $emailService,
         private PayrollRepositoryInterface $repository
     ) {}
 
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['payslip-view']), only: ['index', 'show', 'download']),
+            new Middleware(PermissionMiddleware::using(['payslip-view']), only: ['index', 'show', 'download', 'email']),
         ];
     }
 
@@ -75,6 +78,25 @@ class PayslipController extends Controller implements HasMiddleware
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.$filename.'"',
         ]);
+    }
+
+    public function email(Request $request, string $id)
+    {
+        try {
+            $payslip = $this->findOwnedPayslip($request, $id);
+            $pdf = $this->payslipPdfService->render($payslip);
+
+            $this->emailService->sendPayslipToEmployee($payslip, $pdf);
+
+            return ResponseHelper::jsonResponse(true, 'Payslip emailed successfully', null, 200);
+        } catch (Throwable $exception) {
+            return ResponseHelper::jsonResponse(
+                false,
+                $exception->getMessage() ?: 'Failed to email payslip',
+                null,
+                422
+            );
+        }
     }
 
     private function findOwnedPayslip(Request $request, string $id): PayrollDetail

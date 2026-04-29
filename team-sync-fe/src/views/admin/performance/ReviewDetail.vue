@@ -292,6 +292,25 @@ const calculatedManagerRating = computed(() => {
   return Math.max(1, Math.min(5, weightedSum / totalWeight)).toFixed(2);
 });
 
+const getCalibrationEffectiveRating = (sectionId) => {
+  const override = calibrationForm.value[sectionId]?.rating;
+  if (override) return Number(override);
+
+  const response = getResponseForSection(sectionId);
+  return Number(response?.manager_rating || response?.self_rating || 0);
+};
+
+const getCalibrationWeightedContribution = (section) => {
+  const effectiveRating = getCalibrationEffectiveRating(section.id);
+  const weight = parseFloat(section?.weight || 0);
+
+  if (!effectiveRating || !weight) {
+    return 0;
+  }
+
+  return (effectiveRating * weight) / 100;
+};
+
 // Submit handlers
 const openConfirmModal = (action) => {
   confirmAction.value = action;
@@ -1415,6 +1434,30 @@ watch(
                     {{ n }}
                   </button>
                 </div>
+                <div class="mt-3 p-3 bg-purple-50 border border-purple-100 rounded-lg">
+                  <p class="text-xs font-medium text-purple-700 mb-1">
+                    Effective Calibration Score
+                  </p>
+                  <div class="flex items-center gap-2">
+                    <span class="text-base font-bold text-purple-800">
+                      {{ getCalibrationEffectiveRating(section.id).toFixed(2) }}
+                    </span>
+                    <span
+                      class="px-2 py-0.5 text-xs font-medium rounded-full border"
+                      :class="getRatingLabel(getCalibrationEffectiveRating(section.id))?.bg"
+                    >
+                      {{
+                        getRatingLabel(getCalibrationEffectiveRating(section.id))
+                          ?.label || "-"
+                      }}
+                    </span>
+                    <span class="text-xs text-purple-600">
+                      Contribution: {{
+                        getCalibrationWeightedContribution(section).toFixed(2)
+                      }}
+                    </span>
+                  </div>
+                </div>
               </div>
 
               <!-- Readonly calibrated rating -->
@@ -1437,6 +1480,18 @@ watch(
                       {{ n }}
                     </div>
                   </div>
+                  <span
+                    class="px-2 py-0.5 text-xs font-medium rounded-full border"
+                    :class="
+                      getRatingLabel(getResponseForSection(section.id)?.final_rating)
+                        ?.bg
+                    "
+                  >
+                    {{
+                      getRatingLabel(getResponseForSection(section.id)?.final_rating)
+                        ?.label || "-"
+                    }}
+                  </span>
                 </div>
               </div>
             </div>

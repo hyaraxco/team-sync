@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\LeaveRequestBulkActionRequest;
 use App\Http\Requests\LeaveRequestProofUploadRequest;
 use App\Http\Requests\LeaveRequestStoreRequest;
 use App\Http\Resources\LeaveRequestResource;
@@ -29,7 +30,7 @@ class LeaveRequestController extends Controller implements HasMiddleware
         return [
             new Middleware(PermissionMiddleware::using(['leave-request-list']), only: ['index', 'getAllPaginated', 'show', 'getCalendarRequests']),
             new Middleware(PermissionMiddleware::using(['leave-request-create']), only: ['store', 'uploadProof']),
-            new Middleware(PermissionMiddleware::using(['leave-request-approve']), only: ['approve', 'reject', 'reviewProof']),
+            new Middleware(PermissionMiddleware::using(['leave-request-approve']), only: ['approve', 'reject', 'bulkAction', 'reviewProof']),
             new Middleware(PermissionMiddleware::using(['leave-request-my-requests']), only: ['getMyLeaveRequests']),
         ];
     }
@@ -154,6 +155,32 @@ class LeaveRequestController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function bulkAction(LeaveRequestBulkActionRequest $request)
+    {
+        $data = $request->validated();
+
+        try {
+            $leaveRequests = $this->leaveRequestRepository->bulkAction($data['ids'], $data['action']);
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Leave Requests '.($data['action'] === 'approve' ? 'Approved' : 'Rejected').' Successfully',
+                LeaveRequestResource::collection($leaveRequests),
+                200
+            );
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
