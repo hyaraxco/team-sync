@@ -7,6 +7,7 @@ import ForgotPassword from "@/views/auth/ForgotPassword.vue";
 import ResetPassword from "@/views/auth/ResetPassword.vue";
 import VerifyEmailResult from "@/views/auth/VerifyEmailResult.vue";
 import AdminDashboard from "@/views/admin/Dashboard.vue";
+import AdminSettings from "@/views/admin/Settings.vue";
 import teamRoutes from "./team";
 import staffMemberRoutes from "./staffMember";
 import StaffMemberCreate from "@/views/admin/staff-member/StaffMemberCreate.vue";
@@ -40,6 +41,14 @@ export const appRoutes = [
         component: AdminDashboard,
         meta: {
           requiredPermission: "dashboard-menu",
+        },
+      },
+      {
+        path: "settings",
+        name: "admin.settings",
+        component: AdminSettings,
+        meta: {
+          requiredAnyPermissions: ["payroll-statistics", "attendance-menu", "review-cycle-manage"],
         },
       },
       {
