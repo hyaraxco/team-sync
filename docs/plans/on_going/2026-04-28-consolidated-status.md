@@ -3,7 +3,7 @@
 > Single Source of Truth — Menggantikan semua dokumen status sebelumnya
 > Tanggal: 2026-04-29 (updated)
 > Branch: main
-> BE Tests: 432/432 | FE Tests: 497/497 | E2E: 19/19
+> BE Tests: 432+ | FE Tests: 497+ | E2E: 19
 
 ---
 
@@ -55,6 +55,15 @@
 | Reviewer self-review guard | 3 controllers + 1 repository | DONE — 7 new tests |
 | Reviewer chain repair | FixReviewerAssignments command | DONE — 4 reviews fixed, 0 self-reviews |
 | PerformanceDataSeeder hardcoded reviewer | PerformanceDataSeeder.php | DONE — uses ReviewerResolverService |
+
+---
+
+## Schedule Meeting Feature (2026-04-29)
+
+- **BE**: Migration, Model, Controller, Service, Repository, Notifications, Job, Command
+- **FE**: MeetingCreateModal, MeetingList, UpcomingMeetings, meeting store, sidebar entry
+- **Permissions**: `meeting-menu`, `meeting-list`, `meeting-create`
+- **Status**: DONE (functional, tests pending)
 
 ---
 
