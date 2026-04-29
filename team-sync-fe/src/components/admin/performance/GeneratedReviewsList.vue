@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, Teleport } from 'vue';
 import { usePerformanceReviewStore } from '@/stores/performanceReview';
 import { useStaffMemberStore } from '@/stores/staffMember';
 import { Play, UserCheck, Edit3, X, User } from 'lucide-vue-next';
@@ -64,6 +64,7 @@ const closeOverrideModal = () => {
   showOverrideModal.value = false;
   selectedReview.value = null;
   selectedReviewerId.value = '';
+  assigning.value = false;
 };
 
 const assignReviewer = async () => {
@@ -184,8 +185,10 @@ const getAvatarUrl = (user) => {
       </table>
     </div>
 
-    <!-- Override Modal -->
-    <div v-if="showOverrideModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
+  </MainCard>
+
+  <Teleport to="body">
+    <div v-if="showOverrideModal" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm">
       <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
         <div class="flex items-center justify-between p-4 border-b border-gray-100">
           <h3 class="text-lg font-bold text-brand-dark">Assign Reviewer</h3>
@@ -200,12 +203,16 @@ const getAvatarUrl = (user) => {
               {{ selectedReview?.staff_member?.user?.name || `Staff #${selectedReview?.staff_member?.id}` }}
             </p>
           </div>
-          
+
           <div>
             <label class="block text-sm font-medium text-brand-dark mb-1">Select Reviewer</label>
             <select v-model="selectedReviewerId" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-brand-primary focus:border-brand-primary">
               <option value="" disabled>-- Select a staff member --</option>
-              <option v-for="staff in staffMembers" :key="staff.id" :value="staff.id">
+              <option
+                v-for="staff in staffMembers.filter((s) => s.id !== selectedReview?.staff_member_id)"
+                :key="staff.id"
+                :value="staff.id"
+              >
                 {{ staff.user?.name || `Staff #${staff.id}` }} ({{ staff.job_information?.job_title || 'No Title' }})
               </option>
             </select>
@@ -215,8 +222,8 @@ const getAvatarUrl = (user) => {
           <button @click="closeOverrideModal" class="px-4 py-2 text-sm font-medium text-brand-dark hover:bg-gray-200 rounded-lg transition-colors">
             Cancel
           </button>
-          <button 
-            @click="assignReviewer" 
+          <button
+            @click="assignReviewer"
             :disabled="assigning || !selectedReviewerId"
             class="px-4 py-2 text-sm font-medium text-white bg-brand-primary hover:bg-brand-primary-dark rounded-lg transition-colors disabled:opacity-50"
           >
@@ -225,5 +232,5 @@ const getAvatarUrl = (user) => {
         </div>
       </div>
     </div>
-  </MainCard>
+  </Teleport>
 </template>
