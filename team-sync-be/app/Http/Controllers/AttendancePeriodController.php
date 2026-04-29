@@ -7,9 +7,19 @@ use App\Interfaces\AttendanceRepositoryInterface;
 use App\Models\AttendancePeriod;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class AttendancePeriodController extends Controller
+class AttendancePeriodController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('attendance-menu')),
+        ];
+    }
+
     public function __construct(private AttendanceRepositoryInterface $repository) {}
 
     public function index(Request $request): JsonResponse
