@@ -7,9 +7,19 @@ use App\Http\Requests\HolidayCalendar\UpdateHolidayRequest;
 use App\Models\HolidayCalendar;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class HolidayCalendarController extends Controller
+class HolidayCalendarController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('attendance-menu'), only: ['store', 'show', 'update', 'destroy']),
+        ];
+    }
+
     public function index(Request $request): JsonResponse
     {
         $holidays = HolidayCalendar::orderBy('date', 'asc')->paginate($request->get('per_page', 15));

@@ -5,9 +5,19 @@ namespace App\Http\Controllers;
 use App\Interfaces\HybridWorkScheduleRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\Controllers\HasMiddleware;
+use Illuminate\Routing\Controllers\Middleware;
+use Spatie\Permission\Middleware\PermissionMiddleware;
 
-class HybridWorkScheduleController extends Controller
+class HybridWorkScheduleController extends Controller implements HasMiddleware
 {
+    public static function middleware(): array
+    {
+        return [
+            new Middleware(PermissionMiddleware::using('attendance-menu'), only: ['index']),
+        ];
+    }
+
     public function __construct(private HybridWorkScheduleRepositoryInterface $repository) {}
 
     public function index(Request $request): JsonResponse
