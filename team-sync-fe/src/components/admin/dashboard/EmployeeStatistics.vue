@@ -22,11 +22,13 @@ import { useDashboardStore } from "@/stores/dashboard";
 import { useTaskStore } from "@/stores/task";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { useNotificationStore } from "@/stores/notifications";
+import { useToast } from "@/composables/useToast";
 import { RouterLink, useRouter } from "vue-router";
 import { getTimeAgo } from "@/utils/dateUtils";
 
 const authStore = useAuthStore();
 const router = useRouter();
+const toast = useToast();
 const notificationStore = useNotificationStore();
 const dashboardStore = useDashboardStore();
 
@@ -324,6 +326,7 @@ const fetchMyStatistics = async () => {
     };
   } catch (error) {
     console.error("Failed to fetch employee statistics:", error);
+    toast.error("Failed to load employee statistics. Please try again.");
   } finally {
     statsLoading.value = false;
   }

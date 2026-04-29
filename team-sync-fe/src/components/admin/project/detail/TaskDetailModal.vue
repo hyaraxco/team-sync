@@ -264,6 +264,7 @@ const handleUpdateStatus = async (status, extraPayload = {}) => {
     emit("updated");
   } catch (error) {
     console.error("Failed to update task status:", error);
+    toast.error("Failed to update task status. Please try again.");
   }
 };
 
@@ -296,6 +297,7 @@ const loadTaskComments = async () => {
     comments.value = await fetchTaskComments(props.task.id);
   } catch (error) {
     console.error("Failed to fetch task comments:", error);
+    toast.error("Failed to load comments. Please try again.");
   } finally {
     commentsLoading.value = false;
   }
@@ -312,6 +314,7 @@ const loadTaskAttachments = async () => {
     attachments.value = await fetchTaskAttachments(props.task.id);
   } catch (error) {
     console.error("Failed to fetch task attachments:", error);
+    toast.error("Failed to load attachments. Please try again.");
   } finally {
     attachmentsLoading.value = false;
   }
@@ -336,6 +339,7 @@ const loadTaskStatusLogs = async () => {
     statusLogs.value = await fetchTaskStatusLogs(props.task.id);
   } catch (error) {
     console.error("Failed to fetch task status logs:", error);
+    toast.error("Failed to load status timeline. Please try again.");
   } finally {
     statusLogsLoading.value = false;
   }
@@ -354,6 +358,7 @@ const handleCreateComment = async () => {
     await loadTaskComments();
   } catch (error) {
     console.error("Failed to create task comment:", error);
+    toast.error("Failed to post comment. Please try again.");
   } finally {
     isSubmittingComment.value = false;
   }
@@ -385,6 +390,7 @@ const handleUpdateComment = async (commentId) => {
     await loadTaskComments();
   } catch (error) {
     console.error("Failed to update task comment:", error);
+    toast.error("Failed to update comment. Please try again.");
   }
 };
 
@@ -402,6 +408,7 @@ const handleDeleteComment = async (comment) => {
     await loadTaskComments();
   } catch (error) {
     console.error("Failed to delete task comment:", error);
+    toast.error("Failed to delete comment. Please try again.");
   }
 };
 
@@ -427,6 +434,7 @@ const handleAttachmentSelected = async (event) => {
     await loadTaskAttachments();
   } catch (error) {
     console.error("Failed to upload task attachment:", error);
+    toast.error("Failed to upload attachment. Please try again.");
   } finally {
     isUploadingAttachment.value = false;
   }
@@ -446,6 +454,7 @@ const handleDeleteAttachment = async (attachment) => {
     await loadTaskAttachments();
   } catch (error) {
     console.error("Failed to delete task attachment:", error);
+    toast.error("Failed to delete attachment. Please try again.");
   }
 };
 
@@ -471,6 +480,7 @@ const handleSelectAssignee = async (employee) => {
     assigneeDropdown.value = false;
   } catch (error) {
     console.error("Failed to update assignee:", error);
+    toast.error("Failed to update assignee. Please try again.");
     assigneeDropdown.value = false;
   }
 };
@@ -490,6 +500,7 @@ const handleRemoveAssignee = async () => {
     emit("updated");
   } catch (error) {
     console.error("Failed to remove assignee:", error);
+    toast.error("Failed to remove assignee. Please try again.");
   }
 };
 
@@ -513,6 +524,7 @@ const handleUpdateDueDate = async () => {
     dueDateEditing.value = false;
   } catch (error) {
     console.error("Failed to update due date:", error);
+    toast.error("Failed to update due date. Please try again.");
     dueDateEditing.value = false;
   }
 };
