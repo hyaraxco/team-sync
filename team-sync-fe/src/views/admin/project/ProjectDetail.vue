@@ -299,10 +299,10 @@ onMounted(async () => {
 
         <div v-if="project.leader" class="flex items-center gap-4">
           <img
-            :src="project.leader.user.profile_photo"
-            :alt="project.leader.user.name"
+            :src="project.leader?.user?.profile_photo"
+            :alt="project.leader?.user?.name"
             class="w-16 h-16 rounded-full object-cover"
-            v-if="project.leader.user.profile_photo"
+            v-if="project.leader?.user?.profile_photo"
           />
           <div
             class="w-12 h-12 rounded-[12px] flex items-center justify-center bg-gray-100"
