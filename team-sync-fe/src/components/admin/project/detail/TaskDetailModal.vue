@@ -112,11 +112,18 @@ const isReviewPhaseLocked = computed(() =>
   ["review", "done"].includes(normalizedTaskStatus.value)
 );
 
-const canManageAssignee = computed(
-  () =>
-    (hasRole("manager") || hasRole("hr") || isProjectLeader.value) &&
-    !isReviewPhaseLocked.value
-);
+const canManageAssignee = computed(() => {
+  if (isReviewPhaseLocked.value) {
+    return false;
+  }
+
+  // Staff users must never see assignee management actions.
+  if (hasRole("staff") && !hasRole("manager") && !hasRole("hr")) {
+    return false;
+  }
+
+  return hasRole("manager") || hasRole("hr") || isProjectLeader.value;
+});
 
 const canEditDueDate = computed(
   () => (hasRole("manager") || hasRole("hr")) && !isReviewPhaseLocked.value
