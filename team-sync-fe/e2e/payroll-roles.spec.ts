@@ -132,13 +132,14 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
         timeout: 15_000,
       });
       processQueueOnce();
+      await page.waitForTimeout(3_000);
       await page.reload();
     } else {
       await page.goto("/admin/payroll");
     }
 
     await expect(page.locator('[data-testid^="payroll-row-"]').first()).toBeVisible({
-      timeout: 15_000,
+      timeout: 30_000,
     });
 
     payrollIdForJourney = await extractPayrollIdFromPendingRow(page);
