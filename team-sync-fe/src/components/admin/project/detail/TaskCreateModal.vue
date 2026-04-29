@@ -64,6 +64,7 @@ const handleSubmit = async () => {
     closeModal();
   } catch (error) {
     console.error("Error creating task:", error);
+    toast.error("Failed to create task. Please try again.");
   } finally {
     isSubmitting.value = false;
   }

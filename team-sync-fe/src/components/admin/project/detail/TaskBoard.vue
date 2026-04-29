@@ -7,11 +7,13 @@ import { useAuthStore } from "@/stores/auth";
 import { can } from "@/helpers/permissionHelper";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
+import { useToast } from "@/composables/useToast";
 import TaskCard from "./TaskCard.vue";
 import TaskDetailModal from "./TaskDetailModal.vue";
 import TaskCreateModal from "./TaskCreateModal.vue";
 
 const route = useRoute();
+const toast = useToast();
 const taskStore = useTaskStore();
 const { tasks, loading } = storeToRefs(taskStore);
 const { fetchProjectTasks, updateTaskStatus, createTask, deleteTask } = taskStore;
@@ -157,6 +159,7 @@ const handleColumnDrop = async (value, targetStatus) => {
     await updateTaskStatus(movedTask.id, targetStatus);
   } catch (error) {
     console.error("Failed to update task status:", error);
+    toast.error("Failed to update task status. Please try again.");
     const serverMessage =
       error?.response?.data?.message ||
       error?.response?.data?.error ||
@@ -196,6 +199,7 @@ const handleCreateTask = async (taskData) => {
     await fetchProjectTasks(route.params.id);
   } catch (error) {
     console.error("Failed to create task:", error);
+    toast.error("Failed to create task. Please try again.");
   }
 };
 
@@ -205,6 +209,7 @@ const handleDeleteTask = async (taskId) => {
     await fetchProjectTasks(route.params.id);
   } catch (error) {
     console.error("Failed to delete task:", error);
+    toast.error("Failed to delete task. Please try again.");
   }
 };
 
