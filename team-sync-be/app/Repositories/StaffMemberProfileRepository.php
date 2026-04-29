@@ -638,7 +638,7 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
         $team = $this->resolveEmployeeTeam($employee);
 
         if (! $team) {
-            throw new \Exception('You are not assigned to any team');
+            return collect();
         }
 
         return $team
