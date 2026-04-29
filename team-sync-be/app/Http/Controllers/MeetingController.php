@@ -23,7 +23,8 @@ class MeetingController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            new Middleware(PermissionMiddleware::using(['meeting-list']), only: ['index', 'getAllPaginated', 'show', 'getUpcoming']),
+            new Middleware(PermissionMiddleware::using(['meeting-list']), only: ['index', 'getAllPaginated', 'show']),
+            new Middleware(PermissionMiddleware::using(['meeting-menu']), only: ['getUpcoming']),
             new Middleware(PermissionMiddleware::using(['meeting-create']), only: ['store']),
         ];
     }
