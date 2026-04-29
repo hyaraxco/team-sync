@@ -1,6 +1,6 @@
 import { expect, request, test, type APIRequestContext, type Page } from "@playwright/test";
 import { loginAsRole, roleCredentials } from "./helpers/auth";
-import { processQueueOnce } from "./helpers/backend";
+import { drainQueue } from "./helpers/backend";
 import { captureEvidence } from "./helpers/evidence";
 
 const apiBaseUrl = (process.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1").replace(
@@ -135,7 +135,7 @@ test.describe.serial("Employee task assignment notifications", () => {
     await managerApi.dispose();
     await managerContext.close();
 
-    processQueueOnce();
+    drainQueue();
 
     const employeeContext = await browser.newContext();
     const employeePage = await employeeContext.newPage();
@@ -143,15 +143,41 @@ test.describe.serial("Employee task assignment notifications", () => {
     await loginAsRole(employeePage, "employee");
     await expect(employeePage.getByTestId("header-notification-toggle")).toBeVisible();
 
-    await employeePage.getByTestId("header-notification-toggle").click();
-    await expect(employeePage.getByTestId("header-notification-panel")).toBeVisible();
+    // Retry polling: open panel, check notification, reload if not found
+    let taskNotificationFound = false;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      await employeePage.getByTestId("header-notification-toggle").click();
+      await expect(employeePage.getByTestId("header-notification-panel")).toBeVisible();
+
+      const taskNotificationLocator = employeePage
+        .locator('[data-testid^="notification-select-"]')
+        .filter({ hasText: taskName })
+        .first();
+
+      try {
+        await expect(taskNotificationLocator).toBeVisible({ timeout: 5_000 });
+        taskNotificationFound = true;
+        break;
+      } catch {
+        // Notification not yet delivered — drain queue again and reload
+        drainQueue(3);
+        await employeePage.reload();
+        await employeePage.waitForTimeout(1_000);
+      }
+    }
+
+    if (!taskNotificationFound) {
+      // Open panel one last time for the final assertion
+      await employeePage.getByTestId("header-notification-toggle").click();
+      await expect(employeePage.getByTestId("header-notification-panel")).toBeVisible();
+    }
 
     const taskNotification = employeePage
       .locator('[data-testid^="notification-select-"]')
       .filter({ hasText: taskName })
       .first();
 
-    await expect(taskNotification).toBeVisible({ timeout: 15_000 });
+    await expect(taskNotification).toBeVisible({ timeout: 10_000 });
     await taskNotification.click();
 
     await expect(employeePage).toHaveURL(new RegExp(`/admin/projects/${projectData.id}$`));

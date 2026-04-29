@@ -30,4 +30,6 @@ interface OptionRepositoryInterface
     public function getPtkpStatusOptions(): array;
 
     public function getSkillLevelOptions(): array;
+
+    public function getProjectTaskTemplateOptions(): array;
 }

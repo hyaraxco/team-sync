@@ -82,6 +82,7 @@ export const usePayrollStore = defineStore("payroll", {
         analytics: getDefaultAnalyticsState(),
         settings: null,
         settingsHistory: [],
+        bpjsRateHistory: [],
         meta: {
             current_page: 1,
             last_page: 1,
@@ -352,6 +353,22 @@ export const usePayrollStore = defineStore("payroll", {
             }
         },
 
+        async emailPayslip(id) {
+            this.loading = true;
+
+            try {
+                const response = await axiosInstance.post(`/payslips/${id}/email`);
+
+                this.success = response.data.message;
+                return response.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async fetchStatistics() {
             this.loadingStatistics = true;
 
@@ -444,6 +461,19 @@ export const usePayrollStore = defineStore("payroll", {
             }
         },
 
+        async fetchBpjsRateHistory() {
+            try {
+                const response = await axiosInstance.get('/payroll-settings/bpjs-rate-history');
+
+                this.bpjsRateHistory = response.data.data ?? [];
+
+                return this.bpjsRateHistory;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
         async exportExcel(id) {
             this.loading = true;
 
@@ -455,6 +485,25 @@ export const usePayrollStore = defineStore("payroll", {
                 triggerBlobDownload(response, 'Payroll_Export.xlsx');
 
                 this.success = 'Excel file downloaded successfully';
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async exportPdf(id) {
+            this.loading = true;
+
+            try {
+                const response = await axiosInstance.get(`/payrolls/${id}/export-pdf`, {
+                    responseType: 'blob'
+                });
+
+                triggerBlobDownload(response, 'Payroll_Export.pdf');
+
+                this.success = 'PDF file downloaded successfully';
             } catch (error) {
                 this.error = handleError(error);
                 throw error;

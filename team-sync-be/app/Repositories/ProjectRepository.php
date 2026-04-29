@@ -4,9 +4,11 @@ namespace App\Repositories;
 
 use App\Constants\CacheConstants;
 use App\DTOs\ProjectDto;
+use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Interfaces\ProjectRepositoryInterface;
 use App\Models\Project;
+use App\Models\ProjectTask;
 use App\Models\StaffMemberProfile;
 use App\Models\TeamMember;
 use App\Services\EmailService;
@@ -43,8 +45,14 @@ class ProjectRepository implements ProjectRepositoryInterface
             ->withCount('tasks')
             ->orderByDesc('created_at');
 
-        if (Auth::user()->hasRole('staff')) {
-            $profile = Auth::user()->staffMemberProfile;
+        /** @var User|null $currentUser */
+        $currentUser = Auth::user();
+        $isStaffUser = $currentUser
+            && is_callable([$currentUser, 'hasRole'])
+            && call_user_func([$currentUser, 'hasRole'], 'staff');
+
+        if ($isStaffUser) {
+            $profile = $currentUser->staffMemberProfile;
             if (! $profile) {
                 return $query;
             }
@@ -136,6 +144,7 @@ class ProjectRepository implements ProjectRepositoryInterface
             }
 
             $this->assignTeams($project->id, $data['teams'] ?? []);
+            $this->createTasksFromTemplate($project->id, $data['task_template'] ?? null);
 
             $this->clearStatisticsCache();
 
@@ -370,6 +379,108 @@ class ProjectRepository implements ProjectRepositoryInterface
         }
 
         $project->teams()->sync($syncPayload);
+    }
+
+    private function createTasksFromTemplate(int $projectId, ?string $taskTemplate): void
+    {
+        if (! $taskTemplate) {
+            return;
+        }
+
+        $templateMap = $this->getTaskTemplateMap();
+        $tasks = $templateMap[$taskTemplate] ?? [];
+
+        foreach ($tasks as $task) {
+            ProjectTask::create([
+                'project_id' => $projectId,
+                'name' => $task['name'],
+                'description' => $task['description'] ?? null,
+                'priority' => $task['priority'] ?? TaskPriority::MEDIUM->value,
+                'status' => $task['status'] ?? TaskStatus::TODO->value,
+                'assignee_id' => null,
+            ]);
+        }
+    }
+
+    private function getTaskTemplateMap(): array
+    {
+        return [
+            'product_mvp' => [
+                [
+                    'name' => 'Kickoff and requirement alignment',
+                    'description' => 'Align scope, timeline, and ownership across teams.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'Create product specification',
+                    'description' => 'Document goals, acceptance criteria, and user flows.',
+                ],
+                [
+                    'name' => 'Implement core MVP features',
+                    'description' => 'Build the minimum set of validated product features.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'QA and regression testing',
+                    'description' => 'Run verification and stabilize issues before release.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'Release preparation and handoff',
+                    'description' => 'Prepare release notes and handoff checklist.',
+                ],
+            ],
+            'website_delivery' => [
+                [
+                    'name' => 'Site architecture and sitemap planning',
+                    'description' => 'Define structure, pages, and navigation hierarchy.',
+                ],
+                [
+                    'name' => 'UI/UX design and approval',
+                    'description' => 'Finalize design assets and responsive layouts.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'Frontend implementation',
+                    'description' => 'Implement approved pages and reusable components.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'CMS/content integration',
+                    'description' => 'Integrate content and verify metadata.',
+                ],
+                [
+                    'name' => 'Cross-browser QA and launch checklist',
+                    'description' => 'Complete QA matrix and launch readiness checks.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+            ],
+            'campaign_launch' => [
+                [
+                    'name' => 'Campaign brief and KPI setup',
+                    'description' => 'Define target audience, goals, and success metrics.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'Creative asset production',
+                    'description' => 'Produce visuals and copy for all channels.',
+                ],
+                [
+                    'name' => 'Landing page and tracking setup',
+                    'description' => 'Configure conversion tracking and campaign links.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'Campaign launch execution',
+                    'description' => 'Launch campaign and monitor initial performance.',
+                    'priority' => TaskPriority::HIGH->value,
+                ],
+                [
+                    'name' => 'Post-launch performance reporting',
+                    'description' => 'Summarize outcomes and optimization actions.',
+                ],
+            ],
+        ];
     }
 
     private function clearStatisticsCache(): void

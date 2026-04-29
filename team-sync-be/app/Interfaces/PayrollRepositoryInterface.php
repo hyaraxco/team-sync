@@ -39,6 +39,8 @@ interface PayrollRepositoryInterface
 
     public function getNotificationDeliverySummary(string $payrollId): array;
 
+    public function getBpjsRateHistory();
+
     public function getStatistics();
 
     public function getAnalytics(int $months = 6): array;

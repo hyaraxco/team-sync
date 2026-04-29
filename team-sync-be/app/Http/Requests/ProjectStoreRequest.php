@@ -28,6 +28,7 @@ class ProjectStoreRequest extends FormRequest
             'photo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'budget' => ['nullable', 'numeric', 'min:0'],
             'project_leader_id' => ['nullable', 'exists:staff_member_profiles,id'],
+            'task_template' => ['nullable', 'string', 'in:product_mvp,website_delivery,campaign_launch'],
             'teams' => ['nullable', 'array'],
             'teams.*' => ['integer', 'exists:teams,id'],
         ];
@@ -46,6 +47,7 @@ class ProjectStoreRequest extends FormRequest
             'photo' => 'Project Photo',
             'budget' => 'Budget',
             'project_leader_id' => 'Project Leader',
+            'task_template' => 'Task Template',
             'teams' => 'Teams',
             'teams.*' => 'Team',
         ];

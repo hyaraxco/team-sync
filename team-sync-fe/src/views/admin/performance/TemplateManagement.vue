@@ -13,6 +13,7 @@ const toast = useToast();
 const showModal = ref(false);
 const editingTemplate = ref(null);
 const saving = ref(false);
+const formErrors = ref({});
 
 const defaultForm = () => ({
   name: '',
@@ -27,6 +28,7 @@ const form = ref(defaultForm());
 const openCreate = () => {
   editingTemplate.value = null;
   form.value = defaultForm();
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -42,6 +44,7 @@ const openEdit = (template) => {
       weight: parseFloat(s.pivot.weight)
     }))
   };
+  formErrors.value = {};
   showModal.value = true;
 };
 
@@ -49,6 +52,7 @@ const closeModal = () => {
   showModal.value = false;
   editingTemplate.value = null;
   form.value = defaultForm();
+  formErrors.value = {};
 };
 
 const addSection = (section) => {
@@ -67,9 +71,29 @@ const totalWeight = computed(() => {
   return form.value.sections.reduce((sum, s) => sum + parseFloat(s.weight || 0), 0);
 });
 
+const validateTemplateForm = () => {
+  const errors = {};
+
+  if (!String(form.value.name || '').trim()) {
+    errors.name = 'Template name is required';
+  }
+
+  if (!form.value.sections.length) {
+    errors.sections = 'Add at least one section';
+  }
+
+  if (form.value.sections.length && totalWeight.value !== 100) {
+    errors.weight = 'Total weight must be exactly 100%';
+  }
+
+  formErrors.value = errors;
+  return Object.keys(errors).length === 0;
+};
+
 const saveTemplate = async () => {
-  if (totalWeight.value !== 100) {
-    toast.error('Total weight must be exactly 100%');
+  if (!validateTemplateForm()) {
+    const firstError = Object.values(formErrors.value)[0] || 'Please complete the required fields';
+    toast.error(firstError);
     return;
   }
 
@@ -193,6 +217,7 @@ onMounted(() => {
             <div>
               <label class="block text-sm font-medium mb-1">Template Name</label>
               <input v-model="form.name" type="text" class="w-full px-3 py-2 border rounded-lg focus:ring-brand-primary" placeholder="e.g. Senior Software Engineer" />
+              <p v-if="formErrors.name" class="text-xs text-red-600 mt-1">{{ formErrors.name }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium mb-1">Description</label>
@@ -223,6 +248,7 @@ onMounted(() => {
                   <Plus class="w-3 h-3 text-brand-primary opacity-0 group-hover:opacity-100" />
                 </button>
               </div>
+              <p v-if="formErrors.sections" class="text-xs text-red-600 mt-2">{{ formErrors.sections }}</p>
             </div>
           </div>
 
@@ -264,6 +290,7 @@ onMounted(() => {
               <Info class="w-4 h-4 flex-shrink-0" />
               Weights must total exactly 100%. Current gap: {{ 100 - totalWeight }}%
             </div>
+            <p v-if="formErrors.weight" class="text-xs text-red-600">{{ formErrors.weight }}</p>
           </div>
         </div>
 

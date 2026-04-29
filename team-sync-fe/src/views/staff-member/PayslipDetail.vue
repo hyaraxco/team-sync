@@ -28,6 +28,7 @@ const toast = useToast();
 
 const payslip = ref(null);
 const loading = ref(true);
+const emailingPayslip = ref(false);
 const expandedAdjustmentIds = ref([]);
 
 onMounted(async () => {
@@ -66,6 +67,27 @@ const handleDownload = async () => {
 
 const handlePrint = () => {
   window.print();
+};
+
+const handleEmailPayslip = async () => {
+  if (emailingPayslip.value) {
+    return;
+  }
+
+  emailingPayslip.value = true;
+  try {
+    await payrollStore.emailPayslip(route.params.id);
+    toast.success("Payslip emailed", "Your payslip PDF has been sent to your email.");
+  } catch (error) {
+    toast.error(
+      "Email failed",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to email payslip.",
+    );
+  } finally {
+    emailingPayslip.value = false;
+  }
 };
 
 const formatCurrency = (value) => {
@@ -179,6 +201,15 @@ const getAdjustmentStatusClass = (status) => {
         >
           <Printer class="w-5 h-5" />
           <span class="font-semibold">Print</span>
+        </button>
+        <button
+          @click="handleEmailPayslip"
+          data-testid="payslip-detail-email"
+          :disabled="emailingPayslip"
+          class="flex items-center gap-2 px-4 py-2 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <Mail class="w-5 h-5" />
+          <span class="font-semibold">{{ emailingPayslip ? 'Sending...' : 'Email Payslip' }}</span>
         </button>
         <button
           @click="handleDownload"

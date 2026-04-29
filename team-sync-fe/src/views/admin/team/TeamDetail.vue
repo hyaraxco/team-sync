@@ -47,7 +47,7 @@ const id = route.params.id;
 
 const teamStore = useTeamStore();
 const { loading, success, error } = storeToRefs(teamStore);
-const { fetchTeam, deleteTeam, addMember, removeMember } = teamStore;
+const { fetchTeam, deleteTeam, addMember, removeMember, updateTeam } = teamStore;
 
 const staffMemberStore = useStaffMemberStore();
 const { staffMembers } = storeToRefs(staffMemberStore);
@@ -59,6 +59,7 @@ const showAddMemberModal = ref(false);
 const searchMember = ref("");
 const addingMember = ref(false);
 const removingMember = ref(false);
+const assigningLead = ref(false);
 const showRemoveMemberModal = ref(false);
 const memberToRemove = ref(null);
 
@@ -131,6 +132,39 @@ const handleRemoveMember = async (member) => {
     );
   } finally {
     removingMember.value = false;
+  }
+};
+
+const isCurrentTeamLead = (member) => {
+  const leaderId = team.value?.leader?.id;
+  const memberUserId = member?.staff_member?.user?.id;
+  return Boolean(leaderId && memberUserId && leaderId === memberUserId);
+};
+
+const handleAssignTeamLead = async (member) => {
+  const targetLeadId = member?.staff_member?.user?.id;
+
+  if (!targetLeadId || isCurrentTeamLead(member)) {
+    return;
+  }
+
+  try {
+    assigningLead.value = true;
+    await updateTeam(id, { team_lead_id: targetLeadId });
+    await handleFetchTeam();
+    toast.success(
+      "Team lead assigned",
+      `${member?.staff_member?.user?.name || "Selected member"} is now the team lead.`,
+    );
+  } catch (error) {
+    toast.error(
+      "Failed to assign team lead",
+      teamStore.error ||
+        error?.response?.data?.message ||
+        "Failed to update team lead.",
+    );
+  } finally {
+    assigningLead.value = false;
   }
 };
 
@@ -476,6 +510,22 @@ watch(
             >View Profile</span
           >
         </RouterLink>
+        <button
+          type="button"
+          @click="handleAssignTeamLead(member)"
+          :disabled="assigningLead || isCurrentTeamLead(member)"
+          class="w-full mt-2 rounded-[8px] px-3 py-2 flex items-center justify-center gap-2 transition-all duration-300 border"
+          :class="
+            isCurrentTeamLead(member)
+              ? 'border-green-200 bg-green-50 text-green-700 cursor-default'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:bg-gray-50 disabled:opacity-60'
+          "
+        >
+          <Crown class="w-4 h-4" />
+          <span class="text-sm font-semibold">
+            {{ isCurrentTeamLead(member) ? 'Current Team Lead' : 'Set as Team Lead' }}
+          </span>
+        </button>
       </div>
     </div>
   </div>

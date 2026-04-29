@@ -74,6 +74,7 @@ const loadingDetails = ref(false);
 const loadingActivityLogs = ref(false);
 const loadingReconciliation = ref(false);
 const loadingNotificationDeliveries = ref(false);
+const exportingPdf = ref(false);
 const searchQuery = ref("");
 const departmentFilter = ref("");
 const paymentDate = ref(new Date().toISOString().split("T")[0]);
@@ -643,7 +644,24 @@ const exportExcel = async () => {
       payrollStore.error ||
         error?.response?.data?.message ||
         "Failed to export Excel file.",
+      );
+  }
+};
+
+const exportPdf = async () => {
+  try {
+    exportingPdf.value = true;
+    await payrollStore.exportPdf(route.params.id);
+    toast.success("Download ready", "Payroll PDF exported successfully.");
+  } catch (error) {
+    toast.error(
+      "Download failed",
+      payrollStore.error ||
+        error?.response?.data?.message ||
+        "Failed to export PDF file.",
     );
+  } finally {
+    exportingPdf.value = false;
   }
 };
 
@@ -1342,6 +1360,19 @@ const handleApprovePayroll = () => {
         </div>
 
         <div class="flex items-center gap-3">
+          <button
+            v-if="hasPayrollList"
+            @click="exportPdf"
+            :disabled="exportingPdf"
+            data-testid="payroll-export-pdf"
+            class="border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <Download class="w-4 h-4 text-gray-600" />
+            <span class="text-brand-dark text-sm font-semibold">
+              {{ exportingPdf ? "Exporting PDF..." : "Export PDF" }}
+            </span>
+          </button>
+
           <button v-if="hasPayrollList" @click="exportExcel"
             data-testid="payroll-export-excel"
             class="border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2">

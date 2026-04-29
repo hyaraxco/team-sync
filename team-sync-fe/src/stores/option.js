@@ -13,6 +13,7 @@ export const useOptionStore = defineStore("option", {
         maritalStatuses: [],
         bloodTypes: [],
         ptkpStatuses: [],
+        projectTaskTemplates: [],
         loading: false,
         error: null,
     }),
@@ -139,6 +140,20 @@ export const useOptionStore = defineStore("option", {
             } catch (error) {
                 this.error = handleError(error);
                 console.error('Failed to fetch PTKP statuses:', error);
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async fetchProjectTaskTemplates() {
+            this.loading = true;
+
+            try {
+                const response = await axiosInstance.get('/options/project-task-templates');
+                this.projectTaskTemplates = response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                console.error('Failed to fetch project task templates:', error);
             } finally {
                 this.loading = false;
             }
