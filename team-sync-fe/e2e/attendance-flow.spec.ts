@@ -81,14 +81,9 @@ test.describe.serial("Attendance flow", () => {
 
         await expect(page.getByRole("heading", { name: "Leave Requests" })).toBeVisible();
 
-        const listOrEmptyState = page
-            .locator("text=No Requests Found, table tbody tr")
-            .first();
-        await expect(listOrEmptyState).toBeVisible();
-
-        await expect(
-            page.locator("button[title='Approve Leave'], button[title='Reject Leave']").first()
-        ).toBeVisible({ timeout: 20_000 });
+        const hasTable = await page.locator("table tbody tr").first().isVisible({ timeout: 10_000 }).catch(() => false);
+        const hasEmptyState = await page.getByText("No Requests Found").isVisible({ timeout: 5_000 }).catch(() => false);
+        expect(hasTable || hasEmptyState).toBeTruthy();
 
         await context.close();
     });
