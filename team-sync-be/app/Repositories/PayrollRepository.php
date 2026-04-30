@@ -16,11 +16,14 @@ use App\Models\PayrollActivityLog;
 use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
+use App\Models\PayrollApproval;
+use App\Models\PayrollApprovalPolicy;
 use App\Models\PayrollReconciliationResolution;
 use App\Models\PayrollSetting;
 use App\Models\PayrollSettingVersion;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Notifications\PayrollCorrected;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
@@ -689,6 +692,70 @@ class PayrollRepository implements PayrollRepositoryInterface
                 throw new \Exception('Payroll must be pending before it can be approved');
             }
 
+            // Check if multi-step approval policies apply
+            $totalAmount = PayrollDetail::where('payroll_id', $payroll->id)->sum('final_salary');
+            $applicablePolicies = PayrollApprovalPolicy::getApplicablePolicies((float) $totalAmount);
+
+            if ($applicablePolicies->isNotEmpty()) {
+                // Create approval records if they don't exist yet
+                $existingApprovals = PayrollApproval::where('payroll_id', $payroll->id)->count();
+
+                if ($existingApprovals === 0) {
+                    foreach ($applicablePolicies as $policy) {
+                        PayrollApproval::create([
+                            'payroll_id' => $payroll->id,
+                            'policy_id' => $policy->id,
+                            'status' => PayrollApproval::STATUS_PENDING,
+                        ]);
+                    }
+
+                    // Submit this actor's approval for their matching policy
+                    $actor = $actorId ? User::find($actorId) : null;
+                    if ($actor) {
+                        $matchingApproval = PayrollApproval::where('payroll_id', $payroll->id)
+                            ->where('status', PayrollApproval::STATUS_PENDING)
+                            ->get()
+                            ->first(function (PayrollApproval $approval) use ($actor) {
+                                return $actor->hasRole($approval->policy?->required_role ?? '');
+                            });
+
+                        if ($matchingApproval) {
+                            $matchingApproval->update([
+                                'status' => PayrollApproval::STATUS_APPROVED,
+                                'approver_id' => $actorId,
+                                'approved_at' => now(),
+                            ]);
+                        }
+                    }
+
+                    // Check if all are now approved
+                    $pendingCount = PayrollApproval::where('payroll_id', $payroll->id)
+                        ->where('status', PayrollApproval::STATUS_PENDING)
+                        ->count();
+
+                    if ($pendingCount > 0) {
+                        // Not all approvals met — keep pending
+                        $this->activityLogger->log(
+                            $payroll->id,
+                            'approval_initiated',
+                            'Multi-step approval initiated',
+                            sprintf(
+                                'Payroll requires %d approval step(s). %d still pending.',
+                                $applicablePolicies->count(),
+                                $pendingCount
+                            ),
+                            $actorId,
+                            [
+                                'total_steps' => $applicablePolicies->count(),
+                                'pending_steps' => $pendingCount,
+                            ]
+                        );
+
+                        return $payroll->loadCount('payrollDetails');
+                    }
+                }
+            }
+
             $payroll->update([
                 'status' => 'approved',
             ]);
@@ -724,6 +791,18 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             if ($payroll->status !== 'approved') {
                 throw new \Exception('Payroll must be approved before it can be marked as paid');
+            }
+
+            // Check multi-step approval completion
+            $pendingApprovals = PayrollApproval::where('payroll_id', $payroll->id)
+                ->where('status', PayrollApproval::STATUS_PENDING)
+                ->count();
+
+            if ($pendingApprovals > 0) {
+                throw new \Exception(sprintf(
+                    'Payroll cannot be marked as paid because %d approval step(s) are still pending.',
+                    $pendingApprovals
+                ));
             }
 
             $reconciliation = $this->buildPayrollReconciliationPayload($payroll);
@@ -767,11 +846,17 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ]
             );
 
-            DB::afterCommit(function () use ($payroll) {
-                $this->emailService->sendPayrollPaidNotifications(
-                    $payroll->id,
-                    PayrollNotificationDelivery::TRIGGER_AUTO_PAID
-                );
+            $correctionCount = (int) $payroll->correction_count;
+
+            DB::afterCommit(function () use ($payroll, $correctionCount) {
+                if ($correctionCount > 0) {
+                    $this->sendCorrectionNotifications($payroll, $correctionCount);
+                } else {
+                    $this->emailService->sendPayrollPaidNotifications(
+                        $payroll->id,
+                        PayrollNotificationDelivery::TRIGGER_AUTO_PAID
+                    );
+                }
             });
 
             return [
@@ -809,10 +894,12 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             $previousStatus = $payroll->status;
             $previousPaymentDate = optional($payroll->payment_date)?->format('Y-m-d');
+            $newCorrectionCount = ((int) $payroll->correction_count) + 1;
 
             $payroll->update([
                 'status' => 'pending',
                 'payment_date' => null,
+                'correction_count' => $newCorrectionCount,
             ]);
 
             $this->activityLogger->log(
@@ -825,6 +912,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'reason' => trim($reason),
                     'previous_status' => $previousStatus,
                     'previous_payment_date' => $previousPaymentDate,
+                    'correction_count' => $newCorrectionCount,
                 ]
             );
 
@@ -1085,6 +1173,90 @@ class PayrollRepository implements PayrollRepositoryInterface
                 $deductionRateChange = round($lastDeductionRate - $firstDeductionRate, 4);
             }
 
+            // Enhanced analytics: BPJS contribution trend
+            $bpjsTrendRows = Payroll::query()
+                ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
+                ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
+                ->limit($months)
+                ->get([
+                    DB::raw('DATE(payrolls.salary_month) as salary_month'),
+                    DB::raw('COALESCE(SUM(payroll_details.bpjs_tk_employee), 0) as bpjs_tk_employee_total'),
+                    DB::raw('COALESCE(SUM(payroll_details.bpjs_tk_employer), 0) as bpjs_tk_employer_total'),
+                    DB::raw('COALESCE(SUM(payroll_details.bpjs_kes_employee), 0) as bpjs_kes_employee_total'),
+                    DB::raw('COALESCE(SUM(payroll_details.bpjs_kes_employer), 0) as bpjs_kes_employer_total'),
+                ])
+                ->keyBy('salary_month');
+
+            // Enhanced analytics: top deduction reasons
+            $deductionReasonRows = Payroll::query()
+                ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
+                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereDate('payrolls.salary_month', '>=', $firstTrend['salary_month'] ?? now()->subMonths($months)->toDateString())
+                ->get([
+                    DB::raw('COALESCE(SUM(payroll_details.absent_days), 0) as total_absent_days'),
+                    DB::raw('COALESCE(SUM(payroll_details.half_day_count), 0) as total_half_days'),
+                    DB::raw('COALESCE(SUM(payroll_details.unpaid_leave_days), 0) as total_unpaid_leave_days'),
+                    DB::raw('COALESCE(SUM(payroll_details.deduction_amount), 0) as total_deduction_amount'),
+                ])
+                ->first();
+
+            $topDeductionReasons = [
+                ['reason' => 'absent', 'days' => (int) ($deductionReasonRows->total_absent_days ?? 0)],
+                ['reason' => 'half_day', 'days' => (int) ($deductionReasonRows->total_half_days ?? 0)],
+                ['reason' => 'unpaid_leave', 'days' => (int) ($deductionReasonRows->total_unpaid_leave_days ?? 0)],
+            ];
+
+            usort($topDeductionReasons, fn ($a, $b) => $b['days'] <=> $a['days']);
+
+            // Build enhanced trends with BPJS data
+            $enhancedTrends = $trends->map(function ($trend) use ($bpjsTrendRows) {
+                $bpjsRow = $bpjsTrendRows->get($trend['salary_month']);
+
+                $bpjsEmployeeTotal = $bpjsRow
+                    ? round((float) $bpjsRow->bpjs_tk_employee_total + (float) $bpjsRow->bpjs_kes_employee_total, 2)
+                    : 0;
+                $bpjsEmployerTotal = $bpjsRow
+                    ? round((float) $bpjsRow->bpjs_tk_employer_total + (float) $bpjsRow->bpjs_kes_employer_total, 2)
+                    : 0;
+
+                return [
+                    ...$trend,
+                    'bpjs_employee_total' => $bpjsEmployeeTotal,
+                    'bpjs_employer_total' => $bpjsEmployerTotal,
+                    'bpjs_combined_total' => round($bpjsEmployeeTotal + $bpjsEmployerTotal, 2),
+                ];
+            })->values();
+
+            // Average salary trend and headcount vs payroll growth
+            $averageSalaryTrend = $enhancedTrends->map(fn ($t) => [
+                'salary_month' => $t['salary_month'],
+                'label' => $t['label'],
+                'average_salary' => $t['average_salary'],
+            ])->values()->all();
+
+            $headcountVsPayrollGrowth = $enhancedTrends->map(fn ($t) => [
+                'salary_month' => $t['salary_month'],
+                'label' => $t['label'],
+                'employee_count' => $t['employee_count'],
+                'total_amount' => $t['total_amount'],
+            ])->values()->all();
+
+            $bpjsContributionTrend = $enhancedTrends->map(fn ($t) => [
+                'salary_month' => $t['salary_month'],
+                'label' => $t['label'],
+                'bpjs_employee_total' => $t['bpjs_employee_total'],
+                'bpjs_employer_total' => $t['bpjs_employer_total'],
+                'bpjs_combined_total' => $t['bpjs_combined_total'],
+            ])->values()->all();
+
+            $totalDeductionsTrend = $enhancedTrends->map(fn ($t) => [
+                'salary_month' => $t['salary_month'],
+                'label' => $t['label'],
+                'total_deductions' => $t['total_deductions'],
+            ])->values()->all();
+
             return [
                 'periods_requested' => $months,
                 'periods_returned' => $trends->count(),
@@ -1111,7 +1283,12 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'headcount_change' => $headcountChange,
                     'deduction_rate_change' => $deductionRateChange,
                 ],
-                'trends' => $trends->all(),
+                'trends' => $enhancedTrends->all(),
+                'average_salary_trend' => $averageSalaryTrend,
+                'total_deductions_trend' => $totalDeductionsTrend,
+                'headcount_vs_payroll_growth' => $headcountVsPayrollGrowth,
+                'bpjs_contribution_trend' => $bpjsContributionTrend,
+                'top_deduction_reasons' => $topDeductionReasons,
             ];
         });
     }
@@ -1262,6 +1439,214 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->get();
     }
 
+    public function getSettingVersionDiff(int $versionId): array
+    {
+        $version = PayrollSettingVersion::with('updatedBy')->findOrFail($versionId);
+
+        $previousVersion = PayrollSettingVersion::query()
+            ->where('payroll_setting_id', $version->payroll_setting_id)
+            ->where('version_number', '<', $version->version_number)
+            ->orderByDesc('version_number')
+            ->first();
+
+        $trackedFields = PayrollSetting::VERSIONED_FIELDS;
+        $changes = [];
+
+        if ($previousVersion) {
+            foreach ($trackedFields as $field) {
+                $oldValue = $previousVersion->{$field};
+                $newValue = $version->{$field};
+
+                $normalizedOld = $this->normalizeVersionFieldValue($field, $oldValue);
+                $normalizedNew = $this->normalizeVersionFieldValue($field, $newValue);
+
+                if ($normalizedOld !== $normalizedNew) {
+                    $changes[] = [
+                        'field' => $field,
+                        'old_value' => $oldValue,
+                        'new_value' => $newValue,
+                    ];
+                }
+            }
+        }
+
+        return [
+            'version_id' => $version->id,
+            'version_number' => (int) $version->version_number,
+            'effective_at' => $version->effective_at?->toIso8601String(),
+            'updated_by' => $version->updatedBy ? [
+                'id' => $version->updatedBy->id,
+                'name' => $version->updatedBy->name,
+            ] : null,
+            'previous_version_number' => $previousVersion ? (int) $previousVersion->version_number : null,
+            'has_previous' => $previousVersion !== null,
+            'changes' => $changes,
+        ];
+    }
+
+    private function normalizeVersionFieldValue(string $field, mixed $value): string
+    {
+        if ($field === 'absent_deduction_rate') {
+            return number_format((float) $value, 2, '.', '');
+        }
+
+        if ($field === 'note_template') {
+            return trim((string) ($value ?? ''));
+        }
+
+        return (string) ($value ?? '');
+    }
+
+    public function getApprovalPolicies(): Collection
+    {
+        return PayrollApprovalPolicy::query()
+            ->orderBy('approval_order')
+            ->get();
+    }
+
+    public function createApprovalPolicy(array $data): PayrollApprovalPolicy
+    {
+        return PayrollApprovalPolicy::create($data);
+    }
+
+    public function updateApprovalPolicy(int $id, array $data): PayrollApprovalPolicy
+    {
+        $policy = PayrollApprovalPolicy::findOrFail($id);
+        $policy->update($data);
+
+        return $policy;
+    }
+
+    public function deleteApprovalPolicy(int $id): void
+    {
+        $policy = PayrollApprovalPolicy::findOrFail($id);
+        $policy->delete();
+    }
+
+    public function getApprovalStatus(string $payrollId): array
+    {
+        $payroll = Payroll::findOrFail($payrollId);
+
+        $approvals = PayrollApproval::with(['policy', 'approver'])
+            ->where('payroll_id', $payroll->id)
+            ->orderBy('id')
+            ->get();
+
+        $allApproved = $approvals->isNotEmpty() && $approvals->every(fn (PayrollApproval $a) => $a->status === PayrollApproval::STATUS_APPROVED);
+        $hasRejection = $approvals->contains(fn (PayrollApproval $a) => $a->status === PayrollApproval::STATUS_REJECTED);
+
+        return [
+            'payroll_id' => (int) $payroll->id,
+            'is_multi_step' => $approvals->isNotEmpty(),
+            'all_approved' => $allApproved,
+            'has_rejection' => $hasRejection,
+            'approvals' => $approvals->map(function (PayrollApproval $approval) {
+                return [
+                    'id' => $approval->id,
+                    'policy_name' => $approval->policy?->name,
+                    'required_role' => $approval->policy?->required_role,
+                    'approval_order' => $approval->policy?->approval_order,
+                    'status' => $approval->status,
+                    'approver' => $approval->approver ? [
+                        'id' => $approval->approver->id,
+                        'name' => $approval->approver->name,
+                    ] : null,
+                    'notes' => $approval->notes,
+                    'approved_at' => $approval->approved_at?->toIso8601String(),
+                ];
+            })->all(),
+        ];
+    }
+
+    public function submitApprovalDecision(string $payrollId, array $data, ?int $actorId = null): array
+    {
+        return DB::transaction(function () use ($payrollId, $data, $actorId) {
+            $payroll = Payroll::query()
+                ->whereKey($payrollId)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if (! in_array($payroll->status, ['pending', 'approved'], true)) {
+                throw new \Exception('Payroll must be pending or approved to submit approval decisions');
+            }
+
+            $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
+
+            if ($approvals->isEmpty()) {
+                throw new \Exception('No approval steps found for this payroll');
+            }
+
+            // Find the next pending approval for the actor's role
+            $actor = $actorId ? User::find($actorId) : null;
+            $targetApproval = null;
+
+            foreach ($approvals as $approval) {
+                if ($approval->status !== PayrollApproval::STATUS_PENDING) {
+                    continue;
+                }
+
+                $requiredRole = $approval->policy?->required_role;
+                if ($actor && $requiredRole && $actor->hasRole($requiredRole)) {
+                    $targetApproval = $approval;
+                    break;
+                }
+            }
+
+            if (! $targetApproval) {
+                throw new \Exception('No pending approval step found for your role');
+            }
+
+            $status = $data['status']; // 'approved' or 'rejected'
+            $targetApproval->update([
+                'status' => $status,
+                'approver_id' => $actorId,
+                'notes' => $data['notes'] ?? null,
+                'approved_at' => $status === PayrollApproval::STATUS_APPROVED ? now() : null,
+            ]);
+
+            $this->activityLogger->log(
+                $payroll->id,
+                'approval_decision',
+                'Approval decision submitted',
+                sprintf(
+                    'Approval step "%s" was %s.',
+                    $targetApproval->policy?->name ?? 'Unknown',
+                    $status
+                ),
+                $actorId,
+                [
+                    'approval_id' => $targetApproval->id,
+                    'policy_name' => $targetApproval->policy?->name,
+                    'decision' => $status,
+                ]
+            );
+
+            // Check if all approvals are now approved
+            $allApproved = PayrollApproval::where('payroll_id', $payroll->id)
+                ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
+                ->doesntExist();
+
+            if ($allApproved && $payroll->status === 'pending') {
+                $payroll->update(['status' => 'approved']);
+
+                $this->activityLogger->log(
+                    $payroll->id,
+                    'approved',
+                    'Payroll approved via multi-step approval',
+                    'All required approval steps have been completed.',
+                    $actorId
+                );
+
+                DB::afterCommit(function () use ($payroll, $actorId) {
+                    $actorName = $actorId ? User::find($actorId)?->name : null;
+                    $this->emailService->sendPayrollApprovedNotification($payroll, $actorName);
+                });
+            }
+
+            return $this->getApprovalStatus($payrollId);
+        });
+    }
+
     public function getMyPayslipsPaginated(
         int $staffMemberId,
         ?string $search,
@@ -1318,6 +1703,20 @@ class PayrollRepository implements PayrollRepositoryInterface
         $payslip->setRelation('appliedAdjustments', $appliedAdjustments);
 
         return $payslip;
+    }
+
+    private function sendCorrectionNotifications(Payroll $payroll, int $correctionCount): void
+    {
+        $details = PayrollDetail::with(['staffMember.user'])
+            ->where('payroll_id', $payroll->id)
+            ->get();
+
+        foreach ($details as $detail) {
+            $user = $detail->staffMember?->user;
+            if ($user) {
+                $user->notify(new PayrollCorrected($detail, $correctionCount));
+            }
+        }
     }
 
     private function buildGenerateReadiness(Carbon $month): array

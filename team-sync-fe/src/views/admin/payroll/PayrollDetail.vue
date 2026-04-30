@@ -189,6 +189,9 @@ const notificationDeliveryRate = computed(() => {
 const hasFailedDeliveries = computed(() => {
   return (notificationDeliverySummary.value?.failed_count ?? 0) > 0;
 });
+const correctionCount = computed(() => payroll.value?.correction_count ?? 0);
+const isCorrected = computed(() => correctionCount.value > 0);
+
 const payrollSettingsVersion = computed(
   () => payroll.value?.payroll_setting_version ?? null
 );
@@ -876,9 +879,18 @@ const handleApprovePayroll = () => {
             This payroll draft references settings {{ payrollSettingsVersionLabel }}.
           </p>
         </div>
-        <span class="inline-flex rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">
-          {{ payrollSettingsVersionLabel }}
-        </span>
+        <div class="flex items-center gap-2">
+          <span
+            v-if="isCorrected"
+            data-testid="payroll-correction-badge"
+            class="inline-flex rounded-full bg-amber-100 px-2 py-1 text-xs font-semibold text-amber-700"
+          >
+            Corrected ×{{ correctionCount }}
+          </span>
+          <span class="inline-flex rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">
+            {{ payrollSettingsVersionLabel }}
+          </span>
+        </div>
       </div>
     </template>
 
@@ -1193,7 +1205,18 @@ const handleApprovePayroll = () => {
                 </p>
               </div>
             </div>
-            <span class="px-2 py-1 rounded-full bg-gray-100 text-gray-700 text-xs font-semibold uppercase">
+            <span
+              :class="[
+                'px-2 py-1 rounded-full text-xs font-semibold uppercase',
+                log.event_type === 'reopened_for_correction'
+                  ? 'bg-amber-100 text-amber-700'
+                  : log.event_type === 'approved'
+                    ? 'bg-green-100 text-green-700'
+                    : log.event_type === 'marked_paid'
+                      ? 'bg-blue-100 text-blue-700'
+                      : 'bg-gray-100 text-gray-700',
+              ]"
+            >
               {{ log.event_type.replaceAll("_", " ") }}
             </span>
           </div>
@@ -1211,6 +1234,16 @@ const handleApprovePayroll = () => {
           <h3 class="text-brand-dark text-lg font-bold">Settings Used</h3>
           <p class="text-brand-light text-sm font-normal mt-1">
             Immutable payroll settings reference used when this payroll draft was generated.
+          </p>
+          <p
+            v-if="payrollSettingsVersion?.effective_at"
+            data-testid="payroll-settings-version-effective-date"
+            class="text-brand-dark text-sm font-semibold mt-2"
+          >
+            Settings Version #{{ payrollSettingsVersion.version_number }}
+            <span class="text-brand-light font-normal">
+              (effective {{ new Date(payrollSettingsVersion.effective_at).toLocaleDateString("id-ID", { year: "numeric", month: "long", day: "numeric" }) }})
+            </span>
           </p>
         </div>
         <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">

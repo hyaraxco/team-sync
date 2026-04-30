@@ -24,7 +24,7 @@ class PayrollSettingController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history', 'bpjsRateHistory', 'bpjsValidation']),
+            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history', 'versionDiff', 'bpjsRateHistory', 'bpjsValidation']),
             new Middleware(PermissionMiddleware::using(['payroll-edit']), only: ['update']),
         ];
     }
@@ -64,6 +64,25 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 PayrollSettingVersionResource::collection($versions),
                 200
             );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function versionDiff(int $id)
+    {
+        try {
+            $diff = $this->payrollRepository->getSettingVersionDiff($id);
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Version Diff Retrieved Successfully',
+                $diff,
+                200
+            );
+        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Version Not Found', null, 404);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);

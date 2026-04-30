@@ -24,6 +24,7 @@ class PayrollFactory extends Factory
             'payroll_setting_version_id' => null,
             'payment_date' => $status === 'paid' ? fake()->dateTimeBetween($salaryMonth, $salaryMonth . ' +1 month') : null,
             'status' => $status,
+            'correction_count' => 0,
         ];
     }
 }
