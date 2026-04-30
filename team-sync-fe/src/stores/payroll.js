@@ -499,6 +499,86 @@ export const usePayrollStore = defineStore("payroll", {
             }
         },
 
+        async fetchSettingVersionDiff(versionId) {
+            try {
+                const response = await axiosInstance.get(`/payroll-settings/versions/${versionId}/diff`);
+
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async fetchApprovalPolicies() {
+            try {
+                const response = await axiosInstance.get('/payroll-approval-policies');
+
+                return response.data.data ?? [];
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async createApprovalPolicy(payload) {
+            try {
+                const response = await axiosInstance.post('/payroll-approval-policies', payload);
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async updateApprovalPolicy(id, payload) {
+            try {
+                const response = await axiosInstance.put(`/payroll-approval-policies/${id}`, payload);
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async deleteApprovalPolicy(id) {
+            try {
+                const response = await axiosInstance.delete(`/payroll-approval-policies/${id}`);
+
+                this.success = response.data.message;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async fetchPayrollApprovals(payrollId) {
+            try {
+                const response = await axiosInstance.get(`/payrolls/${payrollId}/approvals`);
+
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async submitPayrollApproval(payrollId, payload) {
+            try {
+                const response = await axiosInstance.post(`/payrolls/${payrollId}/approvals`, payload);
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
         async fetchBpjsRateHistory() {
             try {
                 const response = await axiosInstance.get('/payroll-settings/bpjs-rate-history');

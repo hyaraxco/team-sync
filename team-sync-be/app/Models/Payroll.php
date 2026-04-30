@@ -17,6 +17,7 @@ class Payroll extends Model
         'payment_date',
         'status',
         'processed_count',
+        'correction_count',
     ];
 
     protected function casts(): array
@@ -50,5 +51,10 @@ class Payroll extends Model
     public function notificationDeliveries()
     {
         return $this->hasMany(PayrollNotificationDelivery::class)->orderByDesc('id');
+    }
+
+    public function approvals()
+    {
+        return $this->hasMany(PayrollApproval::class)->orderBy('id');
     }
 }

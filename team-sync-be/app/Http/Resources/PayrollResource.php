@@ -29,6 +29,7 @@ class PayrollResource extends JsonResource
             ),
             'payment_date' => $this->payment_date,
             'status' => $this->status,
+            'correction_count' => (int) ($this->correction_count ?? 0),
 
             // Only include full details if relationship is loaded
             'payroll_details' => PayrollDetailResource::collection($this->whenLoaded('payrollDetails')),

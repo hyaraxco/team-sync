@@ -13,6 +13,7 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\PayrollApprovalPolicyController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PayrollSettingController;
 use App\Http\Controllers\PayslipController;
@@ -133,6 +134,7 @@ Route::prefix('v1')
             Route::get('payrolls/analytics', [PayrollController::class, 'getAnalytics']);
             Route::get('payroll-settings', [PayrollSettingController::class, 'show']);
             Route::get('payroll-settings/history', [PayrollSettingController::class, 'history']);
+            Route::get('payroll-settings/versions/{id}/diff', [PayrollSettingController::class, 'versionDiff']);
             Route::get('payroll-settings/bpjs-rate-history', [PayrollSettingController::class, 'bpjsRateHistory']);
             Route::get('payroll-settings/bpjs-validation', [PayrollSettingController::class, 'bpjsValidation']);
             Route::put('payroll-settings', [PayrollSettingController::class, 'update']);
@@ -154,6 +156,12 @@ Route::prefix('v1')
             Route::post('payrolls/{id}/mark-as-paid', [PayrollController::class, 'markAsPaid']);
             Route::post('payrolls/{id}/reopen', [PayrollController::class, 'reopenPayroll']);
             Route::post('payrolls/{id}/resend-notifications', [PayrollController::class, 'resendNotifications']);
+            Route::get('payrolls/{id}/approvals', [PayrollApprovalPolicyController::class, 'getApprovalStatus']);
+            Route::post('payrolls/{id}/approvals', [PayrollApprovalPolicyController::class, 'submitApproval']);
+            Route::get('payroll-approval-policies', [PayrollApprovalPolicyController::class, 'index']);
+            Route::post('payroll-approval-policies', [PayrollApprovalPolicyController::class, 'store']);
+            Route::put('payroll-approval-policies/{id}', [PayrollApprovalPolicyController::class, 'update']);
+            Route::delete('payroll-approval-policies/{id}', [PayrollApprovalPolicyController::class, 'destroy']);
             Route::put('payroll-details/{id}', [PayrollController::class, 'updateDetail']);
             Route::apiResource('payrolls', PayrollController::class)->only(['index', 'show']);
             Route::get('my-payslips', [PayslipController::class, 'index']);
