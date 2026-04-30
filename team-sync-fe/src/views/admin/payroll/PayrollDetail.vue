@@ -18,6 +18,10 @@ import {
   Settings,
   Activity,
   UserCheck,
+  ShieldCheck,
+  XCircle,
+  Minus,
+  Bell,
 } from "lucide-vue-next";
 import { debounce } from "lodash";
 import Pagination from "@/components/admin/payroll/Pagination.vue";
@@ -84,6 +88,54 @@ const showAdjustmentDetailsModal = ref(false);
 
 const activeTab = ref("employees");
 
+// Reconciliation resolution modal state
+const showResolveExceptionModal = ref(false);
+const resolvingException = ref(false);
+const resolveExceptionTarget = ref(null);
+const resolveExceptionForm = ref({
+  resolution_action: "acknowledged",
+  reason: "",
+});
+
+const openResolveExceptionModal = (exception) => {
+  resolveExceptionTarget.value = exception;
+  resolveExceptionForm.value = { resolution_action: "acknowledged", reason: "" };
+  showResolveExceptionModal.value = true;
+};
+
+const closeResolveExceptionModal = () => {
+  showResolveExceptionModal.value = false;
+  resolveExceptionTarget.value = null;
+};
+
+const handleResolveException = async () => {
+  if (!resolveExceptionTarget.value || resolveExceptionForm.value.reason.trim().length < 10) {
+    return;
+  }
+
+  resolvingException.value = true;
+
+  try {
+    await payrollStore.resolveReconciliationException(route.params.id, {
+      staff_member_id: resolveExceptionTarget.value.staff_member_id,
+      exception_type: resolveExceptionTarget.value.type,
+      resolution_action: resolveExceptionForm.value.resolution_action,
+      reason: resolveExceptionForm.value.reason.trim(),
+    });
+
+    toast.success("Exception Resolved", "Reconciliation exception has been resolved successfully.");
+    closeResolveExceptionModal();
+    await fetchPayrollReconciliation();
+  } catch (error) {
+    toast.error(
+      "Failed to resolve exception",
+      payrollStore.error || error?.response?.data?.message || "An error occurred.",
+    );
+  } finally {
+    resolvingException.value = false;
+  }
+};
+
 const selectedAdjustmentItems = computed(
   () => selectedAdjustmentEmployee.value?.adjustments || []
 );
@@ -116,7 +168,7 @@ const displayedReconciliationIssueCount = computed(() =>
   )
 );
 const hasCriticalReconciliationIssue = computed(
-  () => (reconciliationSummary.value?.critical_count ?? 0) > 0
+  () => (reconciliationSummary.value?.unresolved_critical_count ?? reconciliationSummary.value?.critical_count ?? 0) > 0
 );
 const canTriggerMarkAsPaid = computed(
   () => canMarkPayrollAsPaid.value && !hasCriticalReconciliationIssue.value
@@ -127,6 +179,16 @@ const notificationDeliverySummary = computed(
 const latestNotificationDeliveries = computed(
   () => notificationDeliveries.value?.latest_by_employee ?? []
 );
+const notificationDeliveryRate = computed(() => {
+  const summary = notificationDeliverySummary.value;
+  if (!summary) {
+    return 0;
+  }
+  return Number(summary.delivery_rate ?? 0);
+});
+const hasFailedDeliveries = computed(() => {
+  return (notificationDeliverySummary.value?.failed_count ?? 0) > 0;
+});
 const payrollSettingsVersion = computed(
   () => payroll.value?.payroll_setting_version ?? null
 );
@@ -595,6 +657,14 @@ const getReconciliationSeverityClass = (severity) => {
   }
 
   return "bg-amber-100 text-amber-700";
+};
+
+const formatResolutionAction = (action) => {
+  if (!action) {
+    return "Unknown";
+  }
+
+  return action.charAt(0).toUpperCase() + action.slice(1);
 };
 
 const formatNotificationStatus = (status) => {
@@ -1323,26 +1393,51 @@ const handleApprovePayroll = () => {
             v-for="(issue, index) in filteredReconciliationExceptions"
             :key="`${issue.staff_member_id}-${issue.type}-${index}`"
             class="rounded-[12px] border border-[#DCDEDD] px-4 py-3"
+            :class="{ 'opacity-60': issue.resolution }"
+            :data-testid="`reconciliation-exception-${issue.staff_member_id}-${issue.type}`"
           >
             <div class="flex items-start justify-between gap-3">
               <div>
-                <p class="text-sm font-semibold text-brand-dark">
+                <p class="text-sm font-semibold text-brand-dark" :class="{ 'line-through': issue.resolution }">
                   {{ issue.employee_name }}
                   <span v-if="issue.employee_code" class="text-brand-light font-normal">
                     ({{ issue.employee_code }})
                   </span>
                 </p>
                 <p class="text-xs text-brand-light mt-1">{{ formatReconciliationType(issue.type) }}</p>
-                <p class="text-sm text-brand-dark mt-2">{{ issue.message }}</p>
+                <p class="text-sm text-brand-dark mt-2" :class="{ 'line-through': issue.resolution }">{{ issue.message }}</p>
+
+                <!-- Resolution badge -->
+                <div
+                  v-if="issue.resolution"
+                  data-testid="reconciliation-resolution-badge"
+                  class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-700"
+                >
+                  <ShieldCheck class="w-3.5 h-3.5" />
+                  <span>{{ formatResolutionAction(issue.resolution.action) }}</span>
+                  <span class="font-normal">by {{ issue.resolution.resolved_by_name }}</span>
+                </div>
               </div>
-              <span
-                :class="[
-                  'inline-flex rounded-full px-2 py-1 text-xs font-semibold uppercase',
-                  getReconciliationSeverityClass(issue.severity),
-                ]"
-              >
-                {{ issue.severity }}
-              </span>
+              <div class="flex flex-col items-end gap-2">
+                <span
+                  :class="[
+                    'inline-flex rounded-full px-2 py-1 text-xs font-semibold uppercase',
+                    getReconciliationSeverityClass(issue.severity),
+                  ]"
+                >
+                  {{ issue.severity }}
+                </span>
+                <button
+                  v-if="!issue.resolution && hasPayrollProcess"
+                  type="button"
+                  @click="openResolveExceptionModal(issue)"
+                  data-testid="reconciliation-resolve-btn"
+                  class="inline-flex items-center gap-1 rounded-[8px] border border-[#DCDEDD] px-2.5 py-1.5 text-xs font-semibold text-brand-dark hover:border-[#0C51D9] hover:bg-gray-50 transition-all duration-300"
+                >
+                  <ShieldCheck class="w-3.5 h-3.5" />
+                  Resolve
+                </button>
+              </div>
             </div>
           </div>
           </div>
@@ -1476,6 +1571,25 @@ const handleApprovePayroll = () => {
           class="mt-4 space-y-4"
           data-testid="payroll-notification-delivery-summary"
         >
+          <div data-testid="notification-delivery-rate" class="rounded-[12px] border border-[#DCDEDD] px-4 py-3">
+            <div class="flex items-center justify-between mb-2">
+              <p class="text-sm font-semibold text-brand-dark">Delivery Rate</p>
+              <span class="text-sm font-extrabold" :class="notificationDeliveryRate >= 80 ? 'text-green-700' : notificationDeliveryRate >= 50 ? 'text-amber-700' : 'text-red-700'">
+                {{ notificationDeliveryRate }}%
+              </span>
+            </div>
+            <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                class="h-full rounded-full transition-all duration-500"
+                :class="notificationDeliveryRate >= 80 ? 'bg-green-500' : notificationDeliveryRate >= 50 ? 'bg-amber-500' : 'bg-red-500'"
+                :style="{ width: `${notificationDeliveryRate}%` }"
+              />
+            </div>
+            <p class="mt-1 text-xs text-brand-light">
+              {{ notificationDeliverySummary.sent_count || 0 }} of {{ notificationDeliverySummary.total_recipients || 0 }} employees notified
+            </p>
+          </div>
+
           <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-[12px] border border-green-200 bg-green-50 px-3 py-3">
               <p class="text-xs uppercase tracking-wide text-green-700">Sent</p>
@@ -1530,6 +1644,27 @@ const handleApprovePayroll = () => {
           </div>
 
           <div
+            v-if="hasFailedDeliveries"
+            data-testid="notification-resend-failed"
+            class="flex items-center justify-between rounded-[12px] border border-red-200 bg-red-50 px-4 py-3"
+          >
+            <div class="flex items-center gap-2">
+              <XCircle class="w-4 h-4 text-red-600" />
+              <p class="text-sm text-red-700">
+                {{ notificationDeliverySummary.failed_count }} notification(s) failed to deliver.
+              </p>
+            </div>
+            <button
+              type="button"
+              @click="openResendNotificationsModal"
+              data-testid="notification-resend-failed-btn"
+              class="rounded-[8px] border border-red-300 bg-white px-3 py-1.5 text-xs font-semibold text-red-700 hover:bg-red-100 transition-all duration-300"
+            >
+              Resend to Failed
+            </button>
+          </div>
+
+          <div
             v-if="latestNotificationDeliveries.length > 0"
             class="space-y-2"
             data-testid="payroll-notification-delivery-list"
@@ -1543,27 +1678,47 @@ const handleApprovePayroll = () => {
               class="rounded-[12px] border border-[#DCDEDD] px-3 py-3"
             >
               <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-sm font-semibold text-brand-dark">
-                    {{ delivery.employee_name || 'Unknown Employee' }}
-                    <span v-if="delivery.employee_code" class="text-brand-light font-normal">
-                      ({{ delivery.employee_code }})
-                    </span>
-                  </p>
-                  <p class="mt-1 text-xs text-brand-light">
-                    {{ delivery.recipient_email || 'No recipient email' }}
-                  </p>
-                  <p class="mt-2 text-xs text-brand-light">
-                    Trigger {{ formatNotificationTrigger(delivery.trigger_type) }} •
-                    Attempts {{ delivery.attempt_count || 0 }}
-                  </p>
-                  <p
-                    v-if="delivery.payslip_path"
-                    data-testid="payroll-notification-deeplink"
-                    class="mt-1 text-xs text-blue-700"
-                  >
-                    Payslip deep-link: {{ delivery.payslip_path }}
-                  </p>
+                <div class="flex items-start gap-3">
+                  <div class="mt-0.5">
+                    <CheckCircle
+                      v-if="delivery.delivery_status === 'sent'"
+                      class="w-5 h-5 text-green-600"
+                      data-testid="notification-status-icon-sent"
+                    />
+                    <XCircle
+                      v-else-if="delivery.delivery_status === 'failed'"
+                      class="w-5 h-5 text-red-600"
+                      data-testid="notification-status-icon-failed"
+                    />
+                    <Minus
+                      v-else
+                      class="w-5 h-5 text-gray-400"
+                      data-testid="notification-status-icon-skipped"
+                    />
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-brand-dark">
+                      {{ delivery.employee_name || 'Unknown Employee' }}
+                      <span v-if="delivery.employee_code" class="text-brand-light font-normal">
+                        ({{ delivery.employee_code }})
+                      </span>
+                    </p>
+                    <p class="mt-1 text-xs text-brand-light">
+                      {{ delivery.recipient_email || 'No recipient email' }}
+                    </p>
+                    <p class="mt-2 text-xs text-brand-light">
+                      Trigger {{ formatNotificationTrigger(delivery.trigger_type) }} •
+                      Attempts {{ delivery.attempt_count || 0 }}
+                      <span v-if="delivery.sent_at"> • Sent {{ formatNotificationTime(delivery.sent_at) }}</span>
+                    </p>
+                    <p
+                      v-if="delivery.payslip_path"
+                      data-testid="payroll-notification-deeplink"
+                      class="mt-1 text-xs text-blue-700"
+                    >
+                      Payslip deep-link: {{ delivery.payslip_path }}
+                    </p>
+                  </div>
                 </div>
                 <span
                   :class="[
@@ -1574,7 +1729,7 @@ const handleApprovePayroll = () => {
                   {{ formatNotificationStatus(delivery.delivery_status) }}
                 </span>
               </div>
-              <p v-if="delivery.failure_reason" class="mt-2 text-xs text-red-600">
+              <p v-if="delivery.failure_reason" class="mt-2 ml-8 text-xs text-red-600">
                 {{ delivery.failure_reason }}
               </p>
             </div>
@@ -1726,6 +1881,16 @@ const handleApprovePayroll = () => {
           will update the status and record the payment date.
         </p>
 
+        <div
+          data-testid="payroll-mark-paid-notification-info"
+          class="mb-4 rounded-[12px] border border-blue-200 bg-blue-50 px-4 py-3 flex items-start gap-3"
+        >
+          <Bell class="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+          <p class="text-blue-700 text-sm">
+            Employee notifications will be sent automatically once payroll is marked as paid.
+          </p>
+        </div>
+
         <div>
           <label class="block text-brand-dark text-sm font-semibold mb-2">
             Payment Date *
@@ -1835,6 +2000,77 @@ const handleApprovePayroll = () => {
           <button
             @click="closeReopenPayrollModal"
             :disabled="reopeningPayroll"
+            class="flex-1 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <span class="text-brand-dark text-sm font-semibold">Cancel</span>
+          </button>
+        </div>
+      </template>
+    </ModalWrapper>
+
+    <!-- Resolve Reconciliation Exception Modal -->
+    <ModalWrapper
+      :show="showResolveExceptionModal"
+      title="Resolve Reconciliation Exception"
+      maxWidth="md"
+      @close="closeResolveExceptionModal"
+    >
+      <div data-testid="reconciliation-resolve-modal" class="space-y-4">
+        <p class="text-brand-light text-sm">
+          Resolve the exception for
+          <span class="font-semibold text-brand-dark">{{ resolveExceptionTarget?.employee_name }}</span>
+          ({{ formatReconciliationType(resolveExceptionTarget?.type) }}).
+        </p>
+
+        <div>
+          <label class="block text-brand-dark text-sm font-semibold mb-2">
+            Resolution Action *
+          </label>
+          <select
+            v-model="resolveExceptionForm.resolution_action"
+            data-testid="reconciliation-resolve-action"
+            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+          >
+            <option value="acknowledged">Acknowledged</option>
+            <option value="resolved">Resolved</option>
+            <option value="waived">Waived</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-brand-dark text-sm font-semibold mb-2">
+            Reason *
+          </label>
+          <textarea
+            v-model="resolveExceptionForm.reason"
+            rows="4"
+            maxlength="500"
+            data-testid="reconciliation-resolve-reason"
+            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300 resize-none"
+            placeholder="Explain why this exception is being resolved (minimum 10 characters)."
+          />
+          <p class="text-brand-light text-xs mt-2">
+            {{ resolveExceptionForm.reason.trim().length }}/500 characters (minimum 10)
+          </p>
+        </div>
+      </div>
+
+      <template #footer>
+        <div class="flex items-center gap-3">
+          <button
+            @click="handleResolveException"
+            :disabled="resolvingException || resolveExceptionForm.reason.trim().length < 10"
+            data-testid="reconciliation-resolve-confirm"
+            class="flex-1 btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <ShieldCheck class="w-4 h-4 text-white" />
+            <span class="text-brand-white text-sm font-semibold">
+              {{ resolvingException ? "Resolving..." : "Confirm Resolution" }}
+            </span>
+          </button>
+          <button
+            @click="closeResolveExceptionModal"
+            :disabled="resolvingException"
             class="flex-1 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <span class="text-brand-dark text-sm font-semibold">Cancel</span>

@@ -3,6 +3,7 @@ import { onMounted, computed } from "vue";
 import { useDashboardStore } from "@/stores/dashboard";
 import { storeToRefs } from "pinia";
 import { User, Clock, Wifi, AlertCircle } from "lucide-vue-next";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 
 const dashboardStore = useDashboardStore();
 const { todayAttendance, todayAttendanceLoading } = storeToRefs(dashboardStore);
@@ -123,14 +124,10 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
         >
           <div class="relative">
             <img
-              v-if="employee.profile_photo"
-              :src="employee.profile_photo"
+              :src="employee.profile_photo || DEFAULT_AVATAR"
               :alt="employee.name"
               class="w-8 h-8 rounded-full object-cover"
             />
-            <div v-else class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-              <User class="w-4 h-4 text-gray-400" />
-            </div>
             <span
               class="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white"
               :class="getStatusConfig(employee.status).dot"
@@ -165,14 +162,10 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
           >
             <div class="relative">
               <img
-                v-if="employee.profile_photo"
-                :src="employee.profile_photo"
+                :src="employee.profile_photo || DEFAULT_AVATAR"
                 :alt="employee.name"
                 class="w-8 h-8 rounded-full object-cover grayscale"
               />
-              <div v-else class="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
-                <User class="w-4 h-4 text-gray-400" />
-              </div>
             </div>
             <div class="flex-1 min-w-0">
               <p class="text-sm font-medium text-gray-500 truncate">{{ employee.name }}</p>

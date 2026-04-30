@@ -1,5 +1,6 @@
 <script setup>
 import { ref, onMounted, watch, computed } from "vue";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import {
   X,
   User,
@@ -885,17 +886,10 @@ watch(
                   >
                     <div class="flex items-center gap-3">
                       <img
-                        :src="selectedAssignee?.user?.profile_photo"
+                        :src="selectedAssignee?.user?.profile_photo || DEFAULT_AVATAR"
                         :alt="selectedAssignee?.user?.name"
                         class="w-10 h-10 rounded-full object-cover"
-                        v-if="selectedAssignee?.user?.profile_photo"
                       />
-                      <div
-                        class="w-10 h-10 rounded-full flex items-center justify-center bg-gray-100"
-                        v-else
-                      >
-                        <User class="w-4 h-4 text-gray-400" />
-                      </div>
                       <div class="flex-1">
                         <h4 class="text-sm font-semibold text-gray-900">
                           {{ selectedAssignee?.user?.name }}
@@ -964,17 +958,10 @@ watch(
                         class="w-full p-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
                       >
                         <img
-                          :src="employee.user?.profile_photo"
+                          :src="employee.user?.profile_photo || DEFAULT_AVATAR"
                           :alt="employee.user?.name"
                           class="w-8 h-8 rounded-full object-cover"
-                          v-if="employee.user?.profile_photo"
                         />
-                        <div
-                          class="w-8 h-8 rounded-full flex items-center justify-center bg-gray-100"
-                          v-else
-                        >
-                          <User class="w-3 h-3 text-gray-400" />
-                        </div>
                         <div class="flex-1 min-w-0">
                           <p class="text-sm font-medium text-gray-900 truncate">
                             {{ employee.user?.name }}

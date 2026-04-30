@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Input, TextArea } from "@/components/common/form";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import {
   User,
   Mail,
@@ -110,23 +111,16 @@ const showPasswordConfirmation = ref(false);
         </div>
 
         <div class="flex flex-col items-center">
-          <!-- Photo Placeholder -->
-          <div
-            v-if="!form.profile_photo_url"
-            class="w-48 h-48 bg-gray-100 border-2 border-dashed border-[#DCDEDD] rounded-full flex items-center justify-center mb-4"
-          >
-            <Camera class="w-16 h-16 text-gray-400" />
-          </div>
-
-          <!-- Selected Photo Container -->
-          <div v-else class="mb-4">
+          <!-- Photo Preview -->
+          <div class="mb-4">
             <div class="relative w-48 h-48">
               <img
-                :src="form.profile_photo_url"
+                :src="form.profile_photo_url || DEFAULT_AVATAR"
                 alt="Profile"
                 class="w-48 h-48 rounded-full object-cover border-2 border-[#DCDEDD]"
               />
               <button
+                v-if="form.profile_photo_url"
                 type="button"
                 @click="deletePhoto"
                 class="absolute -top-2 -right-2 w-8 h-8 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors flex items-center justify-center"

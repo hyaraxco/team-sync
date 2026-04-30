@@ -1,5 +1,5 @@
 <script setup>
-import { formatToClientTimezone } from "@/helpers/format";
+import { formatToClientTimezone, DEFAULT_AVATAR } from "@/helpers/format";
 import { can } from "@/helpers/permissionHelper";
 import _ from "lodash";
 import { Calendar, Crown, Edit, Eye, FileText, User } from "lucide-vue-next";
@@ -62,17 +62,9 @@ const navigateToDetail = () => {
     <div class="border-t border-[#DCDEDD] pt-4 mb-4" v-if="data.leader">
       <div class="flex items-center gap-3">
         <img
-          :src="data.leader?.user?.profile_photo"
+          :src="data.leader?.user?.profile_photo || DEFAULT_AVATAR"
           class="w-10 h-10 rounded-full object-cover"
-          v-if="data.leader?.user?.profile_photo"
         />
-
-        <div
-          class="w-10 h-10 rounded-[12px] flex items-center justify-center bg-gray-100"
-          v-else
-        >
-          <User class="w-5 h-5 text-gray-400" />
-        </div>
 
         <div class="flex-1">
           <h5 class="text-brand-dark text-sm font-semibold">

@@ -14,6 +14,7 @@ import { storeToRefs } from "pinia";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import _ from "lodash";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
@@ -395,17 +396,10 @@ onUnmounted(() => {
             @click="toggleAccountMenu"
           >
             <img
-              :src="user?.profile_photo"
+              :src="user?.profile_photo || DEFAULT_AVATAR"
               alt="User Avatar"
               class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
-              v-if="user?.profile_photo"
             />
-            <div
-              class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gray-100"
-              v-else
-            >
-              <UserIcon class="w-5 h-5 text-gray-400" />
-            </div>
             <div class="hidden md:block text-left">
               <p class="text-brand-dark text-sm sm:text-base font-semibold">
                 {{ user?.name }}

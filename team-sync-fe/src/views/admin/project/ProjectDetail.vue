@@ -16,6 +16,7 @@ import { useRoute } from "vue-router";
 import router from "@/router";
 import { onMounted, ref, computed } from "vue";
 import { formatDate, calculateDuration } from "@/utils/dateUtils";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import { formatRupiah } from "@/utils/formatUtils";
 import {
   getPriorityColor,
@@ -245,17 +246,10 @@ onMounted(async () => {
               <div class="mt-4 pt-4 border-t border-[#DCDEDD]">
                 <div v-if="team.leader" class="flex items-center gap-3">
                   <img
-                    v-if="team.leader.profile_photo"
-                    :src="team.leader.profile_photo"
+                    :src="team.leader.profile_photo || DEFAULT_AVATAR"
                     :alt="team.leader.name"
                     class="w-9 h-9 rounded-full object-cover"
                   />
-                  <div
-                    v-else
-                    class="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center"
-                  >
-                    <User class="w-4 h-4 text-gray-400" />
-                  </div>
                   <div class="flex-1">
                     <p class="text-brand-dark text-sm font-semibold">
                       {{ team.leader.name }}
@@ -294,17 +288,10 @@ onMounted(async () => {
 
         <div v-if="project.leader" class="flex items-center gap-4">
           <img
-            :src="project.leader?.user?.profile_photo"
+            :src="project.leader?.user?.profile_photo || DEFAULT_AVATAR"
             :alt="project.leader?.user?.name"
             class="w-16 h-16 rounded-full object-cover"
-            v-if="project.leader?.user?.profile_photo"
           />
-          <div
-            class="w-12 h-12 rounded-[12px] flex items-center justify-center bg-gray-100"
-            v-else
-          >
-            <User class="w-5 h-5 text-gray-400" />
-          </div>
           <div class="flex-1">
             <h4 class="text-brand-dark text-md font-bold mb-1">
               {{ project.leader?.user?.name }}

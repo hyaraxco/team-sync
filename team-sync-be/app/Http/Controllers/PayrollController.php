@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exports\PayrollExport;
 use App\Exports\PayrollReportExport;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\ResolveReconciliationExceptionRequest;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\PayrollActivityLogResource;
 use App\Http\Resources\PayrollDetailResource;
@@ -36,10 +37,10 @@ class PayrollController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['payroll-list']), only: ['index', 'getAllPaginated', 'show', 'getDetails', 'getReconciliation', 'exportExcel', 'exportReport', 'getActivityLogs']),
-            new Middleware(PermissionMiddleware::using(['payroll-create']), only: ['generate', 'generateReadiness', 'readinessDashboard']),
+            new Middleware(PermissionMiddleware::using(['payroll-list']), only: ['index', 'getAllPaginated', 'show', 'getDetails', 'getReconciliation', 'getReconciliationResolutions', 'exportExcel', 'exportReport', 'getActivityLogs']),
+            new Middleware(PermissionMiddleware::using(['payroll-create']), only: ['generate', 'generateReadiness', 'readinessDashboard', 'readinessTeamSummary']),
             new Middleware(PermissionMiddleware::using(['payroll-edit']), only: ['updateDetail', 'approvePayroll']),
-            new Middleware(PermissionMiddleware::using(['payroll-process']), only: ['markAsPaid', 'reopenPayroll', 'resendNotifications', 'getNotificationDeliveries']),
+            new Middleware(PermissionMiddleware::using(['payroll-process']), only: ['markAsPaid', 'reopenPayroll', 'resendNotifications', 'getNotificationDeliveries', 'resolveReconciliationException']),
             new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['getStatistics', 'getAnalytics', 'getPayrollStatistics']),
         ];
     }
@@ -156,6 +157,51 @@ class PayrollController extends Controller implements HasMiddleware
         }
     }
 
+    public function resolveReconciliationException(ResolveReconciliationExceptionRequest $request, string $id)
+    {
+        try {
+            $resolution = $this->payrollRepository->resolveReconciliationException(
+                $id,
+                $request->validated(),
+                $request->user()?->id
+            );
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Reconciliation exception resolved successfully',
+                $resolution,
+                200
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function getReconciliationResolutions(string $id)
+    {
+        try {
+            $resolutions = $this->payrollRepository->getReconciliationResolutions($id);
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Reconciliation resolutions retrieved successfully',
+                $resolutions,
+                200
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
     public function generateReadiness(Request $request)
     {
         $validated = $request->validate([
@@ -187,6 +233,30 @@ class PayrollController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(
                 true,
                 'Payroll readiness dashboard retrieved successfully.',
+                $payload,
+                200
+            );
+        } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::warning('PayrollController domain exception: ' . $e->getMessage());
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function readinessTeamSummary(Request $request)
+    {
+        $validated = $request->validate([
+            'salary_month' => 'required|date_format:Y-m',
+        ]);
+
+        try {
+            $payload = $this->payrollRepository->getReadinessTeamSummary($validated['salary_month']);
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Payroll readiness team summary retrieved successfully.',
                 $payload,
                 200
             );
