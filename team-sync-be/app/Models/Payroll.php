@@ -16,6 +16,7 @@ class Payroll extends Model
         'payroll_setting_version_id',
         'payment_date',
         'status',
+        'processed_count',
     ];
 
     protected function casts(): array

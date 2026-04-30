@@ -6,6 +6,7 @@ import { Play, UserCheck, Edit3, X, User } from 'lucide-vue-next';
 import { storeToRefs } from 'pinia';
 import MainCard from '@/components/common/MainCard.vue';
 import { useToast } from '@/composables/useToast';
+import { DEFAULT_AVATAR } from '@/helpers/format';
 
 const props = defineProps({
   cycle: {
@@ -87,7 +88,7 @@ const assignReviewer = async () => {
 };
 
 const getAvatarUrl = (user) => {
-    return user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'U')}&background=random`;
+    return user?.avatar || DEFAULT_AVATAR;
 };
 </script>
 

@@ -5,6 +5,7 @@ namespace App\Services\Payroll;
 use App\Models\BpjsRate;
 use App\Models\PtkpAmount;
 use App\Models\TaxBracket;
+use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
 class TaxCalculationService
@@ -20,6 +21,11 @@ class TaxCalculationService
     protected const JABATAN_MAX_ANNUAL = 6_000_000;
 
     protected const JABATAN_MAX_MONTHLY = 500_000;
+
+    /**
+     * Number of months after which BPJS rates are considered potentially outdated.
+     */
+    protected const BPJS_RATE_STALENESS_MONTHS = 12;
 
     public function __construct()
     {
@@ -163,6 +169,159 @@ class TaxCalculationService
                 'pkp' => round($pkpRoundedDown, 2),
                 'pph21_annual' => round($pph21Annual, 2),
             ],
+        ];
+    }
+
+    /**
+     * Validate BPJS rates for staleness and completeness.
+     *
+     * @return array{
+     *     is_valid: bool,
+     *     warnings: array<int, array{component: string, type: string, message: string}>,
+     *     rates: array<string, array{
+     *         component: string,
+     *         effective_date: ?string,
+     *         valid_until: ?string,
+     *         is_expired: bool,
+     *         is_potentially_outdated: bool
+     *     }>
+     * }
+     */
+    public function validateBpjsRates(): array
+    {
+        $rates = BpjsRate::all()->keyBy('component');
+        $warnings = [];
+        $rateDetails = [];
+        $now = Carbon::now();
+
+        $expectedComponents = ['jht', 'jkk', 'jkm', 'jp', 'bpjs_kesehatan'];
+        $missingComponents = array_diff($expectedComponents, $rates->keys()->all());
+
+        foreach ($missingComponents as $component) {
+            $warnings[] = [
+                'component' => $component,
+                'type' => 'missing_component',
+                'message' => sprintf('BPJS component "%s" is not configured in the database.', $component),
+            ];
+        }
+
+        foreach ($rates as $component => $rate) {
+            $effectiveDate = $rate->effective_date;
+            $validUntil = $rate->valid_until;
+            $isExpired = false;
+            $isPotentiallyOutdated = false;
+
+            // Check if rate has expired based on valid_until
+            if ($validUntil && Carbon::parse($validUntil)->lt($now)) {
+                $isExpired = true;
+                $warnings[] = [
+                    'component' => $component,
+                    'type' => 'expired',
+                    'message' => sprintf(
+                        'BPJS rate for "%s" expired on %s. Please update with the latest government regulation.',
+                        $rate->description ?? $component,
+                        Carbon::parse($validUntil)->format('d M Y')
+                    ),
+                ];
+            }
+
+            // Check staleness: effective_date > BPJS_RATE_STALENESS_MONTHS ago
+            if ($effectiveDate) {
+                $monthsSinceEffective = Carbon::parse($effectiveDate)->diffInMonths($now);
+                if ($monthsSinceEffective >= static::BPJS_RATE_STALENESS_MONTHS) {
+                    $isPotentiallyOutdated = true;
+                    $warnings[] = [
+                        'component' => $component,
+                        'type' => 'potentially_outdated',
+                        'message' => sprintf(
+                            'BPJS rate for "%s" has been effective since %s (%d months ago). Consider verifying against the latest regulation.',
+                            $rate->description ?? $component,
+                            Carbon::parse($effectiveDate)->format('d M Y'),
+                            $monthsSinceEffective
+                        ),
+                    ];
+                }
+            } elseif (! $effectiveDate && ! $validUntil) {
+                // No date fields set — fall back to updated_at staleness check
+                $updatedAt = $rate->updated_at;
+                if ($updatedAt) {
+                    $monthsSinceUpdate = Carbon::parse($updatedAt)->diffInMonths($now);
+                    if ($monthsSinceUpdate >= static::BPJS_RATE_STALENESS_MONTHS) {
+                        $isPotentiallyOutdated = true;
+                        $warnings[] = [
+                            'component' => $component,
+                            'type' => 'potentially_outdated',
+                            'message' => sprintf(
+                                'BPJS rate for "%s" was last updated %d months ago. Consider verifying against the latest regulation.',
+                                $rate->description ?? $component,
+                                $monthsSinceUpdate
+                            ),
+                        ];
+                    }
+                }
+            }
+
+            $rateDetails[$component] = [
+                'component' => $component,
+                'description' => $rate->description,
+                'employee_rate' => (float) $rate->employee_rate,
+                'employer_rate' => (float) $rate->employer_rate,
+                'max_salary_base' => $rate->max_salary_base !== null ? (float) $rate->max_salary_base : null,
+                'effective_date' => $effectiveDate ? Carbon::parse($effectiveDate)->toDateString() : null,
+                'valid_until' => $validUntil ? Carbon::parse($validUntil)->toDateString() : null,
+                'is_expired' => $isExpired,
+                'is_potentially_outdated' => $isPotentiallyOutdated,
+            ];
+        }
+
+        return [
+            'is_valid' => empty($warnings),
+            'warnings' => $warnings,
+            'rates' => $rateDetails,
+        ];
+    }
+
+    /**
+     * Get BPJS cap warnings for a given gross salary.
+     * Returns which salary caps are being applied and their impact.
+     *
+     * @return array{
+     *     gross_salary: float,
+     *     caps_applied: array<int, array{
+     *         component: string,
+     *         description: ?string,
+     *         cap_amount: float,
+     *         salary_exceeds_cap: bool,
+     *         excess_amount: float,
+     *         capped_base: float
+     *     }>
+     * }
+     */
+    public function getBpjsCapWarnings(float $grossSalary): array
+    {
+        $capsApplied = [];
+
+        foreach ($this->bpjsRates as $component => $rate) {
+            if ($rate->max_salary_base === null) {
+                continue;
+            }
+
+            $capAmount = (float) $rate->max_salary_base;
+            $exceedsCap = $grossSalary > $capAmount;
+
+            $capsApplied[] = [
+                'component' => $component,
+                'description' => $rate->description,
+                'cap_amount' => $capAmount,
+                'salary_exceeds_cap' => $exceedsCap,
+                'excess_amount' => $exceedsCap ? round($grossSalary - $capAmount, 2) : 0,
+                'capped_base' => $exceedsCap ? $capAmount : $grossSalary,
+            ];
+        }
+
+        return [
+            'gross_salary' => round($grossSalary, 2),
+            'caps_applied' => $capsApplied,
         ];
     }
 }

@@ -27,6 +27,7 @@ import {
 } from "lucide-vue-next";
 import { onMounted, ref, watch } from "vue";
 import { debounce } from "lodash";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import { useTeamStore } from "@/stores/team";
 import { useOptionStore } from "@/stores/option";
 import { useStaffMemberStore } from "@/stores/staffMember";
@@ -328,17 +329,10 @@ watch(
               >
                 <div class="flex items-center gap-3">
                   <img
-                    :src="selectedLead?.user?.profile_photo"
+                    :src="selectedLead?.user?.profile_photo || DEFAULT_AVATAR"
                     alt="Lead Photo"
                     class="w-12 h-12 rounded-full object-cover"
-                    v-if="selectedLead?.user?.profile_photo"
                   />
-                  <div
-                    class="w-12 h-12 rounded-[12px] flex items-center justify-center bg-gray-100"
-                    v-else
-                  >
-                    <User class="w-5 h-5 text-gray-400" />
-                  </div>
                   <div class="flex-1">
                     <h4 class="text-brand-dark text-base font-semibold">
                       {{ selectedLead?.user?.name }}
@@ -712,18 +706,10 @@ watch(
                 class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden"
               >
                 <img
-                  :src="employee.user?.profile_photo"
+                  :src="employee.user?.profile_photo || DEFAULT_AVATAR"
                   alt="Sarah Johnson"
                   class="w-14 h-14 rounded-[12px] object-cover"
-                  v-if="employee.user?.profile_photo"
                 />
-
-                <div
-                  class="w-14 h-14 rounded-[12px] flex items-center justify-center bg-gray-100"
-                  v-else
-                >
-                  <User class="w-5 h-5 text-gray-400" />
-                </div>
               </div>
               <div class="flex-1">
                 <h4 class="text-brand-dark text-base font-bold">

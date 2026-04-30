@@ -1,5 +1,6 @@
 <script setup>
 import { can } from "@/helpers/permissionHelper";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import _ from "lodash";
 import { Building, User, Calendar, Eye, Edit } from "lucide-vue-next";
 import { useRouter } from "vue-router";
@@ -33,17 +34,10 @@ const goToDetail = () => {
     <div class="flex flex-col items-center mb-3">
       <div class="relative">
         <img
-          :src="data?.user?.profile_photo"
+          :src="data?.user?.profile_photo || DEFAULT_AVATAR"
           alt="Sarah Johnson"
           class="w-20 h-20 rounded-full object-cover mb-3"
-          v-if="data?.user?.profile_photo"
         />
-        <div
-          class="w-20 h-20 rounded-full flex items-center justify-center bg-gray-100"
-          v-else
-        >
-          <User class="w-5 h-5 text-gray-400" />
-        </div>
         <!-- Active Badge Overlapped at Bottom -->
         <span
           class="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md text-xs font-semibold bg-[#F0FDF4] text-[#166534]"

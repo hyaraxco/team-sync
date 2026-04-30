@@ -25,7 +25,13 @@ interface PayrollRepositoryInterface
 
     public function getReadinessDashboard(string $salaryMonth): array;
 
+    public function getReadinessTeamSummary(string $salaryMonth): array;
+
     public function getReconciliation(string $payrollId, array $filters = []): array;
+
+    public function resolveReconciliationException(string $payrollId, array $data, ?int $actorId = null): array;
+
+    public function getReconciliationResolutions(string $payrollId): array;
 
     public function updatePayrollDetail(string $id, array $data, ?int $actorId = null);
 

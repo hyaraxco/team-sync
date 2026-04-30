@@ -16,6 +16,15 @@ export default [
         },
     },
     {
+        path: 'payroll/readiness',
+        name: 'admin.payroll.readiness',
+        component: () => import('@/views/admin/payroll/PayrollReadiness.vue'),
+        meta: {
+            requiredPermission: 'payroll-create',
+            requiresAuth: true,
+        },
+    },
+    {
         path: 'payroll/create',
         name: 'admin.payroll.create',
         component: PayrollCreate,

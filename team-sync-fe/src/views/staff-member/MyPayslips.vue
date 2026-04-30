@@ -390,11 +390,24 @@ const clearSearch = () => {
         class="text-center py-12 text-gray-500"
       >
         <FileText class="w-16 h-16 mx-auto mb-4 text-gray-300" />
-        <p class="text-lg font-semibold">No payroll history found</p>
-        <p class="text-sm">
-          Your payroll periods for {{ filters.year }} will appear here once they
-          are processed.
-        </p>
+        <template v-if="filters.year === currentYear">
+          <p class="text-lg font-semibold" data-testid="my-payroll-empty-processing">
+            Your payslip is being processed
+          </p>
+          <p class="text-sm">
+            Payroll for the current period is still being prepared. You will be
+            notified once it is ready.
+          </p>
+        </template>
+        <template v-else>
+          <p class="text-lg font-semibold" data-testid="my-payroll-empty-none">
+            No payslip available for this period
+          </p>
+          <p class="text-sm">
+            There are no payroll records for {{ filters.year }}. Try selecting a
+            different year.
+          </p>
+        </template>
       </div>
 
       <Pagination

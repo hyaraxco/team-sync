@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Models\PayrollReconciliationResolution;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -44,8 +45,59 @@ class PayrollResource extends JsonResource
                 return $this->payrollDetails->sum('final_salary');
             }),
 
+            // Lightweight reconciliation summary for dashboard badges
+            'reconciliation_summary' => $this->whenLoaded('payrollDetails', function () {
+                if (! in_array($this->status, ['pending', 'approved'], true)) {
+                    return null;
+                }
+
+                return $this->computeLightweightReconciliationSummary();
+            }),
+
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
+        ];
+    }
+
+    private function computeLightweightReconciliationSummary(): array
+    {
+        $criticalCount = 0;
+        $warningCount = 0;
+
+        foreach ($this->payrollDetails as $detail) {
+            $bankInfo = $detail->staffMember?->bankInformation;
+            $hasMissingBank = ! $bankInfo
+                || blank($bankInfo->bank_name)
+                || blank($bankInfo->account_number)
+                || blank($bankInfo->account_holder_name);
+
+            if ($hasMissingBank) {
+                $criticalCount++;
+            }
+
+            if ((float) $detail->final_salary <= 0) {
+                $criticalCount++;
+            }
+
+            $originalSalary = (float) $detail->original_salary;
+            $finalSalary = (float) $detail->final_salary;
+            if ($originalSalary > 0 && $finalSalary > 0 && $finalSalary < ($originalSalary * 0.5)) {
+                $warningCount++;
+            }
+        }
+
+        // Subtract resolved critical exceptions
+        $resolvedCriticalCount = PayrollReconciliationResolution::query()
+            ->where('payroll_id', $this->id)
+            ->whereIn('exception_type', ['missing_bank_account', 'zero_salary'])
+            ->count();
+
+        $unresolvedCriticalCount = max(0, $criticalCount - $resolvedCriticalCount);
+
+        return [
+            'critical_count' => $criticalCount,
+            'unresolved_critical_count' => $unresolvedCriticalCount,
+            'warning_count' => $warningCount,
         ];
     }
 }

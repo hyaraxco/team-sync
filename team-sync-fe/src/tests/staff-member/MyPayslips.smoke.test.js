@@ -188,9 +188,9 @@ describe("MyPayslips smoke", () => {
     const wrapper = factory();
     await flushAsync();
 
-    expect(wrapper.text()).toContain("No payroll history found");
+    expect(wrapper.text()).toContain("Your payslip is being processed");
     expect(wrapper.get('[data-testid="my-payroll-empty"]').text()).toContain(
-      String(new Date().getFullYear())
+      "notified once it is ready"
     );
   });
 

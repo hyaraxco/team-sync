@@ -4,6 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
+use App\Models\PayrollReconciliationResolution;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Notifications\PayrollPaid;
@@ -178,6 +179,158 @@ class PayrollReconciliationTest extends TestCase
         );
         $this->assertContains('missing_bank_account', $typePayload['available_types'] ?? []);
         $this->assertSame('excessive_deduction', $typePayload['applied_filters']['type'] ?? null);
+    }
+
+    public function test_zero_salary_exception_is_detected_when_final_salary_is_zero(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll] = $this->createApprovedPayrollDetail(
+            withBankInformation: true,
+            originalSalary: 10000000,
+            finalSalary: 0
+        );
+
+        $response = $this->getJson("/api/v1/payrolls/{$payroll->id}/reconciliation")
+            ->assertOk();
+
+        $exceptions = $response->json('data.exceptions') ?? [];
+        $zeroSalaryExceptions = array_filter($exceptions, fn ($e) => $e['type'] === 'zero_salary');
+
+        $this->assertNotEmpty($zeroSalaryExceptions);
+        $this->assertSame('critical', array_values($zeroSalaryExceptions)[0]['severity']);
+    }
+
+    public function test_salary_decrease_anomaly_warning_is_detected_when_final_below_50_percent(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll] = $this->createApprovedPayrollDetail(
+            withBankInformation: true,
+            originalSalary: 10000000,
+            finalSalary: 4000000
+        );
+
+        $response = $this->getJson("/api/v1/payrolls/{$payroll->id}/reconciliation")
+            ->assertOk();
+
+        $exceptions = $response->json('data.exceptions') ?? [];
+        $anomalyExceptions = array_filter($exceptions, fn ($e) => $e['type'] === 'salary_decrease_anomaly');
+
+        $this->assertNotEmpty($anomalyExceptions);
+        $this->assertSame('warning', array_values($anomalyExceptions)[0]['severity']);
+    }
+
+    public function test_resolving_an_exception_creates_a_resolution_record(): void
+    {
+        $finance = $this->actingAsRole('finance');
+        [$payroll, $employee] = $this->createApprovedPayrollDetail(withBankInformation: false);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/reconciliation/resolve", [
+            'staff_member_id' => $employee->id,
+            'exception_type' => 'missing_bank_account',
+            'resolution_action' => 'acknowledged',
+            'reason' => 'Bank information will be updated before next payroll cycle.',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.resolution_action', 'acknowledged')
+            ->assertJsonPath('data.staff_member_id', $employee->id)
+            ->assertJsonPath('data.exception_type', 'missing_bank_account');
+
+        $this->assertDatabaseHas('payroll_reconciliation_resolutions', [
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $employee->id,
+            'exception_type' => 'missing_bank_account',
+            'resolution_action' => 'acknowledged',
+            'resolved_by' => $finance->id,
+        ]);
+    }
+
+    public function test_resolved_critical_exceptions_do_not_block_mark_as_paid(): void
+    {
+        $finance = $this->actingAsRole('finance');
+        [$payroll, $employee, $employeeUser] = $this->createApprovedPayrollDetail(withBankInformation: false);
+
+        // Resolve the critical exception
+        PayrollReconciliationResolution::create([
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $employee->id,
+            'exception_type' => 'missing_bank_account',
+            'resolution_action' => 'waived',
+            'reason' => 'Employee will receive payment via cash transfer this month.',
+            'resolved_by' => $finance->id,
+        ]);
+
+        // Now mark as paid should succeed
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
+            'payment_date' => '2026-05-30',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'paid');
+
+        Notification::assertSentTo($employeeUser, PayrollPaid::class);
+    }
+
+    public function test_unresolved_critical_exceptions_still_block_mark_as_paid(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll] = $this->createApprovedPayrollDetail(withBankInformation: false);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
+            'payment_date' => '2026-05-30',
+        ])
+            ->assertStatus(400);
+
+        $this->assertSame('approved', $payroll->fresh()->status);
+    }
+
+    public function test_resolution_history_endpoint_returns_correct_data(): void
+    {
+        $finance = $this->actingAsRole('finance');
+        [$payroll, $employee] = $this->createApprovedPayrollDetail(withBankInformation: false);
+
+        PayrollReconciliationResolution::create([
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $employee->id,
+            'exception_type' => 'missing_bank_account',
+            'resolution_action' => 'resolved',
+            'reason' => 'Bank information has been updated in the system.',
+            'resolved_by' => $finance->id,
+        ]);
+
+        $response = $this->getJson("/api/v1/payrolls/{$payroll->id}/reconciliation/resolutions")
+            ->assertOk();
+
+        $resolutions = $response->json('data');
+        $this->assertCount(1, $resolutions);
+        $this->assertSame('missing_bank_account', $resolutions[0]['exception_type']);
+        $this->assertSame('resolved', $resolutions[0]['resolution_action']);
+        $this->assertSame($finance->name, $resolutions[0]['resolved_by_name']);
+    }
+
+    public function test_reconciliation_payload_includes_resolution_info_for_resolved_exceptions(): void
+    {
+        $finance = $this->actingAsRole('finance');
+        [$payroll, $employee] = $this->createApprovedPayrollDetail(withBankInformation: false);
+
+        PayrollReconciliationResolution::create([
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $employee->id,
+            'exception_type' => 'missing_bank_account',
+            'resolution_action' => 'acknowledged',
+            'reason' => 'Will be fixed before next cycle.',
+            'resolved_by' => $finance->id,
+        ]);
+
+        $response = $this->getJson("/api/v1/payrolls/{$payroll->id}/reconciliation")
+            ->assertOk();
+
+        $exceptions = $response->json('data.exceptions') ?? [];
+        $bankException = collect($exceptions)->firstWhere('type', 'missing_bank_account');
+
+        $this->assertNotNull($bankException);
+        $this->assertNotNull($bankException['resolution']);
+        $this->assertSame('acknowledged', $bankException['resolution']['action']);
+        $this->assertSame($finance->name, $bankException['resolution']['resolved_by_name']);
+        $this->assertSame(0, $response->json('data.summary.unresolved_critical_count'));
     }
 
     private function actingAsRole(string $roleName): User
