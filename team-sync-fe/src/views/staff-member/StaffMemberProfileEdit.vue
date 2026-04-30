@@ -4,6 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import Input from "@/components/common/form/Input.vue";
 import { User as UserIcon, Mail, Lock, Upload } from "lucide-vue-next";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 
 const authStore = useAuthStore();
 const { user, loading, error, success } = storeToRefs(authStore);
@@ -149,15 +150,10 @@ const handleSubmit = async () => {
                     class="w-32 h-32 relative z-10 flex items-center justify-center"
                   >
                     <img
-                      :src="form.profile_photo_url"
+                      :src="form.profile_photo_url || DEFAULT_AVATAR"
                       alt="Profile Photo"
                       class="w-16 h-16 object-cover rounded-full"
-                      v-if="form.profile_photo_url"
                     />
-                    <div
-                      class="w-16 h-16 rounded-full bg-gray-100"
-                      v-else
-                    ></div>
                   </div>
                 </div>
               </div>

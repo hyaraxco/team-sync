@@ -47,8 +47,8 @@ describe('Team Store', () => {
         expect(result).toEqual(mockTeam);
     });
 
-    it('createTeam calls POST and sets success message', async () => {
-        const payload = { name: 'Platform Team' };
+    it('createTeam calls POST with FormData and sets success message', async () => {
+        const payload = { name: 'Platform Team', responsibilities: ['Build', 'Ship', 'Maintain'] };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
                 message: 'Team created',
@@ -58,13 +58,16 @@ describe('Team Store', () => {
 
         await store.createTeam(payload);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('teams', payload);
+        expect(axiosInstance.post).toHaveBeenCalledWith('teams', expect.any(FormData));
+        const formData = axiosInstance.post.mock.calls[0][1];
+        expect(formData.get('name')).toBe('Platform Team');
+        expect(formData.getAll('responsibilities[]')).toEqual(['Build', 'Ship', 'Maintain']);
         expect(store.success).toBe('Team created');
         expect(store.loading).toBe(false);
     });
 
-    it('updateTeam calls POST with PUT method override and sets success', async () => {
-        const payload = { name: 'Updated Team' };
+    it('updateTeam calls POST with FormData including PUT method override and sets success', async () => {
+        const payload = { name: 'Updated Team', responsibilities: ['Lead', 'Deliver', 'Review'] };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
                 message: 'Team updated',
@@ -74,10 +77,10 @@ describe('Team Store', () => {
 
         await store.updateTeam(21, payload);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('teams/21', {
-            ...payload,
-            _method: 'PUT',
-        });
+        expect(axiosInstance.post).toHaveBeenCalledWith('teams/21', expect.any(FormData));
+        const formData = axiosInstance.post.mock.calls[0][1];
+        expect(formData.get('name')).toBe('Updated Team');
+        expect(formData.get('_method')).toBe('PUT');
         expect(store.success).toBe('Team updated');
     });
 

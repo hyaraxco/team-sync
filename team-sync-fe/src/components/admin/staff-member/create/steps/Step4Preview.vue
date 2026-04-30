@@ -6,6 +6,7 @@ import {
   CreditCard,
   CheckCircle,
 } from "lucide-vue-next";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 
 interface Props {
   step1Data: any;
@@ -110,14 +111,13 @@ const formatText = (text: string) => {
           <p class="text-brand-light text-xs font-semibold mb-1">
             Profile Photo
           </p>
-          <div v-if="step1Data.profile_photo_url">
+          <div>
             <img
-              :src="step1Data.profile_photo_url"
+              :src="step1Data.profile_photo_url || DEFAULT_AVATAR"
               alt="Profile Photo"
               class="w-20 h-20 rounded-full object-cover border-2 border-[#DCDEDD]"
             />
           </div>
-          <p v-else class="text-brand-dark text-base font-semibold">-</p>
         </div>
         <div>
           <p class="text-brand-light text-xs font-semibold mb-1">Full Name</p>

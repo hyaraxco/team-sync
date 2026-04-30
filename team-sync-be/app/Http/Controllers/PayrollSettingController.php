@@ -7,6 +7,7 @@ use App\Http\Resources\PayrollSettingResource;
 use App\Http\Resources\PayrollSettingVersionResource;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\PayrollSetting;
+use App\Services\Payroll\TaxCalculationService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -15,14 +16,15 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 class PayrollSettingController extends Controller implements HasMiddleware
 {
     public function __construct(
-        private PayrollRepositoryInterface $payrollRepository
+        private PayrollRepositoryInterface $payrollRepository,
+        private TaxCalculationService $taxCalculationService
     ) {
     }
 
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history', 'bpjsRateHistory']),
+            new Middleware(PermissionMiddleware::using(['payroll-statistics']), only: ['show', 'history', 'bpjsRateHistory', 'bpjsValidation']),
             new Middleware(PermissionMiddleware::using(['payroll-edit']), only: ['update']),
         ];
     }
@@ -131,6 +133,23 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 true,
                 'BPJS Rate History Retrieved Successfully',
                 $history,
+                200
+            );
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    public function bpjsValidation()
+    {
+        try {
+            $validation = $this->taxCalculationService->validateBpjsRates();
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'BPJS Validation Retrieved Successfully',
+                $validation,
                 200
             );
         } catch (\Throwable $e) {

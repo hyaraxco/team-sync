@@ -180,6 +180,29 @@ export const usePayrollStore = defineStore("payroll", {
             }
         },
 
+        async resolveReconciliationException(payrollId, payload) {
+            try {
+                const response = await axiosInstance.post(`/payrolls/${payrollId}/reconciliation/resolve`, payload);
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async fetchReconciliationResolutions(payrollId) {
+            try {
+                const response = await axiosInstance.get(`/payrolls/${payrollId}/reconciliation/resolutions`);
+
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
         async generatePayroll(payload) {
             this.loading = true;
 
@@ -214,6 +237,21 @@ export const usePayrollStore = defineStore("payroll", {
         async fetchReadinessDashboard(salaryMonth) {
             try {
                 const response = await axiosInstance.get('/payrolls/readiness-dashboard', {
+                    params: {
+                        salary_month: salaryMonth,
+                    },
+                });
+
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async fetchReadinessTeamSummary(salaryMonth) {
+            try {
+                const response = await axiosInstance.get('/payrolls/readiness-dashboard/team-summary', {
                     params: {
                         salary_month: salaryMonth,
                     },

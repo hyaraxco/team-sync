@@ -134,15 +134,19 @@ Route::prefix('v1')
             Route::get('payroll-settings', [PayrollSettingController::class, 'show']);
             Route::get('payroll-settings/history', [PayrollSettingController::class, 'history']);
             Route::get('payroll-settings/bpjs-rate-history', [PayrollSettingController::class, 'bpjsRateHistory']);
+            Route::get('payroll-settings/bpjs-validation', [PayrollSettingController::class, 'bpjsValidation']);
             Route::put('payroll-settings', [PayrollSettingController::class, 'update']);
             Route::get('payrolls/all/paginated', [PayrollController::class, 'getAllPaginated']);
             Route::get('payrolls/export-report', [PayrollController::class, 'exportReport']);
             Route::get('payrolls/generate-readiness', [PayrollController::class, 'generateReadiness']);
             Route::get('payrolls/readiness-dashboard', [PayrollController::class, 'readinessDashboard']);
+            Route::get('payrolls/readiness-dashboard/team-summary', [PayrollController::class, 'readinessTeamSummary']);
             Route::post('payrolls/generate', [PayrollController::class, 'generate']);
             Route::get('payrolls/{id}/statistics', [PayrollController::class, 'getPayrollStatistics']);
             Route::get('payrolls/{id}/details', [PayrollController::class, 'getDetails']); // Paginated details
             Route::get('payrolls/{id}/reconciliation', [PayrollController::class, 'getReconciliation']);
+            Route::post('payrolls/{id}/reconciliation/resolve', [PayrollController::class, 'resolveReconciliationException']);
+            Route::get('payrolls/{id}/reconciliation/resolutions', [PayrollController::class, 'getReconciliationResolutions']);
             Route::get('payrolls/{id}/activity-logs', [PayrollController::class, 'getActivityLogs']);
             Route::get('payrolls/{id}/notification-deliveries', [PayrollController::class, 'getNotificationDeliveries']);
             Route::get('payrolls/{id}/export-excel', [PayrollController::class, 'exportExcel']);

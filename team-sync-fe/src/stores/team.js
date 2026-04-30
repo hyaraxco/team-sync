@@ -2,6 +2,33 @@ import { defineStore } from "pinia";
 import { axiosInstance } from '@/plugins/axios';
 import { handleError } from "@/helpers/errorHelper";
 
+const buildTeamFormData = (payload, method = null) => {
+    const formData = new FormData();
+
+    formData.append('name', payload.name ?? '');
+    formData.append('expected_size', payload.expected_size ?? '');
+    formData.append('description', payload.description ?? '');
+    formData.append('department', payload.department ?? '');
+    formData.append('status', payload.status ?? '');
+    formData.append('team_lead_id', payload.team_lead_id ?? '');
+
+    if (Array.isArray(payload.responsibilities)) {
+        payload.responsibilities.forEach((item) => {
+            formData.append('responsibilities[]', item ?? '');
+        });
+    }
+
+    if (payload.icon instanceof File) {
+        formData.append('icon', payload.icon);
+    }
+
+    if (method) {
+        formData.append('_method', method);
+    }
+
+    return formData;
+};
+
 export const useTeamStore = defineStore("team", {
     state: () => ({
         teams: [],
@@ -91,7 +118,8 @@ export const useTeamStore = defineStore("team", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.post('teams', payload);
+                const formData = buildTeamFormData(payload);
+                const response = await axiosInstance.post('teams', formData);
 
                 this.success = response.data.message;
             } catch (error) {
@@ -105,10 +133,8 @@ export const useTeamStore = defineStore("team", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.post(`teams/${id}`, {
-                    ...payload,
-                    _method: 'PUT',
-                });
+                const formData = buildTeamFormData(payload, 'PUT');
+                const response = await axiosInstance.post(`teams/${id}`, formData);
 
                 this.success = response.data.message;
             } catch (error) {

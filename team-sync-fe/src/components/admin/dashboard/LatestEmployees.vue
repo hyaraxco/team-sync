@@ -3,6 +3,7 @@ import { onMounted, watch } from "vue";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { useRouter } from "vue-router";
 import { User } from "lucide-vue-next";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import { getTimeAgo } from "@/utils/dateUtils";
 import { storeToRefs } from "pinia";
 import EmptyState from "@/components/common/EmptyState.vue";
@@ -78,17 +79,10 @@ const goToEmployeeDetail = (id: number) => {
         class="flex flex-col sm:flex-row sm:items-center gap-3"
       >
         <img
-          :src="employee.user?.profile_photo"
+          :src="employee.user?.profile_photo || DEFAULT_AVATAR"
           :alt="employee.user?.name"
           class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover"
-          v-if="employee?.user?.profile_photo"
         />
-        <div
-          class="w-12 h-12 sm:w-20 sm:h-20 rounded-full flex items-center justify-center bg-gray-100"
-          v-else
-        >
-          <User class="w-5 h-5 text-gray-400" />
-        </div>
         <div class="flex-1">
           <div class="flex items-center gap-2 flex-wrap">
             <p class="text-brand-dark text-base sm:text-lg font-bold">

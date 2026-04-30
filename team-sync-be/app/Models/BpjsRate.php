@@ -12,6 +12,8 @@ class BpjsRate extends Model
         'employer_rate',
         'max_salary_base',
         'description',
+        'effective_date',
+        'valid_until',
     ];
 
     protected function casts(): array
@@ -20,6 +22,8 @@ class BpjsRate extends Model
             'employee_rate' => 'decimal:2',
             'employer_rate' => 'decimal:2',
             'max_salary_base' => 'decimal:2',
+            'effective_date' => 'date',
+            'valid_until' => 'date',
         ];
     }
 }

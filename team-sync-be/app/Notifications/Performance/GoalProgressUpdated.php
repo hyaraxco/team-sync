@@ -3,17 +3,18 @@
 namespace App\Notifications\Performance;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Notification;
 
-class GoalProgressUpdated extends Notification
+class GoalProgressUpdated extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public function __construct(
-        public int $goalId,
-        public string $goalTitle,
-        public string $employeeName,
-        public int $progressPercentage,
+        protected int $goalId,
+        protected string $goalTitle,
+        protected string $employeeName,
+        protected int $progressPercentage,
     ) {}
 
     public function via(object $notifiable): array
@@ -25,10 +26,13 @@ class GoalProgressUpdated extends Notification
     {
         return [
             'category' => 'performance',
-            'title' => 'Goal Progress Updated',
-            'body' => "{$this->employeeName} updated progress on goal \"{$this->goalTitle}\" to {$this->progressPercentage}%.",
+            'title' => 'Progress Goal Diperbarui',
+            'body' => "{$this->employeeName} memperbarui progress goal \"{$this->goalTitle}\" menjadi {$this->progressPercentage}%.",
             'action_url' => "/admin/performance/goals/{$this->goalId}",
             'goal_id' => $this->goalId,
+            'goal_title' => $this->goalTitle,
+            'employee_name' => $this->employeeName,
+            'progress_percentage' => $this->progressPercentage,
         ];
     }
 }

@@ -1,5 +1,6 @@
 <script setup>
 import { Clock, User } from "lucide-vue-next";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDate } from "@/utils/dateUtils";
 
@@ -59,31 +60,12 @@ const formatStatusLabel = (status) => {
     >
       <!-- Assignee Avatar -->
       <div class="flex items-center gap-2">
-        <template v-if="task.assignee">
-          <img
-            :src="task.assignee.user.profile_photo"
-            :alt="task.assignee.user.name"
-            class="w-7 h-7 rounded-full object-cover ring-2 ring-white"
-            :title="task.assignee.name"
-            v-if="task.assignee.user.profile_photo"
-          />
-
-          <div
-            class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center"
-            title="Unassigned"
-            v-else
-          >
-            <User class="w-3.5 h-3.5 text-gray-400" />
-          </div>
-        </template>
-        <template v-else>
-          <div
-            class="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center"
-            title="Unassigned"
-          >
-            <User class="w-3.5 h-3.5 text-gray-400" />
-          </div>
-        </template>
+        <img
+          :src="task.assignee?.user?.profile_photo || DEFAULT_AVATAR"
+          :alt="task.assignee?.user?.name || 'Unassigned'"
+          class="w-7 h-7 rounded-full object-cover ring-2 ring-white"
+          :title="task.assignee?.user?.name || 'Unassigned'"
+        />
       </div>
 
       <!-- Due Date -->

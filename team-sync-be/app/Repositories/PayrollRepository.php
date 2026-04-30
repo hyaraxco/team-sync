@@ -16,6 +16,7 @@ use App\Models\PayrollActivityLog;
 use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
+use App\Models\PayrollReconciliationResolution;
 use App\Models\PayrollSetting;
 use App\Models\PayrollSettingVersion;
 use App\Models\StaffMemberProfile;
@@ -170,6 +171,12 @@ class PayrollRepository implements PayrollRepositoryInterface
         return $paginated;
     }
 
+    /**
+     * Batch size for processing employees during payroll generation.
+     * Smaller than PAYROLL_BULK_INSERT_CHUNK_SIZE to limit memory during calculation.
+     */
+    private const PAYROLL_PROCESSING_BATCH_SIZE = 100;
+
     public function generatePayroll(string $salaryMonth, ?int $actorId = null): Payroll
     {
         return DB::transaction(function () use ($salaryMonth, $actorId) {
@@ -192,120 +199,58 @@ class PayrollRepository implements PayrollRepositoryInterface
                 'attendance_period_id' => $attendancePeriod->id,
                 'payroll_setting_version_id' => $settingsVersion->id,
                 'status' => 'processing',
+                'processed_count' => 0,
             ]);
 
-            $activeEmployees = StaffMemberProfile::with(['jobInformation', 'user'])
-                ->whereIn('id', $readiness['meta']['staff_member_ids_with_attendance'] ?? [])
-                ->whereHas('jobInformation', function ($query) {
-                    $query->where('status', 'active');
-                })
-                ->get();
-
+            $staffMemberIds = $readiness['meta']['staff_member_ids_with_attendance'] ?? [];
             $startOfMonth = $month->copy()->startOfMonth();
             $endOfMonth = $month->copy()->endOfMonth();
             $workingDays = $this->resolveWorkingDays($settingsVersion, $startOfMonth, $endOfMonth);
-
-            $payrollDetails = [];
             $deductionRate = (float) $settingsVersion->absent_deduction_rate;
 
-            foreach ($activeEmployees as $employee) {
-                $jobInfo = $employee->jobInformation;
-                $originalSalary = $jobInfo->monthly_salary ?? 0;
+            $totalProcessed = 0;
 
-                $fairnessSummary = $this->attendanceClassifier->summarizePeriod(
-                    $employee->id,
-                    $startOfMonth,
-                    $endOfMonth
-                );
+            // Process employees in batches to limit memory usage
+            $staffMemberIdChunks = array_chunk($staffMemberIds, self::PAYROLL_PROCESSING_BATCH_SIZE);
 
-                $effectiveWorkingDays = (int) ($fairnessSummary['effective_working_days'] ?? 0);
-                $dailySalary = (float) ($fairnessSummary['daily_rate'] ?? 0);
-                $deductionDays = (float) ($fairnessSummary['deduction_days'] ?? 0);
-                $legacyDailySalary = $workingDays > 0 ? ((float) $originalSalary / $workingDays) : 0;
-                $deduction = $deductionDays * $legacyDailySalary * $deductionRate;
-                $finalSalary = $this->applyRounding(
-                    max(0, $originalSalary - $deduction),
-                    $settingsVersion->rounding_mode,
-                    (int) $settingsVersion->rounding_unit
-                );
+            foreach ($staffMemberIdChunks as $batchIds) {
+                $batchEmployees = StaffMemberProfile::with(['jobInformation', 'user'])
+                    ->whereIn('id', $batchIds)
+                    ->whereHas('jobInformation', function ($query) {
+                        $query->where('status', 'active');
+                    })
+                    ->get();
 
-                $attendedDays = (int) ($fairnessSummary['attended_days'] ?? 0);
-                $lateDays = (int) ($fairnessSummary['late_days'] ?? 0);
-                $sickDays = (int) ($fairnessSummary['sick_days'] ?? 0);
-                $absentDays = (int) ($fairnessSummary['absent_days'] ?? 0);
-                $warningFlags = $fairnessSummary['warning_flags'] ?? [];
+                $payrollDetails = [];
 
-                // ── Tax & BPJS Calculation ────────────────────────────
-                $ptkpStatus = $employee->ptkp_status ?? null;
-                $hasNpwp = ! empty($employee->npwp);
-                $grossForTax = (float) $originalSalary;
-
-                $taxResult = $this->taxCalculationService->calculateMonthlyPph21(
-                    $grossForTax,
-                    $ptkpStatus,
-                    $hasNpwp
-                );
-
-                $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax);
-
-                $pph21Amount = $taxResult['pph21_monthly'];
-
-                // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
-                $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
-                    + ($bpjsResult['breakdown']['jp_employee'] ?? 0);
-                $bpjsTkEmployer = ($bpjsResult['breakdown']['jht_employer'] ?? 0)
-                    + ($bpjsResult['breakdown']['jkk_employer'] ?? 0)
-                    + ($bpjsResult['breakdown']['jkm_employer'] ?? 0)
-                    + ($bpjsResult['breakdown']['jp_employer'] ?? 0);
-
-                $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
-                $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
-
-                $payrollDetails[] = [
-                    'payroll_id' => $payroll->id,
-                    'staff_member_id' => $employee->id,
-                    'original_salary' => $originalSalary,
-                    'final_salary' => $finalSalary,
-                    'effective_working_days' => $effectiveWorkingDays,
-                    'daily_rate' => round($dailySalary, 2),
-                    'attended_days' => $attendedDays,
-                    'present_days' => (int) ($fairnessSummary['present_days'] ?? 0),
-                    'late_days' => $lateDays,
-                    'half_day_count' => (int) ($fairnessSummary['half_day_count'] ?? 0),
-                    'paid_leave_days' => (int) ($fairnessSummary['paid_leave_days'] ?? 0),
-                    'unpaid_leave_days' => (int) ($fairnessSummary['unpaid_leave_days'] ?? 0),
-                    'holiday_days' => (int) ($fairnessSummary['holiday_days'] ?? 0),
-                    'sick_days' => $sickDays,
-                    'absent_days' => $absentDays,
-                    'deduction_days' => round($deductionDays, 2),
-                    'deduction_amount' => round($deduction, 2),
-                    'pph21_amount' => round($pph21Amount, 2),
-                    'bpjs_tk_employee' => round($bpjsTkEmployee, 2),
-                    'bpjs_tk_employer' => round($bpjsTkEmployer, 2),
-                    'bpjs_kes_employee' => round($bpjsKesEmployee, 2),
-                    'bpjs_kes_employer' => round($bpjsKesEmployer, 2),
-                    'tax_calculation_meta' => json_encode($taxResult, JSON_THROW_ON_ERROR),
-                    'policy_mismatch_days' => (int) ($fairnessSummary['policy_mismatch_days'] ?? 0),
-                    'warning_flags' => empty($warningFlags) ? null : json_encode(array_values($warningFlags), JSON_THROW_ON_ERROR),
-                    'notes' => $this->buildPayrollNote($settingsVersion, [
-                        'working_days' => $workingDays,
-                        'attended_days' => $attendedDays,
-                        'late_days' => $lateDays,
-                        'sick_days' => $sickDays,
-                        'permission_days' => 0,
-                        'absent_days' => $absentDays,
-                        'deduction' => $deduction,
-                    ]),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ];
-            }
-
-            if (! empty($payrollDetails)) {
-                foreach (array_chunk($payrollDetails, CacheConstants::PAYROLL_BULK_INSERT_CHUNK_SIZE) as $chunk) {
-                    DB::table('payroll_details')->insert($chunk);
+                foreach ($batchEmployees as $employee) {
+                    $payrollDetails[] = $this->buildPayrollDetailRow(
+                        $employee,
+                        $payroll,
+                        $settingsVersion,
+                        $startOfMonth,
+                        $endOfMonth,
+                        $workingDays,
+                        $deductionRate
+                    );
                 }
+
+                // Bulk insert this batch
+                if (! empty($payrollDetails)) {
+                    foreach (array_chunk($payrollDetails, CacheConstants::PAYROLL_BULK_INSERT_CHUNK_SIZE) as $chunk) {
+                        DB::table('payroll_details')->insert($chunk);
+                    }
+                    $totalProcessed += count($payrollDetails);
+
+                    // Update progress on the payroll record
+                    $payroll->updateQuietly(['processed_count' => $totalProcessed]);
+                }
+
+                // Free memory from this batch
+                unset($batchEmployees, $payrollDetails);
             }
+
+            unset($staffMemberIdChunks);
 
             $appliedAdjustmentsCount = $this->applyApprovedAdjustmentsToPayroll(
                 $payroll,
@@ -330,7 +275,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 $actorId,
                 [
                     'salary_month' => $month->format('Y-m'),
-                    'employee_count' => count($payrollDetails),
+                    'employee_count' => $totalProcessed,
                     'applied_adjustments_count' => $appliedAdjustmentsCount,
                     'settings_version_id' => (int) $settingsVersion->id,
                     'settings_version_number' => (int) $settingsVersion->version_number,
@@ -358,6 +303,111 @@ class PayrollRepository implements PayrollRepositoryInterface
                 'payrollDetails.staffMember.bankInformation',
             ]);
         });
+    }
+
+    /**
+     * Build a single payroll detail row for an employee.
+     * Extracted to reduce memory footprint during batch processing.
+     */
+    private function buildPayrollDetailRow(
+        StaffMemberProfile $employee,
+        Payroll $payroll,
+        PayrollSettingVersion $settingsVersion,
+        Carbon $startOfMonth,
+        Carbon $endOfMonth,
+        int $workingDays,
+        float $deductionRate
+    ): array {
+        $jobInfo = $employee->jobInformation;
+        $originalSalary = $jobInfo->monthly_salary ?? 0;
+
+        $fairnessSummary = $this->attendanceClassifier->summarizePeriod(
+            $employee->id,
+            $startOfMonth,
+            $endOfMonth
+        );
+
+        $effectiveWorkingDays = (int) ($fairnessSummary['effective_working_days'] ?? 0);
+        $dailySalary = (float) ($fairnessSummary['daily_rate'] ?? 0);
+        $deductionDays = (float) ($fairnessSummary['deduction_days'] ?? 0);
+        $legacyDailySalary = $workingDays > 0 ? ((float) $originalSalary / $workingDays) : 0;
+        $deduction = $deductionDays * $legacyDailySalary * $deductionRate;
+        $finalSalary = $this->applyRounding(
+            max(0, $originalSalary - $deduction),
+            $settingsVersion->rounding_mode,
+            (int) $settingsVersion->rounding_unit
+        );
+
+        $attendedDays = (int) ($fairnessSummary['attended_days'] ?? 0);
+        $lateDays = (int) ($fairnessSummary['late_days'] ?? 0);
+        $sickDays = (int) ($fairnessSummary['sick_days'] ?? 0);
+        $absentDays = (int) ($fairnessSummary['absent_days'] ?? 0);
+        $warningFlags = $fairnessSummary['warning_flags'] ?? [];
+
+        // ── Tax & BPJS Calculation ────────────────────────────
+        $ptkpStatus = $employee->ptkp_status ?? null;
+        $hasNpwp = ! empty($employee->npwp);
+        $grossForTax = (float) $originalSalary;
+
+        $taxResult = $this->taxCalculationService->calculateMonthlyPph21(
+            $grossForTax,
+            $ptkpStatus,
+            $hasNpwp
+        );
+
+        $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax);
+
+        $pph21Amount = $taxResult['pph21_monthly'];
+
+        // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
+        $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
+            + ($bpjsResult['breakdown']['jp_employee'] ?? 0);
+        $bpjsTkEmployer = ($bpjsResult['breakdown']['jht_employer'] ?? 0)
+            + ($bpjsResult['breakdown']['jkk_employer'] ?? 0)
+            + ($bpjsResult['breakdown']['jkm_employer'] ?? 0)
+            + ($bpjsResult['breakdown']['jp_employer'] ?? 0);
+
+        $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
+        $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
+
+        return [
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $employee->id,
+            'original_salary' => $originalSalary,
+            'final_salary' => $finalSalary,
+            'effective_working_days' => $effectiveWorkingDays,
+            'daily_rate' => round($dailySalary, 2),
+            'attended_days' => $attendedDays,
+            'present_days' => (int) ($fairnessSummary['present_days'] ?? 0),
+            'late_days' => $lateDays,
+            'half_day_count' => (int) ($fairnessSummary['half_day_count'] ?? 0),
+            'paid_leave_days' => (int) ($fairnessSummary['paid_leave_days'] ?? 0),
+            'unpaid_leave_days' => (int) ($fairnessSummary['unpaid_leave_days'] ?? 0),
+            'holiday_days' => (int) ($fairnessSummary['holiday_days'] ?? 0),
+            'sick_days' => $sickDays,
+            'absent_days' => $absentDays,
+            'deduction_days' => round($deductionDays, 2),
+            'deduction_amount' => round($deduction, 2),
+            'pph21_amount' => round($pph21Amount, 2),
+            'bpjs_tk_employee' => round($bpjsTkEmployee, 2),
+            'bpjs_tk_employer' => round($bpjsTkEmployer, 2),
+            'bpjs_kes_employee' => round($bpjsKesEmployee, 2),
+            'bpjs_kes_employer' => round($bpjsKesEmployer, 2),
+            'tax_calculation_meta' => json_encode($taxResult, JSON_THROW_ON_ERROR),
+            'policy_mismatch_days' => (int) ($fairnessSummary['policy_mismatch_days'] ?? 0),
+            'warning_flags' => empty($warningFlags) ? null : json_encode(array_values($warningFlags), JSON_THROW_ON_ERROR),
+            'notes' => $this->buildPayrollNote($settingsVersion, [
+                'working_days' => $workingDays,
+                'attended_days' => $attendedDays,
+                'late_days' => $lateDays,
+                'sick_days' => $sickDays,
+                'permission_days' => 0,
+                'absent_days' => $absentDays,
+                'deduction' => $deduction,
+            ]),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
     }
 
     public function getGenerateReadiness(string $salaryMonth): array
@@ -405,6 +455,9 @@ class PayrollRepository implements PayrollRepositoryInterface
             'employees_with_attendance' => (int) ($readiness['meta']['active_employees_with_attendance_count'] ?? 0),
         ];
 
+        // BPJS rate validation warnings for readiness dashboard
+        $bpjsValidation = $this->taxCalculationService->validateBpjsRates();
+
         return [
             'salary_month' => (string) ($readiness['meta']['salary_month'] ?? $month->format('Y-m')),
             'attendance_period' => [
@@ -418,10 +471,76 @@ class PayrollRepository implements PayrollRepositoryInterface
                 'reason_code' => (string) ($readiness['reason_code'] ?? 'unknown'),
                 'message' => (string) ($readiness['message'] ?? ''),
             ],
+            'bpjs_validation' => [
+                'is_valid' => $bpjsValidation['is_valid'],
+                'warnings' => $bpjsValidation['warnings'],
+            ],
             'summary' => $summary,
             'employees' => $rows,
             'blocked_reasons' => $employeeRowsPayload['blocked_reasons'],
             'warning_flags' => $employeeRowsPayload['warning_flags'],
+        ];
+    }
+
+    public function getReadinessTeamSummary(string $salaryMonth): array
+    {
+        $dashboard = $this->getReadinessDashboard($salaryMonth);
+        $employees = $dashboard['employees'] ?? [];
+
+        $grouped = [];
+        $unassigned = ['total' => 0, 'ready' => 0, 'warning' => 0, 'blocked' => 0, 'covered_days' => 0, 'scheduled_days' => 0];
+
+        foreach ($employees as $employee) {
+            $teamName = $employee['team_name'] ?? null;
+            $status = $employee['status'] ?? 'ready';
+            $coveredDays = (int) ($employee['metrics']['covered_days'] ?? 0);
+            $scheduledDays = (int) ($employee['metrics']['scheduled_working_days'] ?? 0);
+
+            if ($teamName === null || $teamName === '') {
+                $unassigned['total']++;
+                $unassigned[$status] = ($unassigned[$status] ?? 0) + 1;
+                $unassigned['covered_days'] += $coveredDays;
+                $unassigned['scheduled_days'] += $scheduledDays;
+            } else {
+                if (! isset($grouped[$teamName])) {
+                    $grouped[$teamName] = ['total' => 0, 'ready' => 0, 'warning' => 0, 'blocked' => 0, 'covered_days' => 0, 'scheduled_days' => 0];
+                }
+
+                $grouped[$teamName]['total']++;
+                $grouped[$teamName][$status] = ($grouped[$teamName][$status] ?? 0) + 1;
+                $grouped[$teamName]['covered_days'] += $coveredDays;
+                $grouped[$teamName]['scheduled_days'] += $scheduledDays;
+            }
+        }
+
+        $teams = [];
+        foreach ($grouped as $teamName => $data) {
+            $teams[] = [
+                'team_name' => $teamName,
+                'total' => $data['total'],
+                'ready' => $data['ready'],
+                'warning' => $data['warning'],
+                'blocked' => $data['blocked'],
+                'coverage_pct' => $data['scheduled_days'] > 0
+                    ? round(($data['covered_days'] / $data['scheduled_days']) * 100, 1)
+                    : 0,
+            ];
+        }
+
+        usort($teams, fn (array $a, array $b) => strcmp($a['team_name'], $b['team_name']));
+
+        return [
+            'salary_month' => $dashboard['salary_month'],
+            'teams' => $teams,
+            'unassigned' => [
+                'total' => $unassigned['total'],
+                'ready' => $unassigned['ready'],
+                'warning' => $unassigned['warning'],
+                'blocked' => $unassigned['blocked'],
+                'coverage_pct' => $unassigned['scheduled_days'] > 0
+                    ? round(($unassigned['covered_days'] / $unassigned['scheduled_days']) * 100, 1)
+                    : 0,
+            ],
         ];
     }
 
@@ -435,6 +554,77 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->findOrFail($payrollId);
 
         return $this->buildPayrollReconciliationPayload($payroll, $filters);
+    }
+
+    public function resolveReconciliationException(string $payrollId, array $data, ?int $actorId = null): array
+    {
+        $payroll = Payroll::findOrFail($payrollId);
+
+        $resolution = PayrollReconciliationResolution::create([
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $data['staff_member_id'],
+            'exception_type' => $data['exception_type'],
+            'resolution_action' => $data['resolution_action'],
+            'reason' => $data['reason'],
+            'resolved_by' => $actorId,
+            'metadata' => $data['metadata'] ?? null,
+        ]);
+
+        $resolution->load('resolvedByUser');
+
+        $this->activityLogger->log(
+            $payroll->id,
+            'reconciliation_exception_resolved',
+            'Reconciliation exception resolved',
+            sprintf(
+                'Exception "%s" for staff member #%d was resolved with action "%s".',
+                $data['exception_type'],
+                $data['staff_member_id'],
+                $data['resolution_action']
+            ),
+            $actorId,
+            [
+                'staff_member_id' => $data['staff_member_id'],
+                'exception_type' => $data['exception_type'],
+                'resolution_action' => $data['resolution_action'],
+            ]
+        );
+
+        return [
+            'id' => $resolution->id,
+            'payroll_id' => $resolution->payroll_id,
+            'staff_member_id' => $resolution->staff_member_id,
+            'exception_type' => $resolution->exception_type,
+            'resolution_action' => $resolution->resolution_action,
+            'reason' => $resolution->reason,
+            'resolved_by_name' => $resolution->resolvedByUser?->name,
+            'resolved_at' => $resolution->created_at?->toIso8601String(),
+        ];
+    }
+
+    public function getReconciliationResolutions(string $payrollId): array
+    {
+        $payroll = Payroll::findOrFail($payrollId);
+
+        $resolutions = PayrollReconciliationResolution::query()
+            ->where('payroll_id', $payroll->id)
+            ->with(['resolvedByUser', 'staffMember.user'])
+            ->orderByDesc('created_at')
+            ->get();
+
+        return $resolutions->map(function (PayrollReconciliationResolution $resolution) {
+            return [
+                'id' => $resolution->id,
+                'payroll_id' => $resolution->payroll_id,
+                'staff_member_id' => $resolution->staff_member_id,
+                'employee_name' => $resolution->staffMember?->user?->name ?? 'Unknown',
+                'exception_type' => $resolution->exception_type,
+                'resolution_action' => $resolution->resolution_action,
+                'reason' => $resolution->reason,
+                'resolved_by_name' => $resolution->resolvedByUser?->name ?? 'Unknown',
+                'resolved_at' => $resolution->created_at?->toIso8601String(),
+            ];
+        })->all();
     }
 
     public function updatePayrollDetail(string $id, array $data, ?int $actorId = null): PayrollDetail
@@ -537,7 +727,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
 
             $reconciliation = $this->buildPayrollReconciliationPayload($payroll);
-            $criticalCount = (int) ($reconciliation['summary']['critical_count'] ?? 0);
+            $criticalCount = (int) ($reconciliation['summary']['unresolved_critical_count'] ?? 0);
 
             if ($criticalCount > 0) {
                 $this->activityLogger->log(
@@ -685,12 +875,21 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->orderByDesc('id')
             ->get();
 
+        $totalRecipients = (int) ($payroll->payroll_details_count ?? 0);
+        $sentCount = $deliveries->where('delivery_status', PayrollNotificationDelivery::STATUS_SENT)->count();
+        $failedCount = $deliveries->where('delivery_status', PayrollNotificationDelivery::STATUS_FAILED)->count();
+        $skippedCount = $deliveries->where('delivery_status', PayrollNotificationDelivery::STATUS_SKIPPED)->count();
+        $deliveryRate = $totalRecipients > 0
+            ? round(($sentCount / $totalRecipients) * 100, 1)
+            : 0;
+
         $summary = [
-            'total_recipients' => (int) ($payroll->payroll_details_count ?? 0),
+            'total_recipients' => $totalRecipients,
             'total_attempts' => $deliveries->count(),
-            'sent_count' => $deliveries->where('delivery_status', PayrollNotificationDelivery::STATUS_SENT)->count(),
-            'failed_count' => $deliveries->where('delivery_status', PayrollNotificationDelivery::STATUS_FAILED)->count(),
-            'skipped_count' => $deliveries->where('delivery_status', PayrollNotificationDelivery::STATUS_SKIPPED)->count(),
+            'sent_count' => $sentCount,
+            'failed_count' => $failedCount,
+            'skipped_count' => $skippedCount,
+            'delivery_rate' => $deliveryRate,
             'auto_attempt_count' => $deliveries->where('trigger_type', PayrollNotificationDelivery::TRIGGER_AUTO_PAID)->count(),
             'manual_attempt_count' => $deliveries->where('trigger_type', PayrollNotificationDelivery::TRIGGER_MANUAL_RESEND)->count(),
             'last_attempt_at' => optional($deliveries->first()?->created_at)->toIso8601String(),
@@ -1887,6 +2086,12 @@ class PayrollRepository implements PayrollRepositoryInterface
             'payrollDetails.staffMember.bankInformation',
         ]);
 
+        $resolutions = PayrollReconciliationResolution::query()
+            ->where('payroll_id', $payroll->id)
+            ->with('resolvedByUser')
+            ->get()
+            ->groupBy(fn (PayrollReconciliationResolution $r) => $r->staff_member_id . '|' . $r->exception_type);
+
         $exceptions = [];
         $criticalEmployeeIds = [];
         $warningEmployeeIds = [];
@@ -1910,6 +2115,45 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'message' => 'Employee bank account information is incomplete.',
                     'metadata' => [
                         'missing_fields' => $missingBankFields,
+                    ],
+                ];
+            }
+
+            if ((float) $payrollDetail->final_salary <= 0) {
+                $criticalEmployeeIds[] = $employeeId;
+                $exceptions[] = [
+                    'staff_member_id' => $employeeId,
+                    'employee_name' => $employeeName,
+                    'employee_code' => $employeeCode,
+                    'severity' => 'critical',
+                    'type' => 'zero_salary',
+                    'message' => 'Employee final salary is zero or negative after deductions.',
+                    'metadata' => [
+                        'original_salary' => (float) $payrollDetail->original_salary,
+                        'final_salary' => (float) $payrollDetail->final_salary,
+                        'deduction_amount' => (float) $payrollDetail->deduction_amount,
+                    ],
+                ];
+            }
+
+            $originalSalary = (float) $payrollDetail->original_salary;
+            $finalSalary = (float) $payrollDetail->final_salary;
+            if ($originalSalary > 0 && $finalSalary > 0 && $finalSalary < ($originalSalary * 0.5)) {
+                $warningEmployeeIds[] = $employeeId;
+                $exceptions[] = [
+                    'staff_member_id' => $employeeId,
+                    'employee_name' => $employeeName,
+                    'employee_code' => $employeeCode,
+                    'severity' => 'warning',
+                    'type' => 'salary_decrease_anomaly',
+                    'message' => sprintf(
+                        'Final salary is only %.1f%% of original salary, which may indicate an anomaly.',
+                        ($finalSalary / $originalSalary) * 100
+                    ),
+                    'metadata' => [
+                        'original_salary' => $originalSalary,
+                        'final_salary' => $finalSalary,
+                        'ratio' => round($finalSalary / $originalSalary, 4),
                     ],
                 ];
             }
@@ -1957,9 +2201,28 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
         }
 
+        // Attach resolution info to each exception
+        $exceptions = array_map(function (array $exception) use ($resolutions) {
+            $key = $exception['staff_member_id'] . '|' . $exception['type'];
+            $resolution = $resolutions->get($key)?->first();
+
+            $exception['resolution'] = $resolution ? [
+                'action' => $resolution->resolution_action,
+                'reason' => $resolution->reason,
+                'resolved_by_name' => $resolution->resolvedByUser?->name ?? 'Unknown',
+                'resolved_at' => $resolution->created_at?->toIso8601String(),
+            ] : null;
+
+            return $exception;
+        }, $exceptions);
+
         $totalExceptionCount = count($exceptions);
         $criticalCount = count(array_filter($exceptions, fn ($exception) => $exception['severity'] === 'critical'));
         $warningCount = count(array_filter($exceptions, fn ($exception) => $exception['severity'] === 'warning'));
+        $unresolvedCriticalCount = count(array_filter(
+            $exceptions,
+            fn ($exception) => $exception['severity'] === 'critical' && $exception['resolution'] === null
+        ));
 
         $normalizedFilters = $this->normalizeReconciliationFilters($filters);
         $filteredExceptions = $this->filterReconciliationExceptions($exceptions, $normalizedFilters);
@@ -1988,6 +2251,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 'total_exception_count' => $totalExceptionCount,
                 'filtered_exception_count' => count($filteredExceptions),
                 'critical_count' => $criticalCount,
+                'unresolved_critical_count' => $unresolvedCriticalCount,
                 'warning_count' => $warningCount,
                 'filtered_critical_count' => $filteredCriticalCount,
                 'filtered_warning_count' => $filteredWarningCount,

@@ -279,6 +279,18 @@ const handleExportReport = async () => {
               >
             </RouterLink>
 
+            <RouterLink
+              v-if="hasPayrollCreate"
+              :to="{ name: 'admin.payroll.readiness' }"
+              data-testid="payroll-readiness-link"
+              class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+            >
+              <UserCheck class="w-4 h-4 text-gray-600" />
+              <span class="text-brand-dark text-sm font-medium"
+                >Readiness Dashboard</span
+              >
+            </RouterLink>
+
             <button
               v-if="hasPayrollStatistics && hasPayrollList"
               type="button"
@@ -465,6 +477,17 @@ const handleExportReport = async () => {
                 >Create New Payroll</span
               >
             </RouterLink>
+            <RouterLink
+              v-if="hasPayrollCreate"
+              :to="{ name: 'admin.payroll.readiness' }"
+              data-testid="payroll-readiness-link-alt"
+              class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+            >
+              <UserCheck class="w-4 h-4 text-gray-600" />
+              <span class="text-brand-dark text-sm font-medium"
+                >Readiness Dashboard</span
+              >
+            </RouterLink>
             <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3">
               <p class="text-brand-dark text-sm font-semibold">
                 Draft monitoring
@@ -527,8 +550,26 @@ const handleExportReport = async () => {
               Processed on {{ formatProcessedDate(payroll.created_at) }}
             </p>
           </div>
-          <div class="flex flex-col justify-center items-center">
+          <div class="flex flex-col justify-center items-center gap-1.5">
             <StatusBadge type="payroll" :value="payroll.status" />
+            <div
+              v-if="payroll.reconciliation_summary && (payroll.reconciliation_summary.unresolved_critical_count > 0 || payroll.reconciliation_summary.warning_count > 0)"
+              class="flex items-center gap-1.5"
+              data-testid="payroll-reconciliation-badge"
+            >
+              <span
+                v-if="payroll.reconciliation_summary.unresolved_critical_count > 0"
+                class="inline-flex rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-semibold text-red-700"
+              >
+                {{ payroll.reconciliation_summary.unresolved_critical_count }} critical
+              </span>
+              <span
+                v-if="payroll.reconciliation_summary.warning_count > 0"
+                class="inline-flex rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
+              >
+                {{ payroll.reconciliation_summary.warning_count }} warnings
+              </span>
+            </div>
           </div>
           <div
             v-if="hasPayrollStatistics"

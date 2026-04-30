@@ -5,6 +5,7 @@ import { useStaffMemberStore } from "@/stores/staffMember";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { can } from "@/helpers/permissionHelper";
+import { DEFAULT_AVATAR } from "@/helpers/format";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
 import {
@@ -105,7 +106,7 @@ onMounted(() => {
           <img
             :src="
               resolvedProfile?.user?.profile_photo ||
-              'https://ui-avatars.com/api/?name=' + resolvedProfile?.user?.name
+              DEFAULT_AVATAR
             "
             :alt="resolvedProfile?.user?.name"
             class="w-32 h-32 rounded-full object-cover"
