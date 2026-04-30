@@ -79,6 +79,51 @@ const formatPercent = (value) => `${(Number(value || 0) * 100).toFixed(2)}%`;
 const analyticsTrendPoints = computed(() => analytics.value?.trends ?? []);
 const hasAnalyticsData = computed(() => analyticsTrendPoints.value.length > 0);
 
+// Finance Insights data
+const averageSalaryTrend = computed(() => analytics.value?.average_salary_trend ?? []);
+const bpjsContributionTrend = computed(() => analytics.value?.bpjs_contribution_trend ?? []);
+const topDeductionReasons = computed(() => analytics.value?.top_deduction_reasons ?? []);
+const headcountVsPayrollGrowth = computed(() => analytics.value?.headcount_vs_payroll_growth ?? []);
+
+const averageSalaryChartSeries = computed(() => [
+    {
+        name: "Average Salary",
+        data: averageSalaryTrend.value.map((p) => Number(p.average_salary || 0)),
+    },
+]);
+
+const averageSalaryChartOptions = computed(() => ({
+    chart: { type: "area", toolbar: { show: false }, sparkline: { enabled: false } },
+    stroke: { width: 2, curve: "smooth" },
+    colors: ["#8B5CF6"],
+    fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.05 } },
+    xaxis: { categories: averageSalaryTrend.value.map((p) => p.label), labels: { style: { fontSize: "11px", colors: "#6B7280" } } },
+    yaxis: { labels: { formatter: (v) => formatRupiahCompact(v), style: { fontSize: "11px", colors: "#6B7280" } } },
+    dataLabels: { enabled: false },
+    grid: { borderColor: "#E5E7EB", strokeDashArray: 4 },
+    tooltip: { y: { formatter: (v) => formatRupiah(v) } },
+}));
+
+const bpjsChartSeries = computed(() => [
+    { name: "Employee BPJS", data: bpjsContributionTrend.value.map((p) => Number(p.bpjs_employee_total || 0)) },
+    { name: "Employer BPJS", data: bpjsContributionTrend.value.map((p) => Number(p.bpjs_employer_total || 0)) },
+]);
+
+const bpjsChartOptions = computed(() => ({
+    chart: { type: "bar", toolbar: { show: false }, stacked: true },
+    colors: ["#14B8A6", "#0EA5E9"],
+    plotOptions: { bar: { borderRadius: 4, columnWidth: "50%" } },
+    xaxis: { categories: bpjsContributionTrend.value.map((p) => p.label), labels: { style: { fontSize: "11px", colors: "#6B7280" } } },
+    yaxis: { labels: { formatter: (v) => formatRupiahCompact(v), style: { fontSize: "11px", colors: "#6B7280" } } },
+    dataLabels: { enabled: false },
+    grid: { borderColor: "#E5E7EB", strokeDashArray: 4 },
+    legend: { position: "top", horizontalAlign: "right" },
+    tooltip: { y: { formatter: (v) => formatRupiah(v) } },
+}));
+
+const deductionReasonLabels = { absent: "Absent", half_day: "Half Day", unpaid_leave: "Unpaid Leave" };
+const formatDeductionReason = (reason) => deductionReasonLabels[reason] || reason;
+
 const analyticsTrendSeries = computed(() => [
   {
     name: "Total Payroll",
@@ -415,6 +460,95 @@ const handleExportReport = async () => {
           <p class="text-brand-light text-sm mt-1">
             Analytics will appear once approved or paid payroll periods are available.
           </p>
+        </div>
+      </div>
+
+      <!-- Finance Insights Section -->
+      <div
+        v-if="hasAnalyticsData"
+        data-testid="payroll-finance-insights"
+        class="space-y-6 mb-6"
+      >
+        <div class="flex items-center gap-3">
+          <h3 class="text-brand-dark text-lg font-bold">Finance Insights</h3>
+          <span class="text-brand-light text-sm">Deeper payroll analytics</span>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- Average Salary Trend -->
+          <div
+            data-testid="payroll-insights-avg-salary"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+          >
+            <h4 class="text-brand-dark text-base font-bold mb-3">Average Salary Trend</h4>
+            <VueApexCharts
+              type="area"
+              height="200"
+              :options="averageSalaryChartOptions"
+              :series="averageSalaryChartSeries"
+            />
+          </div>
+
+          <!-- BPJS Contribution Trend -->
+          <div
+            data-testid="payroll-insights-bpjs"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+          >
+            <h4 class="text-brand-dark text-base font-bold mb-3">BPJS Contribution Trend</h4>
+            <VueApexCharts
+              type="bar"
+              height="200"
+              :options="bpjsChartOptions"
+              :series="bpjsChartSeries"
+            />
+          </div>
+
+          <!-- Top Deduction Reasons -->
+          <div
+            data-testid="payroll-insights-deduction-reasons"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+          >
+            <h4 class="text-brand-dark text-base font-bold mb-3">Top Deduction Reasons</h4>
+            <div class="space-y-3">
+              <div
+                v-for="reason in topDeductionReasons"
+                :key="reason.reason"
+                class="flex items-center justify-between"
+              >
+                <span class="text-brand-dark text-sm font-medium">{{ formatDeductionReason(reason.reason) }}</span>
+                <div class="flex items-center gap-2">
+                  <div class="w-32 h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      class="h-full bg-blue-500 rounded-full"
+                      :style="{ width: `${Math.min(100, (reason.days / Math.max(1, topDeductionReasons[0]?.days || 1)) * 100)}%` }"
+                    ></div>
+                  </div>
+                  <span class="text-brand-light text-xs font-semibold w-12 text-right">{{ reason.days }}d</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Headcount vs Payroll Growth -->
+          <div
+            data-testid="payroll-insights-headcount"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+          >
+            <h4 class="text-brand-dark text-base font-bold mb-3">Headcount vs Payroll</h4>
+            <div class="space-y-2">
+              <div
+                v-for="point in headcountVsPayrollGrowth"
+                :key="point.salary_month"
+                class="flex items-center justify-between border-b border-gray-100 pb-2 last:border-0"
+              >
+                <span class="text-brand-dark text-sm">{{ point.label }}</span>
+                <div class="flex items-center gap-4">
+                  <span class="text-brand-light text-xs">{{ point.employee_count }} staff</span>
+                  <span class="text-brand-dark text-sm font-semibold">{{ formatRupiahCompact(point.total_amount) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </template>

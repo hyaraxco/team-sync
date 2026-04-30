@@ -57,6 +57,20 @@ interface PayrollRepositoryInterface
 
     public function getActivityLogs(string $payrollId);
 
+    public function getSettingVersionDiff(int $versionId): array;
+
+    public function getApprovalPolicies();
+
+    public function createApprovalPolicy(array $data);
+
+    public function updateApprovalPolicy(int $id, array $data);
+
+    public function deleteApprovalPolicy(int $id): void;
+
+    public function getApprovalStatus(string $payrollId): array;
+
+    public function submitApprovalDecision(string $payrollId, array $data, ?int $actorId = null): array;
+
     public function getMyPayslipsPaginated(
         int $staffMemberId,
         ?string $search,
