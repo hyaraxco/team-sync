@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AxiosError } from "axios";
 import { ref, onMounted, computed } from "vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
@@ -12,7 +11,6 @@ import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
-import { DEFAULT_AVATAR } from "@/helpers/format";
 
 const toast = useToast();
 import { useRoute, useRouter } from "vue-router";
@@ -47,18 +45,6 @@ const { loading, performanceStatistics, success } = storeToRefs(staffMemberStore
 const staffMember = ref<any>(null);
 const showDeleteModal = ref(false);
 
-type ApiErrorResponse = {
-  message?: string;
-};
-
-const getErrorMessage = (error: unknown, fallback: string) => {
-  const apiError = error as AxiosError<ApiErrorResponse>;
-
-  return (
-    staffMemberStore.error || apiError.response?.data?.message || fallback
-  );
-};
-
 const loadStaffMember = async () => {
   try {
     const staffMemberId = route.params.id as string;
@@ -68,7 +54,9 @@ const loadStaffMember = async () => {
   } catch (error) {
     toast.error(
       "Failed to load staff member",
-      getErrorMessage(error, "Failed to load staff member."),
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to load staff member.",
     );
     router.push({ name: "admin.staffMembers" });
   }
@@ -102,7 +90,9 @@ const handleDeleteStaffMember = async () => {
   } catch (error) {
     toast.error(
       "Failed to delete staff member",
-      getErrorMessage(error, "Failed to delete staff member."),
+      staffMemberStore.error ||
+        error?.response?.data?.message ||
+        "Failed to delete staff member.",
     );
   }
 };
@@ -129,10 +119,17 @@ onMounted(() => {
       <div class="flex items-center gap-6">
         <div class="relative">
           <img
-            :src="staffMember.user?.profile_photo || DEFAULT_AVATAR"
+            :src="staffMember.user?.profile_photo"
+            v-if="staffMember.user?.profile_photo"
             alt="Staff Member"
             class="w-32 h-32 rounded-full object-cover"
           />
+          <div
+            v-else
+            class="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center"
+          >
+            <User class="w-16 h-16 text-gray-400" />
+          </div>
           <StatusBadge
             v-if="statusText"
             type="status"

@@ -138,6 +138,18 @@ class PermissionSeeder extends Seeder
             'list',
             'create',
         ],
+
+        'overtime' => [
+            'list',
+            'create',
+            'approve',
+        ],
+
+        'thr' => [
+            'list',
+            'generate',
+            'approve',
+        ],
     ];
 
     /**

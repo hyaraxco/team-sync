@@ -93,9 +93,16 @@ const handlePerPageChange = async (perPage) => {
 
 const formatHolidayType = (type) => {
     if (type === 'collective_leave') {
-        return 'Collective Leave';
+        return 'Cuti Bersama';
     }
     return 'National Holiday';
+};
+
+const getHolidayTypeColor = (type) => {
+    if (type === 'collective_leave') {
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+    }
+    return 'bg-red-100 text-red-800 border-red-200';
 };
 
 const submitForm = async () => {
@@ -201,11 +208,14 @@ onMounted(() => {
                                 {{ holiday.description }}
                             </td>
                             <td class="py-4 px-4">
-                                <StatusBadge
-                                    type="status"
-                                    :value="holiday.type"
-                                    :label="formatHolidayType(holiday.type)"
-                                />
+                                <span
+                                    :class="[
+                                        'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border',
+                                        getHolidayTypeColor(holiday.type)
+                                    ]"
+                                >
+                                    {{ formatHolidayType(holiday.type) }}
+                                </span>
                             </td>
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-2">
@@ -279,8 +289,11 @@ onMounted(() => {
                     class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9]"
                 >
                     <option value="national_holiday">National Holiday</option>
-                    <option value="collective_leave">Collective Leave</option>
+                    <option value="collective_leave">Collective Leave (Cuti Bersama)</option>
                 </select>
+                <p class="mt-1 text-xs text-gray-500">
+                    Cuti bersama does not require leave requests and won't deduct from employee leave balance.
+                </p>
             </div>
 
             <div class="flex gap-3 pt-2">

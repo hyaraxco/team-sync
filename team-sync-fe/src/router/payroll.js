@@ -2,6 +2,7 @@ import PayrollDashboard from '@/views/admin/payroll/PayrollDashboard.vue';
 import PayrollCreate from '@/views/admin/payroll/PayrollCreate.vue';
 import PayrollDetail from '@/views/admin/payroll/PayrollDetail.vue';
 import PayrollSettings from '@/views/admin/payroll/PayrollSettings.vue';
+import ThrManagement from '@/views/admin/payroll/ThrManagement.vue';
 import MyPayslips from '@/views/staff-member/MyPayslips.vue';
 import PayslipDetail from '@/views/staff-member/PayslipDetail.vue';
 
@@ -39,6 +40,33 @@ export default [
         component: PayrollSettings,
         meta: {
             requiredPermission: 'payroll-statistics',
+            requiresAuth: true,
+        },
+    },
+    {
+        path: 'payroll/comparison',
+        name: 'admin.payroll.comparison',
+        component: () => import('@/views/admin/payroll/PayrollComparison.vue'),
+        meta: {
+            requiredPermission: 'payroll-statistics',
+            requiresAuth: true,
+        },
+    },
+    {
+        path: 'payroll/thr',
+        name: 'admin.payroll.thr',
+        component: ThrManagement,
+        meta: {
+            requiredPermission: 'thr-list',
+            requiresAuth: true,
+        },
+    },
+    {
+        path: 'payroll/thr/:id',
+        name: 'admin.payroll.thr.detail',
+        component: () => import('@/views/admin/payroll/ThrManagement.vue'),
+        meta: {
+            requiredPermission: 'thr-list',
             requiresAuth: true,
         },
     },

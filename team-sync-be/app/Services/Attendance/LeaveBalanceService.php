@@ -135,4 +135,28 @@ class LeaveBalanceService
             default => $employmentType,
         };
     }
+
+    /**
+     * Get upcoming collective leave (cuti bersama) days for an employee.
+     */
+    public function getUpcomingCollectiveLeave(int $employeeId): Collection
+    {
+        $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);
+        if (! $employee) {
+            return collect();
+        }
+
+        $employmentType = $this->normalizeEmploymentType($employee->jobInformation?->employment_type ?? 'full_time');
+
+        return HolidayCalendar::query()
+            ->where('type', 'collective_leave')
+            ->whereDate('date', '>=', now())
+            ->whereDate('date', '<=', now()->endOfYear())
+            ->orderBy('date')
+            ->get()
+            ->filter(function (HolidayCalendar $holiday) use ($employmentType) {
+                $appliesTo = $holiday->applies_to;
+                return $appliesTo === null || in_array($employmentType, $appliesTo, true);
+            });
+    }
 }

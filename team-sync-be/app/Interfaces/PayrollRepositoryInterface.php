@@ -51,6 +51,8 @@ interface PayrollRepositoryInterface
 
     public function getAnalytics(int $months = 6): array;
 
+    public function getComparison(string $month1, string $month2): array;
+
     public function getPayrollStatistics(string $payrollId);
 
     public function getPayrollReportRows(array $filters);

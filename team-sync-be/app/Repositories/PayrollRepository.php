@@ -11,6 +11,7 @@ use App\Models\BpjsRate;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
+use App\Models\OvertimeRecord;
 use App\Models\Payroll;
 use App\Models\PayrollActivityLog;
 use App\Models\PayrollAdjustment;
@@ -27,6 +28,7 @@ use App\Notifications\PayrollCorrected;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
+use App\Services\Payroll\OvertimeCalculationService;
 use App\Services\Payroll\TaxCalculationService;
 use App\Services\PayrollActivityLogger;
 use Carbon\Carbon;
@@ -64,18 +66,22 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     protected TaxCalculationService $taxCalculationService;
 
+    protected OvertimeCalculationService $overtimeCalculationService;
+
     public function __construct(
         EmailService $emailService,
         PayrollActivityLogger $activityLogger,
         AttendanceClassifier $attendanceClassifier,
         AttendancePeriodService $attendancePeriodService,
-        TaxCalculationService $taxCalculationService
+        TaxCalculationService $taxCalculationService,
+        OvertimeCalculationService $overtimeCalculationService
     ) {
         $this->emailService = $emailService;
         $this->activityLogger = $activityLogger;
         $this->attendanceClassifier = $attendanceClassifier;
         $this->attendancePeriodService = $attendancePeriodService;
         $this->taxCalculationService = $taxCalculationService;
+        $this->overtimeCalculationService = $overtimeCalculationService;
     }
 
     public function getAll(
@@ -335,11 +341,6 @@ class PayrollRepository implements PayrollRepositoryInterface
         $deductionDays = (float) ($fairnessSummary['deduction_days'] ?? 0);
         $legacyDailySalary = $workingDays > 0 ? ((float) $originalSalary / $workingDays) : 0;
         $deduction = $deductionDays * $legacyDailySalary * $deductionRate;
-        $finalSalary = $this->applyRounding(
-            max(0, $originalSalary - $deduction),
-            $settingsVersion->rounding_mode,
-            (int) $settingsVersion->rounding_unit
-        );
 
         $attendedDays = (int) ($fairnessSummary['attended_days'] ?? 0);
         $lateDays = (int) ($fairnessSummary['late_days'] ?? 0);
@@ -373,6 +374,29 @@ class PayrollRepository implements PayrollRepositoryInterface
         $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
         $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
 
+        // ── Overtime Calculation ──────────────────────────────────────
+        $approvedOvertimeRecords = OvertimeRecord::query()
+            ->approved()
+            ->forStaffMember($employee->id)
+            ->forPeriod($startOfMonth, $endOfMonth)
+            ->get();
+
+        $overtimeResult = $this->overtimeCalculationService->calculateOvertimePay(
+            (float) $originalSalary,
+            $approvedOvertimeRecords
+        );
+
+        $overtimeAmount = $overtimeResult['total_amount'];
+        $overtimeHours = $overtimeResult['total_hours'];
+        $overtimeRecordsCount = $approvedOvertimeRecords->count();
+
+        // Add overtime to final salary
+        $finalSalary = $this->applyRounding(
+            max(0, $originalSalary - $deduction) + $overtimeAmount,
+            $settingsVersion->rounding_mode,
+            (int) $settingsVersion->rounding_unit
+        );
+
         return [
             'payroll_id' => $payroll->id,
             'staff_member_id' => $employee->id,
@@ -391,6 +415,9 @@ class PayrollRepository implements PayrollRepositoryInterface
             'absent_days' => $absentDays,
             'deduction_days' => round($deductionDays, 2),
             'deduction_amount' => round($deduction, 2),
+            'overtime_hours' => round($overtimeHours, 2),
+            'overtime_amount' => round($overtimeAmount, 2),
+            'overtime_records_count' => $overtimeRecordsCount,
             'pph21_amount' => round($pph21Amount, 2),
             'bpjs_tk_employee' => round($bpjsTkEmployee, 2),
             'bpjs_tk_employer' => round($bpjsTkEmployer, 2),
@@ -1106,6 +1133,88 @@ class PayrollRepository implements PayrollRepositoryInterface
         ];
     }
 
+    public function getComparison(string $month1, string $month2): array
+    {
+        $cacheKey = CacheConstants::CACHE_KEY_PAYROLL_ANALYTICS . '_compare_' . $month1 . '_' . $month2;
+
+        return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($month1, $month2) {
+            $months = [$month1, $month2];
+            $results = [];
+
+            foreach ($months as $idx => $m) {
+                $monthDate = Carbon::parse($m)->startOfMonth()->toDateString();
+                $payroll = Payroll::query()
+                    ->whereIn('status', ['approved', 'paid'])
+                    ->whereDate('salary_month', $monthDate)
+                    ->first();
+
+                if (!$payroll) {
+                    $results[$idx === 0 ? 'month1' : 'month2'] = [
+                        'period' => Carbon::parse($m)->format('F Y'),
+                        'found' => false,
+                        'employee_count' => 0,
+                        'gross_salary' => 0,
+                        'allowances' => 0,
+                        'deductions' => 0,
+                        'bpjs_deductions' => 0,
+                        'bpjs_employer' => 0,
+                        'tax_amount' => 0,
+                        'net_salary' => 0,
+                    ];
+                    continue;
+                }
+
+                $details = $payroll->payrollDetails()
+                    ->select([
+                        DB::raw('COUNT(DISTINCT staff_member_id) as employee_count'),
+                        DB::raw('COALESCE(SUM(original_salary), 0) as gross_salary'),
+                        DB::raw('0 as allowances'),
+                        DB::raw('COALESCE(SUM(deduction_amount), 0) as total_deductions'),
+                        DB::raw('COALESCE(SUM(bpjs_tk_employee + bpjs_kes_employee), 0) as bpjs_deductions'),
+                        DB::raw('COALESCE(SUM(bpjs_tk_employer + bpjs_kes_employer), 0) as bpjs_employer'),
+                        DB::raw('COALESCE(SUM(pph21_amount), 0) as tax_amount'),
+                        DB::raw('COALESCE(SUM(final_salary), 0) as net_salary'),
+                    ])->first();
+
+                $results[$idx === 0 ? 'month1' : 'month2'] = [
+                    'period' => Carbon::parse($m)->format('F Y'),
+                    'found' => true,
+                    'employee_count' => (int) $details->employee_count,
+                    'gross_salary' => (float) $details->gross_salary,
+                    'allowances' => (float) $details->allowances,
+                    'deductions' => (float) $details->total_deductions,
+                    'bpjs_deductions' => (float) $details->bpjs_deductions,
+                    'bpjs_employer' => (float) $details->bpjs_employer,
+                    'tax_amount' => (float) $details->tax_amount,
+                    'net_salary' => (float) $details->net_salary,
+                ];
+            }
+
+            // Calculate variances
+            $m1 = $results['month1'];
+            $m2 = $results['month2'];
+
+            $variances = [];
+            $metrics = ['employee_count', 'gross_salary', 'allowances', 'deductions', 'bpjs_deductions', 'bpjs_employer', 'tax_amount', 'net_salary'];
+            
+            foreach ($metrics as $metric) {
+                $diff = $m2[$metric] - $m1[$metric];
+                $pct = $m1[$metric] > 0 ? ($diff / $m1[$metric]) * 100 : ($m2[$metric] > 0 ? 100 : 0);
+                
+                $variances[$metric] = [
+                    'difference' => $diff,
+                    'percentage' => round($pct, 2)
+                ];
+            }
+
+            return [
+                'month1' => $m1,
+                'month2' => $m2,
+                'variances' => $variances
+            ];
+        });
+    }
+
     public function getAnalytics(int $months = 6): array
     {
         $months = max(1, min(24, $months));
@@ -1676,7 +1785,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function findOwnedPaidPayslipOrFail(string $id, int $staffMemberId)
     {
         $payslip = PayrollDetail::with([
-            'payroll',
+            'payroll.payrollSettingVersion',
             'staffMember.user',
             'staffMember.jobInformation.team',
             'staffMember.bankInformation',

@@ -13,6 +13,8 @@ use App\Http\Controllers\MeetingController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\OptionController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\OvertimeController;
+use App\Http\Controllers\ThrPayrollController;
 use App\Http\Controllers\PayrollApprovalPolicyController;
 use App\Http\Controllers\PayrollController;
 use App\Http\Controllers\PayrollSettingController;
@@ -47,7 +49,7 @@ Route::prefix('v1')
         Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:60,1');
         Route::get('email/verify/{id}/{hash}', [EmailVerificationController::class, 'verify'])->name('verification.verify');
 
-        Route::middleware('auth:sanctum')->group(function () {
+        Route::middleware(['auth:sanctum', 'resolve.company'])->group(function () {
             Route::get('me', [AuthController::class, 'me']);
             Route::put('me', [AuthController::class, 'updateProfile']);
 
@@ -128,10 +130,12 @@ Route::prefix('v1')
 
             // Leave Balance routes
             Route::get('my-leave-balances', [LeaveBalanceController::class, 'getMyBalances']);
+            Route::get('my-upcoming-cuti-bersama', [LeaveBalanceController::class, 'getMyUpcomingCutiBersama']);
 
             // Payroll routes
             Route::get('payrolls/statistics', [PayrollController::class, 'getStatistics']);
             Route::get('payrolls/analytics', [PayrollController::class, 'getAnalytics']);
+            Route::get('payrolls/compare', [PayrollController::class, 'getComparison']);
             Route::get('payroll-settings', [PayrollSettingController::class, 'show']);
             Route::get('payroll-settings/history', [PayrollSettingController::class, 'history']);
             Route::get('payroll-settings/versions/{id}/diff', [PayrollSettingController::class, 'versionDiff']);
@@ -168,6 +172,25 @@ Route::prefix('v1')
             Route::get('my-payslips/{id}', [PayslipController::class, 'show']);
             Route::get('payslips/{id}/download', [PayslipController::class, 'download']);
             Route::post('payslips/{id}/email', [PayslipController::class, 'email']);
+
+            // Overtime routes
+            Route::get('overtime', [OvertimeController::class, 'index']);
+            Route::post('overtime', [OvertimeController::class, 'store']);
+            Route::get('overtime/summary', [OvertimeController::class, 'getOvertimeSummary']);
+            Route::get('overtime/my-overtime', [OvertimeController::class, 'getMyOvertime']);
+            Route::get('overtime/{id}', [OvertimeController::class, 'show']);
+            Route::post('overtime/{id}/approve', [OvertimeController::class, 'approve']);
+            Route::post('overtime/{id}/reject', [OvertimeController::class, 'reject']);
+
+            // THR (Tunjangan Hari Raya) routes
+            Route::get('thr', [ThrPayrollController::class, 'index']);
+            Route::get('thr/year-summary', [ThrPayrollController::class, 'getYearSummary']);
+            Route::post('thr/simulate', [ThrPayrollController::class, 'simulate']);
+            Route::post('thr/generate', [ThrPayrollController::class, 'generate']);
+            Route::get('thr/{id}', [ThrPayrollController::class, 'show']);
+            Route::get('thr/{id}/details', [ThrPayrollController::class, 'getDetails']);
+            Route::post('thr/{id}/approve', [ThrPayrollController::class, 'approve']);
+            Route::post('thr/{id}/mark-as-paid', [ThrPayrollController::class, 'markAsPaid']);
 
             // Project Tasks by project
             Route::get('projects/{id}/tasks', [ProjectTaskController::class, 'getByProject']);

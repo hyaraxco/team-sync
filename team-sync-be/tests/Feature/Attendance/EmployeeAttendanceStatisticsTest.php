@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -106,46 +107,56 @@ class EmployeeAttendanceStatisticsTest extends TestCase
 
     public function test_statistics_returns_correct_counts(): void
     {
+        // Freeze time to mid-month so the endpoint's endDate covers all seeded records
+        Carbon::setTestNow('2026-04-15 09:00:00');
+
         $this->actingAsRole('hr');
 
         $employee = StaffMemberProfile::factory()->create();
 
-        $baseDate = now()->startOfMonth();
+        // Use explicit weekday dates in April 2026 to avoid weekend ambiguity
+        $presentDates = [
+            Carbon::create(2026, 4, 1),  // Wednesday
+            Carbon::create(2026, 4, 2),  // Thursday
+            Carbon::create(2026, 4, 3),  // Friday
+        ];
 
         // 3 present
-        for ($i = 0; $i < 3; $i++) {
+        foreach ($presentDates as $date) {
             Attendance::create([
                 'staff_member_id' => $employee->id,
                 'attendance_period_id' => $this->period->id,
-                'date' => $baseDate->copy()->addDays($i),
-                'check_in' => $baseDate->copy()->addDays($i)->setTime(8, 0),
-                'check_out' => $baseDate->copy()->addDays($i)->setTime(17, 0),
+                'date' => $date,
+                'check_in' => $date->copy()->setTime(8, 0),
+                'check_out' => $date->copy()->setTime(17, 0),
                 'status' => 'present',
             ]);
         }
 
         // 1 late
+        $lateDate = Carbon::create(2026, 4, 7); // Monday
         Attendance::create([
             'staff_member_id' => $employee->id,
             'attendance_period_id' => $this->period->id,
-            'date' => $baseDate->copy()->addDays(6),
-            'check_in' => $baseDate->copy()->addDays(6)->setTime(10, 0),
-            'check_out' => $baseDate->copy()->addDays(6)->setTime(17, 0),
+            'date' => $lateDate,
+            'check_in' => $lateDate->copy()->setTime(10, 0),
+            'check_out' => $lateDate->copy()->setTime(17, 0),
             'status' => 'late',
         ]);
 
         // 1 sick
+        $sickDate = Carbon::create(2026, 4, 8); // Tuesday
         Attendance::create([
             'staff_member_id' => $employee->id,
             'attendance_period_id' => $this->period->id,
-            'date' => $baseDate->copy()->addDays(7),
-            'check_in' => $baseDate->copy()->addDays(7)->setTime(8, 0),
+            'date' => $sickDate,
+            'check_in' => $sickDate->copy()->setTime(8, 0),
             'status' => 'sick',
         ]);
 
         $this->withoutExceptionHandling();
 
-        $response = $this->getJson("/api/v1/attendances/employee/{$employee->id}/statistics")
+        $response = $this->getJson("/api/v1/attendances/employee/{$employee->id}/statistics?month=2026-04")
             ->assertOk();
 
         $data = $response->json('data');
@@ -153,6 +164,8 @@ class EmployeeAttendanceStatisticsTest extends TestCase
         $this->assertGreaterThanOrEqual(3, $data['present_days']);
         $this->assertEquals(1, $data['sick_days']);
         $this->assertEquals(1, $data['late_days']);
+
+        Carbon::setTestNow();
     }
 
     public function test_can_filter_statistics_by_month(): void

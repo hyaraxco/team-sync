@@ -86,6 +86,8 @@ class RolePermissionSeeder extends Seeder
                 'goal-',
                 'feedback-',
                 'meeting-',
+                'overtime-',
+                'thr-',
             ], array_merge($staffSpecific, [
                 'task-delete',
                 // Manager-only: HR should NOT see Team Reviews
@@ -128,6 +130,12 @@ class RolePermissionSeeder extends Seeder
                     'analytics-menu',
                     'analytics-view',
                     'analytics-export',
+                    'overtime-list',
+                    'overtime-create',
+                    'overtime-approve',
+                    'thr-list',
+                    'thr-generate',
+                    'thr-approve',
                     ...$selfServiceBaseline,
                 ])->get()
             );

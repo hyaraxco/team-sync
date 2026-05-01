@@ -5,6 +5,7 @@ import LeaveRequestList from '@/views/admin/attendance/LeaveRequestList.vue';
 import AttendanceSettings from '@/views/admin/attendance/AttendanceSettings.vue';
 import AttendancePeriods from '@/views/admin/attendance/AttendancePeriods.vue';
 import PolicyMismatches from '@/views/admin/attendance/PolicyMismatches.vue';
+import OvertimeManagement from '@/views/admin/attendance/OvertimeManagement.vue';
 
 export default [
     {
@@ -77,6 +78,14 @@ export default [
         component: () => import('@/views/admin/attendance/HybridScheduleList.vue'),
         meta: {
             requiredPermission: 'attendance-menu',
+        },
+    },
+    {
+        path: 'overtime',
+        name: 'admin.attendance.overtime',
+        component: OvertimeManagement,
+        meta: {
+            requiredPermission: 'overtime-list',
         },
     },
     {

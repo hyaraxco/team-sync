@@ -6,6 +6,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -20,8 +21,17 @@ class PayslipEmailTest extends TestCase
     {
         parent::setUp();
 
+        // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
+        Carbon::setTestNow('2026-05-02 09:00:00');
+
         $this->seed(MinimalPayrollE2ESeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_unauthenticated_user_cannot_email_payslip(): void
