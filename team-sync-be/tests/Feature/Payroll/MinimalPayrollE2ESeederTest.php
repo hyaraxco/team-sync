@@ -16,8 +16,17 @@ class MinimalPayrollE2ESeederTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
+    }
+
     public function test_minimal_payroll_e2e_seeder_prepares_a_payroll_ready_dataset(): void
     {
+        // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
+        Carbon::setTestNow('2026-05-02 09:00:00');
+
         $this->seed(MinimalPayrollE2ESeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
@@ -66,6 +75,9 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
     public function test_minimal_payroll_e2e_seeder_can_be_run_twice_without_duplicate_attendance_errors(): void
     {
+        // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
+        Carbon::setTestNow('2026-05-02 09:00:00');
+
         $this->seed(MinimalPayrollE2ESeeder::class);
         $this->seed(MinimalPayrollE2ESeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();

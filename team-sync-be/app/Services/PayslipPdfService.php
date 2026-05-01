@@ -3,87 +3,165 @@
 namespace App\Services;
 
 use App\Models\PayrollDetail;
+use App\Services\Payroll\TaxCalculationService;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 class PayslipPdfService
 {
+    public function __construct(
+        private readonly TaxCalculationService $taxService
+    ) {}
+
     public function render(PayrollDetail $payrollDetail): string
     {
         $payroll = $payrollDetail->payroll;
         $employee = $payrollDetail->staffMember;
         $jobInformation = $employee?->jobInformation;
-        $totalDeductions = max(0, (float) $payrollDetail->original_salary - (float) $payrollDetail->final_salary);
+        $payrollSettingVersion = $payroll?->payrollSettingVersion;
 
-        $lines = [
-            'Payslip',
-            'Period: '.Carbon::parse($payroll?->salary_month)->format('F Y'),
-            'Employee: '.($employee?->user?->name ?? 'N/A'),
-            'Employee Code: '.($employee?->code ?? 'N/A'),
-            'Department: '.($jobInformation?->team?->name ?? $jobInformation?->job_title ?? 'N/A'),
-            'Payment Date: '.Carbon::parse($payroll?->payment_date ?? $payroll?->created_at)->format('d F Y'),
-            'Basic Salary: Rp '.number_format((float) $payrollDetail->original_salary, 0, ',', '.'),
-            'Total Deductions: Rp '.number_format($totalDeductions, 0, ',', '.'),
-            'Net Salary: Rp '.number_format((float) $payrollDetail->final_salary, 0, ',', '.'),
-            'Attendance: '.$payrollDetail->attended_days.' present, '.$payrollDetail->sick_days.' sick, '.$payrollDetail->absent_days.' absent',
-        ];
+        // Basic salary components
+        $basicSalary = (float) $payrollDetail->original_salary;
+        $overtimeAmount = (float) $payrollDetail->overtime_amount;
+        $overtimeHours = (float) $payrollDetail->overtime_hours;
+        $allowances = 0; // TODO: Implement allowances in payroll generation
+        $bonus = 0; // TODO: Implement bonus in payroll generation
+        $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus;
 
-        if ($payrollDetail->notes) {
-            $lines[] = 'Notes: '.$payrollDetail->notes;
-        }
+        // Calculate BPJS breakdown
+        $bpjsBreakdown = $this->calculateBpjsBreakdown($basicSalary);
 
-        return $this->buildPdf($lines);
-    }
+        // Calculate tax
+        $taxResult = $this->taxService->calculateMonthlyPph21(
+            $basicSalary,
+            $employee?->ptkp_status,
+            ! empty($employee?->npwp)
+        );
+        $tax = $taxResult['pph21_monthly'];
 
-    private function buildPdf(array $lines): string
-    {
-        $content = "BT\n/F1 12 Tf\n14 TL\n50 780 Td\n";
+        // Absence deduction
+        $absenceDeduction = (float) $payrollDetail->deduction_amount;
+        $deductionDays = (float) $payrollDetail->deduction_days;
 
-        foreach ($lines as $index => $line) {
-            $encoded = $this->encodeText($line);
-            $content .= sprintf('(%s) Tj', $encoded);
+        // Other deductions (calculated as remainder)
+        $totalBpjs = $bpjsBreakdown['total'];
+        $otherDeductions = max(0, ($grossSalary - (float) $payrollDetail->final_salary) - $totalBpjs - $tax - $absenceDeduction);
+        $totalDeductions = $totalBpjs + $tax + $absenceDeduction + $otherDeductions;
 
-            if ($index !== array_key_last($lines)) {
-                $content .= "\nT*\n";
+        // Net salary
+        $netSalary = (float) $payrollDetail->final_salary;
+
+        // Adjustments
+        $adjustments = [];
+        $adjustmentTotalAmount = 0;
+        if ($payrollDetail->relationLoaded('appliedAdjustments')) {
+            foreach ($payrollDetail->appliedAdjustments as $adj) {
+                $amount = (float) $adj->amount_delta;
+                $adjustments[] = [
+                    'reason' => $adj->reason ?? 'Penyesuaian',
+                    'amount_delta' => $amount,
+                    'formatted_amount' => $this->formatSignedRupiah($amount),
+                ];
+                $adjustmentTotalAmount += $amount;
             }
         }
 
-        $content .= "\nET";
+        // Prepare data for Blade template
+        $data = [
+            'companyName' => config('app.name', 'Team Sync Pro'),
+            'companyAddress' => 'Indonesia',
+            'period' => Carbon::parse($payroll->salary_month)->locale('id')->translatedFormat('F Y'),
+            'employeeName' => $employee?->user?->name ?? $employee?->full_name ?? 'N/A',
+            'employeeCode' => $employee?->employee_id ?? 'N/A',
+            'department' => $jobInformation?->team?->name ?? $jobInformation?->job_title ?? 'N/A',
+            'paymentDate' => Carbon::parse($payroll->payment_date ?? $payroll->created_at)->locale('id')->translatedFormat('d F Y'),
 
-        $objects = [
-            "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj",
-            "2 0 obj\n<< /Type /Pages /Count 1 /Kids [3 0 R] >>\nendobj",
-            "3 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>\nendobj",
-            "4 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj",
-            "5 0 obj\n<< /Length ".strlen($content)." >>\nstream\n{$content}\nendstream\nendobj",
+            // Earnings
+            'basicSalary' => $this->formatRupiah($basicSalary),
+            'overtimeHours' => number_format($overtimeHours, 1, ',', '.'),
+            'overtimeAmount' => $this->formatRupiah($overtimeAmount),
+            'allowances' => $this->formatRupiah($allowances),
+            'bonus' => $this->formatRupiah($bonus),
+            'grossSalary' => $this->formatRupiah($grossSalary),
+
+            // Deductions - BPJS
+            'bpjsKesehatan' => $this->formatRupiah($bpjsBreakdown['bpjs_kesehatan']),
+            'bpjsKesehatanRate' => $bpjsBreakdown['bpjs_kesehatan_rate'],
+            'bpjsJht' => $this->formatRupiah($bpjsBreakdown['jht']),
+            'bpjsJhtRate' => $bpjsBreakdown['jht_rate'],
+            'bpjsJp' => $this->formatRupiah($bpjsBreakdown['jp']),
+            'bpjsJpRate' => $bpjsBreakdown['jp_rate'],
+            'totalBpjs' => $this->formatRupiah($totalBpjs),
+
+            // Deductions - Tax & Others
+            'tax' => $this->formatRupiah($tax),
+            'absenceDeduction' => $this->formatRupiah($absenceDeduction),
+            'deductionDays' => number_format($deductionDays, 1, ',', '.'),
+            'otherDeductions' => $this->formatRupiah($otherDeductions),
+            'totalDeductions' => $this->formatRupiah($totalDeductions),
+
+            // Net Salary
+            'netSalary' => $this->formatRupiah($netSalary),
+
+            // Attendance
+            'effectiveWorkingDays' => $payrollDetail->effective_working_days,
+            'attendedDays' => $payrollDetail->attended_days,
+            'presentDays' => $payrollDetail->present_days,
+            'lateDays' => $payrollDetail->late_days,
+            'sickDays' => $payrollDetail->sick_days,
+            'paidLeaveDays' => $payrollDetail->paid_leave_days,
+            'unpaidLeaveDays' => $payrollDetail->unpaid_leave_days,
+            'absentDays' => $payrollDetail->absent_days,
+
+            // Adjustments
+            'adjustments' => $adjustments,
+            'adjustmentTotalAmount' => $adjustmentTotalAmount,
+            'adjustmentTotalFormatted' => $this->formatSignedRupiah($adjustmentTotalAmount),
+
+            // Notes
+            'notes' => $payrollDetail->notes,
+            'generatedAt' => now()->locale('id')->translatedFormat('d F Y H:i'),
         ];
 
-        $pdf = "%PDF-1.4\n";
-        $offsets = [];
+        // Generate PDF using dompdf
+        $pdf = Pdf::loadView('exports.payslip-pdf', $data);
+        $pdf->setPaper('a4', 'portrait');
 
-        foreach ($objects as $object) {
-            $offsets[] = strlen($pdf);
-            $pdf .= $object."\n";
-        }
-
-        $xrefOffset = strlen($pdf);
-        $pdf .= "xref\n0 ".(count($objects) + 1)."\n";
-        $pdf .= "0000000000 65535 f \n";
-
-        foreach ($offsets as $offset) {
-            $pdf .= sprintf('%010d 00000 n ', $offset)."\n";
-        }
-
-        $pdf .= "trailer\n<< /Size ".(count($objects) + 1)." /Root 1 0 R >>\n";
-        $pdf .= "startxref\n{$xrefOffset}\n%%EOF";
-
-        return $pdf;
+        return $pdf->output();
     }
 
-    private function encodeText(string $text): string
+    private function calculateBpjsBreakdown(float $basicSalary): array
     {
-        $encoded = iconv('UTF-8', 'windows-1252//TRANSLIT//IGNORE', $text) ?: $text;
-        $encoded = preg_replace('/[^\x20-\x7E]/', ' ', $encoded) ?? $encoded;
+        $bpjs = $this->taxService->calculateBpjs($basicSalary);
+        $breakdown = $bpjs['breakdown'];
 
-        return str_replace(['\\', '(', ')'], ['\\\\', '\\(', '\\)'], $encoded);
+        return [
+            'bpjs_kesehatan' => $breakdown['bpjs_kesehatan_employee'] ?? 0,
+            'bpjs_kesehatan_rate' => 1, // 1% employee contribution
+            'jht' => $breakdown['jht_employee'] ?? 0,
+            'jht_rate' => 2, // 2% employee contribution
+            'jp' => $breakdown['jp_employee'] ?? 0,
+            'jp_rate' => 1, // 1% employee contribution
+            'total' => $bpjs['employee_share'],
+        ];
+    }
+
+    private function formatRupiah(float $amount): string
+    {
+        return 'Rp ' . number_format($amount, 0, ',', '.');
+    }
+
+    private function formatSignedRupiah(float $amount): string
+    {
+        $formatted = $this->formatRupiah(abs($amount));
+
+        if ($amount > 0) {
+            return '+' . $formatted;
+        }
+        if ($amount < 0) {
+            return '-' . $formatted;
+        }
+
+        return $formatted;
     }
 }

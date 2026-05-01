@@ -3,6 +3,8 @@
 namespace App\Http\Requests;
 
 use App\Enums\LeaveType;
+use App\Models\HolidayCalendar;
+use Carbon\Carbon;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -46,4 +48,35 @@ class LeaveRequestStoreRequest extends FormRequest
             ]);
         }
     }
+
+    /**
+     * Configure the validator instance.
+     */
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+            if (!$this->has('start_date') || !$this->has('end_date')) {
+                return;
+            }
+
+            $startDate = Carbon::parse($this->start_date);
+            $endDate = Carbon::parse($this->end_date);
+
+            // Check for collective leave days (cuti bersama) in the requested period
+            $collectiveLeaves = HolidayCalendar::query()
+                ->where('type', 'collective_leave')
+                ->whereBetween('date', [$startDate, $endDate])
+                ->get();
+
+            if ($collectiveLeaves->isNotEmpty()) {
+                $cutiBersamaDates = $collectiveLeaves->pluck('name')->join(', ');
+                
+                $validator->errors()->add(
+                    'start_date',
+                    "Your leave request includes collective leave days (Cuti Bersama): {$cutiBersamaDates}. These are company-wide holidays and do not require a leave request. Please adjust your dates to exclude these days."
+                );
+            }
+        });
+    }
 }
+

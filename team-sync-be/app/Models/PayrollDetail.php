@@ -33,6 +33,9 @@ class PayrollDetail extends Model
         'absent_days',
         'deduction_days',
         'deduction_amount',
+        'overtime_hours',
+        'overtime_amount',
+        'overtime_records_count',
         'policy_mismatch_days',
         'warning_flags',
         'notes',
@@ -46,6 +49,8 @@ class PayrollDetail extends Model
             'daily_rate' => 'decimal:2',
             'deduction_days' => 'decimal:2',
             'deduction_amount' => 'decimal:2',
+            'overtime_hours' => 'decimal:2',
+            'overtime_amount' => 'decimal:2',
             'warning_flags' => 'array',
         ];
     }

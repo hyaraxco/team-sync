@@ -7,6 +7,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
         leaveRequests: [],
         myLeaveRequests: [],
         myLeaveBalances: [],
+        upcomingCutiBersama: [],
         calendarData: [],
         currentLeaveRequest: null,
         meta: {
@@ -21,36 +22,6 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
     }),
 
     actions: {
-        async fetchMyLeaveRequests() {
-            this.loading = true;
-            this.error = null;
-
-            try {
-                const response = await axiosInstance.get('my-leave-requests');
-
-                this.myLeaveRequests = response.data.data;
-            } catch (error) {
-                this.error = handleError(error);
-            } finally {
-                this.loading = false;
-            }
-        },
-
-        async fetchMyLeaveBalances() {
-            this.loading = true;
-            this.error = null;
-
-            try {
-                const response = await axiosInstance.get('my-leave-balances');
-
-                this.myLeaveBalances = response.data.data;
-            } catch (error) {
-                this.error = handleError(error);
-            } finally {
-                this.loading = false;
-            }
-        },
-
         async createLeaveRequest(payload) {
             this.loading = true;
             this.error = null;
@@ -68,32 +39,28 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             }
         },
 
-        async getLeaveRequestById(id) {
+        async fetchMyLeaveRequests() {
             this.loading = true;
             this.error = null;
 
             try {
-                const response = await axiosInstance.get(`leave-requests/${id}`);
+                const response = await axiosInstance.get('my-leave-requests');
 
-                this.currentLeaveRequest = response.data.data;
-                return response.data.data;
+                this.myLeaveRequests = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                throw error;
             } finally {
                 this.loading = false;
             }
         },
 
-        async fetchLatestLeaveRequests(limit = 5) {
+        async fetchUpcomingCutiBersama() {
             this.loading = true;
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('leave-requests', {
-                    params: { limit }
-                });
-
+                const response = await axiosInstance.get('my-upcoming-cuti-bersama');
+                this.upcomingCutiBersama = response.data.data;
                 return response.data.data;
             } catch (error) {
                 this.error = handleError(error);
