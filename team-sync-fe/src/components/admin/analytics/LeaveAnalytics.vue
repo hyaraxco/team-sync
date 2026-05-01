@@ -303,7 +303,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
 
   <!-- Empty State -->
   <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
-    <PalmtreeIcon class="w-16 h-16 mb-4 opacity-30" />
+    <PalmtreeIcon class="w-16 h-16 mb-4 opacity-50" />
     <p class="text-lg font-medium">No leave analytics available</p>
     <p class="text-sm mt-1">Try adjusting the period or filters</p>
   </div>

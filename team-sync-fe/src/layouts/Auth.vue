@@ -68,21 +68,21 @@
             <div class="flex gap-6 pt-4">
               <div>
                 <p class="text-2xl font-bold text-white">6</p>
-                <p class="text-xs text-white/60">HR Modules</p>
+                <p class="text-xs text-white/80">HR Modules</p>
               </div>
               <div>
                 <p class="text-2xl font-bold text-white">4</p>
-                <p class="text-xs text-white/60">User Roles</p>
+                <p class="text-xs text-white/80">User Roles</p>
               </div>
               <div>
                 <p class="text-2xl font-bold text-white">99%</p>
-                <p class="text-xs text-white/60">Uptime</p>
+                <p class="text-xs text-white/80">Uptime</p>
               </div>
             </div>
           </div>
 
           <!-- Footer -->
-          <p class="text-xs text-white/50">
+          <p class="text-xs text-white/70">
             © 2026 TeamSync. All rights reserved.
           </p>
         </div>

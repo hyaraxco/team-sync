@@ -76,7 +76,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 </script>
 
 <template>
-  <div class="stats-card bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-4 sm:p-5">
+  <div class="stats-card bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-4 sm:p-5 dark:bg-gray-800 dark:border-gray-700">
     <div class="flex items-center justify-between">
       <div>
         <p class="text-brand-dark text-sm font-medium">{{ title }}</p>

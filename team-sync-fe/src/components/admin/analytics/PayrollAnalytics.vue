@@ -205,7 +205,7 @@ const deductionDonutSeries = computed(() =>
 
   <!-- Empty State -->
   <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
-    <WalletIcon class="w-16 h-16 mb-4 opacity-30" />
+    <WalletIcon class="w-16 h-16 mb-4 opacity-50" />
     <p class="text-lg font-medium">No payroll analytics available</p>
     <p class="text-sm mt-1">Try adjusting the period or filters</p>
   </div>

@@ -36,7 +36,7 @@ const onNavigate = () => emit("navigate");
   <!-- Sidebar -->
   <aside
     id="sidebar"
-    class="fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white/80 backdrop-blur-xl border-r border-gray-200/50 flex flex-col transform transition-all duration-300 ease-in-out"
+    class="fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white backdrop-blur-xl border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700"
     :class="[
       props.isOpen ? 'translate-x-0' : '-translate-x-full',
       'lg:translate-x-0',
@@ -45,7 +45,7 @@ const onNavigate = () => emit("navigate");
   >
     <!-- Logo Section -->
     <div
-      class="px-6 py-4 border-b border-[#DCDEDD] flex items-center justify-between"
+      class="px-6 py-4 border-b border-[#DCDEDD] flex items-center justify-between dark:border-gray-700"
     >
       <div class="flex items-center gap-4">
         <div class="w-14 h-14 relative flex items-center justify-center">

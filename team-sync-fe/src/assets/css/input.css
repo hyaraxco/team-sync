@@ -161,3 +161,24 @@ html {
     background-color: #EBF8FF;
     color: #1E40AF;
 }
+
+/* Dark mode overrides */
+.dark .nav-link {
+    background: #1f2937; /* gray-800 */
+}
+
+.dark .nav-link:hover {
+    background: #374151; /* gray-700 */
+}
+
+.dark .section-title {
+    color: #9CA3AF; /* gray-400 */
+}
+
+.dark .text-brand-dark {
+    color: #F9FAFB; /* gray-50 */
+}
+
+.dark .text-brand-light {
+    color: #9CA3AF; /* gray-400 */
+}
