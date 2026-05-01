@@ -4,7 +4,7 @@
       <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-purple-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       <div class="absolute bottom-0 left-0 -ml-32 w-96 h-96 bg-blue-600/20 rounded-full blur-[120px] pointer-events-none"></div>
 
-      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/30 pb-8">
         <div class="space-y-2">
           <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
             System Configuration
@@ -16,7 +16,7 @@
       </header>
 
       <!-- Tabs Navigation -->
-      <nav class="relative z-10 flex gap-8 border-b border-white/5" aria-label="Tabs">
+      <nav class="relative z-10 flex gap-8 border-b border-white/15" aria-label="Tabs">
         <button 
           v-for="tab in ['Attendance Policies', 'Leave Entitlements', 'Holiday Calendars']" 
           :key="tab"
@@ -42,38 +42,38 @@
             </div>
             
             <template v-else>
-              <div v-for="policy in policyStore.policies" :key="policy.id" class="policy-card group p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10">
+              <div v-for="policy in policyStore.policies" :key="policy.id" class="policy-card group p-6 rounded-2xl bg-white/[0.08] border border-white/15 hover:bg-white/[0.12] transition-all duration-500 hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-500/10">
                 <div class="flex justify-between items-start mb-6">
                   <h3 class="text-xl font-medium capitalize">{{ policy.employment_type.replace('_', ' ') }}</h3>
                   <span class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full bg-white/10 text-neutral-300">Policy</span>
                 </div>
                 
                 <div class="space-y-4 text-sm">
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2">
                     <span class="text-neutral-400 font-light">Work Hours</span>
                     <span class="font-medium text-purple-400">{{ policy.work_start_time.substring(0,5) }} - {{ policy.work_end_time.substring(0,5) }}</span>
                   </div>
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2">
                     <span class="text-neutral-400 font-light">Late Grace Period</span>
                     <span class="font-medium text-rose-400">{{ policy.late_grace_minutes }} mins</span>
                   </div>
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2">
                     <span class="text-neutral-400 font-light">Half Day Min</span>
                     <span class="font-medium text-blue-400">{{ policy.half_day_min_hours }} hours</span>
                   </div>
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2">
                     <span class="text-neutral-400 font-light">Required Work Days</span>
                     <span class="font-medium text-white">{{ policy.work_days_per_week }} days/week</span>
                   </div>
                 </div>
 
-                <button class="w-full mt-8 py-3 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm tracking-wide font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50">
+                <button class="w-full mt-8 py-3 rounded-xl bg-white/10 hover:bg-white/10 border border-white/30 text-sm tracking-wide font-medium transition-all focus:outline-none focus:ring-2 focus:ring-purple-500/50">
                   Edit Policy
                 </button>
               </div>
             </template>
 
-          <button class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-white/20 text-neutral-400 hover:text-white hover:border-white/50 hover:bg-white/5 transition-all duration-500 min-h-[300px]">
+          <button class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-white/30 text-neutral-400 hover:text-white hover:border-white/50 hover:bg-white/10 transition-all duration-500 min-h-[300px]">
             <svg class="w-12 h-12 mb-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v16m8-8H4"></path></svg>
             <span class="font-medium tracking-wide">Create Custom Policy</span>
           </button>
@@ -94,7 +94,7 @@
           <div v-else v-for="(group, type) in entitlementStore.groupedEntitlements" :key="type" class="mb-8">
             <h3 class="text-xl font-medium capitalize mb-4 text-purple-300">{{ type.replace('_', ' ') }}</h3>
             <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              <div v-for="entitlement in group" :key="entitlement.id" class="policy-card p-6 rounded-2xl bg-white/[0.03] border border-white/[0.05] hover:bg-white/[0.05] transition-all duration-300">
+              <div v-for="entitlement in group" :key="entitlement.id" class="policy-card p-6 rounded-2xl bg-white/[0.08] border border-white/15 hover:bg-white/[0.12] transition-all duration-300">
                 <div class="flex justify-between items-start mb-4">
                   <h4 class="text-lg font-medium capitalize">{{ entitlement.leave_type.replace('_', ' ') }}</h4>
                   <span v-if="!entitlement.is_eligible" class="px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider rounded bg-rose-500/20 text-rose-300 border border-rose-500/30">Ineligible</span>
@@ -103,22 +103,22 @@
                 </div>
                 
                 <div class="space-y-3 text-sm">
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2">
                     <span class="text-neutral-400 font-light">Quota</span>
                     <span class="font-medium text-white" v-if="entitlement.quota_scope === 'unlimited' || entitlement.quota_scope === 'unpaid'">Unlimited</span>
                     <span class="font-medium text-white" v-else>{{ entitlement.quota_days }} days ({{ entitlement.quota_scope }})</span>
                   </div>
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2" v-if="entitlement.carry_over_max_days > 0">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2" v-if="entitlement.carry_over_max_days > 0">
                     <span class="text-neutral-400 font-light">Max Carry Over</span>
                     <span class="font-medium text-blue-400">{{ entitlement.carry_over_max_days }} days</span>
                   </div>
-                  <div class="flex justify-between items-center border-b border-white/5 pb-2">
+                  <div class="flex justify-between items-center border-b border-white/15 pb-2">
                     <span class="text-neutral-400 font-light">Requires Proof</span>
                     <span class="font-medium" :class="entitlement.requires_attachment ? 'text-rose-400' : 'text-neutral-500'">{{ entitlement.requires_attachment ? 'Yes' : 'No' }}</span>
                   </div>
                 </div>
 
-                <button class="w-full mt-6 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs tracking-wide font-medium transition-all">
+                <button class="w-full mt-6 py-2 rounded-lg bg-white/10 hover:bg-white/10 border border-white/30 text-xs tracking-wide font-medium transition-all">
                   Edit Rules
                 </button>
               </div>
@@ -134,10 +134,10 @@
             </button>
           </div>
 
-          <div class="overflow-x-auto rounded-2xl border border-white/10 bg-white/[0.02] backdrop-blur-md">
+          <div class="overflow-x-auto rounded-2xl border border-white/30 bg-white/[0.06] backdrop-blur-md">
             <table class="w-full text-left border-collapse">
               <thead>
-                <tr class="border-b border-white/10 text-xs uppercase tracking-widest text-neutral-500">
+                <tr class="border-b border-white/30 text-xs uppercase tracking-widest text-neutral-500">
                   <th class="p-4 font-medium">Holiday Name</th>
                   <th class="p-4 font-medium">Date</th>
                   <th class="p-4 font-medium">Type</th>
@@ -160,7 +160,7 @@
                 <tr v-else-if="!holidayStore.paginatedHolidays?.length" class="text-center text-neutral-500">
                   <td colspan="4" class="p-8 font-light italic">No holidays configured yet.</td>
                 </tr>
-                <tr v-else v-for="holiday in holidayStore.paginatedHolidays" :key="holiday.id" class="hover:bg-white/5 transition-colors">
+                <tr v-else v-for="holiday in holidayStore.paginatedHolidays" :key="holiday.id" class="hover:bg-white/10 transition-colors">
                   <td class="p-4 font-medium text-neutral-200">{{ holiday.name || holiday.description }}</td>
                   <td class="p-4 text-neutral-400">{{ holiday.date }}</td>
                   <td class="p-4"><span class="px-2 py-1 text-xs rounded bg-neutral-800 text-neutral-300 border border-neutral-700">{{ holiday.type }}</span></td>

@@ -526,7 +526,7 @@ onMounted(async () => {
       :pending-requests-count="pendingRequestsCount"
     />
 
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6">
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6 dark:bg-gray-800 dark:border-gray-700">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
        
         <button
@@ -559,7 +559,7 @@ onMounted(async () => {
     >
       <div
         v-if="canViewMyLeaveRequests"
-        class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6 mb-2"
+        class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6 mb-2 dark:bg-gray-800 dark:border-gray-700"
       >
         <div class="flex items-center justify-between mb-6">
           <div class="flex items-center gap-3">

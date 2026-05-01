@@ -307,7 +307,7 @@ const handleExportReport = async () => {
 
         <!-- Quick Actions Card (spans 2 rows on the right) -->
         <div
-          class="lg:row-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+          class="lg:row-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
         >
           <h3 class="text-brand-dark text-lg font-bold mb-4">
             Payroll Actions
@@ -405,7 +405,7 @@ const handleExportReport = async () => {
 
       <div
         data-testid="payroll-analytics-section"
-        class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6 dark:bg-gray-800 dark:border-gray-700"
       >
         <div class="flex items-center justify-between gap-3 mb-4">
           <div>
@@ -490,7 +490,7 @@ const handleExportReport = async () => {
           <!-- Average Salary Trend -->
           <div
             data-testid="payroll-insights-avg-salary"
-            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
           >
             <h4 class="text-brand-dark text-base font-bold mb-3">Average Salary Trend</h4>
             <VueApexCharts
@@ -504,7 +504,7 @@ const handleExportReport = async () => {
           <!-- BPJS Contribution Trend -->
           <div
             data-testid="payroll-insights-bpjs"
-            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
           >
             <h4 class="text-brand-dark text-base font-bold mb-3">BPJS Contribution Trend</h4>
             <VueApexCharts
@@ -518,7 +518,7 @@ const handleExportReport = async () => {
           <!-- Top Deduction Reasons -->
           <div
             data-testid="payroll-insights-deduction-reasons"
-            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
           >
             <h4 class="text-brand-dark text-base font-bold mb-3">Top Deduction Reasons</h4>
             <div class="space-y-3">
@@ -544,7 +544,7 @@ const handleExportReport = async () => {
           <!-- Headcount vs Payroll Growth -->
           <div
             data-testid="payroll-insights-headcount"
-            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
           >
             <h4 class="text-brand-dark text-base font-bold mb-3">Headcount vs Payroll</h4>
             <div class="space-y-2">
@@ -568,7 +568,7 @@ const handleExportReport = async () => {
     <template v-else>
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
         <div
-          class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6"
+          class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6 dark:bg-gray-800 dark:border-gray-700"
         >
           <div class="flex items-center gap-3 mb-4">
             <div
@@ -608,7 +608,7 @@ const handleExportReport = async () => {
           </div>
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
+        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700">
           <h3 class="text-brand-dark text-lg font-bold mb-4">
             Payroll Actions
           </h3>
@@ -656,7 +656,7 @@ const handleExportReport = async () => {
     />
 
     <!-- Monthly Payroll Periods -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700">
       <div class="flex items-center justify-between mb-4">
         <h3 class="text-brand-dark text-lg font-bold">
           Monthly Payroll Periods
