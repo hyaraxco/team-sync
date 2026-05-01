@@ -974,7 +974,7 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <div v-show="activeTab === 'employees'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
+    <div v-show="activeTab === 'employees'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in dark:bg-gray-800 dark:border-gray-700">
       <div class="flex items-center justify-between mb-6">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
@@ -1149,7 +1149,7 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <div v-show="activeTab === 'activity'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
+    <div v-show="activeTab === 'activity'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in dark:bg-gray-800 dark:border-gray-700">
       <div class="flex items-start justify-between gap-4 mb-6">
         <div>
           <h3 class="text-brand-dark text-lg font-bold">Payroll Activity</h3>
@@ -1227,7 +1227,7 @@ const handleApprovePayroll = () => {
     <div
       v-show="activeTab === 'settings'"
       data-testid="payroll-settings-used-section"
-      class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in"
+      class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in dark:bg-gray-800 dark:border-gray-700"
     >
       <div class="flex items-start justify-between gap-4 mb-6">
         <div>
@@ -1314,7 +1314,7 @@ const handleApprovePayroll = () => {
       </div>
     </div>
 
-    <div v-show="activeTab === 'reconciliation'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in">
+    <div v-show="activeTab === 'reconciliation'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in dark:bg-gray-800 dark:border-gray-700">
       <div class="flex items-start justify-between gap-4 mb-6">
         <div>
           <h3 class="text-brand-dark text-lg font-bold">Reconciliation Check</h3>

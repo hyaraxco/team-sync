@@ -3,7 +3,7 @@
     <div class="max-w-7xl mx-auto space-y-8 relative">
       <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       
-      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/30 pb-8">
         <div class="space-y-2">
           <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
             Attendance Periods
@@ -30,7 +30,7 @@
             <svg class="animate-spin w-8 h-8 text-indigo-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
           </div>
 
-          <div v-else-if="!periodStore.periods?.length" class="text-center p-12 border border-dashed border-white/10 rounded-2xl text-neutral-500">
+          <div v-else-if="!periodStore.periods?.length" class="text-center p-12 border border-dashed border-white/30 rounded-2xl text-neutral-500">
             <p class="font-light italic">No attendance periods found.</p>
           </div>
 
@@ -39,8 +39,8 @@
               v-for="period in periodStore.periods" 
               :key="period.id"
               @click="selectPeriod(period)"
-              class="group flex items-center justify-between p-5 rounded-2xl bg-white/[0.03] border transition-all duration-300 cursor-pointer"
-              :class="selectedPeriod?.id === period.id ? 'border-indigo-500/50 bg-white/[0.08] shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border-white/[0.05] hover:bg-white/[0.06] hover:border-white/20'"
+              class="group flex items-center justify-between p-5 rounded-2xl bg-white/[0.08] border transition-all duration-300 cursor-pointer"
+              :class="selectedPeriod?.id === period.id ? 'border-indigo-500/50 bg-white/[0.12] shadow-[0_0_30px_rgba(99,102,241,0.15)]' : 'border-white/15 hover:bg-white/[0.12] hover:border-white/30'"
             >
               <div class="flex items-center gap-5">
                 <div class="w-12 h-12 rounded-full flex items-center justify-center font-display font-medium text-lg"
@@ -75,7 +75,7 @@
         </div>
 
         <div class="lg:col-span-1">
-          <div class="sticky top-8 p-6 rounded-3xl bg-neutral-800/50 backdrop-blur-xl border border-white/10 shadow-2xl">
+          <div class="sticky top-8 p-6 rounded-3xl bg-neutral-800/50 backdrop-blur-xl border border-white/30 shadow-2xl">
             <h2 class="text-xl font-light mb-6 flex items-center gap-2">
               <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
               Readiness Workspace
@@ -87,7 +87,7 @@
             </div>
             
             <div v-else class="space-y-6">
-              <div class="p-4 rounded-xl bg-white/5 border border-white/5">
+              <div class="p-4 rounded-xl bg-white/10 border border-white/15">
                 <h3 class="text-sm text-neutral-400 font-light mb-1">Selected Period</h3>
                 <p class="text-lg font-medium text-white">{{ selectedPeriod.month }}</p>
               </div>
@@ -112,10 +112,10 @@
                 </div>
               </div>
 
-              <div class="pt-6 border-t border-white/10">
+              <div class="pt-6 border-t border-white/30">
                 <button 
                   class="w-full py-3 rounded-xl font-medium tracking-wide transition-all"
-                  :class="selectedPeriod.status === 'review' ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-white/5 text-neutral-500 cursor-not-allowed'"
+                  :class="selectedPeriod.status === 'review' ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25' : 'bg-white/10 text-neutral-500 cursor-not-allowed'"
                   :disabled="selectedPeriod.status !== 'review'"
                 >
                   Generate Payroll

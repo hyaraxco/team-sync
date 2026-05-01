@@ -47,7 +47,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
   <!-- Wrapper mode: when default slot content is provided, render as a plain card -->
   <div
     v-if="$slots.default"
-    class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5"
+    class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5 dark:bg-gray-800 dark:border-gray-700"
   >
     <slot></slot>
   </div>

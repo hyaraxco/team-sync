@@ -195,7 +195,7 @@ const clearSearch = () => {
       />
 
       <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
       >
         <div class="flex items-center justify-between mb-3">
           <div
@@ -214,7 +214,7 @@ const clearSearch = () => {
       </div>
 
       <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
       >
         <div class="flex items-center justify-between mb-3">
           <div
@@ -233,7 +233,7 @@ const clearSearch = () => {
       </div>
 
       <div
-        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+        class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
       >
         <div class="flex items-center justify-between mb-3">
           <div
@@ -254,7 +254,7 @@ const clearSearch = () => {
       </div>
     </div>
 
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-4">
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-4 dark:bg-gray-800 dark:border-gray-700">
       <div class="flex flex-col md:flex-row gap-4">
         <div class="flex-1 relative">
           <div
@@ -301,7 +301,7 @@ const clearSearch = () => {
       </div>
     </div>
 
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6">
+    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6 dark:bg-gray-800 dark:border-gray-700">
       <div class="mb-6">
         <h3 class="text-[#0C1C3C] font-bold text-xl">All Payroll Periods</h3>
         <p class="text-gray-600 text-sm mt-1">

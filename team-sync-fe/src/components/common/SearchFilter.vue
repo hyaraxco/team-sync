@@ -129,7 +129,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
+  <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 dark:bg-gray-800 dark:border-gray-700">
     <div
       class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4"
     >
@@ -138,7 +138,7 @@ onUnmounted(() => {
         <div
           class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
         >
-          <SearchIcon class="h-5 w-5 text-gray-400" />
+          <SearchIcon class="h-5 w-5 text-gray-500" />
         </div>
         <input
           v-model="searchQuery"
@@ -159,7 +159,7 @@ onUnmounted(() => {
           <div
             class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none"
           >
-            <component :is="getIcon(filter.icon)" class="h-4 w-4 text-gray-400" />
+            <component :is="getIcon(filter.icon)" class="h-4 w-4 text-gray-500" />
           </div>
           <select
             v-model="filterValues[filter.key]"
@@ -177,7 +177,7 @@ onUnmounted(() => {
           <div
             class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"
           >
-            <ChevronDownIcon class="h-4 w-4 text-gray-400" />
+            <ChevronDownIcon class="h-4 w-4 text-gray-500" />
           </div>
         </div>
 

@@ -3,7 +3,7 @@
     <div class="max-w-6xl mx-auto space-y-8 relative">
       <div class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-cyan-600/20 rounded-full blur-[120px] pointer-events-none"></div>
       
-      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/10 pb-8">
+      <header class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/30 pb-8">
         <div class="space-y-2">
           <h1 class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500">
             Hybrid Schedule
@@ -24,7 +24,7 @@
           <p>Failed to load schedule. The service might be temporarily unavailable.</p>
         </div>
 
-        <div v-else-if="loading" class="flex justify-center p-16 border border-white/5 rounded-3xl bg-white/[0.02]">
+        <div v-else-if="loading" class="flex justify-center p-16 border border-white/15 rounded-3xl bg-white/[0.06]">
           <svg class="animate-spin w-8 h-8 text-cyan-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
         </div>
 
@@ -37,7 +37,7 @@
             </h2>
             <div class="grid gap-3">
               <div v-for="(location, day) in schedule.base_schedule" :key="day" 
-                   class="flex items-center justify-between p-4 rounded-xl bg-white/[0.03] border border-white/5 hover:bg-white/[0.06] transition-colors">
+                   class="flex items-center justify-between p-4 rounded-xl bg-white/[0.08] border border-white/15 hover:bg-white/[0.12] transition-colors">
                 <span class="font-medium text-white capitalize">{{ day }}</span>
                 <span 
                   class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border"
@@ -55,13 +55,13 @@
               Overrides & Exceptions
             </h2>
             
-            <div v-if="!schedule.overrides?.length" class="text-center p-8 border border-dashed border-white/10 rounded-2xl bg-white/[0.01] text-neutral-500">
+            <div v-if="!schedule.overrides?.length" class="text-center p-8 border border-dashed border-white/30 rounded-2xl bg-white/[0.06] text-neutral-500">
               <p class="font-light italic">No overrides requested.</p>
             </div>
             
             <div v-else class="space-y-3">
               <div v-for="override in schedule.overrides" :key="override.id" 
-                   class="p-4 rounded-xl bg-white/[0.03] border border-white/5">
+                   class="p-4 rounded-xl bg-white/[0.08] border border-white/15">
                 <div class="flex justify-between items-start mb-2">
                   <div>
                     <p class="font-medium text-white">{{ override.date }}</p>
@@ -71,7 +71,7 @@
                     {{ override.status }}
                   </span>
                 </div>
-                <p class="text-xs text-neutral-500 italic mt-2 border-t border-white/5 pt-2">Reason: {{ override.reason }}</p>
+                <p class="text-xs text-neutral-500 italic mt-2 border-t border-white/15 pt-2">Reason: {{ override.reason }}</p>
               </div>
             </div>
           </div>

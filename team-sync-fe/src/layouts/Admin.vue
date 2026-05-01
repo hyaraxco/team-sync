@@ -26,7 +26,7 @@ const closeSidebar = () => {
       <!-- Top Navbar -->
       <Header @toggle-sidebar="toggleSidebar" />
       <!-- Dashboard Content -->
-      <main class="main-content flex-1 overflow-auto p-3">
+      <main class="main-content flex-1 overflow-auto p-3 bg-gray-50 dark:bg-gray-900">
         <RouterView />
       </main>
     </div>
