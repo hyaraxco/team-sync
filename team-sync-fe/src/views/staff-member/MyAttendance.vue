@@ -1116,6 +1116,7 @@ onMounted(async () => {
                       v-model="leaveForm.start_date"
                       @change="updateEndDateMin"
                       required
+                      data-testid="leave-start-date"
                       class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                     />
                   </div>
@@ -1130,6 +1131,7 @@ onMounted(async () => {
                       v-model="leaveForm.end_date"
                       :min="leaveForm.start_date"
                       required
+                      data-testid="leave-end-date"
                       class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                     />
                   </div>
@@ -1174,6 +1176,7 @@ onMounted(async () => {
                       v-model="leaveForm.reason"
                       required
                       rows="4"
+                      data-testid="leave-reason"
                       class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold resize-none"
                       placeholder="Please provide a detailed reason for your leave request..."
                     ></textarea>

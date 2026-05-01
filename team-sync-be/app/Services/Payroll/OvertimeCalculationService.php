@@ -12,10 +12,6 @@ class OvertimeCalculationService
     protected const HOURLY_DIVISOR = 173;
 
     /**
-     * Calculate total overtime pay for a collection of approved overtime records.
-     *
-     * @param  float  $monthlySalary  Employee's monthly salary
-     * @param  Collection  $overtimeRecords  Collection of OvertimeRecord models (approved)
      * @return array{total_amount: float, breakdown: array, total_hours: float}
      */
     public function calculateOvertimePay(float $monthlySalary, Collection $overtimeRecords): array
@@ -60,10 +56,6 @@ class OvertimeCalculationService
         ];
     }
 
-    /**
-     * Calculate hourly rate from monthly salary.
-     * Formula: Monthly Salary ÷ 173
-     */
     public function getHourlyRate(float $monthlySalary): float
     {
         return $monthlySalary / self::HOURLY_DIVISOR;
@@ -122,22 +114,11 @@ class OvertimeCalculationService
         return round($amount, 2);
     }
 
-    /**
-     * Calculate holiday overtime pay.
-     * Same structure as weekend overtime:
-     * - First 7 hours: 2× hourly rate
-     * - 8th hour: 3× hourly rate
-     * - 9th hour onwards: 4× hourly rate
-     */
     public function calculateHolidayOvertime(float $hourlyRate, float $hours): float
     {
-        // Holiday overtime uses the same multiplier structure as weekend
         return $this->calculateWeekendOvertime($hourlyRate, $hours);
     }
 
-    /**
-     * Get a human-readable description of multipliers applied.
-     */
     private function getMultiplierDescription(string $type, float $hours): string
     {
         if ($type === 'workday') {
@@ -148,7 +129,6 @@ class OvertimeCalculationService
             return '1.5x (1h) + 2x (' . round($hours - 1, 2) . 'h)';
         }
 
-        // Weekend/Holiday
         if ($hours <= 7.0) {
             return '2x';
         }

@@ -23,14 +23,9 @@ class OvertimeRecord extends Model
 
     public const TYPE_HOLIDAY = 'holiday';
 
-    /**
-     * Maximum overtime hours per day (Indonesian regulation).
-     */
+    // Indonesian labor regulation limits (Kepmenakertrans KEP.102/MEN/VI/2004)
     public const MAX_HOURS_PER_DAY = 4;
 
-    /**
-     * Maximum overtime hours per week (Indonesian regulation).
-     */
     public const MAX_HOURS_PER_WEEK = 18;
 
     protected $fillable = [
