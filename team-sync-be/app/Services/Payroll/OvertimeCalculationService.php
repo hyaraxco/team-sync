@@ -12,6 +12,11 @@ class OvertimeCalculationService
     protected const HOURLY_DIVISOR = 173;
 
     /**
+     * Maximum daily overtime hours per Indonesian labor law.
+     */
+    private const MAX_DAILY_OVERTIME_HOURS = 4.0;
+
+    /**
      * @return array{total_amount: float, breakdown: array, total_hours: float}
      */
     public function calculateOvertimePay(float $monthlySalary, Collection $overtimeRecords): array
@@ -22,7 +27,7 @@ class OvertimeCalculationService
         $breakdown = [];
 
         foreach ($overtimeRecords as $record) {
-            $hours = (float) $record->hours;
+            $hours = min(max(0, (float) $record->hours), self::MAX_DAILY_OVERTIME_HOURS);
             $type = $record->overtime_type;
 
             $amount = match ($type) {
@@ -58,6 +63,10 @@ class OvertimeCalculationService
 
     public function getHourlyRate(float $monthlySalary): float
     {
+        if ($monthlySalary <= 0) {
+            return 0.0;
+        }
+
         return $monthlySalary / self::HOURLY_DIVISOR;
     }
 

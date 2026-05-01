@@ -232,12 +232,13 @@ class OvertimeCalculationTest extends TestCase
         $this->assertArrayHasKey('breakdown', $result);
         $this->assertArrayHasKey('total_hours', $result);
 
-        $this->assertEquals(10.0, $result['total_hours']);
+        // Hours are capped at 4.0 per record (Indonesian labor law max)
+        $this->assertEquals(6.0, $result['total_hours']);
         $this->assertCount(2, $result['breakdown']);
 
-        // Verify individual amounts
+        // Verify individual amounts (weekend record capped from 8.0 to 4.0)
         $workdayAmount = $this->service->calculateWorkdayOvertime($hourlyRate, 2.0);
-        $weekendAmount = $this->service->calculateWeekendOvertime($hourlyRate, 8.0);
+        $weekendAmount = $this->service->calculateWeekendOvertime($hourlyRate, 4.0);
         $expectedTotal = round($workdayAmount + $weekendAmount, 2);
 
         $this->assertEqualsWithDelta($expectedTotal, $result['total_amount'], 0.01);

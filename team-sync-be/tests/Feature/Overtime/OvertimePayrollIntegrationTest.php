@@ -209,7 +209,8 @@ class OvertimePayrollIntegrationTest extends TestCase
 
         $this->assertNotNull($detail);
         $this->assertEquals(3, $detail->overtime_records_count);
-        $this->assertEquals(11.0, (float) $detail->overtime_hours);
+        // Hours are capped at 4.0 per record: 1.0 + 2.0 + 4.0 = 7.0
+        $this->assertEquals(7.0, (float) $detail->overtime_hours);
         $this->assertGreaterThan(0, (float) $detail->overtime_amount);
     }
 
