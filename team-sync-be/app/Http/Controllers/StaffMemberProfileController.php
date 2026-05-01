@@ -267,7 +267,10 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Team Retrieved Successfully', TeamResource::make($team), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Team Not Found', null, 404);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'not assigned to any team')) {
+                return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
+            }
             \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -284,7 +287,10 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Team members Retrieved Successfully', TeamMemberResource::collection($members), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Team Not Found', null, 404);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'not assigned to any team')) {
+                return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
+            }
             \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -301,7 +307,10 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Team projects Retrieved Successfully', ProjectResource::collection($projects), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Team Not Found', null, 404);
-        } catch (\Throwable $e) {
+        } catch (\Exception $e) {
+            if (str_contains($e->getMessage(), 'not assigned to any team')) {
+                return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
+            }
             \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
