@@ -12,6 +12,9 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
+            // 0. Seed company (multi-tenancy foundation)
+            CompanySeeder::class,
+
             // 1. Seed roles and permissions first
             RoleSeeder::class,
             PermissionSeeder::class,

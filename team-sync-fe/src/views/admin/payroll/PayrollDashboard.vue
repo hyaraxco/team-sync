@@ -350,6 +350,18 @@ const handleExportReport = async () => {
             </button>
 
             <RouterLink
+              v-if="hasPayrollStatistics"
+              :to="{ name: 'admin.payroll.comparison' }"
+              data-testid="payroll-comparison-link"
+              class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+            >
+              <Banknote class="w-4 h-4 text-gray-600" />
+              <span class="text-brand-dark text-sm font-medium"
+                >MoM Comparison</span
+              >
+            </RouterLink>
+
+            <RouterLink
               :to="{ name: 'admin.payroll.settings' }"
               data-testid="payroll-settings-link"
               class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"

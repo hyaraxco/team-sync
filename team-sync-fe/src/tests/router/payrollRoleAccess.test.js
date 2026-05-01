@@ -25,6 +25,18 @@ vi.mock("@/views/staff-member/PayslipDetail.vue", () => ({
   default: {},
 }));
 
+vi.mock("@/views/admin/payroll/ThrManagement.vue", () => ({
+  default: {},
+}));
+
+vi.mock("@/views/admin/payroll/PayrollReadiness.vue", () => ({
+  default: {},
+}));
+
+vi.mock("@/views/admin/payroll/PayrollComparison.vue", () => ({
+  default: {},
+}));
+
 import payrollRoutes from "@/router/payroll";
 
 const routeMeta = (name) =>

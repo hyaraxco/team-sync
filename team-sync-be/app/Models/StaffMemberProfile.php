@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -14,7 +15,7 @@ use Laravel\Scout\Searchable;
  */
 class StaffMemberProfile extends Model
 {
-    use HasFactory, Searchable, SoftDeletes;
+    use BelongsToCompany, HasFactory, Searchable, SoftDeletes;
 
     protected $appends = ['full_name', 'email'];
 
@@ -160,5 +161,10 @@ class StaffMemberProfile extends Model
     public function payrollAdjustments()
     {
         return $this->hasMany(PayrollAdjustment::class, 'staff_member_id');
+    }
+
+    public function overtimeRecords()
+    {
+        return $this->hasMany(OvertimeRecord::class, 'staff_member_id');
     }
 }

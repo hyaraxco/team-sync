@@ -41,4 +41,21 @@ class LeaveBalanceController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
+
+    public function getMyUpcomingCutiBersama(Request $request)
+    {
+        try {
+            $employee = $request->user()->staffMemberProfile;
+            if (! $employee) {
+                return ResponseHelper::jsonResponse(false, 'Employee profile not found.', [], 404);
+            }
+
+            $cutiBersama = $this->leaveBalanceService->getUpcomingCollectiveLeave($employee->id);
+
+            return ResponseHelper::jsonResponse(true, 'Upcoming collective leave retrieved successfully.', $cutiBersama, 200);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('LeaveBalanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
 }

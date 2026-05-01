@@ -83,6 +83,7 @@ export const usePayrollStore = defineStore("payroll", {
         settings: null,
         settingsHistory: [],
         bpjsRateHistory: [],
+        payrollComparison: null,
         meta: {
             current_page: 1,
             last_page: 1,
@@ -445,6 +446,28 @@ export const usePayrollStore = defineStore("payroll", {
                 this.analytics = response.data.data ?? getDefaultAnalyticsState();
 
                 return this.analytics;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loadingAnalytics = false;
+            }
+        },
+
+        async fetchPayrollComparison(month1, month2) {
+            this.loadingAnalytics = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get('/payrolls/compare', {
+                    params: {
+                        month1,
+                        month2
+                    },
+                });
+
+                this.payrollComparison = response.data.data;
+                return this.payrollComparison;
             } catch (error) {
                 this.error = handleError(error);
                 throw error;

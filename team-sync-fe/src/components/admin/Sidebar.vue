@@ -543,11 +543,11 @@ const onNavigate = () => emit("navigate");
           </RouterLink>
 
           <!-- 3. My Payroll (monthly) -->
-          <RouterLink
+            <RouterLink
             :to="{ name: 'staffMember.payroll' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
-              'nav-link-active': $route.name?.startsWith('staffMember.payroll') || $route.name?.startsWith('staffMember.payslips'),
+              'nav-link-active': $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
             }"
             v-if="can('payslip-view')"
             @click="onNavigate"
@@ -555,14 +555,14 @@ const onNavigate = () => emit("navigate");
             <WalletIcon
               class="w-5 h-5 text-gray-600"
               :class="{
-                'text-white': $route.name?.startsWith('staffMember.payroll') || $route.name?.startsWith('staffMember.payslips'),
+                'text-white': $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
                 'text-brand-white':
-                  $route.name?.startsWith('staffMember.payroll') || $route.name?.startsWith('staffMember.payslips'),
+                  $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
               }"
               >My Payroll</span
             >

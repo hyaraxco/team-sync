@@ -26,9 +26,18 @@ class PayrollRoleJourneyTest extends TestCase
     {
         parent::setUp();
 
+        // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
+        Carbon::setTestNow('2026-05-02 09:00:00');
+
         $this->seed(MinimalPayrollE2ESeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     public function test_seeded_hr_finance_manager_and_employee_follow_the_expected_payroll_journey(): void
