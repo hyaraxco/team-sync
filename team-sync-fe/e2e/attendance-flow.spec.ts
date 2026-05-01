@@ -1,15 +1,18 @@
 import { expect, test } from "@playwright/test";
 import { loginAsRole } from "./helpers/auth";
 
-const getTomorrow = () => {
+/**
+ * Get the next available weekday (Mon-Fri) in the next month.
+ * Next month's attendance period is always "open", so leave requests are accepted.
+ */
+const getNextMonthWeekday = (offset = 0) => {
     const date = new Date();
-    date.setDate(date.getDate() + 1);
-    return date.toISOString().slice(0, 10);
-};
-
-const getDayAfterTomorrow = () => {
-    const date = new Date();
-    date.setDate(date.getDate() + 2);
+    date.setMonth(date.getMonth() + 1);
+    date.setDate(10 + offset); // Start from 10th to avoid edge cases
+    // Ensure it's a weekday
+    while (date.getDay() === 0 || date.getDay() === 6) {
+        date.setDate(date.getDate() + 1);
+    }
     return date.toISOString().slice(0, 10);
 };
 
@@ -49,11 +52,11 @@ test.describe.serial("Attendance flow", () => {
         const leaveTypeSelect = page.locator("select").filter({ has: page.locator("option[value='']") }).first();
         await leaveTypeSelect.selectOption({ index: 1 });
 
-        const tomorrow = getTomorrow();
-        const dayAfterTomorrow = getDayAfterTomorrow();
+        const startDate = getNextMonthWeekday(0);
+        const endDate = getNextMonthWeekday(1);
 
-        await page.locator('input[type="date"]').nth(0).fill(tomorrow);
-        await page.locator('input[type="date"]').nth(1).fill(dayAfterTomorrow);
+        await page.locator('input[type="date"]').nth(0).fill(startDate);
+        await page.locator('input[type="date"]').nth(1).fill(endDate);
         await page
             .locator('textarea[placeholder*="detailed reason for your leave request"]')
             .fill(`E2E leave request ${Date.now()}`);
