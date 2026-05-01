@@ -1,16 +1,13 @@
 <?php
 
-namespace Tests\Feature\Overtime;
+namespace Tests\Unit\Services;
 
 use App\Services\Payroll\OvertimeCalculationService;
-use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 use Tests\TestCase;
 
 class OvertimeCalculationTest extends TestCase
 {
-    use RefreshDatabase;
-
     private OvertimeCalculationService $service;
 
     protected function setUp(): void

@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Interfaces\OvertimeRepositoryInterface;
+use App\Models\AttendancePeriod;
 use App\Models\OvertimeRecord;
 use App\Models\User;
 use App\Notifications\OvertimeApprovedNotification;
@@ -45,18 +46,27 @@ class OvertimeService
     }
 
     /**
-     * Create a new overtime record with business rule validation.
-     *
      * @return array{success: bool, message: string, record: ?OvertimeRecord}
      */
     public function create(array $validated): array
     {
-        // Calculate hours from start_time and end_time
+        $lockedPeriod = AttendancePeriod::where('status', AttendancePeriod::STATUS_LOCKED)
+            ->where('start_date', '<=', $validated['date'])
+            ->where('end_date', '>=', $validated['date'])
+            ->exists();
+
+        if ($lockedPeriod) {
+            return [
+                'success' => false,
+                'message' => 'Cannot create overtime for a date in a locked attendance period.',
+                'record' => null,
+            ];
+        }
+
         $start = Carbon::createFromFormat('H:i', $validated['start_time']);
         $end = Carbon::createFromFormat('H:i', $validated['end_time']);
         $hours = round(abs($end->diffInMinutes($start)) / 60, 2);
 
-        // Validate max hours per day
         if ($hours > OvertimeRecord::MAX_HOURS_PER_DAY) {
             return [
                 'success' => false,
@@ -65,7 +75,6 @@ class OvertimeService
             ];
         }
 
-        // Validate max hours per week
         $existingWeeklyHours = $this->overtimeRepository->getWeeklyHoursForStaffMember(
             $validated['staff_member_id'],
             $validated['date']
@@ -101,8 +110,6 @@ class OvertimeService
     }
 
     /**
-     * Approve an overtime record.
-     *
      * @return array{success: bool, message: string, record: ?OvertimeRecord}
      */
     public function approve(int $id, User $approver): array
@@ -119,7 +126,6 @@ class OvertimeService
 
         $record = $this->overtimeRepository->approve($record, $approver->id);
 
-        // Send notification to employee
         $employeeUser = $record->staffMember?->user;
         if ($employeeUser) {
             $employeeUser->notify(new OvertimeApprovedNotification($record, $approver));
@@ -133,8 +139,6 @@ class OvertimeService
     }
 
     /**
-     * Reject an overtime record.
-     *
      * @return array{success: bool, message: string, record: ?OvertimeRecord}
      */
     public function reject(int $id, string $reason, User $rejector): array
@@ -151,7 +155,6 @@ class OvertimeService
 
         $record = $this->overtimeRepository->reject($record, $reason);
 
-        // Send notification to employee
         $employeeUser = $record->staffMember?->user;
         if ($employeeUser) {
             $employeeUser->notify(new OvertimeRejectedNotification($record, $rejector));

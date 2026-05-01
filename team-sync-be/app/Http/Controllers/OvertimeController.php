@@ -32,9 +32,6 @@ class OvertimeController extends Controller implements HasMiddleware
         ];
     }
 
-    /**
-     * List overtime records with optional filtering.
-     */
     public function index(Request $request): JsonResponse
     {
         try {
@@ -60,9 +57,6 @@ class OvertimeController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Create a new overtime record.
-     */
     public function store(StoreOvertimeRequest $request): JsonResponse
     {
         try {
@@ -85,9 +79,6 @@ class OvertimeController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Show a single overtime record.
-     */
     public function show(string $id): JsonResponse
     {
         try {
@@ -108,9 +99,6 @@ class OvertimeController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Approve an overtime record.
-     */
     public function approve(ApproveOvertimeRequest $request, string $id): JsonResponse
     {
         try {
@@ -135,9 +123,6 @@ class OvertimeController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Reject an overtime record.
-     */
     public function reject(RejectOvertimeRequest $request, string $id): JsonResponse
     {
         try {
@@ -166,9 +151,6 @@ class OvertimeController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Get overtime records for the authenticated employee.
-     */
     public function getMyOvertime(Request $request): JsonResponse
     {
         try {
@@ -198,9 +180,6 @@ class OvertimeController extends Controller implements HasMiddleware
         }
     }
 
-    /**
-     * Get overtime summary statistics.
-     */
     public function getOvertimeSummary(Request $request): JsonResponse
     {
         try {

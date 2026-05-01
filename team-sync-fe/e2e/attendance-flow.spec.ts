@@ -55,11 +55,9 @@ test.describe.serial("Attendance flow", () => {
         const startDate = getNextMonthWeekday(0);
         const endDate = getNextMonthWeekday(1);
 
-        await page.locator('input[type="date"]').nth(0).fill(startDate);
-        await page.locator('input[type="date"]').nth(1).fill(endDate);
-        await page
-            .locator('textarea[placeholder*="detailed reason for your leave request"]')
-            .fill(`E2E leave request ${Date.now()}`);
+        await page.getByTestId('leave-start-date').fill(startDate);
+        await page.getByTestId('leave-end-date').fill(endDate);
+        await page.getByTestId('leave-reason').fill(`E2E leave request ${Date.now()}`);
 
         await page.getByRole("button", { name: "Submit Request" }).click();
 
