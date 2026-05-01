@@ -319,6 +319,89 @@ class OvertimeControllerTest extends TestCase
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Negative Path: Business Rule Enforcement
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function test_cannot_create_overtime_exceeding_4_hours_per_day(): void
+    {
+        $this->actingAsRole('hr');
+
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
+        });
+
+        $payload = [
+            'staff_member_id' => $employee->id,
+            'date' => now()->subDay()->format('Y-m-d'),
+            'start_time' => '17:00',
+            'end_time' => '21:30', // 4.5 hours — exceeds max 4
+            'overtime_type' => 'workday',
+        ];
+
+        $this->postJson('/api/v1/overtime', $payload)
+            ->assertStatus(422)
+            ->assertJsonFragment(['success' => false]);
+    }
+
+    public function test_cannot_create_overtime_for_locked_attendance_period(): void
+    {
+        $this->actingAsRole('hr');
+
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
+        });
+
+        $lockedDate = now()->subDays(10)->format('Y-m-d');
+
+        \App\Models\AttendancePeriod::factory()->create([
+            'start_date' => now()->subDays(15)->format('Y-m-d'),
+            'end_date' => now()->subDays(5)->format('Y-m-d'),
+            'status' => \App\Models\AttendancePeriod::STATUS_LOCKED,
+            'locked_at' => now()->subDays(3),
+        ]);
+
+        $payload = [
+            'staff_member_id' => $employee->id,
+            'date' => $lockedDate,
+            'start_time' => '17:00',
+            'end_time' => '19:00',
+            'overtime_type' => 'workday',
+        ];
+
+        $this->postJson('/api/v1/overtime', $payload)
+            ->assertStatus(422)
+            ->assertJsonFragment(['success' => false]);
+    }
+
+    public function test_cannot_create_duplicate_overtime_for_same_date_and_employee(): void
+    {
+        $this->actingAsRole('hr');
+
+        $date = now()->subDay()->format('Y-m-d');
+
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () use ($date) {
+            $emp = StaffMemberProfile::factory()->create();
+            OvertimeRecord::factory()->forEmployee($emp)->create([
+                'date' => $date,
+            ]);
+
+            return $emp;
+        });
+
+        $payload = [
+            'staff_member_id' => $employee->id,
+            'date' => $date,
+            'start_time' => '17:00',
+            'end_time' => '19:00',
+            'overtime_type' => 'workday',
+        ];
+
+        $this->postJson('/api/v1/overtime', $payload)
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['date']);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Helper
     // ─────────────────────────────────────────────────────────────────────────
 

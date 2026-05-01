@@ -2,21 +2,32 @@
 
 namespace App\Http\Requests;
 
-use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOvertimeRequest extends FormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array<string, ValidationRule|array<mixed>|string>
-     */
     public function rules(): array
     {
         return [
             'staff_member_id' => ['required', 'integer', 'exists:staff_member_profiles,id'],
-            'date' => ['required', 'date', 'before_or_equal:today'],
+            'date' => [
+                'required',
+                'date',
+                'before_or_equal:today',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (! $value || ! $this->input('staff_member_id')) {
+                        return;
+                    }
+
+                    $exists = \App\Models\OvertimeRecord::where('staff_member_id', $this->input('staff_member_id'))
+                        ->whereDate('date', $value)
+                        ->exists();
+
+                    if ($exists) {
+                        $fail('An overtime record already exists for this employee on the selected date.');
+                    }
+                },
+            ],
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'overtime_type' => ['required', 'string', 'in:workday,weekend,holiday'],

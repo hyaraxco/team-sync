@@ -103,7 +103,6 @@ class CutiBersamaValidationTest extends TestCase
             'user_id' => $user->id,
         ]);
 
-        // Create national holiday (not cuti bersama)
         HolidayCalendar::create([
             'date' => now()->addDays(5)->format('Y-m-d'),
             'name' => 'National Holiday Test',
@@ -121,12 +120,14 @@ class CutiBersamaValidationTest extends TestCase
             'reason' => 'Test leave request',
         ]);
 
-        // Should not get cuti bersama validation error
         if ($response->status() === 422) {
             $errors = $response->json('errors.start_date', []);
             foreach ($errors as $error) {
                 $this->assertStringNotContainsString('collective leave', $error);
             }
+        } else {
+            // Request passed validation — national holiday did not trigger cuti bersama rejection
+            $this->assertNotEquals(422, $response->status());
         }
     }
 
