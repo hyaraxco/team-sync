@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 import { drainQueue } from "./helpers/backend";
 import { captureEvidence } from "./helpers/evidence";
@@ -20,6 +20,14 @@ const previousMonth = () => {
   const year = date.getFullYear();
   const month = String(date.getMonth() + 1).padStart(2, "0");
   return `${year}-${month}`;
+};
+
+const isExpectedWaitFailure = (error: unknown) => {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /Timed out|Timeout|expect\.poll|toBeVisible/.test(error.message);
 };
 
 const extractPayrollIdFromPendingRow = async (page: Parameters<typeof captureEvidence>[0]) => {
@@ -113,7 +121,11 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
           })
           .toBe(true);
         return true;
-      } catch {
+      } catch (error) {
+        if (!isExpectedWaitFailure(error)) {
+          throw error;
+        }
+
         return false;
       }
     };
@@ -144,7 +156,11 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
           });
           rowVisible = true;
           break;
-        } catch {
+        } catch (error) {
+          if (!isExpectedWaitFailure(error)) {
+            throw error;
+          }
+
           drainQueue(3);
         }
       }
