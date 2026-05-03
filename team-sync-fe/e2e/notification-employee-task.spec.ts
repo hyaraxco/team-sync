@@ -1,4 +1,5 @@
-import { expect, request, test, type APIRequestContext, type Page } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
+import { request, type APIRequestContext, type Page } from "@playwright/test";
 import { loginAsRole, roleCredentials } from "./helpers/auth";
 import { drainQueue } from "./helpers/backend";
 import { captureEvidence } from "./helpers/evidence";
@@ -40,6 +41,14 @@ type NotificationPayload = {
     task_id?: number;
     task_name?: string;
   };
+};
+
+const isExpectedNotificationWaitFailure = (error: unknown) => {
+  if (!(error instanceof Error)) {
+    return false;
+  }
+
+  return /Timed out|toBeVisible/.test(error.message);
 };
 
 const getTokenCookie = async (page: Page): Promise<string> => {
@@ -158,7 +167,11 @@ test.describe.serial("Employee task assignment notifications", () => {
         await expect(taskNotificationLocator).toBeVisible({ timeout: 5_000 });
         taskNotificationFound = true;
         break;
-      } catch {
+      } catch (error) {
+        if (!isExpectedNotificationWaitFailure(error)) {
+          throw error;
+        }
+
         // Notification not yet delivered — drain queue again and reload
         drainQueue(3);
         await employeePage.reload();

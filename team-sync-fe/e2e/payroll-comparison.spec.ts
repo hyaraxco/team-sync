@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 import { captureEvidence } from "./helpers/evidence";
 
@@ -25,14 +25,27 @@ test.describe("Month-over-Month Payroll Comparison Report", () => {
 
         await compareBtn.click();
 
-        await page.waitForTimeout(3_000);
+        await expect
+            .poll(async () => {
+                if (await page.getByRole("table").first().isVisible()) {
+                    return "table";
+                }
+
+                if (await page.getByText(/No payroll data found/i).first().isVisible()) {
+                    return "no-data";
+                }
+
+                if (await page.getByText(/loading/i).first().isVisible()) {
+                    return "loading";
+                }
+
+                return "pending";
+            }, {
+                timeout: 15_000,
+                intervals: [250, 500, 1_000],
+            })
+            .toMatch(/^(table|no-data)$/);
 
         await captureEvidence(page, "payroll-mom-comparison-results.png");
-
-        const hasTable = await page.getByRole("table").isVisible().catch(() => false);
-        const hasNoData = await page.getByText(/No payroll data found/i).isVisible().catch(() => false);
-        const hasLoading = await page.getByText(/Loading/i).isVisible().catch(() => false);
-
-        expect(hasTable || hasNoData || hasLoading).toBeTruthy();
     });
 });

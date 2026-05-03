@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 
 test.describe.serial("Performance Reviewer Override Journey", () => {
@@ -17,7 +17,7 @@ test.describe.serial("Performance Reviewer Override Journey", () => {
     await expect(page).toHaveURL(/\/admin\/performance\/cycles\/1$/);
 
     // Verify we are on the detail page and the Generated Reviews section is visible
-    await expect(page.getByText("Generated Reviews")).toBeVisible();
+    await expect(page.getByText("Generated Reviews")).toBeVisible({ timeout: 15_000 });
 
     // 3. Generate Reviews
     // Check if the "Generate Reviews" button exists and click it
