@@ -1,4 +1,4 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 import { captureEvidence } from "./helpers/evidence";
 
@@ -19,8 +19,8 @@ test.describe("Cuti Bersama (Collective Leave) Validations", () => {
         const cutiWidget = page.locator('[data-testid="upcoming-cuti-bersama"]');
         const cutiHeading = page.getByText(/Upcoming Cuti Bersama/i);
 
-        const widgetVisible = await cutiWidget.isVisible().catch(() => false);
-        const headingVisible = await cutiHeading.isVisible().catch(() => false);
+        const widgetVisible = await cutiWidget.first().isVisible();
+        const headingVisible = await cutiHeading.first().isVisible();
 
         if (widgetVisible || headingVisible) {
             await captureEvidence(page, "cuti-bersama-widget-visible.png");

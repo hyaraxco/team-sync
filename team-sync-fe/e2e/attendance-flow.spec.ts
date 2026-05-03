@@ -1,19 +1,34 @@
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 
+const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
+
 /**
- * Get the next available weekday (Mon-Fri) in the next month.
- * Next month's attendance period is always "open", so leave requests are accepted.
+ * Pick a weekday range in next month with a rotating start day
+ * to avoid overlaps between repeated test executions.
  */
-const getNextMonthWeekday = (offset = 0) => {
-    const date = new Date();
-    date.setMonth(date.getMonth() + 1);
-    date.setDate(10 + offset); // Start from 10th to avoid edge cases
-    // Ensure it's a weekday
-    while (date.getDay() === 0 || date.getDay() === 6) {
-        date.setDate(date.getDate() + 1);
+const getNextMonthWeekdayRange = () => {
+    const start = new Date();
+    start.setMonth(start.getMonth() + 1, 1);
+
+    const rotatingOffset = Math.floor((Date.now() / 1_000) % 10);
+    start.setDate(10 + rotatingOffset);
+
+    while (start.getDay() === 0 || start.getDay() === 6) {
+        start.setDate(start.getDate() + 1);
     }
-    return date.toISOString().slice(0, 10);
+
+    const end = new Date(start);
+    end.setDate(end.getDate() + 1);
+
+    while (end.getDay() === 0 || end.getDay() === 6) {
+        end.setDate(end.getDate() + 1);
+    }
+
+    return {
+        startDate: toDateInputValue(start),
+        endDate: toDateInputValue(end),
+    };
 };
 
 test.describe.serial("Attendance flow", () => {
@@ -52,8 +67,7 @@ test.describe.serial("Attendance flow", () => {
         const leaveTypeSelect = page.locator("select").filter({ has: page.locator("option[value='']") }).first();
         await leaveTypeSelect.selectOption({ index: 1 });
 
-        const startDate = getNextMonthWeekday(0);
-        const endDate = getNextMonthWeekday(1);
+        const { startDate, endDate } = getNextMonthWeekdayRange();
 
         await page.getByTestId('leave-start-date').fill(startDate);
         await page.getByTestId('leave-end-date').fill(endDate);
@@ -82,8 +96,8 @@ test.describe.serial("Attendance flow", () => {
 
         await expect(page.getByRole("heading", { name: "Leave Requests" })).toBeVisible();
 
-        const hasTable = await page.locator("table tbody tr").first().isVisible({ timeout: 10_000 }).catch(() => false);
-        const hasEmptyState = await page.getByText("No Requests Found").isVisible({ timeout: 5_000 }).catch(() => false);
+        const hasTable = await page.locator("table tbody tr").first().isVisible({ timeout: 10_000 });
+        const hasEmptyState = await page.getByText("No Requests Found").first().isVisible({ timeout: 5_000 });
         expect(hasTable || hasEmptyState).toBeTruthy();
 
         await context.close();

@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\License;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
@@ -35,6 +36,29 @@ class MinimalPayrollE2ESeeder extends Seeder
         });
 
         DB::transaction(function () {
+            // Seed an active license so all feature-gated routes are accessible
+            $license = License::withTrashed()->updateOrCreate(
+                ['license_hash' => hash('sha256', 'e2e-test-license-key')],
+                [
+                    'license_key' => 'e2e-test-license-key',
+                    'company_name' => 'E2E Test Company',
+                    'contact_email' => 'e2e@teamsync.com',
+                    'issued_at' => now()->subYear(),
+                    'expires_at' => now()->addYear(),
+                    'is_active' => true,
+                    'features' => ['attendance', 'leave', 'payroll', 'analytics', 'performance', 'overtime', 'thr'],
+                    'max_users' => 100,
+                    'current_users' => 4,
+                    'activated_at' => now(),
+                    'last_validated_at' => now(),
+                    'signature' => base64_encode('e2e-fake-signature'),
+                ]
+            );
+
+            if ($license->trashed()) {
+                $license->restore();
+            }
+
             $payrollMonth = now()->startOfMonth();
             PayrollSetting::current()->update([
                 'attendance_cutoff_day' => 1,

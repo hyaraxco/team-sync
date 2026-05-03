@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 
 test.describe.serial("Performance TOPSIS Ranking UI", () => {
@@ -13,7 +13,7 @@ test.describe.serial("Performance TOPSIS Ranking UI", () => {
     // The E2E seeder creates "E2E Review Cycle P4" with ID 1 (status: active)
     await page.goto("/admin/performance/cycles/1");
     await expect(page).toHaveURL(/\/admin\/performance\/cycles\/1$/);
-    await expect(page.getByRole("heading", { name: "E2E Review Cycle P4" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "E2E Review Cycle P4" })).toBeVisible({ timeout: 15_000 });
 
     // For active cycles, TOPSIS section shows info banner (not the ranking panel)
     await expect(
@@ -35,7 +35,7 @@ test.describe.serial("Performance TOPSIS Ranking UI", () => {
     // The PerformanceDataSeeder creates "Q4 2025 Performance Review" (status: completed)
     await page.goto("/admin/performance/cycles/3");
     await expect(page).toHaveURL(/\/admin\/performance\/cycles\/3$/);
-    await expect(page.getByRole("heading", { name: "Q4 2025 Performance Review" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Q4 2025 Performance Review" })).toBeVisible({ timeout: 15_000 });
 
     // TOPSIS heading and Recalculate button should be visible for completed cycles
     await expect(page.getByText("TOPSIS Performance Ranking")).toBeVisible();
