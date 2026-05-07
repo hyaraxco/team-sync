@@ -31,7 +31,7 @@ class ProjectTaskFactory extends Factory
             'rejected_reason' => $isRejected ? fake()->sentence() : null,
             'rejected_by' => $isRejected ? StaffMemberProfile::factory() : null,
             'rejected_at' => $isRejected ? fake()->dateTimeBetween('-14 days', 'now') : null,
-            'due_date' => fake()->optional(0.9)->dateTimeBetween('now', '+3 months')->format('Y-m-d'),
+            'due_date' => fake()->boolean(90) ? fake()->dateTimeBetween('now', '+3 months')->format('Y-m-d') : null,
         ];
     }
 }
