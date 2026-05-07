@@ -41,22 +41,36 @@ class AnalyticsEndpointGapTest extends TestCase
         return $user;
     }
 
+    private function actingAsFinance(): User
+    {
+        $user = User::factory()->create();
+        $role = Role::findByName('finance', 'sanctum');
+        $user->assignRole($role);
+        Sanctum::actingAs($user);
+
+        return $user;
+    }
+
     /**
-     * Helper: assert route exists and is authenticated.
+     * Helper: assert route exists and is authenticated for a given role.
      * Some analytics endpoints use MySQL-specific SQL (DATE_FORMAT, TIMESTAMPDIFF)
      * which fail on SQLite test DB. The controller catches these and returns 500.
      * We verify: route exists (not 404), auth guard works (not 401/403).
      */
-    private function assertAnalyticsRouteAccessible(string $uri): void
+    private function assertAnalyticsRouteAccessible(string $uri, string $role = 'hr'): void
     {
-        $this->actingAsHr();
+        if ($role === 'finance') {
+            $this->actingAsFinance();
+        } else {
+            $this->actingAsHr();
+        }
 
         $response = $this->getJson($uri);
 
         // Route must exist (not 404) and user must be authorized (not 401/403)
         $this->assertNotEquals(404, $response->status(), "Route {$uri} should exist (got 404)");
         $this->assertNotEquals(401, $response->status(), "Route {$uri} should not require re-auth (got 401)");
-        $this->assertNotEquals(403, $response->status(), "Route {$uri} should be accessible to HR (got 403)");
+        $this->assertNotEquals(403, $response->status(), "Route {$uri} should be accessible to {$role} (got 403)");
 
         // If 200, verify standard response structure
         if ($response->status() === 200) {
@@ -117,14 +131,16 @@ class AnalyticsEndpointGapTest extends TestCase
 
     public function test_payroll_cost_per_employee_endpoint_exists(): void
     {
-        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/payroll/cost-per-employee');
+        // Payroll analytics requires analytics-finance-view (Finance role)
+        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/payroll/cost-per-employee', 'finance');
     }
 
     // ─── GAP-4f: Payroll Processing Time ────────────────────────────
 
     public function test_payroll_processing_time_endpoint_exists(): void
     {
-        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/payroll/processing-time');
+        // Payroll analytics requires analytics-finance-view (Finance role)
+        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/payroll/processing-time', 'finance');
     }
 
     // ─── GAP-4g: Project Resource Utilization ───────────────────────

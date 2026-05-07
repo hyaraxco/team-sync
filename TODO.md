@@ -48,9 +48,26 @@
   - Rewrote `RolePermissionSeeder`: Manager explicit allowlist, HR no payroll ops, Finance owns payroll/THR, staff self-service only.
   - Updated `PayrollController` middleware: readiness dashboard accepts `payroll-readiness-view`.
   - Updated 34 tests to match new role matrix. All 730 tests pass.
-- [ ] Update backend seeders/middleware/resources first, with role matrix and forbidden-access tests.
-- [ ] Update frontend sidebar/router/dashboard/settings/analytics second, with role visibility tests.
-- [ ] Run focused backend, frontend, and E2E role-navigation verification.
+- [x] Update backend seeders/middleware/resources first, with role matrix and forbidden-access tests.
+  - Added `analytics-hr-view`, `analytics-finance-view`, `analytics-performance-view`, `analytics-project-view` permissions.
+  - Added `dashboard-hr-view` permission for company-wide dashboard stats.
+  - Split AnalyticsController middleware by audience (HR/Finance/Manager/Performance/Project).
+  - Scoped DashboardController: company stats → HR only, self-stats → all, team pulse → manager.
+  - Added `tests/Feature/RoleForbiddenAccessTest.php` (20 test methods).
+  - Updated `tests/Unit/RolePermissionMatrixTest.php` with audience permission tests.
+  - Updated `tests/Feature/Analytics/AnalyticsEndpointGapTest.php` for Finance payroll endpoints.
+  - All 762 tests pass.
+- [x] Update frontend sidebar/router/dashboard/settings/analytics second, with role visibility tests.
+  - Dashboard.vue: Staff → EmployeeStatistics only, Finance → PayrollAnalytics, Manager → TeamPulse + EmployeeStats, HR/Superadmin → full company-wide (gated by `dashboard-hr-view`).
+  - AnalyticsDashboard.vue: Tabs gated by `analytics-hr-view`, `analytics-finance-view`, `analytics-performance-view`, `analytics-project-view`. Default tab auto-selects per role.
+  - Sidebar/Router/Settings: Already correctly permission-gated, no changes needed.
+  - Updated Dashboard smoke test to match new role-based rendering.
+  - All 618 frontend tests pass.
+- [x] Run focused backend, frontend, and E2E role-navigation verification.
+  - Backend: 762 tests pass (3197 assertions).
+  - Frontend: 618 tests pass (108 test files).
+  - Role forbidden-access tests verify all boundaries.
+  - Dashboard/Analytics smoke tests verify role-based rendering.
 
 ## Docs Cleanup Plan
 

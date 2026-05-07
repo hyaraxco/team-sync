@@ -59,6 +59,8 @@ class RolePermissionSeeder extends Seeder
                     'task-create',
                     'task-edit',
                     'overtime-create',
+                    // Meetings: view list (receive/join)
+                    'meeting-list',
                 ]))->get()
             );
 
@@ -103,6 +105,12 @@ class RolePermissionSeeder extends Seeder
                     'review-manager-submit',
                     'goal-assign-team',
                     'performance-analytics-view',
+                    // Analytics: team-scoped performance & project only
+                    'analytics-menu',
+                    'analytics-performance-view',
+                    'analytics-project-view',
+                    // Meetings: view list (team meeting context)
+                    'meeting-list',
                 ]))->get()
             );
 
@@ -129,6 +137,8 @@ class RolePermissionSeeder extends Seeder
                 'task-delete',
                 // Exclude: Manager-only team review submission
                 'review-manager-submit',
+                // Exclude: Finance-only analytics
+                'analytics-finance-view',
             ])->merge(
                 Permission::whereIn('name', [
                     // Payroll: read-only readiness context only
@@ -163,8 +173,11 @@ class RolePermissionSeeder extends Seeder
                     'analytics-menu',
                     'analytics-view',
                     'analytics-export',
+                    'analytics-finance-view',
                     // Overtime: payroll context (list only, no approval)
                     'overtime-list',
+                    // Meetings: view list (receive/join)
+                    'meeting-list',
                 ]))->get()
             );
         });
