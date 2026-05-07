@@ -1,6 +1,7 @@
 # Team Sync Docs
 
-Dokumentasi proyek disederhanakan menjadi empat area utama: plans, testing, references, dan project context.
+Dokumentasi proyek disederhanakan menjadi tiga area: plans, testing, dan references.
+Project context untuk AI agents ada di root `AGENTS.md`.
 
 ## Struktur
 
@@ -13,7 +14,6 @@ docs/
 │   ├── be/             # Backend/RBAC/role QA runbooks
 │   └── fe/             # Frontend/manual QA artifacts
 ├── references/         # Domain guides (attendance, payroll, employee)
-├── project-context.md  # Context engineering untuk AI agents
 └── README.md           # File ini
 ```
 
@@ -21,7 +21,7 @@ docs/
 
 | Area | File | Status |
 |---|---|---|
-| Project context for agents | [project-context.md](project-context.md) | Context aktif |
+| Project context for agents | [../AGENTS.md](../AGENTS.md) | Context aktif (root) |
 | Payroll domain guide | [references/payroll.md](references/payroll.md) | Guide aktif |
 | Attendance domain guide | [references/attendance.md](references/attendance.md) | Guide aktif |
 | Employee self-service guide | [references/employee.md](references/employee.md) | Guide aktif |
