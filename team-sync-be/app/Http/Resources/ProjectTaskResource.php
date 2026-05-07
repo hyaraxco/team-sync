@@ -25,6 +25,7 @@ class ProjectTaskResource extends JsonResource
             'rejected_reason' => $this->rejected_reason,
             'rejected_by' => $this->rejected_by,
             'rejected_at' => $this->rejected_at,
+            'needs_revision' => $this->needs_revision,
             'due_date' => $this->due_date?->format('Y-m-d'),
             'project' => new ProjectResource($this->whenLoaded('project')),
             'assignee' => new StaffMemberProfileResource($this->whenLoaded('assignee')),

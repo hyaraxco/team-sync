@@ -20,6 +20,7 @@ class ProjectTask extends Model
         'rejected_reason',
         'rejected_by',
         'rejected_at',
+        'needs_revision',
         'due_date',
     ];
 
@@ -28,6 +29,7 @@ class ProjectTask extends Model
         return [
             'due_date' => 'date',
             'rejected_at' => 'datetime',
+            'needs_revision' => 'boolean',
         ];
     }
 

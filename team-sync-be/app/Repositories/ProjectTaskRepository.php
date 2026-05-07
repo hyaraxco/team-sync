@@ -116,8 +116,10 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             ? $this->normalizeStatusForWorkflow((string) $data['status'])
             : $fromStatus;
         $hasStatusChange = $fromStatus !== $toStatus;
+        $isBeingRejected = $hasStatusChange && $toStatus === TaskStatus::REJECTED->value;
         $isRejectedReassignment = $hasAssigneeChange && $fromStatus === TaskStatus::REJECTED->value;
 
+        // When rejected + reassigned to different staff → reset to todo
         if ($isRejectedReassignment) {
             $toStatus = TaskStatus::TODO->value;
             $hasStatusChange = $fromStatus !== $toStatus;
@@ -126,17 +128,31 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $taskDto = ProjectTaskDto::fromArrayForUpdate($data, $task);
         $updatePayload = $taskDto->toArray();
 
-        if ($hasStatusChange && $toStatus === TaskStatus::REJECTED->value) {
+        // Handle rejection: set rejected fields + needs_revision flag
+        if ($isBeingRejected) {
             $updatePayload['rejected_reason'] = trim((string) ($data['rejected_reason'] ?? ''));
             $updatePayload['rejected_by'] = Auth::user()?->staffMemberProfile?->id;
             $updatePayload['rejected_at'] = now();
+
+            // If same assignee stays → needs_revision=true (staff can pick it up)
+            // If reassigned to different staff → handled below (reset to todo)
+            if (! $hasAssigneeChange) {
+                $updatePayload['needs_revision'] = true;
+            }
         }
 
+        // When rejected + reassigned to different staff → full reset
         if ($isRejectedReassignment) {
             $updatePayload['status'] = TaskStatus::TODO->value;
             $updatePayload['rejected_reason'] = null;
             $updatePayload['rejected_by'] = null;
             $updatePayload['rejected_at'] = null;
+            $updatePayload['needs_revision'] = false;
+        }
+
+        // When staff starts revision (rejected → in_progress), clear needs_revision
+        if ($fromStatus === TaskStatus::REJECTED->value && $toStatus === TaskStatus::IN_PROGRESS->value) {
+            $updatePayload['needs_revision'] = false;
         }
 
         $task->update($updatePayload);
