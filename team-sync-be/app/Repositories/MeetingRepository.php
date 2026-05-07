@@ -13,7 +13,8 @@ class MeetingRepository implements MeetingRepositoryInterface
     public function getAllPaginated(
         ?string $search,
         ?string $department,
-        ?int $rowPerPage
+        ?int $rowPerPage,
+        ?array $teamIds = null
     ): LengthAwarePaginator {
         $query = Meeting::query()
             ->with(['creator', 'teams'])
@@ -23,16 +24,26 @@ class MeetingRepository implements MeetingRepositoryInterface
             ->when($department, function ($query) use ($department) {
                 $query->whereJsonContains('departments', $department);
             })
+            ->when($teamIds !== null, function ($query) use ($teamIds) {
+                $query->whereHas('teams', function ($q) use ($teamIds) {
+                    $q->whereIn('teams.id', $teamIds);
+                });
+            })
             ->orderByDesc('scheduled_at');
 
         return $query->paginate($rowPerPage ?? 10);
     }
 
-    public function getUpcoming(?int $limit = 10): Collection
+    public function getUpcoming(?int $limit = 10, ?array $teamIds = null): Collection
     {
         return Meeting::query()
             ->upcoming()
             ->with(['creator', 'teams'])
+            ->when($teamIds !== null, function ($query) use ($teamIds) {
+                $query->whereHas('teams', function ($q) use ($teamIds) {
+                    $q->whereIn('teams.id', $teamIds);
+                });
+            })
             ->limit($limit ?? 10)
             ->get();
     }

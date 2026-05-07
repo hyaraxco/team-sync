@@ -22,6 +22,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -258,11 +259,22 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
     }
 
     /**
-     * Get employee performance statistics
+     * Get employee performance statistics.
+     * Staff can only view their own; manager/HR can view any.
      */
     public function getPerformanceStatistics(string $id): JsonResponse
     {
         try {
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+
+            if (! $isReviewer) {
+                $ownProfileId = $user->staffMemberProfile?->id;
+                if (! $ownProfileId || (string) $ownProfileId !== $id) {
+                    return ResponseHelper::jsonResponse(false, 'You can only view your own performance statistics.', null, 403);
+                }
+            }
+
             $statistics = $this->staffMemberProfileRepository->getPerformanceStatistics($id);
 
             return ResponseHelper::jsonResponse(true, 'Employee performance statistics fetched successfully', $statistics, 200);

@@ -18,14 +18,15 @@ class MeetingService
     public function getAllPaginated(
         ?string $search,
         ?string $department,
-        ?int $rowPerPage
+        ?int $rowPerPage,
+        ?array $teamIds = null
     ): LengthAwarePaginator {
-        return $this->meetingRepository->getAllPaginated($search, $department, $rowPerPage);
+        return $this->meetingRepository->getAllPaginated($search, $department, $rowPerPage, $teamIds);
     }
 
-    public function getUpcoming(?int $limit = 10): Collection
+    public function getUpcoming(?int $limit = 10, ?array $teamIds = null): Collection
     {
-        return $this->meetingRepository->getUpcoming($limit);
+        return $this->meetingRepository->getUpcoming($limit, $teamIds);
     }
 
     public function getById(int $id): Meeting
