@@ -187,6 +187,7 @@ describe("PayrollDashboard smoke", () => {
     setPermissions([
       "payroll-menu",
       "payroll-list",
+      "payroll-create",
       "payroll-edit",
       "payroll-process",
       "payroll-statistics",
@@ -200,7 +201,8 @@ describe("PayrollDashboard smoke", () => {
     expect(fetchPayrollAnalytics).toHaveBeenCalledWith(6);
     expect(wrapper.text()).toContain("Total Payroll Amount");
     expect(wrapper.text()).toContain("Payroll Analytics (Last 6 Periods)");
-    expect(wrapper.text()).not.toContain("Create New Payroll");
+    expect(wrapper.text()).toContain("Create New Payroll");
+    expect(wrapper.text()).toContain("Readiness Dashboard");
     expect(wrapper.text()).toContain("Export Payroll Report");
     const settingsLink = wrapper.find('[data-testid="payroll-settings-link"]');
     expect(settingsLink.exists()).toBe(true);
@@ -212,6 +214,7 @@ describe("PayrollDashboard smoke", () => {
     setPermissions([
       "payroll-menu",
       "payroll-list",
+      "payroll-create",
       "payroll-edit",
       "payroll-process",
       "payroll-statistics",
@@ -245,6 +248,7 @@ describe("PayrollDashboard smoke", () => {
     setPermissions([
       "payroll-menu",
       "payroll-list",
+      "payroll-create",
       "payroll-edit",
       "payroll-process",
       "payroll-statistics",

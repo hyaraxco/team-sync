@@ -114,6 +114,8 @@ const staffMemberPayload = {
     identity_number: "3175010101010001",
     date_of_birth: "1998-01-10",
     place_of_birth: "Bandung",
+    last_education: "s1",
+    seniority_level: "senior",
     gender: "female",
     religion: "islam",
     marital_status: "single",
