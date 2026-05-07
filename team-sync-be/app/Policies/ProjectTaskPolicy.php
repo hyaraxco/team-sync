@@ -13,7 +13,6 @@ class ProjectTaskPolicy
 {
     /**
      * Determine if the user can view any tasks (index/list).
-     * Actual scoping is done in the repository via applyCurrentUserReadScope.
      */
     public function viewAny(User $user): bool
     {
@@ -30,6 +29,8 @@ class ProjectTaskPolicy
             return Response::allow();
         }
 
+        $task->loadMissing('project.teams');
+
         if (! $this->isProjectMember($user, $task->project)) {
             return Response::deny('You can only view tasks in projects you are a member of.');
         }
@@ -39,7 +40,9 @@ class ProjectTaskPolicy
 
     /**
      * Determine if the user can create a task.
-     * Staff: must be project member, can only self-assign, status must be 'todo'.
+     *
+     * PL/Manager: can create tasks with any field, assign to any project member.
+     * Staff: can only create tasks in own project, self-assign, status=todo.
      */
     public function create(User $user, array $data = []): Response
     {
@@ -48,11 +51,12 @@ class ProjectTaskPolicy
             return Response::deny('Your account is not linked to an employee profile.');
         }
 
+        // Manager/HR can create freely
         if ($this->isReviewerRole($user)) {
             return Response::allow();
         }
 
-        // Pure staff checks
+        // Project leader check
         $projectId = $data['project_id'] ?? null;
         if (! $projectId) {
             return Response::deny('Project ID is required.');
@@ -63,6 +67,12 @@ class ProjectTaskPolicy
             return Response::deny('Project not found.');
         }
 
+        // PL can create freely in their project
+        if ($project->project_leader_id === $profile->id) {
+            return Response::allow();
+        }
+
+        // Pure staff checks
         if (! $this->isProjectMember($user, $project)) {
             return Response::deny('You can only create tasks in projects you are a member of.');
         }
@@ -83,21 +93,33 @@ class ProjectTaskPolicy
     }
 
     /**
-     * Determine if the user can update a task (basic access check).
-     * Staff: must be assignee or project leader.
+     * Determine if the user can update a task.
+     *
+     * Flow rules:
+     * - PL/Manager: can edit task fields ONLY when status=todo
+     * - PL/Manager: LOCKED during in_progress (staff is working)
+     * - PL/Manager: can review→done or review→rejected
+     * - Staff: can only change status (drag/drop transitions)
+     * - Staff: todo→in_progress, in_progress→review, rejected→in_progress
      */
     public function update(User $user, ProjectTask $task, array $data = []): Response
     {
         $task->loadMissing('project');
 
         $profile = $user->staffMemberProfile;
-        $isReviewer = $this->isReviewerRole($user);
-        $isPureEmployee = $user->hasRole('staff') && ! $isReviewer;
-        $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
-        $isAssignee = $profile && $task->assignee_id === $profile->id;
+        if (! $profile) {
+            return Response::deny('Your account is not linked to an employee profile.');
+        }
 
-        // Basic access: pure employee must be assignee or project leader
-        if ($isPureEmployee && ! $isAssignee && ! $isProjectLeader) {
+        $isReviewer = $this->isReviewerRole($user);
+        $isProjectLeader = $task->project?->project_leader_id === $profile->id;
+        $isPrivileged = $isReviewer || $isProjectLeader;
+        $isAssignee = $task->assignee_id === $profile->id;
+
+        $currentStatus = strtolower(trim((string) $task->status));
+
+        // ─── Basic access check ─────────────────────────────────────
+        if (! $isPrivileged && ! $isAssignee) {
             return Response::deny('You can only update your own assigned tasks.');
         }
 
@@ -106,71 +128,63 @@ class ProjectTaskPolicy
             return Response::allow();
         }
 
-        // Field-level checks
-        $currentStatus = strtolower(trim((string) $task->status));
-
-        // Assignee change check
-        $hasAssigneeChange = $this->hasFieldChanged('assignee_id', $data, $task);
-        if ($hasAssigneeChange) {
-            if (! $isReviewer && ! $isProjectLeader) {
-                return Response::deny('Only manager/HR/project leader can reassign task assignee.');
-            }
-
-            $isLockedForFieldEdit = in_array($currentStatus, [
-                TaskStatus::REVIEW->value,
-                TaskStatus::DONE->value,
-            ], true);
-
-            if ($isLockedForFieldEdit) {
-                return Response::deny('Assignee and due date can only be changed before review or after task is rejected.');
-            }
-        }
-
-        // Due date change check (same lock as assignee)
-        $hasDueDateChange = $this->hasFieldChanged('due_date', $data, $task);
-        if ($hasDueDateChange && ($isReviewer || $isProjectLeader)) {
-            $isLockedForFieldEdit = in_array($currentStatus, [
-                TaskStatus::REVIEW->value,
-                TaskStatus::DONE->value,
-            ], true);
-
-            if ($isLockedForFieldEdit) {
-                return Response::deny('Assignee and due date can only be changed before review or after task is rejected.');
-            }
-        }
-
-        // Status transition check
+        // ─── Status transition check ────────────────────────────────
         $hasStatusChange = $this->hasFieldChanged('status', $data, $task);
         if ($hasStatusChange) {
-            $fromStatus = $currentStatus;
             $toStatus = strtolower(trim((string) $data['status']));
-
-            $transitionResponse = $this->transitionStatus($user, $task, $fromStatus, $toStatus);
+            $transitionResponse = $this->transitionStatus($user, $task, $currentStatus, $toStatus);
             if ($transitionResponse->denied()) {
                 return $transitionResponse;
             }
-
-            // Rejected reason required
-            $isReviewerTransitionToRejected =
-                ($isReviewer || $isProjectLeader) &&
-                in_array($fromStatus, [TaskStatus::REVIEW->value, TaskStatus::DONE->value], true) &&
-                $toStatus === TaskStatus::REJECTED->value;
-
-            if ($isReviewerTransitionToRejected) {
-                $reason = trim((string) ($data['rejected_reason'] ?? ''));
-                if ($reason === '') {
-                    return Response::deny('Rejected reason is required for this transition.');
-                }
-            }
         }
 
-        // Staff blocked fields
-        if ($isPureEmployee) {
-            $blockedFields = ['project_id', 'name', 'description', 'priority', 'due_date', 'rejected_reason'];
-            foreach ($blockedFields as $field) {
+        // ─── Privileged user (PL/Manager) field edit rules ──────────
+        if ($isPrivileged) {
+            // Special case: reassign is allowed when status=rejected
+            // (reassign to different staff → resets to todo in repository)
+            $isReassignOnRejected = $this->hasFieldChanged('assignee_id', $data, $task)
+                && $currentStatus === TaskStatus::REJECTED->value;
+
+            $editableFields = ['name', 'description', 'priority', 'due_date', 'assignee_id', 'project_id'];
+            $hasFieldEdit = false;
+            foreach ($editableFields as $field) {
                 if ($this->hasFieldChanged($field, $data, $task)) {
-                    return Response::deny('You are not allowed to modify '.$field.'.');
+                    // Skip assignee_id check if it's a reassign-on-rejected
+                    if ($field === 'assignee_id' && $isReassignOnRejected) {
+                        continue;
+                    }
+                    $hasFieldEdit = true;
+                    break;
                 }
+            }
+
+            if ($hasFieldEdit) {
+                // PL/Manager can only edit task fields when status=todo
+                if ($currentStatus !== TaskStatus::TODO->value) {
+                    return Response::deny('Task fields can only be edited when status is "todo".');
+                }
+            }
+
+            // Rejected reason required when rejecting
+            if ($hasStatusChange) {
+                $toStatus = strtolower(trim((string) $data['status']));
+                if ($toStatus === TaskStatus::REJECTED->value) {
+                    $reason = trim((string) ($data['rejected_reason'] ?? ''));
+                    if ($reason === '') {
+                        return Response::deny('Rejected reason is required when rejecting a task.');
+                    }
+                }
+            }
+
+            return Response::allow();
+        }
+
+        // ─── Staff field edit rules ─────────────────────────────────
+        // Staff can ONLY change status (via drag/drop or detail modal button)
+        $staffBlockedFields = ['project_id', 'name', 'description', 'priority', 'due_date', 'assignee_id', 'rejected_reason'];
+        foreach ($staffBlockedFields as $field) {
+            if ($this->hasFieldChanged($field, $data, $task)) {
+                return Response::deny('You are not allowed to modify '.$field.'.');
             }
         }
 
@@ -178,111 +192,141 @@ class ProjectTaskPolicy
     }
 
     /**
-     * Determine if the user can reassign a task.
-     * Only manager/HR/project leader can change assignee.
-     */
-    public function reassign(User $user, ProjectTask $task): Response
-    {
-        if ($this->isReviewerRole($user)) {
-            return Response::allow();
-        }
-
-        $profile = $user->staffMemberProfile;
-        $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
-
-        if ($isProjectLeader) {
-            return Response::allow();
-        }
-
-        return Response::deny('Only manager/HR/project leader can reassign task assignee.');
-    }
-
-    /**
      * Determine if the user can delete a task.
-     * Only manager can delete.
+     * Only PL/Manager can delete, and only when status=todo.
      */
     public function delete(User $user, ProjectTask $task): Response
     {
-        if ($user->hasRole('manager')) {
-            return Response::allow();
+        $task->loadMissing('project');
+
+        $profile = $user->staffMemberProfile;
+        $isReviewer = $this->isReviewerRole($user);
+        $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
+
+        if (! $isReviewer && ! $isProjectLeader) {
+            return Response::deny('Only manager/HR/project leader can delete tasks.');
         }
 
-        return Response::deny('Only manager can delete tasks.');
+        $currentStatus = strtolower(trim((string) $task->status));
+        if ($currentStatus !== TaskStatus::TODO->value) {
+            return Response::deny('Tasks can only be deleted when status is "todo".');
+        }
+
+        return Response::allow();
     }
 
     /**
      * Determine if the user can add comments/attachments to a task.
-     * Staff: must be assignee, task must not be in review/done/cancelled.
+     *
+     * Flow:
+     * - PL/Manager: can comment/attach ONLY when status=todo (setting up task)
+     * - Staff assignee: can comment/attach when in_progress or rejected+needs_revision
+     * - LOCKED for everyone: review, done, cancelled
      */
     public function collaborate(User $user, ProjectTask $task): Response
     {
+        $task->loadMissing('project');
+
         $profile = $user->staffMemberProfile;
         if (! $profile) {
             return Response::deny('Unauthorized.');
         }
 
-        if ($this->isReviewerRole($user)) {
-            return Response::allow();
-        }
-
+        $isReviewer = $this->isReviewerRole($user);
         $isProjectLeader = $task->project?->project_leader_id === $profile->id;
-        if ($isProjectLeader) {
-            return Response::allow();
+        $isPrivileged = $isReviewer || $isProjectLeader;
+        $isAssignee = $task->assignee_id === $profile->id;
+
+        $currentStatus = strtolower(trim((string) $task->status));
+
+        // PL/Manager: can only collaborate when todo (setting up task details)
+        if ($isPrivileged) {
+            if ($currentStatus === TaskStatus::TODO->value) {
+                return Response::allow();
+            }
+
+            return Response::deny('Task collaboration is only allowed when status is "todo" for managers.');
         }
 
-        $isAssignee = $task->assignee_id === $profile->id;
+        // Staff: must be assignee
         if (! $isAssignee) {
             return Response::deny('You can only collaborate on your own assigned tasks.');
         }
 
-        $lockedStatuses = [
-            TaskStatus::REVIEW->value,
-            TaskStatus::DONE->value,
-            TaskStatus::CANCELLED->value,
-        ];
-
-        $currentStatus = strtolower(trim((string) $task->status));
-        if (in_array($currentStatus, $lockedStatuses, true)) {
-            return Response::deny('Task is locked for this action in current status.');
+        // Staff: allowed during in_progress
+        if ($currentStatus === TaskStatus::IN_PROGRESS->value) {
+            return Response::allow();
         }
 
-        return Response::allow();
+        // Staff: allowed during rejected + needs_revision
+        if ($currentStatus === TaskStatus::REJECTED->value && $task->needs_revision) {
+            return Response::allow();
+        }
+
+        return Response::deny('You can only add comments/attachments when working on the task.');
     }
 
     /**
-     * Determine if the user can transition a task's status.
-     * Validates allowed transitions per role.
+     * Validate status transitions based on role.
+     *
+     * Staff transitions:
+     *   todo → in_progress (start working)
+     *   in_progress → review (submit for review)
+     *   rejected → in_progress (start revision, only if needs_revision=true)
+     *
+     * PL/Manager transitions:
+     *   review → done (approve)
+     *   review → rejected (reject with reason)
+     *   todo → cancelled (cancel before work starts)
      */
     public function transitionStatus(User $user, ProjectTask $task, string $from, string $to): Response
     {
+        $profile = $user->staffMemberProfile;
         $isReviewer = $this->isReviewerRole($user);
-        $isPureEmployee = $user->hasRole('staff') && ! $isReviewer;
+        $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
+        $isPrivileged = $isReviewer || $isProjectLeader;
+        $isAssignee = $profile && $task->assignee_id === $profile->id;
 
-        if ($isPureEmployee) {
-            $employeeTransitions = [
+        if ($from === $to) {
+            return Response::allow();
+        }
+
+        // ─── Staff transitions ──────────────────────────────────────
+        if (! $isPrivileged) {
+            if (! $isAssignee) {
+                return Response::deny('Only the assignee can change task status.');
+            }
+
+            $staffTransitions = [
                 TaskStatus::TODO->value => [TaskStatus::IN_PROGRESS->value],
                 TaskStatus::IN_PROGRESS->value => [TaskStatus::REVIEW->value],
                 TaskStatus::REJECTED->value => [TaskStatus::IN_PROGRESS->value],
             ];
 
-            $allowed = $employeeTransitions[$from] ?? [];
+            $allowed = $staffTransitions[$from] ?? [];
             if (! in_array($to, $allowed, true)) {
-                return Response::deny("Invalid status transition from {$from} to {$to}.");
+                return Response::deny("You cannot transition task from \"{$from}\" to \"{$to}\".");
             }
-        }
 
-        if ($isReviewer) {
-            $reviewerTransitions = [
-                TaskStatus::REVIEW->value => [TaskStatus::DONE->value, TaskStatus::REJECTED->value],
-                TaskStatus::DONE->value => [TaskStatus::REJECTED->value],
-            ];
-
-            if ($from !== $to) {
-                $allowed = $reviewerTransitions[$from] ?? [];
-                if (! in_array($to, $allowed, true)) {
-                    return Response::deny("Invalid reviewer status transition from {$from} to {$to}.");
+            // rejected → in_progress only if needs_revision is true
+            if ($from === TaskStatus::REJECTED->value && $to === TaskStatus::IN_PROGRESS->value) {
+                if (! $task->needs_revision) {
+                    return Response::deny('This task is not marked for revision.');
                 }
             }
+
+            return Response::allow();
+        }
+
+        // ─── PL/Manager transitions ────────────────────────────────
+        $privilegedTransitions = [
+            TaskStatus::REVIEW->value => [TaskStatus::DONE->value, TaskStatus::REJECTED->value],
+            TaskStatus::TODO->value => [TaskStatus::CANCELLED->value],
+        ];
+
+        $allowed = $privilegedTransitions[$from] ?? [];
+        if (! in_array($to, $allowed, true)) {
+            return Response::deny("Invalid transition from \"{$from}\" to \"{$to}\" for reviewer.");
         }
 
         return Response::allow();
@@ -317,6 +361,10 @@ class ProjectTaskPolicy
             return (string) $value->value;
         }
 
+        if ($value instanceof \DateTimeInterface) {
+            return $value->format('Y-m-d');
+        }
+
         return (string) $value;
     }
 
@@ -337,6 +385,7 @@ class ProjectTaskPolicy
         }
 
         // Check team membership
+        $project->loadMissing('teams');
         $jobInfoTeamId = $profile->jobInformation->team_id ?? null;
         $teamMemberIds = TeamMember::where('staff_member_id', $profile->id)
             ->whereNull('left_at')
