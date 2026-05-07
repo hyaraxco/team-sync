@@ -55,14 +55,14 @@ class LeaveEntitlementControllerTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'items',
-                    'grouped'
-                ]
+                    'grouped',
+                ],
             ]);
 
         $data = $response->json('data');
         $this->assertGreaterThan(0, count($data['items']));
         $this->assertIsArray($data['grouped']);
-        
+
         // Ensure it's grouped by employment type
         $firstItem = $data['items'][0];
         $this->assertArrayHasKey($firstItem['employment_type'], $data['grouped']);

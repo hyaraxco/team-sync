@@ -13,7 +13,7 @@ class OvertimeCalculationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $this->service = new OvertimeCalculationService();
+        $this->service = new OvertimeCalculationService;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -246,7 +246,7 @@ class OvertimeCalculationTest extends TestCase
 
     public function test_calculate_overtime_pay_with_empty_records(): void
     {
-        $result = $this->service->calculateOvertimePay(10_000_000, new Collection());
+        $result = $this->service->calculateOvertimePay(10_000_000, new Collection);
 
         $this->assertEquals(0.0, $result['total_amount']);
         $this->assertEquals(0.0, $result['total_hours']);

@@ -3,21 +3,22 @@
 namespace Tests\Feature\Performance;
 
 use App\Models\JobInformation;
-use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
 use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
-use App\Models\PerformanceReviewTemplate;
+use App\Models\PerformanceReviewResponse;
+use App\Models\PerformanceReviewSection;
 use App\Models\ReviewerRule;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Notifications\Performance\FeedbackReceived;
 use App\Notifications\Performance\GoalAssigned;
 use App\Notifications\Performance\GoalDeadlineApproaching;
+use App\Notifications\Performance\GoalProgressUpdated;
 use App\Notifications\Performance\ReviewCalibrated;
 use App\Notifications\Performance\ReviewCycleStarted;
-use App\Notifications\Performance\ReviewSubmittedForManager;
 use App\Notifications\Performance\ReviewSubmittedForCalibration;
+use App\Notifications\Performance\ReviewSubmittedForManager;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -27,11 +28,12 @@ use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PerformanceNotificationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -42,6 +44,8 @@ class PerformanceNotificationTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->activateTestLicense();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
@@ -80,6 +84,33 @@ class PerformanceNotificationTest extends TestCase
             $recipientUser,
             FeedbackReceived::class
         );
+
+        $this->assertDatabaseHas('performance_feedback', [
+            'staff_member_id' => $recipientProfile->id,
+            'given_by' => $giverProfile->id,
+            'content' => 'Great work on the project!',
+        ]);
+    }
+
+    public function test_feedback_giver_can_view_feedback_they_created(): void
+    {
+        [$giverUser, $giverProfile] = $this->createUserWithProfile('manager');
+        [, $recipientProfile] = $this->createUserWithProfile('staff');
+
+        Sanctum::actingAs($giverUser);
+
+        $createResponse = $this->postJson('/api/v1/performance/feedback', [
+            'staff_member_id' => $recipientProfile->id,
+            'feedback_type' => 'positive',
+            'content' => 'Great work on the project!',
+        ]);
+
+        $createResponse->assertCreated();
+        $feedbackId = $createResponse->json('data.id');
+
+        $this->getJson("/api/v1/performance/feedback/{$feedbackId}")
+            ->assertOk()
+            ->assertJsonPath('data.given_by', $giverProfile->id);
     }
 
     public function test_feedback_received_notification_uses_database_channel_only(): void
@@ -435,7 +466,7 @@ class PerformanceNotificationTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $cycle = PerformanceReviewCycle::factory()->active()->create();
-        $section = \App\Models\PerformanceReviewSection::create([
+        $section = PerformanceReviewSection::create([
             'name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true,
         ]);
 
@@ -473,7 +504,7 @@ class PerformanceNotificationTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $cycle = PerformanceReviewCycle::factory()->active()->create();
-        $section = \App\Models\PerformanceReviewSection::create([
+        $section = PerformanceReviewSection::create([
             'name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true,
         ]);
 
@@ -513,7 +544,7 @@ class PerformanceNotificationTest extends TestCase
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $cycle = PerformanceReviewCycle::factory()->active()->create();
-        $section = \App\Models\PerformanceReviewSection::create([
+        $section = PerformanceReviewSection::create([
             'name' => 'S1', 'weight' => 100, 'order' => 1, 'is_active' => true,
         ]);
 
@@ -527,7 +558,7 @@ class PerformanceNotificationTest extends TestCase
         ]);
 
         // Create a response so calibration has data
-        \App\Models\PerformanceReviewResponse::create([
+        PerformanceReviewResponse::create([
             'review_id' => $review->id,
             'section_id' => $section->id,
             'manager_rating' => 4,
@@ -550,7 +581,7 @@ class PerformanceNotificationTest extends TestCase
 
     public function test_goal_progress_updated_notification_uses_database_channel_only(): void
     {
-        $notification = new \App\Notifications\Performance\GoalProgressUpdated(
+        $notification = new GoalProgressUpdated(
             goalId: 1,
             goalTitle: 'Complete OKRs',
             employeeName: 'Jane Employee',
@@ -563,7 +594,7 @@ class PerformanceNotificationTest extends TestCase
 
     public function test_goal_progress_updated_notification_has_correct_structure(): void
     {
-        $notification = new \App\Notifications\Performance\GoalProgressUpdated(
+        $notification = new GoalProgressUpdated(
             goalId: 42,
             goalTitle: 'Complete OKRs',
             employeeName: 'Jane Employee',
@@ -606,6 +637,6 @@ class PerformanceNotificationTest extends TestCase
         ]);
         $response->assertStatus(201); // Repository returns 201
 
-        Notification::assertSentTo($managerUser, \App\Notifications\Performance\GoalProgressUpdated::class);
+        Notification::assertSentTo($managerUser, GoalProgressUpdated::class);
     }
 }

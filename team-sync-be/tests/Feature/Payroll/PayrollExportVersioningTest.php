@@ -11,14 +11,17 @@ use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollExportVersioningTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     public function test_export_uses_settings_version_working_days_when_detail_value_is_missing(): void
     {
+        $this->activateTestLicense();
+
         $setting = PayrollSetting::current();
         $setting->update([
             'working_days_mode' => 'fixed',
@@ -40,6 +43,8 @@ class PayrollExportVersioningTest extends TestCase
 
     public function test_export_prefers_effective_working_days_from_detail_when_available(): void
     {
+        $this->activateTestLicense();
+
         $setting = PayrollSetting::current();
         $setting->update([
             'working_days_mode' => 'fixed',
@@ -61,6 +66,8 @@ class PayrollExportVersioningTest extends TestCase
 
     public function test_export_uses_safe_default_for_legacy_payroll_without_settings_version(): void
     {
+        $this->activateTestLicense();
+
         $detail = $this->createPayrollDetail('2026-10-01', null, 0);
 
         $export = new PayrollExport($detail->payroll_id);

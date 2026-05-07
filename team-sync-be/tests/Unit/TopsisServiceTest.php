@@ -3,7 +3,7 @@
 use App\Services\TopsisService;
 
 /**
- * Helper: buat data kandidat dengan 5 kriteria TOPSIS.
+ * Helper: buat data kandidat dengan 7 kriteria TOPSIS.
  */
 function makeCandidate(
     string $id,
@@ -13,6 +13,8 @@ function makeCandidate(
     float $c3,
     float $c4,
     float $c5,
+    float $c6,
+    float $c7,
     ?string $department = 'Engineering'
 ): array {
     return [
@@ -24,6 +26,8 @@ function makeCandidate(
         'avg_goal_completion' => $c3,
         'goal_completion_ratio' => $c4,
         'positive_feedback_count' => $c5,
+        'attendance_quality' => $c6,
+        'task_completion_quality' => $c7,
     ];
 }
 
@@ -36,14 +40,16 @@ function defaultWeights(): array
         'avg_manager_rating' => 0.30,
         'final_rating' => 0.30,
         'avg_goal_completion' => 0.20,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.10,
+        'goal_completion_ratio' => 0.05,
+        'positive_feedback_count' => 0.05,
+        'attendance_quality' => 0.05,
+        'task_completion_quality' => 0.05,
     ];
 }
 
 // --- Test 1: Empty candidates ---
 it('returns empty ranking when no candidates provided', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
     $result = $service->calculate([], defaultWeights());
 
     expect($result)
@@ -63,8 +69,8 @@ it('returns empty ranking when no candidates provided', function () {
 
 // --- Test 2: Single candidate ---
 it('ranks single candidate as rank 1 with coefficient 1.0', function () {
-    $service = new TopsisService();
-    $candidates = [makeCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5)];
+    $service = new TopsisService;
+    $candidates = [makeCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0)];
     $result = $service->calculate($candidates, defaultWeights());
 
     expect($result['total_candidates'])->toBe(1);
@@ -80,10 +86,10 @@ it('ranks single candidate as rank 1 with coefficient 1.0', function () {
 
 // --- Test 3: Two candidates — high vs low performer ---
 it('ranks high performer above low performer with two candidates', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-low', 'Bob',   2.0, 2.0, 30.0, 0.3, 0),
-        makeCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10),
+        makeCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
+        makeCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -111,13 +117,13 @@ it('ranks high performer above low performer with two candidates', function () {
 
 // --- Test 4: Five candidates — full ranking sort ---
 it('sorts five candidates by closeness coefficient descending', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-3', 'Charlie', 3.0, 3.0, 50.0, 0.5, 3),
-        makeCandidate('emp-5', 'Eve',     5.0, 5.0, 100.0, 1.0, 10),
-        makeCandidate('emp-1', 'Alice',   1.0, 1.0, 10.0, 0.1, 0),
-        makeCandidate('emp-4', 'Diana',   4.0, 4.0, 75.0, 0.8, 7),
-        makeCandidate('emp-2', 'Bob',     2.0, 2.0, 30.0, 0.3, 1),
+        makeCandidate('emp-3', 'Charlie', 3.0, 3.0, 50.0, 0.5, 3, 75.0, 70.0),
+        makeCandidate('emp-5', 'Eve', 5.0, 5.0, 100.0, 1.0, 10, 99.0, 99.0),
+        makeCandidate('emp-1', 'Alice', 1.0, 1.0, 10.0, 0.1, 0, 40.0, 35.0),
+        makeCandidate('emp-4', 'Diana', 4.0, 4.0, 75.0, 0.8, 7, 88.0, 86.0),
+        makeCandidate('emp-2', 'Bob', 2.0, 2.0, 30.0, 0.3, 1, 60.0, 55.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -147,11 +153,11 @@ it('sorts five candidates by closeness coefficient descending', function () {
 
 // --- Test 5: Identical scores — division-by-zero safety ---
 it('handles identical scores without NaN or Infinity', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 3.5, 3.5, 60.0, 0.7, 4),
-        makeCandidate('emp-2', 'Bob',   3.5, 3.5, 60.0, 0.7, 4),
-        makeCandidate('emp-3', 'Charlie', 3.5, 3.5, 60.0, 0.7, 4),
+        makeCandidate('emp-1', 'Alice', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
+        makeCandidate('emp-2', 'Bob', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
+        makeCandidate('emp-3', 'Charlie', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -176,12 +182,12 @@ it('handles identical scores without NaN or Infinity', function () {
 
 // --- Test 6: All-zero values in one criterion column ---
 it('handles all-zero values in one criterion column', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
     // C5 (positive_feedback_count) = 0 for all candidates
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 4.0, 4.0, 80.0, 0.9, 0),
-        makeCandidate('emp-2', 'Bob',   3.0, 3.0, 60.0, 0.5, 0),
-        makeCandidate('emp-3', 'Charlie', 2.0, 2.0, 40.0, 0.3, 0),
+        makeCandidate('emp-1', 'Alice', 4.0, 4.0, 80.0, 0.9, 0, 95.0, 92.0),
+        makeCandidate('emp-2', 'Bob', 3.0, 3.0, 60.0, 0.5, 0, 80.0, 75.0),
+        makeCandidate('emp-3', 'Charlie', 2.0, 2.0, 40.0, 0.3, 0, 60.0, 58.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -201,13 +207,13 @@ it('handles all-zero values in one criterion column', function () {
 
 // --- Test 7: Custom weights change ranking ---
 it('produces different rankings when weights change', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
 
     // Alice: high competency (C1), low KPI (C2)
     // Bob: low competency (C1), high KPI (C2)
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 5.0, 2.0, 50.0, 0.5, 3),
-        makeCandidate('emp-2', 'Bob',   2.0, 5.0, 50.0, 0.5, 3),
+        makeCandidate('emp-1', 'Alice', 5.0, 2.0, 50.0, 0.5, 3, 85.0, 80.0),
+        makeCandidate('emp-2', 'Bob', 2.0, 5.0, 50.0, 0.5, 3, 85.0, 80.0),
     ];
 
     // Weight heavily on C1 (competency) → Alice should win
@@ -217,6 +223,8 @@ it('produces different rankings when weights change', function () {
         'avg_goal_completion' => 0.10,
         'goal_completion_ratio' => 0.10,
         'positive_feedback_count' => 0.05,
+        'attendance_quality' => 0.00,
+        'task_completion_quality' => 0.00,
     ];
     $resultC1 = $service->calculate($candidates, $weightsC1Heavy);
     expect($resultC1['ranking'][0]['staff_member_id'])->toBe('emp-1'); // Alice wins
@@ -228,6 +236,8 @@ it('produces different rankings when weights change', function () {
         'avg_goal_completion' => 0.10,
         'goal_completion_ratio' => 0.10,
         'positive_feedback_count' => 0.05,
+        'attendance_quality' => 0.00,
+        'task_completion_quality' => 0.00,
     ];
     $resultC2 = $service->calculate($candidates, $weightsC2Heavy);
     expect($resultC2['ranking'][0]['staff_member_id'])->toBe('emp-2'); // Bob wins
@@ -235,14 +245,14 @@ it('produces different rankings when weights change', function () {
 
 // --- Test 8: Rating label boundaries ---
 it('assigns correct labels based on closeness coefficient boundaries', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
 
     // Create 2 extreme candidates to produce known coefficients
     // Best candidate gets coefficient = 1.0 (Outstanding)
     // Worst candidate gets coefficient = 0.0 (Unsatisfactory)
     $candidates = [
-        makeCandidate('emp-best', 'Best', 5.0, 5.0, 100.0, 1.0, 10),
-        makeCandidate('emp-worst', 'Worst', 1.0, 1.0, 0.0, 0.0, 0),
+        makeCandidate('emp-best', 'Best', 5.0, 5.0, 100.0, 1.0, 10, 100.0, 100.0),
+        makeCandidate('emp-worst', 'Worst', 1.0, 1.0, 0.0, 0.0, 0, 0.0, 0.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -259,11 +269,11 @@ it('assigns correct labels based on closeness coefficient boundaries', function 
 
 // --- Test 9: Output structure completeness ---
 it('returns complete output structure with all required keys', function () {
-    $service = new TopsisService();
+    $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5),
-        makeCandidate('emp-2', 'Bob',   3.0, 3.5, 60.0, 0.6, 3),
-        makeCandidate('emp-3', 'Charlie', 2.5, 2.0, 40.0, 0.4, 1),
+        makeCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
+        makeCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+        makeCandidate('emp-3', 'Charlie', 2.5, 2.0, 40.0, 0.4, 1, 70.0, 68.0),
     ];
     $weights = defaultWeights();
     $result = $service->calculate($candidates, $weights);
@@ -282,14 +292,16 @@ it('returns complete output structure with all required keys', function () {
     // Weights should match input
     expect($result['weights'])->toBe($weights);
 
-    // Criteria should list all 5
-    expect($result['criteria'])->toHaveCount(5);
+    // Criteria should list all 7
+    expect($result['criteria'])->toHaveCount(7);
     expect($result['criteria'])->toContain(
         'avg_manager_rating',
         'final_rating',
         'avg_goal_completion',
         'goal_completion_ratio',
-        'positive_feedback_count'
+        'positive_feedback_count',
+        'attendance_quality',
+        'task_completion_quality'
     );
 
     // Ideal solutions should have all criteria keys

@@ -12,11 +12,12 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class TaskAssignmentNotificationsTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private int $profileSequence = 1;
 
@@ -30,6 +31,7 @@ class TaskAssignmentNotificationsTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 

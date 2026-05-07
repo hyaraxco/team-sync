@@ -11,17 +11,19 @@ use App\Models\User;
 use App\Services\Payroll\ThrCalculationService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class ThrCalculationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private ThrCalculationService $service;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->activateTestLicense();
         $this->seedTaxInfrastructure();
         $this->service = app(ThrCalculationService::class);
     }

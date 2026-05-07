@@ -9,11 +9,12 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class LeaveBalanceControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -25,6 +26,7 @@ class LeaveBalanceControllerTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 

@@ -14,15 +14,18 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollCalculationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,

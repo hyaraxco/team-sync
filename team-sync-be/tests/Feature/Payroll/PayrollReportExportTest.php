@@ -14,15 +14,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollReportExportTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -63,9 +66,9 @@ class PayrollReportExportTest extends TestCase
             ->assertHeader('content-disposition', 'attachment; filename=Payroll_Report_2026-05_Paid_Detail.xlsx');
     }
 
-    public function test_hr_can_export_yearly_report_with_all_statuses(): void
+    public function test_finance_can_export_yearly_report_with_all_statuses(): void
     {
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
         $this->createPayrollWithDetail('2026-03-01', 'pending');
         $this->createPayrollWithDetail('2026-04-01', 'paid', '2026-04-28');
 

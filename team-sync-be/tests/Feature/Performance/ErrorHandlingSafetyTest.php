@@ -4,9 +4,7 @@ namespace Tests\Feature\Performance;
 
 use App\Interfaces\PerformanceGoalRepositoryInterface;
 use App\Models\PerformanceGoal;
-use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewSection;
-use App\Models\PerformanceReviewTemplate;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -14,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 /**
@@ -21,13 +20,14 @@ use Tests\TestCase;
  */
 class ErrorHandlingSafetyTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private const INTERNAL_SECRET = 'SQLSTATE[42S02]: Base table not found: performance_goals_archive';
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->activateTestLicense();
         $this->seedRolesAndPermissions();
     }
 

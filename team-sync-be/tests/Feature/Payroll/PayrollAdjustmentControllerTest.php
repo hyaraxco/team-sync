@@ -13,15 +13,18 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollAdjustmentControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -48,10 +51,10 @@ class PayrollAdjustmentControllerTest extends TestCase
 
     public function test_authorized_user_can_list_adjustments(): void
     {
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $employee = StaffMemberProfile::factory()->create();
-        
+
         $sourcePeriod = AttendancePeriod::create([
             'start_date' => '2026-04-01',
             'end_date' => '2026-04-30',
@@ -87,9 +90,11 @@ class PayrollAdjustmentControllerTest extends TestCase
                             'adjustment_kind',
                             'amount_delta',
                             'status',
-                        ]
-                    ]
-                ]
+                            'approved_by',
+                            'approved_at',
+                        ],
+                    ],
+                ],
             ]);
 
         $this->assertCount(1, $response->json('data.data'));
@@ -97,7 +102,7 @@ class PayrollAdjustmentControllerTest extends TestCase
 
     public function test_authorized_user_can_approve_pending_adjustment(): void
     {
-        $user = $this->actingAsRole('hr');
+        $user = $this->actingAsRole('finance');
 
         $employee = StaffMemberProfile::factory()->create();
         $sourcePeriod = AttendancePeriod::create([
@@ -126,17 +131,24 @@ class PayrollAdjustmentControllerTest extends TestCase
             'notes' => 'Approved by HR',
         ])
             ->assertOk()
-            ->assertJsonPath('data.status', PayrollAdjustment::STATUS_APPROVED);
+            ->assertJsonPath('data.status', PayrollAdjustment::STATUS_APPROVED)
+            ->assertJsonPath('data.approved_by', $user->id)
+            ->assertJsonPath('data.approver.id', $user->id)
+            ->assertJsonPath('data.approver.name', $user->name)
+            ->assertJson(fn ($json) => $json->whereNot('data.approved_at', null)->etc());
 
         $this->assertDatabaseHas('payroll_adjustments', [
             'id' => $adjustment->id,
             'status' => PayrollAdjustment::STATUS_APPROVED,
+            'approved_by' => $user->id,
         ]);
+
+        $this->assertNotNull($adjustment->fresh()->approved_at);
     }
 
     public function test_cannot_approve_already_approved_adjustment(): void
     {
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $employee = StaffMemberProfile::factory()->create();
         $sourcePeriod = AttendancePeriod::create([

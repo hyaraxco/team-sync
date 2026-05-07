@@ -14,11 +14,12 @@ use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class LeaveRequestProofUploadTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -30,6 +31,7 @@ class LeaveRequestProofUploadTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 

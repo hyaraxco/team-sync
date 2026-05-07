@@ -29,8 +29,8 @@
 cd team-sync-be
 docker compose exec web php artisan migrate:fresh --seed --force
 
-# 2. Start queue worker (for notifications)
-docker compose exec -d web php artisan queue:work --tries=1
+# 2. Start queue worker + scheduler (for notifications and meeting reminders)
+docker compose up -d queue scheduler
 
 # 3. Start FE dev server
 cd ../team-sync-fe
@@ -292,7 +292,8 @@ bun run e2e:report
 | Issue | Solution |
 |-------|---------|
 | Login fails | Run `docker compose exec web php artisan migrate:fresh --seed --force` |
-| Notifications empty | Start queue worker: `docker compose exec -d web php artisan queue:work --tries=1` |
+| Notifications empty | Start queue worker: `docker compose up -d queue` |
+| Meeting reminders not delivered | Start scheduler too: `docker compose up -d scheduler` or run `php artisan schedule:work` locally |
 | Payroll create blocked | Need attendance records for current month — clock in/out first |
 | 403 on API calls | Check role permissions — user may not have required permission |
 | Meilisearch errors | Set `SCOUT_DRIVER=null` in `.env` or start Meilisearch container |

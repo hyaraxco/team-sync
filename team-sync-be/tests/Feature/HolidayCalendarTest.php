@@ -2,19 +2,20 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\HolidayCalendar;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class HolidayCalendarTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $admin;
+
     private User $user;
 
     protected function setUp(): void
@@ -50,9 +51,9 @@ class HolidayCalendarTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'data' => [
-                        '*' => ['id', 'date', 'name', 'type']
-                    ]
-                ]
+                        '*' => ['id', 'date', 'name', 'type'],
+                    ],
+                ],
             ]);
     }
 
@@ -101,7 +102,7 @@ class HolidayCalendarTest extends TestCase
     public function test_allows_admin_to_update_a_holiday()
     {
         Sanctum::actingAs($this->admin);
-        
+
         $holiday = HolidayCalendar::factory()->create([
             'name' => 'Old Name',
         ]);
@@ -124,7 +125,7 @@ class HolidayCalendarTest extends TestCase
     public function test_allows_admin_to_delete_a_holiday()
     {
         Sanctum::actingAs($this->admin);
-        
+
         $holiday = HolidayCalendar::factory()->create();
 
         $response = $this->deleteJson("/api/v1/holiday-calendars/{$holiday->id}");

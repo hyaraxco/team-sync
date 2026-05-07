@@ -7,22 +7,31 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-## Local Queue Worker
+## Local Queue Worker and Scheduler
 
 Notification delivery uses queued jobs (`QUEUE_CONNECTION=database`).
 If no queue worker is running, `/api/v1/my-notifications` can appear empty even when notification emitters are called.
 
+Meeting notifications use a dedicated `meetings` queue:
+
+- Creating a meeting dispatches `BroadcastMeetingJob` on `meetings` for scheduled notifications.
+- `meetings:send-reminders` is scheduled every minute and dispatches reminder jobs on `meetings` for meetings starting in 15 minutes.
+- Run the Laravel scheduler (`schedule:work` locally, or a production cron that runs `schedule:run` every minute) so reminder jobs are enqueued.
+
 For Docker local development:
 
 ```bash
-docker compose up -d queue
+docker compose up -d queue scheduler
 ```
 
 For non-Docker local development:
 
 ```bash
-php artisan queue:work
+php artisan queue:work --queue=default,meetings --tries=3 --timeout=600
+php artisan schedule:work
 ```
+
+The `composer dev` script starts the API server, `default,meetings` queue listener, scheduler, logs, and Vite together.
 
 ## About Laravel
 

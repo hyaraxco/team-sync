@@ -74,14 +74,15 @@ app/
 
 ```bash
 php artisan serve                          # Dev server
-php artisan queue:work                     # Queue worker
+php artisan queue:work --queue=default,meetings --timeout=600  # Queue worker incl. meeting jobs
+php artisan schedule:work                  # Scheduler for meeting reminders
 php artisan test                           # Pest tests
 ./vendor/bin/pest                          # Direct Pest
 php artisan migrate                        # Run migrations
 php artisan migrate:rollback               # Rollback last batch
 php artisan make:model Name -mfsr          # Model + migration + seeder + factory + resource
 php artisan make:controller NameController  # New controller
-docker compose up -d queue                 # Queue via Docker
+docker compose up -d queue scheduler       # Queue + scheduler via Docker
 ```
 
 ## NOTES

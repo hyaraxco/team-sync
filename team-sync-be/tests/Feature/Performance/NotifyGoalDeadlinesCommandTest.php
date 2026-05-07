@@ -45,7 +45,7 @@ class NotifyGoalDeadlinesCommandTest extends TestCase
 
         $goal = PerformanceGoal::create([
             'staff_member_id' => $profile->id,
-            'title' => 'Test Goal ' . uniqid(),
+            'title' => 'Test Goal '.uniqid(),
             'goal_type' => 'okr',
             'status' => $status,
             'start_date' => Carbon::today()->subMonth()->toDateString(),

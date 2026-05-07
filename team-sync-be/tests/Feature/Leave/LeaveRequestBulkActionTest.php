@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Leave;
 
+use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use Database\Seeders\LeaveEntitlementSeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -12,11 +14,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class LeaveRequestBulkActionTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -26,8 +29,10 @@ class LeaveRequestBulkActionTest extends TestCase
             RoleSeeder::class,
             PermissionSeeder::class,
             RolePermissionSeeder::class,
+            LeaveEntitlementSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
@@ -35,12 +40,16 @@ class LeaveRequestBulkActionTest extends TestCase
     {
         $hr = $this->actingAsHrWithStaffMemberProfile();
         $employee = $this->createEmployee('full_time');
+        LeaveEntitlement::query()
+            ->where('employment_type', 'full_time')
+            ->where('leave_type', 'annual_leave')
+            ->update(['quota_days' => 20]);
 
         $firstRequest = LeaveRequest::create([
             'staff_member_id' => $employee->id,
             'leave_type' => 'annual_leave',
-            'start_date' => '2026-04-18',
-            'end_date' => '2026-04-18',
+            'start_date' => '2026-04-17',
+            'end_date' => '2026-04-17',
             'total_days' => 1,
             'reason' => 'Family event',
             'status' => 'pending',
@@ -48,11 +57,11 @@ class LeaveRequestBulkActionTest extends TestCase
 
         $secondRequest = LeaveRequest::create([
             'staff_member_id' => $employee->id,
-            'leave_type' => 'sick_leave',
-            'start_date' => '2026-04-19',
-            'end_date' => '2026-04-19',
+            'leave_type' => 'annual_leave',
+            'start_date' => '2026-04-20',
+            'end_date' => '2026-04-20',
             'total_days' => 1,
-            'reason' => 'Flu symptoms',
+            'reason' => 'Family errand',
             'status' => 'pending',
         ]);
 
@@ -121,6 +130,76 @@ class LeaveRequestBulkActionTest extends TestCase
             'status' => 'rejected',
             'approved_by' => $hr->staffMemberProfile->id,
         ]);
+    }
+
+    public function test_approve_reject_requires_pending_leave_request(): void
+    {
+        $this->actingAsHrWithStaffMemberProfile();
+        $employee = $this->createEmployee('full_time');
+
+        $leaveRequest = LeaveRequest::create([
+            'staff_member_id' => $employee->id,
+            'leave_type' => 'annual_leave',
+            'start_date' => '2026-04-22',
+            'end_date' => '2026-04-22',
+            'total_days' => 1,
+            'reason' => 'Already decided',
+            'status' => 'approved',
+        ]);
+
+        $this->postJson("/api/v1/leave-requests/approve/{$leaveRequest->id}")
+            ->assertStatus(400)
+            ->assertJsonPath('success', false);
+
+        $this->postJson("/api/v1/leave-requests/reject/{$leaveRequest->id}")
+            ->assertStatus(400)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_approve_reject_requires_pending_leave_request_in_bulk_action(): void
+    {
+        $this->actingAsHrWithStaffMemberProfile();
+        $employee = $this->createEmployee('full_time');
+
+        $leaveRequest = LeaveRequest::create([
+            'staff_member_id' => $employee->id,
+            'leave_type' => 'annual_leave',
+            'start_date' => '2026-04-23',
+            'end_date' => '2026-04-23',
+            'total_days' => 1,
+            'reason' => 'Already decided',
+            'status' => 'approved',
+        ]);
+
+        $this->postJson('/api/v1/leave-requests/bulk-action', [
+            'ids' => [$leaveRequest->id],
+            'action' => 'reject',
+        ])
+            ->assertStatus(400)
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_bulk_approve_validates_leave_entitlement(): void
+    {
+        $this->actingAsHrWithStaffMemberProfile();
+        $employee = $this->createEmployee('full_time');
+
+        $leaveRequest = LeaveRequest::create([
+            'staff_member_id' => $employee->id,
+            'leave_type' => 'sick_leave',
+            'start_date' => '2026-04-24',
+            'end_date' => '2026-04-24',
+            'total_days' => 1,
+            'reason' => 'Fever without proof',
+            'status' => 'pending',
+        ]);
+
+        $this->postJson('/api/v1/leave-requests/bulk-action', [
+            'ids' => [$leaveRequest->id],
+            'action' => 'approve',
+        ])
+            ->assertStatus(400)
+            ->assertJsonPath('success', false);
     }
 
     public function test_bulk_action_validates_payload(): void

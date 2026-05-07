@@ -25,15 +25,18 @@ use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollGenerateRulesTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -50,11 +53,11 @@ class PayrollGenerateRulesTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_hr_cannot_generate_payroll_for_a_future_month(): void
+    public function test_finance_cannot_generate_payroll_for_a_future_month(): void
     {
         Queue::fake();
         Carbon::setTestNow('2026-04-28 09:00:00');
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $response = $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-05',
@@ -71,7 +74,7 @@ class PayrollGenerateRulesTest extends TestCase
     {
         Queue::fake();
         Carbon::setTestNow('2026-04-28 09:00:00');
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         Payroll::create([
             'salary_month' => '2026-04-01',
@@ -89,7 +92,7 @@ class PayrollGenerateRulesTest extends TestCase
         Queue::assertNothingPushed();
     }
 
-    public function test_hr_cannot_generate_current_month_before_cutoff(): void
+    public function test_finance_cannot_generate_current_month_before_cutoff(): void
     {
         Queue::fake();
         Carbon::setTestNow('2026-04-07 09:00:00');
@@ -97,7 +100,7 @@ class PayrollGenerateRulesTest extends TestCase
             'attendance_cutoff_day' => 25,
         ]);
         $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $response = $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-04',
@@ -110,7 +113,7 @@ class PayrollGenerateRulesTest extends TestCase
         Queue::assertNothingPushed();
     }
 
-    public function test_hr_cannot_generate_payroll_when_attendance_is_not_ready(): void
+    public function test_finance_cannot_generate_payroll_when_attendance_is_not_ready(): void
     {
         Queue::fake();
         Carbon::setTestNow('2026-04-28 09:00:00');
@@ -131,7 +134,7 @@ class PayrollGenerateRulesTest extends TestCase
                 'skill_level' => 'intermediate',
             ]);
         });
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $response = $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-04',
@@ -144,7 +147,7 @@ class PayrollGenerateRulesTest extends TestCase
         Queue::assertNothingPushed();
     }
 
-    public function test_hr_can_generate_payroll_for_a_valid_month_after_cutoff(): void
+    public function test_finance_can_generate_payroll_for_a_valid_month_after_cutoff(): void
     {
         Queue::fake();
         Carbon::setTestNow('2026-04-28 09:00:00');
@@ -152,7 +155,7 @@ class PayrollGenerateRulesTest extends TestCase
             'attendance_cutoff_day' => 25,
         ]);
         $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-04',
@@ -174,7 +177,7 @@ class PayrollGenerateRulesTest extends TestCase
                 'attendance_cutoff_day' => 25,
             ]);
             $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
-            $this->actingAsRole('hr');
+            $this->actingAsRole('finance');
 
             $payload = ['salary_month' => '2026-04'];
 
@@ -211,12 +214,12 @@ class PayrollGenerateRulesTest extends TestCase
 
             $payload = ['salary_month' => '2026-04'];
 
-            $this->actingAsRole('hr');
+            $this->actingAsRole('finance');
             $this->postJson('/api/v1/payrolls/generate', $payload)
                 ->assertOk()
                 ->assertJsonPath('data.status', 'processing');
 
-            $this->actingAsRole('hr');
+            $this->actingAsRole('finance');
             $this->postJson('/api/v1/payrolls/generate', $payload)
                 ->assertOk()
                 ->assertJsonPath('data.status', 'processing');
@@ -331,7 +334,7 @@ class PayrollGenerateRulesTest extends TestCase
             'attendance_cutoff_day' => 25,
         ]);
         $this->createActiveEmployeeWithAttendance(now()->startOfMonth());
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-04')
             ->assertOk()
@@ -339,7 +342,7 @@ class PayrollGenerateRulesTest extends TestCase
             ->assertJsonPath('data.reason_code', 'cutoff_not_reached');
     }
 
-    public function test_hr_cannot_generate_payroll_when_period_is_not_in_review(): void
+    public function test_finance_cannot_generate_payroll_when_period_is_not_in_review(): void
     {
         Queue::fake();
         Carbon::setTestNow('2026-04-28 09:00:00');
@@ -356,7 +359,7 @@ class PayrollGenerateRulesTest extends TestCase
             'locked_at' => now(),
         ]);
 
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-04',
@@ -383,7 +386,7 @@ class PayrollGenerateRulesTest extends TestCase
             'locked_at' => now(),
         ]);
 
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-04')
             ->assertOk()
@@ -417,7 +420,7 @@ class PayrollGenerateRulesTest extends TestCase
             'status' => 'pending',
         ]);
 
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $response = $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-04')
             ->assertOk()
@@ -455,7 +458,7 @@ class PayrollGenerateRulesTest extends TestCase
             'status' => AttendancePeriod::STATUS_REVIEW,
         ]);
 
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $response = $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-04')
             ->assertOk()
@@ -509,7 +512,7 @@ class PayrollGenerateRulesTest extends TestCase
             'status' => AttendancePeriod::STATUS_REVIEW,
         ]);
 
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $response = $this->getJson('/api/v1/payrolls/readiness-dashboard?salary_month=2026-04')
             ->assertOk();

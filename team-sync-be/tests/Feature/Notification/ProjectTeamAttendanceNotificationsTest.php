@@ -22,11 +22,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class ProjectTeamAttendanceNotificationsTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private int $profileSequence = 1;
 
@@ -41,6 +42,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             AttendancePolicySeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 

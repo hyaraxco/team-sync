@@ -16,11 +16,12 @@ use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollRoleJourneyTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -30,6 +31,7 @@ class PayrollRoleJourneyTest extends TestCase
         Carbon::setTestNow('2026-05-02 09:00:00');
 
         $this->seed(MinimalPayrollE2ESeeder::class);
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
     }
@@ -48,14 +50,15 @@ class PayrollRoleJourneyTest extends TestCase
         $payrollDate = now()->startOfMonth()->toDateString();
         $this->seedFullMonthAttendanceForActiveEmployees($salaryMonth);
 
-        $this->actingAsEmail('tasyia@teamsync.com');
-        $hrMe = $this
+        // Finance generates payroll (Finance owns payroll-create)
+        $this->actingAsEmail('dwimeta@teamsync.com');
+        $financeMe = $this
             ->getJson('/api/v1/me')
             ->assertOk();
 
-        $this->assertSame('tasyia@teamsync.com', $hrMe->json('data.email'));
-        $this->assertContains('payroll-create', $hrMe->json('data.permissions'));
-        $this->assertNotContains('payroll-statistics', $hrMe->json('data.permissions'));
+        $this->assertSame('dwimeta@teamsync.com', $financeMe->json('data.email'));
+        $this->assertContains('payroll-create', $financeMe->json('data.permissions'));
+        $this->assertContains('payroll-process', $financeMe->json('data.permissions'));
 
         $this
             ->postJson('/api/v1/payrolls/generate', [
@@ -74,14 +77,18 @@ class PayrollRoleJourneyTest extends TestCase
         $this->assertSame('pending', $payroll->status);
         $this->assertGreaterThan(0, $payroll->payrollDetails()->count());
 
-        $this->actingAsEmail('dwimeta@teamsync.com');
-        $financeMe = $this
+        // HR should NOT have payroll-create (read-only readiness only)
+        $this->actingAsEmail('tasyia@teamsync.com');
+        $hrMe = $this
             ->getJson('/api/v1/me')
             ->assertOk();
 
-        $this->assertSame('dwimeta@teamsync.com', $financeMe->json('data.email'));
-        $this->assertContains('payroll-process', $financeMe->json('data.permissions'));
-        $this->assertNotContains('payroll-create', $financeMe->json('data.permissions'));
+        $this->assertSame('tasyia@teamsync.com', $hrMe->json('data.email'));
+        $this->assertNotContains('payroll-create', $hrMe->json('data.permissions'));
+        $this->assertContains('payroll-readiness-view', $hrMe->json('data.permissions'));
+
+        // Switch back to Finance for approval/payment flow
+        $this->actingAsEmail('dwimeta@teamsync.com');
 
         $this
             ->getJson('/api/v1/payrolls/all/paginated')

@@ -8,11 +8,12 @@ use App\Models\PayrollSettingVersion;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollSettingVersionBackfillCommandTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function tearDown(): void
     {
@@ -22,6 +23,8 @@ class PayrollSettingVersionBackfillCommandTest extends TestCase
 
     public function test_backfill_command_dry_run_keeps_legacy_rows_unchanged(): void
     {
+        $this->activateTestLicense();
+
         Carbon::setTestNow('2026-04-01 08:00:00');
 
         $setting = PayrollSetting::current();
@@ -40,6 +43,8 @@ class PayrollSettingVersionBackfillCommandTest extends TestCase
 
     public function test_backfill_command_assigns_versions_by_effective_time_and_is_idempotent(): void
     {
+        $this->activateTestLicense();
+
         $setting = PayrollSetting::current();
 
         Carbon::setTestNow('2026-04-01 08:00:00');

@@ -15,15 +15,18 @@ use Illuminate\Support\Facades\Cache;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollAnalyticsEnhancedTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -140,7 +143,7 @@ class PayrollAnalyticsEnhancedTest extends TestCase
     private function seedPayrollData(): void
     {
         $user = User::factory()->create([
-            'email' => 'analytics-employee+' . uniqid() . '@teamsync.com',
+            'email' => 'analytics-employee+'.uniqid().'@teamsync.com',
         ]);
 
         $staffMember = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {

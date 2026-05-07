@@ -13,15 +13,18 @@ use Database\Seeders\PermissionSeeder;
 use Database\Seeders\ReviewerRuleSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
+uses(ActivatesLicense::class);
 
 beforeEach(function () {
     $this->seed(PermissionSeeder::class);
     $this->seed(RolePermissionSeeder::class);
     $this->seed(ReviewerRuleSeeder::class);
     $this->seed(PerformanceReviewSectionSeeder::class);
+    $this->activateTestLicense();
 });
 
 function createUserWithRole(string $role): array

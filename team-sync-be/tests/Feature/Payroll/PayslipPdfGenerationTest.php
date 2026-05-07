@@ -15,11 +15,12 @@ use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayslipPdfGenerationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private User $employee;
 
@@ -28,6 +29,8 @@ class PayslipPdfGenerationTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seedTaxInfrastructure();
 
@@ -45,8 +48,7 @@ class PayslipPdfGenerationTest extends TestCase
 
         $profile = StaffMemberProfile::factory()->create([
             'user_id' => $this->employee->id,
-            
-            
+
             'ptkp_status' => 'TK/0',
             'npwp' => '12.345.678.9-012.000',
         ]);
@@ -189,7 +191,7 @@ class PayslipPdfGenerationTest extends TestCase
     public function test_unauthenticated_user_cannot_download_payslip(): void
     {
         $response = $this->get("/api/v1/payslips/{$this->payslip->id}/download");
-        
+
         // Should return 401 or 500 (if login route not defined)
         $this->assertContains($response->status(), [401, 500]);
     }
