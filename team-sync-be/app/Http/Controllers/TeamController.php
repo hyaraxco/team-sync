@@ -11,10 +11,12 @@ use App\Http\Resources\PaginateResource;
 use App\Http\Resources\TeamResource;
 use App\Interfaces\TeamRepositoryInterface;
 use App\Models\Team;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -93,12 +95,19 @@ class TeamController extends Controller implements HasMiddleware
      */
     public function store(TeamStoreRequest $request): JsonResponse
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $team = $this->teamRepository->create($request);
+            $response = Gate::inspect('create', Team::class);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $team = $this->teamRepository->create($data);
 
             return ResponseHelper::jsonResponse(true, 'Team Created Successfully', new TeamResource($team), 201);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -127,12 +136,19 @@ class TeamController extends Controller implements HasMiddleware
      */
     public function update(TeamUpdateRequest $request, Team $team): JsonResponse
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $team = $this->teamRepository->update($team->id, $request);
+            $response = Gate::inspect('update', $team);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $team = $this->teamRepository->update($team->id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Team Updated Successfully', new TeamResource($team), 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -146,9 +162,16 @@ class TeamController extends Controller implements HasMiddleware
     public function destroy(Team $team): JsonResponse
     {
         try {
+            $response = Gate::inspect('delete', $team);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $this->teamRepository->delete($team->id);
 
             return ResponseHelper::jsonResponse(true, 'Team Deleted Successfully', null, 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -162,9 +185,16 @@ class TeamController extends Controller implements HasMiddleware
     public function getStatistics(): JsonResponse
     {
         try {
+            $response = Gate::inspect('viewStatistics', Team::class);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $statistics = $this->teamRepository->getStatistics();
 
             return ResponseHelper::jsonResponse(true, 'Team Statistics Retrieved Successfully', $statistics, 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -212,9 +242,16 @@ class TeamController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
+            $response = Gate::inspect('manageMember', $team);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $member = $this->teamRepository->addMember($team->id, $validated['staff_member_id']);
 
             return ResponseHelper::jsonResponse(true, 'Member Added Successfully', $member, 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Exception $e) {
             Log::warning('TeamController::addMember domain exception: '.$e->getMessage());
 
@@ -234,9 +271,16 @@ class TeamController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
+            $response = Gate::inspect('manageMember', $team);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $member = $this->teamRepository->removeMember($team->id, $validated['staff_member_id']);
 
             return ResponseHelper::jsonResponse(true, 'Member Removed Successfully', $member, 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Exception $e) {
             Log::warning('TeamController::removeMember domain exception: '.$e->getMessage());
 
