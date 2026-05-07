@@ -21,6 +21,7 @@ class PermissionSeeder extends Seeder
 
         'team' => [
             'menu',
+            'statistic',
             'list',
             'create',
             'edit',
@@ -30,6 +31,7 @@ class PermissionSeeder extends Seeder
 
         'staff-member' => [
             'menu',
+            'statistic',
             'list',
             'create',
             'edit',

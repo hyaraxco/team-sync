@@ -36,7 +36,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['staff-member-list|staff-member-create|staff-member-edit|staff-member-delete']), only: ['index', 'getAllPaginated', 'show', 'getStatistics']),
+            new Middleware(PermissionMiddleware::using(['staff-member-list|staff-member-create|staff-member-edit|staff-member-delete']), only: ['index', 'getAllPaginated', 'show']),
+            new Middleware(PermissionMiddleware::using(['staff-member-statistic']), only: ['getStatistics']),
             new Middleware(PermissionMiddleware::using(['staff-member-create']), only: ['store', 'checkAvailability']),
             new Middleware(PermissionMiddleware::using(['staff-member-edit']), only: ['update']),
             new Middleware(PermissionMiddleware::using(['staff-member-delete']), only: ['destroy']),
