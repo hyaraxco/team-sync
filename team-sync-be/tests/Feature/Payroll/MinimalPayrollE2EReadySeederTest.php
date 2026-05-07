@@ -9,11 +9,12 @@ use Database\Seeders\MinimalPayrollE2EReadySeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class MinimalPayrollE2EReadySeederTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function tearDown(): void
     {
@@ -23,6 +24,8 @@ class MinimalPayrollE2EReadySeederTest extends TestCase
 
     public function test_ready_seeder_creates_paid_payroll_and_employee_can_see_it(): void
     {
+        $this->activateTestLicense();
+
         // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
         Carbon::setTestNow('2026-05-02 09:00:00');
 

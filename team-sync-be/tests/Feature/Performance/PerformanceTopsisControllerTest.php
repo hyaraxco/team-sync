@@ -2,30 +2,36 @@
 
 namespace Tests\Feature\Performance;
 
-use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
-use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
-use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PerformanceTopsisControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private User $hrAdmin;
+
     private User $employee;
+
     private PerformanceReviewCycle $completedCycle;
+
     private PerformanceReviewCycle $activeCycle;
+
     private PerformanceReviewSection $sectionC1;
+
     private PerformanceReviewSection $sectionC2;
+
     private PerformanceReviewSection $sectionC3;
+
     private PerformanceReviewSection $sectionC4;
+
     private PerformanceReviewSection $sectionC5;
 
     protected function setUp(): void
@@ -42,6 +48,7 @@ class PerformanceTopsisControllerTest extends TestCase
         $this->artisan('db:seed', ['--class' => 'HrSeeder']);
         $this->artisan('db:seed', ['--class' => 'FinanceSeeder']);
         $this->artisan('db:seed', ['--class' => 'PerformanceDataSeeder']);
+        $this->activateTestLicense();
 
         // Give HR permission
         $hrRole = Role::findByName('hr', 'sanctum');
@@ -76,8 +83,8 @@ class PerformanceTopsisControllerTest extends TestCase
                 'ranking',
                 'weights',
                 'ideal_positive',
-                'ideal_negative'
-            ]
+                'ideal_negative',
+            ],
         ]);
 
         $this->assertGreaterThanOrEqual(1, $response->json('data.total_candidates'));
@@ -96,8 +103,8 @@ class PerformanceTopsisControllerTest extends TestCase
             'success' => false,
             'data' => [
                 'total_completed' => 0,
-                'ranking' => []
-            ]
+                'ranking' => [],
+            ],
         ]);
     }
 
@@ -105,12 +112,12 @@ class PerformanceTopsisControllerTest extends TestCase
     {
         Sanctum::actingAs($this->hrAdmin);
 
-        $response = $this->getJson("/api/v1/performance/cycles/99999/topsis-ranking");
+        $response = $this->getJson('/api/v1/performance/cycles/99999/topsis-ranking');
 
         $response->assertStatus(404);
         $response->assertJson([
             'success' => false,
-            'message' => 'Review cycle tidak ditemukan'
+            'message' => 'Review cycle tidak ditemukan',
         ]);
     }
 
@@ -118,10 +125,12 @@ class PerformanceTopsisControllerTest extends TestCase
     {
         Sanctum::actingAs($this->hrAdmin);
 
-        $response = $this->getJson("/api/v1/performance/cycles/{$this->completedCycle->id}/topsis-ranking?w_avg_manager_rating=0.8&w_final_rating=0.05&w_avg_goal_completion=0.05&w_goal_completion_ratio=0.05&w_positive_feedback_count=0.05");
+        $response = $this->getJson("/api/v1/performance/cycles/{$this->completedCycle->id}/topsis-ranking?w_avg_manager_rating=0.7&w_final_rating=0.1&w_avg_goal_completion=0.05&w_goal_completion_ratio=0.05&w_positive_feedback_count=0.05&w_attendance_quality=0.03&w_task_completion_quality=0.02");
         $response->assertStatus(200);
         $this->assertArrayHasKey('avg_manager_rating', $response->json('data.weights'));
-        $this->assertEquals(0.8, $response->json('data.weights.avg_manager_rating'));
+        $this->assertEquals(0.7, $response->json('data.weights.avg_manager_rating'));
+        $this->assertArrayHasKey('attendance_quality', $response->json('data.weights'));
+        $this->assertArrayHasKey('task_completion_quality', $response->json('data.weights'));
     }
 
     public function test_employee_cannot_access_topsis_ranking()

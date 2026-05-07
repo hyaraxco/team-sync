@@ -17,15 +17,18 @@ use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollAuthorizationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -42,7 +45,7 @@ class PayrollAuthorizationTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_hr_can_generate_payroll_but_cannot_edit_process_or_view_statistics(): void
+    public function test_hr_has_readiness_view_only_no_payroll_operations(): void
     {
         Queue::fake();
         Carbon::setTestNow('2026-05-28 09:00:00');
@@ -50,22 +53,25 @@ class PayrollAuthorizationTest extends TestCase
         $payrollDetail = $this->createPayrollDetail();
         $this->createActiveEmployeeWithAttendance('2026-05');
 
-        $this->postJson('/api/v1/payrolls/generate', [
-            'salary_month' => '2026-05',
-        ])->assertOk();
-        $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-05')
-            ->assertOk();
+        // HR can view readiness dashboard (payroll-readiness-view)
         $this->getJson('/api/v1/payrolls/readiness-dashboard?salary_month=2026-05')
             ->assertOk();
 
-        Queue::assertPushed(GeneratePayrollJob::class);
+        // HR CANNOT generate payroll (Finance owns this)
+        $this->postJson('/api/v1/payrolls/generate', [
+            'salary_month' => '2026-05',
+        ])->assertForbidden();
+        $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-05')
+            ->assertForbidden();
 
+        Queue::assertNothingPushed();
+
+        // HR CANNOT edit, approve, process, or view statistics
         $this->putJson("/api/v1/payroll-details/{$payrollDetail->id}", [
             'notes' => 'HR should not edit payroll figures',
         ])->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/approve")
             ->assertForbidden();
-
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/mark-as-paid", [
             'payment_date' => '2026-05-30',
         ])->assertForbidden();
@@ -79,32 +85,35 @@ class PayrollAuthorizationTest extends TestCase
         $this->getJson('/api/v1/payrolls/analytics')->assertForbidden();
         $this->getJson('/api/v1/payroll-settings')->assertForbidden();
         $this->getJson('/api/v1/payroll-settings/history')->assertForbidden();
-        $this->get("/api/v1/payrolls/{$payrollDetail->payroll_id}/export-excel")->assertOk();
-        $this->getJson('/api/v1/payrolls/export-report?status=all&period_type=yearly&year=2026')->assertOk();
-        $this->getJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/activity-logs")->assertOk();
-        $this->getJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/notification-deliveries")->assertForbidden();
 
-        $this->assertTrue($user->hasPermissionTo('payroll-create', 'sanctum'));
+        // HR also cannot list/export payrolls (no payroll-list)
+        $this->getJson('/api/v1/payrolls/all/paginated')->assertForbidden();
+
+        $this->assertTrue($user->hasPermissionTo('payroll-readiness-view', 'sanctum'));
+        $this->assertFalse($user->hasPermissionTo('payroll-create', 'sanctum'));
+        $this->assertFalse($user->hasPermissionTo('payroll-list', 'sanctum'));
         $this->assertFalse($user->hasPermissionTo('payroll-edit', 'sanctum'));
         $this->assertFalse($user->hasPermissionTo('payroll-process', 'sanctum'));
         $this->assertFalse($user->hasPermissionTo('payroll-statistics', 'sanctum'));
     }
 
-    public function test_finance_can_edit_process_and_view_statistics_but_cannot_generate(): void
+    public function test_finance_can_generate_edit_process_and_view_statistics(): void
     {
         Queue::fake();
+        Carbon::setTestNow('2026-05-28 09:00:00');
         $user = $this->actingAsRole('finance');
         $payrollDetail = $this->createPayrollDetail();
+        $this->createActiveEmployeeWithAttendance('2026-05');
 
         $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-05',
-        ])->assertForbidden();
+        ])->assertOk();
         $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-05')
-            ->assertForbidden();
+            ->assertOk();
         $this->getJson('/api/v1/payrolls/readiness-dashboard?salary_month=2026-05')
-            ->assertForbidden();
+            ->assertOk();
 
-        Queue::assertNothingPushed();
+        Queue::assertPushed(GeneratePayrollJob::class);
 
         $this->putJson("/api/v1/payroll-details/{$payrollDetail->id}", [
             'notes' => 'Reviewed by Finance',
@@ -131,7 +140,7 @@ class PayrollAuthorizationTest extends TestCase
         $this->getJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/activity-logs")->assertOk();
         $this->getJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/notification-deliveries")->assertOk();
 
-        $this->assertFalse($user->hasPermissionTo('payroll-create', 'sanctum'));
+        $this->assertTrue($user->hasPermissionTo('payroll-create', 'sanctum'));
         $this->assertTrue($user->hasPermissionTo('payroll-edit', 'sanctum'));
         $this->assertTrue($user->hasPermissionTo('payroll-process', 'sanctum'));
         $this->assertTrue($user->hasPermissionTo('payroll-statistics', 'sanctum'));

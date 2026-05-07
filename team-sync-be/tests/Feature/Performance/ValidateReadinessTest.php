@@ -11,11 +11,14 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 uses(TestCase::class, RefreshDatabase::class);
+uses(ActivatesLicense::class);
 
 beforeEach(function () {
+    $this->activateTestLicense();
     Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
     Permission::firstOrCreate(['name' => 'review-calibrate', 'guard_name' => 'sanctum']);
     $hrRole = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'sanctum']);

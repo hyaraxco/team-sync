@@ -10,11 +10,12 @@ use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class MinimalPayrollE2ESeederTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function tearDown(): void
     {
@@ -24,6 +25,8 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
     public function test_minimal_payroll_e2e_seeder_prepares_a_payroll_ready_dataset(): void
     {
+        $this->activateTestLicense();
+
         // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
         Carbon::setTestNow('2026-05-02 09:00:00');
 
@@ -36,9 +39,11 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $employee = StaffMemberProfile::where('code', 'EMP001')->firstOrFail();
         $payrollMonth = now()->startOfMonth();
 
-        $this->assertTrue($hr->hasPermissionTo('payroll-create', 'sanctum'));
+        // PRD: Finance owns payroll operations; HR has readiness-view only
+        $this->assertFalse($hr->hasPermissionTo('payroll-create', 'sanctum'));
+        $this->assertTrue($hr->hasPermissionTo('payroll-readiness-view', 'sanctum'));
         $this->assertFalse($hr->hasPermissionTo('payroll-process', 'sanctum'));
-        $this->assertFalse($finance->hasPermissionTo('payroll-create', 'sanctum'));
+        $this->assertTrue($finance->hasPermissionTo('payroll-create', 'sanctum'));
         $this->assertTrue($finance->hasPermissionTo('payroll-process', 'sanctum'));
         $this->assertFalse($manager->hasPermissionTo('payroll-menu', 'sanctum'));
         $this->assertTrue($manager->hasPermissionTo('leave-request-create', 'sanctum'));
@@ -75,6 +80,8 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
     public function test_minimal_payroll_e2e_seeder_can_be_run_twice_without_duplicate_attendance_errors(): void
     {
+        $this->activateTestLicense();
+
         // Freeze time past the attendance cutoff day (seeder sets cutoff_day=1)
         Carbon::setTestNow('2026-05-02 09:00:00');
 

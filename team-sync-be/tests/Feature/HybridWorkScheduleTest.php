@@ -2,23 +2,26 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
-use App\Models\HybridWorkSchedule;
 use App\Models\HybridScheduleOverride;
+use App\Models\HybridWorkSchedule;
 use App\Models\StaffMemberProfile;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class HybridWorkScheduleTest extends TestCase
 {
     use RefreshDatabase;
 
     private User $admin;
+
     private User $employee;
+
     private StaffMemberProfile $employeeProfile;
+
     private StaffMemberProfile $adminProfile;
 
     protected function setUp(): void
@@ -52,9 +55,9 @@ class HybridWorkScheduleTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'data' => [
-                        '*' => ['id', 'staff_member_id', 'effective_from', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday']
-                    ]
-                ]
+                        '*' => ['id', 'staff_member_id', 'effective_from', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
+                    ],
+                ],
             ]);
     }
 
@@ -80,7 +83,7 @@ class HybridWorkScheduleTest extends TestCase
 
         $response = $this->postJson('/api/v1/hybrid-schedule-overrides', [
             'date' => '2026-05-01',
-            'planned_work_mode' => 'WFH',
+            'planned_work_mode' => 'remote',
             'reason' => 'Need focus time',
         ]);
 
@@ -91,8 +94,21 @@ class HybridWorkScheduleTest extends TestCase
             'staff_member_id' => $this->employeeProfile->id,
             'status' => 'pending',
             'date' => '2026-05-01 00:00:00',
-            'planned_work_mode' => 'WFH',
+            'planned_work_mode' => 'remote',
         ]);
+    }
+
+    public function test_schedule_override_rejects_unsupported_work_mode()
+    {
+        Sanctum::actingAs($this->employee);
+
+        $this->postJson('/api/v1/hybrid-schedule-overrides', [
+            'date' => '2026-05-01',
+            'planned_work_mode' => 'WFH',
+            'reason' => 'Need focus time',
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['planned_work_mode']);
     }
 
     public function test_admin_can_approve_override()

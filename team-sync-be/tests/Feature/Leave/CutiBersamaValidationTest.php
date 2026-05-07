@@ -3,7 +3,6 @@
 namespace Tests\Feature\Leave;
 
 use App\Models\HolidayCalendar;
-use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
@@ -12,11 +11,12 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class CutiBersamaValidationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -28,6 +28,7 @@ class CutiBersamaValidationTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 

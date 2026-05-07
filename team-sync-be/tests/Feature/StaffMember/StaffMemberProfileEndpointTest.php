@@ -33,7 +33,8 @@ class StaffMemberProfileEndpointTest extends TestCase
             ->assertJsonFragment(['code' => 'EMP001'])
             ->assertJsonFragment(['email' => 'agung@teamsync.com'])
             ->assertJsonFragment(['full_name' => 'Agung Emergency Contact'])
-            ->assertJsonFragment(['job_title' => 'Software Engineer']);
+            ->assertJsonFragment(['job_title' => 'Software Engineer'])
+            ->assertJsonStructure(['data' => ['last_education', 'seniority_level']]);
     }
 
     public function test_internal_admin_roles_can_access_their_own_profile_payload(): void
@@ -98,19 +99,16 @@ class StaffMemberProfileEndpointTest extends TestCase
         );
     }
 
-    public function test_it_hides_sensitive_data_for_regular_staff_viewing_other_profiles(): void
+    public function test_staff_cannot_access_staff_directory_show_endpoint(): void
     {
         $staff = User::where('email', 'agung@teamsync.com')->firstOrFail();
         $otherProfile = StaffMemberProfile::where('id', '!=', $staff->staffMemberProfile->id)->firstOrFail();
 
         Sanctum::actingAs($staff);
 
-        $response = $this->getJson('/api/v1/staff-members/'.$otherProfile->id);
-
-        $response->assertOk()
-            ->assertJsonMissingPath('data.identity_number')
-            ->assertJsonMissingPath('data.npwp')
-            ->assertJsonMissingPath('data.job_information.monthly_salary');
+        // Staff no longer has staff-member-list; directory is forbidden
+        $this->getJson('/api/v1/staff-members/'.$otherProfile->id)
+            ->assertForbidden();
     }
 
     public function test_it_exposes_sensitive_data_for_users_viewing_their_own_profile(): void
@@ -140,17 +138,15 @@ class StaffMemberProfileEndpointTest extends TestCase
             ->assertJsonPath('data.job_information.monthly_salary', $otherProfile->jobInformation->monthly_salary);
     }
 
-    public function test_it_exposes_salary_for_users_with_payroll_list_permission(): void
+    public function test_finance_cannot_access_staff_directory_show_endpoint(): void
     {
         $finance = User::where('email', 'dwimeta@teamsync.com')->firstOrFail();
         $otherProfile = StaffMemberProfile::where('id', '!=', $finance->staffMemberProfile->id)->firstOrFail();
 
         Sanctum::actingAs($finance);
 
-        $response = $this->getJson('/api/v1/staff-members/'.$otherProfile->id);
-
-        $response->assertOk()
-            ->assertJsonMissingPath('data.identity_number')
-            ->assertJsonPath('data.job_information.monthly_salary', $otherProfile->jobInformation->monthly_salary);
+        // Finance no longer has staff-member-list; directory is forbidden
+        $this->getJson('/api/v1/staff-members/'.$otherProfile->id)
+            ->assertForbidden();
     }
 }

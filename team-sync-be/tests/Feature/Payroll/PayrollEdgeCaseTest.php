@@ -3,10 +3,8 @@
 namespace Tests\Feature\Payroll;
 
 use App\Models\Payroll;
-use App\Models\PayrollApproval;
 use App\Models\PayrollApprovalPolicy;
 use App\Models\PayrollDetail;
-use App\Models\PayrollReconciliationResolution;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Services\Payroll\OvertimeCalculationService;
@@ -14,20 +12,23 @@ use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollEdgeCaseTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -189,7 +190,7 @@ class PayrollEdgeCaseTest extends TestCase
 
         // Give custom roles the payroll-edit permission so they can submit approvals
         if (! in_array($roleName, ['finance', 'hr', 'manager', 'staff'], true)) {
-            $permission = \Spatie\Permission\Models\Permission::firstOrCreate([
+            $permission = Permission::firstOrCreate([
                 'name' => 'payroll-edit',
                 'guard_name' => 'sanctum',
             ]);
@@ -212,7 +213,7 @@ class PayrollEdgeCaseTest extends TestCase
     private function createPayrollWithDetail(string $status = 'pending', float $totalSalary = 9500000): Payroll
     {
         $user = User::factory()->create([
-            'email' => 'employee+' . uniqid() . '@teamsync.com',
+            'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
         $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {

@@ -1,7 +1,7 @@
 # Role & Permission Rename - Deployment Checklist
 
-**Branch**: `feature/role-permission-rename`  
-**Commit**: `cca55ee`  
+**Branch**: `feature/role-permission-rename`
+**Commit**: `cca55ee`
 **Date**: April 21, 2026
 
 ---
@@ -169,7 +169,7 @@ php artisan tinker
 ## Troubleshooting
 
 ### Issue: "There is no role named `employee`"
-**Cause**: Migration didn't run or cache not cleared  
+**Cause**: Migration didn't run or cache not cleared
 **Solution**:
 ```bash
 php artisan migrate
@@ -177,7 +177,7 @@ php artisan permission:cache-reset
 ```
 
 ### Issue: Old permissions still showing
-**Cause**: Cache not cleared  
+**Cause**: Cache not cleared
 **Solution**:
 ```bash
 php artisan permission:cache-reset
@@ -186,7 +186,7 @@ sudo systemctl restart php-fpm
 ```
 
 ### Issue: Users can't access their roles
-**Cause**: Queue workers not restarted  
+**Cause**: Queue workers not restarted
 **Solution**:
 ```bash
 php artisan queue:restart
@@ -195,7 +195,7 @@ php artisan horizon:terminate
 ```
 
 ### Issue: Tests failing with role not found
-**Cause**: Tests running against old database state  
+**Cause**: Tests running against old database state
 **Solution**:
 ```bash
 php artisan migrate:fresh --seed
@@ -246,5 +246,5 @@ For issues during deployment:
 ## Related Documentation
 
 - [Spatie Laravel-Permission Cache](https://spatie.be/docs/laravel-permission/v7/advanced-usage/cache)
-- [Implementation Summary](./RENAME_IMPLEMENTATION_SUMMARY.md)
-- [Project Config](./team-sync-be/config/permission.php)
+- [Implementation Summary](../plans/archive/RENAME_IMPLEMENTATION_SUMMARY.md)
+- [Project Config](../../team-sync-be/config/permission.php)

@@ -14,17 +14,21 @@ use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollApprovalMatrixTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -154,6 +158,32 @@ class PayrollApprovalMatrixTest extends TestCase
             ->assertJsonPath('data.is_multi_step', false);
     }
 
+    public function test_policy_create_validation_rejects_invalid_payload(): void
+    {
+        $this->actingAsRole('finance');
+
+        $this->postJson('/api/v1/payroll-approval-policies', [
+            'name' => '',
+            'min_amount' => -1,
+            'approval_order' => 0,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['name', 'min_amount', 'required_role', 'approval_order']);
+    }
+
+    public function test_submit_approval_validation_rejects_invalid_status(): void
+    {
+        $this->actingAsRole('finance');
+        $payroll = $this->createPayrollWithDetail(status: 'pending', totalSalary: 9500000);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approvals", [
+            'status' => 'pending',
+            'notes' => str_repeat('x', 1001),
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['status', 'notes']);
+    }
+
     private function actingAsRole(string $roleName): User
     {
         $this->ensureRoleExists($roleName);
@@ -164,7 +194,7 @@ class PayrollApprovalMatrixTest extends TestCase
 
         // Give custom roles the payroll-edit permission so they can submit approvals
         if (! in_array($roleName, ['finance', 'hr', 'manager', 'staff'], true)) {
-            $permission = \Spatie\Permission\Models\Permission::firstOrCreate([
+            $permission = Permission::firstOrCreate([
                 'name' => 'payroll-edit',
                 'guard_name' => 'sanctum',
             ]);
@@ -186,9 +216,7 @@ class PayrollApprovalMatrixTest extends TestCase
 
     private function createPayrollWithDetail(string $status = 'pending', float $totalSalary = 9500000): Payroll
     {
-        $user = User::factory()->create([
-            'email' => 'employee+' . uniqid() . '@teamsync.com',
-        ]);
+        $user = User::factory()->create();
 
         $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {
             return StaffMemberProfile::factory()->for($user)->create();

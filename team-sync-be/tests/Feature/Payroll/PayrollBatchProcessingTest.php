@@ -18,6 +18,7 @@ use Database\Seeders\TaxBracketSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 /**
@@ -26,11 +27,13 @@ use Tests\TestCase;
  */
 class PayrollBatchProcessingTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -189,8 +192,8 @@ class PayrollBatchProcessingTest extends TestCase
                     Attendance::create([
                         'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->format('Y-m-d') . ' 08:00:00',
-                        'check_out' => $cursor->format('Y-m-d') . ' 17:00:00',
+                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
+                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
                         'status' => 'present',
                         'notes' => 'Batch processing test',
                     ]);

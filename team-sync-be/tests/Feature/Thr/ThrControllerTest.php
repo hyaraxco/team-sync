@@ -15,13 +15,16 @@ use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class ThrControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private User $hrUser;
+
+    private User $financeUser;
 
     private User $staffUser;
 
@@ -37,10 +40,14 @@ class ThrControllerTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
 
         $this->hrUser = User::factory()->create();
         $this->hrUser->assignRole('hr');
+
+        $this->financeUser = User::factory()->create();
+        $this->financeUser->assignRole('finance');
 
         $this->staffUser = User::factory()->create();
         $this->staffUser->assignRole('staff');
@@ -86,11 +93,11 @@ class ThrControllerTest extends TestCase
             ->assertJsonPath('data.id', $thr->id);
     }
 
-    public function test_hr_can_generate_thr(): void
+    public function test_finance_can_generate_thr(): void
     {
         $this->createEmployee(salary: 10_000_000, startDate: now()->subMonths(12), religion: 'islam');
 
-        $this->actingAs($this->hrUser)
+        $this->actingAs($this->financeUser)
             ->postJson('/api/v1/thr/generate', [
                 'religion_event' => 'idul_fitri',
                 'year' => 2026,
@@ -102,9 +109,22 @@ class ThrControllerTest extends TestCase
             ->assertJsonPath('data.status', 'pending');
     }
 
+    public function test_hr_cannot_generate_thr(): void
+    {
+        $this->createEmployee(salary: 10_000_000, startDate: now()->subMonths(12), religion: 'islam');
+
+        $this->actingAs($this->hrUser)
+            ->postJson('/api/v1/thr/generate', [
+                'religion_event' => 'idul_fitri',
+                'year' => 2026,
+                'religion_holiday_date' => now()->addMonths(2)->format('Y-m-d'),
+            ])
+            ->assertStatus(403);
+    }
+
     public function test_generate_thr_validates_required_fields(): void
     {
-        $this->actingAs($this->hrUser)
+        $this->actingAs($this->financeUser)
             ->postJson('/api/v1/thr/generate', [])
             ->assertStatus(422);
     }
@@ -118,7 +138,7 @@ class ThrControllerTest extends TestCase
             'religion_event' => 'idul_fitri',
         ]);
 
-        $this->actingAs($this->hrUser)
+        $this->actingAs($this->financeUser)
             ->postJson('/api/v1/thr/generate', [
                 'religion_event' => 'idul_fitri',
                 'year' => 2026,
@@ -128,11 +148,20 @@ class ThrControllerTest extends TestCase
             ->assertJsonPath('success', false);
     }
 
-    public function test_hr_can_approve_pending_thr(): void
+    public function test_hr_cannot_approve_pending_thr(): void
     {
         $thr = ThrPayroll::factory()->pending()->create();
 
         $this->actingAs($this->hrUser)
+            ->postJson("/api/v1/thr/{$thr->id}/approve")
+            ->assertStatus(403);
+    }
+
+    public function test_finance_can_approve_pending_thr(): void
+    {
+        $thr = ThrPayroll::factory()->pending()->create();
+
+        $this->actingAs($this->financeUser)
             ->postJson("/api/v1/thr/{$thr->id}/approve")
             ->assertStatus(200)
             ->assertJsonPath('success', true)
@@ -143,16 +172,27 @@ class ThrControllerTest extends TestCase
     {
         $thr = ThrPayroll::factory()->approved()->create();
 
-        $this->actingAs($this->hrUser)
+        $this->actingAs($this->financeUser)
             ->postJson("/api/v1/thr/{$thr->id}/approve")
             ->assertStatus(400);
     }
 
-    public function test_hr_can_mark_approved_thr_as_paid(): void
+    public function test_hr_cannot_mark_approved_thr_as_paid(): void
     {
         $thr = ThrPayroll::factory()->approved()->create();
 
         $this->actingAs($this->hrUser)
+            ->postJson("/api/v1/thr/{$thr->id}/mark-as-paid", [
+                'payment_date' => now()->format('Y-m-d'),
+            ])
+            ->assertStatus(403);
+    }
+
+    public function test_finance_can_mark_approved_thr_as_paid(): void
+    {
+        $thr = ThrPayroll::factory()->approved()->create();
+
+        $this->actingAs($this->financeUser)
             ->postJson("/api/v1/thr/{$thr->id}/mark-as-paid", [
                 'payment_date' => now()->format('Y-m-d'),
             ])
@@ -165,18 +205,20 @@ class ThrControllerTest extends TestCase
     {
         $thr = ThrPayroll::factory()->pending()->create();
 
-        $this->actingAs($this->hrUser)
+        $this->actingAs($this->financeUser)
             ->postJson("/api/v1/thr/{$thr->id}/mark-as-paid", [
                 'payment_date' => now()->format('Y-m-d'),
             ])
             ->assertStatus(400);
     }
 
-    public function test_hr_can_simulate_thr(): void
+
+
+    public function test_finance_can_simulate_thr(): void
     {
         $this->createEmployee(salary: 10_000_000, startDate: now()->subMonths(12), religion: 'islam');
 
-        $this->actingAs($this->hrUser)
+        $this->actingAs($this->financeUser)
             ->postJson('/api/v1/thr/simulate', [
                 'religion_event' => 'idul_fitri',
                 'year' => 2026,
@@ -195,6 +237,17 @@ class ThrControllerTest extends TestCase
                     'eligible_employees',
                 ],
             ]);
+    }
+
+    public function test_hr_cannot_simulate_thr(): void
+    {
+        $this->actingAs($this->hrUser)
+            ->postJson('/api/v1/thr/simulate', [
+                'religion_event' => 'idul_fitri',
+                'year' => 2026,
+                'religion_holiday_date' => now()->addMonths(2)->format('Y-m-d'),
+            ])
+            ->assertStatus(403);
     }
 
     public function test_hr_can_get_year_summary(): void

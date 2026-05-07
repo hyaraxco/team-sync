@@ -75,6 +75,31 @@ class MyNotificationsTest extends TestCase
         $this->assertSame('Limit 3', $payload[1]['title']);
     }
 
+    public function test_it_returns_paginated_notifications_when_page_or_per_page_is_requested(): void
+    {
+        $user = User::factory()->create();
+        $baseTime = CarbonImmutable::create(2026, 4, 13, 11, 0, 0, 'UTC');
+
+        for ($index = 1; $index <= 7; $index++) {
+            $this->createNotification($user, "Paged {$index}", $baseTime->addMinutes($index));
+        }
+
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/my-notifications?per_page=3&page=2')
+            ->assertOk()
+            ->assertJsonPath('data.meta.current_page', 2)
+            ->assertJsonPath('data.meta.last_page', 3)
+            ->assertJsonPath('data.meta.per_page', 3)
+            ->assertJsonPath('data.meta.total', 7)
+            ->assertJsonCount(3, 'data.items');
+
+        $payload = $response->json('data.items');
+
+        $this->assertSame('Paged 4', $payload[0]['title']);
+        $this->assertSame('Paged 2', $payload[2]['title']);
+    }
+
     public function test_it_validates_limit_parameter_range(): void
     {
         $user = User::factory()->create();
@@ -119,6 +144,28 @@ class MyNotificationsTest extends TestCase
 
         $this->postJson("/api/v1/my-notifications/{$notificationId}/mark-as-read")
             ->assertUnauthorized();
+    }
+
+    public function test_authenticated_user_can_mark_all_own_notifications_as_read(): void
+    {
+        $user = User::factory()->create();
+        $otherUser = User::factory()->create();
+        $baseTime = CarbonImmutable::create(2026, 4, 13, 12, 10, 0, 'UTC');
+
+        $this->createNotification($user, 'Unread A', $baseTime->addMinutes(1));
+        $this->createNotification($user, 'Unread B', $baseTime->addMinutes(2));
+        $this->createNotification($user, 'Already read', $baseTime->addMinutes(3), $baseTime->addMinutes(4));
+        $otherNotificationId = $this->createNotification($otherUser, 'Other unread', $baseTime->addMinutes(5));
+
+        Sanctum::actingAs($user);
+
+        $this->postJson('/api/v1/my-notifications/mark-all-read')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.marked_count', 2);
+
+        $this->assertSame(0, $user->unreadNotifications()->count());
+        $this->assertNull($otherUser->notifications()->findOrFail($otherNotificationId)->read_at);
     }
 
     public function test_authenticated_user_can_mark_own_notification_as_read(): void

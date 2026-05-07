@@ -20,6 +20,8 @@ class StaffMemberProfileDtoTest extends TestCase
         $this->assertSame('full_time', $dto->employment_type);
         $this->assertSame(12500000.0, $dto->monthly_salary);
         $this->assertSame('islam', $dto->religion);
+        $this->assertSame('s1', $dto->last_education);
+        $this->assertSame('mid', $dto->seniority_level);
         $this->assertSame([
             ['name' => 'Alice', 'relationship' => 'Sibling'],
         ], $dto->emergency_contacts);
@@ -76,6 +78,8 @@ class StaffMemberProfileDtoTest extends TestCase
         $this->assertSame(10000000.0, $dto->monthly_salary);
         $this->assertSame('users/existing.jpg', $dto->profile_photo);
         $this->assertSame('BCA', $dto->bank_name);
+        $this->assertNull($dto->last_education);
+        $this->assertNull($dto->seniority_level);
     }
 
     private function payload(): array
@@ -98,6 +102,8 @@ class StaffMemberProfileDtoTest extends TestCase
             'address' => 'Jl. Mawar',
             'city' => 'Jakarta',
             'postal_code' => '12345',
+            'last_education' => 's1',
+            'seniority_level' => 'mid',
             'profile_photo' => 'users/photo.jpg',
             'job_title' => 'Senior Engineer',
             'team_id' => 2,
