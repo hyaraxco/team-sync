@@ -53,15 +53,19 @@ const { executiveSummary, executiveSummaryLoading, period, department, teamId } 
 
 const activeTab = ref('executive')
 
-const tabs = [
-  { id: 'executive', label: 'Executive Summary', icon: BarChart3Icon },
-  { id: 'workforce', label: 'Workforce', icon: UsersIcon },
-  { id: 'attendance', label: 'Attendance', icon: CalendarCheckIcon },
-  { id: 'leave', label: 'Leave', icon: PalmtreeIcon },
-  { id: 'payroll', label: 'Payroll', icon: WalletIcon },
-  { id: 'projects', label: 'Projects', icon: FolderKanbanIcon },
-  { id: 'performance', label: 'Performance', icon: TrendingUpIcon },
+const allTabs = [
+  { id: 'executive', label: 'Executive Summary', icon: BarChart3Icon, permission: null },
+  { id: 'workforce', label: 'Workforce', icon: UsersIcon, permission: 'staff-member-menu' },
+  { id: 'attendance', label: 'Attendance', icon: CalendarCheckIcon, permission: 'attendance-menu' },
+  { id: 'leave', label: 'Leave', icon: PalmtreeIcon, permission: 'leave-request-list' },
+  { id: 'payroll', label: 'Payroll', icon: WalletIcon, permission: 'payroll-statistics' },
+  { id: 'projects', label: 'Projects', icon: FolderKanbanIcon, permission: 'project-menu' },
+  { id: 'performance', label: 'Performance', icon: TrendingUpIcon, permission: 'performance-analytics-view' },
 ]
+
+const tabs = computed(() =>
+  allTabs.filter(tab => !tab.permission || can(tab.permission))
+)
 
 const periodOptions = [
   { value: '3m', label: 'Last 3 Months' },

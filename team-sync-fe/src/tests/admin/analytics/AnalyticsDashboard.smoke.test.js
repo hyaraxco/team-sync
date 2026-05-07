@@ -138,6 +138,7 @@ describe("AnalyticsDashboard smoke", () => {
     });
 
     it("switches tab and fetches attendance analytics", async () => {
+        canMock.mockReturnValue(true);
         const wrapper = factory();
         await flushAsync();
 
