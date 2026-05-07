@@ -416,6 +416,15 @@ class ProjectTaskPolicyTest extends TestCase
         $this->assertTrue($response->allowed());
     }
 
+    public function test_manager_can_collaborate_on_review_task(): void
+    {
+        $task = $this->makeTask('review');
+
+        $response = $this->policy->collaborate($this->managerUser, $task);
+
+        $this->assertTrue($response->allowed());
+    }
+
     public function test_manager_cannot_collaborate_on_in_progress_task(): void
     {
         $task = $this->makeTask('in_progress');
@@ -423,16 +432,16 @@ class ProjectTaskPolicyTest extends TestCase
         $response = $this->policy->collaborate($this->managerUser, $task);
 
         $this->assertTrue($response->denied());
-        $this->assertStringContainsString('only allowed when status is "todo" or "rejected"', $response->message());
+        $this->assertStringContainsString('only allowed when status is "todo" or "review"', $response->message());
     }
 
-    public function test_manager_can_collaborate_on_rejected_task(): void
+    public function test_manager_cannot_collaborate_on_rejected_task(): void
     {
         $task = $this->makeTask('rejected');
 
         $response = $this->policy->collaborate($this->managerUser, $task);
 
-        $this->assertTrue($response->allowed());
+        $this->assertTrue($response->denied());
     }
 
     public function test_staff_can_collaborate_on_in_progress_task(): void
@@ -548,12 +557,21 @@ class ProjectTaskPolicyTest extends TestCase
         $this->assertTrue($response->denied());
     }
 
-    public function test_pl_staff_can_collaborate_on_rejected_task(): void
+    public function test_pl_staff_can_collaborate_on_review_task(): void
+    {
+        $task = $this->makeTask('review', ['project_id' => $this->plStaffProject->id]);
+
+        $response = $this->policy->collaborate($this->plStaffUser, $task);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function test_pl_staff_cannot_collaborate_on_rejected_task(): void
     {
         $task = $this->makeTask('rejected', ['project_id' => $this->plStaffProject->id]);
 
         $response = $this->policy->collaborate($this->plStaffUser, $task);
 
-        $this->assertTrue($response->allowed());
+        $this->assertTrue($response->denied());
     }
 }
