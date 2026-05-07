@@ -15,11 +15,14 @@ use App\Http\Resources\ProjectTaskResource;
 use App\Http\Resources\ProjectTaskStatusLogResource;
 use App\Interfaces\ProjectTaskRepositoryInterface;
 use App\Models\ProjectTask;
+use App\Models\ProjectTaskAttachment;
+use App\Models\ProjectTaskComment;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -139,7 +142,12 @@ class ProjectTaskController extends Controller implements HasMiddleware
     public function show(string $id)
     {
         try {
-            $task = $this->projectTaskRepository->getById($id);
+            $task = ProjectTask::with(['project.teams', 'assignee.user'])->findOrFail($id);
+
+            $response = Gate::inspect('view', $task);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
 
             return ResponseHelper::jsonResponse(true, 'Task Retrieved Successfully', new ProjectTaskResource($task), 200);
         } catch (AuthorizationException $e) {
@@ -257,6 +265,26 @@ class ProjectTaskController extends Controller implements HasMiddleware
         $payload = $request->validated();
 
         try {
+            $task = ProjectTask::with('project')->findOrFail($id);
+
+            // Task status lock check (same as storeComment)
+            $collaborateResponse = Gate::inspect('collaborate', $task);
+            if ($collaborateResponse->denied()) {
+                return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
+            }
+
+            $comment = ProjectTaskComment::where('project_task_id', $task->id)->findOrFail($commentId);
+
+            // Ownership check: staff can only edit their own comments
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+            if (! $isReviewer) {
+                $profileId = $user->staffMemberProfile?->id;
+                if (! $profileId || $comment->staff_member_id !== $profileId) {
+                    return ResponseHelper::jsonResponse(false, 'You can only edit your own comments.', null, 403);
+                }
+            }
+
             $comment = $this->projectTaskRepository->updateComment($id, $commentId, $payload);
 
             return ResponseHelper::jsonResponse(true, 'Task Comment Updated Successfully', new ProjectTaskCommentResource($comment), 200);
@@ -274,6 +302,26 @@ class ProjectTaskController extends Controller implements HasMiddleware
     public function deleteComment(string $id, string $commentId)
     {
         try {
+            $task = ProjectTask::with('project')->findOrFail($id);
+
+            // Task status lock check
+            $collaborateResponse = Gate::inspect('collaborate', $task);
+            if ($collaborateResponse->denied()) {
+                return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
+            }
+
+            $comment = ProjectTaskComment::where('project_task_id', $task->id)->findOrFail($commentId);
+
+            // Ownership check: staff can only delete their own comments
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+            if (! $isReviewer) {
+                $profileId = $user->staffMemberProfile?->id;
+                if (! $profileId || $comment->staff_member_id !== $profileId) {
+                    return ResponseHelper::jsonResponse(false, 'You can only delete your own comments.', null, 403);
+                }
+            }
+
             $this->projectTaskRepository->deleteComment($id, $commentId);
 
             return ResponseHelper::jsonResponse(true, 'Task Comment Deleted Successfully', null, 200);
@@ -351,6 +399,19 @@ class ProjectTaskController extends Controller implements HasMiddleware
     public function deleteAttachment(string $id, string $attachmentId)
     {
         try {
+            $task = ProjectTask::with('project')->findOrFail($id);
+            $attachment = ProjectTaskAttachment::where('project_task_id', $task->id)->findOrFail($attachmentId);
+
+            // Ownership check: staff can only delete their own attachments
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+            if (! $isReviewer) {
+                $profileId = $user->staffMemberProfile?->id;
+                if (! $profileId || $attachment->staff_member_id !== $profileId) {
+                    return ResponseHelper::jsonResponse(false, 'You can only delete your own attachments.', null, 403);
+                }
+            }
+
             $this->projectTaskRepository->deleteAttachment($id, $attachmentId);
 
             return ResponseHelper::jsonResponse(true, 'Task Attachment Deleted Successfully', null, 200);
