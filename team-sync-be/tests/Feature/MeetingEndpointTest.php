@@ -149,12 +149,12 @@ class MeetingEndpointTest extends TestCase
             ->assertOk();
     }
 
-    public function test_manager_with_meeting_menu_cannot_list_meetings_without_meeting_list(): void
+    public function test_manager_can_list_meetings_with_meeting_list_permission(): void
     {
         $this->actingAsRole('manager');
 
         $this->getJson('/api/v1/meetings/all/paginated?row_per_page=10')
-            ->assertForbidden();
+            ->assertOk();
     }
 
     public function test_any_role_can_view_upcoming_meetings(): void

@@ -4,10 +4,10 @@ import { captureEvidence } from "./helpers/evidence";
 
 test.describe("THR Generation Flow (E2E)", () => {
     test.beforeEach(async ({ page }) => {
-        await loginAsRole(page, "hr");
+        await loginAsRole(page, "finance");
     });
 
-    test("HR should be able to navigate to THR Management and view/generate THR", async ({ page }) => {
+    test("Finance should be able to navigate to THR Management and view/generate THR", async ({ page }) => {
         await page.goto("/admin/payroll/thr");
         await page.waitForLoadState("networkidle");
 

@@ -350,7 +350,8 @@ test.describe.serial("Project Capability Benchmark — Full Stack Validation", (
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    await loginAsRole(page, "hr");
+    // Finance owns payroll operations (HR no longer has payroll-menu)
+    await loginAsRole(page, "finance");
     await page.goto("/admin/payroll");
     await page.waitForLoadState("networkidle");
 

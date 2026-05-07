@@ -22,7 +22,36 @@ class AnalyticsController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['analytics-view'])),
+            // Base gate: must have analytics-view for any analytics endpoint
+            new Middleware(PermissionMiddleware::using(['analytics-view']), only: [
+                'getExecutiveSummary',
+            ]),
+            // HR analytics: workforce, attendance, leave (HR/Superadmin)
+            new Middleware(PermissionMiddleware::using(['analytics-hr-view']), only: [
+                'getWorkforceAnalytics', 'getAttendanceAnalytics', 'getLeaveAnalytics',
+                'getTurnoverRate', 'getAverageTenure', 'getNewHireTrends',
+                'getAttendanceComplianceRate', 'getAttendancePatterns', 'getRemoteOfficeRatio',
+                'getLeaveUtilizationRate', 'getLeaveBalanceTrends', 'getPeakLeavePeriods',
+                'getWorkforceDemographics', 'getAttendanceCorrectionFrequency',
+                'getLeaveApprovalTurnaround', 'getLeaveTypeDistribution',
+            ]),
+            // Finance analytics: payroll (Finance/Superadmin)
+            new Middleware(PermissionMiddleware::using(['analytics-finance-view']), only: [
+                'getPayrollAnalytics',
+                'getPayrollCostTrends', 'getSalaryDistribution', 'getDeductionAnalysis',
+                'getPayrollCostPerEmployee', 'getPayrollProcessingTime',
+            ]),
+            // Performance analytics: team/company performance (HR/Manager/Superadmin)
+            new Middleware(PermissionMiddleware::using(['analytics-performance-view']), only: [
+                'getTeamPerformanceSummary', 'getCompanyPerformanceSummary',
+                'getRatingDistribution', 'getGoalCompletionRate', 'getFeedbackMetrics',
+            ]),
+            // Project analytics: project metrics (HR/Manager/Superadmin)
+            new Middleware(PermissionMiddleware::using(['analytics-project-view']), only: [
+                'getProjectAnalytics',
+                'getProjectTimelineAdherence', 'getTaskVelocity', 'getOverdueTrends',
+                'getProjectResourceUtilization',
+            ]),
         ];
     }
 

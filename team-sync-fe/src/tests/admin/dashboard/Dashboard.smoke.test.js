@@ -46,8 +46,8 @@ describe("Dashboard smoke", () => {
     beforeEach(() => {
         vi.clearAllMocks();
         authStoreMock.user = {
-            roles: ["admin"],
-            permissions: [{ name: "dashboard-view" }],
+            roles: ["hr"],
+            permissions: ["dashboard-menu", "dashboard-view", "dashboard-hr-view"],
         };
     });
 
@@ -56,7 +56,7 @@ describe("Dashboard smoke", () => {
         expect(wrapper.exists()).toBe(true);
     });
 
-    it("renders admin dashboard widget container by default", () => {
+    it("renders HR/admin dashboard widget container with dashboard-hr-view", () => {
         const wrapper = factory();
 
         expect(wrapper.find(".statistics-stub").exists()).toBe(true);
@@ -66,33 +66,38 @@ describe("Dashboard smoke", () => {
         expect(wrapper.find(".today-attendance-overview-stub").exists()).toBe(true);
     });
 
-    it("renders team pulse for manager flow permission", () => {
+    it("renders team pulse for manager with review-manager-submit", () => {
         authStoreMock.user = {
             roles: ["manager"],
-            permissions: [{ name: "dashboard-view" }, { name: "review-manager-submit" }],
+            permissions: ["dashboard-menu", "dashboard-view", "review-manager-submit"],
         };
 
         const wrapper = factory();
 
         expect(wrapper.find(".team-pulse-overview-stub").exists()).toBe(true);
+        expect(wrapper.find(".employee-statistics-stub").exists()).toBe(true);
+        // Manager should NOT see company-wide stats
+        expect(wrapper.find(".statistics-stub").exists()).toBe(false);
+        expect(wrapper.find(".latest-employees-stub").exists()).toBe(false);
     });
 
-    it("renders staff dashboard widgets for staff role", () => {
+    it("renders staff dashboard with only employee statistics", () => {
         authStoreMock.user = {
             roles: ["staff"],
-            permissions: [{ name: "dashboard-view" }],
+            permissions: ["dashboard-menu", "dashboard-view"],
         };
 
         const wrapper = factory();
         expect(wrapper.find(".employee-statistics-stub").exists()).toBe(true);
-        expect(wrapper.find(".search-section-stub").exists()).toBe(true);
+        // Staff should NOT see company-wide stats or search
+        expect(wrapper.find(".search-section-stub").exists()).toBe(false);
         expect(wrapper.find(".statistics-stub").exists()).toBe(false);
     });
 
     it("renders finance dashboard analytics for finance role", () => {
         authStoreMock.user = {
             roles: ["finance"],
-            permissions: [],
+            permissions: ["dashboard-menu", "dashboard-view"],
         };
 
         const wrapper = factory();

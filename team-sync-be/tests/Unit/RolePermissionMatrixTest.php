@@ -113,3 +113,72 @@ it('ensures manager uses explicit allowlist (no payroll, no license, no staff di
     expect($managerRole->hasPermissionTo('task-menu'))->toBeTrue();
     expect($managerRole->hasPermissionTo('review-manager-submit'))->toBeTrue();
 });
+
+// ─── Analytics audience-scoped permissions ────────────────────────────────────
+
+it('ensures HR gets analytics-hr-view but NOT analytics-finance-view', function () {
+    $hrRole = Role::findByName('hr');
+
+    expect($hrRole->hasPermissionTo('analytics-hr-view'))->toBeTrue();
+    expect($hrRole->hasPermissionTo('analytics-performance-view'))->toBeTrue();
+    expect($hrRole->hasPermissionTo('analytics-project-view'))->toBeTrue();
+    expect($hrRole->hasPermissionTo('analytics-finance-view'))->toBeFalse();
+});
+
+it('ensures Finance gets analytics-finance-view but NOT analytics-hr-view', function () {
+    $financeRole = Role::findByName('finance');
+
+    expect($financeRole->hasPermissionTo('analytics-finance-view'))->toBeTrue();
+    expect($financeRole->hasPermissionTo('analytics-hr-view'))->toBeFalse();
+    expect($financeRole->hasPermissionTo('analytics-performance-view'))->toBeFalse();
+    expect($financeRole->hasPermissionTo('analytics-project-view'))->toBeFalse();
+});
+
+it('ensures Manager gets analytics-performance-view and analytics-project-view only', function () {
+    $managerRole = Role::findByName('manager');
+
+    expect($managerRole->hasPermissionTo('analytics-menu'))->toBeTrue();
+    expect($managerRole->hasPermissionTo('analytics-performance-view'))->toBeTrue();
+    expect($managerRole->hasPermissionTo('analytics-project-view'))->toBeTrue();
+    expect($managerRole->hasPermissionTo('analytics-hr-view'))->toBeFalse();
+    expect($managerRole->hasPermissionTo('analytics-finance-view'))->toBeFalse();
+});
+
+it('ensures Staff has NO analytics permissions', function () {
+    $staffRole = Role::findByName('staff');
+
+    expect($staffRole->hasPermissionTo('analytics-menu'))->toBeFalse();
+    expect($staffRole->hasPermissionTo('analytics-view'))->toBeFalse();
+    expect($staffRole->hasPermissionTo('analytics-hr-view'))->toBeFalse();
+    expect($staffRole->hasPermissionTo('analytics-finance-view'))->toBeFalse();
+});
+
+// ─── Dashboard audience-scoped permissions ───────────────────────────────────
+
+it('ensures HR gets dashboard-hr-view for company-wide stats', function () {
+    $hrRole = Role::findByName('hr');
+
+    expect($hrRole->hasPermissionTo('dashboard-hr-view'))->toBeTrue();
+    expect($hrRole->hasPermissionTo('dashboard-view'))->toBeTrue();
+});
+
+it('ensures Finance does NOT get dashboard-hr-view', function () {
+    $financeRole = Role::findByName('finance');
+
+    expect($financeRole->hasPermissionTo('dashboard-hr-view'))->toBeFalse();
+    expect($financeRole->hasPermissionTo('dashboard-view'))->toBeTrue();
+});
+
+it('ensures Manager does NOT get dashboard-hr-view', function () {
+    $managerRole = Role::findByName('manager');
+
+    expect($managerRole->hasPermissionTo('dashboard-hr-view'))->toBeFalse();
+    expect($managerRole->hasPermissionTo('dashboard-view'))->toBeTrue();
+});
+
+it('ensures Staff does NOT get dashboard-hr-view', function () {
+    $staffRole = Role::findByName('staff');
+
+    expect($staffRole->hasPermissionTo('dashboard-hr-view'))->toBeFalse();
+    expect($staffRole->hasPermissionTo('dashboard-view'))->toBeTrue();
+});

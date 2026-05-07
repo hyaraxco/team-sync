@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attendance;
+use App\Models\LeaveRequest;
 use App\Models\License;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
@@ -81,6 +82,7 @@ class MinimalPayrollE2ESeeder extends Seeder
             );
 
             $this->resetPayrollMonth($payrollMonth);
+            $this->clearPayrollBlockers($payrollMonth);
             $this->seedAttendanceForActiveEmployeesForMonth($payrollMonth);
 
             // Create an empty Performance Review Cycle for E2E testing (ID 1)
@@ -111,6 +113,42 @@ class MinimalPayrollE2ESeeder extends Seeder
                 $payrollMonth->format('F Y')
             ));
         });
+    }
+
+    /**
+     * Clear leave-related blockers that prevent payroll generation.
+     * Resolves pending leave requests and sick proof issues for the month.
+     */
+    private function clearPayrollBlockers(Carbon $payrollMonth): void
+    {
+        $startDate = $payrollMonth->copy()->startOfMonth()->toDateString();
+        $endDate = $payrollMonth->copy()->endOfMonth()->toDateString();
+
+        // Approve all pending leave requests for this month
+        LeaveRequest::query()
+            ->where('status', 'pending')
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('end_date', '>=', $startDate)
+            ->update(['status' => 'approved']);
+
+        // Resolve sick leave proof issues (mark proof as approved)
+        LeaveRequest::query()
+            ->where('status', 'approved')
+            ->where('leave_type', 'sick_leave')
+            ->whereDate('start_date', '<=', $endDate)
+            ->whereDate('end_date', '>=', $startDate)
+            ->where(function ($query) {
+                $query->whereNull('proof_review_status')
+                    ->orWhere('proof_review_status', '!=', 'approved');
+            })
+            ->update([
+                'proof_review_status' => 'approved',
+                'proof_file_path' => 'e2e/placeholder-proof.pdf',
+                'proof_file_name' => 'placeholder-proof.pdf',
+                'proof_mime_type' => 'application/pdf',
+                'proof_size_kb' => 100,
+                'proof_uploaded_at' => now(),
+            ]);
     }
 
     private function resetPayrollMonth(Carbon $payrollMonth): void

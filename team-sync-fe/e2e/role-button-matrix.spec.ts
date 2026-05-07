@@ -88,19 +88,16 @@ test.describe.serial("Staff Member module — button visibility per role", () =>
         await context.close();
     });
 
-    test("Finance sees staff list (view-only) without CRUD buttons", async ({ browser }) => {
+    test("Finance is denied staff list (no staff-member-menu) — redirects to dashboard", async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
         await loginAsRole(page, "finance");
 
+        // Finance does NOT have staff-member-menu (PRD: Finance owns payroll only)
         await page.goto("/admin/staff-members");
-        await expect(page).toHaveURL(/\/admin\/staff-members$/);
-        await page.waitForLoadState("networkidle");
+        await expect(page).toHaveURL(/\/admin\/dashboard$/);
 
-        await expectTextHidden(page, "Add Staff Member");
-        await expectTextHidden(page, "Import CSV");
-
-        await captureEvidence(page, "rbm-finance-staff-view-only.png");
+        await captureEvidence(page, "rbm-finance-staff-denied.png");
         await context.close();
     });
 
@@ -240,21 +237,16 @@ test.describe.serial("Project module — button visibility per role", () => {
 test.describe.serial("Payroll dashboard — action buttons per role", () => {
     test.setTimeout(120_000);
 
-    test("HR sees Readiness only — NOT Create/Settings/Export/Comparison", async ({ browser }) => {
+    test("HR is denied payroll dashboard (no payroll-menu) — redirects to dashboard", async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
         await loginAsRole(page, "hr");
 
+        // HR does NOT have payroll-menu — Finance owns payroll operations
         await page.goto("/admin/payroll");
-        await expect(page).toHaveURL(/\/admin\/payroll$/);
-        await page.waitForLoadState("networkidle");
+        await expect(page).toHaveURL(/\/admin\/dashboard$/);
 
-        // HR has payroll-readiness-view only — no payroll-create, no payroll-statistics
-        await expectTextHidden(page, "Create New Payroll");
-        await expect(page.getByTestId("payroll-export-report-open")).toHaveCount(0);
-        await expect(page.getByTestId("payroll-comparison-link")).toHaveCount(0);
-
-        await captureEvidence(page, "rbm-hr-payroll-actions.png");
+        await captureEvidence(page, "rbm-hr-payroll-denied.png");
         await context.close();
     });
 

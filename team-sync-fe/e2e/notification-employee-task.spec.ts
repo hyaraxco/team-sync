@@ -86,17 +86,26 @@ test.describe.serial("Employee task assignment notifications", () => {
   test.setTimeout(180_000);
 
   test("manager assigns task and employee receives, opens, and reads notification", async ({ browser }) => {
+    // Use HR to fetch employee list (Manager doesn't have staff-member-list permission)
+    const hrContext = await browser.newContext();
+    const hrPage = await hrContext.newPage();
+    await loginAsRole(hrPage, "hr");
+    const hrToken = await getTokenCookie(hrPage);
+    const hrApi = await createApiContext(hrToken);
+
+    const employeesData = await expectApiSuccess<EmployeeListPayload>(
+      await hrApi.get("staff-members/all/paginated?row_per_page=50"),
+      "Fetch employee list"
+    );
+    await hrContext.close();
+
+    // Manager creates project and assigns task
     const managerContext = await browser.newContext();
     const managerPage = await managerContext.newPage();
 
     await loginAsRole(managerPage, "manager");
     const managerToken = await getTokenCookie(managerPage);
     const managerApi = await createApiContext(managerToken);
-
-    const employeesData = await expectApiSuccess<EmployeeListPayload>(
-      await managerApi.get("staff-members/all/paginated?row_per_page=50"),
-      "Fetch employee list"
-    );
 
     const employeeProfile = employeesData.data.find(
       (item) => item.user?.email === roleCredentials.employee.email

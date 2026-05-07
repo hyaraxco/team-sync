@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import { can } from "@/helpers/permissionHelper";
 import Statistics from "@/components/admin/dashboard/Statistics.vue";
 import EmployeeStatistics from "@/components/admin/dashboard/EmployeeStatistics.vue";
 import SearchSection from "@/components/admin/dashboard/SearchSection.vue";
@@ -24,18 +25,15 @@ const isFinance = computed(() => {
   return authStore.user?.roles?.some((role: any) => role === "finance");
 });
 
-// Check if user has dashboard view permission
-const hasDashboardPermission = computed(() => {
-  return authStore.user?.permissions?.some(
-    (permission: any) => permission.name === "dashboard-view"
-  );
+// Check if user is manager role
+const isManager = computed(() => {
+  return authStore.user?.roles?.some((role: any) => role === "manager");
 });
 
-const showTeamPulse = computed(() => {
-  return authStore.user?.permissions?.some(
-    (permission: any) => permission.name === "review-manager-submit"
-  );
-});
+// Check if user has HR-level dashboard access (company-wide stats)
+const hasDashboardHrView = computed(() => can('dashboard-hr-view'));
+
+const showTeamPulse = computed(() => can('review-manager-submit'));
 
 // Search params shared between SearchSection and Latest components
 const searchParams = ref({});
@@ -50,7 +48,6 @@ const handleSearch = (params) => {
     <template v-if="isEmployee">
       <div class="space-y-6">
         <EmployeeStatistics />
-        <SearchSection v-if="hasDashboardPermission" @search="handleSearch" />
       </div>
     </template>
 
@@ -60,12 +57,21 @@ const handleSearch = (params) => {
       </div>
     </template>
 
-    <template v-else>
+    <template v-else-if="isManager">
       <div class="space-y-6">
         <TeamPulseOverview v-if="showTeamPulse" />
-        <Statistics />
+        <EmployeeStatistics />
+        <UpcomingMeetings />
+      </div>
+    </template>
+
+    <template v-else>
+      <!-- HR / Superadmin: full company-wide dashboard -->
+      <div class="space-y-6">
+        <TeamPulseOverview v-if="showTeamPulse" />
+        <Statistics v-if="hasDashboardHrView" />
         <SearchSection @search="handleSearch" />
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div v-if="hasDashboardHrView" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <LatestEmployees :searchParams="searchParams" />
           <LatestTeams :searchParams="searchParams" />
           <TodayAttendanceOverview />
