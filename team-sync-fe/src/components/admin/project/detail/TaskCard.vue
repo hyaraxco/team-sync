@@ -52,6 +52,12 @@ const formatStatusLabel = (status) => {
       >
         Need Review
       </span>
+      <span
+        v-if="task.needs_revision"
+        class="px-2.5 py-1 rounded-md text-xs font-semibold bg-red-100 text-red-700"
+      >
+        Needs Revision
+      </span>
     </div>
 
     <!-- Footer with Assignee and Due Date -->

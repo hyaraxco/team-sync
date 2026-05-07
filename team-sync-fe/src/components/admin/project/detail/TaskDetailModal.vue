@@ -179,17 +179,27 @@ const isTaskTerminal = computed(() =>
   ["done", "cancelled"].includes(normalizedTaskStatus.value)
 );
 
+/**
+ * Mirrors backend ProjectTaskPolicy::collaborate() gate.
+ *
+ * PL/Manager: todo (setup), review (feedback before reject)
+ * Staff assignee: in_progress, rejected + needs_revision
+ * Everyone locked: done, cancelled
+ */
 const canCollaborateTask = computed(() => {
   if (isTaskTerminal.value) {
     return false;
   }
 
+  const status = normalizedTaskStatus.value;
+
   if (hasRole("manager") || hasRole("hr") || isProjectLeader.value) {
-    return true;
+    return ["todo", "review"].includes(status);
   }
 
-  if (hasRole("staff")) {
-    return isOwnAssignedTask.value;
+  if (hasRole("staff") && isOwnAssignedTask.value) {
+    if (status === "in_progress") return true;
+    if (status === "rejected" && props.task?.needs_revision) return true;
   }
 
   return false;
@@ -466,17 +476,17 @@ const toggleAssigneeDropdown = () => {
   }
 };
 
-const handleSelectAssignee = async (employee) => {
+const handleSelectAssignee = async (staffMember) => {
   try {
     await updateTask(props.task.id, {
       assignee_id: staffMember.id,
     });
-    selectedAssignee.value = employee;
+    selectedAssignee.value = staffMember;
 
     // Fetch ulang data tasks
     await fetchProjectTasks(props.projectId);
 
-    emit("assigneeChanged", employee);
+    emit("assigneeChanged", staffMember);
     emit("updated");
     assigneeDropdown.value = false;
   } catch (error) {
@@ -954,7 +964,7 @@ watch(
                         v-for="staffMember in staffMembers"
                         :key="staffMember.id"
                         type="button"
-                        @click="handleSelectAssignee(employee)"
+                        @click="handleSelectAssignee(staffMember)"
                         class="w-full p-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
                       >
                         <img
@@ -1057,6 +1067,12 @@ watch(
                     class="mt-2 inline-flex px-2.5 py-1 rounded-md bg-amber-100 text-amber-700 text-xs font-semibold"
                   >
                     Need Review
+                  </div>
+                  <div
+                    v-if="task.needs_revision"
+                    class="mt-2 inline-flex px-2.5 py-1 rounded-md bg-red-100 text-red-700 text-xs font-semibold"
+                  >
+                    Needs Revision
                   </div>
                   <p
                     v-if="task.status === 'rejected' && task.rejected_reason"
