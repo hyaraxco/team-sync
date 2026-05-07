@@ -171,6 +171,42 @@ class ProjectTaskPolicyTest extends TestCase
         $this->assertTrue($response->allowed());
     }
 
+    public function test_manager_cannot_assign_to_non_project_member(): void
+    {
+        $outsider = StaffMemberProfile::factory()->create();
+
+        $response = $this->policy->create($this->managerUser, [
+            'project_id' => $this->project->id,
+            'assignee_id' => $outsider->id,
+            'status' => 'todo',
+        ]);
+
+        $this->assertTrue($response->denied());
+        $this->assertStringContainsString('must be a member of the project', $response->message());
+    }
+
+    public function test_manager_can_assign_to_project_member(): void
+    {
+        $response = $this->policy->create($this->managerUser, [
+            'project_id' => $this->project->id,
+            'assignee_id' => $this->staffProfile->id,
+            'status' => 'todo',
+        ]);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function test_manager_can_assign_to_project_leader(): void
+    {
+        $response = $this->policy->create($this->managerUser, [
+            'project_id' => $this->project->id,
+            'assignee_id' => $this->managerProfile->id,
+            'status' => 'todo',
+        ]);
+
+        $this->assertTrue($response->allowed());
+    }
+
     // ═══════════════════════════════════════════════════════════════════
     // UPDATE — PL/Manager field edits
     // ═══════════════════════════════════════════════════════════════════
@@ -369,6 +405,40 @@ class ProjectTaskPolicyTest extends TestCase
 
         $this->assertTrue($response->denied());
         $this->assertStringContainsString('not allowed to modify assignee_id', $response->message());
+    }
+
+    public function test_manager_cannot_reassign_to_non_project_member(): void
+    {
+        $outsider = StaffMemberProfile::factory()->create();
+        $task = $this->makeTask('rejected');
+
+        $response = $this->policy->update($this->managerUser, $task, [
+            'assignee_id' => $outsider->id,
+        ]);
+
+        $this->assertTrue($response->denied());
+        $this->assertStringContainsString('must be a member of the project', $response->message());
+    }
+
+    public function test_manager_can_reassign_to_project_member(): void
+    {
+        // Create another staff in the same team
+        $otherStaffUser = User::factory()->create();
+        $otherStaffUser->assignRole('staff');
+        $otherStaffProfile = StaffMemberProfile::factory()->create(['user_id' => $otherStaffUser->id]);
+        TeamMember::create([
+            'team_id' => $this->team->id,
+            'staff_member_id' => $otherStaffProfile->id,
+            'joined_at' => now(),
+        ]);
+
+        $task = $this->makeTask('rejected');
+
+        $response = $this->policy->update($this->managerUser, $task, [
+            'assignee_id' => $otherStaffProfile->id,
+        ]);
+
+        $this->assertTrue($response->allowed());
     }
 
     // ═══════════════════════════════════════════════════════════════════

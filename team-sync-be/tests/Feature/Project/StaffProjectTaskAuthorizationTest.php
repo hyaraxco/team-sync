@@ -326,19 +326,34 @@ class StaffProjectTaskAuthorizationTest extends TestCase
         $response->assertCreated();
     }
 
-    public function test_manager_can_assign_task_to_anyone(): void
+    public function test_manager_can_assign_task_to_project_member(): void
     {
         Sanctum::actingAs($this->managerUser);
 
         $response = $this->postJson('/api/v1/project-tasks', [
             'project_id' => $this->projectA->id,
-            'name' => 'Assigned to staff B',
-            'assignee_id' => $this->staffProfileB->id,
+            'name' => 'Assigned to staff A (project member)',
+            'assignee_id' => $this->staffProfileA->id,
             'priority' => TaskPriority::MEDIUM->value,
             'status' => TaskStatus::TODO->value,
         ]);
 
         $response->assertCreated();
+    }
+
+    public function test_manager_cannot_assign_task_to_non_project_member(): void
+    {
+        Sanctum::actingAs($this->managerUser);
+
+        $response = $this->postJson('/api/v1/project-tasks', [
+            'project_id' => $this->projectA->id,
+            'name' => 'Assigned to staff B (NOT project member)',
+            'assignee_id' => $this->staffProfileB->id,
+            'priority' => TaskPriority::MEDIUM->value,
+            'status' => TaskStatus::TODO->value,
+        ]);
+
+        $response->assertForbidden();
     }
 
     // ─── Helpers ────────────────────────────────────────────────────────
