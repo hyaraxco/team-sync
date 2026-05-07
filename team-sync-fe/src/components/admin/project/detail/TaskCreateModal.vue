@@ -1,8 +1,9 @@
 <script setup>
-import { ref, watch } from "vue";
+import { ref, watch, computed } from "vue";
 import { X } from "lucide-vue-next";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import { useToast } from "@/composables/useToast";
+import { useAuthStore } from "@/stores/auth";
 
 const toast = useToast();
 
@@ -18,6 +19,31 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["close", "created"]);
+
+const authStore = useAuthStore();
+
+const roleNames = computed(() =>
+  (authStore.user?.roles || []).map((role) => role.name || role)
+);
+
+const isPureStaff = computed(
+  () =>
+    roleNames.value.includes("staff") &&
+    !roleNames.value.includes("manager") &&
+    !roleNames.value.includes("hr")
+);
+
+const availableStatuses = computed(() => {
+  if (isPureStaff.value) {
+    return [{ value: "todo", label: "To Do" }];
+  }
+  return [
+    { value: "todo", label: "To Do" },
+    { value: "in_progress", label: "In Progress" },
+    { value: "review", label: "Review" },
+    { value: "done", label: "Done" },
+  ];
+});
 
 const formData = ref({
   name: "",
@@ -133,10 +159,13 @@ const handleSubmit = async () => {
             v-model="formData.status"
             class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
           >
-            <option value="todo">To Do</option>
-            <option value="in_progress">In Progress</option>
-            <option value="review">Review</option>
-            <option value="done">Done</option>
+            <option
+              v-for="status in availableStatuses"
+              :key="status.value"
+              :value="status.value"
+            >
+              {{ status.label }}
+            </option>
           </select>
         </div>
       </div>
