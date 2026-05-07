@@ -26,13 +26,14 @@ class OvertimeApprovedNotification extends Notification implements ShouldQueue
     {
         return [
             'type' => 'overtime_approved',
+            'category' => 'overtime',
             'title' => 'Overtime Request Approved',
-            'message' => "Your overtime request for {$this->record->date->format('d M Y')} ({$this->record->hours} hours) has been approved by {$this->approver->name}.",
+            'body' => "Your overtime request for {$this->record->date->format('d M Y')} ({$this->record->hours} hours) has been approved by {$this->approver->name}.",
+            'action_url' => '/admin/attendance/my-overtime',
             'overtime_record_id' => $this->record->id,
             'date' => $this->record->date->format('Y-m-d'),
             'hours' => (float) $this->record->hours,
             'approved_by' => $this->approver->name,
-            'link' => '/attendance/overtime',
         ];
     }
 }

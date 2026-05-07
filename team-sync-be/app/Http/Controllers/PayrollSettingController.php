@@ -8,9 +8,11 @@ use App\Http\Resources\PayrollSettingVersionResource;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\PayrollSetting;
 use App\Services\Payroll\TaxCalculationService;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PayrollSettingController extends Controller implements HasMiddleware
@@ -18,8 +20,7 @@ class PayrollSettingController extends Controller implements HasMiddleware
     public function __construct(
         private PayrollRepositoryInterface $payrollRepository,
         private TaxCalculationService $taxCalculationService
-    ) {
-    }
+    ) {}
 
     public static function middleware()
     {
@@ -43,7 +44,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollSettingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -65,7 +67,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollSettingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -81,10 +84,11 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 $diff,
                 200
             );
-        } catch (\Illuminate\Database\Eloquent\ModelNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Version Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollSettingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -138,7 +142,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollSettingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -155,7 +160,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollSettingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -172,7 +178,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollSettingController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollSettingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

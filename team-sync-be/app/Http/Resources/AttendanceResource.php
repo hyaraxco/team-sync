@@ -28,6 +28,8 @@ class AttendanceResource extends JsonResource
                 ? sprintf('%02d:%02d', $this->check_in->diffInHours($this->check_out), $this->check_in->diff($this->check_out)->format('%I'))
                 : null,
             'status' => $this->status,
+            'actual_work_mode' => $this->actual_work_mode,
+            'policy_mismatch_flag' => (bool) $this->policy_mismatch_flag,
             'notes' => $this->notes,
             'staff_member' => new StaffMemberProfileResource($this->whenLoaded('staffMember')),
             'created_at' => $this->created_at,

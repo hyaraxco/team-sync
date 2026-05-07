@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Interfaces\HybridWorkScheduleRepositoryInterface;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -34,7 +34,7 @@ class HybridWorkScheduleController extends Controller implements HasMiddleware
     {
         $profile = $request->user()->staffMemberProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
 
@@ -50,7 +50,7 @@ class HybridWorkScheduleController extends Controller implements HasMiddleware
     {
         $profile = $request->user()->staffMemberProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['success' => false, 'message' => 'Profile not found'], 404);
         }
 

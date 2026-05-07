@@ -14,6 +14,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceGoalController extends Controller implements HasMiddleware
@@ -119,7 +120,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Goal deleted successfully');
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('PerformanceGoalController::destroy: ' . $e->getMessage());
+            Log::warning('PerformanceGoalController::destroy: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, 'Failed to delete goal. It may be linked to a completed review.', null, 400);
         }
     }

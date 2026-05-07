@@ -1,8 +1,8 @@
 <?php
 
 use App\Helpers\ResponseHelper;
+use App\Http\Middleware\EnsureFeatureEnabled;
 use App\Http\Middleware\EnsureProjectMembership;
-use App\Http\Middleware\ResolveCompanyContext;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -22,8 +22,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
+            'feature.enabled' => EnsureFeatureEnabled::class,
             'project.member' => EnsureProjectMembership::class,
-            'resolve.company' => ResolveCompanyContext::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

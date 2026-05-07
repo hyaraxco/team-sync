@@ -70,7 +70,7 @@ class OvertimeService
         if ($hours > OvertimeRecord::MAX_HOURS_PER_DAY) {
             return [
                 'success' => false,
-                'message' => 'Overtime hours exceed maximum allowed per day (' . OvertimeRecord::MAX_HOURS_PER_DAY . ' hours)',
+                'message' => 'Overtime hours exceed maximum allowed per day ('.OvertimeRecord::MAX_HOURS_PER_DAY.' hours)',
                 'record' => null,
             ];
         }
@@ -85,7 +85,7 @@ class OvertimeService
 
             return [
                 'success' => false,
-                'message' => "Weekly overtime limit exceeded. Maximum " . OvertimeRecord::MAX_HOURS_PER_WEEK . " hours/week. Remaining capacity: {$remaining} hours.",
+                'message' => 'Weekly overtime limit exceeded. Maximum '.OvertimeRecord::MAX_HOURS_PER_WEEK." hours/week. Remaining capacity: {$remaining} hours.",
                 'record' => null,
             ];
         }

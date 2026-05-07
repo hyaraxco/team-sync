@@ -24,6 +24,8 @@ class StaffMemberProfileDto
         public readonly string $address,
         public readonly string $city,
         public readonly string $postal_code,
+        public readonly ?string $last_education,
+        public readonly ?string $seniority_level,
         public readonly ?string $profile_photo,
         // Job Information
         public readonly string $job_title,
@@ -61,6 +63,8 @@ class StaffMemberProfileDto
             'address' => $this->address,
             'city' => $this->city,
             'postal_code' => $this->postal_code,
+            'last_education' => $this->last_education,
+            'seniority_level' => $this->seniority_level,
             'profile_photo' => $this->profile_photo,
             // Job Information
             'job_title' => $this->job_title,
@@ -99,6 +103,8 @@ class StaffMemberProfileDto
             address: $data['address'],
             city: $data['city'],
             postal_code: $data['postal_code'],
+            last_education: $data['last_education'] ?? null,
+            seniority_level: $data['seniority_level'] ?? null,
             profile_photo: $data['profile_photo'] ?? null,
             // Job Information
             job_title: $data['job_title'],
@@ -137,6 +143,8 @@ class StaffMemberProfileDto
             address: $data['address'] ?? $existingProfile->address,
             city: $data['city'] ?? $existingProfile->city,
             postal_code: $data['postal_code'] ?? $existingProfile->postal_code,
+            last_education: $data['last_education'] ?? $existingProfile->last_education,
+            seniority_level: $data['seniority_level'] ?? $existingProfile->seniority_level,
             profile_photo: $data['profile_photo'] ?? data_get($existingProfile, 'user.profile_photo'),
             // Job Information
             job_title: $data['job_title'] ?? $existingProfile->jobInformation?->job_title ?? '',

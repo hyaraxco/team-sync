@@ -24,7 +24,7 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
      */
     public function index(Request $request): JsonResponse
     {
-        $query = PayrollAdjustment::with(['staffMember', 'sourcePeriod', 'targetPeriod'])
+        $query = PayrollAdjustment::with(['staffMember', 'sourcePeriod', 'targetPeriod', 'approver'])
             ->orderBy('created_at', 'desc');
 
         if ($request->has('status')) {
@@ -61,8 +61,15 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
 
         $adjustment->update([
             'status' => PayrollAdjustment::STATUS_APPROVED,
+            'approved_by' => $request->user()?->id,
+            'approved_at' => now(),
         ]);
 
-        return ResponseHelper::jsonResponse(true, 'Payroll Adjustment Approved Successfully', $adjustment->fresh(), 200);
+        return ResponseHelper::jsonResponse(
+            true,
+            'Payroll Adjustment Approved Successfully',
+            $adjustment->fresh(['staffMember', 'sourcePeriod', 'targetPeriod', 'approver']),
+            200
+        );
     }
 }

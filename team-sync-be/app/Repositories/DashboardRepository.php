@@ -3,11 +3,18 @@
 namespace App\Repositories;
 
 use App\Constants\CacheConstants;
+use App\Enums\TaskStatus;
 use App\Interfaces\DashboardRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\Project;
+use App\Models\ProjectTaskStatusLog;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
+use App\Models\User;
+use App\Notifications\TeamPulseNudge;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class DashboardRepository implements DashboardRepositoryInterface
@@ -122,10 +129,10 @@ class DashboardRepository implements DashboardRepositoryInterface
             // Performance outcome stats from completed reviews
             $outcomeStats = DB::table('performance_reviews')
                 ->where('status', 'completed')
-                ->selectRaw("
+                ->selectRaw('
                     COUNT(CASE WHEN promotion_eligible = 1 THEN 1 END) as promotion_eligible_count,
                     COUNT(CASE WHEN pip_required = 1 THEN 1 END) as pip_required_count
-                ")
+                ')
                 ->first();
 
             return [
@@ -151,7 +158,7 @@ class DashboardRepository implements DashboardRepositoryInterface
                 ],
                 'performance' => [
                     'promotion_eligible' => (int) ($outcomeStats->promotion_eligible_count ?? 0),
-                    'pip_required'       => (int) ($outcomeStats->pip_required_count ?? 0),
+                    'pip_required' => (int) ($outcomeStats->pip_required_count ?? 0),
                 ],
             ];
         });
@@ -325,5 +332,276 @@ class DashboardRepository implements DashboardRepositoryInterface
             'checked_in' => array_slice($checkedIn, 0, 10),
             'not_checked_in' => array_slice($notCheckedIn, 0, 10),
         ];
+    }
+
+    public function getTeamPulse(): array
+    {
+        $actor = auth()->user();
+
+        if (! $actor instanceof User) {
+            throw new AuthorizationException('Unauthorized.');
+        }
+
+        $teamIds = $this->resolveManagedTeamIds($actor);
+
+        if ($teamIds === []) {
+            return [
+                'updated_at' => now()->toIso8601String(),
+                'summary' => [
+                    'red' => 0,
+                    'yellow' => 0,
+                    'green' => 0,
+                    'total' => 0,
+                ],
+                'staff_members' => [],
+            ];
+        }
+
+        $staffMembers = StaffMemberProfile::query()
+            ->with(['user', 'jobInformation.team'])
+            ->whereIn('id', function ($query) use ($teamIds) {
+                $query->select('staff_member_id')
+                    ->from('team_members')
+                    ->whereIn('team_id', $teamIds)
+                    ->whereNull('left_at');
+            })
+            ->orderBy('id')
+            ->get();
+
+        if ($staffMembers->isEmpty()) {
+            return [
+                'updated_at' => now()->toIso8601String(),
+                'summary' => [
+                    'red' => 0,
+                    'yellow' => 0,
+                    'green' => 0,
+                    'total' => 0,
+                ],
+                'staff_members' => [],
+            ];
+        }
+
+        $staffIds = $staffMembers->pluck('id')->all();
+        $today = Carbon::today();
+        $todayString = $today->toDateString();
+        $staleThreshold = $today->copy()->subDays(2)->startOfDay();
+
+        $todayAttendances = Attendance::query()
+            ->whereIn('staff_member_id', $staffIds)
+            ->whereDate('date', $todayString)
+            ->get()
+            ->keyBy('staff_member_id');
+
+        $taskRows = DB::table('project_tasks')
+            ->selectRaw('assignee_id, COUNT(*) as total_tasks')
+            ->selectRaw('SUM(CASE WHEN status = ? THEN 1 ELSE 0 END) as done_tasks', [TaskStatus::DONE->value])
+            ->selectRaw('SUM(CASE WHEN status IN (?, ?) THEN 1 ELSE 0 END) as active_tasks', [TaskStatus::IN_PROGRESS->value, TaskStatus::REVIEW->value])
+            ->selectRaw('SUM(CASE WHEN status = ? AND due_date < ? THEN 1 ELSE 0 END) as overdue_tasks', [TaskStatus::TODO->value, $todayString])
+            ->selectRaw('SUM(CASE WHEN status = ? AND due_date <= ? THEN 1 ELSE 0 END) as due_today_tasks', [TaskStatus::TODO->value, $todayString])
+            ->whereIn('assignee_id', $staffIds)
+            ->whereNull('deleted_at')
+            ->groupBy('assignee_id')
+            ->get()
+            ->keyBy('assignee_id');
+
+        $doneTodayRows = ProjectTaskStatusLog::query()
+            ->selectRaw('project_tasks.assignee_id as staff_member_id, COUNT(project_task_status_logs.id) as done_today')
+            ->join('project_tasks', 'project_tasks.id', '=', 'project_task_status_logs.project_task_id')
+            ->whereIn('project_tasks.assignee_id', $staffIds)
+            ->where('project_task_status_logs.to_status', TaskStatus::DONE->value)
+            ->whereDate('project_task_status_logs.changed_at', $todayString)
+            ->groupBy('project_tasks.assignee_id')
+            ->get()
+            ->keyBy('staff_member_id');
+
+        $nudgeLookup = DB::table('notifications')
+            ->selectRaw('notifiable_id, MAX(created_at) as last_nudged_at')
+            ->where('notifiable_type', User::class)
+            ->where('type', TeamPulseNudge::class)
+            ->whereIn('notifiable_id', $staffMembers->pluck('user_id')->all())
+            ->groupBy('notifiable_id')
+            ->get()
+            ->keyBy('notifiable_id');
+
+        $pulseItems = $staffMembers->map(function (StaffMemberProfile $staffMember) use ($todayAttendances, $taskRows, $doneTodayRows, $nudgeLookup, $staleThreshold) {
+            $attendance = $todayAttendances->get($staffMember->id);
+            $taskStats = $taskRows->get($staffMember->id);
+            $doneToday = (int) ($doneTodayRows->get($staffMember->id)->done_today ?? 0);
+
+            $totalTasks = (int) ($taskStats->total_tasks ?? 0);
+            $overdueTasks = (int) ($taskStats->overdue_tasks ?? 0);
+            $dueTodayTasks = (int) ($taskStats->due_today_tasks ?? 0);
+            $velocityPercent = $dueTodayTasks > 0
+                ? (int) round(($doneToday / $dueTodayTasks) * 100)
+                : ($doneToday > 0 ? 100 : 0);
+
+            $attendancePresent = $attendance !== null || $staffMember->jobInformation?->work_location === 'remote';
+            $attendanceStatus = $attendance?->status ?? ($attendancePresent ? 'remote' : 'not_checked_in');
+            $attendanceLabel = $this->normalizeAttendanceLabel($attendanceStatus);
+            $attendanceScore = $attendancePresent ? 100 : 0;
+            $staleBlocked = $this->hasStaleActiveTasks($staffMember->id, $staleThreshold);
+
+            $riskLevel = 'green';
+            $riskReason = 'Task berjalan normal hari ini.';
+
+            if (! $attendancePresent || $overdueTasks > 0 || $staleBlocked) {
+                $riskLevel = 'red';
+                $riskReason = ! $attendancePresent
+                    ? 'Belum terlihat aktif di absensi hari ini.'
+                    : ($overdueTasks > 0
+                        ? 'Ada task tertunda yang sudah melewati due date.'
+                        : 'Ada task aktif yang stagnan lebih dari 2 hari.');
+            } elseif ($velocityPercent < 50 && $totalTasks > 0) {
+                $riskLevel = 'yellow';
+                $riskReason = 'Kecepatan progres hari ini masih di bawah 50%.';
+            }
+
+            $lastNudgedAt = $nudgeLookup->get($staffMember->user_id)->last_nudged_at ?? null;
+
+            return [
+                'id' => $staffMember->id,
+                'name' => $staffMember->user?->name,
+                'profile_photo' => $staffMember->user?->profile_photo ? asset('storage/'.$staffMember->user->profile_photo) : null,
+                'job_title' => $staffMember->jobInformation?->job_title,
+                'team_name' => $staffMember->jobInformation?->team?->name,
+                'attendance' => [
+                    'status' => $attendanceStatus,
+                    'label' => $attendanceLabel,
+                    'score' => $attendanceScore,
+                ],
+                'task_velocity' => [
+                    'percent' => max(0, min(100, $velocityPercent)),
+                    'done_today' => $doneToday,
+                    'due_today' => $dueTodayTasks,
+                    'overdue' => $overdueTasks,
+                    'active' => (int) ($taskStats->active_tasks ?? 0),
+                ],
+                'risk' => [
+                    'level' => $riskLevel,
+                    'reason' => $riskReason,
+                ],
+                'nudge' => [
+                    'last_sent_at' => $lastNudgedAt ? Carbon::parse($lastNudgedAt)->toIso8601String() : null,
+                    'status' => $lastNudgedAt ? 'sent' : 'idle',
+                ],
+                'detail_url' => '/admin/staff-members/'.$staffMember->id,
+            ];
+        })->sortBy([
+            fn (array $item) => $this->riskSortOrder($item['risk']['level']),
+            fn (array $item) => $item['task_velocity']['percent'],
+            fn (array $item) => $item['name'] ?? '',
+        ])->values();
+
+        return [
+            'updated_at' => now()->toIso8601String(),
+            'summary' => [
+                'red' => $pulseItems->where('risk.level', 'red')->count(),
+                'yellow' => $pulseItems->where('risk.level', 'yellow')->count(),
+                'green' => $pulseItems->where('risk.level', 'green')->count(),
+                'total' => $pulseItems->count(),
+            ],
+            'staff_members' => $pulseItems->all(),
+        ];
+    }
+
+    public function sendTeamPulseNudge(int $staffMemberId, ?string $message = null): array
+    {
+        $actor = auth()->user();
+
+        if (! $actor instanceof User) {
+            throw new AuthorizationException('Unauthorized.');
+        }
+
+        $teamIds = $this->resolveManagedTeamIds($actor);
+
+        if ($teamIds === []) {
+            throw new AuthorizationException('You do not manage any team members for Team Pulse.');
+        }
+
+        $staffMember = StaffMemberProfile::query()
+            ->with(['user'])
+            ->where('id', $staffMemberId)
+            ->whereIn('id', function ($query) use ($teamIds) {
+                $query->select('staff_member_id')
+                    ->from('team_members')
+                    ->whereIn('team_id', $teamIds)
+                    ->whereNull('left_at');
+            })
+            ->first();
+
+        if (! $staffMember instanceof StaffMemberProfile) {
+            throw (new ModelNotFoundException)->setModel(StaffMemberProfile::class, [$staffMemberId]);
+        }
+
+        $recipient = $staffMember->user;
+
+        if (! $recipient instanceof User) {
+            throw new AuthorizationException('Selected staff member does not have an active user account.');
+        }
+
+        $resolvedMessage = trim((string) $message);
+        if ($resolvedMessage === '') {
+            $resolvedMessage = sprintf(
+                'Hi %s, kulihat task hari ini agak melambat. Ada blocker yang bisa kubantu?',
+                $recipient->name ?? 'tim'
+            );
+        }
+
+        $recipient->notify(new TeamPulseNudge(
+            $staffMember->id,
+            (string) ($recipient->name ?? $staffMember->code),
+            (string) ($actor->name ?? 'Manager'),
+            $resolvedMessage,
+        ));
+
+        return [
+            'staff_member_id' => $staffMember->id,
+            'staff_member_name' => $recipient->name,
+            'message' => $resolvedMessage,
+            'sent_at' => now()->toIso8601String(),
+        ];
+    }
+
+    private function resolveManagedTeamIds(User $actor): array
+    {
+        $managedTeamIds = Team::query()
+            ->where('team_lead_id', $actor->id)
+            ->pluck('id')
+            ->map(fn ($id) => (int) $id)
+            ->all();
+
+        return array_values(array_unique($managedTeamIds));
+    }
+
+    private function hasStaleActiveTasks(int $staffMemberId, Carbon $staleThreshold): bool
+    {
+        return DB::table('project_tasks')
+            ->where('assignee_id', $staffMemberId)
+            ->whereNull('deleted_at')
+            ->whereIn('status', [TaskStatus::TODO->value, TaskStatus::IN_PROGRESS->value, TaskStatus::REVIEW->value])
+            ->where('updated_at', '<', $staleThreshold)
+            ->exists();
+    }
+
+    private function normalizeAttendanceLabel(string $status): string
+    {
+        return match ($status) {
+            'present' => 'Hadir',
+            'late' => 'Terlambat',
+            'remote' => 'Remote',
+            'half_day' => 'Half Day',
+            'annual_leave', 'on_leave' => 'Cuti',
+            'sick_leave', 'sick' => 'Sakit',
+            default => 'Belum Check-in',
+        };
+    }
+
+    private function riskSortOrder(string $riskLevel): int
+    {
+        return match ($riskLevel) {
+            'red' => 0,
+            'yellow' => 1,
+            default => 2,
+        };
     }
 }

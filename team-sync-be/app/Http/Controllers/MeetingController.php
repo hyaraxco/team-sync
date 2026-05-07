@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class MeetingController extends Controller implements HasMiddleware
@@ -45,7 +46,7 @@ class MeetingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -73,7 +74,7 @@ class MeetingController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -90,7 +91,7 @@ class MeetingController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Upcoming Meetings Retrieved Successfully', MeetingResource::collection($meetings), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -105,7 +106,7 @@ class MeetingController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Meeting Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -118,7 +119,7 @@ class MeetingController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Meeting Created Successfully', new MeetingResource($meeting), 201);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('MeetingController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }

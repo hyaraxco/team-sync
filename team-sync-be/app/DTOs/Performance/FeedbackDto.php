@@ -20,7 +20,7 @@ class FeedbackDto
     {
         return new self(
             $data['staff_member_id'],
-            Auth::id() ?? $data['given_by'], // fallback for testing or manual creation
+            Auth::user()?->staffMemberProfile?->id ?? $data['given_by'], // fallback for testing or manual creation
             $data['feedback_type'],
             $data['category'] ?? null,
             $data['content'],

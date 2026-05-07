@@ -2,14 +2,13 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 
 class PayrollSetting extends Model
 {
-    use BelongsToCompany, HasFactory;
+    use HasFactory;
 
     public const VERSIONED_FIELDS = [
         'payday_day',

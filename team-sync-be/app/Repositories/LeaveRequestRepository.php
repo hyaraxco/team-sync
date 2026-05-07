@@ -13,6 +13,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\Services\Attendance\AttendancePeriodService;
+use App\Services\Attendance\LeaveEntitlementValidator;
 use App\Services\EmailService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
@@ -26,7 +27,8 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 {
     public function __construct(
         private EmailService $emailService,
-        private AttendancePeriodService $attendancePeriodService
+        private AttendancePeriodService $attendancePeriodService,
+        private LeaveEntitlementValidator $leaveEntitlementValidator
     ) {}
 
     public function getAll(
@@ -138,6 +140,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             }
 
             $data['total_days'] = $startDate->diffInDays($endDate) + 1;
+            $data['status'] = 'pending';
 
             $leaveRequestDto = LeaveRequestDto::fromArray($data);
             $leaveRequest = LeaveRequest::create($leaveRequestDto->toArray());
@@ -159,6 +162,9 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             if (! $approverProfileId) {
                 throw new \Exception('Your user account is not linked to a staff profile. Approval failed.');
             }
+
+            $this->ensurePending($leaveRequest);
+            $this->ensureEntitlementIsValid($leaveRequest);
 
             $data = [
                 'status' => 'approved',
@@ -185,6 +191,8 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             if (! $approverProfileId) {
                 throw new \Exception('Your user account is not linked to a staff profile. Rejection failed.');
             }
+
+            $this->ensurePending($leaveRequest);
 
             $data = [
                 'status' => 'rejected',
@@ -226,9 +234,16 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 }
 
                 $this->authorizeManagerScope($leaveRequest);
+                $this->ensurePending($leaveRequest);
+
+                $isApproveAction = $action === 'approve';
+
+                if ($isApproveAction) {
+                    $this->ensureEntitlementIsValid($leaveRequest);
+                }
 
                 $data = [
-                    'status' => $action === 'approve' ? 'approved' : 'rejected',
+                    'status' => $isApproveAction ? 'approved' : 'rejected',
                     'approved_by' => $approverProfileId,
                 ];
 
@@ -476,6 +491,30 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         });
     }
 
+    private function ensurePending(LeaveRequest $leaveRequest): void
+    {
+        if ($this->leaveStatusValue($leaveRequest) !== 'pending') {
+            throw new \Exception('Only pending leave requests can be approved or rejected.');
+        }
+    }
+
+    private function ensureEntitlementIsValid(LeaveRequest $leaveRequest): void
+    {
+        $result = $this->leaveEntitlementValidator->validate($leaveRequest->loadMissing('staffMember.jobInformation'));
+
+        if (! ($result['valid'] ?? false)) {
+            $errors = implode(', ', $result['errors'] ?? ['leave_entitlement_invalid']);
+            throw new \Exception("Leave request cannot be approved: {$errors}.");
+        }
+    }
+
+    private function leaveStatusValue(LeaveRequest $leaveRequest): string
+    {
+        return is_object($leaveRequest->status) && property_exists($leaveRequest->status, 'value')
+            ? (string) $leaveRequest->status->value
+            : (string) $leaveRequest->status;
+    }
+
     private function resolveNextAdjustableTargetPeriod(AttendancePeriod $sourcePeriod): AttendancePeriod
     {
         $targetMonth = Carbon::parse((string) $sourcePeriod->start_date)
@@ -516,6 +555,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
         return $periodDays;
     }
+
     public function getCalendarData(string $month)
     {
         $startOfMonth = Carbon::parse($month)->startOfMonth();

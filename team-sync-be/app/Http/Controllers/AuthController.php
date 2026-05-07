@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\AuthProfileUpdateRequest;
 use App\Http\Requests\LoginStoreRequest;
 use App\Http\Resources\UserResource;
 use App\Interfaces\AuthRepositoryInterface;
-use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Throwable;
 
 class AuthController extends Controller
 {
@@ -39,7 +41,8 @@ class AuthController extends Controller
 
             return ResponseHelper::jsonResponse(true, 'Profile Retrieved Successfully', new UserResource($user), 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('AuthController::me error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AuthController::me error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -51,25 +54,20 @@ class AuthController extends Controller
 
             return ResponseHelper::jsonResponse(true, 'Logout Successful', new UserResource($user), 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::error('AuthController::logout error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AuthController::logout error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(AuthProfileUpdateRequest $request)
     {
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'password' => 'nullable|string|min:8|confirmed',
-            'profile_photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-        ]);
+        $validated = $request->validated();
 
         try {
-            $user = $this->authRepository->updateProfile([
-                'name' => $request->input('name'),
-                'password' => $request->input('password'),
-                'profile_photo' => $request->file('profile_photo'),
-            ]);
+            $validated['profile_photo'] = $request->file('profile_photo');
+
+            $user = $this->authRepository->updateProfile($validated);
 
             return ResponseHelper::jsonResponse(true, 'Profile Updated Successfully', new UserResource($user), 200);
         } catch (\Exception $e) {
@@ -77,10 +75,14 @@ class AuthController extends Controller
             $message = $status < 500 ? $e->getMessage() : 'Internal Server Error';
 
             if ($status >= 500) {
-                \Illuminate\Support\Facades\Log::error('AuthController::updateProfile error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+                Log::error('AuthController::updateProfile error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
             }
 
             return ResponseHelper::jsonResponse(false, $message, null, $status);
+        } catch (Throwable $e) {
+            Log::error('AuthController::updateProfile error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 }

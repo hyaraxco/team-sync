@@ -5,8 +5,11 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\AttendanceCheckInRequest;
 use App\Http\Requests\AttendanceCheckOutRequest;
+use App\Http\Requests\AttendancePaginatedListRequest;
 use App\Http\Requests\AttendancePolicyMismatchAcknowledgeRequest;
+use App\Http\Requests\AttendancePolicyMismatchListRequest;
 use App\Http\Requests\AttendancePolicyMismatchResolveRequest;
+use App\Http\Requests\EmployeeAttendanceStatisticsRequest;
 use App\Http\Resources\AttendancePolicyMismatchResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\PaginateResource;
@@ -16,6 +19,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class AttendanceController extends Controller implements HasMiddleware
@@ -54,27 +58,26 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendances Retrieved Successfully', AttendanceResource::collection($attendances), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function getAllPaginated(Request $request)
+    public function getAllPaginated(AttendancePaginatedListRequest $request)
     {
-        $request = $request->validate([
-            'search' => 'nullable|string',
-            'row_per_page' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
         try {
             $attendances = $this->attendanceRepository->getAllPaginated(
-                $request['search'] ?? null,
-                $request['row_per_page']
+                $validated['search'] ?? null,
+                $validated['row_per_page']
             );
 
             return ResponseHelper::jsonResponse(true, 'Attendances Retrieved Successfully', PaginateResource::make($attendances, AttendanceResource::class), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -86,7 +89,8 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'My Attendances Retrieved Successfully', AttendanceResource::collection($attendances), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -98,7 +102,8 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Statistics Retrieved Successfully', $statistics, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -114,7 +119,8 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Last Attendance Retrieved Successfully', new AttendanceResource($attendance), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -128,10 +134,12 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Check-in Successful', new AttendanceResource($attendance), 201);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -145,10 +153,12 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Check-out Successful', new AttendanceResource($attendance), 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -163,7 +173,8 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Statistics Retrieved Successfully', $statistics, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -177,10 +188,12 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Policy Mismatch Acknowledged Successfully', $mismatch, 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -194,10 +207,12 @@ class AttendanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Policy Mismatch Resolved Successfully', $mismatch, 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -214,7 +229,8 @@ class AttendanceController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Attendance Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -222,17 +238,19 @@ class AttendanceController extends Controller implements HasMiddleware
     /**
      * Get paginated policy mismatches for admin dashboard.
      */
-    public function getPolicyMismatches(Request $request)
+    public function getPolicyMismatches(AttendancePolicyMismatchListRequest $request)
     {
+        $validated = $request->validated();
+
         try {
             $query = AttendancePolicyMismatch::with(['staffMember', 'attendance'])
                 ->orderBy('mismatch_date', 'desc');
 
-            if ($request->has('status')) {
-                $query->where('status', $request->status);
+            if (isset($validated['status'])) {
+                $query->where('status', $validated['status']);
             }
 
-            $mismatches = $query->paginate($request->get('per_page', 15));
+            $mismatches = $query->paginate($validated['per_page'] ?? 15);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -241,7 +259,8 @@ class AttendanceController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -249,16 +268,19 @@ class AttendanceController extends Controller implements HasMiddleware
     /**
      * Get attendance statistics for a specific employee (admin view).
      */
-    public function getEmployeeStatistics(Request $request, string $employeeId)
+    public function getEmployeeStatistics(EmployeeAttendanceStatisticsRequest $request, string $employeeId)
     {
+        $validated = $request->validated();
+
         try {
-            $statistics = $this->attendanceRepository->getEmployeeStatistics($employeeId, $request->all());
+            $statistics = $this->attendanceRepository->getEmployeeStatistics($employeeId, $validated);
 
             return ResponseHelper::jsonResponse(true, 'Employee Attendance Statistics Retrieved Successfully', $statistics, 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

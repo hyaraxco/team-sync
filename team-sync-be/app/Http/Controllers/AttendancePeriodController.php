@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Requests\AttendancePeriod\CreateAttendancePeriodRequest;
 use App\Interfaces\AttendanceRepositoryInterface;
 use App\Models\AttendancePeriod;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Spatie\Permission\Middleware\PermissionMiddleware;
@@ -35,7 +35,7 @@ class AttendancePeriodController extends Controller implements HasMiddleware
     public function store(CreateAttendancePeriodRequest $request): JsonResponse
     {
         $hasOpenPeriod = $this->repository->hasOpenAttendancePeriod();
-        
+
         if ($hasOpenPeriod) {
             return response()->json([
                 'success' => false,
@@ -58,7 +58,7 @@ class AttendancePeriodController extends Controller implements HasMiddleware
     public function update(Request $request, string $id): JsonResponse
     {
         $data = $request->validate([
-            'status' => 'required|string|in:' . AttendancePeriod::STATUS_OPEN . ',' . AttendancePeriod::STATUS_REVIEW . ',' . AttendancePeriod::STATUS_LOCKED,
+            'status' => 'required|string|in:'.AttendancePeriod::STATUS_OPEN.','.AttendancePeriod::STATUS_REVIEW.','.AttendancePeriod::STATUS_LOCKED,
         ]);
 
         $period = $this->repository->findAttendancePeriodOrFail($id);
@@ -78,7 +78,7 @@ class AttendancePeriodController extends Controller implements HasMiddleware
         }
 
         $updateData = ['status' => $data['status']];
-        
+
         if ($data['status'] === AttendancePeriod::STATUS_LOCKED) {
             $updateData['locked_at'] = now();
         }

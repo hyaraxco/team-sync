@@ -16,6 +16,7 @@ class AttendanceDto
         public readonly ?float $check_out_lat,
         public readonly ?float $check_out_long,
         public readonly string $status,
+        public readonly ?string $actual_work_mode = null,
         public readonly ?string $notes = null,
     ) {}
 
@@ -31,6 +32,7 @@ class AttendanceDto
             'check_out_lat' => $this->check_out_lat,
             'check_out_long' => $this->check_out_long,
             'status' => $this->status,
+            'actual_work_mode' => $this->actual_work_mode,
             'notes' => $this->notes,
         ];
     }
@@ -47,6 +49,7 @@ class AttendanceDto
             check_out_lat: isset($data['check_out_lat']) ? (float) $data['check_out_lat'] : null,
             check_out_long: isset($data['check_out_long']) ? (float) $data['check_out_long'] : null,
             status: $data['status'],
+            actual_work_mode: $data['actual_work_mode'] ?? null,
             notes: $data['notes'] ?? null,
         );
     }
@@ -63,6 +66,7 @@ class AttendanceDto
             check_out_lat: isset($data['check_out_lat']) ? (float) $data['check_out_lat'] : $existingAttendance->check_out_lat,
             check_out_long: isset($data['check_out_long']) ? (float) $data['check_out_long'] : $existingAttendance->check_out_long,
             status: $data['status'] ?? $existingAttendance->status,
+            actual_work_mode: $data['actual_work_mode'] ?? $existingAttendance->actual_work_mode,
             notes: $data['notes'] ?? $existingAttendance->notes,
         );
     }

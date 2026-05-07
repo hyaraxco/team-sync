@@ -10,6 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -45,7 +46,8 @@ class AnalyticsExportController extends Controller implements HasMiddleware
 
             return Excel::download(new AnalyticsMultiSheetExport($sheets), $filename);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AnalyticsExportController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AnalyticsExportController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -76,7 +78,8 @@ class AnalyticsExportController extends Controller implements HasMiddleware
 
             return $pdf->download($filename);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AnalyticsExportController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AnalyticsExportController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

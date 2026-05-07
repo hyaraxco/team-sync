@@ -28,8 +28,10 @@ class ThrPaymentNotification extends Notification implements ShouldQueue
 
         return [
             'type' => 'thr_payment',
+            'category' => 'payroll',
             'title' => "THR {$eventLabel} {$this->thrPayroll->year} Dibayarkan",
-            'message' => "THR {$eventLabel} Anda sebesar Rp " . number_format((float) $this->detail->net_thr_amount, 0, ',', '.') . " telah dibayarkan.",
+            'body' => "THR {$eventLabel} Anda sebesar Rp ".number_format((float) $this->detail->net_thr_amount, 0, ',', '.').' telah dibayarkan.',
+            'action_url' => '/admin/payroll/thr',
             'thr_payroll_id' => $this->thrPayroll->id,
             'thr_detail_id' => $this->detail->id,
             'religion_event' => $this->thrPayroll->religion_event,
@@ -38,7 +40,6 @@ class ThrPaymentNotification extends Notification implements ShouldQueue
             'tax_amount' => (float) $this->detail->pph21_amount,
             'net_amount' => (float) $this->detail->net_thr_amount,
             'payment_date' => $this->thrPayroll->payment_date?->format('Y-m-d'),
-            'link' => '/payroll/thr',
         ];
     }
 }

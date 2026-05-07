@@ -2095,13 +2095,13 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                         });
                 })
                 ->groupBy('teams.id', 'teams.name')
-                ->selectRaw("
+                ->selectRaw('
                     teams.name as team_name,
                     COUNT(DISTINCT team_members.staff_member_id) as total_members,
                     COUNT(DISTINCT CASE WHEN project_tasks.id IS NOT NULL THEN team_members.staff_member_id END) as members_with_tasks,
                     COUNT(project_tasks.id) as total_tasks,
                     ROUND(AVG(CASE WHEN project_tasks.id IS NOT NULL THEN 1 ELSE 0 END) * 100, 1) as utilization_rate
-                ")
+                ')
                 ->orderByDesc('utilization_rate')
                 ->get()
                 ->map(fn ($r) => [

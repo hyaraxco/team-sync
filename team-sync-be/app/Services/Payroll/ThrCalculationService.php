@@ -5,6 +5,7 @@ namespace App\Services\Payroll;
 use App\Models\StaffMemberProfile;
 use App\Models\ThrPayroll;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 
 class ThrCalculationService
 {
@@ -51,7 +52,7 @@ class ThrCalculationService
 
         // Minimum 1 month tenure required
         if ($tenureMonths < ThrPayroll::MIN_TENURE_MONTHS) {
-            return $this->ineligibleResult("Tenure less than {$tenureMonths} month(s). Minimum required: " . ThrPayroll::MIN_TENURE_MONTHS);
+            return $this->ineligibleResult("Tenure less than {$tenureMonths} month(s). Minimum required: ".ThrPayroll::MIN_TENURE_MONTHS);
         }
 
         // Calculate proration factor
@@ -134,10 +135,8 @@ class ThrCalculationService
 
     /**
      * Get eligible employees for a specific religion event.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getEligibleEmployees(string $religionEvent): \Illuminate\Database\Eloquent\Collection
+    public function getEligibleEmployees(string $religionEvent): Collection
     {
         // Find religions that map to this event
         $religions = array_keys(

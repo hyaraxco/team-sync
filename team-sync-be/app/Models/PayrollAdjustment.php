@@ -34,6 +34,8 @@ class PayrollAdjustment extends Model
         'amount_delta',
         'reason',
         'status',
+        'approved_by',
+        'approved_at',
     ];
 
     protected function casts(): array
@@ -41,6 +43,7 @@ class PayrollAdjustment extends Model
         return [
             'days_delta' => 'decimal:2',
             'amount_delta' => 'decimal:2',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -57,6 +60,11 @@ class PayrollAdjustment extends Model
     public function targetPeriod()
     {
         return $this->belongsTo(AttendancePeriod::class, 'target_period_id');
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function leaveRequestSource()

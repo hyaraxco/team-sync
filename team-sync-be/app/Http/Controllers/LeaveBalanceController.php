@@ -7,6 +7,7 @@ use App\Services\Attendance\LeaveBalanceService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class LeaveBalanceController extends Controller implements HasMiddleware
@@ -37,7 +38,8 @@ class LeaveBalanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave balances retrieved successfully.', $balances, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveBalanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveBalanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -54,7 +56,8 @@ class LeaveBalanceController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Upcoming collective leave retrieved successfully.', $cutiBersama, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveBalanceController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveBalanceController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

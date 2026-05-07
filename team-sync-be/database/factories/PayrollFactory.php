@@ -22,7 +22,7 @@ class PayrollFactory extends Factory
             'salary_month' => $salaryMonth,
             'attendance_period_id' => fake()->boolean(80) ? AttendancePeriod::factory() : null,
             'payroll_setting_version_id' => null,
-            'payment_date' => $status === 'paid' ? fake()->dateTimeBetween($salaryMonth, $salaryMonth . ' +1 month') : null,
+            'payment_date' => $status === 'paid' ? fake()->dateTimeBetween($salaryMonth, $salaryMonth.' +1 month') : null,
             'status' => $status,
             'correction_count' => 0,
         ];

@@ -156,6 +156,7 @@ class LeaveBalanceService
             ->get()
             ->filter(function (HolidayCalendar $holiday) use ($employmentType) {
                 $appliesTo = $holiday->applies_to;
+
                 return $appliesTo === null || in_array($employmentType, $appliesTo, true);
             });
     }

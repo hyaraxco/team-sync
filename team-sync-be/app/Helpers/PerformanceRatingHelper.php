@@ -2,6 +2,7 @@
 
 namespace App\Helpers;
 
+use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewResponse;
 
 class PerformanceRatingHelper
@@ -22,8 +23,8 @@ class PerformanceRatingHelper
      */
     public static function calculateFinalRating(int $reviewId): array
     {
-        $review = \App\Models\PerformanceReview::find($reviewId);
-        if (!$review) {
+        $review = PerformanceReview::find($reviewId);
+        if (! $review) {
             return ['final_rating' => null, 'final_rating_label' => null];
         }
 
@@ -82,8 +83,8 @@ class PerformanceRatingHelper
      */
     public static function calculateManagerRating(int $reviewId): ?float
     {
-        $review = \App\Models\PerformanceReview::find($reviewId);
-        if (!$review) {
+        $review = PerformanceReview::find($reviewId);
+        if (! $review) {
             return null;
         }
 

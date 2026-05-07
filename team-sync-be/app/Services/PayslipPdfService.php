@@ -148,7 +148,7 @@ class PayslipPdfService
 
     private function formatRupiah(float $amount): string
     {
-        return 'Rp ' . number_format($amount, 0, ',', '.');
+        return 'Rp '.number_format($amount, 0, ',', '.');
     }
 
     private function formatSignedRupiah(float $amount): string
@@ -156,10 +156,10 @@ class PayslipPdfService
         $formatted = $this->formatRupiah(abs($amount));
 
         if ($amount > 0) {
-            return '+' . $formatted;
+            return '+'.$formatted;
         }
         if ($amount < 0) {
-            return '-' . $formatted;
+            return '-'.$formatted;
         }
 
         return $formatted;

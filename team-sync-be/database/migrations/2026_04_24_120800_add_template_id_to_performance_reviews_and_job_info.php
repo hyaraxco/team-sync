@@ -12,18 +12,18 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('performance_reviews', function (Blueprint $table) {
-            if (!Schema::hasColumn('performance_reviews', 'review_template_id')) {
+            if (! Schema::hasColumn('performance_reviews', 'review_template_id')) {
                 $table->foreignId('review_template_id')->nullable()->after('reviewer_id')->constrained('performance_review_templates')->nullOnDelete();
-            } elseif (!$this->hasForeignKey('performance_reviews', 'performance_reviews_review_template_id_foreign')) {
+            } elseif (! $this->hasForeignKey('performance_reviews', 'performance_reviews_review_template_id_foreign')) {
                 // Column exists (from partial run) but FK was not added — add only the constraint
                 $table->foreign('review_template_id')->references('id')->on('performance_review_templates')->nullOnDelete();
             }
         });
 
         Schema::table('job_information', function (Blueprint $table) {
-            if (!Schema::hasColumn('job_information', 'review_template_id')) {
+            if (! Schema::hasColumn('job_information', 'review_template_id')) {
                 $table->foreignId('review_template_id')->nullable()->after('job_title')->constrained('performance_review_templates')->nullOnDelete();
-            } elseif (!$this->hasForeignKey('job_information', 'job_information_review_template_id_foreign')) {
+            } elseif (! $this->hasForeignKey('job_information', 'job_information_review_template_id_foreign')) {
                 $table->foreign('review_template_id')->references('id')->on('performance_review_templates')->nullOnDelete();
             }
         });
@@ -39,6 +39,7 @@ return new class extends Migration
             ->where('CONSTRAINT_NAME', $fkName)
             ->where('CONSTRAINT_TYPE', 'FOREIGN KEY')
             ->count();
+
         return $count > 0;
     }
 
