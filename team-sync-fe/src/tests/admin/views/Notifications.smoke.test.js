@@ -7,7 +7,10 @@ const { notificationStoreMock, routerPushMock } = vi.hoisted(() => ({
     notifications: [],
     loading: false,
     error: null,
-    fetchLatestNotifications: vi.fn(),
+    meta: null,
+    markingAllRead: false,
+    fetchNotificationsPaginated: vi.fn(),
+    markAllAsRead: vi.fn(),
   },
   routerPushMock: vi.fn(),
 }));
@@ -38,7 +41,10 @@ describe("Notifications view smoke", () => {
     notificationStoreMock.notifications = [];
     notificationStoreMock.loading = false;
     notificationStoreMock.error = null;
-    notificationStoreMock.fetchLatestNotifications.mockReset().mockResolvedValue([]);
+    notificationStoreMock.meta = null;
+    notificationStoreMock.markingAllRead = false;
+    notificationStoreMock.fetchNotificationsPaginated.mockReset().mockResolvedValue({ items: [], meta: null });
+    notificationStoreMock.markAllAsRead.mockReset().mockResolvedValue(null);
     routerPushMock.mockReset().mockResolvedValue(undefined);
   });
 
@@ -65,7 +71,7 @@ describe("Notifications view smoke", () => {
     const wrapper = factory();
     await flushUi();
 
-    expect(notificationStoreMock.fetchLatestNotifications).toHaveBeenCalledWith(100);
+    expect(notificationStoreMock.fetchNotificationsPaginated).toHaveBeenCalledWith({ page: 1, perPage: 15 });
     expect(wrapper.text()).toContain("All Notifications");
     expect(wrapper.text()).toContain("Payroll update");
     expect(wrapper.text()).toContain("Task assigned");
@@ -80,8 +86,8 @@ describe("Notifications view smoke", () => {
       .find((button) => button.text().includes("Refresh"))
       .trigger("click");
 
-    expect(notificationStoreMock.fetchLatestNotifications).toHaveBeenCalledTimes(2);
-    expect(notificationStoreMock.fetchLatestNotifications).toHaveBeenNthCalledWith(2, 100);
+    expect(notificationStoreMock.fetchNotificationsPaginated).toHaveBeenCalledTimes(2);
+    expect(notificationStoreMock.fetchNotificationsPaginated).toHaveBeenNthCalledWith(2, { page: 1, perPage: 15 });
   });
 
   it("navigates to notification action_url when row is clicked", async () => {
@@ -115,5 +121,21 @@ describe("Notifications view smoke", () => {
 
     expect(wrapper.text()).toContain("No notifications yet.");
     expect(wrapper.text()).toContain("New updates will appear here.");
+  });
+
+  it("retries the current page from the error state", async () => {
+    notificationStoreMock.error = "Unable to load notifications";
+    notificationStoreMock.meta = { current_page: 2, last_page: 3 };
+
+    const wrapper = factory();
+    await flushUi();
+
+    await wrapper
+      .findAll("button")
+      .find((button) => button.text().includes("Try again"))
+      .trigger("click");
+
+    expect(notificationStoreMock.fetchNotificationsPaginated).toHaveBeenCalledTimes(2);
+    expect(notificationStoreMock.fetchNotificationsPaginated).toHaveBeenNthCalledWith(2, { page: 1, perPage: 15 });
   });
 });

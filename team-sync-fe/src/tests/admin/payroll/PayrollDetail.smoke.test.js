@@ -204,9 +204,9 @@ describe("PayrollDetail smoke", () => {
     await flushView();
 
     expect(wrapper.text()).toContain("Payroll approved");
-    expect(wrapper.text()).toContain("Mark as Paid");
+    expect(wrapper.find('[data-testid="payroll-mark-as-paid"]').exists()).toBe(true);
     expect(wrapper.text()).toContain("Reopen for Correction");
-    expect(wrapper.text()).not.toContain("Approve Payroll");
+    expect(wrapper.find('[data-testid="payroll-approve"]').exists()).toBe(false);
   });
 
   it("shows automatic notification info after payroll is paid", async () => {

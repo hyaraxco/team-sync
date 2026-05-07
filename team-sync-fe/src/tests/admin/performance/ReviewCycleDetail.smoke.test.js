@@ -116,6 +116,84 @@ describe("ReviewCycleDetail smoke", () => {
         expect(reviewStoreMock.fetchCycleById).toHaveBeenCalledWith(12);
     });
 
+    it("renders TOPSIS headers C6 and C7 when ranking is available", async () => {
+        reviewStoreRefs.currentCycle.value.status = "completed";
+        reviewStoreRefs.topsisResult.value = {
+            weights: {
+                avg_manager_rating: 0.30,
+                final_rating: 0.30,
+                avg_goal_completion: 0.20,
+                goal_completion_ratio: 0.05,
+                positive_feedback_count: 0.05,
+                attendance_quality: 0.05,
+                task_completion_quality: 0.05,
+            },
+            ideal_positive: {
+                avg_manager_rating: 1,
+                final_rating: 1,
+                avg_goal_completion: 1,
+                goal_completion_ratio: 1,
+                positive_feedback_count: 1,
+                attendance_quality: 1,
+                task_completion_quality: 1,
+            },
+            ideal_negative: {
+                avg_manager_rating: 0,
+                final_rating: 0,
+                avg_goal_completion: 0,
+                goal_completion_ratio: 0,
+                positive_feedback_count: 0,
+                attendance_quality: 0,
+                task_completion_quality: 0,
+            },
+            ranking: [
+                {
+                    staff_member_id: "1",
+                    employee_name: "A",
+                    rank: 1,
+                    department: "Engineering",
+                    raw_scores: {
+                        avg_manager_rating: 4,
+                        final_rating: 4,
+                        avg_goal_completion: 80,
+                        goal_completion_ratio: 0.8,
+                        positive_feedback_count: 5,
+                        attendance_quality: 90,
+                        task_completion_quality: 85,
+                    },
+                    normalized_scores: {
+                        avg_manager_rating: 0.5,
+                        final_rating: 0.5,
+                        avg_goal_completion: 0.5,
+                        goal_completion_ratio: 0.5,
+                        positive_feedback_count: 0.5,
+                        attendance_quality: 0.5,
+                        task_completion_quality: 0.5,
+                    },
+                    weighted_scores: {
+                        avg_manager_rating: 0.175,
+                        final_rating: 0.15,
+                        avg_goal_completion: 0.10,
+                        goal_completion_ratio: 0.025,
+                        positive_feedback_count: 0.025,
+                        attendance_quality: 0.015,
+                        task_completion_quality: 0.01,
+                    },
+                    distance_positive: 0,
+                    distance_negative: 1,
+                    closeness_coefficient: 1,
+                    label: "Outstanding",
+                },
+            ],
+        };
+
+        const wrapper = factory();
+        await flushAsync();
+
+        expect(wrapper.text()).toContain("C6");
+        expect(wrapper.text()).toContain("C7");
+    });
+
     it("navigates back when back button is clicked", async () => {
         const wrapper = factory();
         const backButton = wrapper.find("button");

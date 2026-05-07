@@ -65,6 +65,7 @@ describe("Sidebar smoke", () => {
     const wrapper = factory();
 
     expect(wrapper.text()).toContain("Payroll");
+    expect(wrapper.text()).toContain("Payroll Adjustments");
   });
 
   it("shows My Payroll when payslip-view is granted", () => {

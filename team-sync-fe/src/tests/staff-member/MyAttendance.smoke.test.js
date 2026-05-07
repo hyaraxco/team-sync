@@ -34,6 +34,7 @@ let currentRoute = {
 };
 let hasLeaveRequestPermission = false;
 let hasClockPermission = false;
+let mockWorkLocation = "office";
 
 vi.mock("@/stores/attendance", () => ({
   useAttendanceStore: () => ({
@@ -81,7 +82,7 @@ vi.mock("@/stores/auth", () => ({
     user: {
       employee_profile: {
         job_information: {
-          work_location: "office",
+          work_location: mockWorkLocation,
         },
       },
     },
@@ -178,6 +179,7 @@ describe("MyAttendance smoke", () => {
     myCorrections.value = [];
     hasLeaveRequestPermission = false;
     hasClockPermission = false;
+    mockWorkLocation = "office";
     currentRoute = {
       name: "staffMember.attendance.my-attendances",
       params: {},
@@ -187,6 +189,8 @@ describe("MyAttendance smoke", () => {
     fetchAttendances.mockClear();
     fetchStatistics.mockClear();
     fetchTodayAttendance.mockClear();
+    checkIn.mockClear();
+    checkOut.mockClear();
     fetchMyLeaveRequests.mockClear();
     fetchMyLeaveBalances.mockClear();
     createLeaveRequest.mockClear();
@@ -248,5 +252,24 @@ describe("MyAttendance smoke", () => {
 
     // Verify Clock In button renders for non-remote users with clock permissions
     expect(wrapper.text()).toContain("Clock In");
+  });
+
+  it("sends selected actual work mode when a hybrid staff member clocks in", async () => {
+    hasClockPermission = true;
+    mockWorkLocation = "hybrid";
+
+    const wrapper = factory();
+    await flushPromises();
+    await wrapper.vm.$nextTick();
+
+    const select = wrapper.get("#actual-work-mode");
+    await select.setValue("remote");
+    await wrapper.get('[data-testid="clock-in-button-label"]').trigger("click");
+
+    expect(checkIn).toHaveBeenCalledWith({
+      check_in_lat: null,
+      check_in_long: null,
+      actual_work_mode: "remote",
+    });
   });
 });

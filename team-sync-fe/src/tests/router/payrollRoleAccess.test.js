@@ -37,6 +37,14 @@ vi.mock("@/views/admin/payroll/PayrollComparison.vue", () => ({
   default: {},
 }));
 
+vi.mock("@/views/admin/payroll/PayrollAdjustmentQueue.vue", () => ({
+  default: {},
+}));
+
+vi.mock("@/views/admin/payroll/PayrollApprovalMatrix.vue", () => ({
+  default: {},
+}));
+
 import payrollRoutes from "@/router/payroll";
 
 const routeMeta = (name) =>
@@ -54,6 +62,7 @@ const rolePermissions = {
   finance: [
     "payroll-menu",
     "payroll-list",
+    "payroll-create",
     "payroll-edit",
     "payroll-process",
     "payroll-statistics",
@@ -129,9 +138,15 @@ describe("payroll route access matrix", () => {
         routeMeta("admin.payroll.detail")
       )
     ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.adjustments")
+      )
+    ).toBe(true);
   });
 
-  it("allows Finance to enter dashboard and detail but not create", () => {
+  it("allows Finance to enter dashboard, readiness, create, and detail routes", () => {
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
@@ -147,13 +162,25 @@ describe("payroll route access matrix", () => {
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
+        routeMeta("admin.payroll.readiness")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
         routeMeta("admin.payroll.create")
       )
-    ).toBe(false);
+    ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
         routeMeta("admin.payroll.settings")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.payroll.adjustments")
       )
     ).toBe(true);
     expect(

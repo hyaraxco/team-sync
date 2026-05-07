@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { test, expect } from "./support/fixtures";
 import { loginAsRole } from "./helpers/auth";
 
 test.describe.serial("Performance Outcome Rules CRUD", () => {
