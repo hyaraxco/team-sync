@@ -423,7 +423,16 @@ class ProjectTaskPolicyTest extends TestCase
         $response = $this->policy->collaborate($this->managerUser, $task);
 
         $this->assertTrue($response->denied());
-        $this->assertStringContainsString('only allowed when status is "todo"', $response->message());
+        $this->assertStringContainsString('only allowed when status is "todo" or "rejected"', $response->message());
+    }
+
+    public function test_manager_can_collaborate_on_rejected_task(): void
+    {
+        $task = $this->makeTask('rejected');
+
+        $response = $this->policy->collaborate($this->managerUser, $task);
+
+        $this->assertTrue($response->allowed());
     }
 
     public function test_staff_can_collaborate_on_in_progress_task(): void
@@ -537,5 +546,14 @@ class ProjectTaskPolicyTest extends TestCase
         $response = $this->policy->collaborate($this->plStaffUser, $task);
 
         $this->assertTrue($response->denied());
+    }
+
+    public function test_pl_staff_can_collaborate_on_rejected_task(): void
+    {
+        $task = $this->makeTask('rejected', ['project_id' => $this->plStaffProject->id]);
+
+        $response = $this->policy->collaborate($this->plStaffUser, $task);
+
+        $this->assertTrue($response->allowed());
     }
 }

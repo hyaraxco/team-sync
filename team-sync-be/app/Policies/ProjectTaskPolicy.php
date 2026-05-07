@@ -239,13 +239,16 @@ class ProjectTaskPolicy
 
         $currentStatus = strtolower(trim((string) $task->status));
 
-        // PL/Manager: can only collaborate when todo (setting up task details)
+        // PL/Manager: can collaborate when todo (setting up) or rejected (giving feedback)
         if ($isPrivileged) {
-            if ($currentStatus === TaskStatus::TODO->value) {
+            if (in_array($currentStatus, [
+                TaskStatus::TODO->value,
+                TaskStatus::REJECTED->value,
+            ], true)) {
                 return Response::allow();
             }
 
-            return Response::deny('Task collaboration is only allowed when status is "todo" for managers.');
+            return Response::deny('Task collaboration is only allowed when status is "todo" or "rejected" for managers.');
         }
 
         // Staff: must be assignee
