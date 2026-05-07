@@ -2,36 +2,40 @@
 
 ## OVERVIEW
 
-Laravel 12 REST API. PHP 8.2+. Sanctum auth. Repository pattern with interface binding. Queued notifications via database driver.
+Laravel 12 REST API. PHP 8.2+. Sanctum auth. Repository pattern with interface binding. Queued notifications via database driver. Indonesian HRIS domain (BPJS, PPh 21, attendance policies).
 
 ## STRUCTURE
 
 ```
 app/
 ├── Console/              # Artisan commands
-├── Constants/            # App-wide constants
-├── DTOs/                 # Data transfer objects (cross-layer)
+├── Constants/            # App-wide constants (CacheConstants, etc.)
+├── DTOs/                 # 10 data transfer objects (cross-layer)
 │   └── Performance/      # Performance-specific DTOs
-├── Enums/                # 20 enums (all fixed option sets)
+├── Enums/                # 21 enums (all fixed option sets)
 ├── Exports/              # Excel exports (Maatwebsite)
 ├── Helpers/              # Utility functions
 ├── Http/
-│   ├── Controllers/      # 34 controllers (thin — delegate to services)
-│   ├── Middleware/        # Custom: EnsureProjectMembership
+│   ├── Controllers/      # 40 controllers (thin — delegate to services)
+│   ├── Middleware/        # Custom: EnsureProjectMembership, PermissionMiddleware
 │   ├── Requests/         # Form request validation
 │   └── Resources/        # API resource transformers
-├── Interfaces/           # 19 repository contracts
-├── Jobs/                 # GeneratePayrollJob (queued)
-├── Models/               # 44 Eloquent models
-├── Notifications/        # 25+ notification classes (queued)
+├── Interfaces/           # 25 repository contracts
+├── Jobs/                 # GeneratePayrollJob (queued, unique per month)
+├── Models/               # 53 Eloquent models
+├── Notifications/        # 32 notification classes (queued)
 │   └── Performance/      # Performance-specific notifications
 ├── Providers/            # Service providers (interface bindings)
-├── Repositories/         # 19 repository implementations
+├── Repositories/         # 25 repository implementations
 └── Services/             # Business logic
     ├── Analytics/        # Snapshot generation, aggregation
-    ├── Attendance/       # Check-in/out, policy enforcement
-    ├── Payroll/          # Generation, tax calc, BPJS
+    ├── Attendance/       # Check-in/out, policy enforcement, hybrid resolver
+    ├── Payroll/          # Generation, tax calc, BPJS, reconciliation
     └── Performance/      # Reviews, goals, TOPSIS ranking
+database/
+├── factories/            # Model factories for testing
+├── migrations/           # 88 migrations (NEVER modify old ones)
+└── seeders/              # Role, permission, demo data, E2E seeders
 ```
 
 ## WHERE TO LOOK
@@ -44,21 +48,38 @@ app/
 | Validation rules | `app/Http/Requests/` | FormRequest classes |
 | API response shape | `app/Http/Resources/` | JsonResource transformers |
 | Permission checks | Route-level via `PermissionMiddleware::using()` | Spatie permissions |
-| Payroll tax logic | `app/Services/Payroll/` | Indonesian tax: BPJS, PTKP, brackets |
+| Payroll tax logic | `app/Services/Payroll/` | Indonesian tax: BPJS, PTKP, TER 2024 |
+| Attendance policies | `app/Services/Attendance/` | HybridScheduleResolver, AttendanceClassifier |
+| Performance/TOPSIS | `app/Services/Performance/` + `TopsisService.php` | Multi-criteria ranking |
 | Excel exports | `app/Exports/` | Maatwebsite/Excel package |
-| Search/indexing | Uses Laravel Scout + Meilisearch | Config in `config/scout.php` |
+| PDF exports | Uses `barryvdh/laravel-dompdf` | Payslip PDF generation |
+| Search/indexing | Laravel Scout + Meilisearch | Config in `config/scout.php` |
+
+## MODELS (53)
+
+Key models by domain:
+
+- **Staff**: User, StaffMemberProfile, JobInformation, BankInformation, EmergencyContact
+- **Attendance**: Attendance, AttendanceCorrection, AttendancePeriod, AttendancePolicy, AttendancePolicyMismatch, HolidayCalendar, HybridScheduleOverride, HybridWorkSchedule
+- **Leave**: LeaveRequest, LeaveEntitlement
+- **Payroll**: Payroll, PayrollDetail, PayrollAdjustment, PayrollApproval, PayrollApprovalPolicy, PayrollSetting, PayrollSettingVersion, PayrollActivityLog, PayrollNotificationDelivery, PayrollReconciliationResolution, BpjsRate, PtkpAmount, TaxBracket
+- **THR**: ThrPayroll, ThrPayrollDetail
+- **Performance**: PerformanceReviewCycle, PerformanceReview, PerformanceReviewResponse, PerformanceReviewSection, PerformanceReviewTemplate, PerformanceGoal, PerformanceGoalUpdate, PerformanceFeedback, PerformanceOutcomeRule, ReviewerRule
+- **Project**: Project, ProjectTask, ProjectTaskAttachment, ProjectTaskComment, ProjectTaskStatusLog, ProjectTeam
+- **Team**: Team, TeamMember
+- **Other**: Meeting, OvertimeRecord, License, Company, AnalyticsSnapshot
 
 ## CONVENTIONS
 
-- **Layering**: Controller (thin) → Service (logic) → Repository (data) → Interface (contract). Never call Repository from Controller directly
+- **Layering**: Controller (thin) → Service (logic) → Repository (data) → Interface (contract). Never skip layers
 - **DTOs** for passing structured data between layers — not arrays
 - **FormRequest** classes for all validation — never validate in controllers
 - **JsonResource** for all API responses — never return raw models
 - **Queued notifications**: All notification classes use `ShouldQueue`. Queue worker MUST be running
-- **Migrations**: Always reversible. 69 existing migrations — never modify old ones, create new
+- **Migrations**: Always reversible. 88 existing migrations — never modify old ones, create new
 - **Factories + Seeders**: `database/factories/` and `database/seeders/` for test data
-- **Config files**: `config/permission.php` (Spatie), `config/sanctum.php`, `config/scout.php` (Meilisearch), `config/telescope.php`
-- **Formatting**: Prettier with `@prettier/plugin-php` + Laravel Pint
+- **Formatting**: Laravel Pint + Prettier with `@prettier/plugin-php`
+- **4-space indentation** everywhere
 
 ## ANTI-PATTERNS
 
@@ -67,28 +88,33 @@ app/
 - **NEVER** modify existing migrations — create new ones
 - **NEVER** return raw model instances from API — use Resources
 - **NEVER** skip queue worker when testing notifications
+- **NEVER** commit `.env` files or `server.log`
 - **DO NOT** add loose scripts to project root (`test-request.php` is legacy)
 - **DO NOT** log to `server.log` in root — use `storage/logs/`
+- **DO NOT** run `./vendor/bin/pest` without `config:clear` first (use `composer test`)
 
 ## COMMANDS
 
 ```bash
-php artisan serve                          # Dev server
-php artisan queue:work --queue=default,meetings --timeout=600  # Queue worker incl. meeting jobs
-php artisan schedule:work                  # Scheduler for meeting reminders
-php artisan test                           # Pest tests
-./vendor/bin/pest                          # Direct Pest
+composer dev                               # Server + queue + scheduler + logs (PREFERRED)
+composer test                              # Clears config, runs Pest
+./vendor/bin/pint                          # PHP formatting
 php artisan migrate                        # Run migrations
 php artisan migrate:rollback               # Rollback last batch
 php artisan make:model Name -mfsr          # Model + migration + seeder + factory + resource
-php artisan make:controller NameController  # New controller
+php artisan queue:work --queue=default,meetings --timeout=600  # Manual queue worker
+php artisan schedule:work                  # Manual scheduler
 docker compose up -d queue scheduler       # Queue + scheduler via Docker
 ```
 
 ## NOTES
 
-- **`composer.json` dev script** runs server + queue + logs + Vite concurrently via `concurrently`
+- **`composer dev`** runs server + queue (default,meetings) + scheduler + logs + Vite concurrently — preferred over manual `artisan serve`
 - **Telescope** installed for debugging (`config/telescope.php`)
-- **`DEDUCTION_WARNING_RATIO = 0.5`** in PayrollRepository — business rule, not arbitrary
+- **`DEDUCTION_WARNING_RATIO = 0.5`** in PayrollRepository — triggers when deductions exceed 50%
 - **`EnsureProjectMembership`** is the only custom middleware — guards project-scoped routes
 - **Performance subdomain** has its own DTOs (`DTOs/Performance/`) and notifications (`Notifications/Performance/`)
+- **Payroll reconciliation**: Exception detection before payment (missing bank, zero salary, abnormal deductions)
+- **Payroll settings versioning**: `PayrollSetting` → `PayrollSettingVersion` (immutable versions)
+- **Attendance periods**: `open → review → locked` lifecycle, tied to payroll generation
+- **Feature flags**: `feature.enabled:{module}` middleware gates analytics and performance routes

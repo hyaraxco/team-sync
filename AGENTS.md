@@ -36,11 +36,11 @@ team-sync/
 | API routes           | `team-sync-be/routes/api.php`                                | All under `/api/v1`, Sanctum-guarded             |
 | Business logic       | `team-sync-be/app/Services/`                                 | Domain-grouped (Payroll/, Attendance/, Performance/, Analytics/) |
 | Data access          | `team-sync-be/app/Repositories/`                             | Interface-bound via `app/Interfaces/`            |
-| Models (45)          | `team-sync-be/app/Models/`                                   | Eloquent, heavy relations                        |
-| Notifications (25+)  | `team-sync-be/app/Notifications/`                            | Queued via database driver — **queue worker required** |
+| Models (53)          | `team-sync-be/app/Models/`                                   | Eloquent, heavy relations                        |
+| Notifications (32)   | `team-sync-be/app/Notifications/`                            | Queued via database driver — **queue worker required** |
 | Frontend views       | `team-sync-fe/src/views/`                                    | Split: `admin/` vs `staff-member/`               |
-| State management     | `team-sync-fe/src/stores/`                                   | 21 Pinia stores, one per domain                  |
-| Routing              | `team-sync-fe/src/router/`                                   | Split by domain module (9 files)                 |
+| State management     | `team-sync-fe/src/stores/`                                   | 25 Pinia stores, one per domain                  |
+| Routing              | `team-sync-fe/src/router/`                                   | Split by domain module (10 files)                |
 | CI workflows         | `.github/workflows/`                                         | `fe-guard-smoke.yml`, `payroll-ui-e2e.yml`, `playwright.yml` |
 | E2E prep script      | `team-sync-fe/scripts/e2e-prepare-be.sh`                     | Seeds/resets BE for E2E runs                     |
 
@@ -109,7 +109,7 @@ team-sync/
 - Meeting reminders require the Laravel scheduler
 
 ### Data Access
-- 69 existing migrations — NEVER modify old ones, always create new
+- 88 existing migrations — NEVER modify old ones, always create new
 - Migrations must always be reversible (include rollback)
 - Spatie permissions: role-based access via middleware applied per-route
 - `EnsureProjectMembership` is the only custom middleware — guards project-scoped routes
