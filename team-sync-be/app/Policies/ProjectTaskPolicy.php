@@ -219,9 +219,9 @@ class ProjectTaskPolicy
      * Determine if the user can add comments/attachments to a task.
      *
      * Flow:
-     * - PL/Manager: can comment/attach ONLY when status=todo (setting up task)
+     * - PL/Manager: can comment/attach when todo (setup) or review (feedback before reject)
      * - Staff assignee: can comment/attach when in_progress or rejected+needs_revision
-     * - LOCKED for everyone: review, done, cancelled
+     * - LOCKED for everyone: done, cancelled
      */
     public function collaborate(User $user, ProjectTask $task): Response
     {
@@ -239,16 +239,16 @@ class ProjectTaskPolicy
 
         $currentStatus = strtolower(trim((string) $task->status));
 
-        // PL/Manager: can collaborate when todo (setting up) or rejected (giving feedback)
+        // PL/Manager: can collaborate when todo (setup) or review (feedback before reject)
         if ($isPrivileged) {
             if (in_array($currentStatus, [
                 TaskStatus::TODO->value,
-                TaskStatus::REJECTED->value,
+                TaskStatus::REVIEW->value,
             ], true)) {
                 return Response::allow();
             }
 
-            return Response::deny('Task collaboration is only allowed when status is "todo" or "rejected" for managers.');
+            return Response::deny('Task collaboration is only allowed when status is "todo" or "review" for managers.');
         }
 
         // Staff: must be assignee
