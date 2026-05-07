@@ -72,6 +72,7 @@ class RolePermissionSeeder extends Seeder
                     'dashboard-view',
                     // Team management
                     'team-menu',
+                    'team-statistic',
                     'team-list',
                     'team-create',
                     'team-edit',

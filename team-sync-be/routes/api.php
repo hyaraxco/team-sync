@@ -36,6 +36,7 @@ use App\Http\Controllers\PerformanceTopsisController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\SetupController;
+use App\Http\Middleware\EnsureProjectMembership;
 use App\Http\Controllers\StaffMemberProfileController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\ThrPayrollController;
@@ -216,8 +217,9 @@ Route::prefix('v1')
                 Route::post('thr/{id}/mark-as-paid', [ThrPayrollController::class, 'markAsPaid']);
             });
 
-            // Project Tasks by project
-            Route::get('projects/{id}/tasks', [ProjectTaskController::class, 'getByProject']);
+            // Project Tasks by project (membership-guarded)
+            Route::get('projects/{id}/tasks', [ProjectTaskController::class, 'getByProject'])
+                ->middleware(EnsureProjectMembership::class);
 
             // Attendance Periods
             Route::apiResource('attendance-periods', AttendancePeriodController::class)
