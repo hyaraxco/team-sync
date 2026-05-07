@@ -135,7 +135,7 @@ class OvertimeCalculationService
                 return '1.5x';
             }
 
-            return '1.5x (1h) + 2x (' . round($hours - 1, 2) . 'h)';
+            return '1.5x (1h) + 2x ('.round($hours - 1, 2).'h)';
         }
 
         if ($hours <= 7.0) {
@@ -143,9 +143,9 @@ class OvertimeCalculationService
         }
 
         if ($hours <= 8.0) {
-            return '2x (7h) + 3x (' . round($hours - 7, 2) . 'h)';
+            return '2x (7h) + 3x ('.round($hours - 7, 2).'h)';
         }
 
-        return '2x (7h) + 3x (1h) + 4x (' . round($hours - 8, 2) . 'h)';
+        return '2x (7h) + 3x (1h) + 4x ('.round($hours - 8, 2).'h)';
     }
 }

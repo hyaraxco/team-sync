@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\PayrollApprovalDecisionRequest;
+use App\Http\Requests\PayrollApprovalPolicyStoreRequest;
+use App\Http\Requests\PayrollApprovalPolicyUpdateRequest;
 use App\Interfaces\PayrollRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PayrollApprovalPolicyController extends Controller implements HasMiddleware
@@ -41,21 +44,15 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
                 200
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollApprovalPolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function store(Request $request)
+    public function store(PayrollApprovalPolicyStoreRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'min_amount' => 'required|numeric|min:0',
-            'max_amount' => 'nullable|numeric|min:0',
-            'required_role' => 'required|string|max:100',
-            'approval_order' => 'required|integer|min:1',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $validated = $request->validated();
 
         try {
             $policy = $this->payrollRepository->createApprovalPolicy($validated);
@@ -67,21 +64,15 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
                 201
             );
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollApprovalPolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function update(Request $request, int $id)
+    public function update(PayrollApprovalPolicyUpdateRequest $request, int $id)
     {
-        $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'min_amount' => 'sometimes|required|numeric|min:0',
-            'max_amount' => 'nullable|numeric|min:0',
-            'required_role' => 'sometimes|required|string|max:100',
-            'approval_order' => 'sometimes|required|integer|min:1',
-            'is_active' => 'nullable|boolean',
-        ]);
+        $validated = $request->validated();
 
         try {
             $policy = $this->payrollRepository->updateApprovalPolicy($id, $validated);
@@ -95,7 +86,8 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Approval Policy Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollApprovalPolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -114,7 +106,8 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Approval Policy Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollApprovalPolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -133,17 +126,15 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollApprovalPolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function submitApproval(Request $request, string $payrollId)
+    public function submitApproval(PayrollApprovalDecisionRequest $request, string $payrollId)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:approved,rejected',
-            'notes' => 'nullable|string|max:1000',
-        ]);
+        $validated = $request->validated();
 
         try {
             $result = $this->payrollRepository->submitApprovalDecision(
@@ -161,10 +152,12 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('PayrollApprovalPolicyController domain exception: ' . $e->getMessage());
+            Log::warning('PayrollApprovalPolicyController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PayrollApprovalPolicyController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

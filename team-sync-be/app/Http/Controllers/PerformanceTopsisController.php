@@ -10,6 +10,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceTopsisController extends Controller implements HasMiddleware
@@ -26,8 +27,10 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
         'avg_manager_rating' => 0.30,  // C1: Competency Score
         'final_rating' => 0.30,  // C2: KPI Score
         'avg_goal_completion' => 0.20,  // C3: Goal Completion %
-        'goal_completion_ratio' => 0.10,  // C4: On-Time Goal Ratio
-        'positive_feedback_count' => 0.10,  // C5: Positive Feedback Count
+        'goal_completion_ratio' => 0.05,  // C4: On-Time Goal Ratio
+        'positive_feedback_count' => 0.05,  // C5: Positive Feedback Count
+        'attendance_quality' => 0.05,  // C6: Attendance Quality
+        'task_completion_quality' => 0.05,  // C7: Task Completion Quality
     ];
 
     public function __construct(
@@ -46,6 +49,8 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
      *   - w_avg_goal_completion     : float (0-1) — C3: Goal Completion weight
      *   - w_goal_completion_ratio   : float (0-1) — C4: On-Time Ratio weight
      *   - w_positive_feedback_count : float (0-1) — C5: Positive Feedback weight
+     *   - w_attendance_quality      : float (0-1) — C6: Attendance Quality weight
+     *   - w_task_completion_quality : float (0-1) — C7: Task Completion Quality weight
      *
      * Total bobot harus = 1.0 (jika tidak, akan dinormalisasi otomatis).
      */
@@ -94,7 +99,8 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Review cycle tidak ditemukan', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('PerformanceTopsisController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('PerformanceTopsisController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -111,6 +117,8 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
             'avg_goal_completion' => 'w_avg_goal_completion',
             'goal_completion_ratio' => 'w_goal_completion_ratio',
             'positive_feedback_count' => 'w_positive_feedback_count',
+            'attendance_quality' => 'w_attendance_quality',
+            'task_completion_quality' => 'w_task_completion_quality',
         ];
 
         $hasCustomWeights = collect($keys)->some(fn ($param) => $request->has($param));

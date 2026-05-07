@@ -2,6 +2,8 @@
 
 namespace App\Http\Requests;
 
+use App\Models\Attendance;
+use App\Models\OvertimeRecord;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreOvertimeRequest extends FormRequest
@@ -19,7 +21,7 @@ class StoreOvertimeRequest extends FormRequest
                         return;
                     }
 
-                    $exists = \App\Models\OvertimeRecord::where('staff_member_id', $this->input('staff_member_id'))
+                    $exists = OvertimeRecord::where('staff_member_id', $this->input('staff_member_id'))
                         ->whereDate('date', $value)
                         ->exists();
 
@@ -31,7 +33,26 @@ class StoreOvertimeRequest extends FormRequest
             'start_time' => ['required', 'date_format:H:i'],
             'end_time' => ['required', 'date_format:H:i', 'after:start_time'],
             'overtime_type' => ['required', 'string', 'in:workday,weekend,holiday'],
-            'attendance_id' => ['nullable', 'integer', 'exists:attendances,id'],
+            'attendance_id' => [
+                'nullable',
+                'integer',
+                'exists:attendances,id',
+                function (string $attribute, mixed $value, \Closure $fail) {
+                    if (! $value || ! $this->input('staff_member_id') || ! $this->input('date')) {
+                        return;
+                    }
+
+                    $matches = Attendance::query()
+                        ->whereKey($value)
+                        ->where('staff_member_id', $this->input('staff_member_id'))
+                        ->whereDate('date', $this->input('date'))
+                        ->exists();
+
+                    if (! $matches) {
+                        $fail('The selected attendance record must belong to the same staff member and overtime date.');
+                    }
+                },
+            ],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

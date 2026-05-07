@@ -43,7 +43,7 @@ class UserDto
             email: $data['email'] ?? $existingUser->email,
             password: $data['password'] ?? $existingUser->password,
             profile_photo: array_key_exists('profile_photo', $data) ? $data['profile_photo'] : $existingUser->profile_photo,
-            roles: $data['roles'] ?? $existingUser->roles,
+            roles: $data['roles'] ?? ($existingUser->roles ? $existingUser->roles->pluck('name')->toArray() : []),
         );
     }
 }

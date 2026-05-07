@@ -79,8 +79,8 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
         // Ownership check: only the recipient or the giver can view a specific feedback
         $user = Auth::user();
         $staffMemberId = $user->staffMemberProfile?->id;
-        $isRecipient = $feedback->staff_member_id === $staffMemberId;
-        $isGiver = $feedback->giver_id === $staffMemberId;
+        $isRecipient = (int) $feedback->staff_member_id === (int) $staffMemberId;
+        $isGiver = (int) $feedback->given_by === (int) $staffMemberId;
 
         if (! $isRecipient && ! $isGiver && ! $user->can('performance-analytics-view')) {
             return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);

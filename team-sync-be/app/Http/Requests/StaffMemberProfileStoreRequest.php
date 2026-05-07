@@ -11,6 +11,7 @@ use App\Enums\MaritalStatus;
 use App\Enums\PtkpStatus;
 use App\Enums\Religion;
 use App\Enums\WorkLocation;
+use App\Support\SensitiveData;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -34,12 +35,12 @@ class StaffMemberProfileStoreRequest extends FormRequest
             'roles.*' => [
                 'required',
                 'string',
-                'in:manager,hr,finance,employee',
+                'in:superadmin,manager,hr,finance,staff',
                 Rule::exists('roles', 'name'),
             ],
 
             // Employee Profile fields
-            'identity_number' => ['required', 'string', 'max:20', 'unique:staff_member_profiles,identity_number'],
+            'identity_number' => ['required', 'string', 'max:20', Rule::unique('staff_member_profiles', 'identity_number_hash')->where(fn ($query) => $query->whereNotNull('identity_number_hash'))],
             'npwp' => ['nullable', 'string', 'max:30'],
             'bpjs_ketenagakerjaan' => ['nullable', 'string', 'max:30'],
             'bpjs_kesehatan' => ['nullable', 'string', 'max:30'],
@@ -54,6 +55,8 @@ class StaffMemberProfileStoreRequest extends FormRequest
             'address' => ['required', 'string'],
             'city' => ['required', 'string', 'max:100'],
             'postal_code' => ['required', 'string', 'max:10'],
+            'last_education' => ['nullable', 'string', Rule::in(['sma_smk', 'd1', 'd2', 'd3', 's1', 's2', 's3'])],
+            'seniority_level' => ['nullable', 'string', Rule::in(['junior', 'mid', 'senior', 'lead'])],
 
             // Job Information fields
             'job_title' => ['required', 'string', 'max:255'],
@@ -67,7 +70,7 @@ class StaffMemberProfileStoreRequest extends FormRequest
 
             // Bank Information fields
             'bank_name' => ['required', 'string', 'in:'.implode(',', array_column(BankName::cases(), 'value'))],
-            'account_number' => ['required', 'string', 'max:50', Rule::unique('bank_information', 'account_number')],
+            'account_number' => ['required', 'string', 'max:50', Rule::unique('bank_information', 'account_number_hash')->where(fn ($query) => $query->whereNotNull('account_number_hash'))],
             'account_holder_name' => ['required', 'string', 'max:255'],
 
             // Emergency Contacts fields (array)
@@ -104,6 +107,8 @@ class StaffMemberProfileStoreRequest extends FormRequest
             'address' => 'Address',
             'city' => 'City',
             'postal_code' => 'Postal Code',
+            'last_education' => 'Last Education',
+            'seniority_level' => 'Seniority Level',
             'profile_photo' => 'Profile Photo',
 
             // Job Information attributes
@@ -128,5 +133,13 @@ class StaffMemberProfileStoreRequest extends FormRequest
             'emergency_contacts.*.phone' => 'Phone Number',
             'emergency_contacts.*.email' => 'Email',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'identity_number_hash' => SensitiveData::hash($this->input('identity_number')),
+            'account_number_hash' => SensitiveData::hash($this->input('account_number')),
+        ]);
     }
 }

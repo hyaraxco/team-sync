@@ -55,7 +55,7 @@ class ThrService
         if ($existing) {
             return [
                 'success' => false,
-                'message' => "THR for " . ThrPayroll::eventLabel($religionEvent) . " {$year} already exists (ID: {$existing->id}, Status: {$existing->status})",
+                'message' => 'THR for '.ThrPayroll::eventLabel($religionEvent)." {$year} already exists (ID: {$existing->id}, Status: {$existing->status})",
                 'thr_payroll' => null,
             ];
         }
@@ -66,7 +66,7 @@ class ThrService
         if ($employees->isEmpty()) {
             return [
                 'success' => false,
-                'message' => "No eligible employees found for " . ThrPayroll::eventLabel($religionEvent),
+                'message' => 'No eligible employees found for '.ThrPayroll::eventLabel($religionEvent),
                 'thr_payroll' => null,
             ];
         }

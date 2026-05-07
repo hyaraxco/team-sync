@@ -51,7 +51,7 @@ class OvertimeController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@index Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@index Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -73,7 +73,7 @@ class OvertimeController extends Controller implements HasMiddleware
                 201
             );
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@store Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@store Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -93,7 +93,7 @@ class OvertimeController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Overtime Record Not Found', null, 404);
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@show Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@show Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -117,7 +117,7 @@ class OvertimeController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Overtime Record Not Found', null, 404);
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@approve Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@approve Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -145,7 +145,7 @@ class OvertimeController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Overtime Record Not Found', null, 404);
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@reject Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@reject Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -174,7 +174,7 @@ class OvertimeController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@getMyOvertime Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@getMyOvertime Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -187,7 +187,7 @@ class OvertimeController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Overtime Summary Retrieved Successfully', $summary, 200);
         } catch (\Throwable $e) {
-            Log::error('OvertimeController@getOvertimeSummary Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('OvertimeController@getOvertimeSummary Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }

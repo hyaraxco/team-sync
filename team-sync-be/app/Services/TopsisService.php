@@ -14,6 +14,8 @@ namespace App\Services;
  *   C3 - avg_goal_completion      : Goal Completion % (0-100)
  *   C4 - goal_completion_ratio    : On-Time Goal Ratio — goals selesai sebelum deadline (0-1)
  *   C5 - positive_feedback_count  : jumlah feedback positif yang diterima
+ *   C6 - attendance_quality       : kualitas absensi (0-100)
+ *   C7 - task_completion_quality  : kualitas penyelesaian tugas (0-100)
  *
  * Langkah-langkah:
  *   1. Bangun matriks keputusan (decision matrix)
@@ -33,6 +35,8 @@ class TopsisService
         'avg_goal_completion',
         'goal_completion_ratio',
         'positive_feedback_count',
+        'attendance_quality',
+        'task_completion_quality',
     ];
 
     /** Semua kriteria adalah Benefit (true = benefit, false = cost) */
@@ -42,6 +46,8 @@ class TopsisService
         'avg_goal_completion' => true,
         'goal_completion_ratio' => true,
         'positive_feedback_count' => true,
+        'attendance_quality' => true,
+        'task_completion_quality' => true,
     ];
 
     /**

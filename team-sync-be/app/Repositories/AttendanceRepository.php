@@ -12,7 +12,6 @@ use App\Models\AttendancePolicyMismatch;
 use App\Models\JobInformation;
 use App\Models\Team;
 use App\Models\TeamMember;
-use App\Models\User;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\Attendance\LeaveBalanceService;
 use App\Services\Attendance\WorkingDaysCalculator;
@@ -102,7 +101,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         $profileId = Auth::user()->staffMemberProfile?->id;
 
         if (! $profileId) {
-            return new Collection();
+            return new Collection;
         }
 
         return Attendance::with(['staffMember.user'])
@@ -224,6 +223,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             }
 
             $attendanceData = array_merge($data, [
+                'staff_member_id' => $profileId,
                 'date' => Carbon::now(),
                 'attendance_period_id' => $this->attendancePeriodService
                     ->ensurePeriodForMonth(Carbon::now())
@@ -232,8 +232,24 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 'status' => 'present',
             ]);
 
+            $workLocation = Auth::user()
+                ->staffMemberProfile
+                ?->jobInformation
+                ?->work_location;
+
+            if ($workLocation === 'hybrid' && empty($data['actual_work_mode'])) {
+                throw new \Exception('Actual work mode is required for hybrid employees.');
+            }
+
+            if (($data['actual_work_mode'] ?? null) === null) {
+                $attendanceData['actual_work_mode'] = $workLocation === 'office' ? 'office' : null;
+            }
+
             $attendanceDto = AttendanceDto::fromArray($attendanceData);
-            $attendance = Attendance::create($attendanceDto->toArray());
+            $attendance = Attendance::create(array_merge(
+                $attendanceDto->toArray(),
+                ['attendance_period_id' => $attendanceData['attendance_period_id']]
+            ));
 
             DB::afterCommit(function () use ($attendance) {
                 $this->emailService->sendAttendanceCheckedInNotification($attendance);

@@ -453,7 +453,7 @@ class DemoDataSeeder extends Seeder
                 );
             }
 
-            $this->command?->line("  Team '{$team->name}': " . count($codes) . ' members assigned');
+            $this->command?->line("  Team '{$team->name}': ".count($codes).' members assigned');
         }
     }
 

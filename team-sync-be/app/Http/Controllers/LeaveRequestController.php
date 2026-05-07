@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\LeaveRequestBulkActionRequest;
+use App\Http\Requests\LeaveRequestCalendarRequest;
+use App\Http\Requests\LeaveRequestPaginatedListRequest;
+use App\Http\Requests\LeaveRequestProofReviewRequest;
 use App\Http\Requests\LeaveRequestProofUploadRequest;
 use App\Http\Requests\LeaveRequestStoreRequest;
 use App\Http\Resources\LeaveRequestResource;
@@ -14,6 +17,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class LeaveRequestController extends Controller implements HasMiddleware
@@ -51,29 +55,28 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (AuthorizationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function getAllPaginated(Request $request)
+    public function getAllPaginated(LeaveRequestPaginatedListRequest $request)
     {
-        $request = $request->validate([
-            'search' => 'nullable|string',
-            'row_per_page' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
         try {
             $leaveRequests = $this->leaveRequestRepository->getAllPaginated(
-                $request['search'] ?? null,
-                $request['row_per_page']
+                $validated['search'] ?? null,
+                $validated['row_per_page']
             );
 
             return ResponseHelper::jsonResponse(true, 'Leave Requests Retrieved Successfully', PaginateResource::make($leaveRequests, LeaveRequestResource::class), 200);
         } catch (AuthorizationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -85,7 +88,8 @@ class LeaveRequestController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'My Leave Requests Retrieved Successfully', LeaveRequestResource::collection($leaveRequests), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -102,10 +106,12 @@ class LeaveRequestController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Leave Request Created Successfully', new LeaveRequestResource($leaveRequest), 201);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
+            Log::warning('LeaveRequestController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -124,7 +130,8 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -139,8 +146,13 @@ class LeaveRequestController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
+        } catch (\Exception $e) {
+            Log::warning('LeaveRequestController domain exception: '.$e->getMessage());
+
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -155,8 +167,13 @@ class LeaveRequestController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
+        } catch (\Exception $e) {
+            Log::warning('LeaveRequestController domain exception: '.$e->getMessage());
+
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -179,10 +196,12 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
+            Log::warning('LeaveRequestController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -200,20 +219,19 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
+            Log::warning('LeaveRequestController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function reviewProof(Request $request, string $id)
+    public function reviewProof(LeaveRequestProofReviewRequest $request, string $id)
     {
-        $data = $request->validate([
-            'proof_review_status' => 'required|string|in:approved,rejected',
-            'proof_review_notes' => 'nullable|string|max:1000',
-        ]);
+        $data = $request->validated();
 
         try {
             $leaveRequest = $this->leaveRequestRepository->reviewProof($id, $data);
@@ -224,25 +242,27 @@ class LeaveRequestController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Leave Request Not Found', null, 404);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('LeaveRequestController domain exception: ' . $e->getMessage());
+            Log::warning('LeaveRequestController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
-    public function getCalendarRequests(Request $request)
+
+    public function getCalendarRequests(LeaveRequestCalendarRequest $request)
     {
-        $request->validate([
-            'month' => 'required|string|regex:/^\d{4}-\d{2}$/',
-        ]);
+        $validated = $request->validated();
 
         try {
-            $leaveRequests = $this->leaveRequestRepository->getCalendarData($request->month);
+            $leaveRequests = $this->leaveRequestRepository->getCalendarData($validated['month']);
 
             return ResponseHelper::jsonResponse(true, 'Calendar Data Retrieved Successfully', LeaveRequestResource::collection($leaveRequests), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('LeaveRequestController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('LeaveRequestController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

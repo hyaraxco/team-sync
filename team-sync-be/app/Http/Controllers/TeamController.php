@@ -15,6 +15,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class TeamController extends Controller implements HasMiddleware
@@ -53,7 +54,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Teams Retrieved Successfully', TeamResource::collection($teams), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -79,7 +81,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Teams Retrieved Successfully', PaginateResource::make($teams, TeamResource::class), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -96,7 +99,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Created Successfully', new TeamResource($team), 201);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -111,7 +115,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Retrieved Successfully', new TeamResource($team), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -128,7 +133,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Updated Successfully', new TeamResource($team), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -143,7 +149,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Deleted Successfully', null, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -158,7 +165,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Statistics Retrieved Successfully', $statistics, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -173,7 +181,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Statistics Retrieved Successfully', $statistics, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -188,7 +197,8 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Team Chart Data Retrieved Successfully', $chartData, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -205,10 +215,12 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Member Added Successfully', $member, 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('TeamController::addMember domain exception: ' . $e->getMessage());
+            Log::warning('TeamController::addMember domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -225,10 +237,12 @@ class TeamController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Member Removed Successfully', $member, 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('TeamController::removeMember domain exception: ' . $e->getMessage());
+            Log::warning('TeamController::removeMember domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('TeamController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('TeamController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

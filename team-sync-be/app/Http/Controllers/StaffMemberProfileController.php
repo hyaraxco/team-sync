@@ -2,8 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\WorkLocation;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\StaffMemberProfileAvailabilityRequest;
+use App\Http\Requests\StaffMemberProfilePaginatedListRequest;
 use App\Http\Requests\StaffMemberProfileStoreRequest;
 use App\Http\Requests\StaffMemberProfileUpdateRequest;
 use App\Http\Resources\PaginateResource;
@@ -14,11 +15,13 @@ use App\Http\Resources\TeamResource;
 use App\Interfaces\StaffMemberProfileRepositoryInterface;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Support\SensitiveData;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class StaffMemberProfileController extends Controller implements HasMiddleware
@@ -60,35 +63,30 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Employee Retrieved Successfully', StaffMemberProfileResource::collection($employees), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function getAllPaginated(Request $request): JsonResponse
+    public function getAllPaginated(StaffMemberProfilePaginatedListRequest $request): JsonResponse
     {
-        $request = $request->validate([
-            'search' => 'nullable|string',
-            'status' => 'nullable|string',
-            'type' => 'nullable|string',
-            'work_location' => 'nullable|string|in:'.implode(',', array_column(WorkLocation::cases(), 'value')),
-            'project_id' => 'nullable|integer',
-            'row_per_page' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         try {
             $employees = $this->staffMemberProfileRepository->getAllPaginated(
-                $request['search'] ?? null,
-                $request['status'] ?? null,
-                $request['type'] ?? null,
-                $request['work_location'] ?? null,
-                $request['project_id'] ?? null,
-                $request['row_per_page']
+                $validated['search'] ?? null,
+                $validated['status'] ?? null,
+                $validated['type'] ?? null,
+                $validated['work_location'] ?? null,
+                $validated['project_id'] ?? null,
+                $validated['row_per_page']
             );
 
             return ResponseHelper::jsonResponse(true, 'Employee Retrieved Successfully', PaginateResource::make($employees, StaffMemberProfileResource::class), 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -105,7 +103,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Employee Created Successfully', StaffMemberProfileResource::make($employee), 201);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -113,12 +112,9 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
     /**
      * Check uniqueness constraints early during multi-step create flow.
      */
-    public function checkAvailability(Request $request): JsonResponse
+    public function checkAvailability(StaffMemberProfileAvailabilityRequest $request): JsonResponse
     {
-        $payload = $request->validate([
-            'email' => ['nullable', 'email'],
-            'identity_number' => ['nullable', 'string', 'max:20'],
-        ]);
+        $payload = $request->validated();
 
         $errors = [];
 
@@ -132,7 +128,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
 
         if (! empty($payload['identity_number'])) {
             $identityExists = StaffMemberProfile::query()
-                ->where('identity_number', $payload['identity_number'])
+                ->where('identity_number_hash', SensitiveData::hash($payload['identity_number']))
                 ->exists();
 
             if ($identityExists) {
@@ -166,7 +162,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -185,7 +182,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -202,7 +200,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -217,7 +216,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Employee statistics fetched successfully', $statistics, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -234,7 +234,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -251,7 +252,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Profile Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -271,7 +273,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             if (str_contains($e->getMessage(), 'not assigned to any team')) {
                 return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
             }
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -291,7 +294,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             if (str_contains($e->getMessage(), 'not assigned to any team')) {
                 return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
             }
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -311,7 +315,8 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             if (str_contains($e->getMessage(), 'not assigned to any team')) {
                 return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
             }
-            \Illuminate\Support\Facades\Log::error('StaffMemberProfileController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

@@ -27,7 +27,7 @@ return new class extends Migration
             $table->foreignId('section_id')->constrained('performance_review_sections')->cascadeOnDelete();
             $table->decimal('weight', 5, 2)->default(0.00);
             $table->timestamps();
-            
+
             $table->unique(['template_id', 'section_id']);
         });
     }

@@ -78,6 +78,7 @@ class DemoInteractionSeeder extends Seeder
 
         if (empty($workDays)) {
             $this->command?->line('  No past work days this month — skipping attendance');
+
             return;
         }
 
@@ -90,7 +91,9 @@ class DemoInteractionSeeder extends Seeder
                 $exists = Attendance::where('staff_member_id', $employee->id)
                     ->whereDate('date', $date)
                     ->exists();
-                if ($exists) continue;
+                if ($exists) {
+                    continue;
+                }
 
                 // Realistic distribution: 75% present, 10% late, 5% sick, 5% absent, 5% half_day
                 $rand = rand(1, 100);
@@ -113,13 +116,13 @@ class DemoInteractionSeeder extends Seeder
                 if (in_array($status, ['present', 'late', 'half_day'])) {
                     $hour = $status === 'late' ? rand(9, 10) : 8;
                     $minute = $status === 'late' ? rand(31, 59) : rand(0, 15);
-                    $checkIn = "{$date} " . sprintf('%02d:%02d:00', $hour, $minute);
+                    $checkIn = "{$date} ".sprintf('%02d:%02d:00', $hour, $minute);
 
                     if ($status === 'half_day') {
-                        $checkOut = "{$date} " . sprintf('%02d:%02d:00', 13, rand(0, 30));
+                        $checkOut = "{$date} ".sprintf('%02d:%02d:00', 13, rand(0, 30));
                         $workedMinutes = rand(240, 270); // ~4-4.5h
                     } else {
-                        $checkOut = "{$date} " . sprintf('%02d:%02d:00', 17, rand(0, 45));
+                        $checkOut = "{$date} ".sprintf('%02d:%02d:00', 17, rand(0, 45));
                         $workedMinutes = rand(420, 540); // ~7-9h
                     }
                 }
@@ -143,12 +146,12 @@ class DemoInteractionSeeder extends Seeder
             }
         }
 
-        if (!empty($batch)) {
+        if (! empty($batch)) {
             DB::table('attendances')->insert($batch);
             $count += count($batch);
         }
 
-        $this->command?->line("  Attendance: {$count} records for " . count($workDays) . " work days");
+        $this->command?->line("  Attendance: {$count} records for ".count($workDays).' work days');
     }
 
     // ── Performance Goals ────────────────────────────────────────────
@@ -161,7 +164,9 @@ class DemoInteractionSeeder extends Seeder
         $yudhis = User::where('email', 'yudhis@teamsync.com')->first();
         $rina = User::where('email', 'rina@teamsync.com')->first();
 
-        if (!$agung || !$budi || !$dina || !$yudhis) return;
+        if (! $agung || ! $budi || ! $dina || ! $yudhis) {
+            return;
+        }
 
         $goals = [
             [
@@ -237,7 +242,7 @@ class DemoInteractionSeeder extends Seeder
             );
         }
 
-        $this->command?->line('  Performance goals: ' . count($goals) . ' seeded');
+        $this->command?->line('  Performance goals: '.count($goals).' seeded');
     }
 
     // ── Performance Feedback ─────────────────────────────────────────
@@ -250,7 +255,9 @@ class DemoInteractionSeeder extends Seeder
         $yudhisProfile = StaffMemberProfile::where('code', 'MGR001')->first();
         $rinaProfile = StaffMemberProfile::where('code', 'MGR002')->first();
 
-        if (!$agung || !$budi || !$yudhisProfile) return;
+        if (! $agung || ! $budi || ! $yudhisProfile) {
+            return;
+        }
 
         $feedbacks = [
             [
@@ -304,7 +311,7 @@ class DemoInteractionSeeder extends Seeder
             );
         }
 
-        $this->command?->line('  Performance feedback: ' . count($feedbacks) . ' seeded');
+        $this->command?->line('  Performance feedback: '.count($feedbacks).' seeded');
     }
 
     // ── Project Tasks ────────────────────────────────────────────────
@@ -318,7 +325,9 @@ class DemoInteractionSeeder extends Seeder
         $budi = StaffMemberProfile::where('code', 'EMP002')->first();
         $dina = StaffMemberProfile::where('code', 'EMP003')->first();
 
-        if (!$hris || !$agung) return;
+        if (! $hris || ! $agung) {
+            return;
+        }
 
         $tasks = [
             // HRIS project tasks
@@ -398,7 +407,7 @@ class DemoInteractionSeeder extends Seeder
             );
         }
 
-        $this->command?->line('  Project tasks: ' . count($tasks) . ' seeded');
+        $this->command?->line('  Project tasks: '.count($tasks).' seeded');
     }
 
     // ── Leave Requests ───────────────────────────────────────────────
@@ -409,7 +418,9 @@ class DemoInteractionSeeder extends Seeder
         $budi = StaffMemberProfile::where('code', 'EMP002')->first();
         $tasyia = User::where('email', 'tasyia@teamsync.com')->first();
 
-        if (!$agung || !$tasyia) return;
+        if (! $agung || ! $tasyia) {
+            return;
+        }
 
         $requests = [
             [
@@ -450,6 +461,6 @@ class DemoInteractionSeeder extends Seeder
             );
         }
 
-        $this->command?->line('  Leave requests: ' . count($requests) . ' seeded');
+        $this->command?->line('  Leave requests: '.count($requests).' seeded');
     }
 }

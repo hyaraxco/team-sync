@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class ProjectTaskController extends Controller implements HasMiddleware
@@ -59,7 +60,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (AuthorizationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -83,7 +85,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (AuthorizationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -97,7 +100,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (AuthorizationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -114,7 +118,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Task Created Successfully', new ProjectTaskResource($task), 201);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -133,7 +138,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -154,7 +160,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -173,7 +180,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -189,7 +197,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -207,7 +216,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -225,7 +235,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task/Comment Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -241,7 +252,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task/Comment Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -257,7 +269,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -273,7 +286,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -291,7 +305,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -307,7 +322,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Task/Attachment Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('ProjectTaskController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

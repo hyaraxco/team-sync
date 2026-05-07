@@ -19,6 +19,7 @@ class AttendanceCheckInRequest extends FormRequest
             'staff_member_id' => ['required', 'integer', 'exists:staff_member_profiles,id'],
             'check_in_lat' => ['nullable', 'numeric'],
             'check_in_long' => ['nullable', 'numeric'],
+            'actual_work_mode' => ['nullable', 'string', 'in:office,remote'],
             'notes' => ['nullable', 'string', 'max:500'],
         ];
     }
@@ -29,6 +30,7 @@ class AttendanceCheckInRequest extends FormRequest
             'staff_member_id' => 'Employee',
             'check_in_lat' => 'Latitude',
             'check_in_long' => 'Longitude',
+            'actual_work_mode' => 'Actual work mode',
             'notes' => 'Catatan',
         ];
     }
@@ -38,10 +40,8 @@ class AttendanceCheckInRequest extends FormRequest
      */
     protected function prepareForValidation(): void
     {
-        if (!$this->has('staff_member_id')) {
-            $this->merge([
-                'staff_member_id' => Auth::user()->staffMemberProfile?->id,
-            ]);
-        }
+        $this->merge([
+            'staff_member_id' => Auth::user()->staffMemberProfile?->id,
+        ]);
     }
 }

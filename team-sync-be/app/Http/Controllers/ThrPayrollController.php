@@ -29,7 +29,8 @@ class ThrPayrollController extends Controller implements HasMiddleware
         return [
             new Middleware(PermissionMiddleware::using(['thr-list']), only: ['index', 'show', 'getDetails', 'getYearSummary']),
             new Middleware(PermissionMiddleware::using(['thr-generate']), only: ['generate', 'simulate']),
-            new Middleware(PermissionMiddleware::using(['thr-approve']), only: ['approve', 'markAsPaid']),
+            new Middleware(PermissionMiddleware::using(['thr-approve']), only: ['approve']),
+            new Middleware(PermissionMiddleware::using(['thr-process']), only: ['markAsPaid']),
         ];
     }
 
@@ -52,7 +53,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@index Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@index Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -75,7 +76,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@show Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@show Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -99,7 +100,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
                 200
             );
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@getDetails Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@getDetails Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -116,7 +117,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'THR Year Summary Retrieved Successfully', $summary, 200);
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@getYearSummary Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@getYearSummary Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -128,7 +129,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
     public function simulate(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'religion_event' => ['required', 'string', 'in:' . implode(',', array_values(ThrPayroll::RELIGION_EVENT_MAP))],
+            'religion_event' => ['required', 'string', 'in:'.implode(',', array_values(ThrPayroll::RELIGION_EVENT_MAP))],
             'year' => ['required', 'integer', 'min:2020', 'max:2100'],
             'religion_holiday_date' => ['required', 'date'],
         ]);
@@ -142,7 +143,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'THR Simulation Generated Successfully', $simulation, 200);
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@simulate Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@simulate Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -167,7 +168,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
                 201
             );
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@generate Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@generate Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -194,7 +195,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@approve Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@approve Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
@@ -225,7 +226,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
         } catch (\Throwable $e) {
-            Log::error('ThrPayrollController@markAsPaid Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('ThrPayrollController@markAsPaid Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\LeaveEntitlementUpdateRequest;
 use App\Interfaces\LeaveEntitlementRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -34,20 +35,9 @@ class LeaveEntitlementController extends Controller implements HasMiddleware
         ], 200);
     }
 
-    public function update(Request $request, string $id): JsonResponse
+    public function update(LeaveEntitlementUpdateRequest $request, string $id): JsonResponse
     {
-        $data = $request->validate([
-            'is_eligible' => 'sometimes|boolean',
-            'is_paid' => 'sometimes|boolean',
-            'quota_scope' => 'sometimes|nullable|string|in:annual,per_occurrence,unlimited,unpaid',
-            'quota_days' => 'sometimes|nullable|numeric|min:0',
-            'carry_over_max_days' => 'sometimes|nullable|integer|min:0',
-            'requires_attachment' => 'sometimes|boolean',
-            'requires_reason' => 'sometimes|boolean',
-            'allowed_mime_types' => 'sometimes|nullable|array',
-            'allowed_mime_types.*' => 'string',
-            'max_attachment_size_kb' => 'sometimes|nullable|integer|min:0',
-        ]);
+        $data = $request->validated();
 
         $entitlement = $this->repository->update($id, $data);
 

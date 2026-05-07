@@ -19,7 +19,7 @@ class CompanyFactory extends Factory
 
         return [
             'name' => $name,
-            'slug' => Str::slug($name) . '-' . fake()->unique()->numberBetween(1, 99999),
+            'slug' => Str::slug($name).'-'.fake()->unique()->numberBetween(1, 99999),
             'domain' => fake()->optional()->domainName(),
             'logo_url' => null,
             'timezone' => 'Asia/Jakarta',

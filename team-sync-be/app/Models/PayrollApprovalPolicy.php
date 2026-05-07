@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -36,7 +37,7 @@ class PayrollApprovalPolicy extends Model
     /**
      * Get active policies that apply to a given total amount.
      */
-    public static function getApplicablePolicies(float $totalAmount): \Illuminate\Database\Eloquent\Collection
+    public static function getApplicablePolicies(float $totalAmount): Collection
     {
         return static::query()
             ->where('is_active', true)
