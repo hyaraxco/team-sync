@@ -28,6 +28,7 @@ const factory = () =>
                     template: '<div class="latest-employees-stub"></div>',
                 },
                 LatestTeams: { template: '<div class="latest-teams-stub"></div>' },
+                TeamPulseOverview: { template: '<div class="team-pulse-overview-stub"></div>' },
                 TodayAttendanceOverview: {
                     template: '<div class="today-attendance-overview-stub"></div>',
                 },
@@ -63,6 +64,17 @@ describe("Dashboard smoke", () => {
         expect(wrapper.find(".latest-employees-stub").exists()).toBe(true);
         expect(wrapper.find(".latest-teams-stub").exists()).toBe(true);
         expect(wrapper.find(".today-attendance-overview-stub").exists()).toBe(true);
+    });
+
+    it("renders team pulse for manager flow permission", () => {
+        authStoreMock.user = {
+            roles: ["manager"],
+            permissions: [{ name: "dashboard-view" }, { name: "review-manager-submit" }],
+        };
+
+        const wrapper = factory();
+
+        expect(wrapper.find(".team-pulse-overview-stub").exists()).toBe(true);
     });
 
     it("renders staff dashboard widgets for staff role", () => {

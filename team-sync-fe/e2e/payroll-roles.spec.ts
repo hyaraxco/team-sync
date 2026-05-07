@@ -92,15 +92,12 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await context.close();
   });
 
-  test("hr creates payroll draft for current month (pending)", async ({ browser }) => {
+  test("finance creates payroll draft for current month (pending)", async ({ browser }) => {
     const context = await browser.newContext();
     const page = await context.newPage();
 
-    await loginAsRole(page, "hr");
+    await loginAsRole(page, "finance");
     await expect(page.getByTestId("sidebar-section-personal")).toBeVisible();
-    await expect(page.getByText("Request Leave")).toBeVisible();
-    await page.goto("/admin/attendance/my-attendances");
-    await expect(page).toHaveURL(/\/admin\/attendance\/my-attendances$/);
     await page.goto("/admin/payroll/create");
     await expect(page).toHaveURL(/\/admin\/payroll\/create$/);
     await expect(page.getByTestId("payroll-create-month")).toHaveAttribute(
@@ -182,9 +179,10 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await expect(page).toHaveURL(
       new RegExp(`/admin/payroll/${payrollIdForJourney}$`)
     );
-    await expect(page.getByText("Payroll Draft Review")).toBeVisible();
+    // Finance has full payroll access — sees full detail view with stats
+    await expect(page.getByText("Total Staff Members")).toBeVisible();
+    // Payroll is pending — Mark as Paid not yet available (needs approval first)
     await expect(page.getByText("Mark as Paid")).toHaveCount(0);
-    await expect(page.getByText("Total Staff Members")).toHaveCount(0);
 
     await page.goto("/admin/payroll/create");
     await expect(page).toHaveURL(/\/admin\/payroll\/create$/);
@@ -198,7 +196,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
       await expect(submitButton).toBeEnabled();
     }
 
-    await captureEvidence(page, "hr-pending-created.png");
+    await captureEvidence(page, "finance-pending-created.png");
     await context.close();
   });
 
@@ -206,7 +204,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     browser,
   }) => {
     if (!payrollIdForJourney) {
-      throw new Error("Payroll id is missing from HR step.");
+      throw new Error("Payroll id is missing from finance create step.");
     }
 
     const context = await browser.newContext();
@@ -216,8 +214,10 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await expect(page.getByTestId("sidebar-section-personal")).toBeVisible();
     await expect(page.getByText("Total Payroll Cost")).toBeVisible();
 
+    // Finance CAN access payroll/create (owns payroll operations)
     await page.goto("/admin/payroll/create");
-    await expect(page).toHaveURL(/\/admin\/dashboard$/);
+    await expect(page).toHaveURL(/\/admin\/payroll\/create$/);
+    // But Finance is denied teams/projects
     await expectRedirectToDashboard(page, "/admin/teams");
     await expectRedirectToDashboard(page, "/admin/projects");
     await page.goto("/admin/my-payroll");
