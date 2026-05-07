@@ -83,25 +83,95 @@ class ProjectTaskPolicy
     }
 
     /**
-     * Determine if the user can update a task.
+     * Determine if the user can update a task (basic access check).
      * Staff: must be assignee or project leader.
      */
-    public function update(User $user, ProjectTask $task): Response
+    public function update(User $user, ProjectTask $task, array $data = []): Response
     {
-        if ($this->isReviewerRole($user)) {
+        $task->loadMissing('project');
+
+        $profile = $user->staffMemberProfile;
+        $isReviewer = $this->isReviewerRole($user);
+        $isPureEmployee = $user->hasRole('staff') && ! $isReviewer;
+        $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
+        $isAssignee = $profile && $task->assignee_id === $profile->id;
+
+        // Basic access: pure employee must be assignee or project leader
+        if ($isPureEmployee && ! $isAssignee && ! $isProjectLeader) {
+            return Response::deny('You can only update your own assigned tasks.');
+        }
+
+        // If no data provided, just check basic access
+        if (empty($data)) {
             return Response::allow();
         }
 
-        $profile = $user->staffMemberProfile;
-        if (! $profile) {
-            return Response::deny('Your account is not linked to an employee profile.');
+        // Field-level checks
+        $currentStatus = strtolower(trim((string) $task->status));
+
+        // Assignee change check
+        $hasAssigneeChange = $this->hasFieldChanged('assignee_id', $data, $task);
+        if ($hasAssigneeChange) {
+            if (! $isReviewer && ! $isProjectLeader) {
+                return Response::deny('Only manager/HR/project leader can reassign task assignee.');
+            }
+
+            $isLockedForFieldEdit = in_array($currentStatus, [
+                TaskStatus::REVIEW->value,
+                TaskStatus::DONE->value,
+            ], true);
+
+            if ($isLockedForFieldEdit) {
+                return Response::deny('Assignee and due date can only be changed before review or after task is rejected.');
+            }
         }
 
-        $isAssignee = $task->assignee_id === $profile->id;
-        $isProjectLeader = $task->project?->project_leader_id === $profile->id;
+        // Due date change check (same lock as assignee)
+        $hasDueDateChange = $this->hasFieldChanged('due_date', $data, $task);
+        if ($hasDueDateChange && ($isReviewer || $isProjectLeader)) {
+            $isLockedForFieldEdit = in_array($currentStatus, [
+                TaskStatus::REVIEW->value,
+                TaskStatus::DONE->value,
+            ], true);
 
-        if (! $isAssignee && ! $isProjectLeader) {
-            return Response::deny('You can only update your own assigned tasks.');
+            if ($isLockedForFieldEdit) {
+                return Response::deny('Assignee and due date can only be changed before review or after task is rejected.');
+            }
+        }
+
+        // Status transition check
+        $hasStatusChange = $this->hasFieldChanged('status', $data, $task);
+        if ($hasStatusChange) {
+            $fromStatus = $currentStatus;
+            $toStatus = strtolower(trim((string) $data['status']));
+
+            $transitionResponse = $this->transitionStatus($user, $task, $fromStatus, $toStatus);
+            if ($transitionResponse->denied()) {
+                return $transitionResponse;
+            }
+
+            // Rejected reason required
+            $isReviewerTransitionToRejected =
+                ($isReviewer || $isProjectLeader) &&
+                in_array($fromStatus, [TaskStatus::REVIEW->value, TaskStatus::DONE->value], true) &&
+                $toStatus === TaskStatus::REJECTED->value;
+
+            if ($isReviewerTransitionToRejected) {
+                $reason = trim((string) ($data['rejected_reason'] ?? ''));
+                if ($reason === '') {
+                    return Response::deny('Rejected reason is required for this transition.');
+                }
+            }
+        }
+
+        // Staff blocked fields
+        if ($isPureEmployee) {
+            $blockedFields = ['project_id', 'name', 'description', 'priority', 'due_date', 'rejected_reason'];
+            foreach ($blockedFields as $field) {
+                if ($this->hasFieldChanged($field, $data, $task)) {
+                    return Response::deny('You are not allowed to modify '.$field.'.');
+                }
+            }
         }
 
         return Response::allow();
@@ -223,6 +293,31 @@ class ProjectTaskPolicy
     private function isReviewerRole(User $user): bool
     {
         return $user->hasRole('manager') || $user->hasRole('hr');
+    }
+
+    private function hasFieldChanged(string $field, array $data, ProjectTask $task): bool
+    {
+        if (! array_key_exists($field, $data)) {
+            return false;
+        }
+
+        $incoming = $this->normalizeValue($data[$field]);
+        $current = $this->normalizeValue($task->{$field});
+
+        return $incoming !== $current;
+    }
+
+    private function normalizeValue(mixed $value): ?string
+    {
+        if ($value === null || $value === '') {
+            return null;
+        }
+
+        if ($value instanceof \BackedEnum) {
+            return (string) $value->value;
+        }
+
+        return (string) $value;
     }
 
     private function isProjectMember(User $user, ?Project $project): bool

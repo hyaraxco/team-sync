@@ -93,8 +93,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
     public function create(array $data): ProjectTask
     {
-        $this->authorizeTaskCreation($data);
-
         $taskDto = ProjectTaskDto::fromArray($data);
         $taskArray = $taskDto->toArray();
 
@@ -124,8 +122,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             $toStatus = TaskStatus::TODO->value;
             $hasStatusChange = $fromStatus !== $toStatus;
         }
-
-        $this->authorizeTaskUpdate($task, $data);
 
         $taskDto = ProjectTaskDto::fromArrayForUpdate($data, $task);
         $updatePayload = $taskDto->toArray();
@@ -167,8 +163,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
     {
         $task = $this->getById($id);
 
-        $this->authorizeTaskDeletion($task);
-
         $task->delete();
 
         return $task;
@@ -193,8 +187,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             throw new AuthorizationException('Your account is not linked to an employee profile.');
         }
 
-        $this->authorizeTaskCollaboration($task, 'create-comment');
-
         $comment = ProjectTaskComment::create([
             'project_task_id' => $task->id,
             'staff_member_id' => $user->staffMemberProfile->id,
@@ -217,8 +209,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $comment = ProjectTaskComment::where('project_task_id', $task->id)
             ->findOrFail($commentId);
 
-        $this->authorizeCommentMutation($task, $comment);
-
         $comment->update([
             'comment' => $data['comment'],
         ]);
@@ -231,8 +221,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $task = $this->getById($taskId);
         $comment = ProjectTaskComment::where('project_task_id', $task->id)
             ->findOrFail($commentId);
-
-        $this->authorizeCommentMutation($task, $comment);
 
         $comment->delete();
 
@@ -272,8 +260,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             throw new AuthorizationException('Your account is not linked to an employee profile.');
         }
 
-        $this->authorizeTaskCollaboration($task, 'create-attachment');
-
         $file = $data['file'];
         $storedPath = $file->store('task-attachments', 'public');
 
@@ -302,8 +288,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         $attachment = ProjectTaskAttachment::where('project_task_id', $task->id)
             ->findOrFail($attachmentId);
 
-        $this->authorizeAttachmentMutation($task, $attachment);
-
         if ($attachment->file_path && Storage::disk('public')->exists($attachment->file_path)) {
             Storage::disk('public')->delete($attachment->file_path);
         }
@@ -313,183 +297,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         return $attachment;
     }
 
-    private function authorizeTaskUpdate(ProjectTask $task, array $data): void
-    {
-        $user = Auth::user();
-        if (! $user) {
-            throw new AuthorizationException('Unauthorized.');
-        }
 
-        $task->loadMissing('project');
-
-        $staffMemberProfileId = $user->staffMemberProfile?->id;
-        $isManager = $user->hasRole('manager');
-        $isHr = $user->hasRole('hr');
-        $isEmployee = $user->hasRole('staff');
-        $isReviewerRole = $isManager || $isHr;
-        $isPureEmployee = $isEmployee && ! $isReviewerRole;
-        $isProjectLeader = $staffMemberProfileId !== null && $task->project?->project_leader_id === $staffMemberProfileId;
-        $isAssignee = $staffMemberProfileId !== null && $task->assignee_id === $staffMemberProfileId;
-
-        if ($isPureEmployee && ! $isAssignee && ! $isProjectLeader) {
-            throw new AuthorizationException('You can only update your own assigned tasks.');
-        }
-
-        $hasAssigneeChange = $this->hasFieldChanged('assignee_id', $data, $task);
-        $hasDueDateChange = $this->hasFieldChanged('due_date', $data, $task);
-
-        $currentStatus = $this->normalizeStatusForWorkflow((string) $task->status);
-        $isLockedForReviewerFieldEdit = in_array($currentStatus, [
-            TaskStatus::REVIEW->value,
-            TaskStatus::DONE->value,
-        ], true);
-
-        if (($hasAssigneeChange || $hasDueDateChange) && ($isReviewerRole || $isProjectLeader) && $isLockedForReviewerFieldEdit) {
-            throw new AuthorizationException('Assignee and due date can only be changed before review or after task is rejected.');
-        }
-
-        if ($hasAssigneeChange && ! ($isReviewerRole || $isProjectLeader)) {
-            throw new AuthorizationException('Only manager/HR/project leader can reassign task assignee.');
-        }
-
-        $hasStatusChange = $this->hasFieldChanged('status', $data, $task);
-        if ($hasStatusChange) {
-            $fromStatus = $this->normalizeStatusForWorkflow((string) $task->status);
-            $toStatus = $this->normalizeStatusForWorkflow((string) $data['status']);
-            $this->validateStatusTransition($fromStatus, $toStatus, $isPureEmployee, $isReviewerRole || $isProjectLeader);
-
-            $isReviewerTransitionToRejected =
-                ($isReviewerRole || $isProjectLeader) &&
-                in_array($fromStatus, [TaskStatus::REVIEW->value, TaskStatus::DONE->value], true) &&
-                $toStatus === TaskStatus::REJECTED->value;
-
-            if ($isReviewerTransitionToRejected) {
-                $reason = trim((string) ($data['rejected_reason'] ?? ''));
-                if ($reason === '') {
-                    throw new AuthorizationException('Rejected reason is required for this transition.');
-                }
-            }
-        }
-
-        if ($isPureEmployee) {
-            $blockedFields = ['project_id', 'name', 'description', 'priority', 'due_date', 'rejected_reason'];
-
-            foreach ($blockedFields as $field) {
-                if ($this->hasFieldChanged($field, $data, $task)) {
-                    throw new AuthorizationException('You are not allowed to modify '.$field.'.');
-                }
-            }
-        }
-    }
-
-    /**
-     * @deprecated Use ProjectTaskPolicy::create() via Gate::inspect() in controller.
-     * Kept as defense-in-depth until full Policy migration is complete.
-     */
-    private function authorizeTaskCreation(array $data): void
-    {
-        $user = Auth::user();
-        if (! $user || ! $user->staffMemberProfile) {
-            throw new AuthorizationException('Your account is not linked to an employee profile.');
-        }
-
-        $isManager = $user->hasRole('manager');
-        $isHr = $user->hasRole('hr');
-        $isReviewerRole = $isManager || $isHr;
-        $isPureEmployee = $user->hasRole('staff') && ! $isReviewerRole;
-
-        $projectId = $data['project_id'] ?? null;
-        if (! $projectId) {
-            throw new AuthorizationException('Project ID is required.');
-        }
-
-        // Staff must be a member of the project to create tasks
-        if ($isPureEmployee) {
-            $employee = $user->staffMemberProfile;
-            $project = Project::with('teams')->find($projectId);
-
-            if (! $project) {
-                throw new AuthorizationException('Project not found.');
-            }
-
-            $isLeader = $project->project_leader_id === $employee->id;
-
-            $jobInfoTeamId = $employee->jobInformation->team_id ?? null;
-            $teamMemberIds = TeamMember::where('staff_member_id', $employee->id)
-                ->whereNull('left_at')
-                ->pluck('team_id')
-                ->toArray();
-            $teamIds = array_unique(array_filter(array_merge(
-                $jobInfoTeamId ? [$jobInfoTeamId] : [],
-                $teamMemberIds
-            )));
-
-            $projectTeamIds = $project->teams->pluck('id')->toArray();
-            $isTeamAssigned = ! empty(array_intersect($projectTeamIds, $teamIds));
-
-            if (! $isLeader && ! $isTeamAssigned) {
-                throw new AuthorizationException('You can only create tasks in projects you are a member of.');
-            }
-
-            // Staff cannot assign tasks to others
-            $assigneeId = $data['assignee_id'] ?? null;
-            if ($assigneeId !== null && (int) $assigneeId !== $employee->id) {
-                throw new AuthorizationException('You can only assign tasks to yourself.');
-            }
-
-            // Staff can only create tasks with initial status 'todo'
-            $status = $data['status'] ?? 'todo';
-            if ($status !== 'todo') {
-                throw new AuthorizationException('Tasks must be created with status "todo".');
-            }
-        }
-    }
-
-    /**
-     * @deprecated Use ProjectTaskPolicy::delete() via Gate::inspect() in controller.
-     * Kept as defense-in-depth until full Policy migration is complete.
-     */
-    private function authorizeTaskDeletion(ProjectTask $task): void
-    {
-        $user = Auth::user();
-        if (! $user || ! $user->hasRole('manager')) {
-            throw new AuthorizationException('Only manager can delete tasks.');
-        }
-    }
-
-    private function validateStatusTransition(string $from, string $to, bool $isEmployee, bool $isReviewer): void
-    {
-        if ($isEmployee) {
-            $employeeTransitions = [
-                TaskStatus::TODO->value => [TaskStatus::IN_PROGRESS->value],
-                TaskStatus::IN_PROGRESS->value => [TaskStatus::REVIEW->value],
-                TaskStatus::REJECTED->value => [TaskStatus::IN_PROGRESS->value],
-            ];
-
-            $allowed = $employeeTransitions[$from] ?? [];
-            if (! in_array($to, $allowed, true)) {
-                throw new AuthorizationException("Invalid status transition from {$from} to {$to}.");
-            }
-
-            return;
-        }
-
-        if ($isReviewer) {
-            $reviewerTransitions = [
-                TaskStatus::REVIEW->value => [TaskStatus::DONE->value, TaskStatus::REJECTED->value],
-                TaskStatus::DONE->value => [TaskStatus::REJECTED->value],
-            ];
-
-            if ($from === $to) {
-                return;
-            }
-
-            $allowed = $reviewerTransitions[$from] ?? [];
-            if (! in_array($to, $allowed, true)) {
-                throw new AuthorizationException("Invalid reviewer status transition from {$from} to {$to}.");
-            }
-        }
-    }
 
     private function hasFieldChanged(string $field, array $data, ProjectTask $task): bool
     {
@@ -601,85 +409,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
 
         return $status;
-    }
-
-    /**
-     * @deprecated Use ProjectTaskPolicy::collaborate() via Gate::inspect() in controller.
-     * Kept as defense-in-depth until full Policy migration is complete.
-     */
-    private function authorizeTaskCollaboration(ProjectTask $task, string $action): void
-    {
-        $user = Auth::user();
-        if (! $user || ! $user->staffMemberProfile) {
-            throw new AuthorizationException('Unauthorized.');
-        }
-
-        $staffMemberProfileId = $user->staffMemberProfile->id;
-        $isManager = $user->hasRole('manager');
-        $isHr = $user->hasRole('hr');
-        $isReviewerRole = $isManager || $isHr;
-        $isPureEmployee = $user->hasRole('staff') && ! $isReviewerRole;
-        $isProjectLeader = $task->project?->project_leader_id === $staffMemberProfileId;
-        $isAssignee = $task->assignee_id === $staffMemberProfileId;
-
-        if (! $isReviewerRole && ! $isProjectLeader && ! $isAssignee) {
-            throw new AuthorizationException('Forbidden.');
-        }
-
-        if ($isPureEmployee) {
-            if (! $isAssignee) {
-                throw new AuthorizationException('You can only collaborate on your own assigned tasks.');
-            }
-
-            $lockedStatuses = [
-                TaskStatus::REVIEW->value,
-                TaskStatus::DONE->value,
-                TaskStatus::CANCELLED->value,
-            ];
-
-            $currentStatus = $this->normalizeStatusForWorkflow((string) $task->status);
-            if (in_array($currentStatus, $lockedStatuses, true)) {
-                throw new AuthorizationException('Task is locked for this action in current status.');
-            }
-        }
-    }
-
-    private function authorizeCommentMutation(ProjectTask $task, ProjectTaskComment $comment): void
-    {
-        $user = Auth::user();
-        if (! $user || ! $user->staffMemberProfile) {
-            throw new AuthorizationException('Unauthorized.');
-        }
-
-        $staffMemberProfileId = $user->staffMemberProfile->id;
-        $isOwner = $comment->staff_member_id === $staffMemberProfileId;
-
-        if (! $isOwner) {
-            throw new AuthorizationException('You are not allowed to modify this comment.');
-        }
-
-        if ($user->hasRole('staff') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
-            $this->authorizeTaskCollaboration($task, 'update-comment');
-        }
-    }
-
-    private function authorizeAttachmentMutation(ProjectTask $task, ProjectTaskAttachment $attachment): void
-    {
-        $user = Auth::user();
-        if (! $user || ! $user->staffMemberProfile) {
-            throw new AuthorizationException('Unauthorized.');
-        }
-
-        $staffMemberProfileId = $user->staffMemberProfile->id;
-        $isOwner = $attachment->staff_member_id === $staffMemberProfileId;
-
-        if (! $isOwner) {
-            throw new AuthorizationException('You are not allowed to modify this attachment.');
-        }
-
-        if ($user->hasRole('staff') && ! ($user->hasRole('manager') || $user->hasRole('hr')) && $isOwner) {
-            $this->authorizeTaskCollaboration($task, 'delete-attachment');
-        }
     }
 
     private function createStatusLog(ProjectTask $task, string $fromStatus, string $toStatus, ?string $reason = null): void

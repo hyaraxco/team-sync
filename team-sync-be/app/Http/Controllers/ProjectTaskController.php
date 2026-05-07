@@ -158,10 +158,17 @@ class ProjectTaskController extends Controller implements HasMiddleware
      */
     public function update(ProjectTaskUpdateRequest $request, string $id)
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $task = $this->projectTaskRepository->update($id, $request);
+            $task = ProjectTask::with('project')->findOrFail($id);
+
+            $response = Gate::inspect('update', [$task, $data]);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $task = $this->projectTaskRepository->update($id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Task Updated Successfully', new ProjectTaskResource($task), 200);
         } catch (AuthorizationException $e) {
