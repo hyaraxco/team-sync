@@ -10,3 +10,9 @@ node_modules/
 
 # Local git worktrees
 .worktrees/
+
+# Tool artifacts
+.playwright-mcp/
+.ralph/
+PI_SETUP_GUIDE.md
+benchmarks/
