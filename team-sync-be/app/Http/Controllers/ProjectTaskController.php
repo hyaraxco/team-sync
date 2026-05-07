@@ -117,6 +117,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
             $task = $this->projectTaskRepository->create($request);
 
             return ResponseHelper::jsonResponse(true, 'Task Created Successfully', new ProjectTaskResource($task), 201);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('ProjectTaskController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

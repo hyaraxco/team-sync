@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\DTOs\ProjectTaskDto;
 use App\Enums\TaskStatus;
 use App\Interfaces\ProjectTaskRepositoryInterface;
+use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\ProjectTaskAttachment;
 use App\Models\ProjectTaskComment;
@@ -92,6 +93,8 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
     public function create(array $data): ProjectTask
     {
+        $this->authorizeTaskCreation($data);
+
         $taskDto = ProjectTaskDto::fromArray($data);
         $taskArray = $taskDto->toArray();
 
@@ -379,6 +382,65 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
     }
 
+    private function authorizeTaskCreation(array $data): void
+    {
+        $user = Auth::user();
+        if (! $user || ! $user->staffMemberProfile) {
+            throw new AuthorizationException('Your account is not linked to an employee profile.');
+        }
+
+        $isManager = $user->hasRole('manager');
+        $isHr = $user->hasRole('hr');
+        $isReviewerRole = $isManager || $isHr;
+        $isPureEmployee = $user->hasRole('staff') && ! $isReviewerRole;
+
+        $projectId = $data['project_id'] ?? null;
+        if (! $projectId) {
+            throw new AuthorizationException('Project ID is required.');
+        }
+
+        // Staff must be a member of the project to create tasks
+        if ($isPureEmployee) {
+            $employee = $user->staffMemberProfile;
+            $project = Project::with('teams')->find($projectId);
+
+            if (! $project) {
+                throw new AuthorizationException('Project not found.');
+            }
+
+            $isLeader = $project->project_leader_id === $employee->id;
+
+            $jobInfoTeamId = $employee->jobInformation->team_id ?? null;
+            $teamMemberIds = TeamMember::where('staff_member_id', $employee->id)
+                ->whereNull('left_at')
+                ->pluck('team_id')
+                ->toArray();
+            $teamIds = array_unique(array_filter(array_merge(
+                $jobInfoTeamId ? [$jobInfoTeamId] : [],
+                $teamMemberIds
+            )));
+
+            $projectTeamIds = $project->teams->pluck('id')->toArray();
+            $isTeamAssigned = ! empty(array_intersect($projectTeamIds, $teamIds));
+
+            if (! $isLeader && ! $isTeamAssigned) {
+                throw new AuthorizationException('You can only create tasks in projects you are a member of.');
+            }
+
+            // Staff cannot assign tasks to others
+            $assigneeId = $data['assignee_id'] ?? null;
+            if ($assigneeId !== null && (int) $assigneeId !== $employee->id) {
+                throw new AuthorizationException('You can only assign tasks to yourself.');
+            }
+
+            // Staff can only create tasks with initial status 'todo'
+            $status = $data['status'] ?? 'todo';
+            if ($status !== 'todo') {
+                throw new AuthorizationException('Tasks must be created with status "todo".');
+            }
+        }
+    }
+
     private function authorizeTaskDeletion(ProjectTask $task): void
     {
         $user = Auth::user();
@@ -558,6 +620,7 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             }
 
             $lockedStatuses = [
+                TaskStatus::REVIEW->value,
                 TaskStatus::DONE->value,
                 TaskStatus::CANCELLED->value,
             ];

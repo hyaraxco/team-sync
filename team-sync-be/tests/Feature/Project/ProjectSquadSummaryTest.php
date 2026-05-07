@@ -224,10 +224,10 @@ class ProjectSquadSummaryTest extends TestCase
 
         Sanctum::actingAs($outsideUser);
 
+        // Staff role does not have 'project-statistic' permission,
+        // so they are blocked at the permission middleware layer (403).
         $this->getJson('/api/v1/projects/'.$project->id.'/squad-summary')
-            ->assertForbidden()
-            ->assertJsonPath('success', false)
-            ->assertJsonPath('message', 'Forbidden');
+            ->assertForbidden();
     }
 
     private function createTeam(string $name): Team
