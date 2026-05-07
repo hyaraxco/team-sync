@@ -10,11 +10,14 @@ use App\Http\Requests\ProjectUpdateRequest;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\ProjectResource;
 use App\Interfaces\ProjectRepositoryInterface;
+use App\Models\Project;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -88,12 +91,19 @@ class ProjectController extends Controller implements HasMiddleware
      */
     public function store(ProjectStoreRequest $request): JsonResponse
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $project = $this->projectRepository->create($request);
+            $response = Gate::inspect('create', Project::class);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $project = $this->projectRepository->create($data);
 
             return ResponseHelper::jsonResponse(true, 'Project Created Successfully', new ProjectResource($project), 201);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -124,14 +134,23 @@ class ProjectController extends Controller implements HasMiddleware
      */
     public function update(ProjectUpdateRequest $request, string $id): JsonResponse
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $project = $this->projectRepository->update($id, $request);
+            $project = Project::findOrFail($id);
+
+            $response = Gate::inspect('update', $project);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $project = $this->projectRepository->update($id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Project Updated Successfully', new ProjectResource($project), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -145,11 +164,20 @@ class ProjectController extends Controller implements HasMiddleware
     public function destroy(string $id): JsonResponse
     {
         try {
+            $project = Project::findOrFail($id);
+
+            $response = Gate::inspect('delete', $project);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $this->projectRepository->delete($id);
 
             return ResponseHelper::jsonResponse(true, 'Project Deleted Successfully', null, 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -163,9 +191,16 @@ class ProjectController extends Controller implements HasMiddleware
     public function getStatistics(): JsonResponse
     {
         try {
+            $response = Gate::inspect('viewStatistics', Project::class);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $statistics = $this->projectRepository->getStatistics();
 
             return ResponseHelper::jsonResponse(true, 'Project Statistics Retrieved Successfully', $statistics, 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
