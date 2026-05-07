@@ -79,6 +79,10 @@ export const useAttendanceStore = defineStore("attendance", {
                     check_in_long: payload.check_in_long,
                 };
 
+                if (payload.actual_work_mode) {
+                    data.actual_work_mode = payload.actual_work_mode;
+                }
+
                 if (payload.notes) {
                     data.notes = payload.notes;
                 }
@@ -275,11 +279,11 @@ export const useAttendanceStore = defineStore("attendance", {
             }
         },
 
-        async acknowledgePolicyMismatch(id, notes) {
+        async acknowledgePolicyMismatch(id, resolution_notes) {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post(`attendance-policy-mismatches/${id}/acknowledge`, { notes });
+                const response = await axiosInstance.post(`attendance-policy-mismatches/${id}/acknowledge`, { resolution_notes });
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {

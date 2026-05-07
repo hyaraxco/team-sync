@@ -90,6 +90,51 @@ describe('Payroll Store', () => {
         expect(store.success).toBe('Payroll marked as paid');
     });
 
+    it('fetchPayrollAdjustments populates adjustment queue and meta state', async () => {
+        const params = { page: 2, per_page: 15, status: 'pending' };
+        const paginator = {
+            data: [{ id: 7, status: 'pending', amount_delta: '250000.00' }],
+            current_page: 2,
+            last_page: 4,
+            per_page: 15,
+            total: 46,
+        };
+        axiosInstance.get.mockResolvedValueOnce({
+            data: {
+                data: paginator,
+            },
+        });
+
+        const result = await store.fetchPayrollAdjustments(params);
+
+        expect(axiosInstance.get).toHaveBeenCalledWith('/payroll-adjustments', { params });
+        expect(result).toEqual(paginator);
+        expect(store.payrollAdjustments).toEqual(paginator.data);
+        expect(store.meta).toEqual({
+            current_page: 2,
+            last_page: 4,
+            per_page: 15,
+            total: 46,
+        });
+        expect(store.loading).toBe(false);
+    });
+
+    it('approvePayrollAdjustment calls existing approve endpoint', async () => {
+        axiosInstance.post.mockResolvedValueOnce({
+            data: {
+                message: 'Payroll Adjustment Approved Successfully',
+                data: { id: 7, status: 'approved' },
+            },
+        });
+
+        const result = await store.approvePayrollAdjustment(7);
+
+        expect(axiosInstance.post).toHaveBeenCalledWith('/payroll-adjustments/7/approve', {});
+        expect(result).toEqual({ id: 7, status: 'approved' });
+        expect(store.success).toBe('Payroll Adjustment Approved Successfully');
+        expect(store.loading).toBe(false);
+    });
+
     it('fetchPayrollStatistics returns statistics payload', async () => {
         const mockStats = { total_employees: 48, net_amount: 125000000 };
         axiosInstance.get.mockResolvedValueOnce({

@@ -6,6 +6,7 @@ import { axiosInstance } from '@/plugins/axios';
 vi.mock('@/plugins/axios', () => ({
     axiosInstance: {
         get: vi.fn(),
+        post: vi.fn(),
     },
 }));
 
@@ -104,5 +105,52 @@ describe('Dashboard Store', () => {
 
         expect(store.error).toBe('Overview not found');
         expect(store.todayAttendanceLoading).toBe(false);
+    });
+
+    it('fetchTeamPulse populates teamPulse state', async () => {
+        const payload = {
+            summary: { red: 1, yellow: 1, green: 1, total: 3 },
+            staff_members: [],
+        };
+        axiosInstance.get.mockResolvedValueOnce({ data: { data: payload } });
+
+        const result = await store.fetchTeamPulse();
+
+        expect(axiosInstance.get).toHaveBeenCalledWith('/dashboard/team-pulse');
+        expect(result).toEqual(payload);
+        expect(store.teamPulse).toEqual(payload);
+        expect(store.teamPulseLoading).toBe(false);
+    });
+
+    it('sendTeamPulseNudge updates matching member nudge metadata', async () => {
+        store.teamPulse = {
+            staff_members: [
+                {
+                    id: 7,
+                    nudge: {
+                        status: 'idle',
+                        last_sent_at: null,
+                    },
+                },
+            ],
+        };
+
+        axiosInstance.post.mockResolvedValueOnce({
+            data: {
+                data: {
+                    staff_member_id: 7,
+                    sent_at: '2026-05-03T10:00:00Z',
+                },
+            },
+        });
+
+        await store.sendTeamPulseNudge(7, 'Ping');
+
+        expect(axiosInstance.post).toHaveBeenCalledWith('/dashboard/team-pulse/7/nudge', {
+            message: 'Ping',
+        });
+        expect(store.teamPulse.staff_members[0].nudge.status).toBe('sent');
+        expect(store.teamPulse.staff_members[0].nudge.last_sent_at).toBe('2026-05-03T10:00:00Z');
+        expect(store.teamPulseNudgingIds).toEqual([]);
     });
 });

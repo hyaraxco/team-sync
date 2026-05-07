@@ -50,6 +50,22 @@ export const useAnalyticsStore = defineStore("analytics", {
     taskVelocity: null,
     overdueTrends: null,
 
+    // Gap-fill Metrics
+    workforceDemographics: null,
+    correctionFrequency: null,
+    leaveApprovalTurnaround: null,
+    leaveTypeDistribution: null,
+    payrollCostPerEmployee: null,
+    payrollProcessingTime: null,
+    projectResourceUtilization: null,
+
+    // Performance Analytics
+    teamPerformanceSummary: null,
+    companyPerformanceSummary: null,
+    ratingDistribution: null,
+    goalCompletionRate: null,
+    feedbackMetrics: null,
+
     enhancedMetricsLoading: false,
 
     error: null,
@@ -467,6 +483,225 @@ export const useAnalyticsStore = defineStore("analytics", {
           },
         );
         this.overdueTrends = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    // ─── Gap-fill Endpoints ────────────────────────────────────────────
+
+    async fetchWorkforceDemographics() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/workforce/demographics",
+          { params: this.buildParams() },
+        );
+        this.workforceDemographics = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchCorrectionFrequency() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/attendance/correction-frequency",
+          { params: this.buildParams() },
+        );
+        this.correctionFrequency = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchLeaveApprovalTurnaround() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/leave/approval-turnaround",
+          { params: this.buildParams() },
+        );
+        this.leaveApprovalTurnaround = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchLeaveTypeDistribution() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/leave/type-distribution",
+          { params: this.buildParams() },
+        );
+        this.leaveTypeDistribution = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchPayrollCostPerEmployee() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/payroll/cost-per-employee",
+          { params: this.buildParams() },
+        );
+        this.payrollCostPerEmployee = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchPayrollProcessingTime() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/payroll/processing-time",
+          { params: this.buildParams() },
+        );
+        this.payrollProcessingTime = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchProjectResourceUtilization() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/project/resource-utilization",
+          { params: this.buildParams() },
+        );
+        this.projectResourceUtilization = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchPerformanceAnalytics() {
+      this.enhancedMetricsLoading = true;
+      this.error = null;
+
+      try {
+        const [team, company, rating, goals, feedback] = await Promise.all([
+          axiosInstance.get("/analytics/performance/team-summary", {
+            params: this.buildParams(),
+          }),
+          axiosInstance.get("/analytics/performance/company-summary", {
+            params: this.buildParams(),
+          }),
+          axiosInstance.get("/analytics/performance/rating-distribution", {
+            params: this.buildParams(),
+          }),
+          axiosInstance.get("/analytics/performance/goal-completion-rate", {
+            params: this.buildParams(),
+          }),
+          axiosInstance.get("/analytics/performance/feedback-metrics", {
+            params: this.buildParams(),
+          }),
+        ]);
+
+        this.teamPerformanceSummary = team.data.data;
+        this.companyPerformanceSummary = company.data.data;
+        this.ratingDistribution = rating.data.data;
+        this.goalCompletionRate = goals.data.data;
+        this.feedbackMetrics = feedback.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    // ─── Performance Analytics ─────────────────────────────────────────
+
+    async fetchTeamPerformanceSummary() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/performance/team-summary",
+          { params: this.buildParams() },
+        );
+        this.teamPerformanceSummary = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchCompanyPerformanceSummary() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/performance/company-summary",
+          { params: this.buildParams() },
+        );
+        this.companyPerformanceSummary = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchRatingDistribution() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/performance/rating-distribution",
+          { params: this.buildParams() },
+        );
+        this.ratingDistribution = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchGoalCompletionRate() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/performance/goal-completion-rate",
+          { params: this.buildParams() },
+        );
+        this.goalCompletionRate = response.data.data;
+      } catch (error) {
+        this.error = handleError(error);
+      } finally {
+        this.enhancedMetricsLoading = false;
+      }
+    },
+
+    async fetchFeedbackMetrics() {
+      this.enhancedMetricsLoading = true;
+      try {
+        const response = await axiosInstance.get(
+          "/analytics/performance/feedback-metrics",
+          { params: this.buildParams() },
+        );
+        this.feedbackMetrics = response.data.data;
       } catch (error) {
         this.error = handleError(error);
       } finally {

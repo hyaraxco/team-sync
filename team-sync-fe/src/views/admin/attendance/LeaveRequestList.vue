@@ -393,7 +393,7 @@ onMounted(() => {
                     <p class="text-sm text-brand-dark max-w-[200px] truncate" :title="request.reason">{{ request.reason }}</p>
                 </td>
                 <td class="py-4 px-4">
-                    <div v-if="request.type === 'sick'" class="flex flex-col gap-1">
+                    <div v-if="request.type === 'sick_leave'" class="flex flex-col gap-1">
                         <a v-if="request.proof_file_path" :href="getProofUrl(request.proof_file_path)" target="_blank" class="text-xs text-blue-600 hover:underline flex items-center gap-1">
                             <ExternalLink class="w-3 h-3" /> View Proof
                         </a>
@@ -411,7 +411,7 @@ onMounted(() => {
                     <StatusBadge type="leave-status" :value="request.status" />
                 </td>
                 <td class="py-4 px-4">
-                   <div class="flex items-center gap-2" v-if="request.status === 'pending' || (request.type === 'sick' && request.proof_file_path && request.proof_review_status === 'pending')">
+                   <div class="flex items-center gap-2" v-if="request.status === 'pending' || (request.type === 'sick_leave' && request.proof_file_path && (!request.proof_review_status || request.proof_review_status === 'pending'))">
                       <button
                         v-if="request.status === 'pending'"
                         @click="showApproveModal(request)"
@@ -429,7 +429,7 @@ onMounted(() => {
                         <X class="w-4 h-4 text-red-600" />
                       </button>
                       <button
-                        v-if="request.type === 'sick' && request.proof_file_path && request.proof_review_status === 'pending'"
+                        v-if="request.type === 'sick_leave' && request.proof_file_path && (!request.proof_review_status || request.proof_review_status === 'pending')"
                         @click="openReviewProof(request)"
                         title="Review Proof"
                         class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-yellow-500 hover:bg-yellow-50 transition-all duration-300 px-3 py-2"

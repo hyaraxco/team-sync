@@ -46,20 +46,20 @@
                 <td class="p-5">
                   <div class="flex items-center gap-3">
                     <div class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold">
-                      {{ item.employee_name.charAt(0) }}
+                      {{ getEmployeeName(item).charAt(0) }}
                     </div>
-                    <span class="font-medium text-neutral-200">{{ item.employee_name }}</span>
+                    <span class="font-medium text-neutral-200">{{ getEmployeeName(item) }}</span>
                   </div>
                 </td>
-                <td class="p-5 text-neutral-400 text-sm">{{ item.date }}</td>
+                <td class="p-5 text-neutral-400 text-sm">{{ item.mismatch_date || item.date }}</td>
                 <td class="p-5">
                   <span class="px-2 py-1 text-xs rounded bg-white/10 text-neutral-300 border border-white/30">
-                    {{ item.scheduled_location }}
+                    {{ formatWorkMode(item.planned_work_mode || item.scheduled_location) }}
                   </span>
                 </td>
                 <td class="p-5">
                   <span class="px-2 py-1 text-xs rounded bg-rose-500/10 text-rose-400 border border-rose-500/20">
-                    {{ item.actual_location }}
+                    {{ formatWorkMode(item.actual_work_mode || item.actual_location) }}
                   </span>
                 </td>
                 <td class="p-5 text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -93,7 +93,7 @@ const error = ref(false);
 onMounted(async () => {
   try {
     const response = await attendanceStore.fetchPolicyMismatches();
-    mismatches.value = response?.data || [];
+    mismatches.value = response?.data?.data || response?.data || [];
   } catch (err) {
     toast.error(
       'Failed to load policy mismatches',
@@ -104,6 +104,10 @@ onMounted(async () => {
     loading.value = false;
   }
 });
+
+const getEmployeeName = (item) => item?.staff_member?.user?.name || item?.staff_member?.name || item?.employee_name || 'Unknown';
+
+const formatWorkMode = (value) => String(value || '-').replaceAll('_', ' ');
 
 const acknowledge = async (id) => {
   try {

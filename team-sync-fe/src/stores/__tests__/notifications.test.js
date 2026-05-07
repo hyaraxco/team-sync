@@ -53,12 +53,12 @@ describe('Notifications Store', () => {
             { id: 2, title: 'B' },
             { id: 3, title: 'C' },
         ];
-        axiosInstance.get.mockResolvedValueOnce({ data: { data: payload } });
+        axiosInstance.get.mockResolvedValueOnce({ data: { data: { items: payload } } });
 
         const result = await store.fetchLatestNotifications(2);
 
         expect(axiosInstance.get).toHaveBeenCalledWith('/my-notifications', {
-            params: { limit: 2 },
+            params: { per_page: 2, page: 1 },
         });
         expect(result).toEqual(payload.slice(0, 2));
         expect(store.notifications).toEqual(payload.slice(0, 2));
@@ -69,12 +69,12 @@ describe('Notifications Store', () => {
 
     it('fetchLatestNotifications falls back to safe default limit', async () => {
         const payload = new Array(7).fill(null).map((_, index) => ({ id: index + 1 }));
-        axiosInstance.get.mockResolvedValueOnce({ data: { data: payload } });
+        axiosInstance.get.mockResolvedValueOnce({ data: { data: { items: payload } } });
 
         await store.fetchLatestNotifications(0);
 
         expect(axiosInstance.get).toHaveBeenCalledWith('/my-notifications', {
-            params: { limit: 5 },
+            params: { per_page: 5, page: 1 },
         });
         expect(store.notifications).toHaveLength(5);
     });

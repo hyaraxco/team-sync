@@ -30,9 +30,13 @@ const props = defineProps({
     type: [String, Object, Array],
     default: null,
   },
+  markingAllRead: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-const emit = defineEmits(["retry", "select"]);
+const emit = defineEmits(["retry", "select", "mark-all-read"]);
 
 const visibleNotifications = computed(() => props.notifications.slice(0, 5));
 
@@ -208,15 +212,25 @@ const getIconTextClass = (notification) => {
     :class="{ hidden: !open, 'notification-panel--open': open }"
   >
     <div class="notification-panel__header border-b border-[#E4EBF9] px-4 py-3">
-      <div class="relative z-10 flex items-start gap-3">
+      <div class="relative z-10 flex items-center justify-between">
         <div>
           <p
             class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0C51D9]"
           >
             Notifications
           </p>
-          <p class="text-xs text-[#5D6882]">Latest 5 updates</p>
+          <p class="text-xs text-[#5D6882]">Latest updates</p>
         </div>
+        <button
+          v-if="visibleNotifications.length > 0"
+          type="button"
+          data-testid="mark-all-read-btn"
+          class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-2.5 py-1 text-[10px] font-semibold text-[#0C51D9] transition-colors hover:bg-[#E1ECFF] disabled:opacity-50"
+          :disabled="markingAllRead"
+          @click="emit('mark-all-read')"
+        >
+          {{ markingAllRead ? 'Marking...' : 'Mark all read' }}
+        </button>
       </div>
     </div>
 

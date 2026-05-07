@@ -44,6 +44,24 @@ export default [
         },
     },
     {
+        path: 'payroll/approval-matrix',
+        name: 'admin.payroll.approval-matrix',
+        component: () => import('@/views/admin/payroll/PayrollApprovalMatrix.vue'),
+        meta: {
+            requiredPermission: 'payroll-statistics',
+            requiresAuth: true,
+        },
+    },
+    {
+        path: 'payroll/adjustments',
+        name: 'admin.payroll.adjustments',
+        component: () => import('@/views/admin/payroll/PayrollAdjustmentQueue.vue'),
+        meta: {
+            requiredPermission: 'payroll-menu',
+            requiresAuth: true,
+        },
+    },
+    {
         path: 'payroll/comparison',
         name: 'admin.payroll.comparison',
         component: () => import('@/views/admin/payroll/PayrollComparison.vue'),

@@ -11,6 +11,8 @@ export const useNotificationStore = defineStore("notifications", {
     unreadCount: 0,
     unreadCountLoading: false,
     markingReadIds: [],
+    meta: null,
+    markingAllRead: false,
   }),
 
   getters: {
@@ -44,12 +46,15 @@ export const useNotificationStore = defineStore("notifications", {
 
       try {
         const response = await axiosInstance.get("/my-notifications", {
-          params: { limit: safeLimit },
+          params: { per_page: safeLimit, page: 1 },
         });
 
-        const payload = Array.isArray(response.data?.data) ? response.data.data : [];
+        const data = response.data?.data;
+        // Support both paginated and legacy response shapes
+        const items = Array.isArray(data?.items) ? data.items : (Array.isArray(data) ? data : []);
 
-        this.notifications = payload.slice(0, safeLimit);
+        this.notifications = items.slice(0, safeLimit);
+        this.meta = data?.meta ?? null;
         this.lastFetchedAt = new Date().toISOString();
 
         return this.notifications;
@@ -60,6 +65,57 @@ export const useNotificationStore = defineStore("notifications", {
         return [];
       } finally {
         this.loading = false;
+      }
+    },
+
+    async fetchNotificationsPaginated({ page = 1, perPage = 10 } = {}) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        const response = await axiosInstance.get("/my-notifications", {
+          params: { per_page: perPage, page },
+        });
+
+        const data = response.data?.data;
+        const items = Array.isArray(data?.items) ? data.items : [];
+
+        this.notifications = items;
+        this.meta = data?.meta ?? null;
+        this.lastFetchedAt = new Date().toISOString();
+
+        return { items, meta: this.meta };
+      } catch (error) {
+        this.error = handleError(error);
+        this.notifications = [];
+
+        return { items: [], meta: null };
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async markAllAsRead() {
+      this.markingAllRead = true;
+      this.error = null;
+
+      try {
+        const response = await axiosInstance.post("/my-notifications/mark-all-read");
+
+        // Update local state
+        this.notifications = this.notifications.map((n) => ({
+          ...n,
+          is_read: true,
+          read_at: n.read_at || new Date().toISOString(),
+        }));
+        this.unreadCount = 0;
+
+        return response.data?.data;
+      } catch (error) {
+        this.error = handleError(error);
+        return null;
+      } finally {
+        this.markingAllRead = false;
       }
     },
 

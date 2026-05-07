@@ -6,6 +6,7 @@ import EmployeeStatistics from "@/components/admin/dashboard/EmployeeStatistics.
 import SearchSection from "@/components/admin/dashboard/SearchSection.vue";
 import LatestEmployees from "@/components/admin/dashboard/LatestEmployees.vue";
 import LatestTeams from "@/components/admin/dashboard/LatestTeams.vue";
+import TeamPulseOverview from "@/components/admin/dashboard/TeamPulseOverview.vue";
 import TodayAttendanceOverview from "@/components/admin/dashboard/TodayAttendanceOverview.vue";
 import UpcomingMeetings from "@/components/common/UpcomingMeetings.vue";
 
@@ -27,6 +28,12 @@ const isFinance = computed(() => {
 const hasDashboardPermission = computed(() => {
   return authStore.user?.permissions?.some(
     (permission: any) => permission.name === "dashboard-view"
+  );
+});
+
+const showTeamPulse = computed(() => {
+  return authStore.user?.permissions?.some(
+    (permission: any) => permission.name === "review-manager-submit"
   );
 });
 
@@ -55,6 +62,7 @@ const handleSearch = (params) => {
 
     <template v-else>
       <div class="space-y-6">
+        <TeamPulseOverview v-if="showTeamPulse" />
         <Statistics />
         <SearchSection @search="handleSearch" />
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">

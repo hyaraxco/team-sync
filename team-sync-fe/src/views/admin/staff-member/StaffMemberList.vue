@@ -13,7 +13,7 @@ import Alert from "@/components/common/Alert.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 
 const staffMemberStore = useStaffMemberStore();
-const { employees, meta, loading, success } = storeToRefs(staffMemberStore);
+const { staffMembers: employees, meta, loading, success } = storeToRefs(staffMemberStore);
 
 const optionStore = useOptionStore();
 const { employmentTypes, jobStatuses } = storeToRefs(optionStore);

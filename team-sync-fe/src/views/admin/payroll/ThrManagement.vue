@@ -258,7 +258,7 @@ function handlePageChange(page) {
                                         <Check :size="16" />
                                     </button>
                                     <button
-                                        v-if="thr.status === 'approved' && can('thr-approve')"
+                                        v-if="thr.status === 'approved' && can('thr-process')"
                                         @click="openPaymentModal(thr)"
                                         class="text-emerald-600 hover:text-emerald-800 text-xs font-medium"
                                     >

@@ -8,7 +8,9 @@ import {
   ArrowRightIcon,
   UserIcon,
   CalendarIcon,
+  Clock3Icon,
   WalletIcon,
+  FileWarningIcon,
   BarChart3Icon,
   XIcon,
   SettingsIcon,
@@ -23,6 +25,7 @@ import {
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
 import { RouterLink } from "vue-router";
+import { ref } from "vue";
 
 const props = defineProps(["isOpen"]);
 const emit = defineEmits(["navigate"]);
@@ -236,7 +239,7 @@ const onNavigate = () => emit("navigate");
             :to="{ name: 'admin.payroll.dashboard' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
             :class="{
-              'nav-link-active': $route.name?.startsWith('admin.payroll'),
+              'nav-link-active': $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
             }"
             v-if="can('payroll-menu')"
             @click="onNavigate"
@@ -244,15 +247,39 @@ const onNavigate = () => emit("navigate");
             <WalletIcon
               class="w-5 h-5 text-gray-600"
               :class="{
-                'text-white': $route.name?.startsWith('admin.payroll'),
+                'text-white': $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
               }"
             />
             <span
               class="text-brand-dark text-base font-medium"
               :class="{
-                'text-brand-white': $route.name?.startsWith('admin.payroll'),
+                'text-brand-white': $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
               }"
               >Payroll</span
+            >
+          </RouterLink>
+
+          <RouterLink
+            :to="{ name: 'admin.payroll.adjustments' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'admin.payroll.adjustments',
+            }"
+            v-if="can('payroll-menu')"
+            @click="onNavigate"
+          >
+            <FileWarningIcon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name === 'admin.payroll.adjustments',
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name === 'admin.payroll.adjustments',
+              }"
+              >Payroll Adjustments</span
             >
           </RouterLink>
 
@@ -517,7 +544,32 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <!-- 2. My Team (frequent collaboration) -->
+          <!-- 2. My Overtime (payroll/attendance self service) -->
+          <RouterLink
+            :to="{ name: 'staffMember.attendance.my-overtime' }"
+            class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+            :class="{
+              'nav-link-active': $route.name === 'staffMember.attendance.my-overtime',
+            }"
+            v-if="canOneOf(['attendance-my-attendances', 'overtime-list', 'overtime-create'])"
+            @click="onNavigate"
+          >
+            <Clock3Icon
+              class="w-5 h-5 text-gray-600"
+              :class="{
+                'text-white': $route.name === 'staffMember.attendance.my-overtime',
+              }"
+            />
+            <span
+              class="text-brand-dark text-base font-medium"
+              :class="{
+                'text-brand-white': $route.name === 'staffMember.attendance.my-overtime',
+              }"
+              >My Overtime</span
+            >
+          </RouterLink>
+
+          <!-- 3. My Team (frequent collaboration) -->
           <RouterLink
             :to="{ name: 'staffMember.team' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -542,7 +594,7 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <!-- 3. My Payroll (monthly) -->
+          <!-- 4. My Payroll (monthly) -->
             <RouterLink
             :to="{ name: 'staffMember.payroll' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -568,7 +620,7 @@ const onNavigate = () => emit("navigate");
             >
           </RouterLink>
 
-          <!-- 4. My Profile (rarely used) -->
+          <!-- 5. My Profile (rarely used) -->
           <RouterLink
             :to="{ name: 'staffMember.profile' }"
             class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
@@ -661,14 +713,16 @@ const onNavigate = () => emit("navigate");
           </p>
 
           <!-- CTA Button -->
-          <button
-            class="btn-primary w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
-          >
-            <span class="text-brand-white text-sm font-semibold"
-              >Upgrade Now</span
+          <RouterLink :to="{ name: 'admin.upgrade-plan' }" @click="onNavigate">
+            <button
+              class="flex items-center justify-center w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
             >
-            <ArrowRightIcon class="w-4 h-4 text-white" />
-          </button>
+              <span class="text-brand-white text-sm font-semibold mr-2"
+                >Upgrade Now</span
+              >
+              <ArrowRightIcon class="w-4 h-4 text-white" />
+            </button>
+          </RouterLink>
         </div>
       </div>
     </div>

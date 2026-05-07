@@ -47,8 +47,26 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
                 const response = await axiosInstance.get('my-leave-requests');
 
                 this.myLeaveRequests = response.data.data;
+                return response.data.data;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async fetchMyLeaveBalances() {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get('my-leave-balances');
+                this.myLeaveBalances = response.data.data;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -76,9 +94,10 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
 
             try {
                 const response = await axiosInstance.get('leave-requests/all/paginated', { params });
-                this.leaveRequests = response.data.data.items;
-                this.meta = response.data.data.meta;
-                return response.data.data;
+                const paginator = response.data.data;
+                this.leaveRequests = paginator.data;
+                this.meta = paginator.meta;
+                return paginator;
             } catch (error) {
                 this.error = handleError(error);
                 throw error;

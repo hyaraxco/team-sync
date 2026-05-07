@@ -105,6 +105,14 @@ export default [
         },
     },
     {
+        path: 'attendance/my-overtime',
+        name: 'staffMember.attendance.my-overtime',
+        component: () => import('@/views/staff-member/MyOvertime.vue'),
+        meta: {
+            requiredAnyPermissions: ['attendance-my-attendances', 'overtime-list', 'overtime-create'],
+        },
+    },
+    {
         path: 'attendance/clock',
         name: 'staffMember.attendance.clock',
         meta: {
