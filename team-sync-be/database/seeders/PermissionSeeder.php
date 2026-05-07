@@ -11,6 +11,7 @@ class PermissionSeeder extends Seeder
         'dashboard' => [
             'menu',
             'view',
+            'hr-view',
         ],
 
         'profile' => [
@@ -91,6 +92,10 @@ class PermissionSeeder extends Seeder
             'menu',
             'view',
             'export',
+            'hr-view',
+            'finance-view',
+            'performance-view',
+            'project-view',
         ],
 
         'payslip' => [

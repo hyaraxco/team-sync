@@ -97,14 +97,9 @@ test.describe.serial("Role-based navigation and access control", () => {
 
     await loginAsRole(page, "manager");
 
-    // Dashboard
-    await expect(page.getByRole("heading", { name: /Dashboard|Welcome/ })).toBeVisible();
+    // Dashboard (Manager sees EmployeeStatistics with Welcome heading + page header)
+    await expect(page.getByRole("heading", { name: /Dashboard|Welcome/ }).first()).toBeVisible();
     await captureEvidence(page, "manager-dashboard.png");
-
-    // Employees (view-only)
-    await page.goto("/admin/staff-members");
-    await expect(page).toHaveURL(/\/admin\/staff-members$/);
-    await captureEvidence(page, "manager-employees.png");
 
     // Teams
     await page.goto("/admin/teams");
@@ -146,7 +141,11 @@ test.describe.serial("Role-based navigation and access control", () => {
     await page.goto("/admin/payroll");
     await expect(page).toHaveURL(/\/admin\/dashboard$/);
 
-    // DENIED: Staff member create (view-only)
+    // DENIED: Staff member list (Manager has no staff-member-menu)
+    await page.goto("/admin/staff-members");
+    await expect(page).toHaveURL(/\/admin\/dashboard$/);
+
+    // DENIED: Staff member create
     await page.goto("/admin/staff-members/create");
     await expect(page).toHaveURL(/\/admin\/dashboard$/);
 
@@ -196,15 +195,12 @@ test.describe.serial("Role-based navigation and access control", () => {
     await expect(page).toHaveURL(/\/admin\/leave-requests$/);
     await captureEvidence(page, "hr-leave-requests.png");
 
-    // Payroll (view + generate, not edit/process)
+    // Payroll: HR has read-only readiness context only (no payroll-menu)
+    // HR is DENIED full payroll dashboard and create
     await page.goto("/admin/payroll");
-    await expect(page).toHaveURL(/\/admin\/payroll$/);
-    await captureEvidence(page, "hr-payroll.png");
-
-    // Payroll create
+    await expect(page).toHaveURL(/\/admin\/dashboard$/);
     await page.goto("/admin/payroll/create");
-    await expect(page).toHaveURL(/\/admin\/payroll\/create$/);
-    await captureEvidence(page, "hr-payroll-create.png");
+    await expect(page).toHaveURL(/\/admin\/dashboard$/);
 
     // Analytics
     await page.goto("/admin/analytics");

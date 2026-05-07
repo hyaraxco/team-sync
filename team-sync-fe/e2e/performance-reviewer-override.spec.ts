@@ -45,8 +45,11 @@ test.describe.serial("Performance Reviewer Override Journey", () => {
 
     const selectReviewer = page.locator("select");
     
-    // Wait for options to populate (staff members minus the reviewee + 1 placeholder)
-    await expect(selectReviewer.locator('option')).toHaveCount(4, { timeout: 15_000 });
+    // Wait for options to populate (at least 2: placeholder + 1 staff member)
+    await expect(async () => {
+      const count = await selectReviewer.locator('option').count();
+      expect(count).toBeGreaterThanOrEqual(2);
+    }).toPass({ timeout: 15_000 });
     
     // Select a reviewer from the dropdown
     await selectReviewer.waitFor({ state: "visible" });

@@ -51,16 +51,25 @@ const teamStore = useTeamStore()
 const optionStore = useOptionStore()
 const { executiveSummary, executiveSummaryLoading, period, department, teamId } = storeToRefs(analyticsStore)
 
-const activeTab = ref('executive')
+// Default to first available tab for the user's role
+const getDefaultTab = () => {
+  if (can('analytics-view')) return 'executive'
+  if (can('analytics-hr-view')) return 'workforce'
+  if (can('analytics-finance-view')) return 'payroll'
+  if (can('analytics-performance-view')) return 'performance'
+  if (can('analytics-project-view')) return 'projects'
+  return 'executive'
+}
+const activeTab = ref(getDefaultTab())
 
 const allTabs = [
-  { id: 'executive', label: 'Executive Summary', icon: BarChart3Icon, permission: null },
-  { id: 'workforce', label: 'Workforce', icon: UsersIcon, permission: 'staff-member-menu' },
-  { id: 'attendance', label: 'Attendance', icon: CalendarCheckIcon, permission: 'attendance-menu' },
-  { id: 'leave', label: 'Leave', icon: PalmtreeIcon, permission: 'leave-request-list' },
-  { id: 'payroll', label: 'Payroll', icon: WalletIcon, permission: 'payroll-statistics' },
-  { id: 'projects', label: 'Projects', icon: FolderKanbanIcon, permission: 'project-menu' },
-  { id: 'performance', label: 'Performance', icon: TrendingUpIcon, permission: 'performance-analytics-view' },
+  { id: 'executive', label: 'Executive Summary', icon: BarChart3Icon, permission: 'analytics-view' },
+  { id: 'workforce', label: 'Workforce', icon: UsersIcon, permission: 'analytics-hr-view' },
+  { id: 'attendance', label: 'Attendance', icon: CalendarCheckIcon, permission: 'analytics-hr-view' },
+  { id: 'leave', label: 'Leave', icon: PalmtreeIcon, permission: 'analytics-hr-view' },
+  { id: 'payroll', label: 'Payroll', icon: WalletIcon, permission: 'analytics-finance-view' },
+  { id: 'projects', label: 'Projects', icon: FolderKanbanIcon, permission: 'analytics-project-view' },
+  { id: 'performance', label: 'Performance', icon: TrendingUpIcon, permission: 'analytics-performance-view' },
 ]
 
 const tabs = computed(() =>
@@ -197,7 +206,7 @@ function fetchActiveTab() {
 watch(activeTab, () => fetchActiveTab())
 
 onMounted(() => {
-  analyticsStore.fetchExecutiveSummary()
+  fetchActiveTab()
 })
 </script>
 

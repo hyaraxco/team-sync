@@ -24,7 +24,11 @@ class DashboardController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['dashboard-view']), only: ['getStatistics', 'getEmployeeStatistics', 'getTodayAttendanceOverview']),
+            // Company-wide statistics: HR/Superadmin only
+            new Middleware(PermissionMiddleware::using(['dashboard-hr-view']), only: ['getStatistics', 'getTodayAttendanceOverview']),
+            // Self-service employee dashboard: any authenticated user with dashboard-view
+            new Middleware(PermissionMiddleware::using(['dashboard-view']), only: ['getEmployeeStatistics']),
+            // Team pulse: manager-scoped
             new Middleware(PermissionMiddleware::using(['review-manager-submit']), only: ['getTeamPulse', 'sendTeamPulseNudge']),
         ];
     }
