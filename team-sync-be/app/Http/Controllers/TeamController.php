@@ -30,7 +30,8 @@ class TeamController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['team-list|team-create|team-edit|team-delete']), only: ['index', 'getAllPaginated', 'show', 'getStatistics', 'getTeamStatistics', 'getTeamChartData']),
+            new Middleware(PermissionMiddleware::using(['team-list|team-create|team-edit|team-delete']), only: ['index', 'getAllPaginated', 'show']),
+            new Middleware(PermissionMiddleware::using(['team-statistic']), only: ['getStatistics', 'getTeamStatistics', 'getTeamChartData']),
             new Middleware(PermissionMiddleware::using(['team-create']), only: ['store']),
             new Middleware(PermissionMiddleware::using(['team-edit']), only: ['update', 'addMember', 'removeMember']),
             new Middleware(PermissionMiddleware::using(['team-delete']), only: ['destroy']),
