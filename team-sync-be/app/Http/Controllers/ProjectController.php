@@ -34,7 +34,8 @@ class ProjectController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(PermissionMiddleware::using(['project-list|project-create|project-edit|project-delete']), only: ['index', 'getAllPaginated', 'show']),
-            new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getStatistics', 'getSquadSummary']),
+            new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getStatistics']),
+            new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getSquadSummary']),
             new Middleware(PermissionMiddleware::using(['project-create']), only: ['store']),
             new Middleware(PermissionMiddleware::using(['project-edit']), only: ['update']),
             new Middleware(PermissionMiddleware::using(['project-delete']), only: ['destroy']),
@@ -211,11 +212,20 @@ class ProjectController extends Controller implements HasMiddleware
     public function getSquadSummary(string $id): JsonResponse
     {
         try {
+            $project = Project::findOrFail($id);
+
+            $response = Gate::inspect('viewSquadSummary', $project);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $summary = $this->projectRepository->getSquadSummary($id);
 
             return ResponseHelper::jsonResponse(true, 'Project Squad Summary Retrieved Successfully', $summary, 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

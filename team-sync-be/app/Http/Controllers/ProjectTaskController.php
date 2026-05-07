@@ -39,12 +39,10 @@ class ProjectTaskController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['task-list|task-create|task-edit|task-delete']), only: ['index', 'getAllPaginated', 'getByProject', 'getByProjectPaginated', 'show']),
+            new Middleware(PermissionMiddleware::using(['task-list']), only: ['index', 'getAllPaginated', 'getByProject', 'getByProjectPaginated', 'show', 'getComments', 'getAttachments', 'getStatusLogs']),
             new Middleware(PermissionMiddleware::using(['task-create']), only: ['store']),
-            new Middleware(PermissionMiddleware::using(['task-edit']), only: ['update']),
+            new Middleware(PermissionMiddleware::using(['task-edit']), only: ['update', 'storeComment', 'updateComment', 'deleteComment', 'storeAttachment', 'deleteAttachment']),
             new Middleware(PermissionMiddleware::using(['task-delete']), only: ['destroy']),
-            new Middleware(PermissionMiddleware::using(['task-list|task-edit']), only: ['getComments', 'getAttachments', 'getStatusLogs']),
-            new Middleware(PermissionMiddleware::using(['task-edit']), only: ['storeComment', 'updateComment', 'deleteComment', 'storeAttachment', 'deleteAttachment']),
         ];
     }
 
