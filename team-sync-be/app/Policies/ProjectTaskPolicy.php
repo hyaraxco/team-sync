@@ -51,12 +51,6 @@ class ProjectTaskPolicy
             return Response::deny('Your account is not linked to an employee profile.');
         }
 
-        // Manager/HR can create freely
-        if ($this->isReviewerRole($user)) {
-            return Response::allow();
-        }
-
-        // Project leader check
         $projectId = $data['project_id'] ?? null;
         if (! $projectId) {
             return Response::deny('Project ID is required.');
@@ -65,6 +59,19 @@ class ProjectTaskPolicy
         $project = Project::with('teams')->find($projectId);
         if (! $project) {
             return Response::deny('Project not found.');
+        }
+
+        // Assignee must be a project member (applies to ALL roles)
+        $assigneeId = $data['assignee_id'] ?? null;
+        if ($assigneeId !== null) {
+            if (! $this->isProjectMemberById((int) $assigneeId, $project)) {
+                return Response::deny('Assignee must be a member of the project.');
+            }
+        }
+
+        // Manager/HR can create freely (assignee already validated above)
+        if ($this->isReviewerRole($user)) {
+            return Response::allow();
         }
 
         // PL can create freely in their project
@@ -78,7 +85,6 @@ class ProjectTaskPolicy
         }
 
         // Staff cannot assign to others
-        $assigneeId = $data['assignee_id'] ?? null;
         if ($assigneeId !== null && (int) $assigneeId !== $profile->id) {
             return Response::deny('You can only assign tasks to yourself.');
         }
@@ -126,6 +132,14 @@ class ProjectTaskPolicy
         // If no data provided, just check basic access
         if (empty($data)) {
             return Response::allow();
+        }
+
+        // ─── Assignee must be project member (applies to ALL roles) ──
+        if ($this->hasFieldChanged('assignee_id', $data, $task)) {
+            $newAssigneeId = (int) $data['assignee_id'];
+            if (! $this->isProjectMemberById($newAssigneeId, $task->project)) {
+                return Response::deny('Assignee must be a member of the project.');
+            }
         }
 
         // ─── Status transition check ────────────────────────────────
@@ -369,6 +383,35 @@ class ProjectTaskPolicy
         }
 
         return (string) $value;
+    }
+
+    /**
+     * Check if a staff member (by profile ID) is a member of the project.
+     * Used for assignee validation — works without a User object.
+     */
+    private function isProjectMemberById(int $profileId, ?Project $project): bool
+    {
+        if (! $project) {
+            return false;
+        }
+
+        // Project leader is always a member
+        if ($project->project_leader_id === $profileId) {
+            return true;
+        }
+
+        // Check team membership
+        $project->loadMissing('teams');
+        $projectTeamIds = $project->teams->pluck('id')->toArray();
+
+        if (empty($projectTeamIds)) {
+            return false;
+        }
+
+        return TeamMember::where('staff_member_id', $profileId)
+            ->whereNull('left_at')
+            ->whereIn('team_id', $projectTeamIds)
+            ->exists();
     }
 
     private function isProjectMember(User $user, ?Project $project): bool

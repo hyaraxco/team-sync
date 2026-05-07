@@ -70,7 +70,7 @@ class TaskAssignmentNotificationsTest extends TestCase
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Assignment Manager');
         [$employeeA, $staffMemberProfileA] = $this->createUserWithRoleAndProfile('staff', 'Employee Alpha');
         [$employeeB, $staffMemberProfileB] = $this->createUserWithRoleAndProfile('staff', 'Employee Beta');
-        $project = $this->createProject($staffMemberProfileA->id);
+        $project = $this->createProject($staffMemberProfileA->id, [$staffMemberProfileA->id, $staffMemberProfileB->id]);
 
         Sanctum::actingAs($manager);
 
@@ -117,7 +117,7 @@ class TaskAssignmentNotificationsTest extends TestCase
         [$actor] = $this->createUserWithRoleAndProfile('manager', 'Actor Manager');
         [$managerAssignee, $managerProfile] = $this->createUserWithRoleAndProfile('manager', 'Assignee Manager');
         [, $staffMemberProfile] = $this->createUserWithRoleAndProfile('staff', 'Leader Employee');
-        $project = $this->createProject($staffMemberProfile->id);
+        $project = $this->createProject($staffMemberProfile->id, [$managerProfile->id]);
 
         Sanctum::actingAs($actor);
 
@@ -143,7 +143,7 @@ class TaskAssignmentNotificationsTest extends TestCase
         [$manager] = $this->createUserWithRoleAndProfile('manager', 'Workflow Manager');
         [, $staffMemberProfileA] = $this->createUserWithRoleAndProfile('staff', 'Owner Employee');
         [, $staffMemberProfileB] = $this->createUserWithRoleAndProfile('staff', 'Replacement Employee');
-        $project = $this->createProject($staffMemberProfileA->id);
+        $project = $this->createProject($staffMemberProfileA->id, [$staffMemberProfileA->id, $staffMemberProfileB->id]);
 
         Sanctum::actingAs($manager);
 
@@ -217,9 +217,14 @@ class TaskAssignmentNotificationsTest extends TestCase
         return [$user, $profile];
     }
 
-    private function createProject(int $projectLeaderId): Project
+    /**
+     * Create a project with a team, and add all given profiles as team members.
+     */
+    private function createProject(int $projectLeaderId, array $memberProfileIds = []): Project
     {
-        return Project::query()->create([
+        $team = \App\Models\Team::factory()->create();
+
+        $project = Project::query()->create([
             'name' => 'Notification Project '.uniqid(),
             'type' => 'web_development',
             'priority' => 'medium',
@@ -229,5 +234,17 @@ class TaskAssignmentNotificationsTest extends TestCase
             'description' => 'Project for notification role flow test.',
             'project_leader_id' => $projectLeaderId,
         ]);
+
+        $project->teams()->attach($team->id, ['assigned_at' => now()]);
+
+        foreach ($memberProfileIds as $profileId) {
+            \App\Models\TeamMember::create([
+                'team_id' => $team->id,
+                'staff_member_id' => $profileId,
+                'joined_at' => now(),
+            ]);
+        }
+
+        return $project;
     }
 }
