@@ -87,16 +87,16 @@ describe('Attendance Period Store', () => {
 
     it('fetchReadiness populates readinessSummary and returns payload', async () => {
         const readiness = {
-            period_id: 15,
+            salary_month: '2026-05',
             ready: true,
             blockers: [],
         };
         axiosInstance.get.mockResolvedValueOnce({ data: { data: readiness } });
 
-        const result = await store.fetchReadiness(15);
+        const result = await store.fetchReadiness({ start_date: '2026-05-01' });
 
         expect(axiosInstance.get).toHaveBeenCalledWith('payrolls/generate-readiness', {
-            params: { period_id: 15 },
+            params: { salary_month: '2026-05' },
         });
         expect(result).toEqual(readiness);
         expect(store.readinessSummary).toEqual(readiness);

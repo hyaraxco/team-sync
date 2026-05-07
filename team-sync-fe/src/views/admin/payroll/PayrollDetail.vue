@@ -64,6 +64,7 @@ const employees = ref([]);
 const activityLogs = ref([]);
 const reconciliation = ref(null);
 const notificationDeliveries = ref(null);
+const approvalStatus = ref(null);
 const pagination = ref({
   current_page: 1,
   per_page: 50,
@@ -78,6 +79,8 @@ const loadingDetails = ref(false);
 const loadingActivityLogs = ref(false);
 const loadingReconciliation = ref(false);
 const loadingNotificationDeliveries = ref(false);
+const loadingApprovals = ref(false);
+const submittingApprovalDecision = ref(false);
 const exportingPdf = ref(false);
 const searchQuery = ref("");
 const departmentFilter = ref("");
@@ -85,6 +88,8 @@ const paymentDate = ref(new Date().toISOString().split("T")[0]);
 const reopenReason = ref("");
 const selectedAdjustmentEmployee = ref(null);
 const showAdjustmentDetailsModal = ref(false);
+const approvalDecisionNotes = ref('');
+const approvalDecisionStatus = ref('approved');
 
 const activeTab = ref("employees");
 
@@ -179,6 +184,8 @@ const notificationDeliverySummary = computed(
 const latestNotificationDeliveries = computed(
   () => notificationDeliveries.value?.latest_by_employee ?? []
 );
+const approvalSteps = computed(() => approvalStatus.value?.approvals ?? []);
+const hasApprovalSteps = computed(() => approvalSteps.value.length > 0);
 const notificationDeliveryRate = computed(() => {
   const summary = notificationDeliverySummary.value;
   if (!summary) {
@@ -228,6 +235,7 @@ const {
       await fetchPayrollStatistics();
     }
     await fetchPayrollNotificationDeliveries();
+    await fetchPayrollApprovals();
     await fetchPayrollReconciliation();
     await fetchPayrollDetails(pagination.value.current_page);
     await fetchPayrollActivityLogs();
@@ -247,10 +255,11 @@ const {
     if (hasPayrollStatistics.value) {
       await fetchPayrollStatistics();
     }
+    await fetchPayrollApprovals();
     await fetchPayrollReconciliation();
     await fetchPayrollDetails(pagination.value.current_page);
     await fetchPayrollActivityLogs();
-    toast.success("Payroll Approved", "Payroll approved and ready for payment.");
+    toast.success("Payroll Approved", "Payroll approval flow updated.");
   },
 });
 
@@ -287,6 +296,7 @@ const {
       await fetchPayrollStatistics();
     }
     await fetchPayrollNotificationDeliveries();
+    await fetchPayrollApprovals();
     await fetchPayrollReconciliation();
     await fetchPayrollDetails(pagination.value.current_page);
     await fetchPayrollActivityLogs();
@@ -450,6 +460,17 @@ const fetchPayrollReconciliation = async () => {
   }
 };
 
+const fetchPayrollApprovals = async () => {
+  try {
+    loadingApprovals.value = true;
+    approvalStatus.value = await payrollStore.fetchPayrollApprovals(route.params.id);
+  } catch (error) {
+    approvalStatus.value = null;
+  } finally {
+    loadingApprovals.value = false;
+  }
+};
+
 const fetchPayrollNotificationDeliveries = async () => {
   if (!hasPayrollProcess.value || payroll.value?.status !== "paid") {
     notificationDeliveries.value = null;
@@ -491,8 +512,9 @@ onMounted(async () => {
     await fetchPayrollStatistics();
   }
   await fetchPayrollNotificationDeliveries();
+  await fetchPayrollApprovals();
   await fetchPayrollReconciliation();
-    await fetchPayrollDetails(1);
+  await fetchPayrollDetails(1);
   await fetchPayrollActivityLogs();
 });
 
@@ -725,13 +747,13 @@ const exportPdf = async () => {
   try {
     exportingPdf.value = true;
     await payrollStore.exportPdf(route.params.id);
-    toast.success("Download ready", "Payroll PDF exported successfully.");
+    toast.success("Download ready", "Payroll payslip ZIP exported successfully.");
   } catch (error) {
     toast.error(
       "Download failed",
       payrollStore.error ||
         error?.response?.data?.message ||
-        "Failed to export PDF file.",
+        "Failed to export payslip ZIP file.",
     );
   } finally {
     exportingPdf.value = false;
@@ -776,8 +798,35 @@ const handleReopenPayroll = () => {
   );
 };
 
+const submitApprovalDecision = async (status) => {
+  submittingApprovalDecision.value = true;
+  approvalDecisionStatus.value = status;
+
+  try {
+    await payrollStore.submitPayrollApproval(route.params.id, {
+      status,
+      notes: approvalDecisionNotes.value.trim() || null,
+    });
+    toast.success('Approval decision submitted', 'The payroll approval chain has been updated.');
+    approvalDecisionNotes.value = '';
+    await fetchPayrollSummary();
+    await fetchPayrollApprovals();
+    await fetchPayrollActivityLogs();
+  } catch (error) {
+    toast.error(
+      'Failed to submit approval decision',
+      payrollStore.error || error?.response?.data?.message || 'Please verify your role and try again.',
+    );
+  } finally {
+    submittingApprovalDecision.value = false;
+  }
+};
+
 const handleApprovePayroll = () => {
-  doApprovePayroll(() => payrollStore.approvePayroll(route.params.id));
+  doApprovePayroll(async () => {
+    await payrollStore.approvePayroll(route.params.id);
+    await fetchPayrollApprovals();
+  });
 };
 </script>
 
@@ -918,7 +967,7 @@ const handleApprovePayroll = () => {
     </div>
 
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mt-2 mb-6" data-testid="payroll-tabs">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
+      <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
         <button
           @click="activeTab = 'employees'"
           class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
@@ -970,6 +1019,19 @@ const handleApprovePayroll = () => {
         >
           <Activity class="w-4 h-4" :class="activeTab === 'activity' ? 'text-white' : 'text-gray-600'" />
           <span class="text-sm font-semibold">Activity Logs</span>
+        </button>
+        <button
+          @click="activeTab = 'approvals'"
+          class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+          :class="
+            activeTab === 'approvals'
+              ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+              : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+          "
+          data-testid="tab-approvals"
+        >
+          <ShieldCheck class="w-4 h-4" :class="activeTab === 'approvals' ? 'text-white' : 'text-gray-600'" />
+          <span class="text-sm font-semibold">Approvals</span>
         </button>
       </div>
     </div>
@@ -1146,6 +1208,86 @@ const handleApprovePayroll = () => {
       <div v-if="employees.length > 0" class="mt-6">
         <Pagination :meta="pagination" :loading="loadingDetails" @page-change="handlePageChange"
           @per-page-change="handlePerPageChange" />
+      </div>
+    </div>
+
+    <div v-show="activeTab === 'approvals'" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 animate-fade-in dark:bg-gray-800 dark:border-gray-700">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+          <ShieldCheck class="w-6 h-6 text-blue-600" />
+        </div>
+        <div>
+          <h3 class="text-brand-dark text-xl font-bold">Approval Chain</h3>
+          <p class="text-brand-light text-sm font-normal">
+            Review threshold-based payroll approval steps and submit a role-based decision.
+          </p>
+        </div>
+      </div>
+
+      <div v-if="loadingApprovals" class="py-8 text-sm text-brand-light">Loading approval chain...</div>
+      <div v-else-if="!hasApprovalSteps" class="rounded-[12px] border border-dashed border-[#DCDEDD] px-4 py-6 text-sm text-brand-light">
+        No multi-step approval chain has been started for this payroll. Use the Approve Payroll action to initialize matching approval policies.
+      </div>
+      <div v-else class="space-y-4">
+        <div class="overflow-x-auto rounded-[12px] border border-[#DCDEDD]">
+          <table class="min-w-full divide-y divide-[#E5E7EB] text-sm">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left font-semibold text-brand-dark">Order</th>
+                <th class="px-4 py-3 text-left font-semibold text-brand-dark">Policy</th>
+                <th class="px-4 py-3 text-left font-semibold text-brand-dark">Required Role</th>
+                <th class="px-4 py-3 text-left font-semibold text-brand-dark">Status</th>
+                <th class="px-4 py-3 text-left font-semibold text-brand-dark">Approver</th>
+                <th class="px-4 py-3 text-left font-semibold text-brand-dark">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-[#F1F5F9] bg-white">
+              <tr v-for="step in approvalSteps" :key="step.id">
+                <td class="px-4 py-3 font-semibold text-brand-dark">{{ step.approval_order }}</td>
+                <td class="px-4 py-3 text-brand-dark">{{ step.policy_name || '-' }}</td>
+                <td class="px-4 py-3 text-brand-dark">{{ step.required_role || '-' }}</td>
+                <td class="px-4 py-3">
+                  <span
+                    class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold capitalize"
+                    :class="step.status === 'approved' ? 'bg-green-100 text-green-700' : step.status === 'rejected' ? 'bg-red-100 text-red-700' : 'bg-yellow-100 text-yellow-700'"
+                  >
+                    {{ step.status }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-brand-dark">{{ step.approver?.name || '-' }}</td>
+                <td class="px-4 py-3 text-brand-light">{{ step.notes || '-' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div v-if="payroll?.status === 'pending'" class="rounded-[16px] border border-blue-100 bg-blue-50 p-4 space-y-3">
+          <label class="block text-sm font-semibold text-brand-dark">Decision Notes</label>
+          <textarea
+            v-model="approvalDecisionNotes"
+            rows="3"
+            class="w-full rounded-[10px] border border-[#DCDEDD] px-4 py-3 text-sm"
+            placeholder="Optional notes for this approval decision"
+          ></textarea>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <button
+              type="button"
+              :disabled="submittingApprovalDecision"
+              class="rounded-[10px] bg-green-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+              @click="submitApprovalDecision('approved')"
+            >
+              {{ submittingApprovalDecision && approvalDecisionStatus === 'approved' ? 'Submitting...' : 'Approve My Step' }}
+            </button>
+            <button
+              type="button"
+              :disabled="submittingApprovalDecision"
+              class="rounded-[10px] bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+              @click="submitApprovalDecision('rejected')"
+            >
+              {{ submittingApprovalDecision && approvalDecisionStatus === 'rejected' ? 'Submitting...' : 'Reject My Step' }}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1497,7 +1639,7 @@ const handleApprovePayroll = () => {
           >
             <Download class="w-4 h-4 text-gray-600" />
             <span class="text-brand-dark text-sm font-semibold">
-              {{ exportingPdf ? "Exporting PDF..." : "Export PDF" }}
+              {{ exportingPdf ? "Exporting ZIP..." : "Export Payslip ZIP" }}
             </span>
           </button>
 

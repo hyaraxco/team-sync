@@ -44,6 +44,8 @@ const step1Data = ref({
   address: "",
   city: "",
   postal_code: "",
+  last_education: "",
+  seniority_level: "",
   profile_photo: null as File | null,
   profile_photo_url: "",
 });
@@ -143,6 +145,8 @@ const loadStaffMemberData = async () => {
       step1Data.value.address = staffMember.address || "";
       step1Data.value.city = staffMember.city || "";
       step1Data.value.postal_code = staffMember.postal_code || "";
+      step1Data.value.last_education = staffMember.last_education || "";
+      step1Data.value.seniority_level = staffMember.seniority_level || "";
       step1Data.value.profile_photo_url = staffMember.user?.profile_photo || "";
 
       // Step 2 - Job Information & Bank Information
@@ -224,6 +228,12 @@ const handleSubmit = async () => {
     formData.append("address", step1Data.value.address);
     formData.append("city", step1Data.value.city);
     formData.append("postal_code", step1Data.value.postal_code);
+    if (step1Data.value.last_education) {
+      formData.append("last_education", step1Data.value.last_education);
+    }
+    if (step1Data.value.seniority_level) {
+      formData.append("seniority_level", step1Data.value.seniority_level);
+    }
 
     if (step1Data.value.profile_photo) {
       formData.append("profile_photo", step1Data.value.profile_photo);

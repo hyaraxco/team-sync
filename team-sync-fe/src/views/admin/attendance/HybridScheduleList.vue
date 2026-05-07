@@ -45,7 +45,13 @@ const getLocationMeta = (location) =>
         badgeClass: 'bg-gray-50 text-gray-700 border-gray-200',
     };
 
-const getBaseSchedule = (schedule) => schedule?.base_schedule || {};
+const getBaseSchedule = (schedule) => schedule?.base_schedule || {
+    monday: schedule?.monday,
+    tuesday: schedule?.tuesday,
+    wednesday: schedule?.wednesday,
+    thursday: schedule?.thursday,
+    friday: schedule?.friday,
+};
 
 const getWeekdayKey = (dateString) => {
     if (!dateString) {
@@ -291,9 +297,9 @@ const confirmReject = () =>
                                         </span>
                                     </td>
                                     <td class="py-4 px-3">
-                                        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border" :class="getLocationMeta(override.requested_location).badgeClass">
-                                            <component :is="getLocationMeta(override.requested_location).icon" class="w-3.5 h-3.5" />
-                                            {{ getLocationMeta(override.requested_location).label }}
+                                        <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border" :class="getLocationMeta(override.planned_work_mode || override.requested_location).badgeClass">
+                                            <component :is="getLocationMeta(override.planned_work_mode || override.requested_location).icon" class="w-3.5 h-3.5" />
+                                            {{ getLocationMeta(override.planned_work_mode || override.requested_location).label }}
                                         </span>
                                     </td>
                                     <td class="py-4 px-3 text-sm text-[#475467] max-w-[280px] truncate" :title="override.reason || '-'">
@@ -347,7 +353,7 @@ const confirmReject = () =>
             <div v-if="selectedApproveOverride" class="rounded-xl border border-[#EAECF0] p-4 text-sm text-[#344054] space-y-1">
                 <p><span class="font-semibold">Employee:</span> {{ selectedApproveOverride.employeeName }}</p>
                 <p><span class="font-semibold">Date:</span> {{ formatRequestDate(selectedApproveOverride.date) }}</p>
-                <p><span class="font-semibold">Requested Location:</span> {{ getLocationMeta(selectedApproveOverride.requested_location).label }}</p>
+                <p><span class="font-semibold">Requested Location:</span> {{ getLocationMeta(selectedApproveOverride.planned_work_mode || selectedApproveOverride.requested_location).label }}</p>
             </div>
         </div>
 
@@ -388,7 +394,7 @@ const confirmReject = () =>
             <div v-if="selectedRejectOverride" class="rounded-xl border border-[#EAECF0] p-4 text-sm text-[#344054] space-y-1">
                 <p><span class="font-semibold">Employee:</span> {{ selectedRejectOverride.employeeName }}</p>
                 <p><span class="font-semibold">Date:</span> {{ formatRequestDate(selectedRejectOverride.date) }}</p>
-                <p><span class="font-semibold">Requested Location:</span> {{ getLocationMeta(selectedRejectOverride.requested_location).label }}</p>
+                <p><span class="font-semibold">Requested Location:</span> {{ getLocationMeta(selectedRejectOverride.planned_work_mode || selectedRejectOverride.requested_location).label }}</p>
                 <p class="italic text-[#667085]">"{{ selectedRejectOverride.reason || '-' }}"</p>
             </div>
 

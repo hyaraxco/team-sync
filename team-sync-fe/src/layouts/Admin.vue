@@ -22,11 +22,11 @@ const closeSidebar = () => {
     </slot>
 
     <!-- Main Content -->
-    <div id="main-content" class="flex-1 flex flex-col overflow-hidden">
+    <div id="main-content" class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300 dark:bg-gray-900">
       <!-- Top Navbar -->
       <Header @toggle-sidebar="toggleSidebar" />
       <!-- Dashboard Content -->
-      <main class="main-content flex-1 overflow-auto p-3 bg-gray-50 dark:bg-gray-900">
+      <main class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
         <RouterView />
       </main>
     </div>

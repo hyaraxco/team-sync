@@ -394,6 +394,8 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
           params.w_avg_goal_completion     = weights.avg_goal_completion;
           params.w_goal_completion_ratio   = weights.goal_completion_ratio;
           params.w_positive_feedback_count = weights.positive_feedback_count;
+          params.w_attendance_quality      = weights.attendance_quality;
+          params.w_task_completion_quality = weights.task_completion_quality;
         }
         const response = await axiosInstance.get(
           `/performance/cycles/${cycleId}/topsis-ranking`,

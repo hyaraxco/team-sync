@@ -26,7 +26,7 @@ describe('Leave Request Store', () => {
         const mockResponse = {
             data: {
                 data: {
-                    items: [{ id: 1, status: 'pending' }, { id: 2, status: 'approved' }],
+                    data: [{ id: 1, status: 'pending' }, { id: 2, status: 'approved' }],
                     meta: { current_page: 1, last_page: 2, per_page: 10, total: 15 },
                 },
             },
@@ -36,7 +36,7 @@ describe('Leave Request Store', () => {
         const result = await store.fetchLeaveRequestsPaginated(params);
 
         expect(axiosInstance.get).toHaveBeenCalledWith('leave-requests/all/paginated', { params });
-        expect(store.leaveRequests).toEqual(mockResponse.data.data.items);
+        expect(store.leaveRequests).toEqual(mockResponse.data.data.data);
         expect(store.meta).toEqual(mockResponse.data.data.meta);
         expect(result).toEqual(mockResponse.data.data);
         expect(store.loading).toBe(false);

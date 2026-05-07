@@ -6,10 +6,7 @@ import {
   UserIcon,
   LogOutIcon,
   MenuIcon,
-  Moon,
-  Sun,
 } from "lucide-vue-next";
-import { useDarkMode } from "@/composables/useDarkMode";
 import NotificationPanel from "@/components/admin/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notifications";
@@ -17,7 +14,6 @@ import { storeToRefs } from "pinia";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
 import _ from "lodash";
-import { DEFAULT_AVATAR } from "@/helpers/format";
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
@@ -25,7 +21,6 @@ const { user } = storeToRefs(authStore);
 const { logout } = authStore;
 const router = useRouter();
 
-const { isDark, toggle: toggleDarkMode } = useDarkMode();
 const isAccountMenuOpen = ref(false);
 const isNotificationPanelOpen = ref(false);
 const notificationPanelId = "header-notification-panel";
@@ -217,6 +212,10 @@ const toggleAccountMenu = () => {
   }
 };
 
+const handleMarkAllRead = async () => {
+  await notificationStore.markAllAsRead();
+};
+
 const handleNotificationSelect = async (notification) => {
   if (!notification?.id) {
     return;
@@ -312,7 +311,7 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="page-header bg-white border-b border-[#DCDEDD] px-4 sm:px-6 py-3.5 sm:py-4 dark:bg-gray-800 dark:border-gray-700"
+    class="page-header bg-white border-b border-[#DCDEDD] px-4 sm:px-6 py-3.5 sm:py-4"
   >
     <div
       class="flex items-start sm:items-center justify-between gap-3 sm:gap-4"
@@ -371,19 +370,12 @@ onUnmounted(() => {
               :notifications="notifications"
               :loading="notificationsLoading"
               :error="notificationsError"
+              :marking-all-read="notificationStore.markingAllRead"
               @retry="fetchLatestNotifications"
               @select="handleNotificationSelect"
+              @mark-all-read="handleMarkAllRead"
             />
           </div>
-          <button
-            type="button"
-            :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
-            class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200 dark:border-gray-600 dark:hover:border-blue-400"
-            @click="toggleDarkMode"
-          >
-            <Sun v-if="isDark" class="w-5 h-5 text-yellow-500" />
-            <Moon v-else class="w-5 h-5 text-gray-600" />
-          </button>
           <button
             type="button"
             aria-label="Messages"
@@ -409,10 +401,17 @@ onUnmounted(() => {
             @click="toggleAccountMenu"
           >
             <img
-              :src="user?.profile_photo || DEFAULT_AVATAR"
+              :src="user?.profile_photo"
               alt="User Avatar"
               class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
+              v-if="user?.profile_photo"
             />
+            <div
+              class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gray-100"
+              v-else
+            >
+              <UserIcon class="w-5 h-5 text-gray-400" />
+            </div>
             <div class="hidden md:block text-left">
               <p class="text-brand-dark text-sm sm:text-base font-semibold">
                 {{ user?.name }}

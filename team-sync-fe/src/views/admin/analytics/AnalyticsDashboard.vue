@@ -11,6 +11,7 @@ import WorkforceAnalytics from '@/components/admin/analytics/WorkforceAnalytics.
 import LeaveAnalytics from '@/components/admin/analytics/LeaveAnalytics.vue'
 import PayrollAnalytics from '@/components/admin/analytics/PayrollAnalytics.vue'
 import ProjectAnalytics from '@/components/admin/analytics/ProjectAnalytics.vue'
+import PerformanceAnalytics from '@/components/admin/analytics/PerformanceAnalytics.vue'
 import { formatRupiahCompact, formatRupiah } from '@/utils/formatUtils'
 import { can } from '@/helpers/permissionHelper'
 import {
@@ -59,6 +60,7 @@ const tabs = [
   { id: 'leave', label: 'Leave', icon: PalmtreeIcon },
   { id: 'payroll', label: 'Payroll', icon: WalletIcon },
   { id: 'projects', label: 'Projects', icon: FolderKanbanIcon },
+  { id: 'performance', label: 'Performance', icon: TrendingUpIcon },
 ]
 
 const periodOptions = [
@@ -184,6 +186,7 @@ function fetchActiveTab() {
     case 'leave': analyticsStore.fetchLeaveAnalytics(); break
     case 'payroll': analyticsStore.fetchPayrollAnalytics(); break
     case 'projects': analyticsStore.fetchProjectAnalytics(); break
+    case 'performance': analyticsStore.fetchPerformanceAnalytics(); break
   }
 }
 
@@ -462,5 +465,8 @@ onMounted(() => {
 
     <!-- Project Analytics Tab -->
     <ProjectAnalytics v-else-if="activeTab === 'projects'" />
+
+    <!-- Performance Analytics Tab -->
+    <PerformanceAnalytics v-else-if="activeTab === 'performance'" />
   </div>
 </template>
