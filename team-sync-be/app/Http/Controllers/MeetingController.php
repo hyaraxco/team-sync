@@ -12,6 +12,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -36,7 +37,8 @@ class MeetingController extends Controller implements HasMiddleware
             $meetings = $this->meetingService->getAllPaginated(
                 $request->query('search'),
                 $request->query('department'),
-                (int) ($request->query('row_per_page', 10))
+                (int) ($request->query('row_per_page', 10)),
+                $this->getTeamIdsForScope()
             );
 
             return ResponseHelper::jsonResponse(
@@ -64,7 +66,8 @@ class MeetingController extends Controller implements HasMiddleware
             $meetings = $this->meetingService->getAllPaginated(
                 $validated['search'] ?? null,
                 $validated['department'] ?? null,
-                $validated['row_per_page']
+                $validated['row_per_page'],
+                $this->getTeamIdsForScope()
             );
 
             return ResponseHelper::jsonResponse(
@@ -87,7 +90,10 @@ class MeetingController extends Controller implements HasMiddleware
         ]);
 
         try {
-            $meetings = $this->meetingService->getUpcoming($validated['limit'] ?? 10);
+            $meetings = $this->meetingService->getUpcoming(
+                $validated['limit'] ?? 10,
+                $this->getTeamIdsForScope()
+            );
 
             return ResponseHelper::jsonResponse(true, 'Upcoming Meetings Retrieved Successfully', MeetingResource::collection($meetings), 200);
         } catch (\Throwable $e) {
@@ -101,6 +107,20 @@ class MeetingController extends Controller implements HasMiddleware
     {
         try {
             $meeting = $this->meetingService->getById($id);
+
+            // Staff can only view meetings targeted at their teams
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+
+            if (! $isReviewer) {
+                $teamIds = $this->getTeamIdsForScope();
+                if ($teamIds !== null) {
+                    $meetingTeamIds = $meeting->teams->pluck('id')->toArray();
+                    if (empty(array_intersect($meetingTeamIds, $teamIds))) {
+                        return ResponseHelper::jsonResponse(false, 'You do not have access to this meeting.', null, 403);
+                    }
+                }
+            }
 
             return ResponseHelper::jsonResponse(true, 'Meeting Retrieved Successfully', new MeetingResource($meeting), 200);
         } catch (ModelNotFoundException $e) {
@@ -123,5 +143,35 @@ class MeetingController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
+    }
+
+    /**
+     * Get team IDs for scope filtering.
+     * Returns null for manager/HR (no filtering), array of team IDs for staff.
+     */
+    private function getTeamIdsForScope(): ?array
+    {
+        $user = Auth::user();
+        $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+
+        if ($isReviewer) {
+            return null; // No scope restriction
+        }
+
+        $profile = $user->staffMemberProfile;
+        if (! $profile) {
+            return [];
+        }
+
+        $jobInfoTeamId = $profile->jobInformation?->team_id;
+        $memberTeamIds = $profile->teamMembers()
+            ->whereNull('left_at')
+            ->pluck('team_id')
+            ->toArray();
+
+        return array_unique(array_filter(array_merge(
+            $jobInfoTeamId ? [$jobInfoTeamId] : [],
+            $memberTeamIds
+        )));
     }
 }

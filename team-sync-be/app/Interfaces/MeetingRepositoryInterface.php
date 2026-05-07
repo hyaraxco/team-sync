@@ -11,10 +11,11 @@ interface MeetingRepositoryInterface
     public function getAllPaginated(
         ?string $search,
         ?string $department,
-        ?int $rowPerPage
+        ?int $rowPerPage,
+        ?array $teamIds = null
     ): LengthAwarePaginator;
 
-    public function getUpcoming(?int $limit = 10): Collection;
+    public function getUpcoming(?int $limit = 10, ?array $teamIds = null): Collection;
 
     public function getById(int $id): Meeting;
 
