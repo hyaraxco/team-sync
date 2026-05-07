@@ -16,15 +16,21 @@ class RolePermissionSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            $manager = Role::firstOrCreate(['name' => 'manager']);
-            $hr = Role::firstOrCreate(['name' => 'hr']);
-            $staff = Role::firstOrCreate(['name' => 'staff']);
-            $finance = Role::firstOrCreate(['name' => 'finance']);
+            $superadmin = Role::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'sanctum']);
+            $manager = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'sanctum']);
+            $hr = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'sanctum']);
+            $staff = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
+            $finance = Role::firstOrCreate(['name' => 'finance', 'guard_name' => 'sanctum']);
 
+            // Superadmin: full access
+            $superadmin->syncPermissions(Permission::all());
+
+            // ─── Self-service baseline (all roles inherit) ───────────────────
             $selfServiceBaseline = [
                 'profile-menu',
                 'profile-view',
                 'attendance-my-attendances',
+                'attendance-my-statistics',
                 'attendance-last-attendance',
                 'attendance-check-in',
                 'attendance-check-out',
@@ -33,7 +39,6 @@ class RolePermissionSeeder extends Seeder
                 'leave-request-create',
                 'leave-request-my-requests',
                 'payslip-view',
-                // Performance Management Baseline
                 'performance-menu',
                 'review-self-submit',
                 'goal-create-own',
@@ -41,37 +46,69 @@ class RolePermissionSeeder extends Seeder
                 'meeting-menu',
             ];
 
-            $staffSpecific = array_merge($selfServiceBaseline, [
-                'team-view',
-            ]);
-
-            $manager->syncPermissions(
-                $this->permissionsAllExcept(array_merge($staffSpecific, [
-                    'leave-request-menu',
-                    'leave-request-create',
-                    'leave-request-my-requests',
-                    'payroll-menu',
-                    'payroll-list',
-                    'payroll-create',
-                    'payroll-edit',
-                    'payroll-delete',
-                    'payroll-process',
-                    'payroll-statistics',
-                    // HR-only: Manager should NOT calibrate or manage review cycles
-                    'review-calibrate',
-                    'review-cycle-manage',
-                    'review-assign-reviewer',
-                    // HR-only: Manager should NOT create/edit/delete staff members (view-only)
-                    'staff-member-create',
-                    'staff-member-edit',
-                    'staff-member-delete',
-                    'meeting-list',
-                    'meeting-create',
-                ]))->merge(
-                    Permission::whereIn('name', $selfServiceBaseline)->get()
-                )->unique('id')->values()
+            // ─── Staff: self-service + personal workspace ────────────────────
+            $staff->syncPermissions(
+                Permission::whereIn('name', array_merge($selfServiceBaseline, [
+                    'dashboard-menu',
+                    'dashboard-view',
+                    'team-view',
+                    'project-menu',
+                    'project-list',
+                    'task-menu',
+                    'task-list',
+                    'task-create',
+                    'task-edit',
+                    'overtime-create',
+                ]))->get()
             );
 
+            // ─── Manager: explicit allowlist (team/project scoped) ───────────
+            $manager->syncPermissions(
+                Permission::whereIn('name', array_merge($selfServiceBaseline, [
+                    // Dashboard
+                    'dashboard-menu',
+                    'dashboard-view',
+                    // Team management
+                    'team-menu',
+                    'team-list',
+                    'team-create',
+                    'team-edit',
+                    'team-delete',
+                    'team-view',
+                    // Project & task management
+                    'project-menu',
+                    'project-statistic',
+                    'project-list',
+                    'project-create',
+                    'project-edit',
+                    'project-delete',
+                    'task-menu',
+                    'task-list',
+                    'task-create',
+                    'task-edit',
+                    'task-delete',
+                    // Attendance: team approval context
+                    'attendance-menu',
+                    'attendance-list',
+                    'attendance-correction-list',
+                    'attendance-correction-approve',
+                    // Leave: team approval
+                    'leave-request-list',
+                    'leave-request-approve',
+                    // Overtime: team approval
+                    'overtime-list',
+                    'overtime-create',
+                    'overtime-approve',
+                    // Performance: team reviews & goals
+                    'review-manager-submit',
+                    'goal-assign-team',
+                    'performance-analytics-view',
+                ]))->get()
+            );
+
+            // ─── HR: workforce, attendance, leave, performance, meetings ─────
+            // HR does NOT get payroll operations (Finance owns those).
+            // HR gets read-only payroll readiness for coordination.
             $hr->syncPermissions($this->permissionsByPrefixes([
                 'dashboard-',
                 'team-',
@@ -87,57 +124,48 @@ class RolePermissionSeeder extends Seeder
                 'feedback-',
                 'meeting-',
                 'overtime-',
-                'thr-',
-            ], array_merge($staffSpecific, [
+            ], [
+                // Exclude: task-delete (admin-only destructive)
                 'task-delete',
-                // Manager-only: HR should NOT see Team Reviews
+                // Exclude: Manager-only team review submission
                 'review-manager-submit',
-            ]))->merge(
+            ])->merge(
                 Permission::whereIn('name', [
-                    'payroll-menu',
-                    'payroll-list',
-                    'payroll-create',
+                    // Payroll: read-only readiness context only
+                    'payroll-readiness-view',
+                    'thr-list',
                     ...$selfServiceBaseline,
                 ])->get()
             )->unique('id')->values());
 
-            $staff->syncPermissions(
-                Permission::whereIn('name', array_merge($selfServiceBaseline, [
-                    'dashboard-menu',
-                    'dashboard-view',
-                    'staff-member-list',
-                    'team-view',
-                    'project-menu',
-                    'project-list',
-                    'task-menu',
-                    'task-create',
-                    'task-list',
-                    'task-edit',
-                ]))->get()
-            );
-
+            // ─── Finance: payroll, THR, payroll analytics ────────────────────
+            // Finance does NOT get full staff directory or HR admin.
             $finance->syncPermissions(
-                Permission::whereIn('name', [
+                Permission::whereIn('name', array_merge($selfServiceBaseline, [
+                    // Dashboard
                     'dashboard-menu',
                     'dashboard-view',
-                    'staff-member-menu',
-                    'staff-member-list',
+                    // Payroll operations (Finance owns all)
                     'payroll-menu',
                     'payroll-list',
+                    'payroll-create',
                     'payroll-edit',
+                    'payroll-delete',
                     'payroll-process',
                     'payroll-statistics',
-                    'analytics-menu',
-                    'analytics-view',
-                    'analytics-export',
-                    'overtime-list',
-                    'overtime-create',
-                    'overtime-approve',
+                    'payroll-readiness-view',
+                    // THR operations (Finance owns generate/approve/process)
                     'thr-list',
                     'thr-generate',
                     'thr-approve',
-                    ...$selfServiceBaseline,
-                ])->get()
+                    'thr-process',
+                    // Analytics: payroll/finance scoped
+                    'analytics-menu',
+                    'analytics-view',
+                    'analytics-export',
+                    // Overtime: payroll context (list only, no approval)
+                    'overtime-list',
+                ]))->get()
             );
         });
     }

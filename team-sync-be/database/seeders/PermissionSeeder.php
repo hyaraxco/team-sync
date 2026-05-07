@@ -84,6 +84,7 @@ class PermissionSeeder extends Seeder
             'delete',
             'process',
             'statistics',
+            'readiness-view',
         ],
 
         'analytics' => [
@@ -139,6 +140,11 @@ class PermissionSeeder extends Seeder
             'create',
         ],
 
+        'license' => [
+            'view',
+            'manage',
+        ],
+
         'overtime' => [
             'list',
             'create',
@@ -149,6 +155,7 @@ class PermissionSeeder extends Seeder
             'list',
             'generate',
             'approve',
+            'process',
         ],
     ];
 
