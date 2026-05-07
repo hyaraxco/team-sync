@@ -54,7 +54,11 @@ class ProjectRepository implements ProjectRepositoryInterface
         if ($isStaffUser) {
             $profile = $currentUser->staffMemberProfile;
             if (! $profile) {
-                return $query;
+                if ($execute) {
+                    return new Collection;
+                }
+
+                return $query->whereRaw('1 = 0');
             }
 
             $employeeId = $profile->id;
