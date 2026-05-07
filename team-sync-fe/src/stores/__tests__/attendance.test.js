@@ -39,8 +39,8 @@ describe('Attendance Store', () => {
     });
 
     it('checkIn calls POST and returns data', async () => {
-        const payload = { check_in_lat: -6.2, check_in_long: 106.8, notes: 'On time' };
-        const mockData = { id: 10, check_in_time: '08:00:00' };
+        const payload = { check_in_lat: -6.2, check_in_long: 106.8, actual_work_mode: 'remote', notes: 'On time' };
+        const mockData = { id: 10, check_in_time: '08:00:00', actual_work_mode: 'remote' };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
                 message: 'Checked in successfully',
@@ -101,7 +101,7 @@ describe('Attendance Store', () => {
         const result = await store.acknowledgePolicyMismatch(5, 'Acknowledged by HR');
 
         expect(axiosInstance.post).toHaveBeenCalledWith('attendance-policy-mismatches/5/acknowledge', {
-            notes: 'Acknowledged by HR',
+            resolution_notes: 'Acknowledged by HR',
         });
         expect(result).toEqual({ id: 5, status: 'acknowledged' });
         expect(store.success).toBe('Mismatch acknowledged');

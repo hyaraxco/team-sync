@@ -187,6 +187,8 @@ const workLocation = computed(
   () => authStore.user?.employee_profile?.job_information?.work_location || 'office'
 );
 const isRemote = computed(() => workLocation.value === 'remote');
+const isHybrid = computed(() => workLocation.value === 'hybrid');
+const actualWorkMode = ref('office');
 
 const canUseClockActions = computed(
   () => !isRemote.value && (can("attendance-check-in") || can("attendance-check-out")),
@@ -280,7 +282,7 @@ const submitLeaveRequest = async () => {
 
   const totalDays = totalDaysCalculated.value;
 
-  if (leaveForm.value.leave_type === 'sick' && !leaveForm.value.proof_file) {
+  if (leaveForm.value.leave_type === 'sick_leave' && !leaveForm.value.proof_file) {
     toast.warning("Missing Proof", "A medical certificate or proof is required for sick leave.");
     return;
   }
@@ -291,7 +293,7 @@ const submitLeaveRequest = async () => {
       total_days: totalDays,
     });
 
-    if (leaveForm.value.leave_type === 'sick' && leaveForm.value.proof_file) {
+    if (leaveForm.value.leave_type === 'sick_leave' && leaveForm.value.proof_file) {
       try {
         await leaveRequestStore.uploadProof(createdRequest.id, leaveForm.value.proof_file);
       } catch (uploadError) {
@@ -381,7 +383,11 @@ const isClockOutDisabled = computed(() => {
 const handleCheckIn = async () => {
   if (attendanceLoading.value) return;
   try {
-    await checkIn({ check_in_lat: null, check_in_long: null });
+    await checkIn({
+      check_in_lat: null,
+      check_in_long: null,
+      actual_work_mode: isHybrid.value ? actualWorkMode.value : 'office',
+    });
     toast.success("Clocked In", "You have successfully clocked in!");
     await fetchTodayAttendance();
     await fetchAttendances();
@@ -491,17 +497,35 @@ onMounted(async () => {
           <span class="text-green-700 text-sm font-semibold">Auto-present · Remote</span>
         </div>
 
+        <div
+          v-if="canUseClockActions && !isCheckedIn && isHybrid"
+          class="bg-white/95 backdrop-blur-sm text-brand-dark rounded-[8px] border border-[#DCDEDD] px-3 py-2 shadow-lg"
+        >
+          <label for="actual-work-mode" class="sr-only">Actual work mode</label>
+          <select
+            id="actual-work-mode"
+            v-model="actualWorkMode"
+            :disabled="attendanceLoading"
+            class="bg-transparent text-sm font-semibold text-brand-dark focus:outline-none disabled:opacity-50"
+          >
+            <option value="office">Office</option>
+            <option value="remote">Remote</option>
+          </select>
+        </div>
+
         <button
           v-if="canUseClockActions && !isCheckedIn"
+          type="button"
           @click="handleCheckIn"
           :disabled="attendanceLoading"
           class="bg-white text-brand-dark rounded-[8px] border border-[#DCDEDD] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           <Clock class="w-4 h-4 text-[#0C51D9]" />
-          <span class="text-brand-dark text-sm font-semibold">Clock In</span>
+          <span data-testid="clock-in-button-label" class="text-brand-dark text-sm font-semibold">Clock In</span>
         </button>
         <button
           v-else-if="canUseClockActions && isCheckedIn"
+          type="button"
           @click="handleCheckOut"
           :disabled="isClockOutDisabled"
           class="bg-white text-brand-dark rounded-[8px] border border-[#EE2A3B] hover:border-[#EE2A3B] hover:border-2 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1195,7 +1219,7 @@ onMounted(async () => {
                     />
                   </div>
 
-                  <div v-if="leaveForm.leave_type === 'sick'">
+                  <div v-if="leaveForm.leave_type === 'sick_leave'">
                     <label
                       class="block text-sm font-medium text-gray-700 mb-1.5"
                       >Medical Certificate / Proof *</label

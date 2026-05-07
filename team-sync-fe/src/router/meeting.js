@@ -4,7 +4,7 @@ export default [
         name: 'admin.meetings',
         component: () => import('@/views/admin/meeting/MeetingList.vue'),
         meta: {
-            requiredPermission: 'meeting-menu',
+            requiredPermission: 'meeting-list',
         },
     },
 ];

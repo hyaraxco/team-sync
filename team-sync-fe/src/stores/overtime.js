@@ -35,14 +35,7 @@ export const useOvertimeStore = defineStore('overtime', {
                 });
                 const paginator = response.data.data;
                 this.records = paginator.data;
-                this.meta = {
-                    current_page: paginator.current_page,
-                    last_page: paginator.last_page,
-                    per_page: paginator.per_page,
-                    total: paginator.total,
-                    from: paginator.from,
-                    to: paginator.to,
-                };
+                this.meta = paginator.meta;
             } catch (error) {
                 this.error = handleError(error);
             } finally {
@@ -107,12 +100,7 @@ export const useOvertimeStore = defineStore('overtime', {
                 });
                 const paginator = response.data.data;
                 this.myRecords = paginator.data;
-                this.meta = {
-                    current_page: paginator.current_page,
-                    last_page: paginator.last_page,
-                    per_page: paginator.per_page,
-                    total: paginator.total,
-                };
+                this.meta = paginator.meta;
             } catch (error) {
                 this.error = handleError(error);
             } finally {

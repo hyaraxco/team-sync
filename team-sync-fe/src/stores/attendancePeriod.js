@@ -47,11 +47,14 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             }
         },
 
-        async fetchReadiness(periodId) {
+        async fetchReadiness(period) {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get(`payrolls/generate-readiness`, { params: { period_id: periodId } });
+                const salaryMonth = typeof period === 'string'
+                    ? period
+                    : (period?.salary_month || period?.month_key || String(period?.start_date || '').slice(0, 7));
+                const response = await axiosInstance.get(`payrolls/generate-readiness`, { params: { salary_month: salaryMonth } });
                 this.readinessSummary = response.data.data;
                 return response.data.data;
             } catch (error) {

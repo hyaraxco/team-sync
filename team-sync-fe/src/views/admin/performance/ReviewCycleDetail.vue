@@ -31,11 +31,13 @@ const { currentCycle, cyclesLoading, topsisResult, topsisLoading } =
 
 // ── Weight configuration ──────────────────────────────────────────────────────
 const weights = ref({
-  avg_manager_rating: 0.35,
+  avg_manager_rating: 0.30,
   final_rating: 0.30,
   avg_goal_completion: 0.20,
-  goal_completion_ratio: 0.10,
+  goal_completion_ratio: 0.05,
   positive_feedback_count: 0.05,
+  attendance_quality: 0.05,
+  task_completion_quality: 0.05,
 });
 
 const weightLabels = {
@@ -44,6 +46,8 @@ const weightLabels = {
   avg_goal_completion: "Goal Completion %",
   goal_completion_ratio: "Goal Completion Ratio",
   positive_feedback_count: "Positive Feedback",
+  attendance_quality: "Attendance Quality",
+  task_completion_quality: "Task Completion Quality",
 };
 
 const totalWeight = computed(() =>
@@ -111,6 +115,12 @@ const getIncompleteWarnings = (item) => {
   if (item.raw_scores.positive_feedback_count === 0) {
     warnings.push("No feedback received");
   }
+  if (item.raw_scores.attendance_quality === 0) {
+    warnings.push("Attendance data unavailable");
+  }
+  if (item.raw_scores.task_completion_quality === 0) {
+    warnings.push("Task completion data unavailable");
+  }
   return warnings;
 };
 
@@ -135,11 +145,13 @@ const calculateRanking = async () => {
 
 const resetWeights = () => {
   weights.value = {
-    avg_manager_rating: 0.35,
+    avg_manager_rating: 0.30,
     final_rating: 0.30,
     avg_goal_completion: 0.20,
-    goal_completion_ratio: 0.10,
+    goal_completion_ratio: 0.05,
     positive_feedback_count: 0.05,
+    attendance_quality: 0.05,
+    task_completion_quality: 0.05,
   };
 };
 
@@ -367,7 +379,7 @@ onMounted(async () => {
         <!-- Ranking Table -->
         <MainCard v-else-if="rankingList.length > 0">
           <!-- Legend criteria -->
-          <div class="grid grid-cols-5 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+          <div class="grid grid-cols-7 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
             <div v-for="(label, key) in weightLabels" :key="key" class="text-center">
               <p class="text-xs font-semibold text-brand-dark">{{ label }}</p>
               <p class="text-xs text-brand-light">weight {{ (topsisResult.weights[key] * 100).toFixed(0) }}%</p>
@@ -385,6 +397,8 @@ onMounted(async () => {
                   <th class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide">C3</th>
                   <th class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide">C4</th>
                   <th class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide">C5</th>
+                  <th class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide">C6</th>
+                  <th class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide">C7</th>
                   <th class="text-center py-3 px-3 text-xs font-semibold text-brand-light uppercase tracking-wide w-32">Score (Ci)</th>
                   <th class="text-center py-3 px-3 text-xs font-semibold text-brand-light uppercase tracking-wide">Label</th>
                   <th class="w-8"></th>
@@ -437,6 +451,12 @@ onMounted(async () => {
                     <td class="py-4 px-2 text-center text-sm text-brand-dark">
                       {{ item.raw_scores.positive_feedback_count }}
                     </td>
+                    <td class="py-4 px-2 text-center text-sm text-brand-dark">
+                      {{ item.raw_scores.attendance_quality.toFixed(1) }}%
+                    </td>
+                    <td class="py-4 px-2 text-center text-sm text-brand-dark">
+                      {{ item.raw_scores.task_completion_quality.toFixed(1) }}%
+                    </td>
                     <!-- Closeness coefficient + bar -->
                     <td class="py-4 px-3">
                       <div class="flex flex-col gap-1">
@@ -471,7 +491,7 @@ onMounted(async () => {
 
                   <!-- Detail row (expandable) -->
                   <tr v-if="expandedRows.has(item.staff_member_id)" class="bg-blue-50/40">
-                    <td colspan="10" class="px-6 py-4">
+                    <td colspan="12" class="px-6 py-4">
                       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                         <!-- Normalisasi steps -->
                         <div>

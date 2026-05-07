@@ -40,6 +40,8 @@ const step1Data = ref({
   address: "",
   city: "",
   postal_code: "",
+  last_education: "",
+  seniority_level: "",
   profile_photo: null as File | null,
   profile_photo_url: "",
 });
@@ -384,6 +386,8 @@ const handleSubmit = async () => {
     formData.append("address", step1Data.value.address);
     formData.append("city", step1Data.value.city);
     formData.append("postal_code", step1Data.value.postal_code);
+    appendIfNotEmpty(formData, "last_education", step1Data.value.last_education);
+    appendIfNotEmpty(formData, "seniority_level", step1Data.value.seniority_level);
 
     if (step1Data.value.profile_photo instanceof File) {
       formData.append("profile_photo", step1Data.value.profile_photo);

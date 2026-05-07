@@ -19,6 +19,7 @@ import {
   Users,
   ShieldCheck,
   LayoutTemplate,
+  Crown,
 } from "lucide-vue-next";
 import { ref, computed, onMounted, watch } from "vue";
 import { useTeamStore } from "@/stores/team";
@@ -288,10 +289,11 @@ watch(
               label="Role *"
               placeholder="Select role"
               :options="[
+                { value: 'superadmin', label: 'Superadmin' },
                 { value: 'manager', label: 'Manager' },
                 { value: 'hr', label: 'HR' },
                 { value: 'finance', label: 'Finance' },
-                { value: 'staff', label: 'Employee' },
+                { value: 'staff', label: 'Staff' },
               ]"
               :error="
                 errors?.roles?.join(', ') || errors?.['roles.0']?.join(', ')

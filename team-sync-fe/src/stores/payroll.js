@@ -71,6 +71,7 @@ export const usePayrollStore = defineStore("payroll", {
     state: () => ({
         payrolls: [],
         payslips: [],
+        payrollAdjustments: [],
         statistics: {
             total_payroll: 0,
             pending_review: 0,
@@ -476,6 +477,48 @@ export const usePayrollStore = defineStore("payroll", {
             }
         },
 
+        async fetchPayrollAdjustments(params = {}) {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get('/payroll-adjustments', { params });
+                const paginator = response.data.data;
+
+                this.payrollAdjustments = paginator.data ?? [];
+                this.meta = {
+                    current_page: paginator.current_page,
+                    last_page: paginator.last_page,
+                    per_page: paginator.per_page,
+                    total: paginator.total,
+                };
+
+                return paginator;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
+        async approvePayrollAdjustment(id, payload = {}) {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.post(`/payroll-adjustments/${id}/approve`, payload);
+
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async fetchSettings() {
             this.loading = true;
 
@@ -642,9 +685,9 @@ export const usePayrollStore = defineStore("payroll", {
                     responseType: 'blob'
                 });
 
-                triggerBlobDownload(response, 'Payroll_Export.pdf');
+                triggerBlobDownload(response, 'Payroll_Payslips.zip');
 
-                this.success = 'PDF file downloaded successfully';
+                this.success = 'Payslip ZIP downloaded successfully';
             } catch (error) {
                 this.error = handleError(error);
                 throw error;

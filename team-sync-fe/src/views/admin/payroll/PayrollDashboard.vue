@@ -12,6 +12,7 @@ import {
   Plus,
   FileText,
   Download,
+  FileWarning,
   Settings,
   Star,
   Calendar,
@@ -362,6 +363,24 @@ const handleExportReport = async () => {
             </RouterLink>
 
             <RouterLink
+              v-if="hasPayrollList"
+              :to="{ name: 'admin.payroll.adjustments' }"
+              data-testid="payroll-adjustment-queue-link"
+              class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+            >
+              <FileWarning class="w-4 h-4 text-gray-600" />
+              <div class="flex flex-col items-start">
+                <span class="text-brand-dark text-sm font-medium"
+                  >Adjustment Queue</span
+                >
+                <span class="text-xs font-normal text-gray-500"
+                  >Approve post-period payroll corrections</span
+                >
+              </div>
+            </RouterLink>
+
+            <RouterLink
+              v-if="hasPayrollStatistics"
               :to="{ name: 'admin.payroll.settings' }"
               data-testid="payroll-settings-link"
               class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"

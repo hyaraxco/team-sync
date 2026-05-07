@@ -26,8 +26,9 @@ const selectedHoliday = ref(null);
 
 const form = ref({
     date: '',
-    description: '',
+    name: '',
     type: 'national_holiday',
+    applies_to: [],
 });
 
 const isEditing = computed(() => Boolean(selectedHoliday.value));
@@ -44,8 +45,9 @@ const fetchData = async () => {
 const resetForm = () => {
     form.value = {
         date: '',
-        description: '',
+        name: '',
         type: 'national_holiday',
+        applies_to: [],
     };
     selectedHoliday.value = null;
 };
@@ -59,8 +61,9 @@ const openEditModal = (holiday) => {
     selectedHoliday.value = holiday;
     form.value = {
         date: holiday.date || '',
-        description: holiday.description || '',
+        name: holiday.name || holiday.description || '',
         type: holiday.type || 'national_holiday',
+        applies_to: holiday.applies_to || [],
     };
     isFormModalOpen.value = true;
 };
@@ -190,7 +193,7 @@ onMounted(() => {
                     <thead>
                         <tr class="border-y border-[#DCDEDD]">
                             <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Date</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Description</th>
+                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Name</th>
                             <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Type</th>
                             <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Actions</th>
                         </tr>
@@ -205,7 +208,7 @@ onMounted(() => {
                                 {{ holiday.date }}
                             </td>
                             <td class="py-4 px-4 text-sm text-brand-dark">
-                                {{ holiday.description }}
+                                {{ holiday.name || holiday.description }}
                             </td>
                             <td class="py-4 px-4">
                                 <span
@@ -271,9 +274,9 @@ onMounted(() => {
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-brand-dark mb-2">Description</label>
+                <label class="block text-sm font-semibold text-brand-dark mb-2">Name</label>
                 <input
-                    v-model="form.description"
+                    v-model="form.name"
                     type="text"
                     required
                     placeholder="e.g., Independence Day"
@@ -324,7 +327,7 @@ onMounted(() => {
     >
         <p class="text-sm text-brand-light mb-6">
             Are you sure you want to delete
-            <span class="font-semibold text-brand-dark">{{ selectedHoliday?.description }}</span>?
+            <span class="font-semibold text-brand-dark">{{ selectedHoliday?.name || selectedHoliday?.description }}</span>?
             This action cannot be undone.
         </p>
 

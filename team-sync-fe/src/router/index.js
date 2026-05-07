@@ -92,6 +92,14 @@ export const appRoutes = [
           requiredPermission: "team-view",
         },
       },
+      {
+        path: "upgrade-plan",
+        name: "admin.upgrade-plan",
+        component: () => import("@/views/admin/UpgradePlan.vue"),
+        meta: {
+          allowAuthenticated: true,
+        },
+      },
     ],
   },
   {
@@ -138,6 +146,11 @@ export const appRoutes = [
         component: StaffMemberDetail,
       },
     ],
+  },
+  {
+    path: "/setup",
+    name: "setup",
+    component: () => import("@/views/setup/SetupWizard.vue"),
   },
   {
     path: "/auth",
@@ -190,8 +203,31 @@ const router = createRouter({
 });
 
 export const registerAuthGuard = (targetRouter) => {
+  let setupChecked = false;
+  let needsSetup = false;
+
   targetRouter.beforeEach(async (to, from, next) => {
     const authStore = useAuthStore();
+
+    // Setup wizard guard — disabled for cloud-hosted development
+    // Will be re-enabled only for self-hosted (Tier 3) deployment mode
+    /*
+    if (!setupChecked && to.name !== "setup") {
+      setupChecked = true;
+      try {
+        const { axiosInstance } = await import("@/plugins/axios");
+        const response = await axiosInstance.get("/setup/status");
+        needsSetup = response.data?.data?.needs_setup === true;
+      } catch {
+        needsSetup = false;
+      }
+
+      if (needsSetup) {
+        next({ name: "setup" });
+        return;
+      }
+    }
+    */
 
     if (to.meta.requiresAuth) {
       if (authStore.token) {

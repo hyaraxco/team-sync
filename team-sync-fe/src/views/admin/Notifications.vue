@@ -1,13 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import {
   BellIcon,
   CheckCircle2,
+  CheckCheck,
   Clock3,
   MessageSquare,
   Users,
   Wallet,
   RefreshCw,
+  ChevronLeftIcon,
+  ChevronRightIcon,
 } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 import { useNotificationStore } from "@/stores/notifications";
@@ -16,11 +19,16 @@ import { getTimeAgo } from "@/utils/dateUtils";
 const notificationStore = useNotificationStore();
 const router = useRouter();
 
+const currentPage = ref(1);
+const perPage = 15;
+
 const notifications = computed(() =>
   Array.isArray(notificationStore.notifications) ? notificationStore.notifications : []
 );
 const loading = computed(() => notificationStore.loading);
 const error = computed(() => notificationStore.error);
+const meta = computed(() => notificationStore.meta);
+const markingAllRead = computed(() => notificationStore.markingAllRead);
 
 const resolveNotificationCategory = (notification: any) =>
   String(
@@ -133,12 +141,23 @@ const openNotification = async (notification: any) => {
   await router.push(actionUrl);
 };
 
-const fetchAllNotifications = async () => {
-  await notificationStore.fetchLatestNotifications(100);
+const fetchNotifications = async (page = 1) => {
+  currentPage.value = page;
+  await notificationStore.fetchNotificationsPaginated({ page, perPage });
+};
+
+const handleMarkAllRead = async () => {
+  await notificationStore.markAllAsRead();
+};
+
+const goToPage = (page: number) => {
+  if (page >= 1 && (!meta.value || page <= meta.value.last_page)) {
+    fetchNotifications(page);
+  }
 };
 
 onMounted(() => {
-  fetchAllNotifications();
+  fetchNotifications(1);
 });
 </script>
 
@@ -153,14 +172,25 @@ onMounted(() => {
           All Notifications
         </h3>
       </div>
-      <button
-        type="button"
-        class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-[#0C51D9] transition-colors hover:bg-[#EFF5FF]"
-        @click="fetchAllNotifications"
-      >
-        <RefreshCw class="h-3.5 w-3.5" />
-        Refresh
-      </button>
+      <div class="flex items-center gap-2">
+        <button
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-[#0C51D9] transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+          :disabled="markingAllRead || notifications.length === 0"
+          @click="handleMarkAllRead"
+        >
+          <CheckCheck class="h-3.5 w-3.5" />
+          {{ markingAllRead ? 'Marking...' : 'Mark all read' }}
+        </button>
+        <button
+          type="button"
+          class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-[#0C51D9] transition-colors hover:bg-[#EFF5FF]"
+          @click="fetchNotifications(currentPage)"
+        >
+          <RefreshCw class="h-3.5 w-3.5" />
+          Refresh
+        </button>
+      </div>
     </div>
 
     <div v-if="loading" class="space-y-3">
@@ -185,7 +215,7 @@ onMounted(() => {
       <button
         type="button"
         class="mt-2 text-sm font-semibold text-red-700 hover:underline"
-        @click="fetchAllNotifications"
+        @click="fetchNotifications(currentPage)"
       >
         Try again
       </button>
@@ -238,6 +268,35 @@ onMounted(() => {
           </p>
         </div>
       </button>
+
+      <!-- Pagination -->
+      <div
+        v-if="meta && meta.last_page > 1"
+        class="flex items-center justify-between border-t border-[#EEF2F8] pt-4 mt-3"
+      >
+        <p class="text-xs text-gray-500">
+          Page {{ meta.current_page }} of {{ meta.last_page }}
+          <span class="text-gray-400">({{ meta.total }} total)</span>
+        </p>
+        <div class="flex items-center gap-1">
+          <button
+            type="button"
+            class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[#DCDEDD] text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
+            :disabled="currentPage <= 1"
+            @click="goToPage(currentPage - 1)"
+          >
+            <ChevronLeftIcon class="h-4 w-4" />
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[#DCDEDD] text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
+            :disabled="currentPage >= meta.last_page"
+            @click="goToPage(currentPage + 1)"
+          >
+            <ChevronRightIcon class="h-4 w-4" />
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </template>
