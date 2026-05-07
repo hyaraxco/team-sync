@@ -3,6 +3,15 @@
 > Context engineering untuk AI agents. Dibaca otomatis oleh Pi, Claude Code, Codex.
 > Last updated: 2026-05-07
 
+## Sub-Repo Context
+
+When working on a specific sub-repo, **also read its AGENTS.md** for detailed conventions:
+
+- **Backend**: [`team-sync-be/AGENTS.md`](team-sync-be/AGENTS.md) — layering, models, services, commands
+- **Frontend**: [`team-sync-fe/AGENTS.md`](team-sync-fe/AGENTS.md) — components, stores, routing, testing
+
+This root file covers cross-cutting concerns: domain rules, role hierarchy, stack overview.
+
 ---
 
 ## Overview
