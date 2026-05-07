@@ -266,18 +266,20 @@ class ProjectTaskController extends Controller implements HasMiddleware
 
         try {
             $task = ProjectTask::with('project')->findOrFail($id);
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
 
-            // Task status lock check (same as storeComment)
-            $collaborateResponse = Gate::inspect('collaborate', $task);
-            if ($collaborateResponse->denied()) {
-                return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
+            // Task status lock check — only for non-privileged users
+            if (! $isReviewer) {
+                $collaborateResponse = Gate::inspect('collaborate', $task);
+                if ($collaborateResponse->denied()) {
+                    return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
+                }
             }
 
             $comment = ProjectTaskComment::where('project_task_id', $task->id)->findOrFail($commentId);
 
             // Ownership check: staff can only edit their own comments
-            $user = Auth::user();
-            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
             if (! $isReviewer) {
                 $profileId = $user->staffMemberProfile?->id;
                 if (! $profileId || $comment->staff_member_id !== $profileId) {
@@ -303,18 +305,20 @@ class ProjectTaskController extends Controller implements HasMiddleware
     {
         try {
             $task = ProjectTask::with('project')->findOrFail($id);
+            $user = Auth::user();
+            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
 
-            // Task status lock check
-            $collaborateResponse = Gate::inspect('collaborate', $task);
-            if ($collaborateResponse->denied()) {
-                return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
+            // Task status lock check — only for non-privileged users
+            if (! $isReviewer) {
+                $collaborateResponse = Gate::inspect('collaborate', $task);
+                if ($collaborateResponse->denied()) {
+                    return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
+                }
             }
 
             $comment = ProjectTaskComment::where('project_task_id', $task->id)->findOrFail($commentId);
 
             // Ownership check: staff can only delete their own comments
-            $user = Auth::user();
-            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
             if (! $isReviewer) {
                 $profileId = $user->staffMemberProfile?->id;
                 if (! $profileId || $comment->staff_member_id !== $profileId) {
