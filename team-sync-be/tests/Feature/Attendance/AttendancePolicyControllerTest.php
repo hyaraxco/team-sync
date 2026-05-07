@@ -61,8 +61,8 @@ class AttendancePolicyControllerTest extends TestCase
                         'employment_type',
                         'work_days_per_week',
                         'work_start_time',
-                    ]
-                ]
+                    ],
+                ],
             ]);
 
         $this->assertGreaterThan(0, count($response->json('data')));

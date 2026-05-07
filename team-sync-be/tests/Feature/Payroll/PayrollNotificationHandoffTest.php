@@ -2,12 +2,18 @@
 
 namespace Tests\Feature\Payroll;
 
+use App\Models\OvertimeRecord;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollNotificationDelivery;
 use App\Models\StaffMemberProfile;
+use App\Models\ThrPayroll;
+use App\Models\ThrPayrollDetail;
 use App\Models\User;
+use App\Notifications\OvertimeApprovedNotification;
+use App\Notifications\OvertimeRejectedNotification;
 use App\Notifications\PayrollPaid;
+use App\Notifications\ThrPaymentNotification;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -17,15 +23,18 @@ use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollNotificationHandoffTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -50,7 +59,7 @@ class PayrollNotificationHandoffTest extends TestCase
         $notification = new PayrollPaid($detail);
         $data = $notification->toArray($staffMemberProfile->user);
 
-        $expectedUrl = '/admin/my-payroll/' . $detail->id;
+        $expectedUrl = '/admin/my-payroll/'.$detail->id;
         $this->assertSame($expectedUrl, $data['action_url']);
     }
 
@@ -151,6 +160,42 @@ class PayrollNotificationHandoffTest extends TestCase
         $this->assertSame((int) $detail->id, $data['payroll_detail_id']);
     }
 
+    public function test_overtime_notifications_use_body_and_staff_overtime_route(): void
+    {
+        $approver = User::factory()->create(['name' => 'Finance Approver']);
+        $record = OvertimeRecord::factory()->approved()->create([
+            'date' => '2026-05-10',
+            'hours' => 2.5,
+            'rejection_reason' => 'Budget cap',
+        ]);
+
+        $approved = (new OvertimeApprovedNotification($record, $approver))->toArray($record->staffMember?->user ?? $approver);
+        $rejected = (new OvertimeRejectedNotification($record, $approver))->toArray($record->staffMember?->user ?? $approver);
+
+        $this->assertArrayHasKey('body', $approved);
+        $this->assertArrayNotHasKey('message', $approved);
+        $this->assertSame('/admin/attendance/my-overtime', $approved['action_url']);
+
+        $this->assertArrayHasKey('body', $rejected);
+        $this->assertArrayNotHasKey('message', $rejected);
+        $this->assertSame('/admin/attendance/my-overtime', $rejected['action_url']);
+    }
+
+    public function test_thr_payment_notification_uses_body_and_admin_thr_route(): void
+    {
+        $thrPayroll = ThrPayroll::factory()->paid()->create();
+        $detail = ThrPayrollDetail::factory()->create([
+            'thr_payroll_id' => $thrPayroll->id,
+            'staff_member_id' => StaffMemberProfile::factory()->create()->id,
+        ]);
+
+        $data = (new ThrPaymentNotification($thrPayroll, $detail))->toArray($detail->staffMember->user);
+
+        $this->assertArrayHasKey('body', $data);
+        $this->assertArrayNotHasKey('message', $data);
+        $this->assertSame('/admin/payroll/thr', $data['action_url']);
+    }
+
     private function actingAsRole(string $roleName): User
     {
         $user = User::factory()->create();
@@ -165,7 +210,7 @@ class PayrollNotificationHandoffTest extends TestCase
     private function createPaidPayrollWithDetail(): array
     {
         $user = User::factory()->create([
-            'email' => 'employee+' . uniqid() . '@teamsync.com',
+            'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
         $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {

@@ -1,4 +1,5 @@
 <?php
+
 namespace Tests\Feature;
 
 use App\Models\User;
@@ -14,9 +15,9 @@ class PayrollRouteTest extends TestCase
         $user = User::factory()->create();
 
         $response = $this->actingAs($user, 'sanctum')->withoutMiddleware()->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-0');
-        
-        echo "STATUS: " . $response->getStatusCode() . "\n";
-        echo "BODY: " . $response->getContent() . "\n";
+
+        echo 'STATUS: '.$response->getStatusCode()."\n";
+        echo 'BODY: '.$response->getContent()."\n";
         $this->assertTrue(true);
     }
 }

@@ -11,11 +11,12 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class GenerateReviewsFeatureTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private User $hrAdmin;
 
@@ -28,6 +29,7 @@ class GenerateReviewsFeatureTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->activateTestLicense();
 
         // Setup Roles
         Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'sanctum']);

@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use App\Models\User;
 use App\Models\AttendancePeriod;
-use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Tests\TestCase;
 use Laravel\Sanctum\Sanctum;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+use Tests\TestCase;
 
 class AttendancePeriodTest extends TestCase
 {
@@ -41,9 +41,9 @@ class AttendancePeriodTest extends TestCase
             ->assertJsonStructure([
                 'data' => [
                     'data' => [
-                        '*' => ['id', 'start_date', 'end_date', 'status']
-                    ]
-                ]
+                        '*' => ['id', 'start_date', 'end_date', 'status'],
+                    ],
+                ],
             ]);
     }
 

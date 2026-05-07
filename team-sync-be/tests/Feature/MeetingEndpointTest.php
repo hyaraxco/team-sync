@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Enums\Department;
+use App\Jobs\BroadcastMeetingJob;
 use App\Models\Meeting;
 use App\Models\Team;
 use App\Models\User;
@@ -65,6 +66,13 @@ class MeetingEndpointTest extends TestCase
             'title' => $payload['title'],
             'created_by' => $hr->id,
         ]);
+
+        Queue::assertPushedOn('meetings', BroadcastMeetingJob::class, function (BroadcastMeetingJob $job) use ($meetingId) {
+            return $job->meetingId === $meetingId
+                && $job->notificationType === 'scheduled'
+                && $job->timeout === 300
+                && $job->tries === 3;
+        });
     }
 
     public function test_create_meeting_validates_required_fields(): void
@@ -139,6 +147,14 @@ class MeetingEndpointTest extends TestCase
 
         $this->getJson('/api/v1/meetings/all/paginated?row_per_page=10')
             ->assertOk();
+    }
+
+    public function test_manager_with_meeting_menu_cannot_list_meetings_without_meeting_list(): void
+    {
+        $this->actingAsRole('manager');
+
+        $this->getJson('/api/v1/meetings/all/paginated?row_per_page=10')
+            ->assertForbidden();
     }
 
     public function test_any_role_can_view_upcoming_meetings(): void

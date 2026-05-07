@@ -5,6 +5,7 @@ use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
+use App\Models\PerformanceReviewTemplate;
 use App\Models\StaffMemberProfile;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
@@ -179,9 +180,9 @@ it('calculateManagerRating returns null when no manager ratings exist', function
 
 it('uses template weights instead of global section weights when template is present', function () {
     // 1. Setup Template and Sections
-    $template = \App\Models\PerformanceReviewTemplate::create([
+    $template = PerformanceReviewTemplate::create([
         'name' => 'Engineering Template',
-        'is_active' => true
+        'is_active' => true,
     ]);
 
     // Section 1: Global weight 50, Template weight 80
@@ -189,15 +190,15 @@ it('uses template weights instead of global section weights when template is pre
         'name' => 'Technical Skills',
         'weight' => 50,
         'order' => 1,
-        'is_active' => true
+        'is_active' => true,
     ]);
-    
+
     // Section 2: Global weight 50, Template weight 20
     $section2 = PerformanceReviewSection::create([
         'name' => 'Soft Skills',
         'weight' => 50,
         'order' => 2,
-        'is_active' => true
+        'is_active' => true,
     ]);
 
     // Attach to template with custom weights
@@ -224,11 +225,10 @@ it('uses template weights instead of global section weights when template is pre
     /**
      * Calculation with Template Weights (80 & 20):
      * (5 * 80 + 2 * 20) / (80 + 20) = (400 + 40) / 100 = 4.4
-     * 
+     *
      * Calculation with Global Weights (50 & 50):
      * (5 * 50 + 2 * 50) / (50 + 50) = (250 + 100) / 100 = 3.5
      */
-
     $result = PerformanceRatingHelper::calculateFinalRating($review->id);
 
     expect($result['final_rating'])->toBe(4.4);

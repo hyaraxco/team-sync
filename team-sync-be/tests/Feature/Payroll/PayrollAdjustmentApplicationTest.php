@@ -21,15 +21,18 @@ use Illuminate\Support\Facades\Queue;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollAdjustmentApplicationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -88,7 +91,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             'status' => PayrollAdjustment::STATUS_APPROVED,
         ]);
 
-        $this->actingAsRole('hr');
+        $this->actingAsRole('finance');
 
         $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-05',

@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 /**
@@ -19,13 +20,15 @@ use Tests\TestCase;
  */
 class ErrorHandlingSafetyTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private const INTERNAL_SECRET = 'SQLSTATE[HY000]: MySQL server has gone away';
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -69,9 +72,9 @@ class ErrorHandlingSafetyTest extends TestCase
 
     public function test_domain_exception_returns_business_message_not_internals(): void
     {
-        // generate-readiness requires payroll-create permission → HR role
+        // generate-readiness requires payroll-create permission → Finance role
         $user = User::factory()->create();
-        $role = Role::findByName('hr', 'sanctum');
+        $role = Role::findByName('finance', 'sanctum');
         $user->assignRole($role);
         Sanctum::actingAs($user);
 

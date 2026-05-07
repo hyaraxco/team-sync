@@ -78,9 +78,9 @@ class PolicyMismatchEndpointTest extends TestCase
                             'planned_work_mode',
                             'actual_work_mode',
                             'status',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ]);
 
         $this->assertCount(1, $response->json('data.data'));
@@ -147,6 +147,15 @@ class PolicyMismatchEndpointTest extends TestCase
             ->assertOk();
 
         $this->assertCount(5, $response->json('data.data'));
+    }
+
+    public function test_validation_rejects_invalid_policy_mismatch_filters(): void
+    {
+        $this->actingAsRole('hr');
+
+        $this->getJson('/api/v1/attendance-policy-mismatches?status=unknown&per_page=0')
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['status', 'per_page']);
     }
 
     private function actingAsRole(string $roleName): User

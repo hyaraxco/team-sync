@@ -8,6 +8,7 @@ use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
+use Database\Seeders\AttendancePolicySeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -16,11 +17,12 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class LeaveCrossRoleNotificationsTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private int $profileSequence = 1;
 
@@ -28,12 +30,16 @@ class LeaveCrossRoleNotificationsTest extends TestCase
     {
         parent::setUp();
 
+        config()->set('license.public_key', '');
+
         $this->seed([
+            AttendancePolicySeeder::class,
             PermissionSeeder::class,
             RoleSeeder::class,
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
@@ -61,6 +67,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
             'Leave Employee',
             $team->id
         );
+        $employeeUser->givePermissionTo(['leave-request-create', 'leave-request-my-requests']);
 
         Sanctum::actingAs($employeeUser);
 
@@ -70,7 +77,9 @@ class LeaveCrossRoleNotificationsTest extends TestCase
             'end_date' => '2026-04-21',
             'reason' => 'Family event',
             'emergency_contact' => '08123456789',
-        ])->assertCreated();
+        ]);
+
+        $response->assertCreated();
 
         $leaveRequestId = (int) $response->json('data.id');
 

@@ -9,15 +9,17 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class OutcomeRuleControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->activateTestLicense();
         $this->seedRolesAndPermissions();
     }
 

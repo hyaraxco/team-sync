@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Overtime;
 
+use App\Models\Attendance;
+use App\Models\AttendancePeriod;
 use App\Models\OvertimeRecord;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
@@ -12,11 +14,12 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class OvertimeControllerTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -28,6 +31,7 @@ class OvertimeControllerTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
@@ -51,7 +55,9 @@ class OvertimeControllerTest extends TestCase
 
     public function test_user_without_permission_cannot_create_overtime(): void
     {
-        $this->actingAsRole('staff');
+        // Use a user with no overtime-create permission (staff now has it)
+        $user = User::factory()->create();
+        Sanctum::actingAs($user);
 
         $this->postJson('/api/v1/overtime', [])
             ->assertForbidden();
@@ -134,6 +140,35 @@ class OvertimeControllerTest extends TestCase
 
         $this->postJson('/api/v1/overtime', $payload)
             ->assertStatus(422);
+    }
+
+    public function test_create_overtime_validates_attendance_belongs_to_same_staff_member_and_date(): void
+    {
+        $this->actingAsRole('hr');
+
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
+        });
+        $otherEmployee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            return StaffMemberProfile::factory()->create();
+        });
+        $attendance = Attendance::factory()->create([
+            'staff_member_id' => $otherEmployee->id,
+            'date' => now()->subDay()->format('Y-m-d'),
+        ]);
+
+        $payload = [
+            'staff_member_id' => $employee->id,
+            'attendance_id' => $attendance->id,
+            'date' => now()->subDay()->format('Y-m-d'),
+            'start_time' => '17:00',
+            'end_time' => '19:00',
+            'overtime_type' => 'workday',
+        ];
+
+        $this->postJson('/api/v1/overtime', $payload)
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['attendance_id']);
     }
 
     public function test_authorized_user_can_show_overtime_record(): void
@@ -353,10 +388,10 @@ class OvertimeControllerTest extends TestCase
 
         $lockedDate = now()->subDays(10)->format('Y-m-d');
 
-        \App\Models\AttendancePeriod::factory()->create([
+        AttendancePeriod::factory()->create([
             'start_date' => now()->subDays(15)->format('Y-m-d'),
             'end_date' => now()->subDays(5)->format('Y-m-d'),
-            'status' => \App\Models\AttendancePeriod::STATUS_LOCKED,
+            'status' => AttendancePeriod::STATUS_LOCKED,
             'locked_at' => now()->subDays(3),
         ]);
 

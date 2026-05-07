@@ -1,9 +1,5 @@
 # PROJECT KNOWLEDGE BASE
 
-**Generated:** 2026-04-27T19:19:38Z
-**Commit:** 10bd03f
-**Branch:** feat/notification-wiring-deeplinks
-
 ## OVERVIEW
 
 Team Sync — HRIS monorepo. Laravel 12 API backend (`team-sync-be`) + Vue 3 SPA frontend (`team-sync-fe`). Manages staff, attendance, payroll, leave, projects, performance reviews, and analytics for an Indonesian workforce context (BPJS, PTKP, tax brackets).
@@ -22,19 +18,19 @@ team-sync/
 
 ## WHERE TO LOOK
 
-| Task | Location | Notes |
-|------|----------|-------|
-| API routes | `team-sync-be/routes/api.php` | All under `/api/v1`, Sanctum-guarded |
-| Business logic | `team-sync-be/app/Services/` | Domain-grouped (Payroll/, Attendance/, Performance/, Analytics/) |
-| Data access | `team-sync-be/app/Repositories/` | Interface-bound via `app/Interfaces/` |
-| Models (45) | `team-sync-be/app/Models/` | Eloquent, heavy relations |
-| Notifications (25+) | `team-sync-be/app/Notifications/` | Queued via database driver — **queue worker required** |
-| Add meeting | `team-sync-be/app/Http/Controllers/MeetingController.php` + `team-sync-fe/src/views/admin/meeting/` | |
-| Frontend views | `team-sync-fe/src/views/` | Split: `admin/` vs `staff-member/` |
-| State management | `team-sync-fe/src/stores/` | 21 Pinia stores, one per domain |
-| Routing | `team-sync-fe/src/router/` | Split by domain module (9 files) |
-| CI workflows | `.github/workflows/` | `fe-guard-smoke.yml`, `payroll-ui-e2e.yml`, `playwright.yml` |
-| E2E prep script | `team-sync-fe/scripts/e2e-prepare-be.sh` | Seeds/resets BE for E2E runs |
+| Task                | Location                                                                                            | Notes                                                            |
+| ------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| API routes          | `team-sync-be/routes/api.php`                                                                       | All under `/api/v1`, Sanctum-guarded                             |
+| Business logic      | `team-sync-be/app/Services/`                                                                        | Domain-grouped (Payroll/, Attendance/, Performance/, Analytics/) |
+| Data access         | `team-sync-be/app/Repositories/`                                                                    | Interface-bound via `app/Interfaces/`                            |
+| Models (45)         | `team-sync-be/app/Models/`                                                                          | Eloquent, heavy relations                                        |
+| Notifications (25+) | `team-sync-be/app/Notifications/`                                                                   | Queued via database driver — **queue worker required**           |
+| Add meeting         | `team-sync-be/app/Http/Controllers/MeetingController.php` + `team-sync-fe/src/views/admin/meeting/` |                                                                  |
+| Frontend views      | `team-sync-fe/src/views/`                                                                           | Split: `admin/` vs `staff-member/`                               |
+| State management    | `team-sync-fe/src/stores/`                                                                          | 21 Pinia stores, one per domain                                  |
+| Routing             | `team-sync-fe/src/router/`                                                                          | Split by domain module (9 files)                                 |
+| CI workflows        | `.github/workflows/`                                                                                | `fe-guard-smoke.yml`, `payroll-ui-e2e.yml`, `playwright.yml`     |
+| E2E prep script     | `team-sync-fe/scripts/e2e-prepare-be.sh`                                                            | Seeds/resets BE for E2E runs                                     |
 
 ## CONVENTIONS
 
@@ -67,7 +63,8 @@ team-sync/
 # Backend
 cd team-sync-be
 php artisan serve                    # Dev server
-php artisan queue:work               # Queue worker (REQUIRED for notifications)
+php artisan queue:work --queue=default,meetings --timeout=600  # Queue worker (REQUIRED for notifications)
+php artisan schedule:work            # Scheduler (REQUIRED for meeting reminders)
 php artisan test                     # Run Pest tests
 ./vendor/bin/pest                    # Direct Pest
 php artisan migrate                  # Run migrations
@@ -81,7 +78,7 @@ bun run e2e                          # Playwright E2E
 
 # Docker (backend)
 cd team-sync-be
-docker compose up -d queue           # Queue worker via Docker
+docker compose up -d queue scheduler # Queue worker + scheduler via Docker
 ```
 
 ## NOTES

@@ -15,15 +15,18 @@ use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 class PayrollCorrectionTrackingTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->activateTestLicense();
 
         $this->seed([
             RoleSeeder::class,
@@ -105,6 +108,7 @@ class PayrollCorrectionTrackingTest extends TestCase
             PayrollCorrected::class,
             function (PayrollCorrected $notification) {
                 $array = $notification->toArray($notification);
+
                 return $array['correction_count'] === 1;
             }
         );
@@ -138,7 +142,7 @@ class PayrollCorrectionTrackingTest extends TestCase
     private function createPayrollWithDetail(string $status = 'pending', ?string $paymentDate = null): Payroll
     {
         $user = User::factory()->create([
-            'email' => 'employee+' . uniqid() . '@teamsync.com',
+            'email' => 'employee+'.uniqid().'@teamsync.com',
         ]);
 
         $staffMemberProfile = StaffMemberProfile::withoutSyncingToSearch(function () use ($user) {

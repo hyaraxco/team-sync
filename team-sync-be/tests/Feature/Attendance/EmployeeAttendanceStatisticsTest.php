@@ -96,7 +96,7 @@ class EmployeeAttendanceStatisticsTest extends TestCase
                     'sick_days',
                     'absent_days',
                     'avg_hours',
-                ]
+                ],
             ]);
 
         $data = $response->json('data');
@@ -179,9 +179,9 @@ class EmployeeAttendanceStatisticsTest extends TestCase
             Attendance::create([
                 'staff_member_id' => $employee->id,
                 'attendance_period_id' => $this->period->id,
-                'date' => "2026-03-" . str_pad($i + 10, 2, '0', STR_PAD_LEFT),
-                'check_in' => "2026-03-" . str_pad($i + 10, 2, '0', STR_PAD_LEFT) . " 08:00:00",
-                'check_out' => "2026-03-" . str_pad($i + 10, 2, '0', STR_PAD_LEFT) . " 17:00:00",
+                'date' => '2026-03-'.str_pad($i + 10, 2, '0', STR_PAD_LEFT),
+                'check_in' => '2026-03-'.str_pad($i + 10, 2, '0', STR_PAD_LEFT).' 08:00:00',
+                'check_out' => '2026-03-'.str_pad($i + 10, 2, '0', STR_PAD_LEFT).' 17:00:00',
                 'status' => 'present',
             ]);
         }
@@ -193,6 +193,17 @@ class EmployeeAttendanceStatisticsTest extends TestCase
 
         $data = $response->json('data');
         $this->assertEquals(3, $data['present_days']);
+    }
+
+    public function test_employee_statistics_validates_month_format(): void
+    {
+        $this->actingAsRole('hr');
+
+        $employee = StaffMemberProfile::factory()->create();
+
+        $this->getJson("/api/v1/attendances/employee/{$employee->id}/statistics?month=2026/03")
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['month']);
     }
 
     private function actingAsRole(string $roleName): User
