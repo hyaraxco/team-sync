@@ -4,14 +4,13 @@ namespace App\Models;
 
 use App\Enums\Department;
 use App\Enums\TeamStatus;
-use App\Traits\BelongsToCompany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Team extends Model
 {
-    use BelongsToCompany, HasFactory, SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'name',

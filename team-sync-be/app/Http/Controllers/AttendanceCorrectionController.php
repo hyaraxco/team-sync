@@ -3,11 +3,15 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\AttendanceCorrectionApproveRequest;
+use App\Http\Requests\AttendanceCorrectionListRequest;
+use App\Http\Requests\AttendanceCorrectionRejectRequest;
+use App\Http\Requests\AttendanceCorrectionStoreRequest;
 use App\Interfaces\AttendanceCorrectionRepositoryInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class AttendanceCorrectionController extends Controller implements HasMiddleware
@@ -28,13 +32,9 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
         ];
     }
 
-    public function getAllPaginated(Request $request)
+    public function getAllPaginated(AttendanceCorrectionListRequest $request)
     {
-        $data = $request->validate([
-            'search' => 'nullable|string',
-            'row_per_page' => 'nullable|integer',
-            'status' => 'nullable|string|in:pending,approved,rejected',
-        ]);
+        $data = $request->validated();
 
         try {
             $corrections = $this->repository->getAllPaginated(
@@ -45,7 +45,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'Attendance Corrections Retrieved Successfully', $corrections, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -57,7 +58,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
 
             return ResponseHelper::jsonResponse(true, 'My Corrections Retrieved Successfully', $corrections, 200);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
@@ -71,67 +73,65 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Correction Not Found', null, 404);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function store(Request $request)
+    public function store(AttendanceCorrectionStoreRequest $request)
     {
-        $data = $request->validate([
-            'attendance_id' => 'required|exists:attendances,id',
-            'requested_check_in' => 'nullable|date',
-            'requested_check_out' => 'nullable|date',
-            'reason' => 'required|string',
-        ]);
+        $data = $request->validated();
 
         try {
             $correction = $this->repository->store($data);
 
             return ResponseHelper::jsonResponse(true, 'Correction Requested Successfully', $correction, 201);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceCorrectionController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceCorrectionController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function approve(Request $request, string $id)
+    public function approve(AttendanceCorrectionApproveRequest $request, string $id)
     {
-        $data = $request->validate([
-            'review_notes' => 'nullable|string',
-        ]);
+        $data = $request->validated();
 
         try {
             $correction = $this->repository->approve($id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Correction Approved Successfully', $correction, 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceCorrectionController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceCorrectionController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }
 
-    public function reject(Request $request, string $id)
+    public function reject(AttendanceCorrectionRejectRequest $request, string $id)
     {
-        $data = $request->validate([
-            'review_notes' => 'required|string',
-        ]);
+        $data = $request->validated();
 
         try {
             $correction = $this->repository->reject($id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Correction Rejected Successfully', $correction, 200);
         } catch (\Exception $e) {
-            \Illuminate\Support\Facades\Log::warning('AttendanceCorrectionController domain exception: ' . $e->getMessage());
+            Log::warning('AttendanceCorrectionController domain exception: '.$e->getMessage());
+
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 400);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('AttendanceCorrectionController Error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }
     }

@@ -7,14 +7,13 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\Performance\CreateReviewCycleRequest;
 use App\Http\Requests\Performance\UpdateReviewCycleRequest;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
+use App\Models\PerformanceReviewTemplate;
 use App\Models\StaffMemberProfile;
 use App\Notifications\Performance\ReviewCycleStarted;
 use App\Services\Performance\ReviewerResolverService;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceReviewCycleController extends Controller implements HasMiddleware
@@ -88,7 +87,7 @@ class PerformanceReviewCycleController extends Controller implements HasMiddlewa
         $assignments = $this->reviewerResolverService->resolveMany($staffMembers);
 
         // Fetch default template as fallback
-        $defaultTemplateId = \App\Models\PerformanceReviewTemplate::where('is_default', true)->first()?->id;
+        $defaultTemplateId = PerformanceReviewTemplate::where('is_default', true)->first()?->id;
 
         $createdCount = 0;
         foreach ($staffMembers as $staffMember) {

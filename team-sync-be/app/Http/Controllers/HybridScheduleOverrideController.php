@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\HybridScheduleOverride;
-use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class HybridScheduleOverrideController extends Controller
 {
@@ -12,13 +12,13 @@ class HybridScheduleOverrideController extends Controller
     {
         $request->validate([
             'date' => 'required|date',
-            'planned_work_mode' => 'required|string',
+            'planned_work_mode' => 'required|string|in:office,remote',
             'reason' => 'required|string',
         ]);
 
         $profile = $request->user()->staffMemberProfile;
 
-        if (!$profile) {
+        if (! $profile) {
             return response()->json(['message' => 'Profile not found'], 404);
         }
 

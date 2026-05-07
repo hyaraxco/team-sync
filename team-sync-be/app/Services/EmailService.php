@@ -44,8 +44,8 @@ use App\Notifications\TeamMemberAdded;
 use App\Notifications\TeamMemberRemoved;
 use App\Notifications\TeamStatusChanged;
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Mail;
 use RuntimeException;
 use Throwable;
 

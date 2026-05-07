@@ -11,6 +11,11 @@ use Illuminate\Support\Facades\Auth;
 
 class LeaveRequestStoreRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return true;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -26,7 +31,6 @@ class LeaveRequestStoreRequest extends FormRequest
             'total_days' => 'nullable|integer|min:1',
             'reason' => 'required|string|max:1000',
             'emergency_contact' => 'nullable|string|max:255',
-            'status' => 'nullable|string|in:pending,approved,rejected',
         ];
     }
 
@@ -42,11 +46,10 @@ class LeaveRequestStoreRequest extends FormRequest
 
     public function prepareForValidation()
     {
-        if (!$this->has('staff_member_id')) {
-            $this->merge([
-                'staff_member_id' => Auth::user()->staffMemberProfile?->id,
-            ]);
-        }
+        $this->merge([
+            'staff_member_id' => Auth::user()->staffMemberProfile?->id,
+            'status' => 'pending',
+        ]);
     }
 
     /**
@@ -55,7 +58,7 @@ class LeaveRequestStoreRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            if (!$this->has('start_date') || !$this->has('end_date')) {
+            if (! $this->has('start_date') || ! $this->has('end_date')) {
                 return;
             }
 
@@ -70,7 +73,7 @@ class LeaveRequestStoreRequest extends FormRequest
 
             if ($collectiveLeaves->isNotEmpty()) {
                 $cutiBersamaDates = $collectiveLeaves->pluck('name')->join(', ');
-                
+
                 $validator->errors()->add(
                     'start_date',
                     "Your leave request includes collective leave days (Cuti Bersama): {$cutiBersamaDates}. These are company-wide holidays and do not require a leave request. Please adjust your dates to exclude these days."
@@ -79,4 +82,3 @@ class LeaveRequestStoreRequest extends FormRequest
         });
     }
 }
-

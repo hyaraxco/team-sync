@@ -22,7 +22,7 @@ class ProjectFactory extends Factory
         $hasEndDate = fake()->boolean(80);
 
         return [
-            'name' => fake()->company() . ' Project',
+            'name' => fake()->company().' Project',
             'type' => fake()->randomElement(array_column(ProjectType::cases(), 'value')),
             'priority' => fake()->randomElement(array_column(ProjectPriority::cases(), 'value')),
             'status' => fake()->randomElement(array_column(ProjectStatus::cases(), 'value')),

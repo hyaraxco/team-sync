@@ -20,7 +20,7 @@ services:
         build:
             context: ./
             dockerfile: ./.docker/php/Dockerfile.local
-        command: php artisan queue:work --tries=3 --timeout=90 --sleep=3
+        command: php artisan queue:work --queue=default,meetings --tries=3 --timeout=600 --sleep=3
         restart: unless-stopped
         healthcheck:
             disable: true
@@ -33,6 +33,22 @@ services:
         depends_on:
             - mysql
             - redis
+    scheduler:
+        build:
+            context: ./
+            dockerfile: ./.docker/php/Dockerfile.local
+        command: php artisan schedule:work
+        restart: unless-stopped
+        volumes:
+            - ./:/var/www/html:cached
+            - laravel-storage:/var/www/html/storage
+            - laravel-vendor:/var/www/html/vendor
+        networks:
+            - api-blue
+        depends_on:
+            - mysql
+            - redis
+
     mysql:
         image: mysql/mysql-server:${MYSQL_VERSION:-8.0}
         ports:

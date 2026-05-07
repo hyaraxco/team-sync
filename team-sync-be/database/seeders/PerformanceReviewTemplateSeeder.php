@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\PerformanceReviewSection;
 use App\Models\PerformanceReviewTemplate;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Collection;
 
 class PerformanceReviewTemplateSeeder extends Seeder
 {
@@ -20,6 +21,7 @@ class PerformanceReviewTemplateSeeder extends Seeder
 
         if ($sections->isEmpty()) {
             $this->command?->warn('No performance review sections found. Run PerformanceReviewSectionSeeder first.');
+
             return;
         }
 
@@ -72,7 +74,7 @@ class PerformanceReviewTemplateSeeder extends Seeder
      */
     private function syncSections(
         PerformanceReviewTemplate $template,
-        \Illuminate\Support\Collection $sections,
+        Collection $sections,
         array $weights
     ): void {
         $syncData = [];

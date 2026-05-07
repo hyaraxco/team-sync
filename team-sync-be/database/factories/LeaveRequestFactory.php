@@ -18,7 +18,7 @@ class LeaveRequestFactory extends Factory
     {
         $startDate = fake()->dateTimeBetween('-1 month', '+1 month');
         $totalDays = fake()->numberBetween(1, 7);
-        $endDate = (clone $startDate)->modify('+' . ($totalDays - 1) . ' days');
+        $endDate = (clone $startDate)->modify('+'.($totalDays - 1).' days');
         $status = fake()->randomElement(['pending', 'approved', 'rejected']);
         $proofReviewStatus = fake()->optional(0.5)->randomElement(['approved', 'rejected']);
         $hasProof = fake()->boolean(40);
@@ -32,7 +32,7 @@ class LeaveRequestFactory extends Factory
             'reason' => fake()->optional()->sentence(),
             'emergency_contact' => fake()->optional()->phoneNumber(),
             'proof_file_path' => $hasProof ? fake()->filePath() : null,
-            'proof_file_name' => $hasProof ? fake()->word() . '.pdf' : null,
+            'proof_file_name' => $hasProof ? fake()->word().'.pdf' : null,
             'proof_mime_type' => $hasProof ? fake()->randomElement(['application/pdf', 'image/jpeg', 'image/png']) : null,
             'proof_size_kb' => $hasProof ? fake()->numberBetween(10, 5120) : null,
             'proof_uploaded_at' => $hasProof ? fake()->dateTimeBetween('-1 month', 'now') : null,

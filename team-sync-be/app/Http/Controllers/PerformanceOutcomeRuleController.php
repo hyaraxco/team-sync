@@ -7,10 +7,8 @@ use App\Http\Requests\Performance\StoreOutcomeRuleRequest;
 use App\Http\Requests\Performance\UpdateOutcomeRuleRequest;
 use App\Http\Resources\PerformanceOutcomeRuleResource;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
-use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class PerformanceOutcomeRuleController extends Controller implements HasMiddleware

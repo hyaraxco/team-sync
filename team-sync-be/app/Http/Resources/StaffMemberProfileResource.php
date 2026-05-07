@@ -38,6 +38,8 @@ class StaffMemberProfileResource extends JsonResource
             'address' => $this->address,
             'city' => $this->city,
             'postal_code' => $this->postal_code,
+            'last_education' => $this->last_education,
+            'seniority_level' => $this->seniority_level,
 
             'job_information' => new JobInformationResource($this->whenLoaded('jobInformation')),
             'bank_information' => $this->when($canSeeSensitive, new BankInformationResource($this->whenLoaded('bankInformation'))),

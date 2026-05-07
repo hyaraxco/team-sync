@@ -30,7 +30,7 @@ class GenerateThrRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'religion_event.in' => 'Invalid religion event. Valid options: ' . implode(', ', array_values(ThrPayroll::RELIGION_EVENT_MAP)),
+            'religion_event.in' => 'Invalid religion event. Valid options: '.implode(', ', array_values(ThrPayroll::RELIGION_EVENT_MAP)),
             'religion_holiday_date.after' => 'Holiday date must be in the future.',
         ];
     }

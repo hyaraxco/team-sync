@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Helpers\PerformanceRatingHelper;
 use App\Interfaces\PerformanceReviewRepositoryInterface;
+use App\Models\Attendance;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceGoal;
 use App\Models\PerformanceOutcomeRule;
@@ -12,7 +13,7 @@ use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\PerformanceReviewTemplate;
-use App\Models\User;
+use App\Models\ProjectTask;
 use App\Services\Performance\PerformanceOutcomeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -404,6 +405,42 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ])
                 ->count();
 
+            $attendanceRecords = Attendance::where('staff_member_id', $employeeId)
+                ->whereBetween('date', [
+                    $cycle->start_date,
+                    $cycle->end_date,
+                ])
+                ->get(['status']);
+
+            $attendanceQuality = 0.0;
+            if ($attendanceRecords->isNotEmpty()) {
+                $attendancePoints = $attendanceRecords->sum(function ($attendance) {
+                    return match ((string) $attendance->status) {
+                        'present' => 1.0,
+                        'late' => 0.7,
+                        'half_day' => 0.5,
+                        'sick_leave', 'annual_leave' => 0.8,
+                        default => 0.0,
+                    };
+                });
+
+                $attendanceQuality = ($attendancePoints / $attendanceRecords->count()) * 100;
+            }
+
+            $allTasks = ProjectTask::where('assignee_id', $employeeId)
+                ->whereBetween('created_at', [
+                    $cycle->start_date.' 00:00:00',
+                    $cycle->end_date.' 23:59:59',
+                ])
+                ->get(['status']);
+
+            $taskCompletionQuality = 0.0;
+            if ($allTasks->isNotEmpty()) {
+                $doneTasks = $allTasks->where('status', 'done')->count();
+                $reviewTasks = $allTasks->where('status', 'review')->count();
+                $taskCompletionQuality = ((($doneTasks * 1.0) + ($reviewTasks * 0.5)) / $allTasks->count()) * 100;
+            }
+
             $candidates[] = [
                 'staff_member_id' => $employeeId,
                 'employee_name' => $review->staffMember->full_name ?? 'Unknown',
@@ -417,6 +454,8 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 'avg_goal_completion' => round((float) $avgGoalCompletion, 4),   // C3
                 'goal_completion_ratio' => round((float) $goalCompletionRatio, 4), // C4
                 'positive_feedback_count' => (int) $positiveFeedbackCount,           // C5
+                'attendance_quality' => round((float) $attendanceQuality, 4),         // C6
+                'task_completion_quality' => round((float) $taskCompletionQuality, 4), // C7
             ];
         }
 

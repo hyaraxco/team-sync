@@ -13,6 +13,7 @@ use App\Enums\Religion;
 use App\Enums\WorkLocation;
 use App\Models\BankInformation;
 use App\Models\StaffMemberProfile;
+use App\Support\SensitiveData;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
@@ -41,13 +42,13 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             'roles.*' => [
                 'required',
                 'string',
-                'in:manager,hr,finance,employee',
+                'in:superadmin,manager,hr,finance,staff',
                 Rule::exists('roles', 'name'),
             ],
 
             // Employee Profile fields
             'code' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('staff_member_profiles', 'code')->ignore($employeeId)],
-            'identity_number' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('staff_member_profiles', 'identity_number')->ignore($employeeId)],
+            'identity_number' => ['sometimes', 'required', 'string', 'max:20', Rule::unique('staff_member_profiles', 'identity_number_hash')->ignore($employeeId)],
             'npwp' => ['nullable', 'string', 'max:30'],
             'bpjs_ketenagakerjaan' => ['nullable', 'string', 'max:30'],
             'bpjs_kesehatan' => ['nullable', 'string', 'max:30'],
@@ -62,6 +63,8 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             'address' => ['sometimes', 'required', 'string'],
             'city' => ['sometimes', 'required', 'string', 'max:100'],
             'postal_code' => ['sometimes', 'required', 'string', 'max:10'],
+            'last_education' => ['nullable', 'string', Rule::in(['sma_smk', 'd1', 'd2', 'd3', 's1', 's2', 's3'])],
+            'seniority_level' => ['nullable', 'string', Rule::in(['junior', 'mid', 'senior', 'lead'])],
 
             // Job Information fields
             'job_title' => ['sometimes', 'required', 'string', 'max:255'],
@@ -75,7 +78,7 @@ class StaffMemberProfileUpdateRequest extends FormRequest
 
             // Bank Information fields
             'bank_name' => ['sometimes', 'required', 'string', 'in:'.implode(',', array_column(BankName::cases(), 'value'))],
-            'account_number' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('bank_information', 'account_number')->ignore($bankInfoId)],
+            'account_number' => ['sometimes', 'required', 'string', 'max:50', Rule::unique('bank_information', 'account_number_hash')->ignore($bankInfoId)],
             'account_holder_name' => ['sometimes', 'required', 'string', 'max:255'],
 
             // Emergency Contacts fields (array)
@@ -114,6 +117,8 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             'address' => 'Address',
             'city' => 'City',
             'postal_code' => 'Postal Code',
+            'last_education' => 'Last Education',
+            'seniority_level' => 'Seniority Level',
             'profile_photo' => 'Profile Photo',
 
             // Job Information attributes
@@ -138,5 +143,13 @@ class StaffMemberProfileUpdateRequest extends FormRequest
             'emergency_contacts.*.phone' => 'Phone Number',
             'emergency_contacts.*.email' => 'Email',
         ];
+    }
+
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'identity_number_hash' => SensitiveData::hash($this->input('identity_number')),
+            'account_number_hash' => SensitiveData::hash($this->input('account_number')),
+        ]);
     }
 }

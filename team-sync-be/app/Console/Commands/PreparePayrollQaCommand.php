@@ -115,11 +115,17 @@ class PreparePayrollQaCommand extends Command
         $manager = User::query()->where('email', 'yudhis@teamsync.com')->firstOrFail();
         $employee = User::query()->where('email', 'agung@teamsync.com')->firstOrFail();
 
-        if (! $hr->hasPermissionTo('payroll-create', 'sanctum') || $hr->hasPermissionTo('payroll-process', 'sanctum')) {
+        // PRD: HR has readiness-view only, no payroll-create/process
+        if ($hr->hasPermissionTo('payroll-create', 'sanctum') || $hr->hasPermissionTo('payroll-process', 'sanctum')) {
             throw new RuntimeException('Permission matrix check failed for HR.');
         }
 
-        if ($finance->hasPermissionTo('payroll-create', 'sanctum')
+        if (! $hr->hasPermissionTo('payroll-readiness-view', 'sanctum')) {
+            throw new RuntimeException('Permission matrix check failed for HR (missing readiness-view).');
+        }
+
+        // PRD: Finance owns payroll-create, process, statistics
+        if (! $finance->hasPermissionTo('payroll-create', 'sanctum')
             || ! $finance->hasPermissionTo('payroll-process', 'sanctum')
             || ! $finance->hasPermissionTo('payroll-statistics', 'sanctum')) {
             throw new RuntimeException('Permission matrix check failed for Finance.');

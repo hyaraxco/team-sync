@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Traits\BelongsToCompany;
+use App\Support\SensitiveData;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,7 +15,7 @@ use Laravel\Scout\Searchable;
  */
 class StaffMemberProfile extends Model
 {
-    use BelongsToCompany, HasFactory, Searchable, SoftDeletes;
+    use HasFactory, Searchable, SoftDeletes;
 
     protected $appends = ['full_name', 'email'];
 
@@ -23,6 +23,7 @@ class StaffMemberProfile extends Model
         'user_id',
         'code',
         'identity_number',
+        'identity_number_hash',
         'npwp',
         'bpjs_ketenagakerjaan',
         'bpjs_kesehatan',
@@ -37,13 +38,26 @@ class StaffMemberProfile extends Model
         'address',
         'city',
         'postal_code',
+        'last_education',
+        'seniority_level',
     ];
 
     protected function casts(): array
     {
         return [
+            'identity_number' => 'encrypted',
+            'npwp' => 'encrypted',
+            'bpjs_ketenagakerjaan' => 'encrypted',
+            'bpjs_kesehatan' => 'encrypted',
             'date_of_birth' => 'date',
         ];
+    }
+
+    protected static function booted(): void
+    {
+        static::saving(function (self $profile) {
+            $profile->identity_number_hash = SensitiveData::hash($profile->identity_number);
+        });
     }
 
     public function getFullNameAttribute(): ?string
