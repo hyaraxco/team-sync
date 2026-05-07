@@ -382,6 +382,10 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
     }
 
+    /**
+     * @deprecated Use ProjectTaskPolicy::create() via Gate::inspect() in controller.
+     * Kept as defense-in-depth until full Policy migration is complete.
+     */
     private function authorizeTaskCreation(array $data): void
     {
         $user = Auth::user();
@@ -441,6 +445,10 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         }
     }
 
+    /**
+     * @deprecated Use ProjectTaskPolicy::delete() via Gate::inspect() in controller.
+     * Kept as defense-in-depth until full Policy migration is complete.
+     */
     private function authorizeTaskDeletion(ProjectTask $task): void
     {
         $user = Auth::user();
@@ -595,6 +603,10 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
         return $status;
     }
 
+    /**
+     * @deprecated Use ProjectTaskPolicy::collaborate() via Gate::inspect() in controller.
+     * Kept as defense-in-depth until full Policy migration is complete.
+     */
     private function authorizeTaskCollaboration(ProjectTask $task, string $action): void
     {
         $user = Auth::user();

@@ -14,11 +14,13 @@ use App\Http\Resources\ProjectTaskCommentResource;
 use App\Http\Resources\ProjectTaskResource;
 use App\Http\Resources\ProjectTaskStatusLogResource;
 use App\Interfaces\ProjectTaskRepositoryInterface;
+use App\Models\ProjectTask;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -111,10 +113,15 @@ class ProjectTaskController extends Controller implements HasMiddleware
      */
     public function store(ProjectTaskStoreRequest $request)
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $task = $this->projectTaskRepository->create($request);
+            $response = Gate::inspect('create', [ProjectTask::class, $data]);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $task = $this->projectTaskRepository->create($data);
 
             return ResponseHelper::jsonResponse(true, 'Task Created Successfully', new ProjectTaskResource($task), 201);
         } catch (AuthorizationException $e) {
@@ -174,6 +181,13 @@ class ProjectTaskController extends Controller implements HasMiddleware
     public function destroy(string $id)
     {
         try {
+            $task = ProjectTask::findOrFail($id);
+
+            $response = Gate::inspect('delete', $task);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $this->projectTaskRepository->delete($id);
 
             return ResponseHelper::jsonResponse(true, 'Task Deleted Successfully', null, 200);
@@ -210,6 +224,13 @@ class ProjectTaskController extends Controller implements HasMiddleware
         $payload = $request->validated();
 
         try {
+            $task = ProjectTask::with('project')->findOrFail($id);
+
+            $response = Gate::inspect('collaborate', $task);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $comment = $this->projectTaskRepository->createComment($id, $payload);
 
             return ResponseHelper::jsonResponse(true, 'Task Comment Created Successfully', new ProjectTaskCommentResource($comment), 201);
@@ -299,6 +320,13 @@ class ProjectTaskController extends Controller implements HasMiddleware
         $payload = $request->validated();
 
         try {
+            $task = ProjectTask::with('project')->findOrFail($id);
+
+            $response = Gate::inspect('collaborate', $task);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $attachment = $this->projectTaskRepository->createAttachment($id, $payload);
 
             return ResponseHelper::jsonResponse(true, 'Task Attachment Uploaded Successfully', new ProjectTaskAttachmentResource($attachment), 201);
