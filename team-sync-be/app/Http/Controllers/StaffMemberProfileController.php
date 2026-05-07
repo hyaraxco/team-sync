@@ -16,11 +16,13 @@ use App\Interfaces\StaffMemberProfileRepositoryInterface;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Support\SensitiveData;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 
@@ -97,12 +99,19 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
      */
     public function store(StaffMemberProfileStoreRequest $request): JsonResponse
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $employee = $this->staffMemberProfileRepository->create($request);
+            $response = Gate::inspect('create', StaffMemberProfile::class);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $employee = $this->staffMemberProfileRepository->create($data);
 
             return ResponseHelper::jsonResponse(true, 'Employee Created Successfully', StaffMemberProfileResource::make($employee), 201);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -174,14 +183,23 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
      */
     public function update(StaffMemberProfileUpdateRequest $request, string $id): JsonResponse
     {
-        $request = $request->validated();
+        $data = $request->validated();
 
         try {
-            $employee = $this->staffMemberProfileRepository->update($id, $request);
+            $profile = StaffMemberProfile::findOrFail($id);
+
+            $response = Gate::inspect('update', $profile);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
+            $employee = $this->staffMemberProfileRepository->update($id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Employee Updated Successfully', StaffMemberProfileResource::make($employee), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -195,11 +213,20 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
     public function destroy(string $id): JsonResponse
     {
         try {
+            $profile = StaffMemberProfile::findOrFail($id);
+
+            $response = Gate::inspect('delete', $profile);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $this->staffMemberProfileRepository->delete($id);
 
             return ResponseHelper::jsonResponse(true, 'Employee Deleted Successfully', null, 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -213,9 +240,16 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
     public function getStatistics(): JsonResponse
     {
         try {
+            $response = Gate::inspect('viewStatistics', StaffMemberProfile::class);
+            if ($response->denied()) {
+                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
+            }
+
             $statistics = $this->staffMemberProfileRepository->getStatistics();
 
             return ResponseHelper::jsonResponse(true, 'Employee statistics fetched successfully', $statistics, 200);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

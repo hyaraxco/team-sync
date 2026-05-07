@@ -191,6 +191,76 @@ class ProjectTaskPolicyTest extends TestCase
         $this->assertTrue($response->allowed());
     }
 
+    // ─── update with data (field-level checks) ────────────────────────────
+
+    public function test_staff_cannot_change_task_name(): void
+    {
+        $task = $this->createTask(TaskStatus::IN_PROGRESS);
+
+        $response = $this->policy->update($this->staffUser, $task, [
+            'name' => 'Changed Name',
+        ]);
+        $this->assertFalse($response->allowed());
+    }
+
+    public function test_staff_cannot_reassign_via_update(): void
+    {
+        $task = $this->createTask(TaskStatus::TODO);
+
+        $response = $this->policy->update($this->staffUser, $task, [
+            'assignee_id' => $this->managerProfile->id,
+        ]);
+        $this->assertFalse($response->allowed());
+    }
+
+    public function test_staff_can_transition_todo_to_in_progress_via_update(): void
+    {
+        $task = $this->createTask(TaskStatus::TODO);
+
+        $response = $this->policy->update($this->staffUser, $task, [
+            'status' => 'in_progress',
+        ]);
+        $this->assertTrue($response->allowed());
+    }
+
+    public function test_staff_cannot_transition_todo_to_done_via_update(): void
+    {
+        $task = $this->createTask(TaskStatus::TODO);
+
+        $response = $this->policy->update($this->staffUser, $task, [
+            'status' => 'done',
+        ]);
+        $this->assertFalse($response->allowed());
+    }
+
+    public function test_manager_cannot_reassign_during_review(): void
+    {
+        $task = $this->createTask(TaskStatus::REVIEW);
+
+        $response = $this->policy->update($this->managerUser, $task, [
+            'assignee_id' => $this->managerProfile->id,
+        ]);
+        $this->assertFalse($response->allowed());
+    }
+
+    public function test_reviewer_reject_requires_reason(): void
+    {
+        $task = $this->createTask(TaskStatus::REVIEW);
+
+        // Without reason
+        $response = $this->policy->update($this->managerUser, $task, [
+            'status' => 'rejected',
+        ]);
+        $this->assertFalse($response->allowed());
+
+        // With reason
+        $response = $this->policy->update($this->managerUser, $task, [
+            'status' => 'rejected',
+            'rejected_reason' => 'Needs rework',
+        ]);
+        $this->assertTrue($response->allowed());
+    }
+
     // ─── reassign ───────────────────────────────────────────────────────
 
     public function test_staff_cannot_reassign(): void
