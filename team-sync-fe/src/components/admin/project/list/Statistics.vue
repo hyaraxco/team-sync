@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
 import VueApexCharts from "vue3-apexcharts";
-import { TrendingUp, Target, Clock, Briefcase, PlayCircle } from "lucide-vue-next";
+import { TrendingUp, Briefcase, PlayCircle } from "lucide-vue-next";
 import { useProjectStore } from "@/stores/project";
 import { storeToRefs } from "pinia";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";

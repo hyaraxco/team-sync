@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { useRouter } from "vue-router";
 import { useToast } from "@/composables/useToast";
-import { Calendar, Plus, Users, TrendingUp, Clock, CheckCircle2, XCircle, Play, Trash2 } from "lucide-vue-next";
+import { Calendar, Plus, TrendingUp, Clock, CheckCircle2, XCircle, Play, Trash2 } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";

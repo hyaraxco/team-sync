@@ -2,7 +2,7 @@
 import { formatToClientTimezone, DEFAULT_AVATAR } from "@/helpers/format";
 import { can } from "@/helpers/permissionHelper";
 import _ from "lodash";
-import { Calendar, Crown, Edit, Eye, FileText, User } from "lucide-vue-next";
+import { Calendar, Crown, Edit, FileText } from "lucide-vue-next";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useRouter } from "vue-router";

@@ -1,9 +1,9 @@
 <script setup>
-import { CheckCircle, X, Calendar, Clock } from "lucide-vue-next";
+import { CheckCircle, Calendar, Clock } from "lucide-vue-next";
 import { formatLeaveType } from "@/utils/attendanceUtils";
 import { formatDateShort } from "@/utils/dateUtils";
 
-const props = defineProps({
+defineProps({
     show: {
         type: Boolean,
         required: true,

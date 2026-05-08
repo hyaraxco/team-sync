@@ -7,17 +7,7 @@ import { useConfirmAction } from "@/composables/useConfirmAction";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import { useToast } from "@/composables/useToast";
 import { formatDateShort } from "@/utils/dateUtils";
-import {
-    Check,
-    X,
-    ClipboardList,
-    CalendarDays,
-    List,
-    ChevronLeft,
-    ChevronRight,
-    FileSearch,
-    ExternalLink,
-} from "lucide-vue-next";
+import { Check, X, CalendarDays, List, ChevronLeft, ChevronRight, FileSearch, ExternalLink } from "lucide-vue-next";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import EmptyState from "@/components/common/EmptyState.vue";

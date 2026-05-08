@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import { ArrowLeft, Calendar, Target, TrendingUp, CheckCircle2, Clock, AlertTriangle, XCircle } from "lucide-vue-next";
+import { ArrowLeft, TrendingUp, CheckCircle2, Clock, AlertTriangle, XCircle } from "lucide-vue-next";
 import { usePerformanceGoalStore } from "@/stores/performanceGoal";
 import { useAuthStore } from "@/stores/auth";
 import MainCard from "@/components/common/MainCard.vue";

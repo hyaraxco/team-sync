@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { useRouter } from "vue-router";
-import { Users, Calendar, TrendingUp, Clock, CheckCircle2, AlertCircle, Filter } from "lucide-vue-next";
+import { Calendar, TrendingUp, Clock, CheckCircle2, AlertCircle } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";

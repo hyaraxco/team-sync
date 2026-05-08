@@ -2,7 +2,6 @@
 import { onMounted, watch } from "vue";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { useRouter } from "vue-router";
-import { User } from "lucide-vue-next";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { getTimeAgo } from "@/utils/dateUtils";
 import { storeToRefs } from "pinia";

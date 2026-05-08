@@ -2,7 +2,7 @@
 import { onMounted, computed } from "vue";
 import { useDashboardStore } from "@/stores/dashboard";
 import { storeToRefs } from "pinia";
-import { User, Clock, Wifi, AlertCircle } from "lucide-vue-next";
+import { Clock, AlertCircle } from "lucide-vue-next";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 
 const dashboardStore = useDashboardStore();

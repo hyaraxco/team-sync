@@ -8,7 +8,7 @@ interface Props {
     step3Data: any;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 // Format date to readable format
 const formatDate = (date: string) => {

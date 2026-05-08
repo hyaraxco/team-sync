@@ -19,7 +19,6 @@ import {
 import { DateTime } from "luxon";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
 import AttendanceCorrectionsList from "@/components/staff-member/attendance/AttendanceCorrectionsList.vue";
-import AttendanceCorrectionModal from "@/components/staff-member/attendance/AttendanceCorrectionModal.vue";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useOptionStore } from "@/stores/option";
@@ -341,7 +340,7 @@ const submitCorrection = async (payload) => {
         await requestCorrection(payload);
         showCorrectionModal.value = false;
         toast.success("Success", "Correction request submitted.");
-    } catch (error) {
+    } catch (_error) {
         toast.error("Error", "Failed to submit correction request.");
     }
 };

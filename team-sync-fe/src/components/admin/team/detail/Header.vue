@@ -4,7 +4,7 @@ import { RouterLink } from "vue-router";
 import _ from "lodash";
 import { formatToClientTimezone } from "@/helpers/format";
 
-const props = defineProps({
+defineProps({
     team: {
         type: Object,
         required: true,

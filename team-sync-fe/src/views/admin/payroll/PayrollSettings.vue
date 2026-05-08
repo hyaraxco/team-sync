@@ -143,7 +143,7 @@ const loadSettings = async () => {
     try {
         const payload = await payrollStore.fetchSettings();
         hydrateForm(payload);
-    } catch (error) {
+    } catch (_error) {
         toast.error("Failed to load payroll settings", payrollStore.error || "Please try again.");
     }
 };
@@ -153,7 +153,7 @@ const loadSettingsHistory = async () => {
         loadingHistory.value = true;
         settingsHistory.value = await payrollStore.fetchSettingsHistory();
         selectedHistoryVersionId.value = settingsHistory.value[0]?.id ?? null;
-    } catch (error) {
+    } catch (_error) {
         toast.error("Failed to load payroll settings history", payrollStore.error || "Please try again.");
         settingsHistory.value = [];
         selectedHistoryVersionId.value = null;
@@ -166,7 +166,7 @@ const loadBpjsRateHistory = async () => {
     try {
         loadingBpjsRateHistory.value = true;
         bpjsRateHistory.value = await payrollStore.fetchBpjsRateHistory();
-    } catch (error) {
+    } catch (_error) {
         toast.error("Failed to load BPJS rate history", payrollStore.error || "Please try again.");
         bpjsRateHistory.value = [];
     } finally {
@@ -340,7 +340,7 @@ const handleSubmit = async () => {
         );
         hydrateForm(settings.value);
         await loadSettingsHistory();
-    } catch (error) {
+    } catch (_error) {
         toast.error("Failed to save payroll settings", payrollStore.error || "Please check the form and try again.");
     }
 };

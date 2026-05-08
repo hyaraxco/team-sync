@@ -1,5 +1,4 @@
-import { ref, watch } from "vue";
-import { debounce } from "lodash";
+import { ref } from "vue";
 
 /**
  * Composable for search, filter, and pagination logic.
@@ -10,7 +9,7 @@ import { debounce } from "lodash";
  * @param {number} [options.debounceMs=300] - Debounce delay in ms
  * @param {number} [options.defaultPerPage=10] - Default rows per page
  */
-export function useSearchFilter({ defaultFilters = {}, fetchFn, debounceMs = 300, defaultPerPage = 10 }) {
+export function useSearchFilter({ defaultFilters = {}, fetchFn, debounceMs: _debounceMs = 300, defaultPerPage = 10 }) {
     const filters = ref({ ...defaultFilters });
 
     const serverOptions = ref({

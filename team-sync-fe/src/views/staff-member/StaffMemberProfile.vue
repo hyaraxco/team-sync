@@ -9,27 +9,8 @@ import { DEFAULT_AVATAR } from "@/helpers/format";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
 import { formatRupiah as formatCurrency, capitalize } from "@/utils/formatUtils.js";
-import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useToast } from "@/composables/useToast";
-import {
-    Edit,
-    CheckCircle,
-    CalendarCheck,
-    Folder,
-    TrendingUp,
-    Contact,
-    Briefcase,
-    MapPin,
-    Phone,
-    Users,
-    ListChecks,
-    Calendar,
-    Code,
-    Star,
-    Building,
-    User,
-    Clock,
-} from "lucide-vue-next";
+import { Edit, Contact, Briefcase, MapPin, Phone, Users, Calendar, Code, Star, Building, User } from "lucide-vue-next";
 
 const staffMemberStore = useStaffMemberStore();
 const authStore = useAuthStore();
