@@ -1,7 +1,7 @@
 <script setup>
 import { X, AlertTriangle } from "lucide-vue-next";
 
-const props = defineProps({
+defineProps({
     show: {
         type: Boolean,
         default: false,

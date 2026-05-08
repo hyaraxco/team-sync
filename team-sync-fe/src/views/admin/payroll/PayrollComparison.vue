@@ -1,9 +1,8 @@
 <script setup>
-import { ref, onMounted, computed, watch } from "vue";
+import { ref, onMounted } from "vue";
 import { usePayrollStore } from "@/stores/payroll";
 import { storeToRefs } from "pinia";
-import { formatRupiah, formatRupiahCompact } from "@/utils/formatUtils";
-import { can } from "@/helpers/permissionHelper";
+import { formatRupiah } from "@/utils/formatUtils";
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 
@@ -32,7 +31,7 @@ onMounted(() => {
     loadComparison();
 });
 
-const getVarianceColor = (metric, diff, pct) => {
+const getVarianceColor = (metric, diff, _pct) => {
     if (diff === 0) return "text-gray-500";
 
     // Higher is generally "worse" for cost from company perspective, but we'll highlight green for positive variance for most, except deductions

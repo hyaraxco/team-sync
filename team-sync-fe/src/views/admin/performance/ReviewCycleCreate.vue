@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { useRouter } from "vue-router";
-import { Calendar, ArrowLeft, Layout } from "lucide-vue-next";
+import { ArrowLeft, Layout } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import Alert from "@/components/common/Alert.vue";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";

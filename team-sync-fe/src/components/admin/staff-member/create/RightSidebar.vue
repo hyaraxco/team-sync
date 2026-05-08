@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Lightbulb, Check, Zap, Users, Copy, BookOpen, BookOpenCheck } from "lucide-vue-next";
+import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
 </script>
 
 <template>

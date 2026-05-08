@@ -1,7 +1,6 @@
 <script setup>
 import Stepper from "@/components/admin/staff-member/create/Stepper.vue";
-import Header from "@/components/admin/Header.vue";
-import { BellIcon, SettingsIcon, ChevronDownIcon, MessageCircleIcon, ArrowLeft, UserIcon } from "lucide-vue-next";
+import { BellIcon, SettingsIcon, ChevronDownIcon, MessageCircleIcon, ArrowLeft } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { ref, provide, computed, watch } from "vue";

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch } from "vue";
 import { X, Clock } from "lucide-vue-next";
 
 const props = defineProps({

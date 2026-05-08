@@ -1,9 +1,8 @@
 <script setup>
-import { computed } from "vue";
 import { formatDateShort, formatTime } from "@/utils/dateUtils";
 import EmptyState from "@/components/common/EmptyState.vue";
 
-const props = defineProps({
+defineProps({
     corrections: {
         type: Array,
         required: true,

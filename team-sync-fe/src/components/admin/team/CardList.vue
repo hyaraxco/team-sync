@@ -1,9 +1,9 @@
 <script setup>
-import { CheckCircle, Eye, Edit, User } from "lucide-vue-next";
+import { CheckCircle, Eye, Edit } from "lucide-vue-next";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 
-const props = defineProps({
+defineProps({
     data: {
         type: Object,
         required: true,

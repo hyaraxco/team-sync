@@ -188,7 +188,7 @@ const deleteGoal = async (goal) => {
 
     openModal(goal);
 
-    const isConfirmed = window.confirm(`Delete goal \"${goal.title}\"? This action cannot be undone.`);
+    const isConfirmed = window.confirm(`Delete goal "${goal.title}"? This action cannot be undone.`);
 
     if (!isConfirmed) {
         closeModal();

@@ -25,7 +25,6 @@ import {
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
 import { RouterLink } from "vue-router";
-import { ref } from "vue";
 
 const props = defineProps(["isOpen"]);
 const emit = defineEmits(["navigate"]);

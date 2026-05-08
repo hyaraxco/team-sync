@@ -3,7 +3,7 @@ import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceFeedbackStore } from "@/stores/performanceFeedback";
 import { useToast } from "@/composables/useToast";
-import { MessageSquare, ThumbsUp, AlertCircle, MessageCircle, Check, Eye, EyeOff } from "lucide-vue-next";
+import { ThumbsUp, AlertCircle, MessageCircle, Check } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 

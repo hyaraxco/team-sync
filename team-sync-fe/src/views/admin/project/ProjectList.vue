@@ -4,7 +4,7 @@ import Statistics from "@/components/admin/project/list/Statistics.vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import { useProjectStore } from "@/stores/project";
 import { storeToRefs } from "pinia";
-import { Upload, Plus, Briefcase, SearchX } from "lucide-vue-next";
+import { Upload, Plus, Briefcase } from "lucide-vue-next";
 import { onMounted } from "vue";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import { can } from "@/helpers/permissionHelper";

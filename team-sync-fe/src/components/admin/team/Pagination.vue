@@ -72,14 +72,12 @@ const visiblePages = computed(() => {
 
 const handlePageChange = (page) => {
     if (page !== currentPage.value && !props.loading) {
-        console.log("Page changed to:", page);
         emit("page-change", page);
     }
 };
 
 const handlePerPageChange = (newPerPage) => {
     if (newPerPage !== perPage.value && !props.loading) {
-        console.log("Per page changed to:", newPerPage);
         emit("per-page-change", newPerPage);
     }
 };

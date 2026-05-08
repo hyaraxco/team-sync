@@ -191,7 +191,7 @@ const acknowledge = async (id) => {
     try {
         await attendanceStore.acknowledgePolicyMismatch(id, "Acknowledged by HR");
         mismatches.value = mismatches.value.filter((m) => m.id !== id);
-    } catch (err) {
+    } catch (_err) {
         alert("Failed to acknowledge mismatch");
     }
 };
@@ -200,7 +200,7 @@ const resolve = async (id) => {
     try {
         await attendanceStore.resolvePolicyMismatch(id, "Resolved to match scheduled");
         mismatches.value = mismatches.value.filter((m) => m.id !== id);
-    } catch (err) {
+    } catch (_err) {
         alert("Failed to resolve mismatch");
     }
 };

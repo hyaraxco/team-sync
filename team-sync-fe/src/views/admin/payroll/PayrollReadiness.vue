@@ -350,7 +350,7 @@ const fetchData = async () => {
         ]);
         readinessDashboard.value = dashboard;
         teamSummary.value = teamData;
-    } catch (error) {
+    } catch (_error) {
         toast.error("Failed to load readiness data", payrollStore.error || "Please try again.");
     } finally {
         loading.value = false;

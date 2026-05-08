@@ -65,11 +65,7 @@ const goToTeamDetail = (id: number) => {
 
         <!-- Team List -->
         <div v-else class="space-y-4">
-            <div
-                v-for="(team, index) in latestTeams"
-                :key="team.id"
-                class="flex flex-col sm:flex-row sm:items-center gap-3"
-            >
+            <div v-for="team in latestTeams" :key="team.id" class="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div
                     class="w-14 h-12 sm:w-16 sm:h-14 relative flex items-center justify-center rounded-[8px] overflow-hidden"
                 >

@@ -36,7 +36,7 @@ import Header from "@/components/admin/team/detail/Header.vue";
 import Statistic from "@/components/admin/team/detail/Statistic.vue";
 import Chart from "@/components/admin/team/detail/Chart.vue";
 import { useStaffMemberStore } from "@/stores/staffMember";
-import { Search, SearchX, ChevronDown, X } from "lucide-vue-next";
+import { Search, X } from "lucide-vue-next";
 import EmptyState from "@/components/common/EmptyState.vue";
 import { useToast } from "@/composables/useToast";
 

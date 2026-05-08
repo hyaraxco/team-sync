@@ -13,7 +13,6 @@ import {
     AlertTriangle,
     Info,
     RefreshCw,
-    Upload,
     ArrowRight,
     ArrowLeft,
     PartyPopper,

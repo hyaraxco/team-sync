@@ -4,7 +4,7 @@ import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import Input from "@/components/common/form/Input.vue";
 import Alert from "@/components/common/Alert.vue";
-import { AtSign, ArrowLeft, Mail, Send, CheckCircle2 } from "lucide-vue-next";
+import { AtSign, ArrowLeft, Send, CheckCircle2 } from "lucide-vue-next";
 import { RouterLink } from "vue-router";
 
 const authStore = useAuthStore();

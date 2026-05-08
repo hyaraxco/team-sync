@@ -125,7 +125,7 @@ vi.mock("@/composables/useSearchFilter", () => ({
 }));
 
 vi.mock("@/composables/useConfirmAction", () => ({
-    useConfirmAction: ({ onSuccess }) => ({
+    useConfirmAction: ({ _onSuccess }) => ({
         isModalOpen: false,
         selectedItem: null,
         isProcessing: false,
@@ -136,7 +136,7 @@ vi.mock("@/composables/useConfirmAction", () => ({
 }));
 
 vi.mock("@/helpers/permissionHelper", () => ({
-    can: (permission) => true,
+    can: (_permission) => true,
 }));
 
 vi.mock("@/utils/dateUtils", () => ({

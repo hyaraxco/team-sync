@@ -1,11 +1,10 @@
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
-import { Clock, Check, X, Plus, Timer, CalendarDays, AlertCircle } from "lucide-vue-next";
+import { Check, X, Plus, Timer, AlertCircle } from "lucide-vue-next";
 import { useOvertimeStore } from "@/stores/overtime";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { formatDateShort } from "@/utils/dateUtils";
-import SearchFilter from "@/components/common/SearchFilter.vue";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
@@ -111,7 +110,7 @@ const confirmReject = async () => {
         rejectionReason.value = "";
         await fetchData();
         store.fetchOvertimeSummary();
-    } catch (e) {
+    } catch (_e) {
         toast.error("Error", "Failed to reject overtime record.");
     }
 };
@@ -136,7 +135,7 @@ const submitCreate = async () => {
         showCreateModal.value = false;
         await fetchData();
         store.fetchOvertimeSummary();
-    } catch (e) {
+    } catch (_e) {
         toast.error("Error", store.error || "Failed to create overtime record.");
     }
 };

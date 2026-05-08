@@ -2,7 +2,7 @@
 import { onMounted } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { storeToRefs } from "pinia";
-import { Clock, CalendarDays } from "lucide-vue-next";
+import { Clock } from "lucide-vue-next";
 import { useAttendanceStore } from "@/stores/attendance";
 import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils";
 import SearchFilter from "@/components/common/SearchFilter.vue";

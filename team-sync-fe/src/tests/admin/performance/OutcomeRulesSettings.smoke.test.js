@@ -153,7 +153,6 @@ describe("OutcomeRulesSettings smoke", () => {
     it("opens edit modal on edit button click", async () => {
         performanceReviewRefs.outcomeRules.value = sampleRules;
         const wrapper = factory();
-        const editBtns = wrapper.findAll("button").filter((b) => b.find("svg"));
         const editBtn = wrapper.findAll("td").at(-1)?.findAll("button")?.at(0);
         if (editBtn) {
             await editBtn.trigger("click");

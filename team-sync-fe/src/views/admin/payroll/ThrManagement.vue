@@ -1,7 +1,7 @@
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
-import { Gift, Check, X, Plus, Calendar, DollarSign, Users, AlertCircle } from "lucide-vue-next";
+import { Gift, Check, Plus, DollarSign, Users, AlertCircle } from "lucide-vue-next";
 import { useThrStore } from "@/stores/thr";
 import { formatDateShort } from "@/utils/dateUtils";
 import Pagination from "@/components/admin/team/Pagination.vue";
@@ -71,7 +71,7 @@ async function handleSimulate() {
             religion_holiday_date: generateForm.value.religion_holiday_date,
         });
         showSimulationModal.value = true;
-    } catch (e) {
+    } catch (_e) {
         toast.error(store.error || "Simulation failed");
     }
 }
@@ -84,7 +84,7 @@ async function handleGenerate() {
         showSimulationModal.value = false;
         resetForm();
         await fetchData();
-    } catch (e) {
+    } catch (_e) {
         toast.error(store.error || "Generation failed");
     }
 }
@@ -95,7 +95,7 @@ async function handleApprove(thr) {
         const result = await store.approve(thr.id);
         toast.success(result.message || "THR approved");
         await fetchData();
-    } catch (e) {
+    } catch (_e) {
         toast.error(store.error || "Approval failed");
     }
 }
@@ -114,7 +114,7 @@ async function handleMarkAsPaid() {
         showPaymentModal.value = false;
         selectedThr.value = null;
         await fetchData();
-    } catch (e) {
+    } catch (_e) {
         toast.error(store.error || "Failed to mark as paid");
     }
 }

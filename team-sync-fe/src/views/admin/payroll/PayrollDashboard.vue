@@ -5,9 +5,7 @@ import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { can } from "@/helpers/permissionHelper";
 import {
-    DollarSign,
     UserCheck,
-    Clock,
     Banknote,
     Plus,
     FileText,
@@ -238,7 +236,7 @@ const handleExportReport = async () => {
         });
         toast.success("Report exported", "Payroll report downloaded successfully.");
         closeExportReportModal();
-    } catch (error) {
+    } catch (_error) {
         toast.error("Export report failed", payrollStore.error || "Failed to export payroll report. Please try again.");
     }
 };

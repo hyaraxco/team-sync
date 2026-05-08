@@ -18,7 +18,6 @@ import {
     Code,
     Check,
     Settings,
-    DollarSign,
     PlayCircle,
     ClipboardList,
     PauseCircle,
@@ -27,7 +26,6 @@ import {
     Flag,
     Zap,
     Search,
-    SearchX,
 } from "lucide-vue-next";
 import { onMounted, ref, watch } from "vue";
 import { debounce } from "lodash";

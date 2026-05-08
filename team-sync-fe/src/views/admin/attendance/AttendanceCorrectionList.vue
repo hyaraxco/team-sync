@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { storeToRefs } from "pinia";
-import { Check, X, ClipboardList } from "lucide-vue-next";
+import { Check, X } from "lucide-vue-next";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
 import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils";
 import SearchFilter from "@/components/common/SearchFilter.vue";

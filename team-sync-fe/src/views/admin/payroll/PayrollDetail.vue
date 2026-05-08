@@ -17,7 +17,6 @@ import {
     RotateCcw,
     Settings,
     Activity,
-    UserCheck,
     ShieldCheck,
     XCircle,
     Minus,
@@ -419,7 +418,7 @@ const fetchPayrollApprovals = async () => {
     try {
         loadingApprovals.value = true;
         approvalStatus.value = await payrollStore.fetchPayrollApprovals(route.params.id);
-    } catch (error) {
+    } catch (_error) {
         approvalStatus.value = null;
     } finally {
         loadingApprovals.value = false;

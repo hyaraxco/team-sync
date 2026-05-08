@@ -1,8 +1,7 @@
 import { mount } from "@vue/test-utils";
-import { describe, it, expect, vi } from "vitest";
+import { describe, it, expect } from "vitest";
 import AttendanceSettings from "@/views/admin/attendance/AttendanceSettings.vue";
 import { createPinia, setActivePinia } from "pinia";
-import { useHolidayCalendarStore } from "@/stores/holidayCalendar";
 
 describe("AttendanceSettings.vue", () => {
     it("renders the header and tabs", () => {

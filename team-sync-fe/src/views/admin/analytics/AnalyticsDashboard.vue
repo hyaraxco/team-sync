@@ -5,7 +5,6 @@ import { useAnalyticsStore } from "@/stores/analytics";
 import { useTeamStore } from "@/stores/team";
 import { useOptionStore } from "@/stores/option";
 import StatsCard from "@/components/common/StatsCard.vue";
-import MainCard from "@/components/common/MainCard.vue";
 import AttendanceAnalytics from "@/components/admin/analytics/AttendanceAnalytics.vue";
 import WorkforceAnalytics from "@/components/admin/analytics/WorkforceAnalytics.vue";
 import LeaveAnalytics from "@/components/admin/analytics/LeaveAnalytics.vue";
@@ -22,7 +21,6 @@ import {
     FolderKanbanIcon,
     PalmtreeIcon,
     TrendingUpIcon,
-    TrendingDownIcon,
     FilterIcon,
     DownloadIcon,
     FileSpreadsheetIcon,
