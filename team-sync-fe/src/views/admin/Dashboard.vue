@@ -1,6 +1,5 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed } from "vue";
-import { useAuthStore } from "@/stores/auth";
 import { can } from "@/helpers/permissionHelper";
 import Statistics from "@/components/admin/dashboard/Statistics.vue";
 import EmployeeStatistics from "@/components/admin/dashboard/EmployeeStatistics.vue";
@@ -13,26 +12,11 @@ import UpcomingMeetings from "@/components/common/UpcomingMeetings.vue";
 
 import PayrollAnalyticsEnhanced from "@/components/admin/analytics/PayrollAnalyticsEnhanced.vue";
 
-const authStore = useAuthStore();
-
-// Check if user is employee role
-const isEmployee = computed(() => {
-  return authStore.user?.roles?.some((role: any) => role === "staff");
-});
-
-// Check if user is finance role
-const isFinance = computed(() => {
-  return authStore.user?.roles?.some((role: any) => role === "finance");
-});
-
-// Check if user is manager role
-const isManager = computed(() => {
-  return authStore.user?.roles?.some((role: any) => role === "manager");
-});
-
-// Check if user has HR-level dashboard access (company-wide stats)
-const hasDashboardHrView = computed(() => can('dashboard-hr-view'));
-
+// Permission-based dashboard branching (no role checks)
+const hasSelfView = computed(() => can('dashboard-self-view'));
+const hasFinanceView = computed(() => can('dashboard-finance-view'));
+const hasTeamView = computed(() => can('dashboard-team-view'));
+const hasHrView = computed(() => can('dashboard-hr-view'));
 const showTeamPulse = computed(() => can('review-manager-submit'));
 
 // Search params shared between SearchSection and Latest components
@@ -45,19 +29,22 @@ const handleSearch = (params) => {
 
 <template>
   <div class="space-y-6">
-    <template v-if="isEmployee">
+    <!-- Staff: self-service dashboard (dashboard-self-view only, no other dashboard perms) -->
+    <template v-if="hasSelfView && !hasFinanceView && !hasTeamView && !hasHrView">
       <div class="space-y-6">
         <EmployeeStatistics />
       </div>
     </template>
 
-    <template v-else-if="isFinance">
+    <!-- Finance: payroll analytics dashboard -->
+    <template v-else-if="hasFinanceView && !hasHrView">
       <div class="space-y-6">
         <PayrollAnalyticsEnhanced />
       </div>
     </template>
 
-    <template v-else-if="isManager">
+    <!-- Manager: team-scoped dashboard -->
+    <template v-else-if="hasTeamView && !hasHrView">
       <div class="space-y-6">
         <TeamPulseOverview v-if="showTeamPulse" />
         <EmployeeStatistics />
@@ -65,13 +52,13 @@ const handleSearch = (params) => {
       </div>
     </template>
 
+    <!-- HR / Superadmin: full company-wide dashboard -->
     <template v-else>
-      <!-- HR / Superadmin: full company-wide dashboard -->
       <div class="space-y-6">
         <TeamPulseOverview v-if="showTeamPulse" />
-        <Statistics v-if="hasDashboardHrView" />
+        <Statistics v-if="hasHrView" />
         <SearchSection @search="handleSearch" />
-        <div v-if="hasDashboardHrView" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div v-if="hasHrView" class="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <LatestEmployees :searchParams="searchParams" />
           <LatestTeams :searchParams="searchParams" />
           <TodayAttendanceOverview />
