@@ -1,9 +1,9 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useTaskStore } from '@/stores/task';
-import { axiosInstance } from '@/plugins/axios';
+import { setActivePinia, createPinia } from "pinia";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { useTaskStore } from "@/stores/task";
+import { axiosInstance } from "@/plugins/axios";
 
-vi.mock('@/plugins/axios', () => ({
+vi.mock("@/plugins/axios", () => ({
     axiosInstance: {
         get: vi.fn(),
         post: vi.fn(),
@@ -12,7 +12,7 @@ vi.mock('@/plugins/axios', () => ({
     },
 }));
 
-describe('Task Store', () => {
+describe("Task Store", () => {
     let store;
 
     beforeEach(() => {
@@ -21,8 +21,11 @@ describe('Task Store', () => {
         vi.clearAllMocks();
     });
 
-    it('fetchProjectTasks populates tasks state', async () => {
-        const mockTasks = [{ id: 1, name: 'Task A' }, { id: 2, name: 'Task B' }];
+    it("fetchProjectTasks populates tasks state", async () => {
+        const mockTasks = [
+            { id: 1, name: "Task A" },
+            { id: 2, name: "Task B" },
+        ];
         axiosInstance.get.mockResolvedValueOnce({
             data: {
                 data: mockTasks,
@@ -31,7 +34,7 @@ describe('Task Store', () => {
 
         await store.fetchProjectTasks(7);
 
-        expect(axiosInstance.get).toHaveBeenCalledWith('project-tasks', {
+        expect(axiosInstance.get).toHaveBeenCalledWith("project-tasks", {
             params: {
                 project_id: 7,
             },
@@ -40,156 +43,156 @@ describe('Task Store', () => {
         expect(store.loading).toBe(false);
     });
 
-    it('fetchProjectTasks sets error on failure', async () => {
+    it("fetchProjectTasks sets error on failure", async () => {
         axiosInstance.get.mockRejectedValueOnce({
             response: {
                 data: {
-                    message: 'Failed to load tasks',
+                    message: "Failed to load tasks",
                 },
             },
         });
 
         await store.fetchProjectTasks(7);
 
-        expect(store.error).toBe('Failed to load tasks');
+        expect(store.error).toBe("Failed to load tasks");
         expect(store.loading).toBe(false);
     });
 
-    it('createTask posts data and returns created task', async () => {
-        const payload = { title: 'Write tests' };
-        const createdTask = { id: 3, title: 'Write tests' };
+    it("createTask posts data and returns created task", async () => {
+        const payload = { title: "Write tests" };
+        const createdTask = { id: 3, title: "Write tests" };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
-                message: 'Task created',
+                message: "Task created",
                 data: createdTask,
             },
         });
 
         const result = await store.createTask(payload);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('project-tasks', payload);
+        expect(axiosInstance.post).toHaveBeenCalledWith("project-tasks", payload);
         expect(result).toEqual(createdTask);
-        expect(store.success).toBe('Task created');
+        expect(store.success).toBe("Task created");
         expect(store.loading).toBe(false);
     });
 
-    it('createTask sets error on failure', async () => {
+    it("createTask sets error on failure", async () => {
         axiosInstance.post.mockRejectedValueOnce({
             response: {
                 data: {
-                    message: 'Task creation failed',
+                    message: "Task creation failed",
                 },
             },
         });
 
-        await store.createTask({ title: 'Invalid task' });
+        await store.createTask({ title: "Invalid task" });
 
-        expect(store.error).toBe('Task creation failed');
+        expect(store.error).toBe("Task creation failed");
         expect(store.loading).toBe(false);
     });
 
-    it('updateTask posts method override, updates local task, and returns updated task', async () => {
-        store.tasks = [{ id: 10, title: 'Old title' }];
-        const payload = { title: 'New title' };
-        const updatedTask = { id: 10, title: 'New title' };
+    it("updateTask posts method override, updates local task, and returns updated task", async () => {
+        store.tasks = [{ id: 10, title: "Old title" }];
+        const payload = { title: "New title" };
+        const updatedTask = { id: 10, title: "New title" };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
-                message: 'Task updated',
+                message: "Task updated",
                 data: updatedTask,
             },
         });
 
         const result = await store.updateTask(10, payload);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('project-tasks/10', {
+        expect(axiosInstance.post).toHaveBeenCalledWith("project-tasks/10", {
             ...payload,
-            _method: 'PUT',
+            _method: "PUT",
         });
         expect(result).toEqual(updatedTask);
         expect(store.tasks[0]).toEqual(updatedTask);
-        expect(store.success).toBe('Task updated');
+        expect(store.success).toBe("Task updated");
         expect(store.loading).toBe(false);
     });
 
-    it('updateTask sets error on failure', async () => {
+    it("updateTask sets error on failure", async () => {
         axiosInstance.post.mockRejectedValueOnce({
             response: {
                 data: {
-                    message: 'Task update failed',
+                    message: "Task update failed",
                 },
             },
         });
 
-        await store.updateTask(10, { title: 'x' });
+        await store.updateTask(10, { title: "x" });
 
-        expect(store.error).toBe('Task update failed');
+        expect(store.error).toBe("Task update failed");
         expect(store.loading).toBe(false);
     });
 
-    it('deleteTask calls DELETE and sets success message', async () => {
+    it("deleteTask calls DELETE and sets success message", async () => {
         axiosInstance.delete.mockResolvedValueOnce({
             data: {
-                message: 'Task deleted',
+                message: "Task deleted",
             },
         });
 
         await store.deleteTask(15);
 
-        expect(axiosInstance.delete).toHaveBeenCalledWith('project-tasks/15');
-        expect(store.success).toBe('Task deleted');
+        expect(axiosInstance.delete).toHaveBeenCalledWith("project-tasks/15");
+        expect(store.success).toBe("Task deleted");
         expect(store.loading).toBe(false);
     });
 
-    it('deleteTask sets error on failure', async () => {
+    it("deleteTask sets error on failure", async () => {
         axiosInstance.delete.mockRejectedValueOnce({
             response: {
                 data: {
-                    message: 'Task delete failed',
+                    message: "Task delete failed",
                 },
             },
         });
 
         await store.deleteTask(15);
 
-        expect(store.error).toBe('Task delete failed');
+        expect(store.error).toBe("Task delete failed");
         expect(store.loading).toBe(false);
     });
 
-    it('updateTaskStatus updates task status and returns response data', async () => {
-        store.tasks = [{ id: 44, status: 'todo' }];
-        const updatedTask = { id: 44, status: 'done' };
+    it("updateTaskStatus updates task status and returns response data", async () => {
+        store.tasks = [{ id: 44, status: "todo" }];
+        const updatedTask = { id: 44, status: "done" };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
                 data: updatedTask,
             },
         });
 
-        const result = await store.updateTaskStatus(44, 'done');
+        const result = await store.updateTaskStatus(44, "done");
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('project-tasks/44', {
-            status: 'done',
-            _method: 'PUT',
+        expect(axiosInstance.post).toHaveBeenCalledWith("project-tasks/44", {
+            status: "done",
+            _method: "PUT",
         });
         expect(store.tasks[0]).toEqual(updatedTask);
         expect(result).toEqual({ data: updatedTask });
     });
 
-    it('updateTaskStatus throws and sets error on failure', async () => {
+    it("updateTaskStatus throws and sets error on failure", async () => {
         const mockError = {
             response: {
                 data: {
-                    message: 'Status update failed',
+                    message: "Status update failed",
                 },
             },
         };
         axiosInstance.post.mockRejectedValueOnce(mockError);
 
-        await expect(store.updateTaskStatus(44, 'done')).rejects.toEqual(mockError);
-        expect(store.error).toBe('Status update failed');
+        await expect(store.updateTaskStatus(44, "done")).rejects.toEqual(mockError);
+        expect(store.error).toBe("Status update failed");
     });
 
-    it('fetchTaskComments returns task comments', async () => {
-        const comments = [{ id: 1, comment: 'Looks good' }];
+    it("fetchTaskComments returns task comments", async () => {
+        const comments = [{ id: 1, comment: "Looks good" }];
         axiosInstance.get.mockResolvedValueOnce({
             data: {
                 data: comments,
@@ -198,27 +201,27 @@ describe('Task Store', () => {
 
         const result = await store.fetchTaskComments(99);
 
-        expect(axiosInstance.get).toHaveBeenCalledWith('project-tasks/99/comments');
+        expect(axiosInstance.get).toHaveBeenCalledWith("project-tasks/99/comments");
         expect(result).toEqual(comments);
     });
 
-    it('fetchTaskComments throws and sets error on failure', async () => {
+    it("fetchTaskComments throws and sets error on failure", async () => {
         const mockError = {
             response: {
                 data: {
-                    message: 'Comments fetch failed',
+                    message: "Comments fetch failed",
                 },
             },
         };
         axiosInstance.get.mockRejectedValueOnce(mockError);
 
         await expect(store.fetchTaskComments(99)).rejects.toEqual(mockError);
-        expect(store.error).toBe('Comments fetch failed');
+        expect(store.error).toBe("Comments fetch failed");
     });
 
-    it('createTaskComment posts comment and returns created comment', async () => {
-        const payload = { comment: 'Please update spec' };
-        const comment = { id: 5, comment: 'Please update spec' };
+    it("createTaskComment posts comment and returns created comment", async () => {
+        const payload = { comment: "Please update spec" };
+        const comment = { id: 5, comment: "Please update spec" };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
                 data: comment,
@@ -227,21 +230,21 @@ describe('Task Store', () => {
 
         const result = await store.createTaskComment(31, payload);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('project-tasks/31/comments', payload);
+        expect(axiosInstance.post).toHaveBeenCalledWith("project-tasks/31/comments", payload);
         expect(result).toEqual(comment);
     });
 
-    it('createTaskComment throws and sets error on failure', async () => {
+    it("createTaskComment throws and sets error on failure", async () => {
         const mockError = {
             response: {
                 data: {
-                    message: 'Comment create failed',
+                    message: "Comment create failed",
                 },
             },
         };
         axiosInstance.post.mockRejectedValueOnce(mockError);
 
-        await expect(store.createTaskComment(31, { comment: 'x' })).rejects.toEqual(mockError);
-        expect(store.error).toBe('Comment create failed');
+        await expect(store.createTaskComment(31, { comment: "x" })).rejects.toEqual(mockError);
+        expect(store.error).toBe("Comment create failed");
     });
 });

@@ -2,16 +2,7 @@
 import { computed, onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRoute, useRouter } from "vue-router";
-import {
-    ArrowLeft,
-    Calendar,
-    Target,
-    TrendingUp,
-    CheckCircle2,
-    Clock,
-    AlertTriangle,
-    XCircle,
-} from "lucide-vue-next";
+import { ArrowLeft, Calendar, Target, TrendingUp, CheckCircle2, Clock, AlertTriangle, XCircle } from "lucide-vue-next";
 import { usePerformanceGoalStore } from "@/stores/performanceGoal";
 import { useAuthStore } from "@/stores/auth";
 import MainCard from "@/components/common/MainCard.vue";
@@ -26,8 +17,7 @@ const performanceGoalStore = usePerformanceGoalStore();
 const authStore = useAuthStore();
 const toast = useToast();
 
-const { currentGoal, goalsLoading, goalUpdates, updatesLoading } =
-    storeToRefs(performanceGoalStore);
+const { currentGoal, goalsLoading, goalUpdates, updatesLoading } = storeToRefs(performanceGoalStore);
 const { user } = storeToRefs(authStore);
 
 const goalId = computed(() => route.params.id);
@@ -78,10 +68,7 @@ const statusConfig = {
 };
 
 const getTypeColor = (type) => {
-    return (
-        goalTypes.find((goalType) => goalType.value === type)?.color ||
-        "bg-gray-100 text-gray-700"
-    );
+    return goalTypes.find((goalType) => goalType.value === type)?.color || "bg-gray-100 text-gray-700";
 };
 
 const getProgressColor = (percentage) => {
@@ -132,10 +119,7 @@ const submitProgressUpdate = async () => {
         resetProgressForm();
         showProgressForm.value = false;
     } catch (error) {
-        progressFormError.value =
-            performanceGoalStore.error ||
-            error?.response?.data?.message ||
-            "Please try again.";
+        progressFormError.value = performanceGoalStore.error || error?.response?.data?.message || "Please try again.";
         toast.error("Failed to update progress", progressFormError.value);
     }
 };
@@ -152,32 +136,23 @@ onMounted(async () => {
 <template>
     <div class="space-y-6">
         <div class="flex items-center gap-4">
-            <button
-                class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                @click="handleBack"
-            >
+            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" @click="handleBack">
                 <ArrowLeft class="w-5 h-5" />
             </button>
             <div>
                 <h1 class="text-3xl font-bold text-brand-dark">Goal Details</h1>
-                <p class="text-brand-light mt-1">
-                    Track goal progress, metrics, and update timeline
-                </p>
+                <p class="text-brand-light mt-1">Track goal progress, metrics, and update timeline</p>
             </div>
         </div>
 
         <div v-if="goalsLoading" class="flex justify-center items-center py-12">
-            <div
-                class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-            ></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
 
         <template v-else-if="currentGoal">
             <MainCard>
                 <div class="space-y-6">
-                    <div
-                        class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4"
-                    >
+                    <div class="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-4">
                         <div>
                             <h2 class="text-2xl font-bold text-brand-dark">
                                 {{ currentGoal.title }}
@@ -193,25 +168,20 @@ onMounted(async () => {
                                 :class="getTypeColor(currentGoal.goal_type)"
                             >
                                 {{
-                                    goalTypes.find(
-                                        (goalType) =>
-                                            goalType.value === currentGoal.goal_type
-                                    )?.label || currentGoal.goal_type
+                                    goalTypes.find((goalType) => goalType.value === currentGoal.goal_type)?.label ||
+                                    currentGoal.goal_type
                                 }}
                             </span>
-                            <StatusBadge
-                                :value="currentGoal.status"
-                                :label="statusConfig[currentGoal.status]?.label"
-                            />
+                            <StatusBadge :value="currentGoal.status" :label="statusConfig[currentGoal.status]?.label" />
                         </div>
                     </div>
 
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-sm font-medium text-brand-light">Progress</span>
-                            <span class="text-sm font-bold text-brand-dark"
-                                >{{ currentGoal.completion_percentage || 0 }}%</span
-                            >
+                            <span class="text-sm font-bold text-brand-dark">
+                                {{ currentGoal.completion_percentage || 0 }}%
+                            </span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                             <div
@@ -224,73 +194,53 @@ onMounted(async () => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Assignee
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Assignee</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{ resolvedAssigneeName }}
                             </p>
                         </div>
 
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Category
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Category</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{ currentGoal.category || "-" }}
                             </p>
                         </div>
 
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Start Date
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Start Date</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{
-                                    currentGoal.start_date
-                                        ? new Date(currentGoal.start_date).toLocaleDateString()
-                                        : "-"
+                                    currentGoal.start_date ? new Date(currentGoal.start_date).toLocaleDateString() : "-"
                                 }}
                             </p>
                         </div>
 
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Due Date
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Due Date</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
-                                {{
-                                    currentGoal.due_date
-                                        ? new Date(currentGoal.due_date).toLocaleDateString()
-                                        : "-"
-                                }}
+                                {{ currentGoal.due_date ? new Date(currentGoal.due_date).toLocaleDateString() : "-" }}
                             </p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Target Value
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Target Value</p>
                             <p class="text-lg font-bold text-brand-dark mt-1">
                                 {{ currentGoal.target_value || "-" }}
                             </p>
                         </div>
 
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Current Value
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Current Value</p>
                             <p class="text-lg font-bold text-brand-dark mt-1">
                                 {{ currentGoal.current_value || "-" }}
                             </p>
                         </div>
 
                         <div class="p-4 border border-gray-100 rounded-xl">
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Unit
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Unit</p>
                             <p class="text-lg font-bold text-brand-dark mt-1">
                                 {{ currentGoal.unit || "-" }}
                             </p>
@@ -306,9 +256,7 @@ onMounted(async () => {
                         class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
                         @click="showProgressForm = !showProgressForm"
                     >
-                        <span class="text-sm font-semibold text-brand-dark">
-                            Add Progress Update
-                        </span>
+                        <span class="text-sm font-semibold text-brand-dark">Add Progress Update</span>
                         <span class="text-xs text-brand-light">
                             {{ showProgressForm ? "Hide form" : "Show form" }}
                         </span>
@@ -327,9 +275,7 @@ onMounted(async () => {
                         />
 
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Progress Percentage *</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Progress Percentage *</label>
                             <input
                                 v-model="progressForm.progress_percentage"
                                 type="number"
@@ -344,9 +290,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Note (Optional)</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Note (Optional)</label>
                             <textarea
                                 v-model="progressForm.note"
                                 rows="3"
@@ -372,36 +316,19 @@ onMounted(async () => {
                     <h3 class="text-lg font-semibold text-brand-dark">Progress Timeline</h3>
                 </div>
 
-                <div
-                    v-if="updatesLoading"
-                    class="flex justify-center items-center py-8"
-                >
-                    <div
-                        class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"
-                    ></div>
+                <div v-if="updatesLoading" class="flex justify-center items-center py-8">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
                 </div>
 
                 <div v-else-if="goalUpdates?.length" class="space-y-3">
-                    <div
-                        v-for="update in goalUpdates"
-                        :key="update.id"
-                        class="p-4 border border-gray-100 rounded-lg"
-                    >
+                    <div v-for="update in goalUpdates" :key="update.id" class="p-4 border border-gray-100 rounded-lg">
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <p class="text-sm font-semibold text-brand-dark">
-                                    {{
-                                        update.note ||
-                                        update.description ||
-                                        "Progress update"
-                                    }}
+                                    {{ update.note || update.description || "Progress update" }}
                                 </p>
                                 <p class="text-xs text-brand-light mt-1">
-                                    {{
-                                        update.created_at
-                                            ? new Date(update.created_at).toLocaleString()
-                                            : "-"
-                                    }}
+                                    {{ update.created_at ? new Date(update.created_at).toLocaleString() : "-" }}
                                 </p>
                             </div>
                             <span
@@ -424,11 +351,6 @@ onMounted(async () => {
             </MainCard>
         </template>
 
-        <EmptyState
-            v-else
-            icon="Target"
-            title="Goal not found"
-            subtitle="The requested goal could not be loaded."
-        />
+        <EmptyState v-else icon="Target" title="Goal not found" subtitle="The requested goal could not be loaded." />
     </div>
 </template>

@@ -2,50 +2,44 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    routeState,
-    routerPushMock,
-    teamStoreMock,
-    teamStoreRefs,
-    staffMemberStoreMock,
-    staffMemberStoreRefs,
-} = vi.hoisted(() => ({
-    routeState: {
-        params: {
-            id: "19",
+const { routeState, routerPushMock, teamStoreMock, teamStoreRefs, staffMemberStoreMock, staffMemberStoreRefs } =
+    vi.hoisted(() => ({
+        routeState: {
+            params: {
+                id: "19",
+            },
         },
-    },
-    routerPushMock: vi.fn(),
-    teamStoreMock: {
-        fetchTeam: vi.fn(),
-        deleteTeam: vi.fn(),
-        addMember: vi.fn(),
-        removeMember: vi.fn(),
-    },
-    teamStoreRefs: {
-        loading: {
-            __v_isRef: true,
-            value: false,
+        routerPushMock: vi.fn(),
+        teamStoreMock: {
+            fetchTeam: vi.fn(),
+            deleteTeam: vi.fn(),
+            addMember: vi.fn(),
+            removeMember: vi.fn(),
         },
-        success: {
-            __v_isRef: true,
-            value: null,
+        teamStoreRefs: {
+            loading: {
+                __v_isRef: true,
+                value: false,
+            },
+            success: {
+                __v_isRef: true,
+                value: null,
+            },
+            error: {
+                __v_isRef: true,
+                value: null,
+            },
         },
-        error: {
-            __v_isRef: true,
-            value: null,
+        staffMemberStoreMock: {
+            fetchStaffMembers: vi.fn(),
         },
-    },
-    staffMemberStoreMock: {
-        fetchStaffMembers: vi.fn(),
-    },
-    staffMemberStoreRefs: {
-        staffMembers: {
-            __v_isRef: true,
-            value: [],
+        staffMemberStoreRefs: {
+            staffMembers: {
+                __v_isRef: true,
+                value: [],
+            },
         },
-    },
-}));
+    }));
 
 vi.mock("@/stores/team", () => ({
     useTeamStore: () => teamStoreMock,

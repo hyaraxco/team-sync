@@ -2,11 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    routeState,
-    authStoreMock,
-    authStoreRefs,
-} = vi.hoisted(() => ({
+const { routeState, authStoreMock, authStoreRefs } = vi.hoisted(() => ({
     routeState: {
         query: {
             token: "valid-reset-token",
@@ -41,7 +37,7 @@ vi.mock("vue-router", () => ({
     RouterLink: {
         name: "RouterLink",
         props: ["to"],
-        template: '<a><slot /></a>',
+        template: "<a><slot /></a>",
     },
 }));
 

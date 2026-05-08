@@ -98,9 +98,7 @@ const fetchPayrollDetails = vi.fn().mockResolvedValue({
     },
 });
 const fetchPayrollActivityLogs = vi.fn().mockResolvedValue([]);
-const fetchPayrollNotificationDeliveries = vi
-    .fn()
-    .mockResolvedValue(deliverySummaryPayload);
+const fetchPayrollNotificationDeliveries = vi.fn().mockResolvedValue(deliverySummaryPayload);
 const fetchPayrollReconciliation = vi.fn().mockResolvedValue({
     summary: {
         total_employees: 10,
@@ -203,8 +201,7 @@ const factory = () =>
                 },
                 ModalWrapper: {
                     props: ["show", "title"],
-                    template:
-                        '<div v-if="show"><slot /><slot name="footer" /></div>',
+                    template: '<div v-if="show"><slot /><slot name="footer" /></div>',
                 },
                 AnimatedValue: {
                     props: ["value"],
@@ -216,25 +213,16 @@ const factory = () =>
 
 describe("PayrollNotificationHandoff - Delivery Rate Progress Bar", () => {
     beforeEach(() => {
-        setPermissions([
-            "payroll-statistics",
-            "payroll-process",
-            "payroll-list",
-            "payroll-edit",
-        ]);
+        setPermissions(["payroll-statistics", "payroll-process", "payroll-list", "payroll-edit"]);
         fetchPayroll.mockResolvedValue(defaultPayrollPayload);
-        fetchPayrollNotificationDeliveries.mockResolvedValue(
-            deliverySummaryPayload,
-        );
+        fetchPayrollNotificationDeliveries.mockResolvedValue(deliverySummaryPayload);
     });
 
     it("renders delivery rate progress bar with correct percentage", async () => {
         const wrapper = factory();
         await flushView();
 
-        const rateEl = wrapper.find(
-            '[data-testid="notification-delivery-rate"]',
-        );
+        const rateEl = wrapper.find('[data-testid="notification-delivery-rate"]');
         expect(rateEl.exists()).toBe(true);
         expect(rateEl.text()).toContain("80%");
     });
@@ -243,9 +231,7 @@ describe("PayrollNotificationHandoff - Delivery Rate Progress Bar", () => {
         const wrapper = factory();
         await flushView();
 
-        const rateEl = wrapper.find(
-            '[data-testid="notification-delivery-rate"]',
-        );
+        const rateEl = wrapper.find('[data-testid="notification-delivery-rate"]');
         expect(rateEl.exists()).toBe(true);
         const bar = rateEl.find(".bg-green-500");
         expect(bar.exists()).toBe(true);
@@ -254,25 +240,16 @@ describe("PayrollNotificationHandoff - Delivery Rate Progress Bar", () => {
 
 describe("PayrollNotificationHandoff - Delivery Status Icons", () => {
     beforeEach(() => {
-        setPermissions([
-            "payroll-statistics",
-            "payroll-process",
-            "payroll-list",
-            "payroll-edit",
-        ]);
+        setPermissions(["payroll-statistics", "payroll-process", "payroll-list", "payroll-edit"]);
         fetchPayroll.mockResolvedValue(defaultPayrollPayload);
-        fetchPayrollNotificationDeliveries.mockResolvedValue(
-            deliverySummaryPayload,
-        );
+        fetchPayrollNotificationDeliveries.mockResolvedValue(deliverySummaryPayload);
     });
 
     it("renders green checkmark icon for sent status", async () => {
         const wrapper = factory();
         await flushView();
 
-        const sentIcon = wrapper.find(
-            '[data-testid="notification-status-icon-sent"]',
-        );
+        const sentIcon = wrapper.find('[data-testid="notification-status-icon-sent"]');
         expect(sentIcon.exists()).toBe(true);
     });
 
@@ -280,9 +257,7 @@ describe("PayrollNotificationHandoff - Delivery Status Icons", () => {
         const wrapper = factory();
         await flushView();
 
-        const failedIcon = wrapper.find(
-            '[data-testid="notification-status-icon-failed"]',
-        );
+        const failedIcon = wrapper.find('[data-testid="notification-status-icon-failed"]');
         expect(failedIcon.exists()).toBe(true);
     });
 
@@ -290,34 +265,23 @@ describe("PayrollNotificationHandoff - Delivery Status Icons", () => {
         const wrapper = factory();
         await flushView();
 
-        const skippedIcon = wrapper.find(
-            '[data-testid="notification-status-icon-skipped"]',
-        );
+        const skippedIcon = wrapper.find('[data-testid="notification-status-icon-skipped"]');
         expect(skippedIcon.exists()).toBe(true);
     });
 });
 
 describe("PayrollNotificationHandoff - Resend to Failed", () => {
     beforeEach(() => {
-        setPermissions([
-            "payroll-statistics",
-            "payroll-process",
-            "payroll-list",
-            "payroll-edit",
-        ]);
+        setPermissions(["payroll-statistics", "payroll-process", "payroll-list", "payroll-edit"]);
         fetchPayroll.mockResolvedValue(defaultPayrollPayload);
-        fetchPayrollNotificationDeliveries.mockResolvedValue(
-            deliverySummaryPayload,
-        );
+        fetchPayrollNotificationDeliveries.mockResolvedValue(deliverySummaryPayload);
     });
 
     it("renders resend to failed button when there are failed deliveries", async () => {
         const wrapper = factory();
         await flushView();
 
-        const resendBtn = wrapper.find(
-            '[data-testid="notification-resend-failed-btn"]',
-        );
+        const resendBtn = wrapper.find('[data-testid="notification-resend-failed-btn"]');
         expect(resendBtn.exists()).toBe(true);
         expect(resendBtn.text()).toContain("Resend to Failed");
     });
@@ -335,21 +299,14 @@ describe("PayrollNotificationHandoff - Resend to Failed", () => {
         const wrapper = factory();
         await flushView();
 
-        const resendBtn = wrapper.find(
-            '[data-testid="notification-resend-failed-btn"]',
-        );
+        const resendBtn = wrapper.find('[data-testid="notification-resend-failed-btn"]');
         expect(resendBtn.exists()).toBe(false);
     });
 });
 
 describe("PayrollNotificationHandoff - Mark as Paid Notification Info", () => {
     beforeEach(() => {
-        setPermissions([
-            "payroll-statistics",
-            "payroll-process",
-            "payroll-list",
-            "payroll-edit",
-        ]);
+        setPermissions(["payroll-statistics", "payroll-process", "payroll-list", "payroll-edit"]);
         fetchPayroll.mockResolvedValue({
             ...defaultPayrollPayload,
             status: "approved",
@@ -365,8 +322,7 @@ describe("PayrollNotificationHandoff - Mark as Paid Notification Info", () => {
                     },
                     ModalWrapper: {
                         props: ["show", "title"],
-                        template:
-                            '<div><slot /><slot name="footer" /></div>',
+                        template: '<div><slot /><slot name="footer" /></div>',
                     },
                     AnimatedValue: {
                         props: ["value"],
@@ -377,13 +333,9 @@ describe("PayrollNotificationHandoff - Mark as Paid Notification Info", () => {
         });
         await flushView();
 
-        const notifInfo = wrapper.find(
-            '[data-testid="payroll-mark-paid-notification-info"]',
-        );
+        const notifInfo = wrapper.find('[data-testid="payroll-mark-paid-notification-info"]');
         expect(notifInfo.exists()).toBe(true);
-        expect(notifInfo.text()).toContain(
-            "Employee notifications will be sent automatically",
-        );
+        expect(notifInfo.text()).toContain("Employee notifications will be sent automatically");
     });
 });
 
@@ -435,9 +387,7 @@ describe("MyPayslips - Empty State", () => {
         const emptyEl = wrapper.find('[data-testid="my-payroll-empty"]');
         expect(emptyEl.exists()).toBe(true);
 
-        const processingEl = wrapper.find(
-            '[data-testid="my-payroll-empty-processing"]',
-        );
+        const processingEl = wrapper.find('[data-testid="my-payroll-empty-processing"]');
         expect(processingEl.exists()).toBe(true);
         expect(processingEl.text()).toContain("Your payslip is being processed");
     });

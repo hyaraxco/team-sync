@@ -2,13 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    reviewStoreMock,
-    reviewStoreRefs,
-    toastSuccessMock,
-    toastErrorMock,
-    routerPushMock,
-} = vi.hoisted(() => ({
+const { reviewStoreMock, reviewStoreRefs, toastSuccessMock, toastErrorMock, routerPushMock } = vi.hoisted(() => ({
     reviewStoreMock: {
         fetchTemplates: vi.fn(),
         createCycle: vi.fn(),
@@ -106,9 +100,7 @@ describe("ReviewCycleCreate smoke", () => {
 
     it("renders template select with options", () => {
         const wrapper = factory();
-        const templateSelect = wrapper.findAll("select").find(
-            (s) => s.text().includes("Default Template"),
-        );
+        const templateSelect = wrapper.findAll("select").find((s) => s.text().includes("Default Template"));
         expect(templateSelect).toBeTruthy();
         expect(templateSelect.text()).toContain("Engineering Template");
     });
@@ -198,9 +190,7 @@ describe("ReviewCycleCreate smoke", () => {
 
     it("navigates back when cancel clicked", async () => {
         const wrapper = factory();
-        const cancelButton = wrapper.findAll("button").find(
-            (b) => b.text() === "Cancel",
-        );
+        const cancelButton = wrapper.findAll("button").find((b) => b.text() === "Cancel");
         await cancelButton.trigger("click");
         expect(routerPushMock).toHaveBeenCalledWith({
             name: "admin.performance.cycles",

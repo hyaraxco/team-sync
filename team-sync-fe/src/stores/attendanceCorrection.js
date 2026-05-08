@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia';
-import { axiosInstance } from '@/plugins/axios';
-import { handleError } from '@/helpers/errorHelper';
+import { defineStore } from "pinia";
+import { axiosInstance } from "@/plugins/axios";
+import { handleError } from "@/helpers/errorHelper";
 
-export const useAttendanceCorrectionStore = defineStore('attendanceCorrection', {
+export const useAttendanceCorrectionStore = defineStore("attendanceCorrection", {
     state: () => ({
         myCorrections: [],
         paginatedCorrections: [],
@@ -21,7 +21,7 @@ export const useAttendanceCorrectionStore = defineStore('attendanceCorrection', 
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('my-attendance-corrections');
+                const response = await axiosInstance.get("my-attendance-corrections");
                 this.myCorrections = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
@@ -34,12 +34,12 @@ export const useAttendanceCorrectionStore = defineStore('attendanceCorrection', 
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('attendance-corrections/all/paginated', {
+                const response = await axiosInstance.get("attendance-corrections/all/paginated", {
                     params: {
                         page: params.page || 1,
-                        search: params.search || '',
+                        search: params.search || "",
                         row_per_page: params.row_per_page || 10,
-                        status: params.status || '',
+                        status: params.status || "",
                     },
                 });
                 const paginator = response.data.data;
@@ -63,7 +63,7 @@ export const useAttendanceCorrectionStore = defineStore('attendanceCorrection', 
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post('attendance-corrections', payload);
+                const response = await axiosInstance.post("attendance-corrections", payload);
                 if (this.myCorrections) {
                     this.myCorrections.unshift(response.data.data);
                 }
@@ -102,6 +102,6 @@ export const useAttendanceCorrectionStore = defineStore('attendanceCorrection', 
             } finally {
                 this.loading = false;
             }
-        }
-    }
+        },
+    },
 });

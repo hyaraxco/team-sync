@@ -2,11 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    authStoreMock,
-    authStoreRefs,
-    routerPushMock,
-} = vi.hoisted(() => ({
+const { authStoreMock, authStoreRefs, routerPushMock } = vi.hoisted(() => ({
     authStoreMock: {
         login: vi.fn(),
     },
@@ -34,7 +30,7 @@ vi.mock("vue-router", () => ({
     RouterLink: {
         name: "RouterLink",
         props: ["to"],
-        template: '<a><slot /></a>',
+        template: "<a><slot /></a>",
     },
 }));
 

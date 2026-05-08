@@ -5,35 +5,35 @@ import ProjectDetail from "@/views/admin/project/ProjectDetail.vue";
 
 export default [
     {
-        path: '/admin/projects',
-        name: 'admin.projects',
+        path: "/admin/projects",
+        name: "admin.projects",
         component: ProjectList,
         meta: {
-            requiredPermission: 'project-menu',
+            requiredPermission: "project-menu",
         },
     },
     {
-        path: '/admin/projects/:id',
-        name: 'admin.projects.detail',
+        path: "/admin/projects/:id",
+        name: "admin.projects.detail",
         component: ProjectDetail,
         meta: {
-            requiredPermission: 'project-list',
+            requiredPermission: "project-list",
         },
     },
     {
-        path: '/admin/projects/create',
-        name: 'admin.projects.create',
+        path: "/admin/projects/create",
+        name: "admin.projects.create",
         component: ProjectCreate,
         meta: {
-            requiredPermission: 'project-create',
+            requiredPermission: "project-create",
         },
     },
     {
-        path: '/admin/projects/:id/edit',
-        name: 'admin.projects.edit',
+        path: "/admin/projects/:id/edit",
+        name: "admin.projects.edit",
         component: ProjectEdit,
         meta: {
-            requiredPermission: 'project-edit',
+            requiredPermission: "project-edit",
         },
-    }
+    },
 ];

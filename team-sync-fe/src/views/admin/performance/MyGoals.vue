@@ -53,19 +53,11 @@ const createForm = ref(defaultCreateForm());
 
 const canCreateGoal = computed(() => can("goal-create-own"));
 const currentEmployeeId = computed(
-    () =>
-        authStore.user?.employee_profile?.id ||
-        authStore.user?.employeeProfile?.id ||
-        null
+    () => authStore.user?.employee_profile?.id || authStore.user?.employeeProfile?.id || null,
 );
 const isEditMode = computed(() => editingGoalId.value !== null);
 
-const {
-    openModal,
-    closeModal,
-    confirmAction,
-    error: confirmActionError,
-} = useConfirmAction();
+const { openModal, closeModal, confirmAction, error: confirmActionError } = useConfirmAction();
 
 const filteredGoals = computed(() => {
     let goals = myGoals.value;
@@ -102,10 +94,7 @@ const statusConfig = {
 };
 
 const getTypeColor = (type) => {
-    return (
-        goalTypes.find((t) => t.value === type)?.color ||
-        "bg-gray-100 text-gray-700"
-    );
+    return goalTypes.find((t) => t.value === type)?.color || "bg-gray-100 text-gray-700";
 };
 
 const getProgressColor = (percentage) => {
@@ -199,9 +188,7 @@ const deleteGoal = async (goal) => {
 
     openModal(goal);
 
-    const isConfirmed = window.confirm(
-        `Delete goal \"${goal.title}\"? This action cannot be undone.`
-    );
+    const isConfirmed = window.confirm(`Delete goal \"${goal.title}\"? This action cannot be undone.`);
 
     if (!isConfirmed) {
         closeModal();
@@ -219,12 +206,7 @@ const deleteGoal = async (goal) => {
 
         toast.success("Goal deleted successfully");
     } catch (error) {
-        toast.error(
-            "Failed to delete goal",
-            error?.response?.data?.message ||
-                error?.message ||
-                "Please try again"
-        );
+        toast.error("Failed to delete goal", error?.response?.data?.message || error?.message || "Please try again");
     } finally {
         openActionMenuId.value = null;
     }
@@ -241,10 +223,7 @@ const submitGoal = async () => {
     try {
         const payload = {
             ...createForm.value,
-            target_value:
-                createForm.value.target_value === ""
-                    ? null
-                    : Number(createForm.value.target_value),
+            target_value: createForm.value.target_value === "" ? null : Number(createForm.value.target_value),
         };
 
         if (isEditMode.value) {
@@ -260,9 +239,7 @@ const submitGoal = async () => {
     } catch (error) {
         toast.error(
             isEditMode.value ? "Failed to update goal" : "Failed to create goal",
-            error?.response?.data?.message ||
-                error?.message ||
-                "Please try again"
+            error?.response?.data?.message || error?.message || "Please try again",
         );
     } finally {
         createLoading.value = false;
@@ -279,9 +256,7 @@ onMounted(async () => {
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-brand-dark">My Goals</h1>
-                <p class="text-brand-light mt-1">
-                    Track your objectives and key results
-                </p>
+                <p class="text-brand-light mt-1">Track your objectives and key results</p>
             </div>
             <button
                 v-if="canCreateGoal"
@@ -296,27 +271,19 @@ onMounted(async () => {
         <MainCard>
             <div class="flex flex-wrap gap-4">
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Goal Type</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Goal Type</label>
                     <select
                         v-model="selectedType"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     >
                         <option value="all">All Types</option>
-                        <option
-                            v-for="type in goalTypes"
-                            :key="type.value"
-                            :value="type.value"
-                        >
+                        <option v-for="type in goalTypes" :key="type.value" :value="type.value">
                             {{ type.label }}
                         </option>
                     </select>
                 </div>
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Status</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Status</label>
                     <select
                         v-model="selectedStatus"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
@@ -332,15 +299,10 @@ onMounted(async () => {
         </MainCard>
 
         <div v-if="goalsLoading" class="flex justify-center items-center py-12">
-            <div
-                class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-            ></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
 
-        <div
-            v-else-if="filteredGoals.length > 0"
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div v-else-if="filteredGoals.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <MainCard
                 v-for="goal in filteredGoals"
                 :key="goal.id"
@@ -406,9 +368,7 @@ onMounted(async () => {
                     <div>
                         <div class="flex items-center justify-between mb-2">
                             <span class="text-xs font-medium text-brand-light">Progress</span>
-                            <span class="text-sm font-bold text-brand-dark"
-                                >{{ goal.completion_percentage }}%</span
-                            >
+                            <span class="text-sm font-bold text-brand-dark">{{ goal.completion_percentage }}%</span>
                         </div>
                         <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
                             <div
@@ -421,45 +381,33 @@ onMounted(async () => {
 
                     <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
                         <div>
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Target
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Target</p>
                             <p class="text-sm font-medium text-brand-dark mt-1">
                                 {{ goal.target_value || "-" }} {{ goal.unit || "" }}
                             </p>
                         </div>
                         <div>
-                            <p class="text-xs text-brand-light uppercase tracking-wide">
-                                Current
-                            </p>
+                            <p class="text-xs text-brand-light uppercase tracking-wide">Current</p>
                             <p class="text-sm font-medium text-brand-dark mt-1">
                                 {{ goal.current_value || "-" }} {{ goal.unit || "" }}
                             </p>
                         </div>
                     </div>
 
-                    <div
-                        class="flex items-center justify-between pt-3 border-t border-gray-100"
-                    >
+                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
                         <div class="flex items-center gap-2">
                             <Calendar class="w-4 h-4 text-brand-light" />
                             <span class="text-xs text-brand-light">
                                 Due {{ new Date(goal.due_date).toLocaleDateString() }}
                             </span>
                             <span
-                                v-if="
-                                    getDaysRemaining(goal.due_date) < 7 &&
-                                    goal.status !== 'completed'
-                                "
+                                v-if="getDaysRemaining(goal.due_date) < 7 && goal.status !== 'completed'"
                                 class="text-xs font-semibold text-red-600"
                             >
                                 ({{ getDaysRemaining(goal.due_date) }} days left)
                             </span>
                         </div>
-                        <StatusBadge
-                            :value="goal.status"
-                            :label="statusConfig[goal.status]?.label"
-                        />
+                        <StatusBadge :value="goal.status" :label="statusConfig[goal.status]?.label" />
                     </div>
                 </div>
             </MainCard>
@@ -481,28 +429,20 @@ onMounted(async () => {
             </button>
         </EmptyState>
 
-        <div
-            v-if="showCreateModal"
-            class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
-        >
+        <div v-if="showCreateModal" class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
             <MainCard class="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-6">
                     <h2 class="text-xl font-bold text-brand-dark">
                         {{ isEditMode ? "Edit Goal" : "Create Goal" }}
                     </h2>
-                    <button
-                        class="p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                        @click="closeCreateModal"
-                    >
+                    <button class="p-2 rounded-lg hover:bg-gray-100 transition-colors" @click="closeCreateModal">
                         <X class="w-5 h-5 text-brand-light" />
                     </button>
                 </div>
 
                 <form class="space-y-4" @submit.prevent="submitGoal">
                     <div>
-                        <label class="block text-sm font-medium text-brand-dark mb-2"
-                            >Title</label
-                        >
+                        <label class="block text-sm font-medium text-brand-dark mb-2">Title</label>
                         <input
                             v-model="createForm.title"
                             type="text"
@@ -512,9 +452,7 @@ onMounted(async () => {
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-brand-dark mb-2"
-                            >Description</label
-                        >
+                        <label class="block text-sm font-medium text-brand-dark mb-2">Description</label>
                         <textarea
                             v-model="createForm.description"
                             rows="3"
@@ -524,9 +462,7 @@ onMounted(async () => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Goal Type</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Goal Type</label>
                             <select
                                 v-model="createForm.goal_type"
                                 class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
@@ -539,9 +475,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Category</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Category</label>
                             <input
                                 v-model="createForm.category"
                                 type="text"
@@ -552,9 +486,7 @@ onMounted(async () => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Start Date</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Start Date</label>
                             <input
                                 v-model="createForm.start_date"
                                 type="date"
@@ -563,9 +495,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Due Date</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Due Date</label>
                             <input
                                 v-model="createForm.due_date"
                                 type="date"
@@ -576,9 +506,7 @@ onMounted(async () => {
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Target Value</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Target Value</label>
                             <input
                                 v-model="createForm.target_value"
                                 type="number"
@@ -589,9 +517,7 @@ onMounted(async () => {
                         </div>
 
                         <div>
-                            <label class="block text-sm font-medium text-brand-dark mb-2"
-                                >Unit</label
-                            >
+                            <label class="block text-sm font-medium text-brand-dark mb-2">Unit</label>
                             <input
                                 v-model="createForm.unit"
                                 type="text"

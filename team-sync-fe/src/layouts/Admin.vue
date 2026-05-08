@@ -6,35 +6,34 @@ import { ref } from "vue";
 const isSidebarOpen = ref(false);
 
 const toggleSidebar = () => {
-  isSidebarOpen.value = !isSidebarOpen.value;
+    isSidebarOpen.value = !isSidebarOpen.value;
 };
 
 const closeSidebar = () => {
-  isSidebarOpen.value = false;
+    isSidebarOpen.value = false;
 };
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar Slot - can be replaced with custom content -->
-    <slot name="sidebar">
-      <Sidebar :isOpen="isSidebarOpen" @navigate="closeSidebar" />
-    </slot>
+    <div class="flex h-screen overflow-hidden">
+        <!-- Sidebar Slot - can be replaced with custom content -->
+        <slot name="sidebar">
+            <Sidebar :isOpen="isSidebarOpen" @navigate="closeSidebar" />
+        </slot>
 
-    <!-- Main Content -->
-    <div id="main-content" class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300 dark:bg-gray-900">
-      <!-- Top Navbar -->
-      <Header @toggle-sidebar="toggleSidebar" />
-      <!-- Dashboard Content -->
-      <main class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
-        <RouterView />
-      </main>
+        <!-- Main Content -->
+        <div
+            id="main-content"
+            class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300 dark:bg-gray-900"
+        >
+            <!-- Top Navbar -->
+            <Header @toggle-sidebar="toggleSidebar" />
+            <!-- Dashboard Content -->
+            <main class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
+                <RouterView />
+            </main>
+        </div>
     </div>
-  </div>
 
-  <div
-    class="fixed inset-0 bg-black/30 lg:hidden"
-    v-if="isSidebarOpen"
-    @click="closeSidebar"
-  ></div>
+    <div class="fixed inset-0 bg-black/30 lg:hidden" v-if="isSidebarOpen" @click="closeSidebar"></div>
 </template>

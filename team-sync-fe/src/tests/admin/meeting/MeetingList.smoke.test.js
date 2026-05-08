@@ -57,15 +57,16 @@ vi.mock("@/helpers/permissionHelper", () => ({
 
 import MeetingList from "@/views/admin/meeting/MeetingList.vue";
 
-const factory = () => mount(MeetingList, {
-    global: {
-        stubs: {
-            MeetingCreateModal: {
-                template: "<div data-testid='meeting-create-modal-stub' />",
+const factory = () =>
+    mount(MeetingList, {
+        global: {
+            stubs: {
+                MeetingCreateModal: {
+                    template: "<div data-testid='meeting-create-modal-stub' />",
+                },
             },
         },
-    },
-});
+    });
 
 const flushAsync = async () => {
     await nextTick();

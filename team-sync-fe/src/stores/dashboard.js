@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useDashboardStore = defineStore("dashboard", {
@@ -47,7 +47,7 @@ export const useDashboardStore = defineStore("dashboard", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/dashboard/my-statistics');
+                const response = await axiosInstance.get("/dashboard/my-statistics");
                 this.myStatistics = response.data.data;
                 return response.data.data;
             } catch (error) {
@@ -63,7 +63,7 @@ export const useDashboardStore = defineStore("dashboard", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/dashboard/statistics');
+                const response = await axiosInstance.get("/dashboard/statistics");
 
                 this.statistics = response.data.data;
             } catch (error) {
@@ -76,7 +76,7 @@ export const useDashboardStore = defineStore("dashboard", {
         async fetchTodayAttendance() {
             this.todayAttendanceLoading = true;
             try {
-                const response = await axiosInstance.get('/dashboard/today-attendance-overview');
+                const response = await axiosInstance.get("/dashboard/today-attendance-overview");
                 this.todayAttendance = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
@@ -90,7 +90,7 @@ export const useDashboardStore = defineStore("dashboard", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/dashboard/team-pulse');
+                const response = await axiosInstance.get("/dashboard/team-pulse");
                 this.teamPulse = response.data.data;
                 return response.data.data;
             } catch (error) {
@@ -123,7 +123,7 @@ export const useDashboardStore = defineStore("dashboard", {
                             ...member,
                             nudge: {
                                 ...(member.nudge || {}),
-                                status: 'sent',
+                                status: "sent",
                                 last_sent_at: payload.sent_at,
                             },
                         };
@@ -138,5 +138,5 @@ export const useDashboardStore = defineStore("dashboard", {
                 this.teamPulseNudgingIds = this.teamPulseNudgingIds.filter((item) => item !== id);
             }
         },
-    }
+    },
 });

@@ -213,10 +213,7 @@ describe("TeamEdit smoke", () => {
         await wrapper.find("form").trigger("submit");
         await flushAsync();
 
-        expect(teamStoreMock.updateTeam).toHaveBeenCalledWith(
-            "9",
-            expect.objectContaining({ name: "Platform Team" }),
-        );
+        expect(teamStoreMock.updateTeam).toHaveBeenCalledWith("9", expect.objectContaining({ name: "Platform Team" }));
         expect(routerBackMock).toHaveBeenCalled();
     });
 });

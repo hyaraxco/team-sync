@@ -2,13 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    analyticsStoreMock,
-    teamStoreMock,
-    optionStoreMock,
-    analyticsStoreRefs,
-    canMock,
-} = vi.hoisted(() => ({
+const { analyticsStoreMock, teamStoreMock, optionStoreMock, analyticsStoreRefs, canMock } = vi.hoisted(() => ({
     analyticsStoreMock: {
         fetchExecutiveSummary: vi.fn(),
         fetchWorkforceAnalytics: vi.fn(),
@@ -142,9 +136,7 @@ describe("AnalyticsDashboard smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        const attendanceTab = wrapper
-            .findAll("button")
-            .find((button) => button.text().includes("Attendance"));
+        const attendanceTab = wrapper.findAll("button").find((button) => button.text().includes("Attendance"));
         await attendanceTab.trigger("click");
         await flushAsync();
 

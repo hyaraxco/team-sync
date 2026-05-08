@@ -26,12 +26,15 @@ onMounted(() => {
     dashboardStore.fetchTeamPulse().catch(() => {});
 });
 
-const summary = computed(() => teamPulse.value?.summary || {
-    red: 0,
-    yellow: 0,
-    green: 0,
-    total: 0,
-});
+const summary = computed(
+    () =>
+        teamPulse.value?.summary || {
+            red: 0,
+            yellow: 0,
+            green: 0,
+            total: 0,
+        },
+);
 
 const staffMembers = computed(() => teamPulse.value?.staff_members || []);
 
@@ -100,7 +103,9 @@ const formatTime = (value) => {
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5 space-y-5">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0C51D9] to-[#3B82F6] flex items-center justify-center">
+                <div
+                    class="w-10 h-10 rounded-[12px] bg-gradient-to-br from-[#0C51D9] to-[#3B82F6] flex items-center justify-center"
+                >
                     <MessageCircleHeart class="w-5 h-5 text-white" />
                 </div>
                 <div>
@@ -151,7 +156,10 @@ const formatTime = (value) => {
             <div v-for="i in 3" :key="i" class="h-28 rounded-[20px] bg-gray-100 animate-pulse"></div>
         </div>
 
-        <div v-else-if="staffMembers.length === 0" class="rounded-[16px] border border-dashed border-[#DCDEDD] p-8 text-center">
+        <div
+            v-else-if="staffMembers.length === 0"
+            class="rounded-[16px] border border-dashed border-[#DCDEDD] p-8 text-center"
+        >
             <p class="text-brand-dark font-semibold">Belum ada anggota tim yang bisa dipantau</p>
             <p class="text-brand-light text-sm mt-1">Pastikan manager sudah memiliki tim aktif.</p>
         </div>
@@ -177,12 +185,15 @@ const formatTime = (value) => {
                                     class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
                                     :class="riskConfig[member.risk.level]?.badge || riskConfig.green.badge"
                                 >
-                                    <component :is="riskConfig[member.risk.level]?.icon || riskConfig.green.icon" class="w-3.5 h-3.5" />
+                                    <component
+                                        :is="riskConfig[member.risk.level]?.icon || riskConfig.green.icon"
+                                        class="w-3.5 h-3.5"
+                                    />
                                     {{ riskConfig[member.risk.level]?.label || riskConfig.green.label }}
                                 </span>
                             </div>
                             <p class="text-sm text-brand-light mt-1">
-                                {{ member.job_title || 'Tanpa jabatan' }}
+                                {{ member.job_title || "Tanpa jabatan" }}
                                 <span v-if="member.team_name">• {{ member.team_name }}</span>
                             </p>
                             <p class="text-sm text-brand-dark mt-2">{{ member.risk.reason }}</p>
@@ -196,7 +207,10 @@ const formatTime = (value) => {
                                 <span>{{ member.attendance.label }}</span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                <div class="h-full rounded-full bg-[#0C51D9]" :style="{ width: member.attendance.score + '%' }"></div>
+                                <div
+                                    class="h-full rounded-full bg-[#0C51D9]"
+                                    :style="{ width: member.attendance.score + '%' }"
+                                ></div>
                             </div>
                         </div>
 
@@ -206,10 +220,14 @@ const formatTime = (value) => {
                                 <span>{{ member.task_velocity.percent }}%</span>
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
-                                <div class="h-full rounded-full bg-emerald-500" :style="{ width: member.task_velocity.percent + '%' }"></div>
+                                <div
+                                    class="h-full rounded-full bg-emerald-500"
+                                    :style="{ width: member.task_velocity.percent + '%' }"
+                                ></div>
                             </div>
                             <p class="text-xs text-brand-light mt-2">
-                                {{ member.task_velocity.done_today }} selesai hari ini • {{ member.task_velocity.overdue }} overdue
+                                {{ member.task_velocity.done_today }} selesai hari ini •
+                                {{ member.task_velocity.overdue }} overdue
                             </p>
                         </div>
                     </div>
@@ -246,14 +264,21 @@ const formatTime = (value) => {
         </div>
 
         <Teleport to="body">
-            <div v-if="isNudgeModalOpen" class="fixed inset-0 z-[9998] bg-black/40 flex items-center justify-center p-4">
+            <div
+                v-if="isNudgeModalOpen"
+                class="fixed inset-0 z-[9998] bg-black/40 flex items-center justify-center p-4"
+            >
                 <div class="w-full max-w-xl rounded-[24px] bg-white border border-[#DCDEDD] p-6 shadow-xl">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h4 class="text-xl font-bold text-brand-dark">Kirim Tanya Kabar</h4>
-                            <p class="text-sm text-brand-light mt-1">Kirim sapaan untuk menanyakan apakah ada kendala yang bisa dibantu.</p>
+                            <p class="text-sm text-brand-light mt-1">
+                                Kirim sapaan untuk menanyakan apakah ada kendala yang bisa dibantu.
+                            </p>
                         </div>
-                        <button type="button" class="text-brand-light hover:text-brand-dark" @click="closeNudgeModal">Tutup</button>
+                        <button type="button" class="text-brand-light hover:text-brand-dark" @click="closeNudgeModal">
+                            Tutup
+                        </button>
                     </div>
 
                     <div class="mt-5 space-y-3">

@@ -1,43 +1,45 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { BadgeCheck, Clock3, FileWarning, RefreshCw, SlidersHorizontal } from 'lucide-vue-next';
-import { usePayrollStore } from '@/stores/payroll';
-import { useToast } from '@/composables/useToast';
-import EmptyState from '@/components/common/EmptyState.vue';
-import { formatRupiah } from '@/utils/formatUtils';
+import { computed, onMounted, ref } from "vue";
+import { BadgeCheck, Clock3, FileWarning, RefreshCw, SlidersHorizontal } from "lucide-vue-next";
+import { usePayrollStore } from "@/stores/payroll";
+import { useToast } from "@/composables/useToast";
+import EmptyState from "@/components/common/EmptyState.vue";
+import { formatRupiah } from "@/utils/formatUtils";
 
 const payrollStore = usePayrollStore();
 const toast = useToast();
 const payrollAdjustments = computed(() => payrollStore.payrollAdjustments || []);
-const meta = computed(() => payrollStore.meta || {
-    current_page: 1,
-    last_page: 1,
-    per_page: 15,
-    total: 0,
-});
+const meta = computed(
+    () =>
+        payrollStore.meta || {
+            current_page: 1,
+            last_page: 1,
+            per_page: 15,
+            total: 0,
+        },
+);
 const loading = computed(() => payrollStore.loading);
 
 const filters = ref({
-    status: '',
+    status: "",
     page: 1,
     per_page: 15,
 });
 const approvingId = ref(null);
 
 const statusOptions = [
-    { label: 'All statuses', value: '' },
-    { label: 'Pending', value: 'pending' },
-    { label: 'Approved', value: 'approved' },
-    { label: 'Applied', value: 'applied' },
+    { label: "All statuses", value: "" },
+    { label: "Pending", value: "pending" },
+    { label: "Approved", value: "approved" },
+    { label: "Applied", value: "applied" },
 ];
 
-const totalAmount = computed(() => payrollAdjustments.value.reduce(
-    (total, adjustment) => total + Number(adjustment.amount_delta || 0),
-    0,
-));
-const pendingCount = computed(() => payrollAdjustments.value.filter((item) => item.status === 'pending').length);
-const approvedCount = computed(() => payrollAdjustments.value.filter((item) => item.status === 'approved').length);
-const appliedCount = computed(() => payrollAdjustments.value.filter((item) => item.status === 'applied').length);
+const totalAmount = computed(() =>
+    payrollAdjustments.value.reduce((total, adjustment) => total + Number(adjustment.amount_delta || 0), 0),
+);
+const pendingCount = computed(() => payrollAdjustments.value.filter((item) => item.status === "pending").length);
+const approvedCount = computed(() => payrollAdjustments.value.filter((item) => item.status === "approved").length);
+const appliedCount = computed(() => payrollAdjustments.value.filter((item) => item.status === "applied").length);
 
 const loadAdjustments = async () => {
     try {
@@ -47,7 +49,10 @@ const loadAdjustments = async () => {
             ...(filters.value.status ? { status: filters.value.status } : {}),
         });
     } catch (error) {
-        toast.error('Failed to load payroll adjustments', payrollStore.error || error?.response?.data?.message || 'Please try again.');
+        toast.error(
+            "Failed to load payroll adjustments",
+            payrollStore.error || error?.response?.data?.message || "Please try again.",
+        );
     }
 };
 
@@ -69,38 +74,43 @@ const approveAdjustment = async (adjustment) => {
     approvingId.value = adjustment.id;
     try {
         await payrollStore.approvePayrollAdjustment(adjustment.id);
-        toast.success('Payroll adjustment approved', 'The adjustment is now ready to be applied in the target payroll period.');
+        toast.success(
+            "Payroll adjustment approved",
+            "The adjustment is now ready to be applied in the target payroll period.",
+        );
         await loadAdjustments();
     } catch (error) {
-        toast.error('Failed to approve adjustment', payrollStore.error || error?.response?.data?.message || 'Only pending adjustments can be approved.');
+        toast.error(
+            "Failed to approve adjustment",
+            payrollStore.error || error?.response?.data?.message || "Only pending adjustments can be approved.",
+        );
     } finally {
         approvingId.value = null;
     }
 };
 
-const getStaffName = (adjustment) => adjustment?.staff_member?.user?.name
-    || adjustment?.staff_member?.name
-    || adjustment?.staff_member?.employee_name
-    || `Staff #${adjustment.staff_member_id}`;
+const getStaffName = (adjustment) =>
+    adjustment?.staff_member?.user?.name ||
+    adjustment?.staff_member?.name ||
+    adjustment?.staff_member?.employee_name ||
+    `Staff #${adjustment.staff_member_id}`;
 
-const getStaffCode = (adjustment) => adjustment?.staff_member?.employee_code
-    || adjustment?.staff_member?.code
-    || '-';
+const getStaffCode = (adjustment) => adjustment?.staff_member?.employee_code || adjustment?.staff_member?.code || "-";
 
 const formatAdjustmentKind = (kind) => {
     if (!kind) {
-        return 'Unknown adjustment';
+        return "Unknown adjustment";
     }
 
     return kind
-        .split('_')
+        .split("_")
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(' ');
+        .join(" ");
 };
 
 const formatPeriod = (period) => {
     if (!period) {
-        return '-';
+        return "-";
     }
 
     if (period.month_key) {
@@ -129,11 +139,12 @@ const formatSignedRupiah = (value) => {
     return formatted;
 };
 
-const getStatusClass = (status) => ({
-    pending: 'bg-amber-100 text-amber-700',
-    approved: 'bg-blue-100 text-blue-700',
-    applied: 'bg-green-100 text-green-700',
-}[status] || 'bg-gray-100 text-gray-700');
+const getStatusClass = (status) =>
+    ({
+        pending: "bg-amber-100 text-amber-700",
+        approved: "bg-blue-100 text-blue-700",
+        applied: "bg-green-100 text-green-700",
+    })[status] || "bg-gray-100 text-gray-700";
 
 onMounted(loadAdjustments);
 </script>
@@ -147,7 +158,8 @@ onMounted(loadAdjustments);
                     Payroll Adjustment Queue
                 </h1>
                 <p class="text-brand-light text-base font-normal mt-2 max-w-3xl">
-                    Review correction credits and deductions generated after attendance or leave updates. The current backend supports listing and approving pending adjustments; reject is not available.
+                    Review correction credits and deductions generated after attendance or leave updates. The current
+                    backend supports listing and approving pending adjustments; reject is not available.
                 </p>
             </div>
             <button
@@ -248,12 +260,18 @@ onMounted(loadAdjustments);
                                 <p class="text-xs text-brand-light">{{ getStaffCode(adjustment) }}</p>
                             </td>
                             <td class="px-4 py-3">
-                                <p class="font-medium text-brand-dark">{{ formatAdjustmentKind(adjustment.adjustment_kind) }}</p>
-                                <p class="mt-1 max-w-xs text-xs text-brand-light">{{ adjustment.reason || 'No reason provided' }}</p>
+                                <p class="font-medium text-brand-dark">
+                                    {{ formatAdjustmentKind(adjustment.adjustment_kind) }}
+                                </p>
+                                <p class="mt-1 max-w-xs text-xs text-brand-light">
+                                    {{ adjustment.reason || "No reason provided" }}
+                                </p>
                             </td>
                             <td class="px-4 py-3 text-brand-light">{{ formatPeriod(adjustment.source_period) }}</td>
                             <td class="px-4 py-3 text-brand-light">{{ formatPeriod(adjustment.target_period) }}</td>
-                            <td class="px-4 py-3 text-right font-medium text-brand-dark">{{ Number(adjustment.days_delta || 0) }}</td>
+                            <td class="px-4 py-3 text-right font-medium text-brand-dark">
+                                {{ Number(adjustment.days_delta || 0) }}
+                            </td>
                             <td
                                 class="px-4 py-3 text-right font-semibold"
                                 :class="Number(adjustment.amount_delta || 0) >= 0 ? 'text-green-700' : 'text-red-700'"
@@ -261,7 +279,10 @@ onMounted(loadAdjustments);
                                 {{ formatSignedRupiah(adjustment.amount_delta) }}
                             </td>
                             <td class="px-4 py-3">
-                                <span class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold" :class="getStatusClass(adjustment.status)">
+                                <span
+                                    class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
+                                    :class="getStatusClass(adjustment.status)"
+                                >
                                     {{ adjustment.status }}
                                 </span>
                             </td>
@@ -273,7 +294,7 @@ onMounted(loadAdjustments);
                                     :disabled="approvingId === adjustment.id"
                                     @click="approveAdjustment(adjustment)"
                                 >
-                                    {{ approvingId === adjustment.id ? 'Approving...' : 'Approve' }}
+                                    {{ approvingId === adjustment.id ? "Approving..." : "Approve" }}
                                 </button>
                                 <span v-else class="text-xs text-brand-light">No action</span>
                             </td>
@@ -282,7 +303,10 @@ onMounted(loadAdjustments);
                 </table>
             </div>
 
-            <div v-if="meta.last_page > 1" class="mt-5 flex items-center justify-between border-t border-[#F1F5F9] pt-4">
+            <div
+                v-if="meta.last_page > 1"
+                class="mt-5 flex items-center justify-between border-t border-[#F1F5F9] pt-4"
+            >
                 <p class="text-sm text-brand-light">
                     Page {{ meta.current_page }} of {{ meta.last_page }} · {{ meta.total }} adjustments
                 </p>

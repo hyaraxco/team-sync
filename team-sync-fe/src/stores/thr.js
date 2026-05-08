@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import { axiosInstance } from '@/plugins/axios';
+import { defineStore } from "pinia";
+import { axiosInstance } from "@/plugins/axios";
 
-export const useThrStore = defineStore('thr', {
+export const useThrStore = defineStore("thr", {
     state: () => ({
         thrPayrolls: [],
         thrPayroll: null,
@@ -19,11 +19,11 @@ export const useThrStore = defineStore('thr', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('/thr', { params });
+                const response = await axiosInstance.get("/thr", { params });
                 this.thrPayrolls = response.data.data?.data || [];
                 this.meta = response.data.data?.meta || null;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch THR payrolls';
+                this.error = error.response?.data?.message || "Failed to fetch THR payrolls";
                 throw error;
             } finally {
                 this.loading = false;
@@ -38,7 +38,7 @@ export const useThrStore = defineStore('thr', {
                 this.thrPayroll = response.data.data;
                 return this.thrPayroll;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch THR payroll';
+                this.error = error.response?.data?.message || "Failed to fetch THR payroll";
                 throw error;
             } finally {
                 this.loading = false;
@@ -53,7 +53,7 @@ export const useThrStore = defineStore('thr', {
                 this.thrDetails = response.data.data?.data || [];
                 this.detailsMeta = response.data.data?.meta || null;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch THR details';
+                this.error = error.response?.data?.message || "Failed to fetch THR details";
                 throw error;
             } finally {
                 this.loading = false;
@@ -64,11 +64,11 @@ export const useThrStore = defineStore('thr', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('/thr/year-summary', { params: { year } });
+                const response = await axiosInstance.get("/thr/year-summary", { params: { year } });
                 this.yearSummary = response.data.data;
                 return this.yearSummary;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to fetch year summary';
+                this.error = error.response?.data?.message || "Failed to fetch year summary";
                 throw error;
             } finally {
                 this.loading = false;
@@ -79,11 +79,11 @@ export const useThrStore = defineStore('thr', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post('/thr/simulate', data);
+                const response = await axiosInstance.post("/thr/simulate", data);
                 this.simulation = response.data.data;
                 return this.simulation;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to simulate THR';
+                this.error = error.response?.data?.message || "Failed to simulate THR";
                 throw error;
             } finally {
                 this.loading = false;
@@ -94,10 +94,10 @@ export const useThrStore = defineStore('thr', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post('/thr/generate', data);
+                const response = await axiosInstance.post("/thr/generate", data);
                 return response.data;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to generate THR';
+                this.error = error.response?.data?.message || "Failed to generate THR";
                 throw error;
             } finally {
                 this.loading = false;
@@ -111,7 +111,7 @@ export const useThrStore = defineStore('thr', {
                 const response = await axiosInstance.post(`/thr/${id}/approve`);
                 return response.data;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to approve THR';
+                this.error = error.response?.data?.message || "Failed to approve THR";
                 throw error;
             } finally {
                 this.loading = false;
@@ -127,7 +127,7 @@ export const useThrStore = defineStore('thr', {
                 });
                 return response.data;
             } catch (error) {
-                this.error = error.response?.data?.message || 'Failed to mark THR as paid';
+                this.error = error.response?.data?.message || "Failed to mark THR as paid";
                 throw error;
             } finally {
                 this.loading = false;

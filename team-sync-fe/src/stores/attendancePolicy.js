@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
-import { axiosInstance } from '@/plugins/axios';
+import { defineStore } from "pinia";
+import { axiosInstance } from "@/plugins/axios";
 
-export const useAttendancePolicyStore = defineStore('attendancePolicy', {
+export const useAttendancePolicyStore = defineStore("attendancePolicy", {
     state: () => ({
         policies: [],
         loading: false,
@@ -12,11 +12,11 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('attendance-policies');
+                const response = await axiosInstance.get("attendance-policies");
                 this.policies = response.data.data;
             } catch (error) {
-                this.error = error.message || 'Failed to fetch attendance policies';
-                console.error('Error fetching attendance policies:', error);
+                this.error = error.message || "Failed to fetch attendance policies";
+                console.error("Error fetching attendance policies:", error);
             } finally {
                 this.loading = false;
             }
@@ -26,18 +26,18 @@ export const useAttendancePolicyStore = defineStore('attendancePolicy', {
             this.error = null;
             try {
                 const response = await axiosInstance.put(`attendance-policies/${id}`, data);
-                const index = this.policies.findIndex(p => p.id === id);
+                const index = this.policies.findIndex((p) => p.id === id);
                 if (index !== -1) {
                     this.policies[index] = response.data.data;
                 }
                 return response.data.data;
             } catch (error) {
-                this.error = error.message || 'Failed to update attendance policy';
-                console.error('Error updating attendance policy:', error);
+                this.error = error.message || "Failed to update attendance policy";
+                console.error("Error updating attendance policy:", error);
                 throw error;
             } finally {
                 this.loading = false;
             }
-        }
-    }
+        },
+    },
 });

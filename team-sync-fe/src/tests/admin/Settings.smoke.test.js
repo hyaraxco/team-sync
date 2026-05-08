@@ -38,15 +38,15 @@ describe("Settings.vue smoke test", () => {
     it("renders settings sections", () => {
         const wrapper = factory();
         const sections = ["Payroll & Finance", "Attendance & Time", "Performance & Growth"];
-        
-        sections.forEach(section => {
+
+        sections.forEach((section) => {
             expect(wrapper.text()).toContain(section);
         });
     });
 
     it("renders links to existing config pages", () => {
         const wrapper = factory();
-        
+
         const expectedLinks = [
             "Payroll Settings",
             "Attendance Policy",
@@ -54,19 +54,19 @@ describe("Settings.vue smoke test", () => {
             "Holiday Calendar",
             "Review Cycles",
             "Outcome Rules",
-            "Review Templates"
+            "Review Templates",
         ];
 
-        expectedLinks.forEach(linkText => {
+        expectedLinks.forEach((linkText) => {
             expect(wrapper.text()).toContain(linkText);
         });
 
         const links = wrapper.findAllComponents(RouterLinkStub);
-        
-        const payrollLink = links.find(l => l.text().includes("Payroll Settings"));
+
+        const payrollLink = links.find((l) => l.text().includes("Payroll Settings"));
         expect(payrollLink.props("to")).toEqual({ name: "admin.payroll.settings" });
 
-        const attendanceLink = links.find(l => l.text().includes("Attendance Policy"));
+        const attendanceLink = links.find((l) => l.text().includes("Attendance Policy"));
         expect(attendanceLink.props("to")).toEqual({ name: "admin.attendance.settings" });
     });
 });

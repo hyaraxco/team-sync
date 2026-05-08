@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useHolidayCalendarStore = defineStore("holidayCalendar", {
@@ -10,7 +10,7 @@ export const useHolidayCalendarStore = defineStore("holidayCalendar", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         error: null,
@@ -22,10 +22,10 @@ export const useHolidayCalendarStore = defineStore("holidayCalendar", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('holiday-calendars', {
+                const response = await axiosInstance.get("holiday-calendars", {
                     params: {
                         page: params.page || 1,
-                        search: params.search || '',
+                        search: params.search || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
@@ -51,7 +51,7 @@ export const useHolidayCalendarStore = defineStore("holidayCalendar", {
             this.error = null;
             this.success = null;
             try {
-                const response = await axiosInstance.post('holiday-calendars', data);
+                const response = await axiosInstance.post("holiday-calendars", data);
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
@@ -92,6 +92,6 @@ export const useHolidayCalendarStore = defineStore("holidayCalendar", {
             } finally {
                 this.loading = false;
             }
-        }
-    }
+        },
+    },
 });
