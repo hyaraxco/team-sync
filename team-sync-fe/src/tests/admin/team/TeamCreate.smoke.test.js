@@ -139,9 +139,7 @@ describe("TeamCreate smoke", () => {
                 job_information: { job_title: "Engineer" },
             },
         ];
-        optionStoreRefs.departments.value = [
-            { value: "engineering", label: "Engineering" },
-        ];
+        optionStoreRefs.departments.value = [{ value: "engineering", label: "Engineering" }];
         optionStoreMock.fetchDepartments.mockResolvedValue(undefined);
         staffMemberStoreMock.fetchStaffMembers.mockResolvedValue(undefined);
         teamStoreMock.createTeam.mockResolvedValue(undefined);

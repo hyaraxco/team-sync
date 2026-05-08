@@ -1,24 +1,18 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
-import { usePayrollStore } from '@/stores/payroll';
-import { storeToRefs } from 'pinia';
-import { formatRupiah, formatRupiahCompact } from '@/utils/formatUtils';
-import { can } from '@/helpers/permissionHelper';
-import {
-    ArrowLeft,
-    TrendingUp,
-    TrendingDown,
-    Minus,
-    AlertCircle
-} from 'lucide-vue-next';
-import MainCard from '@/components/common/MainCard.vue';
+import { ref, onMounted, computed, watch } from "vue";
+import { usePayrollStore } from "@/stores/payroll";
+import { storeToRefs } from "pinia";
+import { formatRupiah, formatRupiahCompact } from "@/utils/formatUtils";
+import { can } from "@/helpers/permissionHelper";
+import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-vue-next";
+import MainCard from "@/components/common/MainCard.vue";
 
 const payrollStore = usePayrollStore();
 const { payrollComparison, loadingAnalytics, error } = storeToRefs(payrollStore);
 
 const getYearMonthString = (date) => {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
     return `${year}-${month}`;
 };
 
@@ -39,15 +33,15 @@ onMounted(() => {
 });
 
 const getVarianceColor = (metric, diff, pct) => {
-    if (diff === 0) return 'text-gray-500';
-    
+    if (diff === 0) return "text-gray-500";
+
     // Higher is generally "worse" for cost from company perspective, but we'll highlight green for positive variance for most, except deductions
-    if (metric === 'deductions' || metric === 'tax_amount') {
-        return diff > 0 ? 'text-red-500' : 'text-green-500';
+    if (metric === "deductions" || metric === "tax_amount") {
+        return diff > 0 ? "text-red-500" : "text-green-500";
     }
-    
+
     // For net_salary, gross_salary, bpjs:
-    return diff > 0 ? 'text-green-500' : 'text-red-500';
+    return diff > 0 ? "text-green-500" : "text-red-500";
 };
 
 const getVarianceIcon = (diff) => {
@@ -57,19 +51,19 @@ const getVarianceIcon = (diff) => {
 };
 
 const formatValue = (metric, value) => {
-    if (metric === 'employee_count') return value;
+    if (metric === "employee_count") return value;
     return formatRupiah(value);
 };
 
 const metrics = [
-    { key: 'employee_count', label: 'Employee Count' },
-    { key: 'gross_salary', label: 'Gross Salary' },
-    { key: 'allowances', label: 'Allowances' },
-    { key: 'deductions', label: 'Deductions' },
-    { key: 'bpjs_deductions', label: 'BPJS Deductions (Employee)' },
-    { key: 'bpjs_employer', label: 'BPJS Employer' },
-    { key: 'tax_amount', label: 'PPh 21 Tax' },
-    { key: 'net_salary', label: 'Net Salary' },
+    { key: "employee_count", label: "Employee Count" },
+    { key: "gross_salary", label: "Gross Salary" },
+    { key: "allowances", label: "Allowances" },
+    { key: "deductions", label: "Deductions" },
+    { key: "bpjs_deductions", label: "BPJS Deductions (Employee)" },
+    { key: "bpjs_employer", label: "BPJS Employer" },
+    { key: "tax_amount", label: "PPh 21 Tax" },
+    { key: "net_salary", label: "Net Salary" },
 ];
 </script>
 
@@ -91,14 +85,26 @@ const metrics = [
             <div class="flex flex-col sm:flex-row items-end gap-4 mb-6">
                 <div class="w-full sm:w-1/3">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Base Month (Month 1)</label>
-                    <input type="month" v-model="month1" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary" />
+                    <input
+                        type="month"
+                        v-model="month1"
+                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary"
+                    />
                 </div>
                 <div class="w-full sm:w-1/3">
                     <label class="block text-sm font-medium text-gray-700 mb-1">Compare Month (Month 2)</label>
-                    <input type="month" v-model="month2" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary" />
+                    <input
+                        type="month"
+                        v-model="month2"
+                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary"
+                    />
                 </div>
                 <div class="w-full sm:w-1/3 pb-0.5">
-                    <button @click="loadComparison" :disabled="loadingAnalytics" class="btn-primary w-full justify-center">
+                    <button
+                        @click="loadComparison"
+                        :disabled="loadingAnalytics"
+                        class="btn-primary w-full justify-center"
+                    >
                         <span v-if="loadingAnalytics">Loading...</span>
                         <span v-else>Compare</span>
                     </button>
@@ -114,35 +120,77 @@ const metrics = [
             </div>
 
             <div v-else-if="payrollComparison && !loadingAnalytics" class="overflow-x-auto">
-                <div v-if="!payrollComparison.month1.found && !payrollComparison.month2.found" class="text-center py-8 text-gray-500">
+                <div
+                    v-if="!payrollComparison.month1.found && !payrollComparison.month2.found"
+                    class="text-center py-8 text-gray-500"
+                >
                     No payroll data found for the selected periods.
                 </div>
-                <div v-else-if="!payrollComparison.month1.found" class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4">
+                <div
+                    v-else-if="!payrollComparison.month1.found"
+                    class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4"
+                >
                     Warning: No payroll data found for {{ payrollComparison.month1.period }}.
                 </div>
-                <div v-else-if="!payrollComparison.month2.found" class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4">
+                <div
+                    v-else-if="!payrollComparison.month2.found"
+                    class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4"
+                >
                     Warning: No payroll data found for {{ payrollComparison.month2.period }}.
                 </div>
 
-                <table v-if="payrollComparison.month1.found || payrollComparison.month2.found" class="w-full text-left border-collapse">
+                <table
+                    v-if="payrollComparison.month1.found || payrollComparison.month2.found"
+                    class="w-full text-left border-collapse"
+                >
                     <thead>
                         <tr class="border-b border-gray-200">
                             <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50 rounded-tl-lg">Metric</th>
-                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50">{{ payrollComparison.month1.period }}</th>
-                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50">{{ payrollComparison.month2.period }}</th>
+                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50">
+                                {{ payrollComparison.month1.period }}
+                            </th>
+                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50">
+                                {{ payrollComparison.month2.period }}
+                            </th>
                             <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50 rounded-tr-lg">Variance</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <tr v-for="metric in metrics" :key="metric.key" class="hover:bg-gray-50 transition-colors">
                             <td class="py-4 px-4 font-medium text-gray-900">{{ metric.label }}</td>
-                            <td class="py-4 px-4 text-gray-600">{{ formatValue(metric.key, payrollComparison.month1[metric.key]) }}</td>
-                            <td class="py-4 px-4 text-gray-600">{{ formatValue(metric.key, payrollComparison.month2[metric.key]) }}</td>
+                            <td class="py-4 px-4 text-gray-600">
+                                {{ formatValue(metric.key, payrollComparison.month1[metric.key]) }}
+                            </td>
+                            <td class="py-4 px-4 text-gray-600">
+                                {{ formatValue(metric.key, payrollComparison.month2[metric.key]) }}
+                            </td>
                             <td class="py-4 px-4">
-                                <div class="flex items-center gap-1 font-medium" :class="getVarianceColor(metric.key, payrollComparison.variances[metric.key].difference, payrollComparison.variances[metric.key].percentage)">
-                                    <component :is="getVarianceIcon(payrollComparison.variances[metric.key].difference)" class="w-4 h-4" />
-                                    <span>{{ formatValue(metric.key, Math.abs(payrollComparison.variances[metric.key].difference)) }}</span>
-                                    <span class="text-xs opacity-75 ml-1">({{ payrollComparison.variances[metric.key].percentage > 0 ? '+' : '' }}{{ payrollComparison.variances[metric.key].percentage }}%)</span>
+                                <div
+                                    class="flex items-center gap-1 font-medium"
+                                    :class="
+                                        getVarianceColor(
+                                            metric.key,
+                                            payrollComparison.variances[metric.key].difference,
+                                            payrollComparison.variances[metric.key].percentage,
+                                        )
+                                    "
+                                >
+                                    <component
+                                        :is="getVarianceIcon(payrollComparison.variances[metric.key].difference)"
+                                        class="w-4 h-4"
+                                    />
+                                    <span>
+                                        {{
+                                            formatValue(
+                                                metric.key,
+                                                Math.abs(payrollComparison.variances[metric.key].difference),
+                                            )
+                                        }}
+                                    </span>
+                                    <span class="text-xs opacity-75 ml-1">
+                                        ({{ payrollComparison.variances[metric.key].percentage > 0 ? "+" : ""
+                                        }}{{ payrollComparison.variances[metric.key].percentage }}%)
+                                    </span>
                                 </div>
                             </td>
                         </tr>

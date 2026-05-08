@@ -145,12 +145,16 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
 </script>
 
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex flex-col items-center justify-center p-4 sm:p-8">
+    <div
+        class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex flex-col items-center justify-center p-4 sm:p-8"
+    >
         <div class="w-full max-w-2xl">
             <!-- Logo -->
             <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-br from-[#0C51D9] to-[#3B82F6] rounded-xl flex items-center justify-center">
+                    <div
+                        class="w-12 h-12 bg-gradient-to-br from-[#0C51D9] to-[#3B82F6] rounded-xl flex items-center justify-center"
+                    >
                         <span class="text-white text-lg font-bold">TS</span>
                     </div>
                     <h1 class="text-2xl font-bold text-gray-900">Team Sync Pro</h1>
@@ -163,28 +167,39 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                 <template v-for="(step, index) in stepConfig" :key="step.number">
                     <div
                         class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all"
-                        :class="currentStep === step.number
-                            ? 'bg-[#0C51D9] text-white'
-                            : currentStep > step.number
-                                ? 'bg-green-100 text-green-700'
-                                : 'bg-gray-100 text-gray-400'"
+                        :class="
+                            currentStep === step.number
+                                ? 'bg-[#0C51D9] text-white'
+                                : currentStep > step.number
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-gray-100 text-gray-400'
+                        "
                     >
                         <component :is="currentStep > step.number ? CheckCircle2 : step.icon" class="w-4 h-4" />
                         <span class="hidden sm:inline">{{ step.label }}</span>
                         <span class="sm:hidden">{{ step.number }}</span>
                     </div>
-                    <div v-if="index < stepConfig.length - 1" class="w-8 h-0.5 bg-gray-200" :class="{ 'bg-green-300': currentStep > step.number }"></div>
+                    <div
+                        v-if="index < stepConfig.length - 1"
+                        class="w-8 h-0.5 bg-gray-200"
+                        :class="{ 'bg-green-300': currentStep > step.number }"
+                    ></div>
                 </template>
             </div>
 
             <!-- Step 1: License Upload -->
-            <div v-if="currentStep === 1 && !setupComplete" class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <div
+                v-if="currentStep === 1 && !setupComplete"
+                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm"
+            >
                 <div class="text-center mb-6">
                     <div class="w-16 h-16 bg-blue-50 rounded-[16px] flex items-center justify-center mx-auto mb-4">
                         <KeyRound class="w-8 h-8 text-[#0C51D9]" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Aktivasi Lisensi</h2>
-                    <p class="text-gray-500 text-sm mt-2">Masukkan kunci lisensi yang Anda dapatkan dari email pembelian.</p>
+                    <p class="text-gray-500 text-sm mt-2">
+                        Masukkan kunci lisensi yang Anda dapatkan dari email pembelian.
+                    </p>
                 </div>
 
                 <div class="space-y-4">
@@ -198,9 +213,14 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         ></textarea>
                     </div>
 
-                    <div v-if="setupStore.error" class="rounded-[12px] bg-red-50 border border-red-200 p-3 text-sm text-red-700 flex items-start gap-2">
+                    <div
+                        v-if="setupStore.error"
+                        class="rounded-[12px] bg-red-50 border border-red-200 p-3 text-sm text-red-700 flex items-start gap-2"
+                    >
                         <AlertCircle class="w-5 h-5 flex-shrink-0 mt-0.5" />
-                        <span>{{ typeof setupStore.error === 'string' ? setupStore.error : 'Kunci lisensi tidak valid.' }}</span>
+                        <span>
+                            {{ typeof setupStore.error === "string" ? setupStore.error : "Kunci lisensi tidak valid." }}
+                        </span>
                     </div>
 
                     <button
@@ -219,7 +239,10 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             </div>
 
             <!-- Step 2: System Health -->
-            <div v-if="currentStep === 2 && !setupComplete" class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <div
+                v-if="currentStep === 2 && !setupComplete"
+                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm"
+            >
                 <div class="text-center mb-6">
                     <div class="w-16 h-16 bg-green-50 rounded-[16px] flex items-center justify-center mx-auto mb-4">
                         <Stethoscope class="w-8 h-8 text-green-600" />
@@ -239,7 +262,11 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         class="flex items-start gap-3 rounded-[12px] border p-3"
                         :class="doctorStatusBg(check.status)"
                     >
-                        <component :is="doctorStatusIcon(check.status)" class="w-5 h-5 mt-0.5 flex-shrink-0" :class="doctorStatusColor(check.status)" />
+                        <component
+                            :is="doctorStatusIcon(check.status)"
+                            class="w-5 h-5 mt-0.5 flex-shrink-0"
+                            :class="doctorStatusColor(check.status)"
+                        />
                         <div>
                             <p class="text-sm font-semibold text-gray-900">{{ check.label }}</p>
                             <p class="text-xs text-gray-600 mt-0.5">{{ check.message }}</p>
@@ -269,13 +296,18 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             </div>
 
             <!-- Step 3: Superadmin Setup -->
-            <div v-if="currentStep === 3 && !setupComplete" class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm">
+            <div
+                v-if="currentStep === 3 && !setupComplete"
+                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm"
+            >
                 <div class="text-center mb-6">
                     <div class="w-16 h-16 bg-purple-50 rounded-[16px] flex items-center justify-center mx-auto mb-4">
                         <UserPlus class="w-8 h-8 text-purple-600" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Buat Akun Superadmin</h2>
-                    <p class="text-gray-500 text-sm mt-2">Akun ini akan memiliki akses penuh ke seluruh modul administratif.</p>
+                    <p class="text-gray-500 text-sm mt-2">
+                        Akun ini akan memiliki akses penuh ke seluruh modul administratif.
+                    </p>
                 </div>
 
                 <form class="space-y-4" @submit.prevent="submitBootstrap">
@@ -325,11 +357,14 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         />
                     </div>
 
-                    <div v-if="setupStore.error" class="rounded-[12px] bg-red-50 border border-red-200 p-3 text-sm text-red-700">
+                    <div
+                        v-if="setupStore.error"
+                        class="rounded-[12px] bg-red-50 border border-red-200 p-3 text-sm text-red-700"
+                    >
                         <template v-if="typeof setupStore.error === 'object'">
                             <ul class="list-disc list-inside">
                                 <li v-for="(messages, field) in setupStore.error" :key="field">
-                                    {{ Array.isArray(messages) ? messages.join(', ') : messages }}
+                                    {{ Array.isArray(messages) ? messages.join(", ") : messages }}
                                 </li>
                             </ul>
                         </template>
@@ -361,7 +396,10 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             </div>
 
             <!-- Setup Complete -->
-            <div v-if="setupComplete" class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm text-center">
+            <div
+                v-if="setupComplete"
+                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm text-center"
+            >
                 <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <PartyPopper class="w-10 h-10 text-green-600" />
                 </div>

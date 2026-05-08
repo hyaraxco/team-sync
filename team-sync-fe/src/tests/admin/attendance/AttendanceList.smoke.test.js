@@ -168,14 +168,10 @@ describe("AttendanceList smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        const approveButton = wrapper
-            .findAll("button")
-            .find((button) => button.text().includes("Approve"));
+        const approveButton = wrapper.findAll("button").find((button) => button.text().includes("Approve"));
 
         await approveButton.trigger("click");
 
-        expect(approveModalOpenMock).toHaveBeenCalledWith(
-            expect.objectContaining({ id: 1 }),
-        );
+        expect(approveModalOpenMock).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 });

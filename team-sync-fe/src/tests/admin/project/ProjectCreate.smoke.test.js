@@ -154,9 +154,7 @@ describe("ProjectCreate smoke", () => {
 
     it("opens leader modal when leader selector clicked", async () => {
         const wrapper = factory();
-        const openButton = wrapper
-            .findAll("button")
-            .find((btn) => btn.text().includes("Select project leader"));
+        const openButton = wrapper.findAll("button").find((btn) => btn.text().includes("Select project leader"));
 
         await openButton.trigger("click");
 

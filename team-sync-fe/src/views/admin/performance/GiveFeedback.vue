@@ -35,11 +35,7 @@ const defaultFormData = () => ({
 const formData = ref(defaultFormData());
 
 const isFormValid = computed(() => {
-    return (
-        !!formData.value.staff_member_id &&
-        !!formData.value.feedback_type &&
-        !!formData.value.content.trim()
-    );
+    return !!formData.value.staff_member_id && !!formData.value.feedback_type && !!formData.value.content.trim();
 });
 
 const resetForm = () => {
@@ -59,25 +55,17 @@ const submitFeedback = async () => {
             linked_goal_id: formData.value.linked_goal_id || null,
         });
 
-        toast.success(
-            "Feedback sent",
-            "Your feedback has been submitted successfully.",
-        );
+        toast.success("Feedback sent", "Your feedback has been submitted successfully.");
         resetForm();
     } catch (error) {
         errorMessage.value =
-            performanceFeedbackStore.error ||
-            error?.response?.data?.message ||
-            "Failed to submit feedback.";
+            performanceFeedbackStore.error || error?.response?.data?.message || "Failed to submit feedback.";
         toast.error("Failed to send feedback", errorMessage.value);
     }
 };
 
 onMounted(async () => {
-    await Promise.all([
-        staffMemberStore.fetchStaffMembers(),
-        performanceGoalStore.fetchMyGoals(),
-    ]);
+    await Promise.all([staffMemberStore.fetchStaffMembers(), performanceGoalStore.fetchMyGoals()]);
 });
 </script>
 
@@ -91,18 +79,11 @@ onMounted(async () => {
             </p>
         </div>
 
-        <Alert
-            v-if="errorMessage"
-            type="danger"
-            title="Unable to send feedback"
-            :message="errorMessage"
-        />
+        <Alert v-if="errorMessage" type="danger" title="Unable to send feedback" :message="errorMessage" />
 
         <MainCard>
             <div v-if="staffLoading" class="flex justify-center items-center py-12">
-                <div
-                    class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-                ></div>
+                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
             </div>
 
             <EmptyState
@@ -114,9 +95,7 @@ onMounted(async () => {
 
             <form v-else class="space-y-6" @submit.prevent="submitFeedback">
                 <div>
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Employee *</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Employee *</label>
                     <select
                         v-model="formData.staff_member_id"
                         name="staff_member_id"
@@ -135,9 +114,7 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Feedback Type *</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Feedback Type *</label>
                     <select
                         v-model="formData.feedback_type"
                         name="feedback_type"
@@ -151,9 +128,7 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Category</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Category</label>
                     <input
                         v-model="formData.category"
                         name="category"
@@ -164,9 +139,7 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Feedback *</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Feedback *</label>
                     <textarea
                         v-model="formData.content"
                         name="content"
@@ -178,20 +151,14 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Linked Goal (Optional)</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Linked Goal (Optional)</label>
                     <select
                         v-model="formData.linked_goal_id"
                         name="linked_goal_id"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     >
                         <option value="">Not linked to any goal</option>
-                        <option
-                            v-for="goal in myGoals"
-                            :key="goal.id"
-                            :value="String(goal.id)"
-                        >
+                        <option v-for="goal in myGoals" :key="goal.id" :value="String(goal.id)">
                             {{ goal.title }}
                         </option>
                     </select>
@@ -206,8 +173,7 @@ onMounted(async () => {
                         class="w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
                     />
                     <label for="is_private" class="text-sm text-brand-dark">
-                        Make this feedback private (visible only to employee and their
-                        manager)
+                        Make this feedback private (visible only to employee and their manager)
                     </label>
                 </div>
 

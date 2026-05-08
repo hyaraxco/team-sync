@@ -1,52 +1,46 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
-const {
-    routeState,
-    routerBackMock,
-    performanceGoalStoreMock,
-    performanceGoalRefs,
-    authStoreMock,
-    authRefs,
-} = vi.hoisted(() => ({
-    routeState: {
-        params: { id: "42" },
-        name: "admin.performance.goal.detail",
-    },
-    routerBackMock: vi.fn(),
-    performanceGoalStoreMock: {
-        fetchGoalById: vi.fn(),
-        fetchProgressUpdates: vi.fn(),
-    },
-    performanceGoalRefs: {
-        currentGoal: {
-            __v_isRef: true,
-            value: null,
+const { routeState, routerBackMock, performanceGoalStoreMock, performanceGoalRefs, authStoreMock, authRefs } =
+    vi.hoisted(() => ({
+        routeState: {
+            params: { id: "42" },
+            name: "admin.performance.goal.detail",
         },
-        goalsLoading: {
-            __v_isRef: true,
-            value: false,
+        routerBackMock: vi.fn(),
+        performanceGoalStoreMock: {
+            fetchGoalById: vi.fn(),
+            fetchProgressUpdates: vi.fn(),
         },
-        goalUpdates: {
-            __v_isRef: true,
-            value: [],
-        },
-        updatesLoading: {
-            __v_isRef: true,
-            value: false,
-        },
-    },
-    authStoreMock: {},
-    authRefs: {
-        user: {
-            __v_isRef: true,
-            value: {
-                id: 1,
-                name: "John Doe",
+        performanceGoalRefs: {
+            currentGoal: {
+                __v_isRef: true,
+                value: null,
+            },
+            goalsLoading: {
+                __v_isRef: true,
+                value: false,
+            },
+            goalUpdates: {
+                __v_isRef: true,
+                value: [],
+            },
+            updatesLoading: {
+                __v_isRef: true,
+                value: false,
             },
         },
-    },
-}));
+        authStoreMock: {},
+        authRefs: {
+            user: {
+                __v_isRef: true,
+                value: {
+                    id: 1,
+                    name: "John Doe",
+                },
+            },
+        },
+    }));
 
 vi.mock("@/stores/performanceGoal", () => ({
     usePerformanceGoalStore: () => performanceGoalStoreMock,

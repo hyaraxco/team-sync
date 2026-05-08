@@ -1,12 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
-const {
-    performanceFeedbackStoreMock,
-    performanceFeedbackRefs,
-    authRefs,
-    routerLinkStub,
-} = vi.hoisted(() => ({
+const { performanceFeedbackStoreMock, performanceFeedbackRefs, authRefs, routerLinkStub } = vi.hoisted(() => ({
     performanceFeedbackStoreMock: {
         fetchGivenFeedback: vi.fn(),
     },

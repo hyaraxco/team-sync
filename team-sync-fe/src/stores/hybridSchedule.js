@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useHybridScheduleStore = defineStore("hybridSchedule", {
@@ -13,7 +13,7 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         error: null,
@@ -25,10 +25,10 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('hybrid-schedules', {
+                const response = await axiosInstance.get("hybrid-schedules", {
                     params: {
                         page: params.page || 1,
-                        search: params.search || '',
+                        search: params.search || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
@@ -53,7 +53,7 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('my-hybrid-schedule');
+                const response = await axiosInstance.get("my-hybrid-schedule");
                 this.mySchedule = response.data.data;
                 return response.data;
             } catch (error) {
@@ -68,7 +68,7 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('my-hybrid-overrides');
+                const response = await axiosInstance.get("my-hybrid-overrides");
                 this.myOverrides = response.data.data;
                 return response.data.data;
             } catch (error) {
@@ -82,7 +82,7 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post('hybrid-schedule-overrides', data);
+                const response = await axiosInstance.post("hybrid-schedule-overrides", data);
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
@@ -112,7 +112,9 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post(`hybrid-schedule-overrides/${id}/reject`, { review_notes: notes });
+                const response = await axiosInstance.post(`hybrid-schedule-overrides/${id}/reject`, {
+                    review_notes: notes,
+                });
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
@@ -121,6 +123,6 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             } finally {
                 this.loading = false;
             }
-        }
-    }
+        },
+    },
 });

@@ -1,14 +1,14 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue';
-import { storeToRefs } from 'pinia';
-import { Gift, Check, X, Plus, Calendar, DollarSign, Users, AlertCircle } from 'lucide-vue-next';
-import { useThrStore } from '@/stores/thr';
-import { formatDateShort } from '@/utils/dateUtils';
-import Pagination from '@/components/admin/team/Pagination.vue';
-import EmptyState from '@/components/common/EmptyState.vue';
-import ModalWrapper from '@/components/common/ModalWrapper.vue';
-import { useToast } from '@/composables/useToast';
-import { can } from '@/helpers/permissionHelper';
+import { onMounted, ref, computed } from "vue";
+import { storeToRefs } from "pinia";
+import { Gift, Check, X, Plus, Calendar, DollarSign, Users, AlertCircle } from "lucide-vue-next";
+import { useThrStore } from "@/stores/thr";
+import { formatDateShort } from "@/utils/dateUtils";
+import Pagination from "@/components/admin/team/Pagination.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
+import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import { useToast } from "@/composables/useToast";
+import { can } from "@/helpers/permissionHelper";
 
 const store = useThrStore();
 const { thrPayrolls, yearSummary, simulation, meta, loading } = storeToRefs(store);
@@ -19,29 +19,29 @@ const showGenerateModal = ref(false);
 const showSimulationModal = ref(false);
 const showPaymentModal = ref(false);
 const selectedThr = ref(null);
-const paymentDate = ref('');
+const paymentDate = ref("");
 
 const generateForm = ref({
-    religion_event: '',
+    religion_event: "",
     year: new Date().getFullYear(),
-    religion_holiday_date: '',
-    notes: '',
+    religion_holiday_date: "",
+    notes: "",
 });
 
 const religionEvents = [
-    { value: 'idul_fitri', label: 'Idul Fitri (Islam)' },
-    { value: 'natal', label: 'Natal / Christmas (Kristen/Katolik)' },
-    { value: 'nyepi', label: 'Nyepi (Hindu)' },
-    { value: 'waisak', label: 'Waisak (Buddha)' },
-    { value: 'imlek', label: 'Imlek (Konghucu)' },
+    { value: "idul_fitri", label: "Idul Fitri (Islam)" },
+    { value: "natal", label: "Natal / Christmas (Kristen/Katolik)" },
+    { value: "nyepi", label: "Nyepi (Hindu)" },
+    { value: "waisak", label: "Waisak (Buddha)" },
+    { value: "imlek", label: "Imlek (Konghucu)" },
 ];
 
 const statusColors = {
-    draft: 'bg-gray-100 text-gray-700',
-    processing: 'bg-blue-100 text-blue-700',
-    pending: 'bg-yellow-100 text-yellow-700',
-    approved: 'bg-green-100 text-green-700',
-    paid: 'bg-emerald-100 text-emerald-800',
+    draft: "bg-gray-100 text-gray-700",
+    processing: "bg-blue-100 text-blue-700",
+    pending: "bg-yellow-100 text-yellow-700",
+    approved: "bg-green-100 text-green-700",
+    paid: "bg-emerald-100 text-emerald-800",
 };
 
 onMounted(async () => {
@@ -61,7 +61,7 @@ async function handleYearChange() {
 
 async function handleSimulate() {
     if (!generateForm.value.religion_event || !generateForm.value.religion_holiday_date) {
-        toast.error('Please fill in religion event and holiday date');
+        toast.error("Please fill in religion event and holiday date");
         return;
     }
     try {
@@ -72,20 +72,20 @@ async function handleSimulate() {
         });
         showSimulationModal.value = true;
     } catch (e) {
-        toast.error(store.error || 'Simulation failed');
+        toast.error(store.error || "Simulation failed");
     }
 }
 
 async function handleGenerate() {
     try {
         const result = await store.generate(generateForm.value);
-        toast.success(result.message || 'THR generated successfully');
+        toast.success(result.message || "THR generated successfully");
         showGenerateModal.value = false;
         showSimulationModal.value = false;
         resetForm();
         await fetchData();
     } catch (e) {
-        toast.error(store.error || 'Generation failed');
+        toast.error(store.error || "Generation failed");
     }
 }
 
@@ -93,16 +93,16 @@ async function handleApprove(thr) {
     if (!confirm(`Approve THR ${thr.event_label} ${thr.year}?`)) return;
     try {
         const result = await store.approve(thr.id);
-        toast.success(result.message || 'THR approved');
+        toast.success(result.message || "THR approved");
         await fetchData();
     } catch (e) {
-        toast.error(store.error || 'Approval failed');
+        toast.error(store.error || "Approval failed");
     }
 }
 
 function openPaymentModal(thr) {
     selectedThr.value = thr;
-    paymentDate.value = new Date().toISOString().split('T')[0];
+    paymentDate.value = new Date().toISOString().split("T")[0];
     showPaymentModal.value = true;
 }
 
@@ -110,26 +110,28 @@ async function handleMarkAsPaid() {
     if (!selectedThr.value || !paymentDate.value) return;
     try {
         const result = await store.markAsPaid(selectedThr.value.id, paymentDate.value);
-        toast.success(result.message || 'THR marked as paid');
+        toast.success(result.message || "THR marked as paid");
         showPaymentModal.value = false;
         selectedThr.value = null;
         await fetchData();
     } catch (e) {
-        toast.error(store.error || 'Failed to mark as paid');
+        toast.error(store.error || "Failed to mark as paid");
     }
 }
 
 function resetForm() {
     generateForm.value = {
-        religion_event: '',
+        religion_event: "",
         year: selectedYear.value,
-        religion_holiday_date: '',
-        notes: '',
+        religion_holiday_date: "",
+        notes: "",
     };
 }
 
 function formatCurrency(amount) {
-    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(amount);
+    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(
+        amount,
+    );
 }
 
 function handlePageChange(page) {
@@ -146,11 +148,7 @@ function handlePageChange(page) {
                 <p class="text-sm text-gray-500 mt-1">Tunjangan Hari Raya — Religious Holiday Bonus</p>
             </div>
             <div class="flex items-center gap-3">
-                <select
-                    v-model="selectedYear"
-                    @change="handleYearChange"
-                    class="rounded-lg border-gray-300 text-sm"
-                >
+                <select v-model="selectedYear" @change="handleYearChange" class="rounded-lg border-gray-300 text-sm">
                     <option v-for="y in [2024, 2025, 2026, 2027]" :key="y" :value="y">{{ y }}</option>
                 </select>
                 <button
@@ -278,11 +276,7 @@ function handlePageChange(page) {
             />
         </div>
 
-        <Pagination
-            v-if="meta && meta.last_page > 1"
-            :meta="meta"
-            @page-change="handlePageChange"
-        />
+        <Pagination v-if="meta && meta.last_page > 1" :meta="meta" @page-change="handlePageChange" />
 
         <!-- Generate Modal -->
         <ModalWrapper :show="showGenerateModal" title="Generate THR" @close="showGenerateModal = false">
@@ -302,11 +296,19 @@ function handlePageChange(page) {
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Holiday Date</label>
-                    <input v-model="generateForm.religion_holiday_date" type="date" class="w-full rounded-lg border-gray-300" />
+                    <input
+                        v-model="generateForm.religion_holiday_date"
+                        type="date"
+                        class="w-full rounded-lg border-gray-300"
+                    />
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
-                    <textarea v-model="generateForm.notes" rows="2" class="w-full rounded-lg border-gray-300"></textarea>
+                    <textarea
+                        v-model="generateForm.notes"
+                        rows="2"
+                        class="w-full rounded-lg border-gray-300"
+                    ></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-2">
                     <button
@@ -347,7 +349,9 @@ function handlePageChange(page) {
 
                 <div class="border-t pt-3">
                     <p class="text-sm font-medium mb-2">Payment Deadline: {{ simulation.payment_deadline }}</p>
-                    <p class="text-sm text-gray-500">Total Gross: {{ formatCurrency(simulation.total_gross_amount) }}</p>
+                    <p class="text-sm text-gray-500">
+                        Total Gross: {{ formatCurrency(simulation.total_gross_amount) }}
+                    </p>
                     <p class="text-sm text-gray-500">Total Tax: {{ formatCurrency(simulation.total_tax_amount) }}</p>
                 </div>
 
@@ -368,8 +372,11 @@ function handlePageChange(page) {
         <ModalWrapper :show="showPaymentModal" title="Mark THR as Paid" @close="showPaymentModal = false">
             <div class="p-4 space-y-4">
                 <p class="text-sm text-gray-600">
-                    Mark <strong>{{ selectedThr?.event_label }} {{ selectedThr?.year }}</strong> as paid for
-                    <strong>{{ selectedThr?.total_employees }}</strong> employees.
+                    Mark
+                    <strong>{{ selectedThr?.event_label }} {{ selectedThr?.year }}</strong>
+                    as paid for
+                    <strong>{{ selectedThr?.total_employees }}</strong>
+                    employees.
                 </p>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Payment Date</label>

@@ -2,12 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    authStoreMock,
-    authStoreRefs,
-    staffMemberStoreMock,
-    routerPushMock,
-} = vi.hoisted(() => ({
+const { authStoreMock, authStoreRefs, staffMemberStoreMock, routerPushMock } = vi.hoisted(() => ({
     authStoreMock: {
         updateProfile: vi.fn(),
         checkAuth: vi.fn(),

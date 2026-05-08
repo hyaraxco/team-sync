@@ -175,12 +175,14 @@ const sortedEmployees = computed(() => {
             bVal = (b.team_name ?? "").toLowerCase();
             return aVal.localeCompare(bVal) * dir;
         } else if (col === "coverage") {
-            const aCov = a.metrics?.scheduled_working_days > 0
-                ? (a.metrics.covered_days / a.metrics.scheduled_working_days) * 100
-                : 0;
-            const bCov = b.metrics?.scheduled_working_days > 0
-                ? (b.metrics.covered_days / b.metrics.scheduled_working_days) * 100
-                : 0;
+            const aCov =
+                a.metrics?.scheduled_working_days > 0
+                    ? (a.metrics.covered_days / a.metrics.scheduled_working_days) * 100
+                    : 0;
+            const bCov =
+                b.metrics?.scheduled_working_days > 0
+                    ? (b.metrics.covered_days / b.metrics.scheduled_working_days) * 100
+                    : 0;
             aVal = aCov;
             bVal = bCov;
         } else {
@@ -409,12 +411,20 @@ watch(salaryMonth, () => {
             <div v-if="readinessDashboard" class="mt-5">
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-sm font-semibold text-slate-700">Overall Readiness</span>
-                    <span class="text-sm font-bold text-slate-900" data-testid="readiness-overall-pct">{{ overallReadinessPct }}%</span>
+                    <span class="text-sm font-bold text-slate-900" data-testid="readiness-overall-pct">
+                        {{ overallReadinessPct }}%
+                    </span>
                 </div>
                 <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
                     <div
                         class="h-full rounded-full transition-all duration-500"
-                        :class="overallReadinessPct === 100 ? 'bg-green-500' : overallReadinessPct >= 70 ? 'bg-blue-500' : 'bg-amber-500'"
+                        :class="
+                            overallReadinessPct === 100
+                                ? 'bg-green-500'
+                                : overallReadinessPct >= 70
+                                  ? 'bg-blue-500'
+                                  : 'bg-amber-500'
+                        "
                         :style="{ width: `${overallReadinessPct}%` }"
                         data-testid="readiness-progress-bar"
                     ></div>
@@ -423,7 +433,11 @@ watch(salaryMonth, () => {
         </div>
 
         <!-- Summary Stat Cards -->
-        <div v-if="readinessDashboard" class="grid grid-cols-2 md:grid-cols-5 gap-4" data-testid="readiness-summary-cards">
+        <div
+            v-if="readinessDashboard"
+            class="grid grid-cols-2 md:grid-cols-5 gap-4"
+            data-testid="readiness-summary-cards"
+        >
             <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-4">
                 <p class="text-slate-500 text-xs font-medium">Total</p>
                 <p class="text-slate-900 text-2xl font-bold mt-1" data-testid="readiness-total">{{ totalEmployees }}</p>
@@ -434,15 +448,21 @@ watch(salaryMonth, () => {
             </div>
             <div class="bg-white border border-amber-200 rounded-[16px] p-4">
                 <p class="text-amber-600 text-xs font-medium">Warning</p>
-                <p class="text-amber-700 text-2xl font-bold mt-1" data-testid="readiness-warning">{{ warningEmployees }}</p>
+                <p class="text-amber-700 text-2xl font-bold mt-1" data-testid="readiness-warning">
+                    {{ warningEmployees }}
+                </p>
             </div>
             <div class="bg-white border border-red-200 rounded-[16px] p-4">
                 <p class="text-red-600 text-xs font-medium">Blocked</p>
-                <p class="text-red-700 text-2xl font-bold mt-1" data-testid="readiness-blocked">{{ blockedEmployees }}</p>
+                <p class="text-red-700 text-2xl font-bold mt-1" data-testid="readiness-blocked">
+                    {{ blockedEmployees }}
+                </p>
             </div>
             <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-4">
                 <p class="text-slate-500 text-xs font-medium">Coverage</p>
-                <p class="text-slate-900 text-2xl font-bold mt-1" data-testid="readiness-coverage">{{ overallCoveragePct }}%</p>
+                <p class="text-slate-900 text-2xl font-bold mt-1" data-testid="readiness-coverage">
+                    {{ overallCoveragePct }}%
+                </p>
             </div>
         </div>
 
@@ -451,7 +471,11 @@ watch(salaryMonth, () => {
             <!-- Left: Table + Team Breakdown -->
             <div class="flex-1 space-y-5">
                 <!-- Team Breakdown Section -->
-                <div v-if="teams.length > 0" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6" data-testid="readiness-team-breakdown">
+                <div
+                    v-if="teams.length > 0"
+                    class="bg-white border border-[#DCDEDD] rounded-[20px] p-6"
+                    data-testid="readiness-team-breakdown"
+                >
                     <h2 class="text-brand-dark text-lg font-bold mb-4">Team Breakdown</h2>
                     <div class="space-y-3">
                         <div
@@ -476,10 +500,14 @@ watch(salaryMonth, () => {
                                     <div class="w-32 h-2 bg-slate-100 rounded-full overflow-hidden">
                                         <div
                                             class="h-full bg-green-500 rounded-full"
-                                            :style="{ width: `${team.total > 0 ? (team.ready / team.total) * 100 : 0}%` }"
+                                            :style="{
+                                                width: `${team.total > 0 ? (team.ready / team.total) * 100 : 0}%`,
+                                            }"
                                         ></div>
                                     </div>
-                                    <span class="text-xs font-semibold text-slate-600">{{ team.ready }}/{{ team.total }}</span>
+                                    <span class="text-xs font-semibold text-slate-600">
+                                        {{ team.ready }}/{{ team.total }}
+                                    </span>
                                 </div>
                             </button>
                             <div v-if="expandedTeams[team.team_name]" class="px-4 pb-3 border-t border-slate-100">
@@ -600,13 +628,19 @@ watch(salaryMonth, () => {
                                     >
                                         Coverage %
                                     </th>
-                                    <th class="text-left py-3 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                    <th
+                                        class="text-left py-3 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                                    >
                                         Blockers
                                     </th>
-                                    <th class="text-left py-3 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                    <th
+                                        class="text-left py-3 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                                    >
                                         Warnings
                                     </th>
-                                    <th class="text-right py-3 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide">
+                                    <th
+                                        class="text-right py-3 px-3 text-xs font-semibold text-slate-500 uppercase tracking-wide"
+                                    >
                                         Actions
                                     </th>
                                 </tr>
@@ -628,11 +662,17 @@ watch(salaryMonth, () => {
                                                     row.status === 'blocked'
                                                         ? 'bg-red-100 text-red-700'
                                                         : row.status === 'warning'
-                                                            ? 'bg-amber-100 text-amber-700'
-                                                            : 'bg-green-100 text-green-700'
+                                                          ? 'bg-amber-100 text-amber-700'
+                                                          : 'bg-green-100 text-green-700'
                                                 "
                                             >
-                                                {{ row.status === 'blocked' ? 'Blocked' : row.status === 'warning' ? 'Warning' : 'Ready' }}
+                                                {{
+                                                    row.status === "blocked"
+                                                        ? "Blocked"
+                                                        : row.status === "warning"
+                                                          ? "Warning"
+                                                          : "Ready"
+                                                }}
                                             </span>
                                         </td>
                                         <td class="py-3 px-3">
@@ -640,11 +680,19 @@ watch(salaryMonth, () => {
                                                 <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
                                                     <div
                                                         class="h-full rounded-full"
-                                                        :class="getCoveragePct(row) === 100 ? 'bg-green-500' : getCoveragePct(row) >= 80 ? 'bg-blue-500' : 'bg-amber-500'"
+                                                        :class="
+                                                            getCoveragePct(row) === 100
+                                                                ? 'bg-green-500'
+                                                                : getCoveragePct(row) >= 80
+                                                                  ? 'bg-blue-500'
+                                                                  : 'bg-amber-500'
+                                                        "
                                                         :style="{ width: `${getCoveragePct(row)}%` }"
                                                     ></div>
                                                 </div>
-                                                <span class="text-xs font-semibold text-slate-700">{{ getCoveragePct(row) }}%</span>
+                                                <span class="text-xs font-semibold text-slate-700">
+                                                    {{ getCoveragePct(row) }}%
+                                                </span>
                                             </div>
                                         </td>
                                         <td class="py-3 px-3">
@@ -699,31 +747,45 @@ watch(salaryMonth, () => {
                                             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-xs">
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Scheduled Days</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.scheduled_working_days ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.scheduled_working_days ?? 0 }}
+                                                    </p>
                                                 </div>
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Covered Days</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.covered_days ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.covered_days ?? 0 }}
+                                                    </p>
                                                 </div>
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Present Days</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.present_days ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.present_days ?? 0 }}
+                                                    </p>
                                                 </div>
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Late Days</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.late_days ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.late_days ?? 0 }}
+                                                    </p>
                                                 </div>
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Half Days</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.half_day_count ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.half_day_count ?? 0 }}
+                                                    </p>
                                                 </div>
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Paid Leave</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.paid_leave_days ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.paid_leave_days ?? 0 }}
+                                                    </p>
                                                 </div>
                                                 <div class="bg-white rounded-[8px] border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Absent Days</p>
-                                                    <p class="text-slate-900 font-bold">{{ row.metrics?.absent_days ?? 0 }}</p>
+                                                    <p class="text-slate-900 font-bold">
+                                                        {{ row.metrics?.absent_days ?? 0 }}
+                                                    </p>
                                                 </div>
                                             </div>
                                         </td>
@@ -743,7 +805,11 @@ watch(salaryMonth, () => {
             <!-- Right Sidebar: Blocker Aggregates + Actions -->
             <div class="w-80 flex-shrink-0 space-y-5">
                 <!-- Blocker Aggregate Panel -->
-                <div v-if="blockedReasonAggregates.length > 0" class="bg-white border border-[#DCDEDD] rounded-[20px] p-5" data-testid="readiness-blocker-panel">
+                <div
+                    v-if="blockedReasonAggregates.length > 0"
+                    class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+                    data-testid="readiness-blocker-panel"
+                >
                     <h3 class="text-brand-dark text-sm font-bold mb-3 flex items-center gap-2">
                         <XCircle class="w-4 h-4 text-red-500" />
                         Blocker Reasons
@@ -758,13 +824,19 @@ watch(salaryMonth, () => {
                             :class="activeBlockerFilter?.key === item.key ? 'bg-red-50 border-red-300' : ''"
                         >
                             <span class="text-xs text-red-700">{{ item.label }}</span>
-                            <span class="text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">{{ item.count }}</span>
+                            <span class="text-xs font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                                {{ item.count }}
+                            </span>
                         </button>
                     </div>
                 </div>
 
                 <!-- Warning Aggregate Panel -->
-                <div v-if="warningFlagAggregates.length > 0" class="bg-white border border-[#DCDEDD] rounded-[20px] p-5" data-testid="readiness-warning-panel">
+                <div
+                    v-if="warningFlagAggregates.length > 0"
+                    class="bg-white border border-[#DCDEDD] rounded-[20px] p-5"
+                    data-testid="readiness-warning-panel"
+                >
                     <h3 class="text-brand-dark text-sm font-bold mb-3 flex items-center gap-2">
                         <AlertTriangle class="w-4 h-4 text-amber-500" />
                         Warning Flags
@@ -779,7 +851,9 @@ watch(salaryMonth, () => {
                             :class="activeWarningFilter?.key === item.key ? 'bg-amber-50 border-amber-300' : ''"
                         >
                             <span class="text-xs text-amber-700">{{ item.label }}</span>
-                            <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">{{ item.count }}</span>
+                            <span class="text-xs font-bold text-amber-700 bg-amber-100 px-2 py-0.5 rounded-full">
+                                {{ item.count }}
+                            </span>
                         </button>
                     </div>
                 </div>
@@ -813,7 +887,10 @@ watch(salaryMonth, () => {
         </div>
 
         <!-- Loading State -->
-        <div v-if="loading && !readinessDashboard" class="bg-white border border-[#DCDEDD] rounded-[20px] p-12 text-center">
+        <div
+            v-if="loading && !readinessDashboard"
+            class="bg-white border border-[#DCDEDD] rounded-[20px] p-12 text-center"
+        >
             <RefreshCw class="w-8 h-8 text-slate-400 animate-spin mx-auto mb-3" />
             <p class="text-slate-600 text-sm">Loading readiness data for {{ formatMonth(salaryMonth) }}...</p>
         </div>

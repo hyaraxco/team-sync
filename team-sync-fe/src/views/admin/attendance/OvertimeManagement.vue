@@ -1,49 +1,42 @@
 <script setup>
-import { onMounted, ref, computed } from 'vue';
-import { storeToRefs } from 'pinia';
-import { Clock, Check, X, Plus, Timer, CalendarDays, AlertCircle } from 'lucide-vue-next';
-import { useOvertimeStore } from '@/stores/overtime';
-import { useStaffMemberStore } from '@/stores/staffMember';
-import { formatDateShort } from '@/utils/dateUtils';
-import SearchFilter from '@/components/common/SearchFilter.vue';
-import Pagination from '@/components/admin/team/Pagination.vue';
-import EmptyState from '@/components/common/EmptyState.vue';
-import ModalWrapper from '@/components/common/ModalWrapper.vue';
-import { useSearchFilter } from '@/composables/useSearchFilter';
-import { useConfirmAction } from '@/composables/useConfirmAction';
-import { useToast } from '@/composables/useToast';
-import { can } from '@/helpers/permissionHelper';
+import { onMounted, ref, computed } from "vue";
+import { storeToRefs } from "pinia";
+import { Clock, Check, X, Plus, Timer, CalendarDays, AlertCircle } from "lucide-vue-next";
+import { useOvertimeStore } from "@/stores/overtime";
+import { useStaffMemberStore } from "@/stores/staffMember";
+import { formatDateShort } from "@/utils/dateUtils";
+import SearchFilter from "@/components/common/SearchFilter.vue";
+import Pagination from "@/components/admin/team/Pagination.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
+import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import { useSearchFilter } from "@/composables/useSearchFilter";
+import { useConfirmAction } from "@/composables/useConfirmAction";
+import { useToast } from "@/composables/useToast";
+import { can } from "@/helpers/permissionHelper";
 
 const store = useOvertimeStore();
 const staffMemberStore = useStaffMemberStore();
 const { records, meta, loading, error, summary } = storeToRefs(store);
 const toast = useToast();
 
-const statusFilter = ref('');
+const statusFilter = ref("");
 const showCreateModal = ref(false);
 const showRejectModal = ref(false);
 const rejectingRecord = ref(null);
-const rejectionReason = ref('');
+const rejectionReason = ref("");
 
-const {
-    filters,
-    fetchData,
-    handleSearch,
-    handleReset,
-    handlePageChange,
-    handlePerPageChange,
-} = useSearchFilter({
-    defaultFilters: { search: null, status: '' },
+const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
+    defaultFilters: { search: null, status: "" },
     fetchFn: (params) => store.fetchOvertimeRecords({ ...params, status: statusFilter.value }),
 });
 
 const createForm = ref({
-    staff_member_id: '',
-    date: '',
-    start_time: '17:00',
-    end_time: '19:00',
-    overtime_type: 'workday',
-    notes: '',
+    staff_member_id: "",
+    date: "",
+    start_time: "17:00",
+    end_time: "19:00",
+    overtime_type: "workday",
+    notes: "",
 });
 
 onMounted(async () => {
@@ -58,18 +51,25 @@ const handleStatusFilter = (status) => {
 
 const getStatusBadge = (status) => {
     switch (status) {
-        case 'approved': return 'bg-green-100 text-green-700';
-        case 'rejected': return 'bg-red-100 text-red-700';
-        default: return 'bg-amber-100 text-amber-700';
+        case "approved":
+            return "bg-green-100 text-green-700";
+        case "rejected":
+            return "bg-red-100 text-red-700";
+        default:
+            return "bg-amber-100 text-amber-700";
     }
 };
 
 const getTypeBadge = (type) => {
     switch (type) {
-        case 'workday': return 'bg-blue-100 text-blue-700';
-        case 'weekend': return 'bg-purple-100 text-purple-700';
-        case 'holiday': return 'bg-orange-100 text-orange-700';
-        default: return 'bg-gray-100 text-gray-700';
+        case "workday":
+            return "bg-blue-100 text-blue-700";
+        case "weekend":
+            return "bg-purple-100 text-purple-700";
+        case "holiday":
+            return "bg-orange-100 text-orange-700";
+        default:
+            return "bg-gray-100 text-gray-700";
     }
 };
 
@@ -83,7 +83,7 @@ const {
     confirmAction: doApprove,
 } = useConfirmAction({
     onSuccess: async () => {
-        toast.success('Approved', 'Overtime record has been approved.');
+        toast.success("Approved", "Overtime record has been approved.");
         await fetchData();
         store.fetchOvertimeSummary();
     },
@@ -97,7 +97,7 @@ const confirmApprove = () =>
 // Reject
 const openRejectModal = (record) => {
     rejectingRecord.value = record;
-    rejectionReason.value = '';
+    rejectionReason.value = "";
     showRejectModal.value = true;
 };
 
@@ -105,26 +105,26 @@ const confirmReject = async () => {
     if (!rejectingRecord.value || rejectionReason.value.length < 10) return;
     try {
         await store.rejectOvertime(rejectingRecord.value.id, rejectionReason.value);
-        toast.success('Rejected', 'Overtime record has been rejected.');
+        toast.success("Rejected", "Overtime record has been rejected.");
         showRejectModal.value = false;
         rejectingRecord.value = null;
-        rejectionReason.value = '';
+        rejectionReason.value = "";
         await fetchData();
         store.fetchOvertimeSummary();
     } catch (e) {
-        toast.error('Error', 'Failed to reject overtime record.');
+        toast.error("Error", "Failed to reject overtime record.");
     }
 };
 
 // Create
 const openCreateModal = () => {
     createForm.value = {
-        staff_member_id: '',
-        date: '',
-        start_time: '17:00',
-        end_time: '19:00',
-        overtime_type: 'workday',
-        notes: '',
+        staff_member_id: "",
+        date: "",
+        start_time: "17:00",
+        end_time: "19:00",
+        overtime_type: "workday",
+        notes: "",
     };
     showCreateModal.value = true;
 };
@@ -132,12 +132,12 @@ const openCreateModal = () => {
 const submitCreate = async () => {
     try {
         await store.createOvertime(createForm.value);
-        toast.success('Created', 'Overtime record has been created.');
+        toast.success("Created", "Overtime record has been created.");
         showCreateModal.value = false;
         await fetchData();
         store.fetchOvertimeSummary();
     } catch (e) {
-        toast.error('Error', store.error || 'Failed to create overtime record.');
+        toast.error("Error", store.error || "Failed to create overtime record.");
     }
 };
 </script>
@@ -215,7 +215,7 @@ const submitCreate = async () => {
                     @click="handleStatusFilter('')"
                     :class="[
                         'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === '' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                        statusFilter === '' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
                     ]"
                 >
                     All
@@ -224,7 +224,9 @@ const submitCreate = async () => {
                     @click="handleStatusFilter('pending')"
                     :class="[
                         'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === 'pending' ? 'bg-amber-600 text-white' : 'bg-amber-50 text-amber-700 hover:bg-amber-100'
+                        statusFilter === 'pending'
+                            ? 'bg-amber-600 text-white'
+                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100',
                     ]"
                 >
                     Pending
@@ -233,7 +235,9 @@ const submitCreate = async () => {
                     @click="handleStatusFilter('approved')"
                     :class="[
                         'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === 'approved' ? 'bg-green-600 text-white' : 'bg-green-50 text-green-700 hover:bg-green-100'
+                        statusFilter === 'approved'
+                            ? 'bg-green-600 text-white'
+                            : 'bg-green-50 text-green-700 hover:bg-green-100',
                     ]"
                 >
                     Approved
@@ -242,7 +246,9 @@ const submitCreate = async () => {
                     @click="handleStatusFilter('rejected')"
                     :class="[
                         'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === 'rejected' ? 'bg-red-600 text-white' : 'bg-red-50 text-red-700 hover:bg-red-100'
+                        statusFilter === 'rejected'
+                            ? 'bg-red-600 text-white'
+                            : 'bg-red-50 text-red-700 hover:bg-red-100',
                     ]"
                 >
                     Rejected
@@ -273,29 +279,35 @@ const submitCreate = async () => {
                 <tbody class="divide-y divide-gray-200">
                     <tr v-for="record in records" :key="record.id" class="hover:bg-gray-50">
                         <td class="px-4 py-3 text-sm text-gray-900">
-                            {{ record.staff_member?.user?.name || '-' }}
+                            {{ record.staff_member?.user?.name || "-" }}
                         </td>
                         <td class="px-4 py-3 text-sm text-gray-600">
                             {{ formatDateShort(record.date) }}
                         </td>
-                        <td class="px-4 py-3 text-sm text-gray-600">
-                            {{ record.start_time }} - {{ record.end_time }}
-                        </td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900">
-                            {{ record.hours }}h
-                        </td>
+                        <td class="px-4 py-3 text-sm text-gray-600">{{ record.start_time }} - {{ record.end_time }}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ record.hours }}h</td>
                         <td class="px-4 py-3">
-                            <span :class="['px-2 py-0.5 rounded-full text-xs font-medium', getTypeBadge(record.overtime_type)]">
+                            <span
+                                :class="[
+                                    'px-2 py-0.5 rounded-full text-xs font-medium',
+                                    getTypeBadge(record.overtime_type),
+                                ]"
+                            >
                                 {{ record.overtime_type }}
                             </span>
                         </td>
                         <td class="px-4 py-3">
-                            <span :class="['px-2 py-0.5 rounded-full text-xs font-medium', getStatusBadge(record.status)]">
+                            <span
+                                :class="['px-2 py-0.5 rounded-full text-xs font-medium', getStatusBadge(record.status)]"
+                            >
                                 {{ record.status }}
                             </span>
                         </td>
                         <td class="px-4 py-3">
-                            <div v-if="record.status === 'pending' && can('overtime-approve')" class="flex items-center gap-2">
+                            <div
+                                v-if="record.status === 'pending' && can('overtime-approve')"
+                                class="flex items-center gap-2"
+                            >
                                 <button
                                     @click="showApproveModal(record)"
                                     class="p-1.5 rounded-md bg-green-50 text-green-600 hover:bg-green-100 transition"
@@ -318,10 +330,7 @@ const submitCreate = async () => {
             </table>
 
             <div v-if="records.length" class="border-t px-4 py-3">
-                <Pagination
-                    :meta="meta"
-                    @page-change="handlePageChange"
-                />
+                <Pagination :meta="meta" @page-change="handlePageChange" />
             </div>
         </div>
 
@@ -330,20 +339,24 @@ const submitCreate = async () => {
             <div class="space-y-4">
                 <p class="text-sm text-gray-600">
                     Are you sure you want to approve this overtime record for
-                    <strong>{{ selectedApproveRecord?.staff_member?.user?.name }}</strong>?
+                    <strong>{{ selectedApproveRecord?.staff_member?.user?.name }}</strong>
+                    ?
                 </p>
                 <p class="text-sm text-gray-500">
-                    {{ selectedApproveRecord?.hours }}h on {{ formatDateShort(selectedApproveRecord?.date) }}
-                    ({{ selectedApproveRecord?.overtime_type }})
+                    {{ selectedApproveRecord?.hours }}h on {{ formatDateShort(selectedApproveRecord?.date) }} ({{
+                        selectedApproveRecord?.overtime_type
+                    }})
                 </p>
                 <div class="flex justify-end gap-3">
-                    <button @click="closeApproveModal" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button @click="closeApproveModal" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
+                        Cancel
+                    </button>
                     <button
                         @click="confirmApprove"
                         :disabled="processingApprove"
                         class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
                     >
-                        {{ processingApprove ? 'Approving...' : 'Approve' }}
+                        {{ processingApprove ? "Approving..." : "Approve" }}
                     </button>
                 </div>
             </div>
@@ -364,12 +377,20 @@ const submitCreate = async () => {
                         class="w-full rounded-lg border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 text-sm"
                         placeholder="Provide a reason for rejection (min 10 characters)..."
                     ></textarea>
-                    <p v-if="rejectionReason.length > 0 && rejectionReason.length < 10" class="text-xs text-red-500 mt-1">
+                    <p
+                        v-if="rejectionReason.length > 0 && rejectionReason.length < 10"
+                        class="text-xs text-red-500 mt-1"
+                    >
                         Minimum 10 characters required
                     </p>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button @click="showRejectModal = false" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button
+                        @click="showRejectModal = false"
+                        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                    >
+                        Cancel
+                    </button>
                     <button
                         @click="confirmReject"
                         :disabled="rejectionReason.length < 10"
@@ -440,13 +461,18 @@ const submitCreate = async () => {
                     ></textarea>
                 </div>
                 <div class="flex justify-end gap-3">
-                    <button @click="showCreateModal = false" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">Cancel</button>
+                    <button
+                        @click="showCreateModal = false"
+                        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
+                    >
+                        Cancel
+                    </button>
                     <button
                         @click="submitCreate"
                         :disabled="loading"
                         class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
                     >
-                        {{ loading ? 'Creating...' : 'Create' }}
+                        {{ loading ? "Creating..." : "Create" }}
                     </button>
                 </div>
             </div>

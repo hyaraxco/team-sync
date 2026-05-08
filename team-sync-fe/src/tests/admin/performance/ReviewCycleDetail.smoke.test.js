@@ -2,12 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    reviewStoreMock,
-    reviewStoreRefs,
-    routerPushMock,
-    routeState,
-} = vi.hoisted(() => ({
+const { reviewStoreMock, reviewStoreRefs, routerPushMock, routeState } = vi.hoisted(() => ({
     reviewStoreMock: {
         fetchCycleById: vi.fn(),
         fetchTopsisRanking: vi.fn(),
@@ -120,9 +115,9 @@ describe("ReviewCycleDetail smoke", () => {
         reviewStoreRefs.currentCycle.value.status = "completed";
         reviewStoreRefs.topsisResult.value = {
             weights: {
-                avg_manager_rating: 0.30,
-                final_rating: 0.30,
-                avg_goal_completion: 0.20,
+                avg_manager_rating: 0.3,
+                final_rating: 0.3,
+                avg_goal_completion: 0.2,
                 goal_completion_ratio: 0.05,
                 positive_feedback_count: 0.05,
                 attendance_quality: 0.05,
@@ -173,7 +168,7 @@ describe("ReviewCycleDetail smoke", () => {
                     weighted_scores: {
                         avg_manager_rating: 0.175,
                         final_rating: 0.15,
-                        avg_goal_completion: 0.10,
+                        avg_goal_completion: 0.1,
                         goal_completion_ratio: 0.025,
                         positive_feedback_count: 0.025,
                         attendance_quality: 0.015,

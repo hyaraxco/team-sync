@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useMeetingStore = defineStore("meeting", {
@@ -10,7 +10,7 @@ export const useMeetingStore = defineStore("meeting", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         loadingUpcoming: false,
@@ -23,7 +23,7 @@ export const useMeetingStore = defineStore("meeting", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/meetings/all/paginated', { params });
+                const response = await axiosInstance.get("/meetings/all/paginated", { params });
 
                 this.meetings = response.data.data.data;
                 this.meta = response.data.data.meta;
@@ -38,7 +38,7 @@ export const useMeetingStore = defineStore("meeting", {
             this.loadingUpcoming = true;
 
             try {
-                const response = await axiosInstance.get('/meetings/upcoming', { params });
+                const response = await axiosInstance.get("/meetings/upcoming", { params });
 
                 this.upcomingMeetings = response.data.data;
             } catch (error) {
@@ -52,7 +52,7 @@ export const useMeetingStore = defineStore("meeting", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.post('meetings', payload);
+                const response = await axiosInstance.post("meetings", payload);
 
                 this.success = response.data.message;
                 return response;
@@ -76,5 +76,5 @@ export const useMeetingStore = defineStore("meeting", {
                 this.loading = false;
             }
         },
-    }
-})
+    },
+});

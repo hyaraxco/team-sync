@@ -2,11 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    attendanceStoreMock,
-    attendanceStoreRefs,
-    searchFilterState,
-} = vi.hoisted(() => ({
+const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = vi.hoisted(() => ({
     attendanceStoreMock: {
         fetchAllPaginated: vi.fn(),
     },
@@ -81,8 +77,7 @@ const factory = () =>
             stubs: {
                 SearchFilter: {
                     props: ["search"],
-                    template:
-                        '<button class="search-trigger" @click="$emit(\'search\')">Search</button>',
+                    template: '<button class="search-trigger" @click="$emit(\'search\')">Search</button>',
                 },
                 Pagination: { template: '<div class="pagination-stub"></div>' },
                 Alert: { template: '<div class="alert-stub"></div>' },

@@ -165,7 +165,7 @@ onMounted(() => {
                             <td class="py-3 px-3">
                                 <div class="flex flex-wrap gap-1">
                                     <span
-                                        v-for="dept in (meeting.departments || [])"
+                                        v-for="dept in meeting.departments || []"
                                         :key="dept"
                                         class="px-2 py-0.5 rounded-full text-xs font-medium"
                                         :class="departmentColors[dept] || 'bg-gray-100 text-gray-700'"
@@ -177,7 +177,7 @@ onMounted(() => {
                             <td class="py-3 px-3">
                                 <div class="flex flex-wrap gap-1">
                                     <span
-                                        v-for="team in (meeting.teams || [])"
+                                        v-for="team in meeting.teams || []"
                                         :key="team.id"
                                         class="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700"
                                     >
@@ -185,7 +185,7 @@ onMounted(() => {
                                     </span>
                                 </div>
                             </td>
-                            <td class="py-3 px-3 text-gray-600">{{ meeting.creator?.name || '-' }}</td>
+                            <td class="py-3 px-3 text-gray-600">{{ meeting.creator?.name || "-" }}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -214,10 +214,6 @@ onMounted(() => {
             </div>
         </div>
 
-        <MeetingCreateModal
-            :show="showCreateModal"
-            @close="showCreateModal = false"
-            @created="handleCreated"
-        />
+        <MeetingCreateModal :show="showCreateModal" @close="showCreateModal = false" @created="handleCreated" />
     </div>
 </template>

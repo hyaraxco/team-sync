@@ -1,14 +1,14 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { storeToRefs } from 'pinia';
-import { Calendar, Plus, Pencil, Trash2 } from 'lucide-vue-next';
-import { useHolidayCalendarStore } from '@/stores/holidayCalendar';
-import { useToast } from '@/composables/useToast';
-import MainCard from '@/components/common/MainCard.vue';
-import EmptyState from '@/components/common/EmptyState.vue';
-import StatusBadge from '@/components/common/StatusBadge.vue';
-import ModalWrapper from '@/components/common/ModalWrapper.vue';
-import Pagination from '@/components/admin/team/Pagination.vue';
+import { computed, onMounted, ref } from "vue";
+import { storeToRefs } from "pinia";
+import { Calendar, Plus, Pencil, Trash2 } from "lucide-vue-next";
+import { useHolidayCalendarStore } from "@/stores/holidayCalendar";
+import { useToast } from "@/composables/useToast";
+import MainCard from "@/components/common/MainCard.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
+import StatusBadge from "@/components/common/StatusBadge.vue";
+import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import Pagination from "@/components/admin/team/Pagination.vue";
 
 const holidayCalendarStore = useHolidayCalendarStore();
 const { paginatedHolidays, meta, loading, error } = storeToRefs(holidayCalendarStore);
@@ -25,15 +25,15 @@ const isSubmitting = ref(false);
 const selectedHoliday = ref(null);
 
 const form = ref({
-    date: '',
-    name: '',
-    type: 'national_holiday',
+    date: "",
+    name: "",
+    type: "national_holiday",
     applies_to: [],
 });
 
 const isEditing = computed(() => Boolean(selectedHoliday.value));
 
-const formTitle = computed(() => (isEditing.value ? 'Edit Holiday' : 'Add Holiday'));
+const formTitle = computed(() => (isEditing.value ? "Edit Holiday" : "Add Holiday"));
 
 const fetchData = async () => {
     await holidayCalendarStore.fetchAllPaginated({
@@ -44,9 +44,9 @@ const fetchData = async () => {
 
 const resetForm = () => {
     form.value = {
-        date: '',
-        name: '',
-        type: 'national_holiday',
+        date: "",
+        name: "",
+        type: "national_holiday",
         applies_to: [],
     };
     selectedHoliday.value = null;
@@ -60,9 +60,9 @@ const openCreateModal = () => {
 const openEditModal = (holiday) => {
     selectedHoliday.value = holiday;
     form.value = {
-        date: holiday.date || '',
-        name: holiday.name || holiday.description || '',
-        type: holiday.type || 'national_holiday',
+        date: holiday.date || "",
+        name: holiday.name || holiday.description || "",
+        type: holiday.type || "national_holiday",
         applies_to: holiday.applies_to || [],
     };
     isFormModalOpen.value = true;
@@ -95,17 +95,17 @@ const handlePerPageChange = async (perPage) => {
 };
 
 const formatHolidayType = (type) => {
-    if (type === 'collective_leave') {
-        return 'Cuti Bersama';
+    if (type === "collective_leave") {
+        return "Cuti Bersama";
     }
-    return 'National Holiday';
+    return "National Holiday";
 };
 
 const getHolidayTypeColor = (type) => {
-    if (type === 'collective_leave') {
-        return 'bg-blue-100 text-blue-800 border-blue-200';
+    if (type === "collective_leave") {
+        return "bg-blue-100 text-blue-800 border-blue-200";
     }
-    return 'bg-red-100 text-red-800 border-red-200';
+    return "bg-red-100 text-red-800 border-red-200";
 };
 
 const submitForm = async () => {
@@ -113,15 +113,15 @@ const submitForm = async () => {
     try {
         if (isEditing.value) {
             await holidayCalendarStore.updateHoliday(selectedHoliday.value.id, form.value);
-            toast.success('Updated', 'Holiday has been updated successfully.');
+            toast.success("Updated", "Holiday has been updated successfully.");
         } else {
             await holidayCalendarStore.createHoliday(form.value);
-            toast.success('Created', 'Holiday has been added successfully.');
+            toast.success("Created", "Holiday has been added successfully.");
         }
         closeFormModal();
         await fetchData();
     } catch (submitError) {
-        toast.error('Failed', holidayCalendarStore.error || submitError?.message || 'Failed to save holiday.');
+        toast.error("Failed", holidayCalendarStore.error || submitError?.message || "Failed to save holiday.");
     } finally {
         isSubmitting.value = false;
     }
@@ -135,11 +135,11 @@ const confirmDelete = async () => {
     isSubmitting.value = true;
     try {
         await holidayCalendarStore.deleteHoliday(selectedHoliday.value.id);
-        toast.success('Deleted', 'Holiday has been deleted successfully.');
+        toast.success("Deleted", "Holiday has been deleted successfully.");
         closeDeleteModal();
         await fetchData();
     } catch (deleteError) {
-        toast.error('Failed', holidayCalendarStore.error || deleteError?.message || 'Failed to delete holiday.');
+        toast.error("Failed", holidayCalendarStore.error || deleteError?.message || "Failed to delete holiday.");
     } finally {
         isSubmitting.value = false;
     }
@@ -158,9 +158,7 @@ onMounted(() => {
                     <Calendar class="w-6 h-6" />
                     Holiday Calendar
                 </h2>
-                <p class="text-sm text-brand-light mt-1">
-                    Manage national holidays and collective leave dates.
-                </p>
+                <p class="text-sm text-brand-light mt-1">Manage national holidays and collective leave dates.</p>
             </div>
 
             <button
@@ -214,7 +212,7 @@ onMounted(() => {
                                 <span
                                     :class="[
                                         'inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold border',
-                                        getHolidayTypeColor(holiday.type)
+                                        getHolidayTypeColor(holiday.type),
                                     ]"
                                 >
                                     {{ formatHolidayType(holiday.type) }}
@@ -256,12 +254,7 @@ onMounted(() => {
         </p>
     </MainCard>
 
-    <ModalWrapper
-        :show="isFormModalOpen"
-        :title="formTitle"
-        maxWidth="md"
-        @close="closeFormModal"
-    >
+    <ModalWrapper :show="isFormModalOpen" :title="formTitle" maxWidth="md" @close="closeFormModal">
         <form class="space-y-4" @submit.prevent="submitForm">
             <div>
                 <label class="block text-sm font-semibold text-brand-dark mb-2">Date</label>
@@ -313,22 +306,19 @@ onMounted(() => {
                     :disabled="isSubmitting"
                     class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-[12px] text-sm font-semibold hover:bg-opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    {{ isSubmitting ? 'Saving...' : isEditing ? 'Update Holiday' : 'Create Holiday' }}
+                    {{ isSubmitting ? "Saving..." : isEditing ? "Update Holiday" : "Create Holiday" }}
                 </button>
             </div>
         </form>
     </ModalWrapper>
 
-    <ModalWrapper
-        :show="isDeleteModalOpen"
-        title="Delete Holiday"
-        maxWidth="md"
-        @close="closeDeleteModal"
-    >
+    <ModalWrapper :show="isDeleteModalOpen" title="Delete Holiday" maxWidth="md" @close="closeDeleteModal">
         <p class="text-sm text-brand-light mb-6">
             Are you sure you want to delete
-            <span class="font-semibold text-brand-dark">{{ selectedHoliday?.name || selectedHoliday?.description }}</span>?
-            This action cannot be undone.
+            <span class="font-semibold text-brand-dark">
+                {{ selectedHoliday?.name || selectedHoliday?.description }}
+            </span>
+            ? This action cannot be undone.
         </p>
 
         <template #footer>
@@ -347,7 +337,7 @@ onMounted(() => {
                     class="flex-1 px-4 py-3 bg-red-600 text-white rounded-[12px] text-sm font-semibold hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     @click="confirmDelete"
                 >
-                    {{ isSubmitting ? 'Deleting...' : 'Delete' }}
+                    {{ isSubmitting ? "Deleting..." : "Delete" }}
                 </button>
             </div>
         </template>

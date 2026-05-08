@@ -2,11 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    reviewStoreMock,
-    reviewStoreRefs,
-    routerPushMock,
-} = vi.hoisted(() => ({
+const { reviewStoreMock, reviewStoreRefs, routerPushMock } = vi.hoisted(() => ({
     reviewStoreMock: {
         fetchTeamReviews: vi.fn(),
     },
