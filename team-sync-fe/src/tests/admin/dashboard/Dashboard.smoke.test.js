@@ -11,6 +11,12 @@ vi.mock("@/stores/auth", () => ({
     useAuthStore: () => authStoreMock,
 }));
 
+vi.mock("@/helpers/permissionHelper", () => ({
+    can: (permission) => {
+        return authStoreMock.user?.permissions?.includes(permission) ?? false;
+    },
+}));
+
 import Dashboard from "@/views/admin/Dashboard.vue";
 
 const factory = () =>
@@ -47,7 +53,7 @@ describe("Dashboard smoke", () => {
         vi.clearAllMocks();
         authStoreMock.user = {
             roles: ["hr"],
-            permissions: ["dashboard-menu", "dashboard-view", "dashboard-hr-view"],
+            permissions: ["dashboard-menu", "dashboard-view", "dashboard-hr-view", "review-manager-submit"],
         };
     });
 
@@ -66,10 +72,10 @@ describe("Dashboard smoke", () => {
         expect(wrapper.find(".today-attendance-overview-stub").exists()).toBe(true);
     });
 
-    it("renders team pulse for manager with review-manager-submit", () => {
+    it("renders team pulse for manager with dashboard-team-view", () => {
         authStoreMock.user = {
             roles: ["manager"],
-            permissions: ["dashboard-menu", "dashboard-view", "review-manager-submit"],
+            permissions: ["dashboard-menu", "dashboard-view", "dashboard-team-view", "review-manager-submit"],
         };
 
         const wrapper = factory();
@@ -81,10 +87,10 @@ describe("Dashboard smoke", () => {
         expect(wrapper.find(".latest-employees-stub").exists()).toBe(false);
     });
 
-    it("renders staff dashboard with only employee statistics", () => {
+    it("renders staff dashboard with only employee statistics (dashboard-self-view)", () => {
         authStoreMock.user = {
             roles: ["staff"],
-            permissions: ["dashboard-menu", "dashboard-view"],
+            permissions: ["dashboard-menu", "dashboard-view", "dashboard-self-view"],
         };
 
         const wrapper = factory();
@@ -94,10 +100,10 @@ describe("Dashboard smoke", () => {
         expect(wrapper.find(".statistics-stub").exists()).toBe(false);
     });
 
-    it("renders finance dashboard analytics for finance role", () => {
+    it("renders finance dashboard analytics with dashboard-finance-view", () => {
         authStoreMock.user = {
             roles: ["finance"],
-            permissions: ["dashboard-menu", "dashboard-view"],
+            permissions: ["dashboard-menu", "dashboard-view", "dashboard-finance-view"],
         };
 
         const wrapper = factory();
