@@ -5,7 +5,6 @@ import {
     ClockIcon,
     ShieldCheckIcon,
     FileTextIcon,
-    UsersIcon,
     AwardIcon,
     ChevronRightIcon,
 } from "lucide-vue-next";

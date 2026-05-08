@@ -1,6 +1,6 @@
 <script setup>
 import * as Icons from "lucide-vue-next";
-import { computed, toRef } from "vue";
+import { computed } from "vue";
 import { useAnimatedNumber } from "@/composables/useAnimatedNumber";
 
 const props = defineProps({

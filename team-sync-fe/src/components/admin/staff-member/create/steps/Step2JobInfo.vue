@@ -8,14 +8,11 @@ import {
     UserCheck,
     Clock,
     CalendarPlus,
-    DollarSign,
     CreditCard,
     MapPin,
-    Calendar,
     X,
     ChevronDown,
     Search,
-    SearchX,
     Users,
     ShieldCheck,
     LayoutTemplate,
@@ -215,7 +212,7 @@ watch(
     (val) => {
         if (val) {
             // allow letters, spaces, dots and apostrophes which are common in names
-            const sanitized = val.replace(/[^a-zA-Z\s\.\']/g, "");
+            const sanitized = val.replace(/[^a-zA-Z\s.']/g, "");
             if (val !== sanitized) {
                 form.value.account_holder_name = sanitized;
             }

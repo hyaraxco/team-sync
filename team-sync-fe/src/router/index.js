@@ -187,7 +187,7 @@ export const appRoutes = [
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
-    scrollBehavior(to, from, savedPosition) {
+    scrollBehavior(_to, _from, _savedPosition) {
         // Scroll the main content area to top
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -203,9 +203,6 @@ const router = createRouter({
 });
 
 export const registerAuthGuard = (targetRouter) => {
-    let setupChecked = false;
-    let needsSetup = false;
-
     targetRouter.beforeEach(async (to, from, next) => {
         const authStore = useAuthStore();
 
@@ -242,7 +239,7 @@ export const registerAuthGuard = (targetRouter) => {
                     }
 
                     next();
-                } catch (error) {
+                } catch (_error) {
                     next({ name: "login" });
                 }
             } else {

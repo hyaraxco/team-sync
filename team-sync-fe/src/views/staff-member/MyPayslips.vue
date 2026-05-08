@@ -17,7 +17,6 @@ import {
     X,
 } from "lucide-vue-next";
 import Pagination from "@/components/admin/team/Pagination.vue";
-import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import MainCard from "@/components/common/MainCard.vue";
 import { useToast } from "@/composables/useToast";
 

@@ -2,7 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceFeedbackStore } from "@/stores/performanceFeedback";
-import { MessageSquare, ThumbsUp, AlertCircle, MessageCircle, EyeOff } from "lucide-vue-next";
+import { ThumbsUp, AlertCircle, MessageCircle, EyeOff } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";

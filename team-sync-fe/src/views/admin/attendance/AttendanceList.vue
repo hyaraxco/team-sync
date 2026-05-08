@@ -2,30 +2,14 @@
 import { ref, onMounted } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { RouterLink } from "vue-router";
-import {
-    TrendingUp,
-    CheckCircle,
-    Star,
-    XCircle,
-    Clock,
-    CalendarX,
-    Laptop,
-    Clock4,
-    CalendarClock,
-    CalendarDays,
-    Users,
-    Check,
-    X,
-} from "lucide-vue-next";
+import { TrendingUp, CheckCircle, Star, Clock, CalendarClock, CalendarDays, Check, X } from "lucide-vue-next";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
-import MainCard from "@/components/common/MainCard.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils.js";
-import { capitalize } from "@/utils/formatUtils.js";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { can } from "@/helpers/permissionHelper";
 import { useConfirmAction } from "@/composables/useConfirmAction";

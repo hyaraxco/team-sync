@@ -17,16 +17,6 @@ export default [
     // Vue 3 essential rules (catches real bugs, not style)
     ...pluginVue.configs["flat/essential"],
 
-    // Vue files use TypeScript parser for lang="ts" support
-    {
-        files: ["**/*.vue"],
-        languageOptions: {
-            parserOptions: {
-                parser: tseslint.parser,
-            },
-        },
-    },
-
     // Prettier disables conflicting formatting rules
     eslintConfigPrettier,
 
@@ -42,15 +32,15 @@ export default [
         },
         rules: {
             // Relax rules for existing codebase
-            "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_" }],
-            "no-console": "warn",
+            "no-unused-vars": ["warn", { argsIgnorePattern: "^_", varsIgnorePattern: "^_", caughtErrorsIgnorePattern: "^_" }],
+            "no-console": ["warn", { allow: ["warn", "error"] }],
             "no-debugger": "error",
             "no-useless-escape": "warn",
             "no-useless-catch": "warn",
 
             // TypeScript — relax for JS-first project with some TS leftovers
             "@typescript-eslint/no-explicit-any": "off",
-            "@typescript-eslint/no-unused-vars": "off", // Use JS no-unused-vars instead
+            "@typescript-eslint/no-unused-vars": "off",
             "@typescript-eslint/only-throw-error": "off",
             "preserve-caught-error": "off",
 
@@ -61,6 +51,20 @@ export default [
             "vue/no-unused-vars": "warn",
             "vue/no-parsing-error": "warn",
             "vue/valid-attribute-name": "warn",
+        },
+    },
+
+    // Vue files: TS parser + disable no-unused-vars (can't see template usage)
+    {
+        files: ["**/*.vue"],
+        languageOptions: {
+            parserOptions: {
+                parser: tseslint.parser,
+            },
+        },
+        rules: {
+            "no-unused-vars": "off",
+            "@typescript-eslint/no-unused-vars": "off",
         },
     },
 

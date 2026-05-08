@@ -6,7 +6,6 @@ import { useHolidayCalendarStore } from "@/stores/holidayCalendar";
 import { useToast } from "@/composables/useToast";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
-import StatusBadge from "@/components/common/StatusBadge.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import Pagination from "@/components/admin/team/Pagination.vue";
 

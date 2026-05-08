@@ -100,13 +100,8 @@ export const useStaffMemberStore = defineStore("staffMember", {
         },
 
         async checkAvailability(payload) {
-            try {
-                const response = await axiosInstance.post("staff-members/check-availability", payload);
-
-                return response.data?.data;
-            } catch (error) {
-                throw error;
-            }
+            const response = await axiosInstance.post("staff-members/check-availability", payload);
+            return response.data?.data;
         },
 
         async updateStaffMember(id, payload) {

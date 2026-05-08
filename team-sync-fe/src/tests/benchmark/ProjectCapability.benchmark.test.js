@@ -11,7 +11,7 @@
  */
 
 import { setActivePinia, createPinia } from "pinia";
-import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 
 // ─── Mock Axios ─────────────────────────────────────────────────────
 vi.mock("@/plugins/axios", () => ({

@@ -1,5 +1,5 @@
 <script setup>
-import { Clock, User } from "lucide-vue-next";
+import { Clock } from "lucide-vue-next";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDate } from "@/utils/dateUtils";

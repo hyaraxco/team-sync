@@ -3,7 +3,6 @@ import { ref, onMounted, watch, computed } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import {
     X,
-    User,
     Calendar,
     Tag,
     AlignLeft,

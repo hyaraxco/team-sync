@@ -344,8 +344,6 @@ describe("PayrollNotificationHandoff - Mark as Paid Notification Info", () => {
 // Since the payroll store mock is already defined above, we test the empty state
 // by verifying the template logic directly via a minimal component mount.
 
-import { ref } from "vue";
-
 describe("MyPayslips - Empty State", () => {
     it("renders processing message for current year when no payslips", async () => {
         // We test the empty state template logic by mounting a simplified version

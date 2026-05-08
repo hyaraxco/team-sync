@@ -1,6 +1,5 @@
 <script setup>
 import { ref, watch, computed } from "vue";
-import { X } from "lucide-vue-next";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import { useToast } from "@/composables/useToast";
 import { useAuthStore } from "@/stores/auth";

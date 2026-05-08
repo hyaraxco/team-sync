@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { X, AlertCircle } from "lucide-vue-next";
+import { AlertCircle } from "lucide-vue-next";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 
 interface Props {
     show: boolean;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits(["close"]);
 </script>
 

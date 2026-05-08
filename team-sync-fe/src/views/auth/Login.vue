@@ -3,7 +3,7 @@ import { computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import Alert from "@/components/common/Alert.vue";
 import Input from "@/components/common/form/Input.vue";
-import { AtSign, Lock, ArrowRight, UserCircle2 } from "lucide-vue-next";
+import { AtSign, Lock, ArrowRight } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import { RouterLink } from "vue-router";
 

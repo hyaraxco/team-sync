@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, Teleport } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { Play, UserCheck, Edit3, X, User } from "lucide-vue-next";

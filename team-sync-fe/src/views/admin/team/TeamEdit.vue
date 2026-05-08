@@ -22,7 +22,6 @@ import {
     PauseCircle,
     Plus,
     Search,
-    SearchX,
     ChevronDown,
 } from "lucide-vue-next";
 import { onMounted, ref, watch } from "vue";

@@ -1,19 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import {
-    CalendarCheckIcon,
-    CheckSquareIcon,
-    FolderIcon,
-    ClockIcon,
-    StarIcon,
-    BellIcon,
-    CheckCircle2,
-    Clock3,
-    Wallet,
-    Calendar,
-    Users,
-    MessageSquare,
-} from "lucide-vue-next";
+import { StarIcon, BellIcon, CheckCircle2, Clock3, Wallet, Calendar, Users, MessageSquare } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import MainCard from "@/components/common/MainCard.vue";

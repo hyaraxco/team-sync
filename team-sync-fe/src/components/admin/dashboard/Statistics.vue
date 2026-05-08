@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, computed } from "vue";
-import { TrendingUpIcon, UsersIcon, CalendarCheckIcon, AlertTriangleIcon, StarIcon } from "lucide-vue-next";
+import { StarIcon } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import MainCard from "@/components/common/MainCard.vue";

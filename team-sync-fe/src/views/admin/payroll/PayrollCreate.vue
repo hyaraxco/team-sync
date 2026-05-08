@@ -264,7 +264,7 @@ const refreshGenerateReadiness = async () => {
             readinessDashboard.value = dashboard;
             readinessExpanded.value = false;
         }
-    } catch (error) {
+    } catch (_error) {
         if (readinessRequestId.value === requestId) {
             readiness.value = null;
             readinessDashboard.value = null;

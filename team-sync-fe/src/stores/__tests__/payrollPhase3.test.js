@@ -193,7 +193,7 @@ describe("Payroll Store - Phase 3 Features", () => {
                 data: { data: mockAnalytics },
             });
 
-            const result = await store.fetchPayrollAnalytics(6);
+            await store.fetchPayrollAnalytics(6);
 
             expect(axiosInstance.get).toHaveBeenCalledWith("/payrolls/analytics", { params: { months: 6 } });
             expect(store.analytics.average_salary_trend).toBeDefined();

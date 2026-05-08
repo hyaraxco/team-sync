@@ -2,7 +2,7 @@
 import { CalendarCheck, CalendarDays, Clock, Clock3 } from "lucide-vue-next";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 
-const props = defineProps({
+defineProps({
     statistics: {
         type: Object,
         required: true,
