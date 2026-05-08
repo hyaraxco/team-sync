@@ -49,7 +49,7 @@ export const appRoutes = [
         name: "admin.settings",
         component: AdminSettings,
         meta: {
-          requiredAnyPermissions: ["payroll-statistics", "attendance-menu", "review-cycle-manage"],
+          requiredAnyPermissions: ["settings-hr-manage", "settings-finance-manage", "settings-system-manage"],
         },
       },
       {
@@ -137,7 +137,7 @@ export const appRoutes = [
     component: AdminLayout,
     meta: {
       requiresAuth: true,
-      requiredPermission: "staff-member-menu",
+      requiredPermission: "staff-member-list",
     },
     children: [
       {

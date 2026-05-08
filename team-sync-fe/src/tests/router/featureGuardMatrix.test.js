@@ -27,23 +27,39 @@ const routeMeta = (name) =>
 const rolePermissions = {
   manager: [
     "dashboard-menu",
+    "dashboard-view",
+    "dashboard-team-view",
     "team-menu",
+    "team-list",
     "team-create",
     "team-edit",
-    "staff-member-menu",
-    "staff-member-create",
-    "staff-member-edit",
+    "team-view",
     "project-menu",
     "project-list",
     "project-create",
     "project-edit",
+    "task-menu",
+    "task-list",
+    "task-create",
+    "task-edit",
+    "task-delete",
     "attendance-menu",
+    "attendance-list",
+    "attendance-correction-list",
+    "attendance-correction-approve",
+    "leave-request-list",
+    "leave-request-approve",
+    "overtime-list",
+    "overtime-create",
+    "overtime-approve",
     "profile-menu",
     "profile-view",
     "attendance-my-attendances",
+    "attendance-my-statistics",
     "attendance-last-attendance",
     "attendance-check-in",
     "attendance-check-out",
+    "attendance-correction-create",
     "leave-request-menu",
     "leave-request-create",
     "leave-request-my-requests",
@@ -54,77 +70,152 @@ const rolePermissions = {
     "goal-create-own",
     "goal-assign-team",
     "feedback-give",
+    "performance-analytics-view",
+    "analytics-menu",
+    "analytics-team-view",
+    "analytics-performance-view",
+    "analytics-project-view",
+    "meeting-menu",
+    "meeting-list",
   ],
   hr: [
     "dashboard-menu",
+    "dashboard-view",
+    "dashboard-hr-view",
+    "dashboard-self-view",
     "team-menu",
+    "team-list",
     "team-create",
     "team-edit",
+    "team-view",
     "staff-member-menu",
+    "staff-member-statistic",
+    "staff-member-list",
     "staff-member-create",
     "staff-member-edit",
+    "staff-member-delete",
     "project-menu",
     "project-list",
     "project-create",
     "project-edit",
+    "task-menu",
+    "task-list",
+    "task-create",
+    "task-edit",
     "attendance-menu",
-    "payroll-menu",
-    "payroll-list",
-    "payroll-create",
-    "profile-menu",
-    "profile-view",
+    "attendance-list",
     "attendance-my-attendances",
+    "attendance-my-statistics",
     "attendance-last-attendance",
     "attendance-check-in",
     "attendance-check-out",
+    "attendance-correction-list",
+    "attendance-correction-create",
+    "attendance-correction-approve",
     "leave-request-menu",
+    "leave-request-list",
     "leave-request-create",
+    "leave-request-approve",
     "leave-request-my-requests",
+    "profile-menu",
+    "profile-view",
     "payslip-view",
     "performance-menu",
     "review-cycle-manage",
     "review-calibrate",
     "review-self-submit",
-    "review-manager-submit",
+    "review-assign-reviewer",
     "goal-create-own",
     "goal-assign-team",
     "feedback-give",
+    "performance-analytics-view",
+    "analytics-menu",
+    "analytics-view",
+    "analytics-export",
+    "analytics-hr-view",
+    "analytics-performance-view",
+    "analytics-project-view",
+    "meeting-menu",
+    "meeting-list",
+    "meeting-create",
+    "overtime-list",
+    "overtime-create",
+    "overtime-approve",
+    "settings-hr-manage",
+    "payroll-readiness-view",
+    "thr-list",
   ],
   finance: [
     "dashboard-menu",
-    "staff-member-menu",
-    "staff-member-list",
-    "attendance-menu",
+    "dashboard-view",
+    "dashboard-finance-view",
     "payroll-menu",
     "payroll-list",
+    "payroll-create",
     "payroll-edit",
+    "payroll-delete",
     "payroll-process",
     "payroll-statistics",
+    "payroll-readiness-view",
+    "thr-list",
+    "thr-generate",
+    "thr-approve",
+    "thr-process",
+    "analytics-menu",
+    "analytics-view",
+    "analytics-export",
+    "analytics-finance-view",
+    "overtime-list",
+    "meeting-list",
+    "settings-finance-manage",
     "profile-menu",
     "profile-view",
     "attendance-my-attendances",
+    "attendance-my-statistics",
     "attendance-last-attendance",
     "attendance-check-in",
     "attendance-check-out",
+    "attendance-correction-create",
     "leave-request-menu",
     "leave-request-create",
     "leave-request-my-requests",
     "payslip-view",
-  ],
-  staff: [
-    "dashboard-menu",
-    "profile-menu",
-    "team-view",
-    "attendance-my-attendances",
-    "attendance-check-in",
-    "attendance-check-out",
-    "payslip-view",
-    "project-menu",
-    "project-list",
     "performance-menu",
     "review-self-submit",
     "goal-create-own",
     "feedback-give",
+    "meeting-menu",
+  ],
+  staff: [
+    "dashboard-menu",
+    "dashboard-view",
+    "dashboard-self-view",
+    "profile-menu",
+    "profile-view",
+    "team-view",
+    "attendance-my-attendances",
+    "attendance-my-statistics",
+    "attendance-last-attendance",
+    "attendance-check-in",
+    "attendance-check-out",
+    "attendance-correction-create",
+    "leave-request-menu",
+    "leave-request-create",
+    "leave-request-my-requests",
+    "payslip-view",
+    "project-menu",
+    "project-list",
+    "task-menu",
+    "task-list",
+    "task-create",
+    "task-edit",
+    "overtime-create",
+    "performance-menu",
+    "review-self-submit",
+    "goal-create-own",
+    "feedback-give",
+    "meeting-menu",
+    "meeting-list",
   ],
 };
 
@@ -163,6 +254,20 @@ describe("feature guard matrix", () => {
         routeMeta("admin.staffMembers")
       )
     ).toBe(false);
+    // Finance no longer has staff-member-menu
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.staffMembers")
+      )
+    ).toBe(false);
+    // Manager no longer has staff-member-menu
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.staffMembers")
+      )
+    ).toBe(false);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
@@ -181,27 +286,37 @@ describe("feature guard matrix", () => {
         routeMeta("admin.attendances")
       )
     ).toBe(false);
+    // Finance no longer has attendance-menu
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.attendances")
+      )
+    ).toBe(false);
   });
 
   it("enforces role access for payroll and employee self-service", () => {
+    // HR no longer has payroll-create (Finance-owned)
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
         routeMeta("admin.payroll.create")
       )
-    ).toBe(true);
+    ).toBe(false);
+    // HR no longer has payroll-list
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
         routeMeta("admin.payroll.detail")
       )
-    ).toBe(true);
+    ).toBe(false);
+    // Finance now has payroll-create
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
         routeMeta("admin.payroll.create")
       )
-    ).toBe(false);
+    ).toBe(true);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.finance,
@@ -343,6 +458,94 @@ describe("feature guard matrix", () => {
       hasRoutePermissionAccess(
         rolePermissions.staff,
         routeMeta("admin.performance.cycles.detail")
+      )
+    ).toBe(false);
+  });
+
+  // Settings: domain-scoped access
+  it("enforces role access for settings (domain-scoped)", () => {
+    // HR has settings-hr-manage
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.settings")
+      )
+    ).toBe(true);
+    // Finance has settings-finance-manage
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.settings")
+      )
+    ).toBe(true);
+    // Staff has no settings permissions
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.staff,
+        routeMeta("admin.settings")
+      )
+    ).toBe(false);
+    // Manager has no settings permissions
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.settings")
+      )
+    ).toBe(false);
+  });
+
+  // Payroll settings: Finance-owned
+  it("enforces Finance-only access for payroll settings and approval matrix", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.payroll.settings")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.payroll.approval-matrix")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.settings")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.approval-matrix")
+      )
+    ).toBe(false);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.manager,
+        routeMeta("admin.payroll.settings")
+      )
+    ).toBe(false);
+  });
+
+  // HR read-only payroll readiness
+  it("allows HR read-only payroll readiness access", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.readiness")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.finance,
+        routeMeta("admin.payroll.readiness")
+      )
+    ).toBe(true);
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.staff,
+        routeMeta("admin.payroll.readiness")
       )
     ).toBe(false);
   });

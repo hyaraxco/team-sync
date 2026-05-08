@@ -12,6 +12,10 @@ class PermissionSeeder extends Seeder
             'menu',
             'view',
             'hr-view',
+            'self-view',
+            'team-view',
+            'finance-view',
+            'system-view',
         ],
 
         'profile' => [
@@ -98,6 +102,7 @@ class PermissionSeeder extends Seeder
             'finance-view',
             'performance-view',
             'project-view',
+            'team-view',
         ],
 
         'payslip' => [
@@ -156,6 +161,12 @@ class PermissionSeeder extends Seeder
             'list',
             'create',
             'approve',
+        ],
+
+        'settings' => [
+            'hr-manage',
+            'finance-manage',
+            'system-manage',
         ],
 
         'thr' => [
