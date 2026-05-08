@@ -1,0 +1,6 @@
+dist
+node_modules
+coverage
+e2e-results
+playwright-report
+bun.lock
