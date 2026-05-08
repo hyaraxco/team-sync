@@ -164,6 +164,7 @@ describe("router guard integration", () => {
         "payroll-edit",
         "payroll-process",
         "payroll-statistics",
+        "settings-finance-manage",
       ],
     });
     const financeRouter = createTestRouter();
@@ -172,7 +173,7 @@ describe("router guard integration", () => {
     expect(financeRouter.currentRoute.value.name).toBe("admin.payroll.settings");
 
     setAuth({
-      permissions: ["dashboard-menu", "payroll-menu", "payroll-list", "payroll-create"],
+      permissions: ["dashboard-menu", "payroll-readiness-view", "settings-hr-manage"],
     });
     const hrRouter = createTestRouter();
 

@@ -657,7 +657,7 @@ const onNavigate = () => emit("navigate");
             :class="{
               'nav-link-active': $route.name === 'admin.settings',
             }"
-            v-if="canOneOf(['payroll-statistics', 'attendance-menu', 'review-cycle-manage'])"
+            v-if="canOneOf(['settings-hr-manage', 'settings-finance-manage', 'settings-system-manage'])"
             @click="onNavigate"
           >
             <SettingsIcon

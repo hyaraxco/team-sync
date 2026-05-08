@@ -22,7 +22,7 @@ const settingsSections = [
                 description: "Manage salary components and global payroll rules.",
                 icon: WalletIcon,
                 routeName: "admin.payroll.settings",
-                permission: "payroll-statistics"
+                permission: "settings-finance-manage"
             }
         ]
     },
@@ -35,21 +35,21 @@ const settingsSections = [
                 description: "Configure grace periods, late penalties, and clock-in rules.",
                 icon: ClockIcon,
                 routeName: "admin.attendance.settings",
-                permission: "attendance-menu"
+                permission: "settings-hr-manage"
             },
             {
                 title: "Attendance Periods",
                 description: "Define monthly attendance cycle dates.",
                 icon: CalendarIcon,
                 routeName: "admin.attendance.periods",
-                permission: "attendance-menu"
+                permission: "settings-hr-manage"
             },
             {
                 title: "Holiday Calendar",
                 description: "Manage public holidays and office closures.",
                 icon: CalendarIcon,
                 routeName: "admin.attendance.holidays",
-                permission: "attendance-menu"
+                permission: "settings-hr-manage"
             }
         ]
     },
@@ -62,21 +62,21 @@ const settingsSections = [
                 description: "Manage active and upcoming performance review periods.",
                 icon: ShieldCheckIcon,
                 routeName: "admin.performance.cycles",
-                permission: "review-cycle-manage"
+                permission: "settings-hr-manage"
             },
             {
                 title: "Outcome Rules",
                 description: "Configure performance-to-payroll outcome mappings.",
                 icon: AwardIcon,
                 routeName: "admin.performance.outcome-rules",
-                permission: "review-cycle-manage"
+                permission: "settings-hr-manage"
             },
             {
                 title: "Review Templates",
                 description: "Design and manage performance review forms.",
                 icon: FileTextIcon,
                 routeName: "admin.performance.templates",
-                permission: "review-cycle-manage"
+                permission: "settings-hr-manage"
             }
         ]
     }

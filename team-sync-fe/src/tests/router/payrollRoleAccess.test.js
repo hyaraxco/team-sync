@@ -54,11 +54,11 @@ const rolePermissions = {
   manager: [
     "dashboard-menu",
     "dashboard-view",
+    "dashboard-team-view",
     "team-menu",
-    "staff-member-menu",
     "attendance-menu",
   ],
-  hr: ["payroll-menu", "payroll-list", "payroll-create"],
+  hr: ["payroll-readiness-view", "thr-list", "settings-hr-manage"],
   finance: [
     "payroll-menu",
     "payroll-list",
@@ -66,10 +66,13 @@ const rolePermissions = {
     "payroll-edit",
     "payroll-process",
     "payroll-statistics",
+    "payroll-readiness-view",
+    "settings-finance-manage",
   ],
   staff: [
     "dashboard-menu",
     "dashboard-view",
+    "dashboard-self-view",
     "attendance-my-attendances",
     "attendance-check-in",
     "attendance-check-out",
@@ -119,29 +122,38 @@ describe("payroll route access matrix", () => {
     ).toBe(false);
   });
 
-  it("allows HR to enter dashboard, create, and detail routes", () => {
+  it("blocks HR from payroll admin routes (Finance-owned)", () => {
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
         routeMeta("admin.payroll.dashboard")
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
         routeMeta("admin.payroll.create")
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
         routeMeta("admin.payroll.detail")
       )
-    ).toBe(true);
+    ).toBe(false);
     expect(
       hasRoutePermissionAccess(
         rolePermissions.hr,
         routeMeta("admin.payroll.adjustments")
+      )
+    ).toBe(false);
+  });
+
+  it("allows HR read-only payroll readiness", () => {
+    expect(
+      hasRoutePermissionAccess(
+        rolePermissions.hr,
+        routeMeta("admin.payroll.readiness")
       )
     ).toBe(true);
   });

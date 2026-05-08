@@ -51,6 +51,7 @@ class RolePermissionSeeder extends Seeder
                 Permission::whereIn('name', array_merge($selfServiceBaseline, [
                     'dashboard-menu',
                     'dashboard-view',
+                    'dashboard-self-view',
                     'team-view',
                     'project-menu',
                     'project-list',
@@ -70,6 +71,7 @@ class RolePermissionSeeder extends Seeder
                     // Dashboard
                     'dashboard-menu',
                     'dashboard-view',
+                    'dashboard-team-view',
                     // Team management
                     'team-menu',
                     'team-statistic',
@@ -108,6 +110,7 @@ class RolePermissionSeeder extends Seeder
                     'performance-analytics-view',
                     // Analytics: team-scoped performance & project only
                     'analytics-menu',
+                    'analytics-team-view',
                     'analytics-performance-view',
                     'analytics-project-view',
                     // Meetings: view list (team meeting context)
@@ -133,13 +136,20 @@ class RolePermissionSeeder extends Seeder
                 'feedback-',
                 'meeting-',
                 'overtime-',
+                'settings-',
             ], [
                 // Exclude: task-delete (admin-only destructive)
                 'task-delete',
                 // Exclude: Manager-only team review submission
                 'review-manager-submit',
-                // Exclude: Finance-only analytics
+                // Exclude: Finance-only dashboard/analytics/settings
+                'dashboard-finance-view',
+                'dashboard-system-view',
+                'dashboard-team-view',
                 'analytics-finance-view',
+                'analytics-team-view',
+                'settings-finance-manage',
+                'settings-system-manage',
             ])->merge(
                 Permission::whereIn('name', [
                     // Payroll: read-only readiness context only
@@ -156,6 +166,7 @@ class RolePermissionSeeder extends Seeder
                     // Dashboard
                     'dashboard-menu',
                     'dashboard-view',
+                    'dashboard-finance-view',
                     // Payroll operations (Finance owns all)
                     'payroll-menu',
                     'payroll-list',
@@ -179,6 +190,8 @@ class RolePermissionSeeder extends Seeder
                     'overtime-list',
                     // Meetings: view list (receive/join)
                     'meeting-list',
+                    // Settings: payroll/finance domain
+                    'settings-finance-manage',
                 ]))->get()
             );
         });
