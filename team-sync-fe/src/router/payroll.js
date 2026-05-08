@@ -21,7 +21,7 @@ export default [
         name: 'admin.payroll.readiness',
         component: () => import('@/views/admin/payroll/PayrollReadiness.vue'),
         meta: {
-            requiredPermission: 'payroll-create',
+            requiredAnyPermissions: ['payroll-create', 'payroll-readiness-view'],
             requiresAuth: true,
         },
     },
@@ -39,7 +39,7 @@ export default [
         name: 'admin.payroll.settings',
         component: PayrollSettings,
         meta: {
-            requiredPermission: 'payroll-statistics',
+            requiredPermission: 'settings-finance-manage',
             requiresAuth: true,
         },
     },
@@ -48,7 +48,7 @@ export default [
         name: 'admin.payroll.approval-matrix',
         component: () => import('@/views/admin/payroll/PayrollApprovalMatrix.vue'),
         meta: {
-            requiredPermission: 'payroll-statistics',
+            requiredPermission: 'settings-finance-manage',
             requiresAuth: true,
         },
     },
@@ -57,7 +57,7 @@ export default [
         name: 'admin.payroll.adjustments',
         component: () => import('@/views/admin/payroll/PayrollAdjustmentQueue.vue'),
         meta: {
-            requiredPermission: 'payroll-menu',
+            requiredPermission: 'payroll-edit',
             requiresAuth: true,
         },
     },
@@ -66,7 +66,7 @@ export default [
         name: 'admin.payroll.comparison',
         component: () => import('@/views/admin/payroll/PayrollComparison.vue'),
         meta: {
-            requiredPermission: 'payroll-statistics',
+            requiredPermission: 'payroll-list',
             requiresAuth: true,
         },
     },
