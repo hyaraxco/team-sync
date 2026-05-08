@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useAttendancePeriodStore = defineStore("attendancePeriod", {
@@ -10,7 +10,7 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         readinessSummary: null,
         loading: false,
@@ -23,10 +23,10 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('attendance-periods', {
+                const response = await axiosInstance.get("attendance-periods", {
                     params: {
                         page: params.page || 1,
-                        search: params.search || '',
+                        search: params.search || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
@@ -51,10 +51,13 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             this.loading = true;
             this.error = null;
             try {
-                const salaryMonth = typeof period === 'string'
-                    ? period
-                    : (period?.salary_month || period?.month_key || String(period?.start_date || '').slice(0, 7));
-                const response = await axiosInstance.get(`payrolls/generate-readiness`, { params: { salary_month: salaryMonth } });
+                const salaryMonth =
+                    typeof period === "string"
+                        ? period
+                        : period?.salary_month || period?.month_key || String(period?.start_date || "").slice(0, 7);
+                const response = await axiosInstance.get(`payrolls/generate-readiness`, {
+                    params: { salary_month: salaryMonth },
+                });
                 this.readinessSummary = response.data.data;
                 return response.data.data;
             } catch (error) {
@@ -63,6 +66,6 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             } finally {
                 this.loading = false;
             }
-        }
-    }
+        },
+    },
 });

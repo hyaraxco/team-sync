@@ -1,11 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 
-const {
-    routerPushMock,
-    performanceGoalStoreMock,
-    performanceGoalRefs,
-} = vi.hoisted(() => ({
+const { routerPushMock, performanceGoalStoreMock, performanceGoalRefs } = vi.hoisted(() => ({
     routerPushMock: vi.fn(),
     performanceGoalStoreMock: {
         fetchTeamGoals: vi.fn(),

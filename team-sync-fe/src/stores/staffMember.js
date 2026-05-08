@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useStaffMemberStore = defineStore("staffMember", {
@@ -26,7 +26,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         loadingLatest: false,
@@ -37,16 +37,16 @@ export const useStaffMemberStore = defineStore("staffMember", {
 
     actions: {
         async fetchStaffMembers(params) {
-            this.loading = true
+            this.loading = true;
 
             try {
-                const response = await axiosInstance.get(`staff-members`, { params })
+                const response = await axiosInstance.get(`staff-members`, { params });
 
-                this.staffMembers = response.data.data
+                this.staffMembers = response.data.data;
             } catch (error) {
-                this.error = handleError(error)
+                this.error = handleError(error);
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
@@ -54,7 +54,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/staff-members/all/paginated', { params });
+                const response = await axiosInstance.get("/staff-members/all/paginated", { params });
 
                 this.staffMembers = response.data.data.data;
                 this.meta = response.data.data.meta;
@@ -84,10 +84,10 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.post('staff-members', payload, {
+                const response = await axiosInstance.post("staff-members", payload, {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
-                    }
+                        "Content-Type": "multipart/form-data",
+                    },
                 });
 
                 this.success = response.data.message;
@@ -101,7 +101,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
 
         async checkAvailability(payload) {
             try {
-                const response = await axiosInstance.post('staff-members/check-availability', payload);
+                const response = await axiosInstance.post("staff-members/check-availability", payload);
 
                 return response.data?.data;
             } catch (error) {
@@ -114,12 +114,12 @@ export const useStaffMemberStore = defineStore("staffMember", {
 
             try {
                 // Add _method PUT for Laravel to handle multipart form data
-                payload.append('_method', 'PUT');
+                payload.append("_method", "PUT");
 
                 const response = await axiosInstance.post(`staff-members/${id}`, payload, {
                     headers: {
-                        'Content-Type': 'multipart/form-data',
-                    }
+                        "Content-Type": "multipart/form-data",
+                    },
                 });
 
                 this.success = response.data.message;
@@ -147,16 +147,15 @@ export const useStaffMemberStore = defineStore("staffMember", {
             }
         },
 
-
         async fetchLatestStaffMembers(params = {}) {
             this.loadingLatest = true;
 
             try {
-                const response = await axiosInstance.get('/staff-members', {
+                const response = await axiosInstance.get("/staff-members", {
                     params: {
                         limit: 5,
                         ...params,
-                    }
+                    },
                 });
 
                 this.latestStaffMembers = response.data.data;
@@ -172,7 +171,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/staff-members/statistics');
+                const response = await axiosInstance.get("/staff-members/statistics");
 
                 this.statistics = response.data.data;
             } catch (error) {
@@ -204,7 +203,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/my-profile');
+                const response = await axiosInstance.get("/my-profile");
 
                 return response.data.data;
             } catch (error) {
@@ -220,7 +219,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/my-team');
+                const response = await axiosInstance.get("/my-team");
 
                 return response.data.data;
             } catch (error) {
@@ -236,7 +235,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/my-team/members');
+                const response = await axiosInstance.get("/my-team/members");
 
                 return response.data.data;
             } catch (error) {
@@ -252,7 +251,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/my-team/projects');
+                const response = await axiosInstance.get("/my-team/projects");
 
                 return response.data.data;
             } catch (error) {
@@ -262,7 +261,5 @@ export const useStaffMemberStore = defineStore("staffMember", {
                 this.loading = false;
             }
         },
-
-
-    }
-})
+    },
+});

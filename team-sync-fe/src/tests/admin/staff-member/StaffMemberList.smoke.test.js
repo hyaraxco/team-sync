@@ -117,7 +117,7 @@ const factory = () =>
                 CardList: { template: '<div class="card-list-stub"></div>' },
                 SearchFilter: {
                     template:
-                        '<button class="search-trigger" @click="$emit(\'search\', { search: \'John\' })">Search</button>',
+                        "<button class=\"search-trigger\" @click=\"$emit('search', { search: 'John' })\">Search</button>",
                 },
                 Pagination: { template: '<div class="pagination-stub"></div>' },
                 Alert: { template: '<div class="alert-stub"></div>' },

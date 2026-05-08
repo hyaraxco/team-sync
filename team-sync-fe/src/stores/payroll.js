@@ -1,13 +1,13 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 const triggerBlobDownload = (response, fallbackFilename) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
-    const link = document.createElement('a');
+    const link = document.createElement("a");
     link.href = url;
 
-    const contentDisposition = response.headers['content-disposition'];
+    const contentDisposition = response.headers["content-disposition"];
     let filename = fallbackFilename;
     if (contentDisposition) {
         const utf8FilenameMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)/i);
@@ -23,7 +23,7 @@ const triggerBlobDownload = (response, fallbackFilename) => {
         }
     }
 
-    link.setAttribute('download', filename);
+    link.setAttribute("download", filename);
     document.body.appendChild(link);
     link.click();
     link.remove();
@@ -31,13 +31,12 @@ const triggerBlobDownload = (response, fallbackFilename) => {
 };
 
 const buildPayrollReportFallbackFilename = (params = {}) => {
-    const status = (params.status || 'all')
-        .toString()
-        .replace(/^\w/, (char) => char.toUpperCase());
-    const periodLabel = params.period_type === 'yearly'
-        ? (params.year || new Date().getFullYear())
-        : (params.month || new Date().toISOString().slice(0, 7));
-    const detailSuffix = params.report_type === 'detail' ? '_Detail' : '';
+    const status = (params.status || "all").toString().replace(/^\w/, (char) => char.toUpperCase());
+    const periodLabel =
+        params.period_type === "yearly"
+            ? params.year || new Date().getFullYear()
+            : params.month || new Date().toISOString().slice(0, 7);
+    const detailSuffix = params.report_type === "detail" ? "_Detail" : "";
 
     return `Payroll_Report_${periodLabel}_${status}${detailSuffix}.xlsx`;
 };
@@ -89,7 +88,7 @@ export const usePayrollStore = defineStore("payroll", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         loadingStatistics: false,
@@ -103,7 +102,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/payrolls/all/paginated', { params });
+                const response = await axiosInstance.get("/payrolls/all/paginated", { params });
 
                 this.payrolls = response.data.data.data;
                 this.meta = response.data.data.meta;
@@ -135,8 +134,8 @@ export const usePayrollStore = defineStore("payroll", {
                     params: {
                         page,
                         per_page: perPage,
-                        ...params
-                    }
+                        ...params,
+                    },
                 });
 
                 this.meta = response.data.data.meta;
@@ -209,7 +208,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.post('/payrolls/generate', payload);
+                const response = await axiosInstance.post("/payrolls/generate", payload);
 
                 this.success = response.data.message;
                 return response.data.data;
@@ -223,7 +222,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async fetchGenerateReadiness(salaryMonth) {
             try {
-                const response = await axiosInstance.get('/payrolls/generate-readiness', {
+                const response = await axiosInstance.get("/payrolls/generate-readiness", {
                     params: {
                         salary_month: salaryMonth,
                     },
@@ -238,7 +237,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async fetchReadinessDashboard(salaryMonth) {
             try {
-                const response = await axiosInstance.get('/payrolls/readiness-dashboard', {
+                const response = await axiosInstance.get("/payrolls/readiness-dashboard", {
                     params: {
                         salary_month: salaryMonth,
                     },
@@ -253,7 +252,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async fetchReadinessTeamSummary(salaryMonth) {
             try {
-                const response = await axiosInstance.get('/payrolls/readiness-dashboard/team-summary', {
+                const response = await axiosInstance.get("/payrolls/readiness-dashboard/team-summary", {
                     params: {
                         salary_month: salaryMonth,
                     },
@@ -350,7 +349,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/my-payslips', { params });
+                const response = await axiosInstance.get("/my-payslips", { params });
 
                 this.payslips = response.data.data.data;
                 this.meta = response.data.data.meta;
@@ -381,7 +380,7 @@ export const usePayrollStore = defineStore("payroll", {
 
             try {
                 const response = await axiosInstance.get(`/payslips/${id}/download`, {
-                    responseType: 'blob'
+                    responseType: "blob",
                 });
 
                 return response.data;
@@ -413,7 +412,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loadingStatistics = true;
 
             try {
-                const response = await axiosInstance.get('/payrolls/statistics');
+                const response = await axiosInstance.get("/payrolls/statistics");
 
                 this.statistics = response.data.data;
             } catch (error) {
@@ -438,7 +437,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loadingAnalytics = true;
 
             try {
-                const response = await axiosInstance.get('/payrolls/analytics', {
+                const response = await axiosInstance.get("/payrolls/analytics", {
                     params: {
                         months,
                     },
@@ -460,10 +459,10 @@ export const usePayrollStore = defineStore("payroll", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/payrolls/compare', {
+                const response = await axiosInstance.get("/payrolls/compare", {
                     params: {
                         month1,
-                        month2
+                        month2,
                     },
                 });
 
@@ -482,7 +481,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/payroll-adjustments', { params });
+                const response = await axiosInstance.get("/payroll-adjustments", { params });
                 const paginator = response.data.data;
 
                 this.payrollAdjustments = paginator.data ?? [];
@@ -523,7 +522,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/payroll-settings');
+                const response = await axiosInstance.get("/payroll-settings");
 
                 this.settings = response.data.data;
                 return response.data.data;
@@ -539,7 +538,7 @@ export const usePayrollStore = defineStore("payroll", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.put('/payroll-settings', payload);
+                const response = await axiosInstance.put("/payroll-settings", payload);
 
                 this.settings = response.data.data;
                 this.success = response.data.message;
@@ -554,7 +553,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async fetchSettingsHistory() {
             try {
-                const response = await axiosInstance.get('/payroll-settings/history');
+                const response = await axiosInstance.get("/payroll-settings/history");
 
                 this.settingsHistory = response.data.data ?? [];
 
@@ -578,7 +577,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async fetchApprovalPolicies() {
             try {
-                const response = await axiosInstance.get('/payroll-approval-policies');
+                const response = await axiosInstance.get("/payroll-approval-policies");
 
                 return response.data.data ?? [];
             } catch (error) {
@@ -589,7 +588,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async createApprovalPolicy(payload) {
             try {
-                const response = await axiosInstance.post('/payroll-approval-policies', payload);
+                const response = await axiosInstance.post("/payroll-approval-policies", payload);
 
                 this.success = response.data.message;
                 return response.data.data;
@@ -647,7 +646,7 @@ export const usePayrollStore = defineStore("payroll", {
 
         async fetchBpjsRateHistory() {
             try {
-                const response = await axiosInstance.get('/payroll-settings/bpjs-rate-history');
+                const response = await axiosInstance.get("/payroll-settings/bpjs-rate-history");
 
                 this.bpjsRateHistory = response.data.data ?? [];
 
@@ -663,12 +662,12 @@ export const usePayrollStore = defineStore("payroll", {
 
             try {
                 const response = await axiosInstance.get(`/payrolls/${id}/export-excel`, {
-                    responseType: 'blob'
+                    responseType: "blob",
                 });
 
-                triggerBlobDownload(response, 'Payroll_Export.xlsx');
+                triggerBlobDownload(response, "Payroll_Export.xlsx");
 
-                this.success = 'Excel file downloaded successfully';
+                this.success = "Excel file downloaded successfully";
             } catch (error) {
                 this.error = handleError(error);
                 throw error;
@@ -682,12 +681,12 @@ export const usePayrollStore = defineStore("payroll", {
 
             try {
                 const response = await axiosInstance.get(`/payrolls/${id}/export-pdf`, {
-                    responseType: 'blob'
+                    responseType: "blob",
                 });
 
-                triggerBlobDownload(response, 'Payroll_Payslips.zip');
+                triggerBlobDownload(response, "Payroll_Payslips.zip");
 
-                this.success = 'Payslip ZIP downloaded successfully';
+                this.success = "Payslip ZIP downloaded successfully";
             } catch (error) {
                 this.error = handleError(error);
                 throw error;
@@ -700,14 +699,14 @@ export const usePayrollStore = defineStore("payroll", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/payrolls/export-report', {
+                const response = await axiosInstance.get("/payrolls/export-report", {
                     params,
-                    responseType: 'blob'
+                    responseType: "blob",
                 });
 
                 triggerBlobDownload(response, buildPayrollReportFallbackFilename(params));
 
-                this.success = 'Payroll report downloaded successfully';
+                this.success = "Payroll report downloaded successfully";
             } catch (error) {
                 this.error = handleError(error);
                 throw error;
@@ -715,5 +714,5 @@ export const usePayrollStore = defineStore("payroll", {
                 this.loading = false;
             }
         },
-    }
-})
+    },
+});

@@ -2,61 +2,55 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    routerPushMock,
-    teamStoreMock,
-    teamStoreRefs,
-    optionStoreMock,
-    optionStoreRefs,
-    searchFilterState,
-} = vi.hoisted(() => ({
-    routerPushMock: vi.fn(),
-    teamStoreMock: {
-        fetchTeamsPaginated: vi.fn(),
-    },
-    teamStoreRefs: {
-        teams: {
-            __v_isRef: true,
-            value: [],
+const { routerPushMock, teamStoreMock, teamStoreRefs, optionStoreMock, optionStoreRefs, searchFilterState } =
+    vi.hoisted(() => ({
+        routerPushMock: vi.fn(),
+        teamStoreMock: {
+            fetchTeamsPaginated: vi.fn(),
         },
-        meta: {
-            __v_isRef: true,
-            value: {
-                from: 1,
-                to: 1,
-                total: 1,
+        teamStoreRefs: {
+            teams: {
+                __v_isRef: true,
+                value: [],
+            },
+            meta: {
+                __v_isRef: true,
+                value: {
+                    from: 1,
+                    to: 1,
+                    total: 1,
+                },
+            },
+            loading: {
+                __v_isRef: true,
+                value: false,
+            },
+            success: {
+                __v_isRef: true,
+                value: null,
             },
         },
-        loading: {
-            __v_isRef: true,
-            value: false,
+        optionStoreMock: {
+            fetchDepartments: vi.fn(),
         },
-        success: {
-            __v_isRef: true,
-            value: null,
+        optionStoreRefs: {
+            departments: {
+                __v_isRef: true,
+                value: [{ value: 1, label: "Engineering" }],
+            },
         },
-    },
-    optionStoreMock: {
-        fetchDepartments: vi.fn(),
-    },
-    optionStoreRefs: {
-        departments: {
-            __v_isRef: true,
-            value: [{ value: 1, label: "Engineering" }],
+        searchFilterState: {
+            filters: {
+                __v_isRef: true,
+                value: { search: null, status: "", department: "" },
+            },
+            fetchData: vi.fn(),
+            handleSearch: vi.fn(),
+            handleReset: vi.fn(),
+            handlePageChange: vi.fn(),
+            handlePerPageChange: vi.fn(),
         },
-    },
-    searchFilterState: {
-        filters: {
-            __v_isRef: true,
-            value: { search: null, status: "", department: "" },
-        },
-        fetchData: vi.fn(),
-        handleSearch: vi.fn(),
-        handleReset: vi.fn(),
-        handlePageChange: vi.fn(),
-        handlePerPageChange: vi.fn(),
-    },
-}));
+    }));
 
 vi.mock("@/stores/team", () => ({
     useTeamStore: () => teamStoreMock,
@@ -110,7 +104,7 @@ const factory = () =>
                 EmptyState: { template: '<div class="empty-state-stub"></div>' },
                 SearchFilter: {
                     template:
-                        '<button class="search-trigger" @click="$emit(\'search\', { search: \'Platform\' })">Search</button>',
+                        "<button class=\"search-trigger\" @click=\"$emit('search', { search: 'Platform' })\">Search</button>",
                 },
                 Alert: { template: '<div class="alert-stub"></div>' },
                 RouterLink: {

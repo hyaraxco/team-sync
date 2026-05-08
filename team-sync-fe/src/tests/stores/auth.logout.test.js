@@ -2,135 +2,135 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 
 const {
-  axiosPostMock,
-  cookieState,
-  getCookieMock,
-  setCookieMock,
-  removeCookieMock,
-  routerPushMock,
-  routerReplaceMock,
-} = vi.hoisted(() => {
-  const cookieState = { token: "seed-token" };
-
-  return {
-    axiosPostMock: vi.fn(),
+    axiosPostMock,
     cookieState,
-    getCookieMock: vi.fn((key) => (key === "token" ? cookieState.token : undefined)),
-    setCookieMock: vi.fn((key, value) => {
-      if (key === "token") {
-        cookieState.token = value;
-      }
-    }),
-    removeCookieMock: vi.fn((key) => {
-      if (key === "token") {
-        cookieState.token = undefined;
-      }
-    }),
-    routerPushMock: vi.fn().mockResolvedValue(undefined),
-    routerReplaceMock: vi.fn().mockResolvedValue(undefined),
-  };
+    getCookieMock,
+    setCookieMock,
+    removeCookieMock,
+    routerPushMock,
+    routerReplaceMock,
+} = vi.hoisted(() => {
+    const cookieState = { token: "seed-token" };
+
+    return {
+        axiosPostMock: vi.fn(),
+        cookieState,
+        getCookieMock: vi.fn((key) => (key === "token" ? cookieState.token : undefined)),
+        setCookieMock: vi.fn((key, value) => {
+            if (key === "token") {
+                cookieState.token = value;
+            }
+        }),
+        removeCookieMock: vi.fn((key) => {
+            if (key === "token") {
+                cookieState.token = undefined;
+            }
+        }),
+        routerPushMock: vi.fn().mockResolvedValue(undefined),
+        routerReplaceMock: vi.fn().mockResolvedValue(undefined),
+    };
 });
 
 vi.mock("@/plugins/axios", () => ({
-  axiosInstance: {
-    post: axiosPostMock,
-    defaults: {
-      headers: {
-        common: {},
-      },
+    axiosInstance: {
+        post: axiosPostMock,
+        defaults: {
+            headers: {
+                common: {},
+            },
+        },
     },
-  },
 }));
 
 vi.mock("js-cookie", () => ({
-  default: {
-    get: getCookieMock,
-    set: setCookieMock,
-    remove: removeCookieMock,
-  },
+    default: {
+        get: getCookieMock,
+        set: setCookieMock,
+        remove: removeCookieMock,
+    },
 }));
 
 vi.mock("@/router", () => ({
-  default: {
-    push: routerPushMock,
-    replace: routerReplaceMock,
-  },
+    default: {
+        push: routerPushMock,
+        replace: routerReplaceMock,
+    },
 }));
 
 import { useAuthStore } from "@/stores/auth";
 
 describe("auth store logout", () => {
-  beforeEach(() => {
-    setActivePinia(createPinia());
+    beforeEach(() => {
+        setActivePinia(createPinia());
 
-    cookieState.token = "seed-token";
+        cookieState.token = "seed-token";
 
-    axiosPostMock.mockReset();
-    getCookieMock.mockClear();
-    setCookieMock.mockClear();
-    removeCookieMock.mockClear();
-    routerPushMock.mockReset().mockResolvedValue(undefined);
-    routerReplaceMock.mockReset().mockResolvedValue(undefined);
-  });
-
-  it("redirects to login and clears local session even when API logout is stuck", async () => {
-    let resolveRequest;
-    const pendingRequest = new Promise((resolve) => {
-      resolveRequest = resolve;
+        axiosPostMock.mockReset();
+        getCookieMock.mockClear();
+        setCookieMock.mockClear();
+        removeCookieMock.mockClear();
+        routerPushMock.mockReset().mockResolvedValue(undefined);
+        routerReplaceMock.mockReset().mockResolvedValue(undefined);
     });
 
-    axiosPostMock.mockReturnValue(pendingRequest);
+    it("redirects to login and clears local session even when API logout is stuck", async () => {
+        let resolveRequest;
+        const pendingRequest = new Promise((resolve) => {
+            resolveRequest = resolve;
+        });
 
-    const store = useAuthStore();
-    store.user = { id: 7, name: "Agung" };
+        axiosPostMock.mockReturnValue(pendingRequest);
 
-    const logoutPromise = store.logout();
+        const store = useAuthStore();
+        store.user = { id: 7, name: "Agung" };
 
-    const completion = Promise.race([
-      logoutPromise.then(() => "resolved"),
-      new Promise((resolve) => setTimeout(() => resolve("timeout"), 0)),
-    ]);
+        const logoutPromise = store.logout();
 
-    await expect(completion).resolves.toBe("resolved");
+        const completion = Promise.race([
+            logoutPromise.then(() => "resolved"),
+            new Promise((resolve) => setTimeout(() => resolve("timeout"), 0)),
+        ]);
 
-    expect(removeCookieMock).toHaveBeenCalledWith("token");
-    expect(store.user).toBeNull();
-    expect(store.error).toBeNull();
-    expect(store.loading).toBe(false);
-    expect(routerReplaceMock).toHaveBeenCalledWith({ name: "login" });
-    expect(axiosPostMock).toHaveBeenCalledWith(
-      "/logout",
-      null,
-      expect.objectContaining({
-        timeout: 5000,
-        headers: expect.objectContaining({
-          Authorization: "Bearer seed-token",
-        }),
-      }),
-    );
+        await expect(completion).resolves.toBe("resolved");
 
-    resolveRequest({ data: {} });
-    await pendingRequest;
-  });
+        expect(removeCookieMock).toHaveBeenCalledWith("token");
+        expect(store.user).toBeNull();
+        expect(store.error).toBeNull();
+        expect(store.loading).toBe(false);
+        expect(routerReplaceMock).toHaveBeenCalledWith({ name: "login" });
+        expect(axiosPostMock).toHaveBeenCalledWith(
+            "/logout",
+            null,
+            expect.objectContaining({
+                timeout: 5000,
+                headers: expect.objectContaining({
+                    Authorization: "Bearer seed-token",
+                }),
+            }),
+        );
 
-  it("does not block logout when router navigation promise hangs", async () => {
-    routerReplaceMock.mockReturnValue(new Promise(() => {}));
-    axiosPostMock.mockResolvedValue({ data: {} });
+        resolveRequest({ data: {} });
+        await pendingRequest;
+    });
 
-    const store = useAuthStore();
-    store.user = { id: 8, name: "Ayu" };
+    it("does not block logout when router navigation promise hangs", async () => {
+        routerReplaceMock.mockReturnValue(new Promise(() => {}));
+        axiosPostMock.mockResolvedValue({ data: {} });
 
-    const logoutPromise = store.logout();
+        const store = useAuthStore();
+        store.user = { id: 8, name: "Ayu" };
 
-    const completion = Promise.race([
-      logoutPromise.then(() => "resolved"),
-      new Promise((resolve) => setTimeout(() => resolve("timeout"), 0)),
-    ]);
+        const logoutPromise = store.logout();
 
-    await expect(completion).resolves.toBe("resolved");
-    expect(removeCookieMock).toHaveBeenCalledWith("token");
-    expect(store.user).toBeNull();
-    expect(store.loading).toBe(false);
-    expect(routerReplaceMock).toHaveBeenCalledWith({ name: "login" });
-  });
+        const completion = Promise.race([
+            logoutPromise.then(() => "resolved"),
+            new Promise((resolve) => setTimeout(() => resolve("timeout"), 0)),
+        ]);
+
+        await expect(completion).resolves.toBe("resolved");
+        expect(removeCookieMock).toHaveBeenCalledWith("token");
+        expect(store.user).toBeNull();
+        expect(store.loading).toBe(false);
+        expect(routerReplaceMock).toHaveBeenCalledWith({ name: "login" });
+    });
 });

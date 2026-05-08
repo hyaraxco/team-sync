@@ -1,29 +1,29 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 const buildTeamFormData = (payload, method = null) => {
     const formData = new FormData();
 
-    formData.append('name', payload.name ?? '');
-    formData.append('expected_size', payload.expected_size ?? '');
-    formData.append('description', payload.description ?? '');
-    formData.append('department', payload.department ?? '');
-    formData.append('status', payload.status ?? '');
-    formData.append('team_lead_id', payload.team_lead_id ?? '');
+    formData.append("name", payload.name ?? "");
+    formData.append("expected_size", payload.expected_size ?? "");
+    formData.append("description", payload.description ?? "");
+    formData.append("department", payload.department ?? "");
+    formData.append("status", payload.status ?? "");
+    formData.append("team_lead_id", payload.team_lead_id ?? "");
 
     if (Array.isArray(payload.responsibilities)) {
         payload.responsibilities.forEach((item) => {
-            formData.append('responsibilities[]', item ?? '');
+            formData.append("responsibilities[]", item ?? "");
         });
     }
 
     if (payload.icon instanceof File) {
-        formData.append('icon', payload.icon);
+        formData.append("icon", payload.icon);
     }
 
     if (method) {
-        formData.append('_method', method);
+        formData.append("_method", method);
     }
 
     return formData;
@@ -59,7 +59,7 @@ export const useTeamStore = defineStore("team", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         loadingLatest: false,
@@ -72,16 +72,16 @@ export const useTeamStore = defineStore("team", {
 
     actions: {
         async fetchTeams(params) {
-            this.loading = true
+            this.loading = true;
 
             try {
-                const response = await axiosInstance.get(`teams`, { params })
+                const response = await axiosInstance.get(`teams`, { params });
 
-                this.teams = response.data.data
+                this.teams = response.data.data;
             } catch (error) {
-                this.error = handleError(error)
+                this.error = handleError(error);
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
@@ -89,7 +89,7 @@ export const useTeamStore = defineStore("team", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/teams/all/paginated', { params });
+                const response = await axiosInstance.get("/teams/all/paginated", { params });
 
                 this.teams = response.data.data.data;
                 this.meta = response.data.data.meta;
@@ -119,7 +119,7 @@ export const useTeamStore = defineStore("team", {
 
             try {
                 const formData = buildTeamFormData(payload);
-                const response = await axiosInstance.post('teams', formData);
+                const response = await axiosInstance.post("teams", formData);
 
                 this.success = response.data.message;
             } catch (error) {
@@ -133,7 +133,7 @@ export const useTeamStore = defineStore("team", {
             this.loading = true;
 
             try {
-                const formData = buildTeamFormData(payload, 'PUT');
+                const formData = buildTeamFormData(payload, "PUT");
                 const response = await axiosInstance.post(`teams/${id}`, formData);
 
                 this.success = response.data.message;
@@ -160,16 +160,15 @@ export const useTeamStore = defineStore("team", {
             }
         },
 
-
         async fetchLatestTeams(params = {}) {
             this.loadingLatest = true;
 
             try {
-                const response = await axiosInstance.get('/teams', {
+                const response = await axiosInstance.get("/teams", {
                     params: {
                         limit: 5,
                         ...params,
-                    }
+                    },
                 });
 
                 this.latestTeams = response.data.data;
@@ -185,7 +184,7 @@ export const useTeamStore = defineStore("team", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/teams/statistics');
+                const response = await axiosInstance.get("/teams/statistics");
 
                 this.statistics = response.data.data;
             } catch (error) {
@@ -232,7 +231,7 @@ export const useTeamStore = defineStore("team", {
 
             try {
                 const response = await axiosInstance.post(`/teams/${teamId}/add-member`, {
-                    staff_member_id: employeeId
+                    staff_member_id: employeeId,
                 });
 
                 this.success = response.data.message;
@@ -252,7 +251,7 @@ export const useTeamStore = defineStore("team", {
 
             try {
                 const response = await axiosInstance.post(`/teams/${teamId}/remove-member`, {
-                    staff_member_id: employeeId
+                    staff_member_id: employeeId,
                 });
 
                 this.success = response.data.message;
@@ -287,6 +286,5 @@ export const useTeamStore = defineStore("team", {
             }
             return arr;
         },
-
-    }
-})
+    },
+});

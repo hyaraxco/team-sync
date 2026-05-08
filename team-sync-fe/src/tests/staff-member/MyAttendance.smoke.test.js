@@ -27,249 +27,249 @@ const requestCorrection = vi.fn().mockResolvedValue(undefined);
 const routerReplace = vi.fn().mockResolvedValue(undefined);
 
 let currentRoute = {
-  name: "staffMember.attendance.my-attendances",
-  params: {},
-  query: {},
-  hash: "",
+    name: "staffMember.attendance.my-attendances",
+    params: {},
+    query: {},
+    hash: "",
 };
 let hasLeaveRequestPermission = false;
 let hasClockPermission = false;
 let mockWorkLocation = "office";
 
 vi.mock("@/stores/attendance", () => ({
-  useAttendanceStore: () => ({
-    loading: attendanceLoading,
-    attendances,
-    statistics,
-    todayAttendance,
-    fetchAttendances,
-    fetchStatistics,
-    fetchTodayAttendance,
-    checkIn,
-    checkOut,
-  }),
+    useAttendanceStore: () => ({
+        loading: attendanceLoading,
+        attendances,
+        statistics,
+        todayAttendance,
+        fetchAttendances,
+        fetchStatistics,
+        fetchTodayAttendance,
+        checkIn,
+        checkOut,
+    }),
 }));
 
 vi.mock("@/stores/leaveRequest", () => ({
-  useLeaveRequestStore: () => ({
-    loading: leaveLoading,
-    myLeaveRequests,
-    myLeaveBalances,
-    fetchMyLeaveRequests,
-    fetchMyLeaveBalances,
-    createLeaveRequest,
-  }),
+    useLeaveRequestStore: () => ({
+        loading: leaveLoading,
+        myLeaveRequests,
+        myLeaveBalances,
+        fetchMyLeaveRequests,
+        fetchMyLeaveBalances,
+        createLeaveRequest,
+    }),
 }));
 
 vi.mock("@/stores/option", () => ({
-  useOptionStore: () => ({
-    leaveTypes,
-    fetchLeaveTypes,
-  }),
+    useOptionStore: () => ({
+        leaveTypes,
+        fetchLeaveTypes,
+    }),
 }));
 
 vi.mock("@/stores/attendanceCorrection", () => ({
-  useAttendanceCorrectionStore: () => ({
-    loading: correctionLoading,
-    myCorrections,
-    fetchMyCorrections,
-    requestCorrection,
-  }),
+    useAttendanceCorrectionStore: () => ({
+        loading: correctionLoading,
+        myCorrections,
+        fetchMyCorrections,
+        requestCorrection,
+    }),
 }));
 
 vi.mock("@/stores/auth", () => ({
-  useAuthStore: () => ({
-    user: {
-      employee_profile: {
-        job_information: {
-          work_location: mockWorkLocation,
+    useAuthStore: () => ({
+        user: {
+            employee_profile: {
+                job_information: {
+                    work_location: mockWorkLocation,
+                },
+            },
         },
-      },
-    },
-  }),
+    }),
 }));
 
 vi.mock("pinia", async (importOriginal) => {
-  const actual = await importOriginal();
+    const actual = await importOriginal();
 
-  return {
-    ...actual,
-    storeToRefs: (store) => store,
-  };
+    return {
+        ...actual,
+        storeToRefs: (store) => store,
+    };
 });
 
 vi.mock("@/composables/useToast", () => ({
-  useToast: () => ({
-    success: vi.fn(),
-    warning: vi.fn(),
-    error: vi.fn(),
-  }),
+    useToast: () => ({
+        success: vi.fn(),
+        warning: vi.fn(),
+        error: vi.fn(),
+    }),
 }));
 
 vi.mock("@/helpers/permissionHelper", () => ({
-  can: (permission) => {
-    if (permission === "leave-request-create") {
-      return hasLeaveRequestPermission;
-    }
+    can: (permission) => {
+        if (permission === "leave-request-create") {
+            return hasLeaveRequestPermission;
+        }
 
-    if (permission === "attendance-check-in" || permission === "attendance-check-out") {
-      return hasClockPermission;
-    }
+        if (permission === "attendance-check-in" || permission === "attendance-check-out") {
+            return hasClockPermission;
+        }
 
-    return false;
-  },
+        return false;
+    },
 }));
 
 vi.mock("vue-router", async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-    useRoute: () => currentRoute,
-    useRouter: () => ({
-      replace: routerReplace,
-    }),
-  };
+    const actual = await importOriginal();
+    return {
+        ...actual,
+        useRoute: () => currentRoute,
+        useRouter: () => ({
+            replace: routerReplace,
+        }),
+    };
 });
 
 import MyAttendance from "@/views/staff-member/MyAttendance.vue";
 
 const flushPromises = async () => {
-  await Promise.resolve();
-  await Promise.resolve();
+    await Promise.resolve();
+    await Promise.resolve();
 };
 
 const factory = () =>
-  mount(MyAttendance, {
-    global: {
-      stubs: {
-        Teleport: true,
-        AttendanceStatsCards: {
-          template: '<div class="attendance-stats-stub" />',
+    mount(MyAttendance, {
+        global: {
+            stubs: {
+                Teleport: true,
+                AttendanceStatsCards: {
+                    template: '<div class="attendance-stats-stub" />',
+                },
+                LeaveRequestSuccessModal: {
+                    template: '<div class="leave-success-modal-stub" />',
+                },
+                EmptyState: {
+                    template: '<div class="empty-state-stub" />',
+                },
+                ClockInOut: {
+                    template: '<div class="clock-in-out-stub">Clock Workspace</div>',
+                },
+                AttendanceCorrectionsList: {
+                    template: '<div class="corrections-list-stub" />',
+                },
+                AttendanceCorrectionModal: {
+                    template: '<div class="correction-modal-stub" />',
+                },
+            },
         },
-        LeaveRequestSuccessModal: {
-          template: '<div class="leave-success-modal-stub" />',
-        },
-        EmptyState: {
-          template: '<div class="empty-state-stub" />',
-        },
-        ClockInOut: {
-          template: '<div class="clock-in-out-stub">Clock Workspace</div>',
-        },
-        AttendanceCorrectionsList: {
-          template: '<div class="corrections-list-stub" />',
-        },
-        AttendanceCorrectionModal: {
-          template: '<div class="correction-modal-stub" />',
-        },
-      },
-    },
-  });
+    });
 
 describe("MyAttendance smoke", () => {
-  beforeEach(() => {
-    attendanceLoading.value = false;
-    attendances.value = [];
-    statistics.value = {};
-    todayAttendance.value = null;
-    leaveLoading.value = false;
-    myLeaveRequests.value = [];
-    myLeaveBalances.value = [];
-    leaveTypes.value = [];
-    correctionLoading.value = false;
-    myCorrections.value = [];
-    hasLeaveRequestPermission = false;
-    hasClockPermission = false;
-    mockWorkLocation = "office";
-    currentRoute = {
-      name: "staffMember.attendance.my-attendances",
-      params: {},
-      query: {},
-      hash: "",
-    };
-    fetchAttendances.mockClear();
-    fetchStatistics.mockClear();
-    fetchTodayAttendance.mockClear();
-    checkIn.mockClear();
-    checkOut.mockClear();
-    fetchMyLeaveRequests.mockClear();
-    fetchMyLeaveBalances.mockClear();
-    createLeaveRequest.mockClear();
-    fetchLeaveTypes.mockClear();
-    fetchMyCorrections.mockClear();
-    routerReplace.mockClear();
-  });
-
-  it("opens the leave request modal from the route query and clears the query", async () => {
-    hasLeaveRequestPermission = true;
-    currentRoute = {
-      name: "staffMember.attendance.my-attendances",
-      params: {},
-      query: { action: "request-leave", source: "dashboard" },
-      hash: "",
-    };
-
-    const wrapper = factory();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-
-    expect(wrapper.text()).toContain("Request New Leave");
-    expect(routerReplace).toHaveBeenCalledWith({
-      name: "staffMember.attendance.my-attendances",
-      params: {},
-      query: { source: "dashboard" },
-      hash: "",
+    beforeEach(() => {
+        attendanceLoading.value = false;
+        attendances.value = [];
+        statistics.value = {};
+        todayAttendance.value = null;
+        leaveLoading.value = false;
+        myLeaveRequests.value = [];
+        myLeaveBalances.value = [];
+        leaveTypes.value = [];
+        correctionLoading.value = false;
+        myCorrections.value = [];
+        hasLeaveRequestPermission = false;
+        hasClockPermission = false;
+        mockWorkLocation = "office";
+        currentRoute = {
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: {},
+            hash: "",
+        };
+        fetchAttendances.mockClear();
+        fetchStatistics.mockClear();
+        fetchTodayAttendance.mockClear();
+        checkIn.mockClear();
+        checkOut.mockClear();
+        fetchMyLeaveRequests.mockClear();
+        fetchMyLeaveBalances.mockClear();
+        createLeaveRequest.mockClear();
+        fetchLeaveTypes.mockClear();
+        fetchMyCorrections.mockClear();
+        routerReplace.mockClear();
     });
-  });
 
-  it("ignores the query action when the user lacks leave permission", async () => {
-    currentRoute = {
-      name: "staffMember.attendance.my-attendances",
-      params: {},
-      query: { action: "request-leave" },
-      hash: "",
-    };
+    it("opens the leave request modal from the route query and clears the query", async () => {
+        hasLeaveRequestPermission = true;
+        currentRoute = {
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: { action: "request-leave", source: "dashboard" },
+            hash: "",
+        };
 
-    const wrapper = factory();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
 
-    expect(wrapper.text()).not.toContain("Request New Leave");
-    expect(routerReplace).not.toHaveBeenCalled();
-  });
-
-  it("opens the clock section from the route query and clears the query", async () => {
-    hasClockPermission = true;
-    currentRoute = {
-      name: "staffMember.attendance.my-attendances",
-      params: {},
-      query: { action: "clock", source: "dashboard" },
-      hash: "",
-    };
-
-    const wrapper = factory();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-
-    // Verify Clock In button renders for non-remote users with clock permissions
-    expect(wrapper.text()).toContain("Clock In");
-  });
-
-  it("sends selected actual work mode when a hybrid staff member clocks in", async () => {
-    hasClockPermission = true;
-    mockWorkLocation = "hybrid";
-
-    const wrapper = factory();
-    await flushPromises();
-    await wrapper.vm.$nextTick();
-
-    const select = wrapper.get("#actual-work-mode");
-    await select.setValue("remote");
-    await wrapper.get('[data-testid="clock-in-button-label"]').trigger("click");
-
-    expect(checkIn).toHaveBeenCalledWith({
-      check_in_lat: null,
-      check_in_long: null,
-      actual_work_mode: "remote",
+        expect(wrapper.text()).toContain("Request New Leave");
+        expect(routerReplace).toHaveBeenCalledWith({
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: { source: "dashboard" },
+            hash: "",
+        });
     });
-  });
+
+    it("ignores the query action when the user lacks leave permission", async () => {
+        currentRoute = {
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: { action: "request-leave" },
+            hash: "",
+        };
+
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.text()).not.toContain("Request New Leave");
+        expect(routerReplace).not.toHaveBeenCalled();
+    });
+
+    it("opens the clock section from the route query and clears the query", async () => {
+        hasClockPermission = true;
+        currentRoute = {
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: { action: "clock", source: "dashboard" },
+            hash: "",
+        };
+
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
+
+        // Verify Clock In button renders for non-remote users with clock permissions
+        expect(wrapper.text()).toContain("Clock In");
+    });
+
+    it("sends selected actual work mode when a hybrid staff member clocks in", async () => {
+        hasClockPermission = true;
+        mockWorkLocation = "hybrid";
+
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
+
+        const select = wrapper.get("#actual-work-mode");
+        await select.setValue("remote");
+        await wrapper.get('[data-testid="clock-in-button-label"]').trigger("click");
+
+        expect(checkIn).toHaveBeenCalledWith({
+            check_in_lat: null,
+            check_in_long: null,
+            actual_work_mode: "remote",
+        });
+    });
 });

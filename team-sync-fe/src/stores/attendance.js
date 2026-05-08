@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useAttendanceStore = defineStore("attendance", {
@@ -27,7 +27,7 @@ export const useAttendanceStore = defineStore("attendance", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         error: null,
@@ -40,7 +40,7 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('my-attendances', { params });
+                const response = await axiosInstance.get("my-attendances", { params });
 
                 this.attendances = response.data.data;
             } catch (error) {
@@ -55,7 +55,7 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('attendances/last-attendance');
+                const response = await axiosInstance.get("attendances/last-attendance");
 
                 this.todayAttendance = response.data.data;
             } catch (error) {
@@ -87,7 +87,7 @@ export const useAttendanceStore = defineStore("attendance", {
                     data.notes = payload.notes;
                 }
 
-                const response = await axiosInstance.post('attendances/check-in', data);
+                const response = await axiosInstance.post("attendances/check-in", data);
 
                 this.success = response.data.message;
                 this.todayAttendance = response.data.data;
@@ -115,7 +115,7 @@ export const useAttendanceStore = defineStore("attendance", {
                     data.notes = payload.notes;
                 }
 
-                const response = await axiosInstance.post('attendances/check-out', data);
+                const response = await axiosInstance.post("attendances/check-out", data);
 
                 this.success = response.data.message;
                 this.todayAttendance = response.data.data;
@@ -134,7 +134,7 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('my-attendance-statistics');
+                const response = await axiosInstance.get("my-attendance-statistics");
 
                 this.statistics = response.data.data;
             } catch (error) {
@@ -149,7 +149,7 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('my-attendance-statistics');
+                const response = await axiosInstance.get("my-attendance-statistics");
 
                 // Map backend response to myStatistics
                 const data = response.data.data;
@@ -175,7 +175,7 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('attendances/statistics');
+                const response = await axiosInstance.get("attendances/statistics");
 
                 return response.data.data;
             } catch (error) {
@@ -191,12 +191,12 @@ export const useAttendanceStore = defineStore("attendance", {
             this.error = null;
 
             try {
-                const today = new Date().toISOString().split('T')[0];
-                const response = await axiosInstance.get('attendances', {
+                const today = new Date().toISOString().split("T")[0];
+                const response = await axiosInstance.get("attendances", {
                     params: {
                         date: today,
-                        limit
-                    }
+                        limit,
+                    },
                 });
 
                 return response.data.data;
@@ -212,10 +212,10 @@ export const useAttendanceStore = defineStore("attendance", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('attendances/all/paginated', {
+                const response = await axiosInstance.get("attendances/all/paginated", {
                     params: {
                         page: params.page || 1,
-                        search: params.search || '',
+                        search: params.search || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
@@ -262,11 +262,11 @@ export const useAttendanceStore = defineStore("attendance", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('attendance-policy-mismatches', {
+                const response = await axiosInstance.get("attendance-policy-mismatches", {
                     params: {
                         page: params.page || 1,
-                        search: params.search || '',
-                        status: params.status || '',
+                        search: params.search || "",
+                        status: params.status || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
@@ -283,7 +283,9 @@ export const useAttendanceStore = defineStore("attendance", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post(`attendance-policy-mismatches/${id}/acknowledge`, { resolution_notes });
+                const response = await axiosInstance.post(`attendance-policy-mismatches/${id}/acknowledge`, {
+                    resolution_notes,
+                });
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
@@ -298,7 +300,9 @@ export const useAttendanceStore = defineStore("attendance", {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post(`attendance-policy-mismatches/${id}/resolve`, { resolution_notes });
+                const response = await axiosInstance.post(`attendance-policy-mismatches/${id}/resolve`, {
+                    resolution_notes,
+                });
                 this.success = response.data.message;
                 return response.data.data;
             } catch (error) {
@@ -307,6 +311,6 @@ export const useAttendanceStore = defineStore("attendance", {
             } finally {
                 this.loading = false;
             }
-        }
-    }
-})
+        },
+    },
+});

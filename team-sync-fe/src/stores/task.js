@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useTaskStore = defineStore("task", {
@@ -16,10 +16,10 @@ export const useTaskStore = defineStore("task", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('project-tasks', {
+                const response = await axiosInstance.get("project-tasks", {
                     params: {
-                        project_id: projectId
-                    }
+                        project_id: projectId,
+                    },
                 });
 
                 this.tasks = response.data.data;
@@ -35,7 +35,7 @@ export const useTaskStore = defineStore("task", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.post('project-tasks', payload);
+                const response = await axiosInstance.post("project-tasks", payload);
 
                 this.success = response.data.message;
                 return response.data.data;
@@ -53,11 +53,11 @@ export const useTaskStore = defineStore("task", {
             try {
                 const response = await axiosInstance.post(`project-tasks/${id}`, {
                     ...payload,
-                    _method: 'PUT',
+                    _method: "PUT",
                 });
 
                 // Update task in local state
-                const taskIndex = this.tasks.findIndex(t => t.id === id);
+                const taskIndex = this.tasks.findIndex((t) => t.id === id);
                 if (taskIndex !== -1 && response.data.data) {
                     this.tasks[taskIndex] = response.data.data;
                 }
@@ -92,11 +92,11 @@ export const useTaskStore = defineStore("task", {
             try {
                 const response = await axiosInstance.post(`project-tasks/${taskId}`, {
                     status: newStatus,
-                    _method: 'PUT',
+                    _method: "PUT",
                 });
 
                 // Update task status in local state
-                const taskIndex = this.tasks.findIndex(t => t.id === taskId);
+                const taskIndex = this.tasks.findIndex((t) => t.id === taskId);
                 if (taskIndex !== -1) {
                     if (response.data?.data) {
                         this.tasks[taskIndex] = response.data.data;
@@ -188,7 +188,7 @@ export const useTaskStore = defineStore("task", {
 
             try {
                 const formData = new FormData();
-                formData.append('file', file);
+                formData.append("file", file);
 
                 const response = await axiosInstance.post(`project-tasks/${taskId}/attachments`, formData);
                 return response.data.data;
@@ -208,5 +208,5 @@ export const useTaskStore = defineStore("task", {
                 throw error;
             }
         },
-    }
-})
+    },
+});

@@ -2,13 +2,7 @@
 import { ref, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { usePerformanceFeedbackStore } from "@/stores/performanceFeedback";
-import {
-    MessageSquare,
-    ThumbsUp,
-    AlertCircle,
-    MessageCircle,
-    EyeOff,
-} from "lucide-vue-next";
+import { MessageSquare, ThumbsUp, AlertCircle, MessageCircle, EyeOff } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
@@ -31,9 +25,7 @@ const filteredFeedback = computed(() => {
 });
 
 const categories = computed(() => {
-    const uniqueCategories = [
-        ...new Set(givenFeedback.value.map((f) => f.category).filter(Boolean)),
-    ];
+    const uniqueCategories = [...new Set(givenFeedback.value.map((f) => f.category).filter(Boolean))];
     return uniqueCategories;
 });
 
@@ -65,18 +57,14 @@ onMounted(async () => {
         <div class="flex items-center justify-between">
             <div>
                 <h1 class="text-3xl font-bold text-brand-dark">Feedback Given</h1>
-                <p class="text-brand-light mt-1">
-                    View and track feedback you have shared with colleagues
-                </p>
+                <p class="text-brand-light mt-1">View and track feedback you have shared with colleagues</p>
             </div>
         </div>
 
         <MainCard>
             <div class="flex flex-wrap gap-4">
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Feedback Type</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Feedback Type</label>
                     <select
                         v-model="selectedType"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
@@ -88,19 +76,13 @@ onMounted(async () => {
                     </select>
                 </div>
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2"
-                        >Category</label
-                    >
+                    <label class="block text-sm font-medium text-brand-dark mb-2">Category</label>
                     <select
                         v-model="selectedCategory"
                         class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     >
                         <option value="all">All Categories</option>
-                        <option
-                            v-for="category in categories"
-                            :key="category"
-                            :value="category"
-                        >
+                        <option v-for="category in categories" :key="category" :value="category">
                             {{ category }}
                         </option>
                     </select>
@@ -109,25 +91,17 @@ onMounted(async () => {
         </MainCard>
 
         <div v-if="feedbackLoading" class="flex justify-center items-center py-12">
-            <div
-                class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
-            ></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
         </div>
 
         <div v-else-if="filteredFeedback.length > 0" class="space-y-4">
-            <div
-                v-for="(feedback, index) in filteredFeedback"
-                :key="feedback.id"
-                class="relative"
-            >
+            <div v-for="(feedback, index) in filteredFeedback" :key="feedback.id" class="relative">
                 <div
                     v-if="index < filteredFeedback.length - 1"
                     class="absolute left-6 top-16 bottom-0 w-0.5 bg-gray-200"
                 ></div>
 
-                <MainCard
-                    class="relative hover:shadow-lg transition-shadow duration-200"
-                >
+                <MainCard class="relative hover:shadow-lg transition-shadow duration-200">
                     <div
                         class="absolute left-0 top-6 w-12 h-12 rounded-full flex items-center justify-center border-4 border-white"
                         :class="feedbackTypeConfig[feedback.feedback_type]?.color"
@@ -157,22 +131,12 @@ onMounted(async () => {
                                 </div>
                                 <div class="flex items-center gap-4 text-sm text-brand-light">
                                     <span>{{ new Date(feedback.created_at).toLocaleDateString() }}</span>
-                                    <span
-                                        v-if="feedback.category"
-                                        class="flex items-center gap-1"
-                                    >
-                                        <span
-                                            class="w-1.5 h-1.5 rounded-full bg-brand-light"
-                                        ></span>
+                                    <span v-if="feedback.category" class="flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-brand-light"></span>
                                         {{ feedback.category }}
                                     </span>
-                                    <span
-                                        v-if="feedback.linked_goal_id"
-                                        class="flex items-center gap-1"
-                                    >
-                                        <span
-                                            class="w-1.5 h-1.5 rounded-full bg-brand-light"
-                                        ></span>
+                                    <span v-if="feedback.linked_goal_id" class="flex items-center gap-1">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-brand-light"></span>
                                         Linked to Goal
                                     </span>
                                 </div>

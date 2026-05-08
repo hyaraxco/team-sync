@@ -1,8 +1,8 @@
-import { defineStore } from 'pinia';
-import { axiosInstance } from '@/plugins/axios';
-import { handleError } from '@/helpers/errorHelper';
+import { defineStore } from "pinia";
+import { axiosInstance } from "@/plugins/axios";
+import { handleError } from "@/helpers/errorHelper";
 
-export const useOvertimeStore = defineStore('overtime', {
+export const useOvertimeStore = defineStore("overtime", {
     state: () => ({
         records: [],
         myRecords: [],
@@ -22,15 +22,15 @@ export const useOvertimeStore = defineStore('overtime', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('overtime', {
+                const response = await axiosInstance.get("overtime", {
                     params: {
                         page: params.page || 1,
                         per_page: params.per_page || 15,
-                        status: params.status || '',
-                        staff_member_id: params.staff_member_id || '',
-                        overtime_type: params.overtime_type || '',
-                        date_from: params.date_from || '',
-                        date_to: params.date_to || '',
+                        status: params.status || "",
+                        staff_member_id: params.staff_member_id || "",
+                        overtime_type: params.overtime_type || "",
+                        date_from: params.date_from || "",
+                        date_to: params.date_to || "",
                     },
                 });
                 const paginator = response.data.data;
@@ -47,7 +47,7 @@ export const useOvertimeStore = defineStore('overtime', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.post('overtime', payload);
+                const response = await axiosInstance.post("overtime", payload);
                 return response.data;
             } catch (error) {
                 this.error = handleError(error);
@@ -91,11 +91,11 @@ export const useOvertimeStore = defineStore('overtime', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('overtime/my-overtime', {
+                const response = await axiosInstance.get("overtime/my-overtime", {
                     params: {
                         page: params.page || 1,
                         per_page: params.per_page || 15,
-                        status: params.status || '',
+                        status: params.status || "",
                     },
                 });
                 const paginator = response.data.data;
@@ -112,7 +112,7 @@ export const useOvertimeStore = defineStore('overtime', {
             this.loading = true;
             this.error = null;
             try {
-                const response = await axiosInstance.get('overtime/summary');
+                const response = await axiosInstance.get("overtime/summary");
                 this.summary = response.data.data;
                 return response.data.data;
             } catch (error) {

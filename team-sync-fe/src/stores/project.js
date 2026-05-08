@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useProjectStore = defineStore("project", {
@@ -14,7 +14,7 @@ export const useProjectStore = defineStore("project", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         loadingSummary: false,
@@ -25,16 +25,16 @@ export const useProjectStore = defineStore("project", {
 
     actions: {
         async fetchProjects(params) {
-            this.loading = true
+            this.loading = true;
 
             try {
-                const response = await axiosInstance.get(`projects`, { params })
+                const response = await axiosInstance.get(`projects`, { params });
 
-                this.projects = response.data.data
+                this.projects = response.data.data;
             } catch (error) {
-                this.error = handleError(error)
+                this.error = handleError(error);
             } finally {
-                this.loading = false
+                this.loading = false;
             }
         },
 
@@ -42,7 +42,7 @@ export const useProjectStore = defineStore("project", {
             this.loading = true;
 
             try {
-                const response = await axiosInstance.get('/projects/all/paginated', { params });
+                const response = await axiosInstance.get("/projects/all/paginated", { params });
 
                 this.projects = response.data.data.data;
                 this.meta = response.data.data.meta;
@@ -99,7 +99,6 @@ export const useProjectStore = defineStore("project", {
             }
         },
 
-
         async createProject(payload) {
             this.loading = true;
 
@@ -107,17 +106,17 @@ export const useProjectStore = defineStore("project", {
                 const formData = new FormData();
 
                 Object.entries(payload).forEach(([key, value]) => {
-                    if (key === 'photo_url') return; // skip local preview URL
+                    if (key === "photo_url") return; // skip local preview URL
 
-                    if (key === 'teams' && Array.isArray(value)) {
-                        value.forEach((id) => formData.append('teams[]', id));
-                    } else if (value !== null && value !== undefined && value !== '') {
+                    if (key === "teams" && Array.isArray(value)) {
+                        value.forEach((id) => formData.append("teams[]", id));
+                    } else if (value !== null && value !== undefined && value !== "") {
                         formData.append(key, value);
                     }
                 });
 
-                const response = await axiosInstance.post('projects', formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                const response = await axiosInstance.post("projects", formData, {
+                    headers: { "Content-Type": "multipart/form-data" },
                 });
 
                 this.success = response.data.message;
@@ -133,20 +132,20 @@ export const useProjectStore = defineStore("project", {
 
             try {
                 const formData = new FormData();
-                formData.append('_method', 'PUT');
+                formData.append("_method", "PUT");
 
                 Object.entries(payload).forEach(([key, value]) => {
-                    if (key === 'photo_url') return; // skip local preview URL
+                    if (key === "photo_url") return; // skip local preview URL
 
-                    if (key === 'teams' && Array.isArray(value)) {
-                        value.forEach((teamId) => formData.append('teams[]', teamId));
-                    } else if (value !== null && value !== undefined && value !== '') {
+                    if (key === "teams" && Array.isArray(value)) {
+                        value.forEach((teamId) => formData.append("teams[]", teamId));
+                    } else if (value !== null && value !== undefined && value !== "") {
                         formData.append(key, value);
                     }
                 });
 
                 const response = await axiosInstance.post(`projects/${id}`, formData, {
-                    headers: { 'Content-Type': 'multipart/form-data' },
+                    headers: { "Content-Type": "multipart/form-data" },
                 });
 
                 this.success = response.data.message;
@@ -162,7 +161,7 @@ export const useProjectStore = defineStore("project", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('/projects/statistics');
+                const response = await axiosInstance.get("/projects/statistics");
 
                 this.statistics = response.data.data;
             } catch (error) {
@@ -171,6 +170,5 @@ export const useProjectStore = defineStore("project", {
                 this.loadingStatistics = false;
             }
         },
-
-    }
-})
+    },
+});

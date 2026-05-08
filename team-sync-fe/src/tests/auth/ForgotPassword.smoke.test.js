@@ -2,10 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    authStoreMock,
-    authStoreRefs,
-} = vi.hoisted(() => ({
+const { authStoreMock, authStoreRefs } = vi.hoisted(() => ({
     authStoreMock: {
         forgotPassword: vi.fn(),
     },
@@ -50,7 +47,7 @@ const factory = () =>
             stubs: {
                 RouterLink: {
                     props: ["to"],
-                    template: '<a><slot /></a>',
+                    template: "<a><slot /></a>",
                 },
             },
         },

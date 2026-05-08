@@ -57,17 +57,18 @@ const ModalWrapperStub = {
     `,
 };
 
-const factory = (props = {}) => mount(MeetingCreateModal, {
-    props: {
-        show: true,
-        ...props,
-    },
-    global: {
-        stubs: {
-            ModalWrapper: ModalWrapperStub,
+const factory = (props = {}) =>
+    mount(MeetingCreateModal, {
+        props: {
+            show: true,
+            ...props,
         },
-    },
-});
+        global: {
+            stubs: {
+                ModalWrapper: ModalWrapperStub,
+            },
+        },
+    });
 
 const flushAsync = async () => {
     await nextTick();

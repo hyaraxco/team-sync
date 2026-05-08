@@ -1,16 +1,16 @@
-import { setActivePinia, createPinia } from 'pinia';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { useHybridScheduleStore } from '@/stores/hybridSchedule';
-import { axiosInstance } from '@/plugins/axios';
+import { setActivePinia, createPinia } from "pinia";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { useHybridScheduleStore } from "@/stores/hybridSchedule";
+import { axiosInstance } from "@/plugins/axios";
 
-vi.mock('@/plugins/axios', () => ({
+vi.mock("@/plugins/axios", () => ({
     axiosInstance: {
         get: vi.fn(),
         post: vi.fn(),
     },
 }));
 
-describe('Hybrid Schedule Store', () => {
+describe("Hybrid Schedule Store", () => {
     let store;
 
     beforeEach(() => {
@@ -19,7 +19,7 @@ describe('Hybrid Schedule Store', () => {
         vi.clearAllMocks();
     });
 
-    it('fetchAllPaginated populates paginatedSchedules and meta', async () => {
+    it("fetchAllPaginated populates paginatedSchedules and meta", async () => {
         const paginator = {
             data: [{ id: 1, team_id: 2 }],
             current_page: 3,
@@ -27,15 +27,15 @@ describe('Hybrid Schedule Store', () => {
             per_page: 20,
             total: 150,
         };
-        const params = { page: 3, search: 'eng', row_per_page: 20 };
-        axiosInstance.get.mockResolvedValueOnce({ data: { data: paginator, message: 'ok' } });
+        const params = { page: 3, search: "eng", row_per_page: 20 };
+        axiosInstance.get.mockResolvedValueOnce({ data: { data: paginator, message: "ok" } });
 
         const result = await store.fetchAllPaginated(params);
 
-        expect(axiosInstance.get).toHaveBeenCalledWith('hybrid-schedules', {
+        expect(axiosInstance.get).toHaveBeenCalledWith("hybrid-schedules", {
             params,
         });
-        expect(result).toEqual({ data: paginator, message: 'ok' });
+        expect(result).toEqual({ data: paginator, message: "ok" });
         expect(store.paginatedSchedules).toEqual(paginator.data);
         expect(store.meta).toEqual({
             current_page: 3,
@@ -47,168 +47,168 @@ describe('Hybrid Schedule Store', () => {
         expect(store.error).toBe(null);
     });
 
-    it('fetchAllPaginated sets error and rethrows on failure', async () => {
+    it("fetchAllPaginated sets error and rethrows on failure", async () => {
         const mockError = {
             response: {
                 status: 500,
-                data: { message: 'Failed to fetch schedules' },
+                data: { message: "Failed to fetch schedules" },
             },
         };
         axiosInstance.get.mockRejectedValueOnce(mockError);
 
         await expect(store.fetchAllPaginated()).rejects.toEqual(mockError);
 
-        expect(store.error).toBe('Failed to fetch schedules');
+        expect(store.error).toBe("Failed to fetch schedules");
         expect(store.loading).toBe(false);
     });
 
-    it('fetchMySchedule stores schedule and returns response', async () => {
-        const payload = { id: 7, days: ['monday', 'wednesday'] };
-        const responseData = { data: payload, message: 'ok' };
+    it("fetchMySchedule stores schedule and returns response", async () => {
+        const payload = { id: 7, days: ["monday", "wednesday"] };
+        const responseData = { data: payload, message: "ok" };
         axiosInstance.get.mockResolvedValueOnce({ data: responseData });
 
         const result = await store.fetchMySchedule();
 
-        expect(axiosInstance.get).toHaveBeenCalledWith('my-hybrid-schedule');
+        expect(axiosInstance.get).toHaveBeenCalledWith("my-hybrid-schedule");
         expect(result).toEqual(responseData);
         expect(store.mySchedule).toEqual(payload);
         expect(store.loading).toBe(false);
     });
 
-    it('fetchMySchedule sets error and rethrows on failure', async () => {
+    it("fetchMySchedule sets error and rethrows on failure", async () => {
         const mockError = {
             response: {
                 status: 404,
-                data: { message: 'Schedule not found' },
+                data: { message: "Schedule not found" },
             },
         };
         axiosInstance.get.mockRejectedValueOnce(mockError);
 
         await expect(store.fetchMySchedule()).rejects.toEqual(mockError);
-        expect(store.error).toBe('Schedule not found');
+        expect(store.error).toBe("Schedule not found");
         expect(store.loading).toBe(false);
     });
 
-    it('fetchMyOverrides populates myOverrides and returns payload', async () => {
-        const overrides = [{ id: 1, date: '2026-05-01' }];
+    it("fetchMyOverrides populates myOverrides and returns payload", async () => {
+        const overrides = [{ id: 1, date: "2026-05-01" }];
         axiosInstance.get.mockResolvedValueOnce({ data: { data: overrides } });
 
         const result = await store.fetchMyOverrides();
 
-        expect(axiosInstance.get).toHaveBeenCalledWith('my-hybrid-overrides');
+        expect(axiosInstance.get).toHaveBeenCalledWith("my-hybrid-overrides");
         expect(result).toEqual(overrides);
         expect(store.myOverrides).toEqual(overrides);
         expect(store.loading).toBe(false);
     });
 
-    it('fetchMyOverrides sets error and does not throw on failure', async () => {
+    it("fetchMyOverrides sets error and does not throw on failure", async () => {
         const mockError = {
             response: {
                 status: 403,
-                data: { message: 'Forbidden overrides access' },
+                data: { message: "Forbidden overrides access" },
             },
         };
         axiosInstance.get.mockRejectedValueOnce(mockError);
 
         await expect(store.fetchMyOverrides()).resolves.toBeUndefined();
 
-        expect(store.error).toBe('Forbidden overrides access');
+        expect(store.error).toBe("Forbidden overrides access");
         expect(store.loading).toBe(false);
     });
 
-    it('createOverride posts payload, sets success, and returns data', async () => {
-        const payload = { date: '2026-05-03', type: 'wfo' };
+    it("createOverride posts payload, sets success, and returns data", async () => {
+        const payload = { date: "2026-05-03", type: "wfo" };
         const created = { id: 40, ...payload };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
-                message: 'Override created',
+                message: "Override created",
                 data: created,
             },
         });
 
         const result = await store.createOverride(payload);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('hybrid-schedule-overrides', payload);
+        expect(axiosInstance.post).toHaveBeenCalledWith("hybrid-schedule-overrides", payload);
         expect(result).toEqual(created);
-        expect(store.success).toBe('Override created');
+        expect(store.success).toBe("Override created");
         expect(store.loading).toBe(false);
     });
 
-    it('createOverride sets error and rethrows on failure', async () => {
+    it("createOverride sets error and rethrows on failure", async () => {
         const mockError = {
             response: {
                 status: 422,
-                data: { errors: { date: ['Date is invalid'] } },
+                data: { errors: { date: ["Date is invalid"] } },
             },
         };
         axiosInstance.post.mockRejectedValueOnce(mockError);
 
         await expect(store.createOverride({})).rejects.toEqual(mockError);
-        expect(store.error).toEqual({ date: ['Date is invalid'] });
+        expect(store.error).toEqual({ date: ["Date is invalid"] });
         expect(store.loading).toBe(false);
     });
 
-    it('approveOverride posts approve endpoint, sets success, and returns data', async () => {
-        const approved = { id: 9, status: 'approved' };
+    it("approveOverride posts approve endpoint, sets success, and returns data", async () => {
+        const approved = { id: 9, status: "approved" };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
-                message: 'Override approved',
+                message: "Override approved",
                 data: approved,
             },
         });
 
         const result = await store.approveOverride(9);
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('hybrid-schedule-overrides/9/approve');
+        expect(axiosInstance.post).toHaveBeenCalledWith("hybrid-schedule-overrides/9/approve");
         expect(result).toEqual(approved);
-        expect(store.success).toBe('Override approved');
+        expect(store.success).toBe("Override approved");
         expect(store.loading).toBe(false);
     });
 
-    it('approveOverride sets error and rethrows on failure', async () => {
+    it("approveOverride sets error and rethrows on failure", async () => {
         const mockError = {
             response: {
                 status: 400,
-                data: { message: 'Cannot approve override' },
+                data: { message: "Cannot approve override" },
             },
         };
         axiosInstance.post.mockRejectedValueOnce(mockError);
 
         await expect(store.approveOverride(1)).rejects.toEqual(mockError);
-        expect(store.error).toBe('Cannot approve override');
+        expect(store.error).toBe("Cannot approve override");
         expect(store.loading).toBe(false);
     });
 
-    it('rejectOverride posts review notes, sets success, and returns data', async () => {
-        const rejected = { id: 6, status: 'rejected' };
+    it("rejectOverride posts review notes, sets success, and returns data", async () => {
+        const rejected = { id: 6, status: "rejected" };
         axiosInstance.post.mockResolvedValueOnce({
             data: {
-                message: 'Override rejected',
+                message: "Override rejected",
                 data: rejected,
             },
         });
 
-        const result = await store.rejectOverride(6, 'Insufficient reason');
+        const result = await store.rejectOverride(6, "Insufficient reason");
 
-        expect(axiosInstance.post).toHaveBeenCalledWith('hybrid-schedule-overrides/6/reject', {
-            review_notes: 'Insufficient reason',
+        expect(axiosInstance.post).toHaveBeenCalledWith("hybrid-schedule-overrides/6/reject", {
+            review_notes: "Insufficient reason",
         });
         expect(result).toEqual(rejected);
-        expect(store.success).toBe('Override rejected');
+        expect(store.success).toBe("Override rejected");
         expect(store.loading).toBe(false);
     });
 
-    it('rejectOverride sets error and rethrows on failure', async () => {
+    it("rejectOverride sets error and rethrows on failure", async () => {
         const mockError = {
             response: {
                 status: 404,
-                data: { message: 'Override not found' },
+                data: { message: "Override not found" },
             },
         };
         axiosInstance.post.mockRejectedValueOnce(mockError);
 
-        await expect(store.rejectOverride(999, 'note')).rejects.toEqual(mockError);
-        expect(store.error).toBe('Override not found');
+        await expect(store.rejectOverride(999, "note")).rejects.toEqual(mockError);
+        expect(store.error).toBe("Override not found");
         expect(store.loading).toBe(false);
     });
 });

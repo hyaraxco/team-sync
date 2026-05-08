@@ -2,13 +2,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    routeState,
-    routerBackMock,
-    reviewStoreMock,
-    reviewStoreRefs,
-    authStoreMock,
-} = vi.hoisted(() => ({
+const { routeState, routerBackMock, reviewStoreMock, reviewStoreRefs, authStoreMock } = vi.hoisted(() => ({
     routeState: {
         params: {
             id: "55",
@@ -175,9 +169,7 @@ describe("ReviewDetail smoke", () => {
             responses: [],
         };
 
-        reviewStoreMock.fetchReviewById.mockResolvedValue(
-            reviewStoreRefs.currentReview.value,
-        );
+        reviewStoreMock.fetchReviewById.mockResolvedValue(reviewStoreRefs.currentReview.value);
         reviewStoreMock.fetchActiveSections.mockResolvedValue(undefined);
         reviewStoreMock.fetchCalibrationContext.mockResolvedValue(undefined);
         reviewStoreMock.fetchValidateReadiness.mockResolvedValue(undefined);

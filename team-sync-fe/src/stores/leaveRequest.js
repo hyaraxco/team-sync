@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import { axiosInstance } from '@/plugins/axios';
+import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
 
 export const useLeaveRequestStore = defineStore("leaveRequest", {
@@ -14,7 +14,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             current_page: 1,
             last_page: 1,
             per_page: 10,
-            total: 0
+            total: 0,
         },
         loading: false,
         error: null,
@@ -27,7 +27,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.post('leave-requests', payload);
+                const response = await axiosInstance.post("leave-requests", payload);
 
                 this.success = response.data.message;
                 return response.data.data;
@@ -44,7 +44,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('my-leave-requests');
+                const response = await axiosInstance.get("my-leave-requests");
 
                 this.myLeaveRequests = response.data.data;
                 return response.data.data;
@@ -61,7 +61,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('my-leave-balances');
+                const response = await axiosInstance.get("my-leave-balances");
                 this.myLeaveBalances = response.data.data;
                 return response.data.data;
             } catch (error) {
@@ -77,7 +77,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('my-upcoming-cuti-bersama');
+                const response = await axiosInstance.get("my-upcoming-cuti-bersama");
                 this.upcomingCutiBersama = response.data.data;
                 return response.data.data;
             } catch (error) {
@@ -93,7 +93,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('leave-requests/all/paginated', { params });
+                const response = await axiosInstance.get("leave-requests/all/paginated", { params });
                 const paginator = response.data.data;
                 this.leaveRequests = paginator.data;
                 this.meta = paginator.meta;
@@ -111,8 +111,8 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.get('leave-requests/all/calendar', {
-                    params: { month }
+                const response = await axiosInstance.get("leave-requests/all/calendar", {
+                    params: { month },
                 });
                 this.calendarData = response.data.data;
                 return response.data.data;
@@ -163,7 +163,7 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
             this.error = null;
 
             try {
-                const response = await axiosInstance.post('leave-requests/bulk-action', {
+                const response = await axiosInstance.post("leave-requests/bulk-action", {
                     ids,
                     action,
                 });
@@ -184,12 +184,12 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
 
             try {
                 const formData = new FormData();
-                formData.append('proof_file', file);
-                
+                formData.append("proof_file", file);
+
                 const response = await axiosInstance.post(`leave-requests/${id}/proof`, formData, {
                     headers: {
-                        'Content-Type': 'multipart/form-data'
-                    }
+                        "Content-Type": "multipart/form-data",
+                    },
                 });
 
                 this.success = response.data.message;
@@ -218,5 +218,5 @@ export const useLeaveRequestStore = defineStore("leaveRequest", {
                 this.loading = false;
             }
         },
-    }
-})
+    },
+});

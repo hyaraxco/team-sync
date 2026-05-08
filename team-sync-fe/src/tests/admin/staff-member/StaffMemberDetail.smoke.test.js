@@ -2,48 +2,42 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    routeState,
-    routerPushMock,
-    toastSuccessMock,
-    toastErrorMock,
-    staffMemberStoreMock,
-    staffMemberStoreRefs,
-} = vi.hoisted(() => ({
-    routeState: {
-        params: {
-            id: "12",
-        },
-    },
-    routerPushMock: vi.fn(),
-    toastSuccessMock: vi.fn(),
-    toastErrorMock: vi.fn(),
-    staffMemberStoreMock: {
-        fetchStaffMember: vi.fn(),
-        fetchPerformanceStatistics: vi.fn(),
-        deleteStaffMember: vi.fn(),
-        error: null,
-    },
-    staffMemberStoreRefs: {
-        loading: {
-            __v_isRef: true,
-            value: false,
-        },
-        performanceStatistics: {
-            __v_isRef: true,
-            value: {
-                tasks_completed: 8,
-                attendance_rate: 92,
-                projects_count: 3,
-                performance_score: 88,
+const { routeState, routerPushMock, toastSuccessMock, toastErrorMock, staffMemberStoreMock, staffMemberStoreRefs } =
+    vi.hoisted(() => ({
+        routeState: {
+            params: {
+                id: "12",
             },
         },
-        success: {
-            __v_isRef: true,
-            value: null,
+        routerPushMock: vi.fn(),
+        toastSuccessMock: vi.fn(),
+        toastErrorMock: vi.fn(),
+        staffMemberStoreMock: {
+            fetchStaffMember: vi.fn(),
+            fetchPerformanceStatistics: vi.fn(),
+            deleteStaffMember: vi.fn(),
+            error: null,
         },
-    },
-}));
+        staffMemberStoreRefs: {
+            loading: {
+                __v_isRef: true,
+                value: false,
+            },
+            performanceStatistics: {
+                __v_isRef: true,
+                value: {
+                    tasks_completed: 8,
+                    attendance_rate: 92,
+                    projects_count: 3,
+                    performance_score: 88,
+                },
+            },
+            success: {
+                __v_isRef: true,
+                value: null,
+            },
+        },
+    }));
 
 vi.mock("@/stores/staffMember", () => ({
     useStaffMemberStore: () => staffMemberStoreMock,

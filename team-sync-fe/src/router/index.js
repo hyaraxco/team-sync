@@ -25,193 +25,193 @@ import performanceRoutes from "./performance";
 import { hasRoutePermissionAccess } from "./permissionAccess";
 
 export const appRoutes = [
-  {
-    path: "/",
-    redirect: "/admin/dashboard",
-  },
-  {
-    path: "/admin",
-    component: AdminLayout,
-    meta: {
-      requiresAuth: true,
+    {
+        path: "/",
+        redirect: "/admin/dashboard",
     },
-    children: [
-      {
-        path: "dashboard",
-        name: "admin.dashboard",
-        component: AdminDashboard,
+    {
+        path: "/admin",
+        component: AdminLayout,
         meta: {
-          requiredPermission: "dashboard-menu",
+            requiresAuth: true,
         },
-      },
-      {
-        path: "settings",
-        name: "admin.settings",
-        component: AdminSettings,
-        meta: {
-          requiredAnyPermissions: ["settings-hr-manage", "settings-finance-manage", "settings-system-manage"],
-        },
-      },
-      {
-        path: "notifications",
-        name: "admin.notifications",
-        component: () => import("@/views/admin/Notifications.vue"),
-        meta: {
-          allowAuthenticated: true,
-        },
-      },
-      ...teamRoutes,
-      ...meetingRoutes,
-      ...staffMemberRoutes,
-      ...projectRoutes,
-      ...attendanceRoutes,
-      ...payrollRoutes,
-      ...analyticsRoutes,
-      ...performanceRoutes,
-      {
-        path: "my-profile",
-        name: "staffMember.profile",
-        component: StaffMemberProfile,
-        meta: {
-          requiredPermission: "profile-menu",
-        },
-      },
-      {
-        path: "my-profile/edit",
-        name: "staffMember.profile.edit",
-        component: () => import("@/views/staff-member/StaffMemberProfileEdit.vue"),
-        meta: {
-          requiredPermission: "profile-menu",
-        },
-      },
-      {
-        path: "my-team",
-        name: "staffMember.team",
-        component: StaffMemberTeam,
-        meta: {
-          requiredPermission: "team-view",
-        },
-      },
-      {
-        path: "upgrade-plan",
-        name: "admin.upgrade-plan",
-        component: () => import("@/views/admin/UpgradePlan.vue"),
-        meta: {
-          allowAuthenticated: true,
-        },
-      },
-    ],
-  },
-  {
-    path: "/admin/staff-members/create",
-    component: StaffMemberCreateLayout,
-    meta: {
-      requiresAuth: true,
-      requiredPermission: "staff-member-create",
+        children: [
+            {
+                path: "dashboard",
+                name: "admin.dashboard",
+                component: AdminDashboard,
+                meta: {
+                    requiredPermission: "dashboard-menu",
+                },
+            },
+            {
+                path: "settings",
+                name: "admin.settings",
+                component: AdminSettings,
+                meta: {
+                    requiredAnyPermissions: ["settings-hr-manage", "settings-finance-manage", "settings-system-manage"],
+                },
+            },
+            {
+                path: "notifications",
+                name: "admin.notifications",
+                component: () => import("@/views/admin/Notifications.vue"),
+                meta: {
+                    allowAuthenticated: true,
+                },
+            },
+            ...teamRoutes,
+            ...meetingRoutes,
+            ...staffMemberRoutes,
+            ...projectRoutes,
+            ...attendanceRoutes,
+            ...payrollRoutes,
+            ...analyticsRoutes,
+            ...performanceRoutes,
+            {
+                path: "my-profile",
+                name: "staffMember.profile",
+                component: StaffMemberProfile,
+                meta: {
+                    requiredPermission: "profile-menu",
+                },
+            },
+            {
+                path: "my-profile/edit",
+                name: "staffMember.profile.edit",
+                component: () => import("@/views/staff-member/StaffMemberProfileEdit.vue"),
+                meta: {
+                    requiredPermission: "profile-menu",
+                },
+            },
+            {
+                path: "my-team",
+                name: "staffMember.team",
+                component: StaffMemberTeam,
+                meta: {
+                    requiredPermission: "team-view",
+                },
+            },
+            {
+                path: "upgrade-plan",
+                name: "admin.upgrade-plan",
+                component: () => import("@/views/admin/UpgradePlan.vue"),
+                meta: {
+                    allowAuthenticated: true,
+                },
+            },
+        ],
     },
-    children: [
-      {
-        path: "",
-        name: "admin.staffMembers.create",
-        component: StaffMemberCreate,
-      },
-    ],
-  },
-  {
-    path: "/admin/staff-members/:id/edit",
-    component: StaffMemberCreateLayout,
-    meta: {
-      requiresAuth: true,
-      requiredPermission: "staff-member-edit",
+    {
+        path: "/admin/staff-members/create",
+        component: StaffMemberCreateLayout,
+        meta: {
+            requiresAuth: true,
+            requiredPermission: "staff-member-create",
+        },
+        children: [
+            {
+                path: "",
+                name: "admin.staffMembers.create",
+                component: StaffMemberCreate,
+            },
+        ],
     },
-    children: [
-      {
-        path: "",
-        name: "admin.staffMembers.edit",
-        component: StaffMemberEdit,
-      },
-    ],
-  },
-  {
-    path: "/admin/staff-members/:id",
-    component: AdminLayout,
-    meta: {
-      requiresAuth: true,
-      requiredPermission: "staff-member-list",
+    {
+        path: "/admin/staff-members/:id/edit",
+        component: StaffMemberCreateLayout,
+        meta: {
+            requiresAuth: true,
+            requiredPermission: "staff-member-edit",
+        },
+        children: [
+            {
+                path: "",
+                name: "admin.staffMembers.edit",
+                component: StaffMemberEdit,
+            },
+        ],
     },
-    children: [
-      {
-        path: "",
-        name: "admin.staffMembers.detail",
-        component: StaffMemberDetail,
-      },
-    ],
-  },
-  {
-    path: "/setup",
-    name: "setup",
-    component: () => import("@/views/setup/SetupWizard.vue"),
-  },
-  {
-    path: "/auth",
-    component: AuthLayout,
-    children: [
-      {
-        path: "login",
-        name: "login",
-        component: Login,
-      },
-      {
-        path: "forgot-password",
-        name: "forgot-password",
-        component: ForgotPassword,
-      },
-      {
-        path: "reset-password",
-        name: "reset-password",
-        component: ResetPassword,
-      },
-      {
-        path: "verify-email",
-        name: "verify-email",
-        component: VerifyEmailResult,
-      },
-    ],
-  },
-  {
-    path: "/:pathMatch(.*)*",
-    name: "not-found",
-    component: () => import("@/views/NotFound.vue"),
-  },
+    {
+        path: "/admin/staff-members/:id",
+        component: AdminLayout,
+        meta: {
+            requiresAuth: true,
+            requiredPermission: "staff-member-list",
+        },
+        children: [
+            {
+                path: "",
+                name: "admin.staffMembers.detail",
+                component: StaffMemberDetail,
+            },
+        ],
+    },
+    {
+        path: "/setup",
+        name: "setup",
+        component: () => import("@/views/setup/SetupWizard.vue"),
+    },
+    {
+        path: "/auth",
+        component: AuthLayout,
+        children: [
+            {
+                path: "login",
+                name: "login",
+                component: Login,
+            },
+            {
+                path: "forgot-password",
+                name: "forgot-password",
+                component: ForgotPassword,
+            },
+            {
+                path: "reset-password",
+                name: "reset-password",
+                component: ResetPassword,
+            },
+            {
+                path: "verify-email",
+                name: "verify-email",
+                component: VerifyEmailResult,
+            },
+        ],
+    },
+    {
+        path: "/:pathMatch(.*)*",
+        name: "not-found",
+        component: () => import("@/views/NotFound.vue"),
+    },
 ];
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  scrollBehavior(to, from, savedPosition) {
-    // Scroll the main content area to top
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const mainContent = document.querySelector(".main-content");
-        if (mainContent) {
-          mainContent.scrollTop = 0;
-        }
-        resolve({ top: 0, left: 0 });
-      }, 100);
-    });
-  },
-  routes: appRoutes,
+    history: createWebHistory(import.meta.env.BASE_URL),
+    scrollBehavior(to, from, savedPosition) {
+        // Scroll the main content area to top
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const mainContent = document.querySelector(".main-content");
+                if (mainContent) {
+                    mainContent.scrollTop = 0;
+                }
+                resolve({ top: 0, left: 0 });
+            }, 100);
+        });
+    },
+    routes: appRoutes,
 });
 
 export const registerAuthGuard = (targetRouter) => {
-  let setupChecked = false;
-  let needsSetup = false;
+    let setupChecked = false;
+    let needsSetup = false;
 
-  targetRouter.beforeEach(async (to, from, next) => {
-    const authStore = useAuthStore();
+    targetRouter.beforeEach(async (to, from, next) => {
+        const authStore = useAuthStore();
 
-    // Setup wizard guard — disabled for cloud-hosted development
-    // Will be re-enabled only for self-hosted (Tier 3) deployment mode
-    /*
+        // Setup wizard guard — disabled for cloud-hosted development
+        // Will be re-enabled only for self-hosted (Tier 3) deployment mode
+        /*
     if (!setupChecked && to.name !== "setup") {
       setupChecked = true;
       try {
@@ -229,31 +229,31 @@ export const registerAuthGuard = (targetRouter) => {
     }
     */
 
-    if (to.meta.requiresAuth) {
-      if (authStore.token) {
-        try {
-          if (!authStore.user) {
-            await authStore.checkAuth();
-          }
+        if (to.meta.requiresAuth) {
+            if (authStore.token) {
+                try {
+                    if (!authStore.user) {
+                        await authStore.checkAuth();
+                    }
 
-          if (!hasRoutePermissionAccess(authStore.user?.permissions, to.meta)) {
+                    if (!hasRoutePermissionAccess(authStore.user?.permissions, to.meta)) {
+                        next({ name: "admin.dashboard" });
+                        return;
+                    }
+
+                    next();
+                } catch (error) {
+                    next({ name: "login" });
+                }
+            } else {
+                next({ name: "login" });
+            }
+        } else if (to.meta.requiresUnauth && authStore.token) {
             next({ name: "admin.dashboard" });
-            return;
-          }
-
-          next();
-        } catch (error) {
-          next({ name: "login" });
+        } else {
+            next();
         }
-      } else {
-        next({ name: "login" });
-      }
-    } else if (to.meta.requiresUnauth && authStore.token) {
-      next({ name: "admin.dashboard" });
-    } else {
-      next();
-    }
-  });
+    });
 };
 
 registerAuthGuard(router);

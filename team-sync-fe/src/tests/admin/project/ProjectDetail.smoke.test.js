@@ -2,28 +2,22 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
 
-const {
-    routeState,
-    projectStoreMock,
-    routerPushMock,
-    formatDateMock,
-    calculateDurationMock,
-    formatRupiahMock,
-} = vi.hoisted(() => ({
-    routeState: {
-        params: {
-            id: "81",
+const { routeState, projectStoreMock, routerPushMock, formatDateMock, calculateDurationMock, formatRupiahMock } =
+    vi.hoisted(() => ({
+        routeState: {
+            params: {
+                id: "81",
+            },
         },
-    },
-    projectStoreMock: {
-        fetchProject: vi.fn(),
-        fetchProjectSquadSummary: vi.fn(),
-    },
-    routerPushMock: vi.fn(),
-    formatDateMock: vi.fn((value) => value || "N/A"),
-    calculateDurationMock: vi.fn(() => "4 months"),
-    formatRupiahMock: vi.fn((value) => `Rp ${value}`),
-}));
+        projectStoreMock: {
+            fetchProject: vi.fn(),
+            fetchProjectSquadSummary: vi.fn(),
+        },
+        routerPushMock: vi.fn(),
+        formatDateMock: vi.fn((value) => value || "N/A"),
+        calculateDurationMock: vi.fn(() => "4 months"),
+        formatRupiahMock: vi.fn((value) => `Rp ${value}`),
+    }));
 
 vi.mock("@/stores/project", () => ({
     useProjectStore: () => projectStoreMock,
@@ -78,8 +72,7 @@ const factory = () =>
                 },
                 AnimatedValue: {
                     props: ["value", "suffix"],
-                    template:
-                        '<span class="animated-value-stub">{{ value }}{{ suffix || "" }}</span>',
+                    template: '<span class="animated-value-stub">{{ value }}{{ suffix || "" }}</span>',
                 },
                 RouterLink: {
                     props: ["to"],
@@ -155,9 +148,7 @@ describe("ProjectDetail smoke", () => {
         await flushAsync();
 
         expect(projectStoreMock.fetchProject).toHaveBeenCalledWith("81");
-        expect(projectStoreMock.fetchProjectSquadSummary).toHaveBeenCalledWith(
-            "81",
-        );
+        expect(projectStoreMock.fetchProjectSquadSummary).toHaveBeenCalledWith("81");
     });
 
     it("handles profile link interaction", async () => {

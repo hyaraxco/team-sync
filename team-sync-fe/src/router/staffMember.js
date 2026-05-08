@@ -3,19 +3,19 @@ import StaffMemberSuccess from "@/views/admin/staff-member/StaffMemberSuccess.vu
 
 export default [
     {
-        path: 'staff-members',
-        name: 'admin.staffMembers',
+        path: "staff-members",
+        name: "admin.staffMembers",
         component: StaffMemberList,
         meta: {
-            requiredPermission: 'staff-member-menu',
+            requiredPermission: "staff-member-menu",
         },
     },
     {
-        path: 'staff-members/success',
-        name: 'admin.staffMembers.success',
+        path: "staff-members/success",
+        name: "admin.staffMembers.success",
         component: StaffMemberSuccess,
         meta: {
-            requiredPermission: 'staff-member-create',
+            requiredPermission: "staff-member-create",
         },
-    }
+    },
 ];
