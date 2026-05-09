@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
 use App\Policies\ProjectTaskPolicy;
+use App\Services\ProjectMembershipService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -42,7 +43,7 @@ class ProjectTaskPolicyTest extends TestCase
     {
         parent::setUp();
 
-        $this->policy = new ProjectTaskPolicy;
+        $this->policy = new ProjectTaskPolicy(new ProjectMembershipService);
 
         // Create permissions
         $permissions = [

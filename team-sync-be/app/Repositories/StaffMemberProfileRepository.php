@@ -674,4 +674,16 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
 
         return $activeMembership->team;
     }
+
+    public function emailExists(string $email): bool
+    {
+        return \App\Models\User::query()->where('email', $email)->exists();
+    }
+
+    public function identityNumberExists(string $identityNumber): bool
+    {
+        return StaffMemberProfile::query()
+            ->where('identity_number_hash', \App\Support\SensitiveData::hash($identityNumber))
+            ->exists();
+    }
 }

@@ -11,6 +11,10 @@ interface ProjectRepositoryInterface
         bool $execute
     );
 
+    public function findById(
+        string $id
+    );
+
     public function getAllPaginated(
         ?string $search,
         ?string $status,

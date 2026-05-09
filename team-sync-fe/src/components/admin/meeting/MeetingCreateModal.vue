@@ -97,7 +97,6 @@ const handleSubmit = async () => {
         emit("created");
     } catch (error) {
         toast.error("Error", "Failed to schedule meeting.");
-        console.error("Error scheduling meeting:", error);
     } finally {
         isSubmitting.value = false;
     }

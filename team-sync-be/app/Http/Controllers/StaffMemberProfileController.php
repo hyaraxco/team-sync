@@ -14,8 +14,6 @@ use App\Http\Resources\TeamMemberResource;
 use App\Http\Resources\TeamResource;
 use App\Interfaces\StaffMemberProfileRepositoryInterface;
 use App\Models\StaffMemberProfile;
-use App\Models\User;
-use App\Support\SensitiveData;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -130,7 +128,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         $errors = [];
 
         if (! empty($payload['email'])) {
-            $emailExists = User::query()->where('email', $payload['email'])->exists();
+            $emailExists = $this->staffMemberProfileRepository->emailExists($payload['email']);
 
             if ($emailExists) {
                 $errors['email'] = ['The Email has already been taken.'];
@@ -138,9 +136,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         }
 
         if (! empty($payload['identity_number'])) {
-            $identityExists = StaffMemberProfile::query()
-                ->where('identity_number_hash', SensitiveData::hash($payload['identity_number']))
-                ->exists();
+            $identityExists = $this->staffMemberProfileRepository->identityNumberExists($payload['identity_number']);
 
             if ($identityExists) {
                 $errors['identity_number'] = ['The Identity Number has already been taken.'];

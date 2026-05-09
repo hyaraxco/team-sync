@@ -6,6 +6,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\ProjectTaskAttachmentStoreRequest;
 use App\Http\Requests\ProjectTaskCommentStoreRequest;
 use App\Http\Requests\ProjectTaskCommentUpdateRequest;
+use App\Http\Requests\ProjectTask\ProjectTaskListRequest;
 use App\Http\Requests\ProjectTaskStoreRequest;
 use App\Http\Requests\ProjectTaskUpdateRequest;
 use App\Http\Resources\PaginateResource;
@@ -15,8 +16,6 @@ use App\Http\Resources\ProjectTaskResource;
 use App\Http\Resources\ProjectTaskStatusLogResource;
 use App\Interfaces\ProjectTaskRepositoryInterface;
 use App\Models\ProjectTask;
-use App\Models\ProjectTaskAttachment;
-use App\Models\ProjectTaskComment;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -69,19 +68,15 @@ class ProjectTaskController extends Controller implements HasMiddleware
         }
     }
 
-    public function getAllPaginated(Request $request)
+    public function getAllPaginated(ProjectTaskListRequest $request)
     {
-        $request = $request->validate([
-            'search' => 'nullable|string',
-            'project_id' => 'nullable|integer',
-            'row_per_page' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
         try {
             $tasks = $this->projectTaskRepository->getAllPaginated(
-                $request['search'] ?? null,
-                $request['project_id'] ?? null,
-                $request['row_per_page']
+                $validated['search'] ?? null,
+                $validated['project_id'] ?? null,
+                $validated['row_per_page']
             );
 
             return ResponseHelper::jsonResponse(true, 'Tasks Retrieved Successfully', PaginateResource::make($tasks, ProjectTaskResource::class), 200);
@@ -275,7 +270,7 @@ class ProjectTaskController extends Controller implements HasMiddleware
                 }
             }
 
-            $comment = ProjectTaskComment::where('project_task_id', $task->id)->findOrFail($commentId);
+            $comment = $this->projectTaskRepository->findCommentById($task->id, $commentId);
 
             // Ownership check: staff can only edit their own comments
             if (! $isReviewer) {
@@ -314,7 +309,7 @@ class ProjectTaskController extends Controller implements HasMiddleware
                 }
             }
 
-            $comment = ProjectTaskComment::where('project_task_id', $task->id)->findOrFail($commentId);
+            $comment = $this->projectTaskRepository->findCommentById($task->id, $commentId);
 
             // Ownership check: staff can only delete their own comments
             if (! $isReviewer) {
@@ -402,7 +397,7 @@ class ProjectTaskController extends Controller implements HasMiddleware
     {
         try {
             $task = ProjectTask::with('project')->findOrFail($id);
-            $attachment = ProjectTaskAttachment::where('project_task_id', $task->id)->findOrFail($attachmentId);
+            $attachment = $this->projectTaskRepository->findAttachmentById($task->id, $attachmentId);
 
             // Ownership check: staff can only delete their own attachments
             $user = Auth::user();

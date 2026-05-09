@@ -501,7 +501,7 @@ class PayrollController extends Controller implements HasMiddleware
     {
         try {
             // Verify payroll exists
-            $payroll = Payroll::findOrFail($id);
+            $payroll = $this->payrollRepository->findById($id);
 
             $this->activityLogger->log(
                 $payroll->id,
@@ -534,14 +534,7 @@ class PayrollController extends Controller implements HasMiddleware
         $zipPath = null;
 
         try {
-            $payroll = Payroll::query()
-                ->with([
-                    'payrollDetails.staffMember.user',
-                    'payrollDetails.staffMember.jobInformation.team',
-                    'payrollDetails.appliedAdjustments',
-                    'payrollSettingVersion',
-                ])
-                ->findOrFail($id);
+            $payroll = $this->payrollRepository->findByIdWithDetails($id);
 
             if ($payroll->payrollDetails->isEmpty()) {
                 return ResponseHelper::jsonResponse(false, 'Payroll Details Not Found', null, 404);

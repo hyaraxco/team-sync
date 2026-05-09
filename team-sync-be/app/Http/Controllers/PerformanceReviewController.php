@@ -55,14 +55,14 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
     public function getMyReviews(Request $request)
     {
-        $reviews = $this->repository->getReviewsForEmployee(Auth::user()->staffMemberProfile?->id, $request->all());
+        $reviews = $this->repository->getReviewsForEmployee(Auth::user()->staffMemberProfile?->id, $request->only(['status', 'cycle_id']));
 
         return ResponseHelper::jsonResponse(true, 'My reviews retrieved successfully', $reviews);
     }
 
     public function getTeamReviews(Request $request)
     {
-        $reviews = $this->repository->getReviewsForManager(Auth::user()->staffMemberProfile?->id, $request->all());
+        $reviews = $this->repository->getReviewsForManager(Auth::user()->staffMemberProfile?->id, $request->only(['status', 'cycle_id']));
 
         return ResponseHelper::jsonResponse(true, 'Team reviews retrieved successfully', $reviews);
     }
@@ -132,7 +132,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
         // Notify HR users that the review is ready for calibration
         $review->load(['cycle', 'staffMember.user']);
-        $hrUsers = User::role('hr')->get();
+        $hrUsers = $this->repository->getHrUsers();
         $managerName = Auth::user()->name ?? 'Manager';
         foreach ($hrUsers as $hrUser) {
             $hrUser->notify(new ReviewSubmittedForCalibration(
@@ -148,7 +148,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
 
     public function getPendingCalibration(Request $request)
     {
-        $reviews = $this->repository->getReviewsPendingCalibration($request->all());
+        $reviews = $this->repository->getReviewsPendingCalibration($request->only(['status', 'cycle_id']));
 
         return ResponseHelper::jsonResponse(true, 'Pending calibration reviews retrieved successfully', $reviews);
     }
@@ -234,20 +234,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
             }
 
             // C3/C4 Check: Does employee have goals?
-            $goals = PerformanceGoal::where('staff_member_id', $review->staff_member_id)
-                ->where(function ($q) use ($review, $cycle) {
-                    $q->where('linked_review_id', $review->id)
-                        ->orWhere(function ($dateQ) use ($cycle) {
-                            $dateQ->whereBetween('start_date', [
-                                $cycle->start_date,
-                                $cycle->end_date,
-                            ])->orWhereBetween('created_at', [
-                                $cycle->start_date.' 00:00:00',
-                                $cycle->end_date.' 23:59:59',
-                            ]);
-                        });
-                })
-                ->get(['id', 'status', 'completed_at', 'due_date']);
+            $goals = $this->repository->getGoalsForReview($review->staff_member_id, $review->id, $cycle);
 
             $goalCount = $goals->count();
             $goalsCompleted = $goals->where('status', 'completed')->count();
@@ -264,13 +251,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
             }
 
             // C5 Check: Does employee have feedback?
-            $feedbackCount = PerformanceFeedback::where('staff_member_id', $review->staff_member_id)
-                ->where('feedback_type', 'positive')
-                ->whereBetween('created_at', [
-                    $cycle->start_date.' 00:00:00',
-                    $cycle->end_date.' 23:59:59',
-                ])
-                ->count();
+            $feedbackCount = $this->repository->getPositiveFeedbackCount($review->staff_member_id, $cycle);
 
             if ($feedbackCount === 0) {
                 $warnings[] = [

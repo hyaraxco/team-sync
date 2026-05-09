@@ -27,7 +27,6 @@ export const useOptionStore = defineStore("option", {
                 this.departments = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch departments:", error);
             } finally {
                 this.loading = false;
             }
@@ -41,7 +40,6 @@ export const useOptionStore = defineStore("option", {
                 this.employmentTypes = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch employment types:", error);
             } finally {
                 this.loading = false;
             }
@@ -55,7 +53,6 @@ export const useOptionStore = defineStore("option", {
                 this.jobStatuses = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch job statuses:", error);
             } finally {
                 this.loading = false;
             }
@@ -69,7 +66,6 @@ export const useOptionStore = defineStore("option", {
                 this.leaveTypes = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch leave types:", error);
             } finally {
                 this.loading = false;
             }
@@ -83,7 +79,6 @@ export const useOptionStore = defineStore("option", {
                 this.workLocations = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch work locations:", error);
             } finally {
                 this.loading = false;
             }
@@ -97,7 +92,6 @@ export const useOptionStore = defineStore("option", {
                 this.religions = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch religions:", error);
             } finally {
                 this.loading = false;
             }
@@ -111,7 +105,6 @@ export const useOptionStore = defineStore("option", {
                 this.maritalStatuses = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch marital statuses:", error);
             } finally {
                 this.loading = false;
             }
@@ -125,7 +118,6 @@ export const useOptionStore = defineStore("option", {
                 this.bloodTypes = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch blood types:", error);
             } finally {
                 this.loading = false;
             }
@@ -139,7 +131,6 @@ export const useOptionStore = defineStore("option", {
                 this.ptkpStatuses = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch PTKP statuses:", error);
             } finally {
                 this.loading = false;
             }
@@ -153,7 +144,6 @@ export const useOptionStore = defineStore("option", {
                 this.projectTaskTemplates = response.data.data;
             } catch (error) {
                 this.error = handleError(error);
-                console.error("Failed to fetch project task templates:", error);
             } finally {
                 this.loading = false;
             }

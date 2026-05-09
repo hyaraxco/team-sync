@@ -132,6 +132,23 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->findOrFail($id);
     }
 
+    public function findById(string $id): Payroll
+    {
+        return Payroll::findOrFail($id);
+    }
+
+    public function findByIdWithDetails(string $id): Payroll
+    {
+        return Payroll::query()
+            ->with([
+                'payrollDetails.staffMember.user',
+                'payrollDetails.staffMember.jobInformation.team',
+                'payrollDetails.appliedAdjustments',
+                'payrollSettingVersion',
+            ])
+            ->findOrFail($id);
+    }
+
     public function getPayrollDetailsPaginated(string $payrollId, int $perPage = 50): LengthAwarePaginator
     {
         // Verify payroll exists

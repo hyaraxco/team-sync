@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\Team\TeamAddMemberRequest;
+use App\Http\Requests\Team\TeamListRequest;
 use App\Http\Requests\Team\TeamRemoveMemberRequest;
 use App\Http\Requests\Team\TeamStoreRequest;
 use App\Http\Requests\Team\TeamUpdateRequest;
@@ -63,20 +64,14 @@ class TeamController extends Controller implements HasMiddleware
         }
     }
 
-    public function getAllPaginated(Request $request): JsonResponse
+    public function getAllPaginated(TeamListRequest $request): JsonResponse
     {
-        $request = $request->validate([
-            'search' => 'nullable|string',
-            'leader_id' => 'nullable|integer|exists:users,id',
-            'status' => 'nullable|string',
-            'department' => 'nullable|string',
-            'row_per_page' => 'required|integer|min:1',
-        ]);
+        $validated = $request->validated();
 
         try {
             $teams = $this->teamRepository->getAllPaginated(
-                $request['search'] ?? null,
-                $request['leader_id'] ?? null,
+                $validated['search'] ?? null,
+                $validated['leader_id'] ?? null,
                 $request['status'] ?? null,
                 $request['department'] ?? null,
                 $request['row_per_page']

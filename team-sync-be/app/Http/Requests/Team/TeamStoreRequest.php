@@ -20,7 +20,7 @@ class TeamStoreRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'expected_size' => ['nullable', 'integer', 'min:1'],
             'description' => ['nullable', 'string'],
-            'icon' => ['required', 'image', 'max:2048'],
+            'icon' => ['required', 'image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'department' => ['required', 'string', 'in:'.implode(',', array_column(Department::cases(), 'value'))],
             'status' => ['nullable', 'string', 'in:'.implode(',', array_column(TeamStatus::cases(), 'value'))],
             'team_lead_id' => ['nullable', 'exists:users,id'],

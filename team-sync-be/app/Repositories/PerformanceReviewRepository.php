@@ -67,6 +67,58 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         return $cycle->delete();
     }
 
+    public function getActiveStaffMembersForReview(int $cycleId)
+    {
+        $cycle = $this->getCycleById($cycleId);
+        $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
+
+        return \App\Models\StaffMemberProfile::with('jobInformation')
+            ->whereHas('jobInformation', function ($q) {
+                $q->where('status', 'active');
+            })
+            ->whereNotIn('id', $existingReviewStaffIds)
+            ->get();
+    }
+
+    public function getDefaultTemplateId(): ?int
+    {
+        return \App\Models\PerformanceReviewTemplate::where('is_default', true)->first()?->id;
+    }
+
+    public function getHrUsers()
+    {
+        return \App\Models\User::role('hr')->get();
+    }
+
+    public function getGoalsForReview(int $staffMemberId, int $reviewId, $cycle)
+    {
+        return \App\Models\PerformanceGoal::where('staff_member_id', $staffMemberId)
+            ->where(function ($q) use ($reviewId, $cycle) {
+                $q->where('linked_review_id', $reviewId)
+                    ->orWhere(function ($dateQ) use ($cycle) {
+                        $dateQ->whereBetween('start_date', [
+                            $cycle->start_date,
+                            $cycle->end_date,
+                        ])->orWhereBetween('created_at', [
+                            $cycle->start_date.' 00:00:00',
+                            $cycle->end_date.' 23:59:59',
+                        ]);
+                    });
+            })
+            ->get(['id', 'status', 'completed_at', 'due_date']);
+    }
+
+    public function getPositiveFeedbackCount(int $staffMemberId, $cycle): int
+    {
+        return \App\Models\PerformanceFeedback::where('staff_member_id', $staffMemberId)
+            ->where('feedback_type', 'positive')
+            ->whereBetween('created_at', [
+                $cycle->start_date.' 00:00:00',
+                $cycle->end_date.' 23:59:59',
+            ])
+            ->count();
+    }
+
     public function getReviewsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator
     {
         $query = PerformanceReview::with(['cycle', 'reviewer.user'])

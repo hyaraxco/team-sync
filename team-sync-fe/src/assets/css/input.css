@@ -2,6 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+}
+
 
 html {
     font-family: "Plus Jakarta Sans", sans-serif;
@@ -160,6 +170,67 @@ html {
 .badge-247 {
     background-color: #EBF8FF;
     color: #1E40AF;
+}
+
+/* Sidebar collapsed state */
+.sidebar-collapsed .nav-link,
+.sidebar-collapsed .nav-link-active {
+    padding: 10px !important;
+    justify-content: center !important;
+    border-radius: 12px !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+}
+
+/* Tooltip for collapsed sidebar */
+.sidebar-collapsed .nav-link,
+.sidebar-collapsed .nav-link-active {
+    position: relative;
+}
+
+.sidebar-collapsed .nav-link::after,
+.sidebar-collapsed .nav-link-active::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    left: calc(100% + 12px);
+    top: 50%;
+    transform: translateY(-50%);
+    background: #0C1C3C;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.sidebar-collapsed .nav-link::before,
+.sidebar-collapsed .nav-link-active::before {
+    content: '';
+    position: absolute;
+    left: calc(100% + 4px);
+    top: 50%;
+    transform: translateY(-50%);
+    border: 5px solid transparent;
+    border-right-color: #0C1C3C;
+    z-index: 100;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+}
+
+.sidebar-collapsed .nav-link:hover::after,
+.sidebar-collapsed .nav-link-active:hover::after,
+.sidebar-collapsed .nav-link:hover::before,
+.sidebar-collapsed .nav-link-active:hover::before {
+    opacity: 1;
 }
 
 /* Dark mode overrides */

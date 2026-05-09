@@ -33,7 +33,7 @@ class RolePermissionMatrixTest extends TestCase
             'attendance-correction-create',
             'leave-request-menu', 'leave-request-create', 'leave-request-my-requests',
             'payslip-view', 'performance-menu', 'review-self-submit',
-            'goal-create-own', 'feedback-give',
+            'goal-create-own',
             'meeting-menu', 'meeting-list',
             'team-view', 'project-menu', 'project-list',
             'task-menu', 'task-list', 'task-create', 'task-edit',
@@ -61,6 +61,7 @@ class RolePermissionMatrixTest extends TestCase
             'attendance-menu', 'attendance-list',
             'settings-hr-manage', 'settings-finance-manage', 'settings-system-manage',
             'dashboard-hr-view', 'dashboard-team-view', 'dashboard-finance-view', 'dashboard-system-view',
+            'feedback-give',
             'license-view', 'license-manage',
         ];
 

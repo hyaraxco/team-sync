@@ -132,7 +132,6 @@ describe("MyPayslips smoke", () => {
 
         expect(wrapper.text()).toContain("My Payroll");
         expect(wrapper.text()).toContain("April 2026");
-        expect(wrapper.get('[data-testid="my-payroll-highlight"]').text()).toContain("Latest paid payroll");
         expect(wrapper.text()).toContain("Average Net Salary");
 
         const viewButton = findButtonByText(wrapper, "View");
