@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\HolidayCalendar\CreateHolidayRequest;
 use App\Http\Requests\HolidayCalendar\UpdateHolidayRequest;
-use App\Models\HolidayCalendar;
+use App\Interfaces\HolidayCalendarRepositoryInterface;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -13,6 +13,10 @@ use Spatie\Permission\Middleware\PermissionMiddleware;
 
 class HolidayCalendarController extends Controller implements HasMiddleware
 {
+    public function __construct(
+        private readonly HolidayCalendarRepositoryInterface $holidayCalendarRepository
+    ) {}
+
     public static function middleware(): array
     {
         return [
@@ -22,7 +26,7 @@ class HolidayCalendarController extends Controller implements HasMiddleware
 
     public function index(Request $request): JsonResponse
     {
-        $holidays = HolidayCalendar::orderBy('date', 'asc')->paginate($request->get('per_page', 15));
+        $holidays = $this->holidayCalendarRepository->getAllPaginated($request->get('per_page', 15));
 
         return response()->json([
             'success' => true,
@@ -32,7 +36,7 @@ class HolidayCalendarController extends Controller implements HasMiddleware
 
     public function store(CreateHolidayRequest $request): JsonResponse
     {
-        $holiday = HolidayCalendar::create($request->validated());
+        $holiday = $this->holidayCalendarRepository->create($request->validated());
 
         return response()->json([
             'success' => true,
@@ -41,28 +45,30 @@ class HolidayCalendarController extends Controller implements HasMiddleware
         ], 201);
     }
 
-    public function show(HolidayCalendar $holidayCalendar): JsonResponse
+    public function show(int $holidayCalendar): JsonResponse
     {
+        $holiday = $this->holidayCalendarRepository->findById($holidayCalendar);
+
         return response()->json([
             'success' => true,
-            'data' => $holidayCalendar,
+            'data' => $holiday,
         ]);
     }
 
-    public function update(UpdateHolidayRequest $request, HolidayCalendar $holidayCalendar): JsonResponse
+    public function update(UpdateHolidayRequest $request, int $holidayCalendar): JsonResponse
     {
-        $holidayCalendar->update($request->validated());
+        $holiday = $this->holidayCalendarRepository->update($holidayCalendar, $request->validated());
 
         return response()->json([
             'success' => true,
             'message' => 'Hari libur berhasil diperbarui.',
-            'data' => $holidayCalendar,
+            'data' => $holiday,
         ]);
     }
 
-    public function destroy(HolidayCalendar $holidayCalendar): JsonResponse
+    public function destroy(int $holidayCalendar): JsonResponse
     {
-        $holidayCalendar->delete();
+        $this->holidayCalendarRepository->delete($holidayCalendar);
 
         return response()->json([
             'success' => true,

@@ -11,17 +11,14 @@ vi.mock("@/plugins/axios", () => ({
 
 describe("Option Store", () => {
     let store;
-    let consoleErrorSpy;
 
     beforeEach(() => {
         setActivePinia(createPinia());
         store = useOptionStore();
         vi.clearAllMocks();
-        consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
     });
 
     afterEach(() => {
-        consoleErrorSpy.mockRestore();
     });
 
     it("fetchDepartments populates departments", async () => {
@@ -42,7 +39,6 @@ describe("Option Store", () => {
         await store.fetchDepartments();
 
         expect(store.error).toBe("Departments failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -64,7 +60,6 @@ describe("Option Store", () => {
         await store.fetchEmploymentTypes();
 
         expect(store.error).toBe("Employment types failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -86,7 +81,6 @@ describe("Option Store", () => {
         await store.fetchJobStatuses();
 
         expect(store.error).toBe("Job statuses failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -108,7 +102,6 @@ describe("Option Store", () => {
         await store.fetchLeaveTypes();
 
         expect(store.error).toBe("Leave types failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -130,7 +123,6 @@ describe("Option Store", () => {
         await store.fetchWorkLocations();
 
         expect(store.error).toBe("Work locations failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -152,7 +144,6 @@ describe("Option Store", () => {
         await store.fetchReligions();
 
         expect(store.error).toBe("Religions failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -174,7 +165,6 @@ describe("Option Store", () => {
         await store.fetchMaritalStatuses();
 
         expect(store.error).toBe("Marital statuses failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -196,7 +186,6 @@ describe("Option Store", () => {
         await store.fetchBloodTypes();
 
         expect(store.error).toBe("Blood types failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 
@@ -218,7 +207,6 @@ describe("Option Store", () => {
         await store.fetchPtkpStatuses();
 
         expect(store.error).toBe("PTKP statuses failed");
-        expect(consoleErrorSpy).toHaveBeenCalled();
         expect(store.loading).toBe(false);
     });
 });

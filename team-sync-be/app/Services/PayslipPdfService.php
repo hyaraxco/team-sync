@@ -24,8 +24,8 @@ class PayslipPdfService
         $basicSalary = (float) $payrollDetail->original_salary;
         $overtimeAmount = (float) $payrollDetail->overtime_amount;
         $overtimeHours = (float) $payrollDetail->overtime_hours;
-        $allowances = 0; // TODO: Implement allowances in payroll generation
-        $bonus = 0; // TODO: Implement bonus in payroll generation
+        $allowances = 0; // Not yet in PayrollDetail schema — placeholder for future feature
+        $bonus = 0; // Not yet in PayrollDetail schema — placeholder for future feature
         $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus;
 
         // Calculate BPJS breakdown

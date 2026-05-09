@@ -5,12 +5,16 @@ namespace App\Policies;
 use App\Enums\TaskStatus;
 use App\Models\Project;
 use App\Models\ProjectTask;
-use App\Models\TeamMember;
 use App\Models\User;
+use App\Services\ProjectMembershipService;
 use Illuminate\Auth\Access\Response;
 
 class ProjectTaskPolicy
 {
+    public function __construct(
+        private readonly ProjectMembershipService $membershipService
+    ) {}
+
     /**
      * Determine if the user can view any tasks (index/list).
      */
@@ -31,7 +35,7 @@ class ProjectTaskPolicy
 
         $task->loadMissing('project.teams');
 
-        if (! $this->isProjectMember($user, $task->project)) {
+        if (! $this->membershipService->isMember($user, $task->project)) {
             return Response::deny('You can only view tasks in projects you are a member of.');
         }
 
@@ -64,7 +68,7 @@ class ProjectTaskPolicy
         // Assignee must be a project member (applies to ALL roles)
         $assigneeId = $data['assignee_id'] ?? null;
         if ($assigneeId !== null) {
-            if (! $this->isProjectMemberById((int) $assigneeId, $project)) {
+            if (! $this->membershipService->isMemberById((int) $assigneeId, $project)) {
                 return Response::deny('Assignee must be a member of the project.');
             }
         }
@@ -80,7 +84,7 @@ class ProjectTaskPolicy
         }
 
         // Pure staff checks
-        if (! $this->isProjectMember($user, $project)) {
+        if (! $this->membershipService->isMember($user, $project)) {
             return Response::deny('You can only create tasks in projects you are a member of.');
         }
 
@@ -137,7 +141,7 @@ class ProjectTaskPolicy
         // ─── Assignee must be project member (applies to ALL roles) ──
         if ($this->hasFieldChanged('assignee_id', $data, $task)) {
             $newAssigneeId = (int) $data['assignee_id'];
-            if (! $this->isProjectMemberById($newAssigneeId, $task->project)) {
+            if (! $this->membershipService->isMemberById($newAssigneeId, $task->project)) {
                 return Response::deny('Assignee must be a member of the project.');
             }
         }
@@ -383,68 +387,5 @@ class ProjectTaskPolicy
         }
 
         return (string) $value;
-    }
-
-    /**
-     * Check if a staff member (by profile ID) is a member of the project.
-     * Used for assignee validation — works without a User object.
-     */
-    private function isProjectMemberById(int $profileId, ?Project $project): bool
-    {
-        if (! $project) {
-            return false;
-        }
-
-        // Project leader is always a member
-        if ($project->project_leader_id === $profileId) {
-            return true;
-        }
-
-        // Check team membership
-        $project->loadMissing('teams');
-        $projectTeamIds = $project->teams->pluck('id')->toArray();
-
-        if (empty($projectTeamIds)) {
-            return false;
-        }
-
-        return TeamMember::where('staff_member_id', $profileId)
-            ->whereNull('left_at')
-            ->whereIn('team_id', $projectTeamIds)
-            ->exists();
-    }
-
-    private function isProjectMember(User $user, ?Project $project): bool
-    {
-        if (! $project) {
-            return false;
-        }
-
-        $profile = $user->staffMemberProfile;
-        if (! $profile) {
-            return false;
-        }
-
-        // Project leader is always a member
-        if ($project->project_leader_id === $profile->id) {
-            return true;
-        }
-
-        // Check team membership
-        $project->loadMissing('teams');
-        $jobInfoTeamId = $profile->jobInformation->team_id ?? null;
-        $teamMemberIds = TeamMember::where('staff_member_id', $profile->id)
-            ->whereNull('left_at')
-            ->pluck('team_id')
-            ->toArray();
-
-        $teamIds = array_unique(array_filter(array_merge(
-            $jobInfoTeamId ? [$jobInfoTeamId] : [],
-            $teamMemberIds
-        )));
-
-        $projectTeamIds = $project->teams->pluck('id')->toArray();
-
-        return ! empty(array_intersect($projectTeamIds, $teamIds));
     }
 }

@@ -307,7 +307,6 @@ const fetchMyStatistics = async () => {
             leave_balance: data.leave_balance ?? null,
         };
     } catch (error) {
-        console.error("Failed to fetch employee statistics:", error);
         toast.error("Failed to load employee statistics. Please try again.");
     } finally {
         statsLoading.value = false;

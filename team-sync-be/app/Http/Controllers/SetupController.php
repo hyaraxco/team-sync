@@ -45,10 +45,14 @@ class SetupController extends Controller
 
     /**
      * Run app:doctor checks and return results as JSON.
-     * Public endpoint — no auth required (used during setup wizard).
+     * Only accessible during first-boot (no superadmin exists yet).
      */
     public function doctor()
     {
+        if (User::role('superadmin')->exists()) {
+            return ResponseHelper::jsonResponse(false, 'Setup already completed. Doctor endpoint is disabled.', null, 403);
+        }
+
         $checks = [];
 
         // Database

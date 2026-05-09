@@ -18,8 +18,7 @@
         "laravel/tinker": "^2.10.1",
         "maatwebsite/excel": "^3.1",
         "meilisearch/meilisearch-php": "^1.16",
-        "spatie/laravel-permission": "^6.21",
-        "teamtnt/laravel-scout-tntsearch-driver": "^15.0"
+        "spatie/laravel-permission": "^6.21"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

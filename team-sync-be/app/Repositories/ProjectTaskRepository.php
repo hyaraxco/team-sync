@@ -194,6 +194,11 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             ->get();
     }
 
+    public function findCommentById(string $taskId, string $commentId): ProjectTaskComment
+    {
+        return ProjectTaskComment::where('project_task_id', $taskId)->findOrFail($commentId);
+    }
+
     public function createComment(string $taskId, array $data): ProjectTaskComment
     {
         $task = $this->getById($taskId);
@@ -251,6 +256,11 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
             ->with(['staffMember.user'])
             ->orderBy('created_at', 'asc')
             ->get();
+    }
+
+    public function findAttachmentById(string $taskId, string $attachmentId): ProjectTaskAttachment
+    {
+        return ProjectTaskAttachment::where('project_task_id', $taskId)->findOrFail($attachmentId);
     }
 
     public function getStatusLogs(string $taskId): Collection

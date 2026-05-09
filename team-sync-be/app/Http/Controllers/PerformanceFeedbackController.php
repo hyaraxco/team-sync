@@ -39,7 +39,7 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
 
     public function getReceivedFeedback(Request $request)
     {
-        $filters = $request->all();
+        $filters = $request->only(['type', 'cycle_id']);
         $feedback = $this->repository->getFeedbackForEmployee(Auth::user()->staffMemberProfile?->id, $filters);
 
         return ResponseHelper::jsonResponse(true, 'Received feedback retrieved successfully', $feedback);
@@ -47,7 +47,7 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
 
     public function getGivenFeedback(Request $request)
     {
-        $feedback = $this->repository->getFeedbackGivenByUser(Auth::user()->staffMemberProfile?->id, $request->all());
+        $feedback = $this->repository->getFeedbackGivenByUser(Auth::user()->staffMemberProfile?->id, $request->only(['type', 'cycle_id']));
 
         return ResponseHelper::jsonResponse(true, 'Given feedback retrieved successfully', $feedback);
     }

@@ -37,7 +37,6 @@ export function useConfirmAction(config = {}) {
             }
         } catch (err) {
             error.value = err;
-            console.error("Action error:", err);
             if (config.onError) {
                 config.onError(err);
             }
