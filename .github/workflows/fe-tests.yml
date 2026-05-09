@@ -1,0 +1,48 @@
+name: FE Tests
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "team-sync-fe/**"
+  push:
+    branches:
+      - main
+    paths:
+      - "team-sync-fe/**"
+
+concurrency:
+  group: fe-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  fe-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.13
+
+      - name: Restore Bun install cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            team-sync-fe/node_modules
+          key: ${{ runner.os }}-bun-${{ hashFiles('team-sync-fe/bun.lock', 'team-sync-fe/package.json') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install FE dependencies
+        working-directory: team-sync-fe
+        run: bun install --frozen-lockfile
+
+      - name: Run Vitest tests
+        working-directory: team-sync-fe
+        run: bun run test
