@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
+import { ref } from "vue";
 
 const grantedPermissions = new Set();
 const currentRoute = {
@@ -16,6 +17,15 @@ vi.mock("@/helpers/permissionHelper", () => ({
     canOneOf: (permissions) => permissions.some((permission) => grantedPermissions.has(permission)),
 }));
 
+vi.mock("@/composables/useSidebar", () => ({
+    useSidebar: () => ({
+        isOpen: ref(true),
+        isCollapsed: ref(false),
+        toggleCollapse: vi.fn(),
+        closeMobile: vi.fn(),
+    }),
+}));
+
 import Sidebar from "@/components/admin/Sidebar.vue";
 
 const RouterLinkStub = {
@@ -26,9 +36,6 @@ const RouterLinkStub = {
 
 const factory = () =>
     mount(Sidebar, {
-        props: {
-            isOpen: true,
-        },
         global: {
             mocks: {
                 $route: currentRoute,

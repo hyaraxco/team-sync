@@ -1,13 +1,5 @@
 import { capitalize as lodashCapitalize } from "lodash";
 
-export const formatCurrency = (amount) => {
-    if (!amount) return "";
-    return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: "USD",
-    }).format(amount);
-};
-
 export const formatRupiah = (amount) => {
     if (!amount) return "IDR 0";
     return `IDR ${new Intl.NumberFormat("id-ID", {

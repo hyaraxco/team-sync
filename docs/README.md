@@ -13,7 +13,7 @@ docs/
 ├── testing/
 │   ├── be/             # Backend/RBAC/role QA runbooks
 │   └── fe/             # Frontend/manual QA artifacts
-├── references/         # Domain guides (attendance, payroll, employee)
+├── references/         # Domain guides & technical references
 └── README.md           # File ini
 ```
 
@@ -30,11 +30,19 @@ docs/
 
 ### On-Going
 
-Kosong — semua plan/spec sudah diimplementasi dan di-archive.
+Kosong — semua plan sudah selesai dan di-archive.
 
 ### Archive
 
 Folder [plans/archive/](plans/archive/) menyimpan dokumen selesai, superseded, atau historis. Pakai sebagai referensi konteks, bukan kontrak implementasi terbaru.
+
+| File | Completed |
+|---|---|
+| [2026-05-10-security-hardening.md](plans/archive/2026-05-10-security-hardening.md) | 2026-05-10 — 6 security fixes |
+| [2026-05-10-bug-fixes.md](plans/archive/2026-05-10-bug-fixes.md) | 2026-05-10 — 6 bug fixes |
+| [2026-05-10-architecture-cleanup.md](plans/archive/2026-05-10-architecture-cleanup.md) | 2026-05-10 — 4 architecture cleanup tasks |
+| [2026-05-10-testing-gaps.md](plans/archive/2026-05-10-testing-gaps.md) | 2026-05-10 — 5 testing gap tasks |
+| [2026-05-10-unit-testing-gaps.md](plans/archive/2026-05-10-unit-testing-gaps.md) | 2026-05-10 — Service & composable unit tests |
 
 ## Testing
 
@@ -51,6 +59,7 @@ Folder [plans/archive/](plans/archive/) menyimpan dokumen selesai, superseded, a
 | [references/attendance.md](references/attendance.md) | Attendance domain guide |
 | [references/employee.md](references/employee.md) | Employee/self-service domain guide |
 | [references/payroll.md](references/payroll.md) | Payroll domain guide and cross-links |
+| [references/authorization-leak-or-grouped-middleware.md](references/authorization-leak-or-grouped-middleware.md) | Authorization patterns & anti-patterns |
 
 ## Conventions
 

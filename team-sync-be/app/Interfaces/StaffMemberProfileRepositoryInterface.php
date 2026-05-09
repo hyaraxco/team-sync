@@ -51,4 +51,12 @@ interface StaffMemberProfileRepositoryInterface
     public function getMyTeamMembers();
 
     public function getMyTeamProjects();
+
+    public function emailExists(
+        string $email
+    ): bool;
+
+    public function identityNumberExists(
+        string $identityNumber
+    ): bool;
 }

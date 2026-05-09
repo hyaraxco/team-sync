@@ -3,12 +3,16 @@
 namespace App\Policies;
 
 use App\Models\Project;
-use App\Models\TeamMember;
 use App\Models\User;
+use App\Services\ProjectMembershipService;
 use Illuminate\Auth\Access\Response;
 
 class ProjectPolicy
 {
+    public function __construct(
+        private readonly ProjectMembershipService $membershipService
+    ) {}
+
     /**
      * Determine if the user can view any projects.
      * Actual scoping is done in the repository.
@@ -28,7 +32,7 @@ class ProjectPolicy
             return Response::allow();
         }
 
-        if (! $this->isProjectMember($user, $project)) {
+        if (! $this->membershipService->isMember($user, $project)) {
             return Response::deny('You can only view projects you are a member of.');
         }
 
@@ -108,7 +112,7 @@ class ProjectPolicy
         }
 
         // Others must be project members
-        if (! $this->isProjectMember($user, $project)) {
+        if (! $this->membershipService->isMember($user, $project)) {
             return Response::deny('You can only view squad summary for projects you are a member of.');
         }
 
@@ -120,34 +124,5 @@ class ProjectPolicy
     private function isPrivilegedRole(User $user): bool
     {
         return $user->hasRole('manager') || $user->hasRole('hr');
-    }
-
-    private function isProjectMember(User $user, Project $project): bool
-    {
-        $profile = $user->staffMemberProfile;
-        if (! $profile) {
-            return false;
-        }
-
-        // Project leader is always a member
-        if ($project->project_leader_id === $profile->id) {
-            return true;
-        }
-
-        // Check team membership
-        $jobInfoTeamId = $profile->jobInformation->team_id ?? null;
-        $teamMemberIds = TeamMember::where('staff_member_id', $profile->id)
-            ->whereNull('left_at')
-            ->pluck('team_id')
-            ->toArray();
-
-        $teamIds = array_unique(array_filter(array_merge(
-            $jobInfoTeamId ? [$jobInfoTeamId] : [],
-            $teamMemberIds
-        )));
-
-        $projectTeamIds = $project->teams->pluck('id')->toArray();
-
-        return ! empty(array_intersect($projectTeamIds, $teamIds));
     }
 }

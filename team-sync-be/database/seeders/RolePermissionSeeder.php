@@ -42,7 +42,6 @@ class RolePermissionSeeder extends Seeder
                 'performance-menu',
                 'review-self-submit',
                 'goal-create-own',
-                'feedback-give',
                 'meeting-menu',
             ];
 
@@ -107,6 +106,7 @@ class RolePermissionSeeder extends Seeder
                     // Performance: team reviews & goals
                     'review-manager-submit',
                     'goal-assign-team',
+                    'feedback-give',
                     'performance-analytics-view',
                     // Analytics: team-scoped performance & project only
                     'analytics-menu',

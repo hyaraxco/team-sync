@@ -17,6 +17,16 @@ interface PerformanceReviewRepositoryInterface
 
     public function deleteCycle(int $id): bool;
 
+    public function getActiveStaffMembersForReview(int $cycleId);
+
+    public function getDefaultTemplateId(): ?int;
+
+    public function getHrUsers();
+
+    public function getGoalsForReview(int $staffMemberId, int $reviewId, $cycle);
+
+    public function getPositiveFeedbackCount(int $staffMemberId, $cycle): int;
+
     // Review Management
     public function getReviewsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator;
 

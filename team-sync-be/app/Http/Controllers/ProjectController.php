@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Enums\ProjectStatus;
 use App\Helpers\ResponseHelper;
 use App\Http\Middleware\EnsureProjectMembership;
+use App\Http\Requests\Project\ProjectListRequest;
 use App\Http\Requests\ProjectStoreRequest;
 use App\Http\Requests\ProjectUpdateRequest;
 use App\Http\Resources\PaginateResource;
@@ -64,19 +65,15 @@ class ProjectController extends Controller implements HasMiddleware
         }
     }
 
-    public function getAllPaginated(Request $request): JsonResponse
+    public function getAllPaginated(ProjectListRequest $request): JsonResponse
     {
-        $request = $request->validate([
-            'search' => 'nullable|string',
-            'status' => 'nullable|string|in:'.implode(',', array_column(ProjectStatus::cases(), 'value')),
-            'row_per_page' => 'required|integer',
-        ]);
+        $validated = $request->validated();
 
         try {
             $projects = $this->projectRepository->getAllPaginated(
-                $request['search'] ?? null,
-                $request['status'] ?? null,
-                $request['row_per_page']
+                $validated['search'] ?? null,
+                $validated['status'] ?? null,
+                $validated['row_per_page']
             );
 
             return ResponseHelper::jsonResponse(true, 'Projects Retrieved Successfully', PaginateResource::make($projects, ProjectResource::class), 200);
@@ -138,7 +135,7 @@ class ProjectController extends Controller implements HasMiddleware
         $data = $request->validated();
 
         try {
-            $project = Project::findOrFail($id);
+            $project = $this->projectRepository->findById($id);
 
             $response = Gate::inspect('update', $project);
             if ($response->denied()) {
@@ -165,7 +162,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function destroy(string $id): JsonResponse
     {
         try {
-            $project = Project::findOrFail($id);
+            $project = $this->projectRepository->findById($id);
 
             $response = Gate::inspect('delete', $project);
             if ($response->denied()) {
@@ -212,7 +209,7 @@ class ProjectController extends Controller implements HasMiddleware
     public function getSquadSummary(string $id): JsonResponse
     {
         try {
-            $project = Project::findOrFail($id);
+            $project = $this->projectRepository->findById($id);
 
             $response = Gate::inspect('viewSquadSummary', $project);
             if ($response->denied()) {
