@@ -9,6 +9,7 @@ import LatestTeams from "@/components/admin/dashboard/LatestTeams.vue";
 import TeamPulseOverview from "@/components/admin/dashboard/TeamPulseOverview.vue";
 import TodayAttendanceOverview from "@/components/admin/dashboard/TodayAttendanceOverview.vue";
 import UpcomingMeetings from "@/components/common/UpcomingMeetings.vue";
+import UpcomingCutiBersama from "@/components/staff-member/UpcomingCutiBersama.vue";
 
 import PayrollAnalyticsEnhanced from "@/components/admin/analytics/PayrollAnalyticsEnhanced.vue";
 
@@ -33,6 +34,8 @@ const handleSearch = (params) => {
         <template v-if="hasSelfView && !hasFinanceView && !hasTeamView && !hasHrView">
             <div class="space-y-6">
                 <EmployeeStatistics />
+                <UpcomingCutiBersama />
+                <UpcomingMeetings />
             </div>
         </template>
 

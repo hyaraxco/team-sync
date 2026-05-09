@@ -23,7 +23,7 @@ class ProjectTaskAttachmentStoreRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => ['required', 'file', 'max:10240'],
+            'file' => ['required', 'file', 'mimes:pdf,jpg,jpeg,png,doc,docx,xls,xlsx,ppt,pptx,txt,zip', 'max:10240'],
         ];
     }
 }

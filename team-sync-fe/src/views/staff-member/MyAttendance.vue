@@ -8,7 +8,6 @@ import {
     Plus,
     User,
     CalendarPlus,
-    Eye,
     CalendarX,
     PenSquare,
     List,
@@ -148,6 +147,40 @@ const getAttendanceStatusDotClass = (status) => {
             return "bg-blue-500";
         default:
             return "bg-gray-300";
+    }
+};
+
+const getAttendanceStatusLabel = (status) => {
+    switch (status) {
+        case "present":
+            return "Present";
+        case "absent":
+            return "Absent";
+        case "late":
+            return "Late";
+        case "leave":
+            return "Leave";
+        case "half_day":
+            return "Half Day";
+        default:
+            return status;
+    }
+};
+
+const getAttendanceStatusLabelClass = (status) => {
+    switch (status) {
+        case "present":
+            return "bg-green-100 text-green-700";
+        case "absent":
+            return "bg-red-100 text-red-700";
+        case "late":
+            return "bg-yellow-100 text-yellow-700";
+        case "leave":
+            return "bg-blue-100 text-blue-700";
+        case "half_day":
+            return "bg-orange-100 text-orange-700";
+        default:
+            return "bg-gray-100 text-gray-600";
     }
 };
 
@@ -519,7 +552,7 @@ onMounted(async () => {
             </div>
         </div>
 
-        <AttendanceStatsCards :statistics="statistics" :pending-requests-count="pendingRequestsCount" />
+        <AttendanceStatsCards :statistics="statistics" :pending-requests-count="pendingRequestsCount" :leave-balances="myLeaveBalances" :leave-loading="leaveLoading" />
 
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6 dark:bg-gray-800 dark:border-gray-700">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -546,69 +579,6 @@ onMounted(async () => {
         </div>
 
         <div v-if="activeSection === 'overview'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div
-                v-if="canViewMyLeaveRequests"
-                class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6 mb-2 dark:bg-gray-800 dark:border-gray-700"
-            >
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
-                            <CalendarCheck class="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <h3 class="text-brand-dark text-lg font-bold">Leave Entitlements</h3>
-                            <p class="text-brand-light text-sm">Your remaining leave quotas</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="leaveLoading" class="text-center py-4">
-                    <p class="text-brand-light">Loading...</p>
-                </div>
-
-                <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <div
-                        v-for="balance in myLeaveBalances"
-                        :key="balance.leave_type"
-                        class="border border-[#DCDEDD] rounded-[16px] p-4 bg-gray-50 flex flex-col"
-                    >
-                        <h4 class="text-brand-dark text-base font-semibold mb-1">
-                            {{ formatLeaveType(balance.leave_type) }}
-                        </h4>
-                        <span class="text-xs text-brand-light mb-3 block capitalize">
-                            {{ balance.quota_scope }} Quota
-                        </span>
-
-                        <div class="mt-auto">
-                            <div v-if="balance.quota_days !== null">
-                                <div class="flex justify-between items-end mb-1">
-                                    <span class="text-3xl font-bold text-brand-dark">{{ balance.remaining_days }}</span>
-                                    <span class="text-sm font-medium text-brand-light pb-1">
-                                        / {{ balance.quota_days }} left
-                                    </span>
-                                </div>
-                                <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                                    <div
-                                        class="bg-blue-600 h-1.5 rounded-full"
-                                        :style="{ width: `${(balance.remaining_days / balance.quota_days) * 100}%` }"
-                                    ></div>
-                                </div>
-                            </div>
-                            <div v-else>
-                                <span class="text-xl font-bold text-brand-dark">Unlimited</span>
-                                <p class="text-sm text-brand-light mt-1">{{ balance.used_days }} day(s) used</p>
-                            </div>
-                        </div>
-                    </div>
-                    <EmptyState
-                        v-if="!leaveLoading && myLeaveBalances.length === 0"
-                        icon="CalendarX"
-                        title="No entitlements found"
-                        class="col-span-full"
-                    />
-                </div>
-            </div>
-
             <div
                 v-if="canViewMyLeaveRequests"
                 class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-6"
@@ -749,47 +719,52 @@ onMounted(async () => {
                         </button>
                     </div>
 
-                    <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-brand-light">
+                    <div class="grid grid-cols-7 border-b border-[#DCDEDD]">
                         <div
                             v-for="weekday in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
                             :key="weekday"
-                            class="py-1"
+                            class="py-2 text-center text-xs font-semibold text-brand-light"
                         >
                             {{ weekday }}
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-7 gap-1">
+                    <div class="grid grid-cols-7 border-l border-[#DCDEDD]">
                         <div
                             v-for="day in attendanceCalendarDays"
                             :key="day.isoDate"
-                            class="border rounded-[10px] min-h-[62px] px-2 py-1.5 flex flex-col items-start transition-all duration-200"
+                            class="border-r border-b border-[#DCDEDD] min-h-[72px] p-1.5 flex flex-col transition-all duration-200"
                             :class="[
-                                day.inCurrentMonth ? 'border-[#DCDEDD] bg-white' : 'border-transparent bg-gray-50',
-                                day.isToday ? 'ring-1 ring-blue-500' : '',
+                                day.inCurrentMonth ? 'bg-white' : 'bg-gray-50/50',
+                                day.isToday ? 'bg-blue-50/50' : '',
                             ]"
                         >
                             <span
-                                class="text-xs font-semibold"
-                                :class="day.inCurrentMonth ? 'text-brand-dark' : 'text-gray-400'"
+                                class="text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full"
+                                :class="[
+                                    day.inCurrentMonth ? 'text-brand-dark' : 'text-gray-400',
+                                    day.isToday ? 'bg-[#0C51D9] text-white' : '',
+                                ]"
                             >
                                 {{ day.day }}
                             </span>
                             <span
-                                v-if="day.status"
-                                class="mt-1.5 w-2.5 h-2.5 rounded-full"
-                                :class="getAttendanceStatusDotClass(day.status)"
-                            ></span>
+                                v-if="day.status && day.inCurrentMonth"
+                                class="text-[10px] font-medium px-1.5 py-0.5 rounded truncate leading-tight"
+                                :class="getAttendanceStatusLabelClass(day.status)"
+                            >
+                                {{ getAttendanceStatusLabel(day.status) }}
+                            </span>
                         </div>
                     </div>
 
-                    <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <div class="flex flex-wrap items-center gap-3 pt-1">
                         <div
                             v-for="legend in attendanceLegend"
                             :key="legend.key"
                             class="flex items-center gap-1.5 text-xs text-brand-dark"
                         >
-                            <span class="w-2.5 h-2.5 rounded-full" :class="legend.class"></span>
+                            <span class="w-2.5 h-2.5 rounded" :class="legend.class"></span>
                             <span>{{ legend.label }}</span>
                         </div>
                     </div>
@@ -819,7 +794,8 @@ onMounted(async () => {
                     <div
                         v-for="request in myLeaveRequests"
                         :key="request.id"
-                        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4"
+                        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        @click="openLeaveDetailsModal(request.id)"
                     >
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
@@ -848,7 +824,7 @@ onMounted(async () => {
 
                         <div class="border-b border-[#DCDEDD] mb-3"></div>
 
-                        <div class="space-y-2 mb-3">
+                        <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-brand-dark text-sm font-medium">Start Date</span>
                                 <span class="text-brand-dark text-sm font-semibold">
@@ -868,14 +844,6 @@ onMounted(async () => {
                                 </span>
                             </div>
                         </div>
-
-                        <button
-                            @click="openLeaveDetailsModal(request.id)"
-                            class="w-full border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
-                        >
-                            <Eye class="w-4 h-4 text-gray-600" />
-                            <span class="text-brand-dark text-sm font-semibold">View Details</span>
-                        </button>
                     </div>
 
                     <EmptyState
@@ -940,7 +908,8 @@ onMounted(async () => {
                     <div
                         v-for="request in myLeaveRequests"
                         :key="request.id"
-                        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4"
+                        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        @click="openLeaveDetailsModal(request.id)"
                     >
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
@@ -969,7 +938,7 @@ onMounted(async () => {
 
                         <div class="border-b border-[#DCDEDD] mb-3"></div>
 
-                        <div class="space-y-2 mb-3">
+                        <div class="space-y-2">
                             <div class="flex items-center justify-between">
                                 <span class="text-brand-dark text-sm font-medium">Start Date</span>
                                 <span class="text-brand-dark text-sm font-semibold">
@@ -989,14 +958,6 @@ onMounted(async () => {
                                 </span>
                             </div>
                         </div>
-
-                        <button
-                            @click="openLeaveDetailsModal(request.id)"
-                            class="w-full border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
-                        >
-                            <Eye class="w-4 h-4 text-gray-600" />
-                            <span class="text-brand-dark text-sm font-semibold">View Details</span>
-                        </button>
                     </div>
 
                     <EmptyState

@@ -42,6 +42,11 @@ interface ProjectTaskRepositoryInterface
         string $taskId
     );
 
+    public function findCommentById(
+        string $taskId,
+        string $commentId
+    );
+
     public function createComment(
         string $taskId,
         array $data
@@ -60,6 +65,11 @@ interface ProjectTaskRepositoryInterface
 
     public function getAttachments(
         string $taskId
+    );
+
+    public function findAttachmentById(
+        string $taskId,
+        string $attachmentId
     );
 
     public function getStatusLogs(

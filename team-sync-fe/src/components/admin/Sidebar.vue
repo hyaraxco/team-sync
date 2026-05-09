@@ -21,15 +21,16 @@ import {
     ScaleIcon,
     AwardIcon,
     VideoIcon,
+    PanelLeftIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
+import { useSidebar } from "@/composables/useSidebar";
 import { RouterLink } from "vue-router";
 
-const props = defineProps(["isOpen"]);
-const emit = defineEmits(["navigate"]);
+const { isOpen, isCollapsed, toggleCollapse, closeMobile } = useSidebar();
 
-const onNavigate = () => emit("navigate");
+const onNavigate = () => closeMobile();
 </script>
 
 <template>
@@ -38,30 +39,46 @@ const onNavigate = () => emit("navigate");
     <!-- Sidebar -->
     <aside
         id="sidebar"
-        class="fixed lg:relative inset-y-0 left-0 z-50 w-64 bg-white backdrop-blur-xl border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700"
-        :class="[props.isOpen ? 'translate-x-0' : '-translate-x-full', 'lg:translate-x-0']"
-        data-collapsed="false"
+        class="fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700 overflow-hidden"
+        :style="{ width: isCollapsed ? '68px' : '256px', minWidth: isCollapsed ? '68px' : '256px' }"
+        :class="[
+            isOpen ? 'translate-x-0' : '-translate-x-full',
+            'lg:translate-x-0',
+            isCollapsed ? 'sidebar-collapsed' : '',
+        ]"
     >
         <!-- Logo Section -->
-        <div class="px-6 py-4 border-b border-[#DCDEDD] flex items-center justify-between dark:border-gray-700">
-            <div class="flex items-center gap-4">
-                <div class="w-14 h-14 relative flex items-center justify-center">
-                    <!-- Background circle -->
+        <div
+            class="border-b border-[#DCDEDD] flex dark:border-gray-700 transition-all duration-300 shrink-0"
+            :class="isCollapsed ? 'px-3 py-3 flex-col items-center gap-2' : 'px-6 py-3 items-center justify-between'"
+        >
+            <div class="flex items-center" :class="isCollapsed ? '' : 'gap-4'">
+                <div
+                    class="relative flex items-center justify-center shrink-0"
+                    :class="isCollapsed ? 'w-10 h-10' : 'w-14 h-14'"
+                >
                     <div
-                        class="w-14 h-14 absolute bg-gradient-to-br from-primary-100 to-primary-200 rounded-full"
+                        class="absolute bg-gradient-to-br from-primary-100 to-primary-200 rounded-full transition-all duration-300"
+                        :class="isCollapsed ? 'w-10 h-10' : 'w-14 h-14'"
                     ></div>
-                    <!-- Overlapping smaller circle -->
                     <div
-                        class="w-10 h-10 absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full opacity-90"
+                        class="absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full opacity-90 transition-all duration-300"
+                        :class="isCollapsed ? 'w-7 h-7' : 'w-10 h-10'"
                     ></div>
-                    <!-- Lucide icon -->
-                    <BuildingIcon class="w-5 h-5 text-white relative z-10" />
+                    <BuildingIcon
+                        class="text-white relative z-10 transition-all duration-300"
+                        :class="isCollapsed ? 'w-3.5 h-3.5' : 'w-5 h-5'"
+                    />
                 </div>
-                <div>
-                    <h1 class="text-brand-dark text-lg font-bold">Team Sync Pro</h1>
-                    <p class="text-brand-dark text-xs font-normal">HRIS Dashboard</p>
+                <div
+                    class="overflow-hidden transition-all duration-300"
+                    :class="isCollapsed ? 'w-0 opacity-0' : 'w-auto opacity-100'"
+                >
+                    <h1 class="text-brand-dark text-lg font-bold whitespace-nowrap">Team Sync Pro</h1>
+                    <p class="text-brand-dark text-xs font-normal whitespace-nowrap">HRIS Dashboard</p>
                 </div>
             </div>
+            <!-- Mobile: close button -->
             <button
                 type="button"
                 aria-label="Close sidebar"
@@ -70,13 +87,28 @@ const onNavigate = () => emit("navigate");
             >
                 <XIcon class="w-5 h-5 text-gray-600" />
             </button>
+            <!-- Desktop: collapse toggle -->
+            <button
+                type="button"
+                aria-label="Toggle sidebar"
+                class="hidden lg:flex w-8 h-8 rounded-lg border border-gray-200 items-center justify-center hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 shrink-0"
+                @click="toggleCollapse"
+            >
+                <PanelLeftIcon
+                    class="w-4 h-4 text-gray-500 transition-transform duration-300"
+                    :class="{ 'rotate-180': isCollapsed }"
+                />
+            </button>
         </div>
 
         <!-- Navigation Menu -->
-        <nav class="px-6 py-4 space-y-6">
+        <nav
+            class="py-4 flex-1 overflow-y-auto scrollbar-hide transition-all duration-300"
+            :class="isCollapsed ? 'px-2 space-y-2' : 'px-6 space-y-6'"
+        >
             <!-- GENERAL Section -->
             <div data-testid="sidebar-section-general">
-                <h3 class="section-title">GENERAL</h3>
+                <h3 v-show="!isCollapsed" class="section-title">GENERAL</h3>
                 <div class="space-y-3">
                     <!-- 1. Dashboard (all roles) -->
                     <RouterLink
@@ -86,6 +118,7 @@ const onNavigate = () => emit("navigate");
                         }"
                         class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
                         v-if="can('dashboard-menu')"
+                        data-tooltip="Dashboard"
                         @click="onNavigate"
                     >
                         <HomeIcon
@@ -95,6 +128,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.dashboard',
@@ -112,6 +146,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name?.startsWith('admin.project'),
                         }"
                         v-if="can('project-menu')"
+                        data-tooltip="Projects"
                         @click="onNavigate"
                     >
                         <FileTextIcon
@@ -121,6 +156,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.project'),
@@ -138,6 +174,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name?.startsWith('admin.staffMember'),
                         }"
                         v-if="can('staff-member-menu')"
+                        data-tooltip="Employees"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -147,6 +184,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.staffMember'),
@@ -164,6 +202,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name?.startsWith('admin.team'),
                         }"
                         v-if="can('team-menu')"
+                        data-tooltip="Our Teams"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -173,6 +212,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.team'),
@@ -190,6 +230,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name?.startsWith('admin.meeting'),
                         }"
                         v-if="can('meeting-menu')"
+                        data-tooltip="Meetings"
                         @click="onNavigate"
                     >
                         <VideoIcon
@@ -199,6 +240,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.meeting'),
@@ -216,6 +258,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name === 'admin.attendances',
                         }"
                         v-if="can('attendance-menu')"
+                        data-tooltip="Attendance"
                         @click="onNavigate"
                     >
                         <CalendarIcon
@@ -225,6 +268,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.attendances',
@@ -243,6 +287,7 @@ const onNavigate = () => emit("navigate");
                                 $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
                         }"
                         v-if="can('payroll-menu')"
+                        data-tooltip="Payroll"
                         @click="onNavigate"
                     >
                         <WalletIcon
@@ -254,6 +299,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white':
@@ -272,6 +318,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name === 'admin.payroll.adjustments',
                         }"
                         v-if="can('payroll-menu')"
+                        data-tooltip="Payroll Adjustments"
                         @click="onNavigate"
                     >
                         <FileWarningIcon
@@ -281,6 +328,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.payroll.adjustments',
@@ -298,6 +346,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name?.startsWith('admin.analytics'),
                         }"
                         v-if="can('analytics-menu')"
+                        data-tooltip="Analytics"
                         @click="onNavigate"
                     >
                         <BarChart3Icon
@@ -307,6 +356,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.analytics'),
@@ -320,7 +370,7 @@ const onNavigate = () => emit("navigate");
 
             <!-- PERFORMANCE Section -->
             <div v-if="can('performance-menu')" data-testid="sidebar-section-performance">
-                <h3 class="section-title">PERFORMANCE</h3>
+                <h3 v-show="!isCollapsed" class="section-title">PERFORMANCE</h3>
                 <div class="space-y-3">
                     <!-- 1. Team Reviews (Manager/HR primary action) -->
                     <RouterLink
@@ -330,6 +380,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-reviews',
                         }"
+                        data-tooltip="Team Reviews"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -337,6 +388,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.team-reviews' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.team-reviews' }"
                         >
@@ -352,6 +404,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.pending-calibration',
                         }"
+                        data-tooltip="Pending Calibration"
                         @click="onNavigate"
                     >
                         <ScaleIcon
@@ -359,6 +412,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.pending-calibration' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.pending-calibration' }"
                         >
@@ -374,6 +428,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.performance.cycles'),
                         }"
+                        data-tooltip="Review Cycles"
                         @click="onNavigate"
                     >
                         <CalendarIcon
@@ -381,6 +436,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name?.startsWith('admin.performance.cycles') }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name?.startsWith('admin.performance.cycles') }"
                         >
@@ -395,6 +451,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.outcome-rules',
                         }"
+                        data-tooltip="Outcome Rules"
                         @click="onNavigate"
                     >
                         <AwardIcon
@@ -402,6 +459,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.outcome-rules' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.outcome-rules' }"
                         >
@@ -416,6 +474,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.templates',
                         }"
+                        data-tooltip="Review Templates"
                         @click="onNavigate"
                     >
                         <FileTextIcon
@@ -423,6 +482,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.templates' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.templates' }"
                         >
@@ -437,6 +497,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.my-reviews',
                         }"
+                        data-tooltip="My Reviews"
                         @click="onNavigate"
                     >
                         <StarIcon
@@ -444,6 +505,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.my-reviews' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.my-reviews' }"
                         >
@@ -459,6 +521,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-goals',
                         }"
+                        data-tooltip="Team Goals"
                         @click="onNavigate"
                     >
                         <TrendingUpIcon
@@ -466,6 +529,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.team-goals' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.team-goals' }"
                         >
@@ -480,6 +544,7 @@ const onNavigate = () => emit("navigate");
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.my-goals',
                         }"
+                        data-tooltip="My Goals"
                         @click="onNavigate"
                     >
                         <TargetIcon
@@ -487,6 +552,7 @@ const onNavigate = () => emit("navigate");
                             :class="{ 'text-white': $route.name === 'admin.performance.my-goals' }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.my-goals' }"
                         >
@@ -503,6 +569,7 @@ const onNavigate = () => emit("navigate");
                                 $route.name === 'admin.performance.feedback.received' ||
                                 $route.name === 'admin.performance.feedback.given',
                         }"
+                        data-tooltip="Feedback"
                         @click="onNavigate"
                     >
                         <MessageSquareIcon
@@ -514,6 +581,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white':
@@ -537,7 +605,7 @@ const onNavigate = () => emit("navigate");
                 "
                 data-testid="sidebar-section-personal"
             >
-                <h3 class="section-title">PERSONAL</h3>
+                <h3 v-show="!isCollapsed" class="section-title">PERSONAL</h3>
                 <div class="space-y-3">
                     <!-- 1. My Attendance (daily check-in/out) -->
                     <RouterLink
@@ -549,6 +617,7 @@ const onNavigate = () => emit("navigate");
                                 $route.name === 'staffMember.attendance.clock',
                         }"
                         v-if="canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
+                        data-tooltip="My Attendance"
                         @click="onNavigate"
                     >
                         <CalendarIcon
@@ -560,6 +629,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white':
@@ -579,6 +649,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name === 'staffMember.attendance.my-overtime',
                         }"
                         v-if="canOneOf(['attendance-my-attendances', 'overtime-list', 'overtime-create'])"
+                        data-tooltip="My Overtime"
                         @click="onNavigate"
                     >
                         <Clock3Icon
@@ -588,6 +659,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'staffMember.attendance.my-overtime',
@@ -605,6 +677,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name === 'staffMember.team',
                         }"
                         v-if="can('team-view')"
+                        data-tooltip="My Team"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -614,6 +687,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'staffMember.team',
@@ -632,6 +706,7 @@ const onNavigate = () => emit("navigate");
                                 $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
                         }"
                         v-if="can('payslip-view')"
+                        data-tooltip="My Payroll"
                         @click="onNavigate"
                     >
                         <WalletIcon
@@ -643,6 +718,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white':
@@ -662,6 +738,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name === 'staffMember.profile',
                         }"
                         v-if="can('profile-menu')"
+                        data-tooltip="My Profile"
                         @click="onNavigate"
                     >
                         <UserIcon
@@ -671,6 +748,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'staffMember.profile',
@@ -684,7 +762,7 @@ const onNavigate = () => emit("navigate");
 
             <!-- PREFERENCES Section -->
             <div data-testid="sidebar-section-preferences">
-                <h3 class="section-title">PREFERENCES</h3>
+                <h3 v-show="!isCollapsed" class="section-title">PREFERENCES</h3>
                 <div class="space-y-3">
                     <RouterLink
                         :to="{ name: 'admin.settings' }"
@@ -693,6 +771,7 @@ const onNavigate = () => emit("navigate");
                             'nav-link-active': $route.name === 'admin.settings',
                         }"
                         v-if="canOneOf(['settings-hr-manage', 'settings-finance-manage', 'settings-system-manage'])"
+                        data-tooltip="Settings"
                         @click="onNavigate"
                     >
                         <SettingsIcon
@@ -702,6 +781,7 @@ const onNavigate = () => emit("navigate");
                             }"
                         />
                         <span
+                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.settings',
@@ -715,7 +795,7 @@ const onNavigate = () => emit("navigate");
         </nav>
 
         <!-- Upgrade to Pro Box -->
-        <div class="px-6 pb-6 mt-auto">
+        <div v-show="!isCollapsed" class="px-6 pb-6 mt-auto">
             <div
                 class="upgrade-card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-[16px] relative overflow-hidden p-5"
             >

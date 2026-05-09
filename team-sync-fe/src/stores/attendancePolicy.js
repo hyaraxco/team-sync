@@ -16,7 +16,6 @@ export const useAttendancePolicyStore = defineStore("attendancePolicy", {
                 this.policies = response.data.data;
             } catch (error) {
                 this.error = error.message || "Failed to fetch attendance policies";
-                console.error("Error fetching attendance policies:", error);
             } finally {
                 this.loading = false;
             }
@@ -33,7 +32,6 @@ export const useAttendancePolicyStore = defineStore("attendancePolicy", {
                 return response.data.data;
             } catch (error) {
                 this.error = error.message || "Failed to update attendance policy";
-                console.error("Error updating attendance policy:", error);
                 throw error;
             } finally {
                 this.loading = false;

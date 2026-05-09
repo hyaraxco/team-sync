@@ -23,7 +23,6 @@ const loadStatistics = async () => {
         try {
             await fetchTeamStatistics(props.team.id);
         } catch (error) {
-            console.error("Failed to load statistics:", error);
             toast.error("Failed to load statistics. Please try again.");
         }
     }

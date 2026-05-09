@@ -32,7 +32,7 @@ class PerformanceReviewCycleController extends Controller implements HasMiddlewa
 
     public function index(Request $request)
     {
-        $cycles = $this->repository->getCycles($request->all());
+        $cycles = $this->repository->getCycles($request->only(['status', 'cycle_type']));
 
         return ResponseHelper::jsonResponse(true, 'Review cycles retrieved successfully', $cycles, 200);
     }
@@ -75,19 +75,12 @@ class PerformanceReviewCycleController extends Controller implements HasMiddlewa
         }
 
         // Get active staff members (excluding those who already have a review for this cycle)
-        $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
-
-        $staffMembers = StaffMemberProfile::with('jobInformation')
-            ->whereHas('jobInformation', function ($q) {
-                $q->where('status', 'active');
-            })
-            ->whereNotIn('id', $existingReviewStaffIds)
-            ->get();
+        $staffMembers = $this->repository->getActiveStaffMembersForReview($id);
 
         $assignments = $this->reviewerResolverService->resolveMany($staffMembers);
 
         // Fetch default template as fallback
-        $defaultTemplateId = PerformanceReviewTemplate::where('is_default', true)->first()?->id;
+        $defaultTemplateId = $this->repository->getDefaultTemplateId();
 
         $createdCount = 0;
         foreach ($staffMembers as $staffMember) {

@@ -147,7 +147,6 @@ const handleColumnDrop = async (value, targetStatus) => {
     try {
         await updateTaskStatus(movedTask.id, targetStatus);
     } catch (error) {
-        console.error("Failed to update task status:", error);
         toast.error("Failed to update task status. Please try again.");
         const serverMessage =
             error?.response?.data?.message ||
@@ -187,7 +186,6 @@ const handleCreateTask = async (taskData) => {
         await createTask(taskData);
         await fetchProjectTasks(route.params.id);
     } catch (error) {
-        console.error("Failed to create task:", error);
         toast.error("Failed to create task. Please try again.");
     }
 };
@@ -197,7 +195,6 @@ const handleDeleteTask = async (taskId) => {
         await deleteTask(taskId);
         await fetchProjectTasks(route.params.id);
     } catch (error) {
-        console.error("Failed to delete task:", error);
         toast.error("Failed to delete task. Please try again.");
     }
 };

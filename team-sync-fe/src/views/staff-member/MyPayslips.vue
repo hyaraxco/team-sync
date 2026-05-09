@@ -125,8 +125,6 @@ const averageNetSalary = computed(() => {
     return totalNetReceived.value / payslips.value.length;
 });
 
-const latestPayslip = computed(() => payslips.value[0] ?? null);
-
 const availableYears = computed(() => Array.from({ length: 6 }, (_, index) => currentYear - index));
 
 const clearSearch = () => {
@@ -139,32 +137,6 @@ const clearSearch = () => {
         <div class="mb-6">
             <h2 class="text-[#0C1C3C] font-bold text-2xl mb-2">My Payroll</h2>
             <p class="text-gray-600">View and download your payroll history</p>
-        </div>
-
-        <div
-            v-if="latestPayslip"
-            class="bg-gradient-to-br from-slate-900 via-slate-800 to-blue-900 rounded-[24px] p-6 md:p-8 text-white mb-6"
-            data-testid="my-payroll-highlight"
-        >
-            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
-                <div>
-                    <p class="text-white/70 text-sm font-medium mb-2">Latest paid payroll</p>
-                    <h3 class="text-3xl font-extrabold mb-2">
-                        {{ formatDate(latestPayslip.period) }}
-                    </h3>
-                    <p class="text-white/80 text-sm">
-                        Paid on
-                        {{ formatDate(latestPayslip.payment_date || latestPayslip.created_at) }}
-                        and ready for download anytime.
-                    </p>
-                </div>
-                <div class="text-left md:text-right">
-                    <p class="text-white/70 text-sm font-medium mb-2">Take-home pay</p>
-                    <p class="text-4xl font-extrabold">
-                        {{ formatCurrency(latestPayslip.net_salary) }}
-                    </p>
-                </div>
-            </div>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">

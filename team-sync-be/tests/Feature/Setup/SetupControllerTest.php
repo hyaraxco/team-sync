@@ -130,4 +130,42 @@ class SetupControllerTest extends TestCase
             ->assertUnprocessable()
             ->assertJsonValidationErrors(['password']);
     }
+
+    public function test_doctor_endpoint_returns_forbidden_when_setup_completed(): void
+    {
+        $this->activateTestLicense();
+
+        Company::query()->create([
+            'name' => 'PT Team Sync',
+            'slug' => 'team-sync',
+            'domain' => 'teamsync.local',
+            'timezone' => 'Asia/Jakarta',
+            'locale' => 'id',
+            'currency' => 'IDR',
+            'is_active' => true,
+            'settings' => [],
+        ]);
+
+        $user = User::factory()->create();
+        $user->assignRole('superadmin');
+
+        $this->getJson('/api/v1/setup/doctor')
+            ->assertForbidden()
+            ->assertJsonPath('success', false);
+    }
+
+    public function test_doctor_endpoint_accessible_when_no_superadmin(): void
+    {
+        $this->getJson('/api/v1/setup/doctor')
+            ->assertOk()
+            ->assertJsonPath('data.healthy', true)
+            ->assertJsonStructure([
+                'data' => [
+                    'healthy',
+                    'checks' => [
+                        '*' => ['label', 'status', 'message'],
+                    ],
+                ],
+            ]);
+    }
 }

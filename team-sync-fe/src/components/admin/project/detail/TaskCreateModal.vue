@@ -83,7 +83,6 @@ const handleSubmit = async () => {
         emit("created", { ...formData.value });
         closeModal();
     } catch (error) {
-        console.error("Error creating task:", error);
         toast.error("Failed to create task. Please try again.");
     } finally {
         isSubmitting.value = false;

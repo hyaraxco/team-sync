@@ -216,6 +216,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                     now()->startOfDay(),
                     now()->endOfDay(),
                 ])
+                ->lockForUpdate()
                 ->first();
 
             if ($existingAttendance) {

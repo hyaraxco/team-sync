@@ -1,24 +1,16 @@
 <script setup>
 import Sidebar from "@/components/admin/Sidebar.vue";
 import Header from "@/components/admin/Header.vue";
-import { ref } from "vue";
+import { provideSidebar } from "@/composables/useSidebar";
 
-const isSidebarOpen = ref(false);
-
-const toggleSidebar = () => {
-    isSidebarOpen.value = !isSidebarOpen.value;
-};
-
-const closeSidebar = () => {
-    isSidebarOpen.value = false;
-};
+const { isOpen, toggleMobile, closeMobile } = provideSidebar();
 </script>
 
 <template>
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar Slot - can be replaced with custom content -->
         <slot name="sidebar">
-            <Sidebar :isOpen="isSidebarOpen" @navigate="closeSidebar" />
+            <Sidebar />
         </slot>
 
         <!-- Main Content -->
@@ -27,7 +19,7 @@ const closeSidebar = () => {
             class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300 dark:bg-gray-900"
         >
             <!-- Top Navbar -->
-            <Header @toggle-sidebar="toggleSidebar" />
+            <Header @toggle-sidebar="toggleMobile" />
             <!-- Dashboard Content -->
             <main class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
                 <RouterView />
@@ -35,5 +27,5 @@ const closeSidebar = () => {
         </div>
     </div>
 
-    <div class="fixed inset-0 bg-black/30 lg:hidden" v-if="isSidebarOpen" @click="closeSidebar"></div>
+    <div class="fixed inset-0 bg-black/30 lg:hidden" v-if="isOpen" @click="closeMobile"></div>
 </template>

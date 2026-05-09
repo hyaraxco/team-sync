@@ -350,7 +350,6 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
                 return response.data.data;
             } catch (error) {
                 // Best-effort fetch — don't pollute store error state (e.g., 403 for non-HR users)
-                console.error("fetchValidateReadiness failed:", error?.response?.status);
                 throw error;
             } finally {
                 this.readinessLoading = false;

@@ -133,6 +133,12 @@ class ProjectRepository implements ProjectRepositoryInterface
             ->findOrFail($id);
     }
 
+    public function findById(
+        string $id
+    ): Project {
+        return Project::findOrFail($id);
+    }
+
     public function create(array $data): Project
     {
         return DB::transaction(function () use ($data) {

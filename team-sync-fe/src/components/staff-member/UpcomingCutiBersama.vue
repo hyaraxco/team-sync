@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { Calendar } from "lucide-vue-next";
-import axiosInstance from "@/plugins/axios";
+import { axiosInstance } from "@/plugins/axios";
 import { formatDateShort } from "@/utils/dateUtils";
+import { useToast } from "@/composables/useToast";
 
+const toast = useToast();
 const cutiBersama = ref([]);
 const loading = ref(false);
 
@@ -15,7 +17,7 @@ const fetchUpcomingCutiBersama = async () => {
             cutiBersama.value = response.data.data || [];
         }
     } catch (error) {
-        console.error("Failed to fetch upcoming cuti bersama:", error);
+        toast.error("Gagal memuat cuti bersama", "Silakan coba lagi nanti.");
     } finally {
         loading.value = false;
     }
