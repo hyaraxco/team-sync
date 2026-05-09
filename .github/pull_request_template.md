@@ -22,12 +22,30 @@ Closes #(issue number)
 - Change 2
 - Change 3
 
+## 📸 Screenshots
+
+> **Required for UI changes.** Playwright will auto-capture screenshots on PR. Manual screenshots also welcome.
+
+### Before (if applicable)
+
+<!-- Screenshot of current behavior -->
+
+### After
+
+<!-- Screenshot of new behavior -->
+
+### Auto-captured Screenshots
+
+> Screenshots are automatically captured by Playwright CI and attached as PR comments.
+> Download from workflow artifacts if needed.
+
 ## Testing
 
 - [ ] Unit tests pass (`composer test`)
 - [ ] Frontend tests pass (`bun run test`)
 - [ ] E2E tests pass (`bun run e2e`)
 - [ ] Manual testing performed
+- [ ] Screenshots captured for UI changes
 
 ## Checklist
 
@@ -39,7 +57,6 @@ Closes #(issue number)
 - [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
 - [ ] Any dependent changes have been merged and published
-
-## Screenshots (if applicable)
+- [ ] Screenshots attached for any UI changes
 
 ## Additional Notes
