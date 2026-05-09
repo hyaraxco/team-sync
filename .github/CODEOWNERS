@@ -1,0 +1,15 @@
+# Default owner for everything
+* @hyaraxco
+
+# Backend
+team-sync-be/ @hyaraxco
+
+# Frontend
+team-sync-fe/ @hyaraxco
+
+# CI/CD
+.github/ @hyaraxco
+
+# Documentation
+docs/ @hyaraxco
+*.md @hyaraxco
