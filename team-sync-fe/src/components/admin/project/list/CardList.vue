@@ -2,10 +2,14 @@
 import { formatToClientTimezone, DEFAULT_AVATAR } from "@/helpers/format";
 import { can } from "@/helpers/permissionHelper";
 import _ from "lodash";
-import { Calendar, Crown, Edit, FileText } from "lucide-vue-next";
+import { Calendar, Crown, Edit, FileText, Trash2 } from "lucide-vue-next";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useRouter } from "vue-router";
+import { useToast } from "@/composables/useToast";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
+import { ref } from "vue";
+import { useProjectStore } from "@/stores/project";
 
 const props = defineProps({
     data: {
@@ -15,8 +19,23 @@ const props = defineProps({
 });
 
 const router = useRouter();
+const toast = useToast();
+const showDeleteModal = ref(false);
+
+const projectStore = useProjectStore();
+const { deleteProject } = projectStore;
+
 const navigateToDetail = () => {
     router.push({ name: "admin.projects.detail", params: { id: props.data.id } });
+};
+
+const handleDeleteProject = async () => {
+    await deleteProject(props.data.id);
+
+    if (projectStore.success) {
+        showDeleteModal.value = false;
+        toast.success("Project deleted", projectStore.success);
+    }
 };
 </script>
 
@@ -113,6 +132,26 @@ const navigateToDetail = () => {
                 <Edit class="w-4 h-4 text-gray-600" />
                 <span class="text-brand-dark text-sm font-semibold">Edit</span>
             </RouterLink>
+            <button
+                v-if="can('project-delete')"
+                @click.stop="showDeleteModal = true"
+                class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-red-500 hover:border-2 hover:bg-red-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+            >
+                <Trash2 class="w-4 h-4 text-gray-600 hover:text-red-600" />
+                <span class="text-brand-dark text-sm font-semibold">Delete</span>
+            </button>
         </div>
     </div>
+
+    <ConfirmationModal
+        :show="showDeleteModal"
+        title="Delete Project"
+        :message="`Are you sure you want to delete '${data.name}'? This will permanently remove the project and all associated data. This action cannot be undone.`"
+        confirmText="Delete Project"
+        cancelText="Cancel"
+        type="danger"
+        :loading="projectStore.loading"
+        @confirm="handleDeleteProject"
+        @cancel="showDeleteModal = false"
+    />
 </template>

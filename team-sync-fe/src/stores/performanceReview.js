@@ -397,6 +397,18 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
             }
         },
 
+        async fetchOutcomeRule(id) {
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get(`/performance/outcome-rules/${id}`);
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
         async createOutcomeRule(data) {
             this.error = null;
             try {

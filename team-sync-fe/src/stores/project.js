@@ -170,5 +170,21 @@ export const useProjectStore = defineStore("project", {
                 this.loadingStatistics = false;
             }
         },
+
+        async deleteProject(id) {
+            this.loading = true;
+            this.error = null;
+            this.success = null;
+
+            try {
+                const response = await axiosInstance.delete(`projects/${id}`);
+
+                this.success = response.data.message;
+            } catch (error) {
+                this.error = handleError(error);
+            } finally {
+                this.loading = false;
+            }
+        },
     },
 });
