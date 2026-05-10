@@ -14,11 +14,18 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
+<<<<<<< Updated upstream
     Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
 });
 
 function createTestReview()
 {
+=======
+    \Spatie\Permission\Models\Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'sanctum']);
+});
+
+function createTestReview() {
+>>>>>>> Stashed changes
     $cycle = PerformanceReviewCycle::factory()->create();
     $employee = StaffMemberProfile::factory()->create();
     $reviewer = StaffMemberProfile::factory()->create();
@@ -177,6 +184,7 @@ it('calculateManagerRating returns null when no manager ratings exist', function
 
     expect($result)->toBeNull();
 });
+<<<<<<< Updated upstream
 
 it('uses template weights instead of global section weights when template is present', function () {
     // 1. Setup Template and Sections
@@ -233,3 +241,5 @@ it('uses template weights instead of global section weights when template is pre
 
     expect($result['final_rating'])->toBe(4.4);
 });
+=======
+>>>>>>> Stashed changes

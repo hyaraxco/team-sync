@@ -245,7 +245,12 @@
         </div>
 
         <!-- Create Period Modal -->
-        <ModalWrapper :show="isCreateModalOpen" title="Create Attendance Period" maxWidth="md" @close="closeCreateModal">
+        <ModalWrapper
+            :show="isCreateModalOpen"
+            title="Create Attendance Period"
+            maxWidth="md"
+            @close="closeCreateModal"
+        >
             <form class="space-y-4" @submit.prevent="submitCreateForm">
                 <div>
                     <label class="block text-sm font-medium text-neutral-300 mb-2">Start Date</label>

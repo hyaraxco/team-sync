@@ -260,4 +260,173 @@ onMounted(async () => {
             description="There are currently no performance reviews waiting for HR calibration."
         />
     </div>
+<<<<<<< Updated upstream
 </template>
+=======
+
+    <!-- Filters -->
+    <MainCard>
+      <div class="space-y-4">
+        <div class="flex flex-wrap gap-4">
+          <div class="flex-1 min-w-[250px]">
+            <label class="block text-sm font-medium text-brand-dark mb-2"
+              >Search Employee</label
+            >
+            <input
+              v-model="searchQuery"
+              type="text"
+              placeholder="Search by name or email..."
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+            />
+          </div>
+          <div class="flex-1 min-w-[200px]">
+            <label class="block text-sm font-medium text-brand-dark mb-2"
+              >Review Cycle</label
+            >
+            <select
+              v-model="selectedCycle"
+              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+            >
+              <option value="all">All Cycles</option>
+              <option v-for="cycle in cycles" :key="cycle.id" :value="cycle.id">
+                {{ cycle.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </MainCard>
+
+    <!-- Loading State -->
+    <div v-if="pendingCalibrationLoading" class="flex justify-center items-center py-12">
+      <div
+        class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"
+      ></div>
+    </div>
+
+    <!-- Reviews Table -->
+    <MainCard v-else-if="filteredReviews.length > 0">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="border-b border-gray-200">
+              <th
+                class="text-left py-3 px-4 text-sm font-semibold text-brand-dark"
+              >
+                Employee
+              </th>
+              <th
+                class="text-left py-3 px-4 text-sm font-semibold text-brand-dark"
+              >
+                Reviewer
+              </th>
+              <th
+                class="text-left py-3 px-4 text-sm font-semibold text-brand-dark"
+              >
+                Review Cycle
+              </th>
+              <th
+                class="text-left py-3 px-4 text-sm font-semibold text-brand-dark"
+              >
+                Current Rating
+              </th>
+              <th
+                class="text-left py-3 px-4 text-sm font-semibold text-brand-dark"
+              >
+                Status
+              </th>
+              <th
+                class="text-right py-3 px-4 text-sm font-semibold text-brand-dark"
+              >
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="review in filteredReviews"
+              :key="review.id"
+              class="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+              @click="viewReview(review.id)"
+            >
+              <td class="py-4 px-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-10 h-10 bg-brand-primary rounded-full flex items-center justify-center text-white font-semibold"
+                  >
+                    {{ review.employee?.full_name?.charAt(0) || "E" }}
+                  </div>
+                  <div>
+                    <p class="font-medium text-brand-dark">
+                      {{ review.employee?.full_name || "Unknown" }}
+                    </p>
+                    <p class="text-sm text-brand-light">
+                      {{ review.employee?.email || "-" }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="flex items-center gap-3">
+                  <div
+                    class="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center text-gray-600 font-semibold text-xs"
+                  >
+                    {{ review.reviewer?.full_name?.charAt(0) || "M" }}
+                  </div>
+                  <div>
+                    <p class="font-medium text-brand-dark text-sm">
+                      {{ review.reviewer?.full_name || "Unknown" }}
+                    </p>
+                  </div>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <div class="flex items-center gap-2">
+                  <Calendar class="w-4 h-4 text-brand-light" />
+                  <span class="text-sm text-brand-dark">{{
+                    review.cycle?.name || "-"
+                  }}</span>
+                </div>
+              </td>
+              <td class="py-4 px-4">
+                <div v-if="review.final_rating" class="flex items-center gap-2">
+                  <span class="text-lg font-bold text-brand-dark">{{
+                    review.final_rating
+                  }}</span>
+                  <span class="text-xs text-brand-light">/ 5.00</span>
+                </div>
+                <span v-else class="text-sm text-gray-400">-</span>
+              </td>
+              <td class="py-4 px-4">
+                <StatusBadge
+                  :status="statusConfig[review.status]?.label"
+                  :color="statusConfig[review.status]?.color"
+                />
+                <p class="text-xs text-brand-light mt-1">
+                  {{ statusConfig[review.status]?.action }}
+                </p>
+              </td>
+              <td class="py-4 px-4 text-right">
+                <button
+                  class="px-4 py-2 text-sm font-medium rounded-lg transition-colors bg-brand-primary text-white hover:bg-brand-primary-dark"
+                  @click.stop="viewReview(review.id)"
+                >
+                  Calibrate
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </MainCard>
+
+    <!-- Empty State -->
+    <EmptyState
+      v-else
+      icon="CheckCircle2"
+      title="No Pending Calibrations"
+      description="There are currently no performance reviews waiting for HR calibration."
+    />
+  </div>
+</template>
+>>>>>>> Stashed changes

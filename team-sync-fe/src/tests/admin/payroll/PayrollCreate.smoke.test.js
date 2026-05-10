@@ -145,6 +145,7 @@ describe("PayrollCreate smoke", () => {
         await input.setValue("2026-04");
         await flushAsync();
 
+<<<<<<< Updated upstream
         expect(toastWarning).toHaveBeenCalledWith(
             "Payroll period unavailable",
             "Payroll for April 2026 already exists.",
@@ -152,6 +153,48 @@ describe("PayrollCreate smoke", () => {
         expect(payrollStore.generatePayroll).not.toHaveBeenCalled();
         expect(push).not.toHaveBeenCalled();
         expect(wrapper.find('button[type="submit"]').attributes("disabled")).toBeDefined();
+=======
+    const futureMonth = getNextMonthKey(getMonthKey(new Date()));
+    const input = wrapper.find('input[type="month"]');
+    await input.setValue(futureMonth);
+    await flushAsync();
+
+    expect(toastWarning).toHaveBeenCalledWith(
+      "Payroll period unavailable",
+      "Future payroll months are locked until the period starts."
+    );
+    expect(wrapper.get('[data-testid="payroll-create-readiness-message"]').text()).toContain(
+      "Future payroll months are locked"
+    );
+    expect(wrapper.find('button[type="submit"]').attributes("disabled")).toBeDefined();
+  });
+
+  it("generates payroll for valid month, then redirects with success toast", async () => {
+    const wrapper = factory();
+    await flushAsync();
+    const validMonth = getMonthKey(new Date());
+
+    const input = wrapper.find('input[type="month"]');
+    await input.setValue(validMonth);
+    await wrapper.find("form").trigger("submit");
+    await flushAsync();
+
+    expect(payrollStore.generatePayroll).toHaveBeenCalledWith({
+      salary_month: validMonth,
+    });
+    expect(toastSuccess).toHaveBeenCalledWith(
+      "Payroll successfully generated",
+      expect.stringContaining("successfully created")
+    );
+    expect(push).toHaveBeenCalledWith({ name: "admin.payroll.dashboard" });
+  });
+
+  it("shows error toast when API generation fails", async () => {
+    const validMonth = getMonthKey(new Date());
+    payrollStore.generatePayroll = vi.fn(async () => {
+      payrollStore.error = "Payroll for current month already exists";
+      throw new Error("Request failed");
+>>>>>>> Stashed changes
     });
 
     it("blocks future month selection before submit", async () => {
@@ -163,6 +206,7 @@ describe("PayrollCreate smoke", () => {
         await input.setValue(futureMonth);
         await flushAsync();
 
+<<<<<<< Updated upstream
         expect(toastWarning).toHaveBeenCalledWith(
             "Payroll period unavailable",
             "Future payroll months are locked until the period starts.",
@@ -172,6 +216,14 @@ describe("PayrollCreate smoke", () => {
         );
         expect(wrapper.find('button[type="submit"]').attributes("disabled")).toBeDefined();
     });
+=======
+    expect(toastError).toHaveBeenCalledWith(
+      "Failed to generate payroll",
+      expect.any(String)
+    );
+    expect(push).not.toHaveBeenCalled();
+  });
+>>>>>>> Stashed changes
 
     it("generates payroll for valid month, then redirects with success toast", async () => {
         const wrapper = factory();
