@@ -4,15 +4,18 @@ import { loginAsRole } from "./helpers/auth";
 const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
 
 /**
- * Pick a weekday range in next month with a rotating start day
- * to avoid overlaps between repeated test executions.
+ * Pick a weekday range 3-6 months in the future to avoid overlaps
+ * with previous test runs or seeded data.
  */
 const getNextMonthWeekdayRange = () => {
     const start = new Date();
-    start.setMonth(start.getMonth() + 1, 1);
+    // Use 3-6 months in the future based on current timestamp to ensure uniqueness
+    const monthsAhead = 3 + (Math.floor(Date.now() / 1000) % 4);
+    start.setMonth(start.getMonth() + monthsAhead, 1);
 
-    const rotatingOffset = Math.floor((Date.now() / 1_000) % 10);
-    start.setDate(10 + rotatingOffset);
+    // Use a rotating day within the month
+    const rotatingOffset = Math.floor((Date.now() / 1_000) % 20);
+    start.setDate(5 + rotatingOffset);
 
     while (start.getDay() === 0 || start.getDay() === 6) {
         start.setDate(start.getDate() + 1);
@@ -57,6 +60,23 @@ test.describe.serial("Attendance flow", () => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
+        // Capture API responses for debugging
+        const apiResponses: Array<{ url: string; status: number; body?: string }> = [];
+        page.on("response", async (response) => {
+            if (response.url().includes("/api/v1/")) {
+                try {
+                    const body = await response.text().catch(() => "<unreadable>");
+                    apiResponses.push({
+                        url: response.url(),
+                        status: response.status(),
+                        body: body.slice(0, 500),
+                    });
+                } catch {
+                    // ignore
+                }
+            }
+        });
+
         await loginAsRole(page, "employee");
         await page.goto("/admin/attendance/my-attendances");
         await expect(page).toHaveURL(/\/admin\/attendance\/my-attendances$/);
@@ -91,9 +111,26 @@ test.describe.serial("Attendance flow", () => {
 
         await page.getByRole("button", { name: "Submit Request" }).click();
 
-        await expect(page.getByText("Request Submitted!")).toBeVisible({
-            timeout: 20_000,
-        });
+        // Wait for either success modal or error toast
+        const successModal = page.getByText("Request Submitted!");
+        const errorToast = page.locator('[class*="toast"], [class*="error"], [role="alert"]').first();
+
+        try {
+            await expect(successModal).toBeVisible({ timeout: 15_000 });
+        } catch {
+            // If success modal doesn't appear, capture debugging info
+            const toastText = await errorToast.textContent().catch(() => "no toast found");
+            const lastApiCalls = apiResponses.slice(-10);
+            const failedCalls = lastApiCalls.filter(r => r.status >= 400);
+            console.log("Leave request failed. Failed API calls:", JSON.stringify(failedCalls, null, 2));
+            console.log("Toast message:", toastText);
+            throw new Error(
+                `Leave request submission failed. ` +
+                `Failed APIs: ${failedCalls.map(r => `${r.status} ${r.url}: ${r.body}`).join("; ")}. ` +
+                `Toast: ${toastText}`
+            );
+        }
+
         await expect(page.getByText("Your leave request has been successfully submitted")).toBeVisible();
 
         await page.getByRole("button", { name: "Got it!" }).click();
