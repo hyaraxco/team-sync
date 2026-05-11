@@ -1,6 +1,7 @@
 import { ref, onMounted } from "vue";
 
 const isDark = ref(false);
+let listenerAdded = false;
 
 export function useDarkMode() {
     const toggle = () => {
@@ -32,13 +33,15 @@ export function useDarkMode() {
 
     onMounted(() => {
         init();
-        if (typeof window.matchMedia === "function") {
-            window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+        if (!listenerAdded && typeof window.matchMedia === "function") {
+            const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+            mediaQuery.addEventListener("change", (e) => {
                 if (!localStorage.getItem("theme")) {
                     isDark.value = e.matches;
                     updateDOM();
                 }
             });
+            listenerAdded = true;
         }
     });
 

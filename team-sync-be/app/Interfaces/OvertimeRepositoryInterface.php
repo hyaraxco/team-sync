@@ -29,4 +29,10 @@ interface OvertimeRepositoryInterface
     public function getSummary(): array;
 
     public function getWeeklyHoursForStaffMember(int $staffMemberId, string $date): float;
+
+    /**
+     * Same as getWeeklyHoursForStaffMember but locks rows with SELECT ... FOR UPDATE
+     * to prevent race conditions when checking weekly overtime limits.
+     */
+    public function getWeeklyHoursForStaffMemberLocked(int $staffMemberId, string $date): float;
 }

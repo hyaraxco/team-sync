@@ -127,7 +127,7 @@ export default [
                 name: "admin.performance.feedback.given",
                 component: () => import("@/views/admin/performance/FeedbackGiven.vue"),
                 meta: {
-                    requiredPermission: "performance-menu",
+                    requiredPermission: "feedback-give",
                 },
             },
             {

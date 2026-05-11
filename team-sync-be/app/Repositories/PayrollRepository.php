@@ -139,14 +139,19 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function findByIdWithDetails(string $id): Payroll
     {
-        return Payroll::query()
+        $payroll = Payroll::query()
             ->with([
                 'payrollDetails.staffMember.user',
                 'payrollDetails.staffMember.jobInformation.team',
-                'payrollDetails.appliedAdjustments',
                 'payrollSettingVersion',
             ])
             ->findOrFail($id);
+
+        // Manually load period-filtered applied adjustments to avoid pulling
+        // adjustments from unrelated payroll periods for the same employee.
+        $this->loadAppliedAdjustmentsForDetails($payroll->payrollDetails, $payroll);
+
+        return $payroll;
     }
 
     public function getPayrollDetailsPaginated(string $payrollId, int $perPage = 50): LengthAwarePaginator
@@ -165,7 +170,20 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->orderBy('final_salary', 'desc') // Highest salary first
             ->paginate($perPage);
 
-        $details = $paginated->getCollection();
+        $this->loadAppliedAdjustmentsForDetails($paginated->getCollection(), $payroll);
+
+        return $paginated;
+    }
+
+    /**
+     * Load period-filtered applied adjustments onto a collection of PayrollDetail models.
+     *
+     * This avoids the bug where the base relationship loads ALL adjustments for an
+     * employee regardless of the payroll period, causing adjustments to appear on
+     * the wrong payslip when an employee has multiple payroll details across months.
+     */
+    private function loadAppliedAdjustmentsForDetails($details, Payroll $payroll): void
+    {
         $employeeIds = $details
             ->pluck('staff_member_id')
             ->filter()
@@ -186,16 +204,12 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->groupBy('staff_member_id');
         }
 
-        $details->transform(function (PayrollDetail $detail) use ($appliedAdjustmentsByEmployee) {
+        $details->each(function (PayrollDetail $detail) use ($appliedAdjustmentsByEmployee) {
             $detail->setRelation(
                 'appliedAdjustments',
                 $appliedAdjustmentsByEmployee->get((int) $detail->staff_member_id, collect())
             );
-
-            return $detail;
         });
-
-        return $paginated;
     }
 
     /**
