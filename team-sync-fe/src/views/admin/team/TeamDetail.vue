@@ -73,9 +73,15 @@ const availableEmployees = computed(() => {
 });
 
 const handleFetchTeam = async () => {
-    const response = await fetchTeam(id);
-
-    team.value = response;
+    try {
+        const response = await fetchTeam(id);
+        team.value = response;
+    } catch (err) {
+        toast.error(
+            "Failed to load team",
+            teamStore.error || err?.response?.data?.message || "Failed to load team details.",
+        );
+    }
 };
 
 const handleDeleteTeam = async () => {

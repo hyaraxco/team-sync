@@ -461,11 +461,13 @@ onMounted(async () => {
     if (hasPayrollStatistics.value) {
         await fetchPayrollStatistics();
     }
-    await fetchPayrollNotificationDeliveries();
-    await fetchPayrollApprovals();
-    await fetchPayrollReconciliation();
-    await fetchPayrollDetails(1);
-    await fetchPayrollActivityLogs();
+    await Promise.all([
+        fetchPayrollNotificationDeliveries(),
+        fetchPayrollApprovals(),
+        fetchPayrollReconciliation(),
+        fetchPayrollDetails(1),
+        fetchPayrollActivityLogs(),
+    ]);
 });
 
 const filteredEmployees = computed(() => employees.value);
@@ -504,6 +506,7 @@ watch(reconciliationIssueTypeOptions, (options) => {
 });
 
 const getAttendancePercentage = (attendedDays, totalDays) => {
+    if (!totalDays) return 0;
     return Math.round((attendedDays / totalDays) * 100);
 };
 

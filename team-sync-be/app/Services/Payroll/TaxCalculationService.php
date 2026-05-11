@@ -113,7 +113,7 @@ class TaxCalculationService
         $jhtBase = $grossMonthly;
         $jhtAmountMonthly = $jhtBase * ((float) $jhtRate?->employee_rate / 100);
 
-        $jpBase = min($grossMonthly, (float) $jpRate?->max_salary_base ?: $grossMonthly);
+        $jpBase = min($grossMonthly, $jpRate?->max_salary_base !== null ? (float) $jpRate->max_salary_base : $grossMonthly);
         $jpAmountMonthly = $jpBase * ((float) $jpRate?->employee_rate / 100);
 
         $bpjsDeductionAnnual = ($jhtAmountMonthly + $jpAmountMonthly) * 12;

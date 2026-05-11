@@ -10,6 +10,7 @@ use App\Notifications\OvertimeApprovedNotification;
 use App\Notifications\OvertimeRejectedNotification;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\DB;
 
 class OvertimeService
 {
@@ -75,38 +76,42 @@ class OvertimeService
             ];
         }
 
-        $existingWeeklyHours = $this->overtimeRepository->getWeeklyHoursForStaffMember(
-            $validated['staff_member_id'],
-            $validated['date']
-        );
+        return DB::transaction(function () use ($validated, $hours) {
+            // Lock weekly overtime rows to prevent concurrent requests from
+            // both passing the weekly limit check (race condition fix).
+            $existingWeeklyHours = $this->overtimeRepository->getWeeklyHoursForStaffMemberLocked(
+                $validated['staff_member_id'],
+                $validated['date']
+            );
 
-        if (($existingWeeklyHours + $hours) > OvertimeRecord::MAX_HOURS_PER_WEEK) {
-            $remaining = round(OvertimeRecord::MAX_HOURS_PER_WEEK - $existingWeeklyHours, 2);
+            if (($existingWeeklyHours + $hours) > OvertimeRecord::MAX_HOURS_PER_WEEK) {
+                $remaining = round(OvertimeRecord::MAX_HOURS_PER_WEEK - $existingWeeklyHours, 2);
+
+                return [
+                    'success' => false,
+                    'message' => 'Weekly overtime limit exceeded. Maximum '.OvertimeRecord::MAX_HOURS_PER_WEEK." hours/week. Remaining capacity: {$remaining} hours.",
+                    'record' => null,
+                ];
+            }
+
+            $record = $this->overtimeRepository->create([
+                'staff_member_id' => $validated['staff_member_id'],
+                'attendance_id' => $validated['attendance_id'] ?? null,
+                'date' => $validated['date'],
+                'start_time' => $validated['start_time'],
+                'end_time' => $validated['end_time'],
+                'hours' => $hours,
+                'overtime_type' => $validated['overtime_type'],
+                'status' => OvertimeRecord::STATUS_PENDING,
+                'notes' => $validated['notes'] ?? null,
+            ]);
 
             return [
-                'success' => false,
-                'message' => 'Weekly overtime limit exceeded. Maximum '.OvertimeRecord::MAX_HOURS_PER_WEEK." hours/week. Remaining capacity: {$remaining} hours.",
-                'record' => null,
+                'success' => true,
+                'message' => 'Overtime Record Created Successfully',
+                'record' => $record,
             ];
-        }
-
-        $record = $this->overtimeRepository->create([
-            'staff_member_id' => $validated['staff_member_id'],
-            'attendance_id' => $validated['attendance_id'] ?? null,
-            'date' => $validated['date'],
-            'start_time' => $validated['start_time'],
-            'end_time' => $validated['end_time'],
-            'hours' => $hours,
-            'overtime_type' => $validated['overtime_type'],
-            'status' => OvertimeRecord::STATUS_PENDING,
-            'notes' => $validated['notes'] ?? null,
-        ]);
-
-        return [
-            'success' => true,
-            'message' => 'Overtime Record Created Successfully',
-            'record' => $record,
-        ];
+        });
     }
 
     /**

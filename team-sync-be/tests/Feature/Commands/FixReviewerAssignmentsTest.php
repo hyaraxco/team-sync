@@ -12,7 +12,6 @@ use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
-use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 

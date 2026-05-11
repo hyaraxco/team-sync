@@ -9,6 +9,7 @@ use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
@@ -90,14 +91,14 @@ class SeedEmployeeIdentityAndGeneratePayrollCommandTest extends TestCase
         // Disable mail & queue for seeding context
         config(['mail.default' => 'array', 'queue.default' => 'sync']);
 
-        $exitCode = \Illuminate\Support\Facades\Artisan::call(
+        $exitCode = Artisan::call(
             'payroll:seed-identity-and-generate',
             ['--month' => '2026-06']
         );
 
         // The command seeds identity data and attempts payroll generation.
         // With proper tax config, it should succeed.
-        $output = \Illuminate\Support\Facades\Artisan::output();
+        $output = Artisan::output();
         $this->assertStringContainsString('employees', $output);
     }
 

@@ -1,7 +1,7 @@
 <script setup>
 import { CheckCircle, TrendingUp, Users, Folder } from "lucide-vue-next";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
-import { onMounted, watch } from "vue";
+import { watch } from "vue";
 import { useTeamStore } from "@/stores/team";
 import { storeToRefs } from "pinia";
 import { useToast } from "@/composables/useToast";
@@ -27,10 +27,6 @@ const loadStatistics = async () => {
         }
     }
 };
-
-onMounted(async () => {
-    await loadStatistics();
-});
 
 watch(
     () => props.team?.id,
