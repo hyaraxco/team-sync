@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\BankInformation;
-use App\Models\StaffMemberProfile;
 use App\Support\SensitiveData;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;

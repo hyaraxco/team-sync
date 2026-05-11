@@ -63,12 +63,12 @@ it('getEmailAttribute returns user email', function () {
 });
 
 it('getFullNameAttribute returns null when user is missing', function () {
-    $profile = new StaffMemberProfile();
+    $profile = new StaffMemberProfile;
     expect($profile->full_name)->toBeNull();
 });
 
 it('getEmailAttribute returns null when user is missing', function () {
-    $profile = new StaffMemberProfile();
+    $profile = new StaffMemberProfile;
     expect($profile->email)->toBeNull();
 });
 

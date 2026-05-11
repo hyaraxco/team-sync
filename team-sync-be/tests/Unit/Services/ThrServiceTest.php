@@ -12,6 +12,7 @@ use App\Services\ThrService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -166,7 +167,7 @@ class ThrServiceTest extends TestCase
 
         $this->calculationService
             ->method('getEligibleEmployees')
-            ->willReturn(new EloquentCollection());
+            ->willReturn(new EloquentCollection);
 
         $result = $this->service->generate($validated, $creator);
 
@@ -404,7 +405,7 @@ class ThrServiceTest extends TestCase
 
     public function test_get_all_paginated_delegates_to_repository(): void
     {
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginator = new LengthAwarePaginator(
             collect([]), 0, 15, 1
         );
 

@@ -9,13 +9,11 @@ namespace App\Services;
  * kinerja komprehensif dalam satu review cycle.
  *
  * Kriteria (semua Benefit — semakin besar semakin baik):
- *   C1 - avg_manager_rating       : Competency Score — weighted avg dari section competency (1-5)
- *   C2 - final_rating             : KPI Score — weighted avg dari section KPI, calibrated jika ada (1-5)
- *   C3 - avg_goal_completion      : Goal Completion % (0-100)
- *   C4 - goal_completion_ratio    : On-Time Goal Ratio — goals selesai sebelum deadline (0-1)
- *   C5 - positive_feedback_count  : jumlah feedback positif yang diterima
- *   C6 - attendance_quality       : kualitas absensi (0-100)
- *   C7 - task_completion_quality  : kualitas penyelesaian tugas (0-100)
+ *   C1 - performance_score  : Skor kinerja (30%) — gabungan kompetensi + KPI (0-100)
+ *   C2 - attendance_rate    : Tingkat kehadiran (20%) — persentase hari masuk (0-100)
+ *   C3 - goal_completion    : Penyelesaian tujuan (25%) — persentase selesai + tepat waktu (0-100)
+ *   C4 - feedback_score     : Skor umpan balik (15%) — jumlah feedback positif yang diterima (0-100)
+ *   C5 - tenure_factor      : Faktor masa kerja (10%) — skala 0-100 berdasarkan durasi kerja
  *
  * Langkah-langkah:
  *   1. Bangun matriks keputusan (decision matrix)
@@ -30,31 +28,27 @@ class TopsisService
 {
     /** Nama kriteria yang digunakan */
     private const CRITERIA = [
-        'avg_manager_rating',
-        'final_rating',
-        'avg_goal_completion',
-        'goal_completion_ratio',
-        'positive_feedback_count',
-        'attendance_quality',
-        'task_completion_quality',
+        'performance_score',
+        'attendance_rate',
+        'goal_completion',
+        'feedback_score',
+        'tenure_factor',
     ];
 
     /** Semua kriteria adalah Benefit (true = benefit, false = cost) */
     private const CRITERIA_TYPES = [
-        'avg_manager_rating' => true,
-        'final_rating' => true,
-        'avg_goal_completion' => true,
-        'goal_completion_ratio' => true,
-        'positive_feedback_count' => true,
-        'attendance_quality' => true,
-        'task_completion_quality' => true,
+        'performance_score' => true,
+        'attendance_rate' => true,
+        'goal_completion' => true,
+        'feedback_score' => true,
+        'tenure_factor' => true,
     ];
 
     /**
      * Jalankan algoritma TOPSIS lengkap.
      *
-     * @param  array  $candidates  Array of ['staff_member_id', 'employee_name', 'department', 'C1'...'C5']
-     * @param  array  $weights  Bobot tiap kriteria ['avg_manager_rating' => 0.35, ...]
+     * @param  array  $candidates  Array of ['staff_member_id', 'employee_name', 'department', 'performance_score', 'attendance_rate', 'goal_completion', 'feedback_score', 'tenure_factor']
+     * @param  array  $weights  Bobot tiap kriteria ['performance_score' => 0.30, 'attendance_rate' => 0.20, ...]
      * @return array Hasil ranking beserta detail kalkulasi tiap langkah
      */
     public function calculate(array $candidates, array $weights): array

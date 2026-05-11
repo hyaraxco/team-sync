@@ -2,24 +2,16 @@
 
 namespace App\Services\Attendance;
 
-use App\Models\AttendancePolicy;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
+use App\Support\AttendanceHelper;
 use Carbon\Carbon;
-use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
 
 class LeaveBalanceService
 {
-    private const DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE = [
-        'full_time' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'contract' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'intern' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'part_time' => ['monday', 'wednesday', 'friday'],
-    ];
-
     public function getEmployeeBalances(int $employeeId, ?string $asOfDate = null): Collection
     {
         $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);
@@ -28,7 +20,7 @@ class LeaveBalanceService
         }
 
         $employmentType = $employee->jobInformation?->employment_type ?? '';
-        $employmentType = $this->normalizeEmploymentType($employmentType);
+        $employmentType = AttendanceHelper::normalizeEmploymentType($employmentType);
 
         $entitlements = LeaveEntitlement::where('employment_type', $employmentType)
             ->where('is_eligible', true)
@@ -38,7 +30,7 @@ class LeaveBalanceService
         $yearStart = $targetDate->copy()->startOfYear()->toDateString();
         $yearEnd = $targetDate->copy()->endOfYear()->toDateString();
 
-        $scheduledWeekdays = $this->resolveScheduledWeekdays($employmentType);
+        $scheduledWeekdays = AttendanceHelper::resolveScheduledWeekdays($employmentType);
 
         return $entitlements->map(function (LeaveEntitlement $entitlement) use ($employeeId, $employmentType, $yearStart, $yearEnd, $scheduledWeekdays) {
             $usedDays = 0;
@@ -51,7 +43,7 @@ class LeaveBalanceService
                     ->get();
 
                 foreach ($approvedLeaves as $leave) {
-                    $usedDays += $this->countWorkingLeaveDays(
+                    $usedDays += AttendanceHelper::countWorkingLeaveDays(
                         $employmentType,
                         Carbon::parse($leave->start_date)->startOfDay(),
                         Carbon::parse($leave->end_date)->endOfDay(),
@@ -72,70 +64,6 @@ class LeaveBalanceService
         });
     }
 
-    private function countWorkingLeaveDays(
-        string $employmentType,
-        CarbonInterface $startDate,
-        CarbonInterface $endDate,
-        Collection $scheduledWeekdays
-    ): int {
-        $days = 0;
-        $cursor = Carbon::parse($startDate)->startOfDay();
-
-        while ($cursor->lessThanOrEqualTo($endDate)) {
-            if ($scheduledWeekdays->contains(strtolower($cursor->englishDayOfWeek))
-                && ! $this->isHolidayForEmploymentType($employmentType, $cursor, $scheduledWeekdays)) {
-                $days++;
-            }
-
-            $cursor->addDay();
-        }
-
-        return $days;
-    }
-
-    private function isHolidayForEmploymentType(
-        string $employmentType,
-        CarbonInterface $date,
-        Collection $scheduledWeekdays
-    ): bool {
-        if (! $scheduledWeekdays->contains(strtolower($date->englishDayOfWeek))) {
-            return false;
-        }
-
-        return HolidayCalendar::query()
-            ->whereDate('date', $date->toDateString())
-            ->get()
-            ->contains(function (HolidayCalendar $holiday) use ($employmentType) {
-                $appliesTo = $holiday->applies_to;
-
-                return $appliesTo === null || in_array($employmentType, $appliesTo, true);
-            });
-    }
-
-    private function resolveScheduledWeekdays(string $employmentType): Collection
-    {
-        $policy = AttendancePolicy::query()
-            ->where('employment_type', $employmentType)
-            ->first();
-
-        $weekdays = $policy?->default_working_weekdays
-            ?? self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE[$employmentType]
-            ?? self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE['full_time'];
-
-        return collect($weekdays)
-            ->map(fn ($weekday) => strtolower((string) $weekday))
-            ->values();
-    }
-
-    private function normalizeEmploymentType(string $employmentType): string
-    {
-        return match ($employmentType) {
-            'internship' => 'intern',
-            'freelance' => 'contract',
-            default => $employmentType,
-        };
-    }
-
     /**
      * Get upcoming collective leave (cuti bersama) days for an employee.
      */
@@ -146,7 +74,7 @@ class LeaveBalanceService
             return collect();
         }
 
-        $employmentType = $this->normalizeEmploymentType($employee->jobInformation?->employment_type ?? 'full_time');
+        $employmentType = AttendanceHelper::normalizeEmploymentType($employee->jobInformation?->employment_type ?? 'full_time');
 
         return HolidayCalendar::query()
             ->where('type', 'collective_leave')

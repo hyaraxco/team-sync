@@ -114,7 +114,7 @@ class ProjectDtoTest extends TestCase
 
     private function makeProject(array $attributes): Project
     {
-        $project = new Project();
+        $project = new Project;
         foreach ($attributes as $key => $value) {
             $project->{$key} = $value;
         }

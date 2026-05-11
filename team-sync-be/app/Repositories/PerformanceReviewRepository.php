@@ -13,10 +13,10 @@ use App\Models\PerformanceReviewCycle;
 use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\PerformanceReviewTemplate;
-use App\Models\ProjectTask;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Services\Performance\PerformanceOutcomeService;
+use Carbon\Carbon;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -344,13 +344,12 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
      * Ambil data skor tiap karyawan dalam satu cycle untuk perhitungan TOPSIS.
      * Hanya mengambil review dengan status 'completed'.
      *
-     * Kriteria TOPSIS:
-     *   C1 = Competency Score (weighted avg dari section dengan topsis_category = 'competency')
-     *   C2 = KPI Score (weighted avg dari section dengan topsis_category = 'kpi')
-     *        Jika HR mengisi final_rating (calibrated), gunakan nilainya; jika tidak, pakai manager_rating
-     *   C3 = Goal Completion % (dari goals employee dalam periode cycle)
-     *   C4 = Goal Completion Ratio / On-Time (goals selesai tepat waktu)
-     *   C5 = Positive Feedback Count (feedback positif dalam periode cycle)
+     * Kriteria TOPSIS (5):
+     *   performance_score = avg(competency, KPI) * 20 → 0-100
+     *   attendance_rate   = attendance quality score → 0-100
+     *   goal_completion   = 80% completion rate + 20% on-time bonus → 0-100
+     *   feedback_score    = positive feedback count
+     *   tenure_factor     = months since hire_date, capped 60, scaled 0-100
      *
      * @return array Array of candidates dengan 5 nilai kriteria siap hitung TOPSIS
      */
@@ -481,19 +480,19 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 $attendanceQuality = ($attendancePoints / $attendanceRecords->count()) * 100;
             }
 
-            $allTasks = ProjectTask::where('assignee_id', $employeeId)
-                ->whereBetween('created_at', [
-                    $cycle->start_date.' 00:00:00',
-                    $cycle->end_date.' 23:59:59',
-                ])
-                ->get(['status']);
-
-            $taskCompletionQuality = 0.0;
-            if ($allTasks->isNotEmpty()) {
-                $doneTasks = $allTasks->where('status', 'done')->count();
-                $reviewTasks = $allTasks->where('status', 'review')->count();
-                $taskCompletionQuality = ((($doneTasks * 1.0) + ($reviewTasks * 0.5)) / $allTasks->count()) * 100;
+            // Tenure factor: months since hire_date, capped at 60 months, scaled 0-100
+            $startDate = $review->staffMember->jobInformation?->start_date;
+            $tenureFactor = 0.0;
+            if ($startDate) {
+                $tenureMonths = Carbon::parse($startDate)->diffInMonths(now());
+                $tenureFactor = min($tenureMonths, 60) / 60 * 100;
             }
+
+            // Merged C1+C2: performance_score = average of competency + KPI (1-5 scale) → 0-100
+            $performanceScore = (($c1CompetencyScore + $c2KpiScore) / 2) * 20;
+
+            // Merged C3+C4: goal_completion = 80% completion rate + 20% on-time bonus
+            $goalCompletion = ($avgGoalCompletion * 0.8) + ($goalCompletionRatio * 100 * 0.2);
 
             $candidates[] = [
                 'staff_member_id' => $employeeId,
@@ -502,14 +501,12 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 'team' => $review->staffMember->jobInformation->team->name ?? null,
                 'review_id' => $review->id,
                 'review_status' => $review->status,
-                // Kriteria TOPSIS (renamed for clarity)
-                'avg_manager_rating' => round($c1CompetencyScore, 4),  // C1: Competency Score
-                'final_rating' => round($c2KpiScore, 4),         // C2: KPI Score
-                'avg_goal_completion' => round((float) $avgGoalCompletion, 4),   // C3
-                'goal_completion_ratio' => round((float) $goalCompletionRatio, 4), // C4
-                'positive_feedback_count' => (int) $positiveFeedbackCount,           // C5
-                'attendance_quality' => round((float) $attendanceQuality, 4),         // C6
-                'task_completion_quality' => round((float) $taskCompletionQuality, 4), // C7
+                // Kriteria TOPSIS (5 criteria)
+                'performance_score' => round((float) $performanceScore, 4),        // Merged C1+C2
+                'attendance_rate' => round((float) $attendanceQuality, 4),          // C6 (renamed)
+                'goal_completion' => round((float) $goalCompletion, 4),             // Merged C3+C4
+                'feedback_score' => (int) $positiveFeedbackCount,                   // C5 (renamed)
+                'tenure_factor' => round((float) $tenureFactor, 4),                // NEW
             ];
         }
 
