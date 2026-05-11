@@ -109,6 +109,7 @@ class ProjectTaskPolicyTest extends TestCase
             'project_id' => $this->project->id,
             'assignee_id' => $this->staffProfile->id,
             'status' => $status,
+            'priority' => 'high',
             'due_date' => now()->addDays(7)->format('Y-m-d'),
         ], $overrides));
     }

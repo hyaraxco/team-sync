@@ -8,6 +8,7 @@ use App\Models\OvertimeRecord;
 use App\Models\User;
 use App\Services\OvertimeService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Notification;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -51,7 +52,7 @@ class OvertimeServiceTest extends TestCase
         $record->status = OvertimeRecord::STATUS_PENDING;
 
         $this->repository
-            ->method('getWeeklyHoursForStaffMember')
+            ->method('getWeeklyHoursForStaffMemberLocked')
             ->willReturn(0.0);
 
         $this->repository
@@ -99,7 +100,7 @@ class OvertimeServiceTest extends TestCase
         ];
 
         $this->repository
-            ->method('getWeeklyHoursForStaffMember')
+            ->method('getWeeklyHoursForStaffMemberLocked')
             ->willReturn(0.0);
 
         $result = $this->service->create($validated);
@@ -119,7 +120,7 @@ class OvertimeServiceTest extends TestCase
         ];
 
         $this->repository
-            ->method('getWeeklyHoursForStaffMember')
+            ->method('getWeeklyHoursForStaffMemberLocked')
             ->willReturn(17.0);
 
         $result = $this->service->create($validated);
@@ -139,7 +140,7 @@ class OvertimeServiceTest extends TestCase
         ];
 
         $this->repository
-            ->method('getWeeklyHoursForStaffMember')
+            ->method('getWeeklyHoursForStaffMemberLocked')
             ->willReturn(0.0);
 
         $this->repository
@@ -287,7 +288,7 @@ class OvertimeServiceTest extends TestCase
 
     public function test_get_all_paginated_delegates_to_repository(): void
     {
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginator = new LengthAwarePaginator(
             collect([]), 0, 15, 1
         );
 
@@ -302,7 +303,7 @@ class OvertimeServiceTest extends TestCase
 
     public function test_get_by_staff_member_delegates_to_repository(): void
     {
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginator = new LengthAwarePaginator(
             collect([]), 0, 15, 1
         );
 

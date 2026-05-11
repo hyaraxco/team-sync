@@ -111,7 +111,7 @@ class JobInformationDtoTest extends TestCase
 
     private function makeJobInformation(array $attributes): JobInformation
     {
-        $job = new JobInformation();
+        $job = new JobInformation;
         foreach ($attributes as $key => $value) {
             $job->{$key} = $value;
         }
