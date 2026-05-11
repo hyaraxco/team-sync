@@ -31,6 +31,7 @@ use App\Services\EmailService;
 use App\Services\Payroll\OvertimeCalculationService;
 use App\Services\Payroll\TaxCalculationService;
 use App\Services\PayrollActivityLogger;
+use App\Support\AttendanceHelper;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -42,13 +43,6 @@ use Illuminate\Support\Facades\DB;
 
 class PayrollRepository implements PayrollRepositoryInterface
 {
-    private const DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE = [
-        'full_time' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'contract' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'intern' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'part_time' => ['monday', 'wednesday', 'friday'],
-    ];
-
     private const UNRESOLVED_MISMATCH_STATUSES = AttendancePolicyMismatch::UNRESOLVED_STATUSES;
 
     private const DEDUCTION_WARNING_RATIO = 0.5;
@@ -2286,7 +2280,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     private function getEntitlementsLookup(SupportCollection $employees): SupportCollection
     {
         $employmentTypes = $employees
-            ->map(fn (StaffMemberProfile $employee) => $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
+            ->map(fn (StaffMemberProfile $employee) => AttendanceHelper::normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
             ->unique()
             ->values()
             ->all();
@@ -2327,7 +2321,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     private function buildEmployeeReadinessRow(StaffMemberProfile $employee, Carbon $startDate, Carbon $endDate, array $lookups): array
     {
         $employeeId = (int) $employee->id;
-        $employmentType = $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time'));
+        $employmentType = AttendanceHelper::normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time'));
 
         $scheduledWeekdays = $this->resolveScheduledWeekdays($employee, $employmentType);
         $scheduledDateLookup = $this->resolveScheduledDateLookup($scheduledWeekdays, $startDate, $endDate);
@@ -2469,15 +2463,6 @@ class PayrollRepository implements PayrollRepositoryInterface
         ];
     }
 
-    private function normalizeEmploymentType(string $employmentType): string
-    {
-        return match ($employmentType) {
-            'internship' => 'intern',
-            'freelance' => 'contract',
-            default => $employmentType,
-        };
-    }
-
     private function resolveScheduledWeekdays(StaffMemberProfile $employee, string $employmentType): array
     {
         $policyWeekdays = $employee->jobInformation?->attendancePolicy?->default_working_weekdays;
@@ -2486,8 +2471,8 @@ class PayrollRepository implements PayrollRepositoryInterface
             return array_values(array_map(fn ($day) => strtolower((string) $day), $policyWeekdays));
         }
 
-        return self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE[$employmentType]
-            ?? self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE['full_time'];
+        return AttendanceHelper::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE[$employmentType]
+            ?? AttendanceHelper::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE['full_time'];
     }
 
     private function resolveScheduledDateLookup(array $scheduledWeekdays, Carbon $startDate, Carbon $endDate): array
