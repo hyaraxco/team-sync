@@ -60,7 +60,7 @@ class ProjectTaskAttachmentValidationTest extends TestCase
         $this->postJson("/api/v1/project-tasks/{$this->task->id}/attachments", [
             'file' => $file,
         ])->assertUnprocessable()
-          ->assertJsonValidationErrors(['file']);
+            ->assertJsonValidationErrors(['file']);
     }
 
     public function test_rejects_exe_file_upload(): void
@@ -72,7 +72,7 @@ class ProjectTaskAttachmentValidationTest extends TestCase
         $this->postJson("/api/v1/project-tasks/{$this->task->id}/attachments", [
             'file' => $file,
         ])->assertUnprocessable()
-          ->assertJsonValidationErrors(['file']);
+            ->assertJsonValidationErrors(['file']);
     }
 
     public function test_rejects_shell_script_upload(): void
@@ -84,7 +84,7 @@ class ProjectTaskAttachmentValidationTest extends TestCase
         $this->postJson("/api/v1/project-tasks/{$this->task->id}/attachments", [
             'file' => $file,
         ])->assertUnprocessable()
-          ->assertJsonValidationErrors(['file']);
+            ->assertJsonValidationErrors(['file']);
     }
 
     public function test_accepts_pdf_file_upload(): void

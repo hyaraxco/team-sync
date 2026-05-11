@@ -139,7 +139,9 @@ class PayrollSetting extends Model
     private function normalizeSnapshotValue(string $field, mixed $value): string
     {
         if ($field === 'absent_deduction_rate') {
-            return number_format((float) $value, 2, '.', '');
+            // Use round() instead of number_format() to avoid float precision
+            // issues (e.g. 0.99999999 vs 1.00) when comparing snapshot values.
+            return (string) round((float) $value, 2);
         }
 
         if (is_string($value)) {

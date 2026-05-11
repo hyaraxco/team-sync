@@ -19,11 +19,21 @@
                         cutoff.
                     </p>
                 </div>
-                <button
-                    class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300 shadow-lg shadow-white/10"
-                >
-                    Sync Latest
-                </button>
+                <div class="flex items-center gap-3">
+                    <button
+                        class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300 shadow-lg shadow-white/10"
+                        @click="openCreateModal"
+                    >
+                        <Plus class="w-4 h-4 inline mr-2" />
+                        Create Period
+                    </button>
+                    <button
+                        class="px-6 py-2.5 rounded-full bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors duration-300"
+                        @click="fetchData"
+                    >
+                        Sync Latest
+                    </button>
+                </div>
             </header>
 
             <div class="relative z-10 grid gap-8 lg:grid-cols-3">
@@ -233,19 +243,91 @@
                 </div>
             </div>
         </div>
+
+        <!-- Create Period Modal -->
+        <ModalWrapper
+            :show="isCreateModalOpen"
+            title="Create Attendance Period"
+            maxWidth="md"
+            @close="closeCreateModal"
+        >
+            <form class="space-y-4" @submit.prevent="submitCreateForm">
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-2">Start Date</label>
+                    <input
+                        v-model="createForm.start_date"
+                        type="date"
+                        required
+                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-2">End Date</label>
+                    <input
+                        v-model="createForm.end_date"
+                        type="date"
+                        required
+                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                    />
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-neutral-300 mb-2">Cutoff Date</label>
+                    <input
+                        v-model="createForm.cutoff_date"
+                        type="date"
+                        required
+                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                    />
+                </div>
+
+                <div class="flex gap-3 pt-4">
+                    <button
+                        type="button"
+                        :disabled="isSubmitting"
+                        class="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white font-medium text-sm hover:bg-white/10 transition-colors"
+                        @click="closeCreateModal"
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        type="submit"
+                        :disabled="isSubmitting"
+                        class="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm hover:bg-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        {{ isSubmitting ? "Creating..." : "Create Period" }}
+                    </button>
+                </div>
+            </form>
+        </ModalWrapper>
     </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from "vue";
+import { storeToRefs } from "pinia";
+import { Plus } from "lucide-vue-next";
 import { useAttendancePeriodStore } from "@/stores/attendancePeriod";
 import { useToast } from "@/composables/useToast";
+import ModalWrapper from "@/components/common/ModalWrapper.vue";
 
 const periodStore = useAttendancePeriodStore();
+const { paginatedPeriods, meta, loading, error } = storeToRefs(periodStore);
 const toast = useToast();
 const selectedPeriod = ref(null);
 
-const periods = computed(() => periodStore.paginatedPeriods || periodStore.periods || []);
+const periods = computed(() => paginatedPeriods.value || periodStore.periods || []);
+
+// Create modal
+const isCreateModalOpen = ref(false);
+const createForm = ref({
+    start_date: "",
+    end_date: "",
+    cutoff_date: "",
+});
+
+const isSubmitting = ref(false);
 
 const readinessCounts = computed(() => {
     const summary = periodStore.readinessSummary || {};
@@ -267,6 +349,41 @@ const selectPeriod = async (period) => {
             periodStore.error || error?.response?.data?.message || "Failed to load readiness.",
         );
     }
+};
+
+// Create modal handlers
+const openCreateModal = () => {
+    isCreateModalOpen.value = true;
+};
+
+const closeCreateModal = () => {
+    isCreateModalOpen.value = false;
+    createForm.value = {
+        start_date: "",
+        end_date: "",
+        cutoff_date: "",
+    };
+};
+
+const submitCreateForm = async () => {
+    isSubmitting.value = true;
+    try {
+        await periodStore.createPeriod(createForm.value);
+        toast.success("Created", "Attendance period has been created successfully.");
+        closeCreateModal();
+        await fetchData();
+    } catch (error) {
+        toast.error(
+            "Failed to create",
+            periodStore.error || error?.response?.data?.message || "Failed to create attendance period.",
+        );
+    } finally {
+        isSubmitting.value = false;
+    }
+};
+
+const fetchData = async () => {
+    await periodStore.fetchAllPaginated();
 };
 
 onMounted(async () => {

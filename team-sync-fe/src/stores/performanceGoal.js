@@ -48,6 +48,27 @@ export const usePerformanceGoalStore = defineStore("performanceGoal", {
             }
         },
 
+        async fetchGoals() {
+            this.goalsLoading = true;
+            this.error = null;
+            try {
+                const response = await axiosInstance.get("/performance/goals");
+                this.myGoals = response.data.data.data || [];
+                this.pagination = {
+                    current_page: response.data.data.current_page,
+                    per_page: response.data.data.per_page,
+                    total: response.data.data.total,
+                    last_page: response.data.data.last_page,
+                };
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.goalsLoading = false;
+            }
+        },
+
         async fetchTeamGoals(filters = {}) {
             this.goalsLoading = true;
             this.error = null;

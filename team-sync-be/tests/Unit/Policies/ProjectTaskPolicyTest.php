@@ -523,6 +523,7 @@ class ProjectTaskPolicyTest extends TestCase
 
         $this->assertTrue($response->allowed());
     }
+
     public function test_staff_can_collaborate_on_rejected_needs_revision_task(): void
     {
         $task = $this->makeTask('rejected', ['needs_revision' => true]);

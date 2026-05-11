@@ -212,8 +212,6 @@ class ThrControllerTest extends TestCase
             ->assertStatus(400);
     }
 
-
-
     public function test_finance_can_simulate_thr(): void
     {
         $this->createEmployee(salary: 10_000_000, startDate: now()->subMonths(12), religion: 'islam');
