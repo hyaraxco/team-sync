@@ -1,36 +1,5 @@
 import { describe, expect, it } from "vitest";
-
-/**
- * Step4Preview parseSalaryNumber logic extracted for direct testing.
- * The function is defined in Step4Preview.vue <script setup> block.
- * We replicate it here to test the pure logic.
- */
-const parseSalaryNumber = (value) => {
-    if (value === null || value === undefined) return null;
-
-    const raw = String(value).trim();
-    if (!raw) return null;
-
-    // Pattern: decimal number like "1.500.000,50" or "1000.50"
-    // If it matches digits.digits (like "1000.50"), treat as float then trunc
-    if (/^\d+\.\d{1,2}$/.test(raw)) {
-        const parsed = Number(raw);
-        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
-    }
-
-    // Indonesian thousand separator: "1.000.000" or "1.000.000,50"
-    if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(raw)) {
-        const parsed = Number(raw.replace(/\./g, "").replace(",", "."));
-        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
-    }
-
-    // Raw digits: "1000000" or mixed chars with digits
-    const digits = raw.replace(/[^0-9]/g, "");
-    if (!digits) return null;
-
-    const parsed = parseInt(digits, 10);
-    return Number.isFinite(parsed) ? parsed : null;
-};
+import { parseSalaryNumber } from "@/utils/salaryUtils";
 
 describe("Step4Preview - parseSalaryNumber", () => {
     // --- Decimal format (e.g. "1.000.000,50") ---

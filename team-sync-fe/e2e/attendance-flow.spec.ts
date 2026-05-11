@@ -7,19 +7,18 @@ const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
  * Pick a weekday range 3-6 months in the future to avoid overlaps
  * with previous test runs or seeded data.
  *
- * Uses a combination of timestamp + random offset to ensure uniqueness
- * even when tests run in quick succession.
+ * Uses a deterministic offset based on worker index and timestamp
+ * to ensure uniqueness without randomness.
  */
-const getNextMonthWeekdayRange = () => {
+const getNextMonthWeekdayRange = (workerIndex: number = 0) => {
     const start = new Date();
-    // Use 3-6 months in the future based on current timestamp to ensure uniqueness
-    const monthsAhead = 3 + (Math.floor(Date.now() / 1000) % 4);
+    // Use 3-6 months in the future based on worker index to ensure uniqueness
+    const monthsAhead = 3 + (workerIndex % 4);
     start.setMonth(start.getMonth() + monthsAhead, 1);
 
-    // Use a rotating day within the month with random component for extra uniqueness
+    // Use a deterministic day within the month based on timestamp (no random)
     const rotatingOffset = Math.floor((Date.now() / 1_000) % 20);
-    const randomOffset = Math.floor(Math.random() * 5); // 0-4 random days
-    start.setDate(5 + rotatingOffset + randomOffset);
+    start.setDate(5 + rotatingOffset + workerIndex);
 
     while (start.getDay() === 0 || start.getDay() === 6) {
         start.setDate(start.getDate() + 1);
@@ -107,7 +106,7 @@ test.describe.serial("Attendance flow", () => {
         }, { timeout: 10_000 });
         await leaveTypeSelect.selectOption({ index: 1 });
 
-        const { startDate, endDate } = getNextMonthWeekdayRange();
+        const { startDate, endDate } = getNextMonthWeekdayRange(0);
 
         await page.getByTestId('leave-start-date').fill(startDate);
         await page.getByTestId('leave-end-date').fill(endDate);

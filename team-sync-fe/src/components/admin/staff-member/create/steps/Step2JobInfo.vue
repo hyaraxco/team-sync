@@ -26,6 +26,7 @@ import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { storeToRefs } from "pinia";
 import RightSidebarStep2 from "@/components/admin/staff-member/create/RightSidebarStep2.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
+import { parseSalaryNumber } from "@/utils/salaryUtils";
 
 interface Props {
     modelValue: any;
@@ -148,29 +149,6 @@ onMounted(async () => {
         form.value.monthly_salary = formatRupiah(form.value.monthly_salary);
     }
 });
-
-const parseSalaryNumber = (value: any): number | null => {
-    if (value === null || value === undefined) return null;
-
-    const raw = String(value).trim();
-    if (!raw) return null;
-
-    if (/^\d+\.\d{1,2}$/.test(raw)) {
-        const parsed = Number(raw);
-        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
-    }
-
-    if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(raw)) {
-        const parsed = Number(raw.replace(/\./g, "").replace(",", "."));
-        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
-    }
-
-    const digits = raw.replace(/[^0-9]/g, "");
-    if (!digits) return null;
-
-    const parsed = parseInt(digits, 10);
-    return Number.isFinite(parsed) ? parsed : null;
-};
 
 const formatRupiah = (value: any) => {
     const parsed = parseSalaryNumber(value);

@@ -35,6 +35,8 @@ const handleDeleteProject = async () => {
     if (projectStore.success) {
         showDeleteModal.value = false;
         toast.success("Project deleted", projectStore.success);
+    } else if (projectStore.error) {
+        toast.error("Delete failed", projectStore.error);
     }
 };
 </script>

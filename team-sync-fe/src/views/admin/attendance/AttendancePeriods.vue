@@ -301,45 +301,6 @@
                 </div>
             </form>
         </ModalWrapper>
-
-        <!-- Edit Status Modal -->
-        <ModalWrapper :show="isEditModalOpen" title="Update Period Status" maxWidth="md" @close="closeEditModal">
-            <form class="space-y-4" @submit.prevent="submitEditForm">
-                <div>
-                    <label class="block text-sm font-medium text-neutral-300 mb-2">Status</label>
-                    <select
-                        v-model="editForm.status"
-                        required
-                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
-                    >
-                        <option value="open">Open</option>
-                        <option value="review">Review</option>
-                        <option value="locked">Locked</option>
-                    </select>
-                    <p class="mt-2 text-xs text-neutral-400">
-                        Status flow: Open → Review → Locked. Cannot skip steps or revert locked periods.
-                    </p>
-                </div>
-
-                <div class="flex gap-3 pt-4">
-                    <button
-                        type="button"
-                        :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white font-medium text-sm hover:bg-white/10 transition-colors"
-                        @click="closeEditModal"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="submit"
-                        :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm hover:bg-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {{ isSubmitting ? "Updating..." : "Update Status" }}
-                    </button>
-                </div>
-            </form>
-        </ModalWrapper>
     </div>
 </template>
 
@@ -365,13 +326,6 @@ const createForm = ref({
     end_date: "",
     cutoff_date: "",
 });
-
-// Edit modal
-const isEditModalOpen = ref(false);
-const editForm = ref({
-    status: "",
-});
-const editingPeriod = ref(null);
 
 const isSubmitting = ref(false);
 
@@ -422,40 +376,6 @@ const submitCreateForm = async () => {
         toast.error(
             "Failed to create",
             periodStore.error || error?.response?.data?.message || "Failed to create attendance period.",
-        );
-    } finally {
-        isSubmitting.value = false;
-    }
-};
-
-// Edit modal handlers
-const openEditModal = (period) => {
-    editingPeriod.value = period;
-    editForm.value = {
-        status: period.status,
-    };
-    isEditModalOpen.value = true;
-};
-
-const closeEditModal = () => {
-    isEditModalOpen.value = false;
-    editForm.value = {
-        status: "",
-    };
-    editingPeriod.value = null;
-};
-
-const submitEditForm = async () => {
-    isSubmitting.value = true;
-    try {
-        await periodStore.updatePeriod(editingPeriod.value.id, editForm.value);
-        toast.success("Updated", "Attendance period status has been updated successfully.");
-        closeEditModal();
-        await fetchData();
-    } catch (error) {
-        toast.error(
-            "Failed to update",
-            periodStore.error || error?.response?.data?.message || "Failed to update attendance period.",
         );
     } finally {
         isSubmitting.value = false;

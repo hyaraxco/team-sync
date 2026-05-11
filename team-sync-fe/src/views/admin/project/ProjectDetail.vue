@@ -122,6 +122,8 @@ const handleDeleteProject = async () => {
     if (projectStore.success) {
         showDeleteModal.value = false;
         router.push({ name: "admin.projects" });
+    } else if (projectStore.error) {
+        toast.error("Delete failed", projectStore.error);
     }
 };
 
