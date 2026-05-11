@@ -6,7 +6,6 @@ use App\Models\AnalyticsSnapshot;
 use App\Services\Analytics\DailyMetricsCalculator;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
 
 class DailyMetricsCalculatorTest extends TestCase
@@ -18,24 +17,6 @@ class DailyMetricsCalculatorTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Recreate analytics_snapshots table without CHECK constraint on metric_type
-        // The service uses 'performance' which isn't in the original enum.
-        DB::statement('DROP TABLE IF EXISTS analytics_snapshots');
-        DB::statement('CREATE TABLE analytics_snapshots (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            metric_type TEXT NOT NULL,
-            metric_name TEXT NOT NULL,
-            period_type TEXT NOT NULL,
-            period_start DATE NOT NULL,
-            period_end DATE,
-            value DECIMAL(12,2),
-            metadata TEXT,
-            calculated_at TIMESTAMP,
-            created_at TIMESTAMP,
-            updated_at TIMESTAMP
-        )');
-        DB::statement('CREATE INDEX idx_analytics_metric_period ON analytics_snapshots (metric_type, metric_name, period_type, period_start)');
 
         $this->service = new DailyMetricsCalculator;
     }
@@ -49,9 +30,8 @@ class DailyMetricsCalculatorTest extends TestCase
     {
         $this->service->calculateDailyMetrics('2026-05-01');
 
-        // The date cast stores as Y-m-d H:i:s
         $snapshot = AnalyticsSnapshot::where('metric_name', 'total_reviews')
-            ->where('period_start', $this->formatPeriodStart('2026-05-01'))
+            ->whereDate('period_start', '2026-05-01')
             ->first();
 
         $this->assertNotNull($snapshot);
@@ -112,8 +92,7 @@ class DailyMetricsCalculatorTest extends TestCase
     {
         $this->service->calculateDailyMetrics();
 
-        $yesterday = now()->subDay()->toDateString();
-        $periodStart = $this->formatPeriodStart($yesterday);
+        $periodStart = $this->formatPeriodStart(now()->subDay()->toDateString());
 
         $this->assertDatabaseHas('analytics_snapshots', [
             'metric_name' => 'total_reviews',
