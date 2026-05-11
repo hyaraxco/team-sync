@@ -242,7 +242,7 @@ class PayrollController extends Controller implements HasMiddleware
                 'Payroll generation is being processed in the background. Please check back shortly.',
                 [
                     'salary_month' => $month->format('F Y'),
-                    'status' => 'processing',
+                    'status' => Payroll::STATUS_PROCESSING,
                 ],
                 200
             );
