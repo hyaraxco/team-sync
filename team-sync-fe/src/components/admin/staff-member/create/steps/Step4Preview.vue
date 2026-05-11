@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { User, Briefcase, Phone, CreditCard, CheckCircle } from "lucide-vue-next";
 import { DEFAULT_AVATAR } from "@/helpers/format";
+import { parseSalaryNumber } from "@/utils/salaryUtils";
 
 interface Props {
     step1Data: any;
@@ -18,29 +19,6 @@ const formatDate = (date: string) => {
         month: "long",
         day: "numeric",
     });
-};
-
-const parseSalaryNumber = (value: any): number | null => {
-    if (value === null || value === undefined) return null;
-
-    const raw = String(value).trim();
-    if (!raw) return null;
-
-    if (/^\d+\.\d{1,2}$/.test(raw)) {
-        const parsed = Number(raw);
-        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
-    }
-
-    if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(raw)) {
-        const parsed = Number(raw.replace(/\./g, "").replace(",", "."));
-        return Number.isFinite(parsed) ? Math.trunc(parsed) : null;
-    }
-
-    const digits = raw.replace(/[^0-9]/g, "");
-    if (!digits) return null;
-
-    const parsed = parseInt(digits, 10);
-    return Number.isFinite(parsed) ? parsed : null;
 };
 
 const formatCurrency = (amount: string) => {

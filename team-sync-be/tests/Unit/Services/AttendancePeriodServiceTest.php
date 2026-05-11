@@ -4,7 +4,6 @@ namespace Tests\Unit\Services;
 
 use App\Models\AttendancePeriod;
 use App\Services\Attendance\AttendancePeriodService;
-use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

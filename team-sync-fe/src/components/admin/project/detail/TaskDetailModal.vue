@@ -868,16 +868,16 @@ watch(
                                     class="w-full p-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
                                 >
                                     <img
-                                        :src="employee.user?.profile_photo || DEFAULT_AVATAR"
-                                        :alt="employee.user?.name"
+                                        :src="staffMember.user?.profile_photo || DEFAULT_AVATAR"
+                                        :alt="staffMember.user?.name"
                                         class="w-8 h-8 rounded-full object-cover"
                                     />
                                     <div class="flex-1 min-w-0">
                                         <p class="text-sm font-medium text-gray-900 truncate">
-                                            {{ employee.user?.name }}
+                                            {{ staffMember.user?.name }}
                                         </p>
                                         <p class="text-xs text-gray-500 truncate">
-                                            {{ employee.job_information?.job_title }}
+                                            {{ staffMember.job_information?.job_title }}
                                         </p>
                                     </div>
                                 </button>

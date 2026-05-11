@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { useDarkMode } from "@/composables/useDarkMode";
 
 describe("useDarkMode", () => {

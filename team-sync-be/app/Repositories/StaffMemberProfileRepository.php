@@ -16,6 +16,8 @@ use App\Models\JobInformation;
 use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Models\User;
+use App\Support\SensitiveData;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -677,13 +679,13 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
 
     public function emailExists(string $email): bool
     {
-        return \App\Models\User::query()->where('email', $email)->exists();
+        return User::query()->where('email', $email)->exists();
     }
 
     public function identityNumberExists(string $identityNumber): bool
     {
         return StaffMemberProfile::query()
-            ->where('identity_number_hash', \App\Support\SensitiveData::hash($identityNumber))
+            ->where('identity_number_hash', SensitiveData::hash($identityNumber))
             ->exists();
     }
 }

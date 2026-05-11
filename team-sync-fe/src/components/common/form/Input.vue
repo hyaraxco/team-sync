@@ -22,6 +22,7 @@
                 :required="required"
                 :min="min"
                 :step="step"
+                :autocomplete="autocomplete"
                 class="peer w-full h-full bg-white text-gray-900 border text-sm rounded-xl outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal font-medium"
                 :class="[
                     hasIcon ? 'pl-12' : 'pl-4',
@@ -69,6 +70,7 @@ const props = defineProps({
     error: { type: String, default: "" },
     min: { type: [String, Number], default: undefined },
     step: { type: [String, Number], default: undefined },
+    autocomplete: { type: String, default: undefined },
 });
 const emit = defineEmits(["update:modelValue", "blur"]);
 
