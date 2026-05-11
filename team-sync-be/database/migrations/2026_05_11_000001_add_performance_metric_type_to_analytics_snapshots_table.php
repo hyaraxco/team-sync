@@ -5,25 +5,35 @@ use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
+    private const METRIC_TYPES = [
+        'workforce',
+        'attendance',
+        'leave',
+        'payroll',
+        'project',
+    ];
+
+    private const METRIC_TYPES_WITH_PERFORMANCE = [
+        'workforce',
+        'attendance',
+        'leave',
+        'payroll',
+        'project',
+        'performance',
+    ];
+
     public function up(): void
     {
         $driver = DB::getDriverName();
 
         if ($driver === 'sqlite') {
-            $this->rebuildSqliteTable([
-                'workforce',
-                'attendance',
-                'leave',
-                'payroll',
-                'project',
-                'performance',
-            ]);
+            $this->rebuildSqliteTable(self::METRIC_TYPES_WITH_PERFORMANCE);
 
             return;
         }
 
         if ($driver === 'mysql') {
-            DB::statement("ALTER TABLE analytics_snapshots MODIFY COLUMN metric_type ENUM('workforce', 'attendance', 'leave', 'payroll', 'project', 'performance') NOT NULL");
+            DB::statement('ALTER TABLE analytics_snapshots MODIFY COLUMN metric_type '.$this->enumDefinition(self::METRIC_TYPES_WITH_PERFORMANCE).' NOT NULL');
         }
     }
 
@@ -32,13 +42,7 @@ return new class extends Migration
         $driver = DB::getDriverName();
 
         if ($driver === 'sqlite') {
-            $this->rebuildSqliteTable([
-                'workforce',
-                'attendance',
-                'leave',
-                'payroll',
-                'project',
-            ], true);
+            $this->rebuildSqliteTable(self::METRIC_TYPES, true);
 
             return;
         }
@@ -48,7 +52,7 @@ return new class extends Migration
                 ->where('metric_type', 'performance')
                 ->update(['metric_type' => 'project']);
 
-            DB::statement("ALTER TABLE analytics_snapshots MODIFY COLUMN metric_type ENUM('workforce', 'attendance', 'leave', 'payroll', 'project') NOT NULL");
+            DB::statement('ALTER TABLE analytics_snapshots MODIFY COLUMN metric_type '.$this->enumDefinition(self::METRIC_TYPES).' NOT NULL');
         }
     }
 
@@ -88,5 +92,13 @@ return new class extends Migration
         DB::statement('CREATE INDEX idx_analytics_metric_period ON analytics_snapshots (metric_type, metric_name, period_type, period_start)');
 
         DB::statement('PRAGMA foreign_keys = ON');
+    }
+
+    /**
+     * @param  array<int, string>  $metricTypes
+     */
+    private function enumDefinition(array $metricTypes): string
+    {
+        return "ENUM('".implode("', '", $metricTypes)."')";
     }
 };
