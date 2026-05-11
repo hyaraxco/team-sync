@@ -65,6 +65,14 @@ class PayrollDetail extends Model
         return $this->belongsTo(StaffMemberProfile::class, 'staff_member_id');
     }
 
+    /**
+     * All adjustments for this staff member (unconstrained by period).
+     *
+     * CAUTION: This loads ALL adjustments for the employee regardless of payroll period.
+     * For period-filtered adjustments, use the repository's manual loading
+     * (see PayrollRepository::loadAppliedAdjustmentsForDetails) or set the relation
+     * via setRelation() after querying PayrollAdjustment with target_period_id.
+     */
     public function appliedAdjustments()
     {
         return $this->hasMany(PayrollAdjustment::class, 'staff_member_id', 'staff_member_id');

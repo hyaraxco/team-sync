@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useAnalyticsStore } from "@/stores/analytics";
 import { useTeamStore } from "@/stores/team";
@@ -29,6 +29,13 @@ import {
 
 const exportLoading = ref(false);
 const showExportMenu = ref(false);
+const exportDropdownRef = ref(null);
+
+const handleClickOutside = (event) => {
+    if (exportDropdownRef.value && !exportDropdownRef.value.contains(event.target)) {
+        showExportMenu.value = false;
+    }
+};
 
 async function handleExportExcel() {
     exportLoading.value = true;
@@ -223,7 +230,12 @@ function fetchActiveTab() {
 watch(activeTab, () => fetchActiveTab());
 
 onMounted(() => {
+    document.addEventListener("click", handleClickOutside);
     fetchActiveTab();
+});
+
+onUnmounted(() => {
+    document.removeEventListener("click", handleClickOutside);
 });
 </script>
 
@@ -263,7 +275,7 @@ onMounted(() => {
                 </select>
 
                 <!-- Export Dropdown -->
-                <div v-if="can('analytics-export')" class="relative">
+                <div v-if="can('analytics-export')" ref="exportDropdownRef" class="relative">
                     <button
                         @click="showExportMenu = !showExportMenu"
                         :disabled="exportLoading"
