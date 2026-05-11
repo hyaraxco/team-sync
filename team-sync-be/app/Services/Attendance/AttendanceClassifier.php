@@ -9,6 +9,7 @@ use App\Models\HolidayCalendar;
 use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
 use App\Services\EmailService;
+use App\Support\AttendanceHelper;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -371,7 +372,7 @@ class AttendanceClassifier
                 continue;
             }
 
-            $leaveType = $this->leaveTypeValue($leaveRequest);
+            $leaveType = AttendanceHelper::leaveTypeValue($leaveRequest);
 
             return [
                 'leave_type' => $leaveType,
@@ -441,7 +442,7 @@ class AttendanceClassifier
         }
 
         $employmentType = (string) ($employee->jobInformation?->employment_type ?? 'full_time');
-        $employmentType = $this->normalizeEmploymentType($employmentType);
+        $employmentType = AttendanceHelper::normalizeEmploymentType($employmentType);
         $policy = $this->resolvePolicy($employmentType);
 
         return [
@@ -474,25 +475,6 @@ class AttendanceClassifier
         return self::DEFAULT_POLICIES[$employmentType] ?? self::DEFAULT_POLICIES['full_time'];
     }
 
-    private function leaveTypeValue(LeaveRequest $leaveRequest): string
-    {
-        $leaveType = $leaveRequest->leave_type;
-
-        if ($leaveType instanceof \BackedEnum) {
-            return (string) $leaveType->value;
-        }
-
-        return (string) $leaveType;
-    }
-
-    private function normalizeEmploymentType(string $employmentType): string
-    {
-        return match ($employmentType) {
-            'internship' => 'intern',
-            'freelance' => 'contract',
-            default => $employmentType,
-        };
-    }
 
     private function buildWarningFlags(
         array $context,

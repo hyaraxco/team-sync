@@ -10,6 +10,14 @@ class Payroll extends Model
 {
     use HasFactory, SoftDeletes;
 
+    public const STATUS_PROCESSING = 'processing';
+
+    public const STATUS_PENDING = 'pending';
+
+    public const STATUS_APPROVED = 'approved';
+
+    public const STATUS_PAID = 'paid';
+
     protected $fillable = [
         'salary_month',
         'attendance_period_id',

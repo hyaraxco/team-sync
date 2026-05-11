@@ -144,4 +144,17 @@ class OvertimeRepository implements OvertimeRepositoryInterface
             ->whereBetween('date', [$weekStart, $weekEnd])
             ->sum('hours');
     }
+
+    public function getWeeklyHoursForStaffMemberLocked(int $staffMemberId, string $date): float
+    {
+        $targetDate = Carbon::parse($date);
+        $weekStart = $targetDate->copy()->startOfWeek();
+        $weekEnd = $targetDate->copy()->endOfWeek();
+
+        return (float) OvertimeRecord::where('staff_member_id', $staffMemberId)
+            ->whereIn('status', [OvertimeRecord::STATUS_PENDING, OvertimeRecord::STATUS_APPROVED])
+            ->whereBetween('date', [$weekStart, $weekEnd])
+            ->lockForUpdate()
+            ->sum('hours');
+    }
 }

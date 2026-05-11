@@ -141,7 +141,7 @@ class AttendancePolicyMismatchLifecycleServiceTest extends TestCase
 
         $this->workingDaysCalculator
             ->method('calculateForEmployee')
-            ->willReturnCallback(function (int $staffMemberId) use ($oldStaffId, $recentStaffId) {
+            ->willReturnCallback(function (int $staffMemberId) use ($oldStaffId) {
                 if ($staffMemberId === $oldStaffId) {
                     return 5;
                 }

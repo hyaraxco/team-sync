@@ -99,7 +99,7 @@ class AttendanceDtoTest extends TestCase
 
     private function makeAttendance(array $attributes): Attendance
     {
-        $attendance = new Attendance();
+        $attendance = new Attendance;
         foreach ($attributes as $key => $value) {
             $attendance->{$key} = $value;
         }

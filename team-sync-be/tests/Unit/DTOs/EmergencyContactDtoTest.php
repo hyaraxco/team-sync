@@ -75,7 +75,7 @@ class EmergencyContactDtoTest extends TestCase
 
     private function makeEmergencyContact(array $attributes): EmergencyContact
     {
-        $contact = new EmergencyContact();
+        $contact = new EmergencyContact;
         foreach ($attributes as $key => $value) {
             $contact->{$key} = $value;
         }

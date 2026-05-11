@@ -31,6 +31,7 @@ use App\Services\EmailService;
 use App\Services\Payroll\OvertimeCalculationService;
 use App\Services\Payroll\TaxCalculationService;
 use App\Services\PayrollActivityLogger;
+use App\Support\AttendanceHelper;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Builder;
@@ -42,13 +43,6 @@ use Illuminate\Support\Facades\DB;
 
 class PayrollRepository implements PayrollRepositoryInterface
 {
-    private const DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE = [
-        'full_time' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'contract' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'intern' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'part_time' => ['monday', 'wednesday', 'friday'],
-    ];
-
     private const UNRESOLVED_MISMATCH_STATUSES = AttendancePolicyMismatch::UNRESOLVED_STATUSES;
 
     private const DEDUCTION_WARNING_RATIO = 0.5;
@@ -139,14 +133,19 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function findByIdWithDetails(string $id): Payroll
     {
-        return Payroll::query()
+        $payroll = Payroll::query()
             ->with([
                 'payrollDetails.staffMember.user',
                 'payrollDetails.staffMember.jobInformation.team',
-                'payrollDetails.appliedAdjustments',
                 'payrollSettingVersion',
             ])
             ->findOrFail($id);
+
+        // Manually load period-filtered applied adjustments to avoid pulling
+        // adjustments from unrelated payroll periods for the same employee.
+        $this->loadAppliedAdjustmentsForDetails($payroll->payrollDetails, $payroll);
+
+        return $payroll;
     }
 
     public function getPayrollDetailsPaginated(string $payrollId, int $perPage = 50): LengthAwarePaginator
@@ -165,7 +164,20 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->orderBy('final_salary', 'desc') // Highest salary first
             ->paginate($perPage);
 
-        $details = $paginated->getCollection();
+        $this->loadAppliedAdjustmentsForDetails($paginated->getCollection(), $payroll);
+
+        return $paginated;
+    }
+
+    /**
+     * Load period-filtered applied adjustments onto a collection of PayrollDetail models.
+     *
+     * This avoids the bug where the base relationship loads ALL adjustments for an
+     * employee regardless of the payroll period, causing adjustments to appear on
+     * the wrong payslip when an employee has multiple payroll details across months.
+     */
+    private function loadAppliedAdjustmentsForDetails($details, Payroll $payroll): void
+    {
         $employeeIds = $details
             ->pluck('staff_member_id')
             ->filter()
@@ -186,16 +198,12 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->groupBy('staff_member_id');
         }
 
-        $details->transform(function (PayrollDetail $detail) use ($appliedAdjustmentsByEmployee) {
+        $details->each(function (PayrollDetail $detail) use ($appliedAdjustmentsByEmployee) {
             $detail->setRelation(
                 'appliedAdjustments',
                 $appliedAdjustmentsByEmployee->get((int) $detail->staff_member_id, collect())
             );
-
-            return $detail;
         });
-
-        return $paginated;
     }
 
     /**
@@ -226,7 +234,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'salary_month' => $month->format('Y-m-d'),
                     'attendance_period_id' => $attendancePeriod->id,
                     'payroll_setting_version_id' => $settingsVersion->id,
-                    'status' => 'processing',
+                    'status' => Payroll::STATUS_PROCESSING,
                     'processed_count' => 0,
                 ]);
             } catch (QueryException $e) {
@@ -298,7 +306,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'attendance_period_id' => $attendancePeriod->id,
                 ]);
 
-            $payroll->update(['status' => 'pending']);
+            $payroll->update(['status' => Payroll::STATUS_PENDING]);
             $this->attendancePeriodService->lockPeriod($attendancePeriod);
 
             $this->activityLogger->log(
@@ -378,11 +386,11 @@ class PayrollRepository implements PayrollRepositoryInterface
         $hasNpwp = ! empty($employee->npwp);
         $grossForTax = (float) $originalSalary;
 
-        $taxResult = $this->taxCalculationService->calculateMonthlyPph21(
-            $grossForTax,
-            $ptkpStatus,
-            $hasNpwp
-        );
+        // TER for Jan–Nov, annualized progressive (Pasal 17) for December true-up
+        $isDecember = $startOfMonth->month === 12;
+        $taxResult = $isDecember
+            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp)
+            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp);
 
         $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax);
 
@@ -696,7 +704,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         return DB::transaction(function () use ($id, $data, $actorId) {
             $payrollDetail = PayrollDetail::findOrFail($id);
 
-            if (in_array($payrollDetail->payroll->status, ['approved', 'paid'], true)) {
+            if (in_array($payrollDetail->payroll->status, [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID], true)) {
                 throw new \Exception('Tidak dapat mengubah payroll yang sudah disetujui atau dibayar');
             }
 
@@ -741,15 +749,15 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($payroll->status === 'paid') {
+            if ($payroll->status === Payroll::STATUS_PAID) {
                 throw new \Exception('Payroll yang sudah dibayar tidak dapat disetujui ulang');
             }
 
-            if ($payroll->status === 'approved') {
+            if ($payroll->status === Payroll::STATUS_APPROVED) {
                 throw new \Exception('Payroll sudah disetujui');
             }
 
-            if ($payroll->status !== 'pending') {
+            if ($payroll->status !== Payroll::STATUS_PENDING) {
                 throw new \Exception('Payroll must be pending before it can be approved');
             }
 
@@ -852,7 +860,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
 
             $payroll->update([
-                'status' => 'approved',
+                'status' => Payroll::STATUS_APPROVED,
             ]);
 
             $this->activityLogger->log(
@@ -880,11 +888,11 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($payroll->status === 'paid') {
+            if ($payroll->status === Payroll::STATUS_PAID) {
                 throw new \Exception('Payroll sudah dibayar');
             }
 
-            if ($payroll->status !== 'approved') {
+            if ($payroll->status !== Payroll::STATUS_APPROVED) {
                 throw new \Exception('Payroll must be approved before it can be marked as paid');
             }
 
@@ -926,7 +934,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
 
             $payroll->update([
-                'status' => 'paid',
+                'status' => Payroll::STATUS_PAID,
                 'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
             ]);
 
@@ -975,15 +983,15 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($payroll->status === 'pending') {
+            if ($payroll->status === Payroll::STATUS_PENDING) {
                 throw new \Exception('Payroll is already in pending status');
             }
 
-            if ($payroll->status === 'processing') {
+            if ($payroll->status === Payroll::STATUS_PROCESSING) {
                 throw new \Exception('Processing payroll cannot be reopened for correction');
             }
 
-            if (! in_array($payroll->status, ['approved', 'paid'], true)) {
+            if (! in_array($payroll->status, [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID], true)) {
                 throw new \Exception('Only approved or paid payroll can be reopened for correction');
             }
 
@@ -992,7 +1000,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             $newCorrectionCount = ((int) $payroll->correction_count) + 1;
 
             $payroll->update([
-                'status' => 'pending',
+                'status' => Payroll::STATUS_PENDING,
                 'payment_date' => null,
                 'correction_count' => $newCorrectionCount,
             ]);
@@ -1020,7 +1028,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         return DB::transaction(function () use ($payrollId, $actorId) {
             $payroll = Payroll::withCount('payrollDetails')->findOrFail($payrollId);
 
-            if ($payroll->status !== 'paid') {
+            if ($payroll->status !== Payroll::STATUS_PAID) {
                 throw new \Exception('Notifications can only be resent for paid payrolls');
             }
 
@@ -1165,11 +1173,11 @@ class PayrollRepository implements PayrollRepositoryInterface
             ? $lastPayroll->payrollDetails()->sum('final_salary')
             : 0;
 
-        $paidPayrolls = Payroll::where('status', 'paid')
+        $paidPayrolls = Payroll::where('status', Payroll::STATUS_PAID)
             ->whereYear('salary_month', now()->year)
             ->count();
 
-        $pendingPayrolls = Payroll::where('status', 'pending')
+        $pendingPayrolls = Payroll::where('status', Payroll::STATUS_PENDING)
             ->count();
 
         // Calculate average salary
@@ -1212,7 +1220,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             foreach ($months as $idx => $m) {
                 $monthDate = Carbon::parse($m)->startOfMonth()->toDateString();
                 $payroll = Payroll::query()
-                    ->whereIn('status', ['approved', 'paid'])
+                    ->whereIn('status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                     ->whereDate('salary_month', $monthDate)
                     ->first();
 
@@ -1292,7 +1300,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($months) {
             $periodRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
                 ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
                 ->limit($months)
@@ -1354,7 +1362,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             // Enhanced analytics: BPJS contribution trend
             $bpjsTrendRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
                 ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
                 ->limit($months)
@@ -1370,7 +1378,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             // Enhanced analytics: top deduction reasons
             $deductionReasonRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->whereDate('payrolls.salary_month', '>=', $firstTrend['salary_month'] ?? now()->subMonths($months)->toDateString())
                 ->get([
                     DB::raw('COALESCE(SUM(payroll_details.absent_days), 0) as total_absent_days'),
@@ -1438,7 +1446,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             return [
                 'periods_requested' => $months,
                 'periods_returned' => $trends->count(),
-                'status_scope' => ['approved', 'paid'],
+                'status_scope' => [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID],
                 'reporting_period' => [
                     'start_month' => $firstTrend['salary_month'] ?? null,
                     'end_month' => $lastTrend['salary_month'] ?? null,
@@ -1744,7 +1752,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (! in_array($payroll->status, ['pending', 'approved'], true)) {
+            if (! in_array($payroll->status, [Payroll::STATUS_PENDING, Payroll::STATUS_APPROVED], true)) {
                 throw new \Exception('Payroll must be pending or approved to submit approval decisions');
             }
 
@@ -1804,8 +1812,8 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
                 ->doesntExist();
 
-            if ($allApproved && $payroll->status === 'pending') {
-                $payroll->update(['status' => 'approved']);
+            if ($allApproved && $payroll->status === Payroll::STATUS_PENDING) {
+                $payroll->update(['status' => Payroll::STATUS_APPROVED]);
 
                 $this->activityLogger->log(
                     $payroll->id,
@@ -1840,7 +1848,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ])
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->where('staff_member_id', $staffMemberId)
-            ->where('payrolls.status', 'paid')
+            ->where('payrolls.status', Payroll::STATUS_PAID)
             ->when($year, function ($query, $yearValue) {
                 $query->whereYear('payrolls.salary_month', $yearValue);
             })
@@ -1862,7 +1870,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->where('id', $id)
             ->where('staff_member_id', $staffMemberId)
             ->whereHas('payroll', function ($query) {
-                $query->where('status', 'paid');
+                $query->where('status', Payroll::STATUS_PAID);
             })
             ->firstOrFail();
 
@@ -2272,7 +2280,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     private function getEntitlementsLookup(SupportCollection $employees): SupportCollection
     {
         $employmentTypes = $employees
-            ->map(fn (StaffMemberProfile $employee) => $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
+            ->map(fn (StaffMemberProfile $employee) => AttendanceHelper::normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time')))
             ->unique()
             ->values()
             ->all();
@@ -2313,7 +2321,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     private function buildEmployeeReadinessRow(StaffMemberProfile $employee, Carbon $startDate, Carbon $endDate, array $lookups): array
     {
         $employeeId = (int) $employee->id;
-        $employmentType = $this->normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time'));
+        $employmentType = AttendanceHelper::normalizeEmploymentType((string) ($employee->jobInformation?->employment_type ?? 'full_time'));
 
         $scheduledWeekdays = $this->resolveScheduledWeekdays($employee, $employmentType);
         $scheduledDateLookup = $this->resolveScheduledDateLookup($scheduledWeekdays, $startDate, $endDate);
@@ -2455,15 +2463,6 @@ class PayrollRepository implements PayrollRepositoryInterface
         ];
     }
 
-    private function normalizeEmploymentType(string $employmentType): string
-    {
-        return match ($employmentType) {
-            'internship' => 'intern',
-            'freelance' => 'contract',
-            default => $employmentType,
-        };
-    }
-
     private function resolveScheduledWeekdays(StaffMemberProfile $employee, string $employmentType): array
     {
         $policyWeekdays = $employee->jobInformation?->attendancePolicy?->default_working_weekdays;
@@ -2472,8 +2471,8 @@ class PayrollRepository implements PayrollRepositoryInterface
             return array_values(array_map(fn ($day) => strtolower((string) $day), $policyWeekdays));
         }
 
-        return self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE[$employmentType]
-            ?? self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE['full_time'];
+        return AttendanceHelper::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE[$employmentType]
+            ?? AttendanceHelper::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE['full_time'];
     }
 
     private function resolveScheduledDateLookup(array $scheduledWeekdays, Carbon $startDate, Carbon $endDate): array

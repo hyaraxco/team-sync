@@ -27,6 +27,165 @@ class TaxCalculationService
      */
     protected const BPJS_RATE_STALENESS_MONTHS = 12;
 
+    /**
+     * TER 2024 — PTKP status to TER category mapping (PP 58/2023).
+     */
+    protected const TER_CATEGORY_MAP = [
+        'TK/0' => 'A',
+        'TK/1' => 'A',
+        'K/0'  => 'A',
+        'TK/2' => 'B',
+        'TK/3' => 'B',
+        'K/1'  => 'B',
+        'K/2'  => 'B',
+        'K/3'  => 'C',
+    ];
+
+    /**
+     * TER 2024 Category A rates — [max_bruto, rate%].
+     * Used for TK/0, TK/1, K/0.
+     */
+    protected const TER_RATES_A = [
+        [5_400_000, 0.00],
+        [5_650_000, 0.0025],
+        [5_950_000, 0.005],
+        [6_300_000, 0.0075],
+        [6_750_000, 0.01],
+        [7_500_000, 0.0125],
+        [8_550_000, 0.015],
+        [9_650_000, 0.0175],
+        [10_050_000, 0.02],
+        [10_350_000, 0.0225],
+        [10_700_000, 0.025],
+        [11_050_000, 0.03],
+        [11_600_000, 0.035],
+        [12_500_000, 0.04],
+        [13_750_000, 0.05],
+        [15_100_000, 0.06],
+        [16_950_000, 0.07],
+        [19_750_000, 0.08],
+        [24_150_000, 0.09],
+        [26_450_000, 0.10],
+        [28_000_000, 0.11],
+        [30_050_000, 0.12],
+        [32_400_000, 0.13],
+        [35_400_000, 0.14],
+        [39_100_000, 0.15],
+        [43_850_000, 0.16],
+        [47_800_000, 0.17],
+        [51_400_000, 0.18],
+        [56_300_000, 0.19],
+        [62_200_000, 0.20],
+        [68_600_000, 0.21],
+        [77_500_000, 0.22],
+        [89_000_000, 0.23],
+        [103_000_000, 0.24],
+        [125_000_000, 0.25],
+        [157_000_000, 0.26],
+        [206_000_000, 0.27],
+        [337_000_000, 0.28],
+        [454_000_000, 0.29],
+        [550_000_000, 0.30],
+        [695_000_000, 0.31],
+        [910_000_000, 0.32],
+        [1_400_000_000, 0.33],
+        [PHP_INT_MAX, 0.34],
+    ];
+
+    /**
+     * TER 2024 Category B rates — [max_bruto, rate%].
+     * Used for TK/2, TK/3, K/1, K/2.
+     */
+    protected const TER_RATES_B = [
+        [6_200_000, 0.00],
+        [6_500_000, 0.0025],
+        [6_850_000, 0.005],
+        [7_300_000, 0.0075],
+        [9_200_000, 0.01],
+        [10_750_000, 0.015],
+        [11_250_000, 0.02],
+        [11_600_000, 0.025],
+        [12_600_000, 0.03],
+        [13_600_000, 0.04],
+        [14_950_000, 0.05],
+        [16_400_000, 0.06],
+        [18_450_000, 0.07],
+        [20_600_000, 0.08],
+        [24_750_000, 0.09],
+        [27_700_000, 0.10],
+        [29_350_000, 0.11],
+        [31_450_000, 0.12],
+        [33_950_000, 0.13],
+        [37_400_000, 0.14],
+        [41_200_000, 0.15],
+        [45_800_000, 0.16],
+        [50_600_000, 0.17],
+        [55_400_000, 0.18],
+        [60_400_000, 0.19],
+        [66_900_000, 0.20],
+        [74_500_000, 0.21],
+        [83_200_000, 0.22],
+        [95_600_000, 0.23],
+        [110_000_000, 0.24],
+        [134_000_000, 0.25],
+        [169_000_000, 0.26],
+        [221_000_000, 0.27],
+        [374_000_000, 0.28],
+        [463_000_000, 0.29],
+        [561_000_000, 0.30],
+        [697_000_000, 0.31],
+        [910_000_000, 0.32],
+        [1_400_000_000, 0.33],
+        [PHP_INT_MAX, 0.34],
+    ];
+
+    /**
+     * TER 2024 Category C rates — [max_bruto, rate%].
+     * Used for K/3.
+     */
+    protected const TER_RATES_C = [
+        [6_600_000, 0.00],
+        [6_950_000, 0.0025],
+        [7_350_000, 0.005],
+        [7_800_000, 0.0075],
+        [8_850_000, 0.01],
+        [9_800_000, 0.0125],
+        [10_950_000, 0.015],
+        [11_200_000, 0.0175],
+        [12_050_000, 0.02],
+        [12_950_000, 0.03],
+        [14_150_000, 0.04],
+        [15_550_000, 0.05],
+        [17_050_000, 0.06],
+        [19_500_000, 0.07],
+        [22_700_000, 0.08],
+        [26_600_000, 0.09],
+        [28_100_000, 0.10],
+        [30_100_000, 0.11],
+        [32_600_000, 0.12],
+        [35_400_000, 0.13],
+        [38_900_000, 0.14],
+        [43_100_000, 0.15],
+        [48_100_000, 0.16],
+        [53_700_000, 0.17],
+        [59_800_000, 0.18],
+        [67_300_000, 0.19],
+        [74_500_000, 0.20],
+        [83_200_000, 0.21],
+        [95_600_000, 0.22],
+        [110_000_000, 0.23],
+        [134_000_000, 0.24],
+        [169_000_000, 0.25],
+        [221_000_000, 0.26],
+        [337_000_000, 0.27],
+        [463_000_000, 0.28],
+        [561_000_000, 0.29],
+        [697_000_000, 0.30],
+        [910_000_000, 0.31],
+        [1_400_000_000, 0.32],
+        [PHP_INT_MAX, 0.34],
+    ];
+
     public function __construct()
     {
         $this->loadConfig();
@@ -113,7 +272,7 @@ class TaxCalculationService
         $jhtBase = $grossMonthly;
         $jhtAmountMonthly = $jhtBase * ((float) $jhtRate?->employee_rate / 100);
 
-        $jpBase = min($grossMonthly, (float) $jpRate?->max_salary_base ?: $grossMonthly);
+        $jpBase = min($grossMonthly, $jpRate?->max_salary_base !== null ? (float) $jpRate->max_salary_base : $grossMonthly);
         $jpAmountMonthly = $jpBase * ((float) $jpRate?->employee_rate / 100);
 
         $bpjsDeductionAnnual = ($jhtAmountMonthly + $jpAmountMonthly) * 12;
@@ -170,6 +329,89 @@ class TaxCalculationService
                 'pph21_annual' => round($pph21Annual, 2),
             ],
         ];
+    }
+
+    /**
+     * Calculate monthly PPh 21 using TER (Tarif Efektif Rata-rata) 2024 method (PP 58/2023).
+     *
+     * TER is applied directly on gross monthly income — PTKP and typical deductions
+     * (biaya jabatan, pension contributions) are already factored into the rate table.
+     * Use this for Jan–Nov payroll. For December, use calculateAnnualizedPph21() for true-up.
+     *
+     * @return array{
+     *     pph21_monthly: float,
+     *     has_npwp: bool,
+     *     ptkp_status: string,
+     *     ter_category: string,
+     *     ter_rate: float,
+     *     meta: array{
+     *         gross_monthly: float,
+     *         ter_category: string,
+     *         ter_rate: float,
+     *         ter_rate_pct: string
+     *     }
+     * }
+     */
+    public function calculateMonthlyTer(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp): array
+    {
+        $defaultPtkpStatus = 'TK/0';
+        $ptkpStatusToUse = $ptkpStatus ?: $defaultPtkpStatus;
+
+        $category = static::TER_CATEGORY_MAP[$ptkpStatusToUse] ?? 'A';
+        $terRate = $this->lookupTerRate($category, $grossMonthly);
+
+        $pph21Monthly = $grossMonthly * $terRate;
+
+        // NPWP surcharge: +20% if no NPWP
+        if (! $hasNpwp) {
+            $pph21Monthly *= 1.20;
+        }
+
+        return [
+            'pph21_monthly' => round($pph21Monthly, 0),
+            'has_npwp' => $hasNpwp,
+            'ptkp_status' => $ptkpStatusToUse,
+            'ter_category' => $category,
+            'ter_rate' => $terRate,
+            'meta' => [
+                'gross_monthly' => round($grossMonthly, 0),
+                'ter_category' => $category,
+                'ter_rate' => $terRate,
+                'ter_rate_pct' => round($terRate * 100, 2).'%',
+            ],
+        ];
+    }
+
+    /**
+     * Annualized PPh 21 using Pasal 17 progressive brackets.
+     * Use for December year-end true-up or when annual method is explicitly required.
+     *
+     * @return array Same structure as calculateMonthlyPph21
+     */
+    public function calculateAnnualizedPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp): array
+    {
+        return $this->calculateMonthlyPph21($grossMonthly, $ptkpStatus, $hasNpwp);
+    }
+
+    /**
+     * Look up the TER rate for a given category and gross monthly income.
+     */
+    protected function lookupTerRate(string $category, float $grossMonthly): float
+    {
+        $table = match ($category) {
+            'B' => static::TER_RATES_B,
+            'C' => static::TER_RATES_C,
+            default => static::TER_RATES_A,
+        };
+
+        foreach ($table as [$maxBruto, $rate]) {
+            if ($grossMonthly <= $maxBruto) {
+                return $rate;
+            }
+        }
+
+        // Fallback — should never reach due to PHP_INT_MAX sentinel
+        return end($table)[1];
     }
 
     /**
