@@ -4,15 +4,21 @@ import { loginAsRole } from "./helpers/auth";
 const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
 
 /**
- * Pick a weekday range in next month with a rotating start day
- * to avoid overlaps between repeated test executions.
+ * Pick a weekday range 3-6 months in the future to avoid overlaps
+ * with previous test runs or seeded data.
+ *
+ * Uses a deterministic offset based on worker index and timestamp
+ * to ensure uniqueness without randomness.
  */
-const getNextMonthWeekdayRange = () => {
+const getNextMonthWeekdayRange = (workerIndex: number = 0) => {
     const start = new Date();
-    start.setMonth(start.getMonth() + 1, 1);
+    // Use 3-6 months in the future based on worker index to ensure uniqueness
+    const monthsAhead = 3 + (workerIndex % 4);
+    start.setMonth(start.getMonth() + monthsAhead, 1);
 
-    const rotatingOffset = Math.floor((Date.now() / 1_000) % 10);
-    start.setDate(10 + rotatingOffset);
+    // Use a deterministic day within the month based on timestamp (no random)
+    const rotatingOffset = Math.floor((Date.now() / 1_000) % 20);
+    start.setDate(5 + rotatingOffset + workerIndex);
 
     while (start.getDay() === 0 || start.getDay() === 6) {
         start.setDate(start.getDate() + 1);
@@ -57,17 +63,50 @@ test.describe.serial("Attendance flow", () => {
         const context = await browser.newContext();
         const page = await context.newPage();
 
+        // Capture API responses for debugging
+        const apiResponses: Array<{ url: string; status: number; body?: string }> = [];
+        page.on("response", async (response) => {
+            if (response.url().includes("/api/v1/")) {
+                try {
+                    const body = await response.text().catch(() => "<unreadable>");
+                    apiResponses.push({
+                        url: response.url(),
+                        status: response.status(),
+                        body: body.slice(0, 500),
+                    });
+                } catch {
+                    // ignore
+                }
+            }
+        });
+
         await loginAsRole(page, "employee");
         await page.goto("/admin/attendance/my-attendances");
         await expect(page).toHaveURL(/\/admin\/attendance\/my-attendances$/);
 
-        await page.getByRole("button", { name: "Request Leave" }).first().click();
-        await expect(page.getByRole("heading", { name: "Request New Leave" })).toBeVisible();
+        // Wait for page to fully load
+        await expect(page.getByRole("heading", { name: "Attendance Overview" })).toBeVisible();
 
+        // Click Request Leave button (wait for it to be visible)
+        const requestLeaveBtn = page.getByRole("button", { name: "Request Leave" }).first();
+        await expect(requestLeaveBtn).toBeVisible({ timeout: 10_000 });
+        await requestLeaveBtn.click();
+
+        // Wait for modal to appear (it's Teleported to body)
+        await expect(page.getByText("Request New Leave")).toBeVisible({ timeout: 10_000 });
+
+        // Wait for leave types to load from API
         const leaveTypeSelect = page.locator("select").filter({ has: page.locator("option[value='']") }).first();
+        await expect(leaveTypeSelect).toBeVisible({ timeout: 5_000 });
+
+        // Wait for options to be populated (option elements are hidden inside select, use count check)
+        await page.waitForFunction(() => {
+            const select = document.querySelector('select');
+            return select && select.options.length > 1;
+        }, { timeout: 10_000 });
         await leaveTypeSelect.selectOption({ index: 1 });
 
-        const { startDate, endDate } = getNextMonthWeekdayRange();
+        const { startDate, endDate } = getNextMonthWeekdayRange(0);
 
         await page.getByTestId('leave-start-date').fill(startDate);
         await page.getByTestId('leave-end-date').fill(endDate);
@@ -75,13 +114,30 @@ test.describe.serial("Attendance flow", () => {
 
         await page.getByRole("button", { name: "Submit Request" }).click();
 
-        await expect(page.getByRole("heading", { name: "Request Submitted!" })).toBeVisible({
-            timeout: 20_000,
-        });
+        // Wait for either success modal or error toast
+        const successModal = page.getByText("Request Submitted!");
+        const errorToast = page.locator('[class*="toast"], [class*="error"], [role="alert"]').first();
+
+        try {
+            await expect(successModal).toBeVisible({ timeout: 15_000 });
+        } catch {
+            // If success modal doesn't appear, capture debugging info
+            const toastText = await errorToast.textContent().catch(() => "no toast found");
+            const lastApiCalls = apiResponses.slice(-10);
+            const failedCalls = lastApiCalls.filter(r => r.status >= 400);
+            console.log("Leave request failed. Failed API calls:", JSON.stringify(failedCalls, null, 2));
+            console.log("Toast message:", toastText);
+            throw new Error(
+                `Leave request submission failed. ` +
+                `Failed APIs: ${failedCalls.map(r => `${r.status} ${r.url}: ${r.body}`).join("; ")}. ` +
+                `Toast: ${toastText}`
+            );
+        }
+
         await expect(page.getByText("Your leave request has been successfully submitted")).toBeVisible();
 
         await page.getByRole("button", { name: "Got it!" }).click();
-        await expect(page.getByRole("heading", { name: "Request Submitted!" })).toHaveCount(0);
+        await expect(page.getByText("Request Submitted!")).toHaveCount(0);
 
         await context.close();
     });

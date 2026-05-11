@@ -58,7 +58,7 @@ describe("useToast", () => {
     });
 
     it("success creates success toast", () => {
-        const id = toast.success("Success Title", "Success message");
+        toast.success("Success Title", "Success message");
 
         expect(toast.toasts[0].type).toBe("success");
         expect(toast.toasts[0].title).toBe("Success Title");

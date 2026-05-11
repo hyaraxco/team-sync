@@ -11,6 +11,8 @@ import {
     User,
     Users,
     ListChecks,
+    Trash2,
+    AlertTriangle,
 } from "lucide-vue-next";
 import { useRoute } from "vue-router";
 import router from "@/router";
@@ -30,13 +32,16 @@ import TaskBoard from "@/components/admin/project/detail/TaskBoard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useToast } from "@/composables/useToast";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 
 const route = useRoute();
 const id = route.params.id;
 
 const projectStore = useProjectStore();
-const { fetchProject, fetchProjectSquadSummary } = projectStore;
+const { fetchProject, fetchProjectSquadSummary, deleteProject } = projectStore;
 const toast = useToast();
+
+const showDeleteModal = ref(false);
 
 const project = ref({});
 const squadSummary = ref(null);
@@ -108,6 +113,17 @@ const handleFetchSquadSummary = async () => {
         squadSummary.value = null;
     } finally {
         squadSummaryLoading.value = false;
+    }
+};
+
+const handleDeleteProject = async () => {
+    await deleteProject(id);
+
+    if (projectStore.success) {
+        showDeleteModal.value = false;
+        router.push({ name: "admin.projects" });
+    } else if (projectStore.error) {
+        toast.error("Delete failed", projectStore.error);
     }
 };
 
@@ -447,6 +463,48 @@ onMounted(async () => {
         </div>
     </div>
 
+    <!-- Danger Zone -->
+    <div class="bg-white border border-[#FEE2E2] rounded-[20px] p-6">
+        <div class="flex items-center gap-3 mb-6">
+            <div class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center">
+                <AlertTriangle class="w-6 h-6 text-red-600" />
+            </div>
+            <div>
+                <h3 class="text-brand-dark text-xl font-bold">Danger Zone</h3>
+                <p class="text-brand-light text-sm font-normal">Irreversible and destructive actions</p>
+            </div>
+        </div>
+        <div
+            class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-[16px]"
+        >
+            <div class="flex-1">
+                <h4 class="text-brand-dark text-base font-bold mb-1">Delete Project</h4>
+                <p class="text-brand-light text-sm">
+                    Permanently delete this project and all associated data. This action cannot be undone.
+                </p>
+            </div>
+            <button
+                @click="showDeleteModal = true"
+                class="btn-primary rounded-[8px] border border-[#A02121] hover:brightness-110 focus:ring-2 focus:ring-[#D90C0C] transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
+            >
+                <Trash2 class="w-4 h-4 text-white" />
+                <span class="text-brand-white text-sm font-semibold">Delete Project</span>
+            </button>
+        </div>
+    </div>
+
     <!-- Tasks Section -->
     <TaskBoard />
+
+    <ConfirmationModal
+        :show="showDeleteModal"
+        title="Delete Project"
+        :message="`Are you sure you want to delete '${project.name}'? This will permanently remove the project and all associated data. This action cannot be undone.`"
+        confirmText="Delete Project"
+        cancelText="Cancel"
+        type="danger"
+        :loading="projectStore.loading"
+        @confirm="handleDeleteProject"
+        @cancel="showDeleteModal = false"
+    />
 </template>

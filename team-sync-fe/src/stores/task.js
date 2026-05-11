@@ -183,6 +183,30 @@ export const useTaskStore = defineStore("task", {
             }
         },
 
+        async fetchTask(id) {
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get(`project-tasks/${id}`);
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async fetchTasksPaginated(params) {
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get("project-tasks/all/paginated", { params });
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
         async uploadTaskAttachment(taskId, file) {
             this.error = null;
 

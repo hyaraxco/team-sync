@@ -258,6 +258,22 @@ export const useAttendanceStore = defineStore("attendance", {
                 this.loading = false;
             }
         },
+
+        async fetchAttendance(id) {
+            this.loading = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get(`attendances/${id}`);
+
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
         async fetchPolicyMismatches(params = {}) {
             this.loading = true;
             this.error = null;

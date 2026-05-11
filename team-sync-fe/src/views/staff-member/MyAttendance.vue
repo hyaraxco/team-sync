@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
     CalendarCheck,
@@ -70,6 +70,8 @@ const submittedLeaveData = ref(null);
 const activeSection = ref("overview");
 const attendanceViewMode = ref("list");
 const calendarMonth = ref(DateTime.now().startOf("month"));
+const currentTime = ref(Date.now());
+let clockInterval = null;
 const leaveForm = ref({
     leave_type: "",
     start_date: "",
@@ -386,7 +388,7 @@ const isClockOutDisabled = computed(() => {
     if (!isCheckedIn.value || !todayAttendance.value?.check_in) return true;
     if (attendanceLoading.value) return true;
     const checkInDate = new Date(todayAttendance.value.check_in);
-    const diff = Date.now() - checkInDate.getTime();
+    const diff = currentTime.value - checkInDate.getTime();
     return diff < 8 * 60 * 60 * 1000;
 });
 
@@ -443,6 +445,10 @@ const setActiveSection = (sectionId) => {
 };
 
 onMounted(async () => {
+    clockInterval = setInterval(() => {
+        currentTime.value = Date.now();
+    }, 60_000);
+
     const requests = [fetchLeaveTypes()];
 
     if (canViewMyAttendanceData.value) {
@@ -464,6 +470,12 @@ onMounted(async () => {
     await Promise.all(requests);
 
     await handleRouteActionQuery();
+});
+
+onUnmounted(() => {
+    if (clockInterval) {
+        clearInterval(clockInterval);
+    }
 });
 </script>
 
@@ -552,7 +564,12 @@ onMounted(async () => {
             </div>
         </div>
 
-        <AttendanceStatsCards :statistics="statistics" :pending-requests-count="pendingRequestsCount" :leave-balances="myLeaveBalances" :leave-loading="leaveLoading" />
+        <AttendanceStatsCards
+            :statistics="statistics"
+            :pending-requests-count="pendingRequestsCount"
+            :leave-balances="myLeaveBalances"
+            :leave-loading="leaveLoading"
+        />
 
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6 dark:bg-gray-800 dark:border-gray-700">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">

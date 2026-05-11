@@ -121,5 +121,19 @@ export const useOvertimeStore = defineStore("overtime", {
                 this.loading = false;
             }
         },
+
+        async fetchOvertimeDetail(id) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await axiosInstance.get(`overtime/${id}`);
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
     },
 });

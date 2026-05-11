@@ -5,7 +5,6 @@ namespace App\Repositories;
 use App\DTOs\ProjectTaskDto;
 use App\Enums\TaskStatus;
 use App\Interfaces\ProjectTaskRepositoryInterface;
-use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\ProjectTaskAttachment;
 use App\Models\ProjectTaskComment;
@@ -322,8 +321,6 @@ class ProjectTaskRepository implements ProjectTaskRepositoryInterface
 
         return $attachment;
     }
-
-
 
     private function hasFieldChanged(string $field, array $data, ProjectTask $task): bool
     {
