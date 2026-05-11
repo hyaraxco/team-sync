@@ -71,6 +71,7 @@ jobs:
           sed -i 's/DB_DATABASE=teamsync_api/DB_DATABASE=team_sync_test/' .env
           sed -i 's/^DB_USERNAME=$/DB_USERNAME=root/' .env
           sed -i 's/^DB_PASSWORD=$/DB_PASSWORD=root/' .env
+          sed -i 's/REDIS_HOST=redis/REDIS_HOST=127.0.0.1/' .env
           sed -i 's/QUEUE_CONNECTION=sync/QUEUE_CONNECTION=database/' .env
           composer install --no-interaction --prefer-dist
           php artisan key:generate
