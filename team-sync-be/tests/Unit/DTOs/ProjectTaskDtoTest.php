@@ -87,7 +87,7 @@ class ProjectTaskDtoTest extends TestCase
 
     private function makeProjectTask(array $attributes): ProjectTask
     {
-        $task = new ProjectTask();
+        $task = new ProjectTask;
         foreach ($attributes as $key => $value) {
             $task->{$key} = $value;
         }

@@ -4,6 +4,7 @@ namespace Tests\Feature\Commands;
 
 use App\Jobs\BroadcastMeetingJob;
 use App\Models\Meeting;
+use App\Services\MeetingService;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Artisan;
@@ -22,12 +23,12 @@ class SendMeetingRemindersTest extends TestCase
             'reminder_sent_at' => null,
         ]);
 
-        $mockService = \Mockery::mock(\App\Services\MeetingService::class);
+        $mockService = \Mockery::mock(MeetingService::class);
         $mockService->shouldReceive('getNeedingReminder')
             ->once()
             ->andReturn(new EloquentCollection([$meeting]));
 
-        $this->app->instance(\App\Services\MeetingService::class, $mockService);
+        $this->app->instance(MeetingService::class, $mockService);
 
         $exitCode = Artisan::call('meetings:send-reminders');
 
@@ -44,12 +45,12 @@ class SendMeetingRemindersTest extends TestCase
     {
         Queue::fake();
 
-        $mockService = \Mockery::mock(\App\Services\MeetingService::class);
+        $mockService = \Mockery::mock(MeetingService::class);
         $mockService->shouldReceive('getNeedingReminder')
             ->once()
-            ->andReturn(new EloquentCollection());
+            ->andReturn(new EloquentCollection);
 
-        $this->app->instance(\App\Services\MeetingService::class, $mockService);
+        $this->app->instance(MeetingService::class, $mockService);
 
         $exitCode = Artisan::call('meetings:send-reminders');
 
@@ -65,12 +66,12 @@ class SendMeetingRemindersTest extends TestCase
             'reminder_sent_at' => null,
         ]);
 
-        $mockService = \Mockery::mock(\App\Services\MeetingService::class);
+        $mockService = \Mockery::mock(MeetingService::class);
         $mockService->shouldReceive('getNeedingReminder')
             ->once()
             ->andReturn(new EloquentCollection([$meeting]));
 
-        $this->app->instance(\App\Services\MeetingService::class, $mockService);
+        $this->app->instance(MeetingService::class, $mockService);
 
         Artisan::call('meetings:send-reminders');
 

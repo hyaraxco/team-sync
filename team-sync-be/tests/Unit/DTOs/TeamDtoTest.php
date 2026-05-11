@@ -94,7 +94,7 @@ class TeamDtoTest extends TestCase
 
     private function makeTeam(array $attributes): Team
     {
-        $team = new Team();
+        $team = new Team;
         foreach ($attributes as $key => $value) {
             $team->{$key} = $value;
         }

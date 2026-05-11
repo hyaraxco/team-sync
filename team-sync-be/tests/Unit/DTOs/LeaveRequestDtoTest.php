@@ -101,7 +101,7 @@ class LeaveRequestDtoTest extends TestCase
 
     private function makeLeaveRequest(array $attributes): LeaveRequest
     {
-        $leaveRequest = new LeaveRequest();
+        $leaveRequest = new LeaveRequest;
         foreach ($attributes as $key => $value) {
             $leaveRequest->{$key} = $value;
         }
