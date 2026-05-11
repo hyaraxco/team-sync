@@ -63,6 +63,7 @@ public/storage/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+<<<<<<< Updated upstream
 coverage/
 *.local
 
@@ -103,3 +104,8 @@ benchmarks/
 *.tgz
 *.tar.gz
 *.zip
+=======
+
+# Local git worktrees
+.worktrees/
+>>>>>>> Stashed changes

@@ -14,6 +14,8 @@ use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\PerformanceReviewTemplate;
 use App\Models\ProjectTask;
+use App\Models\StaffMemberProfile;
+use App\Models\User;
 use App\Services\Performance\PerformanceOutcomeService;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
@@ -72,7 +74,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         $cycle = $this->getCycleById($cycleId);
         $existingReviewStaffIds = $cycle->reviews()->pluck('staff_member_id')->toArray();
 
-        return \App\Models\StaffMemberProfile::with('jobInformation')
+        return StaffMemberProfile::with('jobInformation')
             ->whereHas('jobInformation', function ($q) {
                 $q->where('status', 'active');
             })
@@ -82,17 +84,17 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getDefaultTemplateId(): ?int
     {
-        return \App\Models\PerformanceReviewTemplate::where('is_default', true)->first()?->id;
+        return PerformanceReviewTemplate::where('is_default', true)->first()?->id;
     }
 
     public function getHrUsers()
     {
-        return \App\Models\User::role('hr')->get();
+        return User::role('hr')->get();
     }
 
     public function getGoalsForReview(int $staffMemberId, int $reviewId, $cycle)
     {
-        return \App\Models\PerformanceGoal::where('staff_member_id', $staffMemberId)
+        return PerformanceGoal::where('staff_member_id', $staffMemberId)
             ->where(function ($q) use ($reviewId, $cycle) {
                 $q->where('linked_review_id', $reviewId)
                     ->orWhere(function ($dateQ) use ($cycle) {
@@ -110,7 +112,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getPositiveFeedbackCount(int $staffMemberId, $cycle): int
     {
-        return \App\Models\PerformanceFeedback::where('staff_member_id', $staffMemberId)
+        return PerformanceFeedback::where('staff_member_id', $staffMemberId)
             ->where('feedback_type', 'positive')
             ->whereBetween('created_at', [
                 $cycle->start_date.' 00:00:00',

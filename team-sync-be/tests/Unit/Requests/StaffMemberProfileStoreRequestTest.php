@@ -6,7 +6,6 @@ use App\Http\Requests\StaffMemberProfileStoreRequest;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Validator;
-use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
 class StaffMemberProfileStoreRequestTest extends TestCase
