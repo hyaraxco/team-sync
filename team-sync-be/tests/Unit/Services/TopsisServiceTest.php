@@ -10,9 +10,8 @@ use App\Services\TopsisService;
  | external dependencies. Every test here exercises the TOPSIS math directly.
  |
  | Criteria (all Benefit type — higher is better):
- |   avg_manager_rating, final_rating, avg_goal_completion,
- |   goal_completion_ratio, positive_feedback_count,
- |   attendance_quality, task_completion_quality
+ |   performance_score, attendance_rate, goal_completion,
+ |   feedback_score, tenure_factor
  |
  | getRatingLabel() thresholds:
  |   ≥ 0.80 → Outstanding
@@ -24,31 +23,27 @@ use App\Services\TopsisService;
  */
 
 /**
- * Helper: create a candidate array with all 7 TOPSIS criteria.
+ * Helper: create a candidate array with all 5 TOPSIS criteria.
  */
 function topsisCandidate(
     string $id,
     string $name,
-    float $c1,
-    float $c2,
-    float $c3,
-    float $c4,
-    float $c5,
-    float $c6,
-    float $c7,
+    float $performanceScore,
+    float $attendanceRate,
+    float $goalCompletion,
+    float $feedbackScore,
+    float $tenureFactor,
     ?string $department = 'Engineering',
 ): array {
     return [
         'staff_member_id' => $id,
         'employee_name' => $name,
         'department' => $department,
-        'avg_manager_rating' => $c1,
-        'final_rating' => $c2,
-        'avg_goal_completion' => $c3,
-        'goal_completion_ratio' => $c4,
-        'positive_feedback_count' => $c5,
-        'attendance_quality' => $c6,
-        'task_completion_quality' => $c7,
+        'performance_score' => $performanceScore,
+        'attendance_rate' => $attendanceRate,
+        'goal_completion' => $goalCompletion,
+        'feedback_score' => $feedbackScore,
+        'tenure_factor' => $tenureFactor,
     ];
 }
 
@@ -58,45 +53,39 @@ function topsisCandidate(
 function topsisWeights(): array
 {
     return [
-        'avg_manager_rating' => 0.20,
-        'final_rating' => 0.15,
-        'avg_goal_completion' => 0.15,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.10,
-        'attendance_quality' => 0.15,
-        'task_completion_quality' => 0.15,
+        'performance_score' => 0.30,
+        'attendance_rate' => 0.20,
+        'goal_completion' => 0.25,
+        'feedback_score' => 0.15,
+        'tenure_factor' => 0.10,
     ];
 }
 
 /**
- * Helper: weights heavily skewed toward avg_manager_rating (C1).
+ * Helper: weights heavily skewed toward performance_score (C1).
  */
 function topsisWeightsC1Heavy(): array
 {
     return [
-        'avg_manager_rating' => 0.70,
-        'final_rating' => 0.05,
-        'avg_goal_completion' => 0.10,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.05,
-        'attendance_quality' => 0.00,
-        'task_completion_quality' => 0.00,
+        'performance_score' => 0.70,
+        'attendance_rate' => 0.05,
+        'goal_completion' => 0.10,
+        'feedback_score' => 0.05,
+        'tenure_factor' => 0.10,
     ];
 }
 
 /**
- * Helper: weights heavily skewed toward final_rating (C2).
+ * Helper: weights heavily skewed toward attendance_rate (C2).
  */
 function topsisWeightsC2Heavy(): array
 {
     return [
-        'avg_manager_rating' => 0.05,
-        'final_rating' => 0.70,
-        'avg_goal_completion' => 0.10,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.05,
-        'attendance_quality' => 0.00,
-        'task_completion_quality' => 0.00,
+        'performance_score' => 0.05,
+        'attendance_rate' => 0.70,
+        'goal_completion' => 0.10,
+        'feedback_score' => 0.05,
+        'tenure_factor' => 0.10,
     ];
 }
 
@@ -111,8 +100,8 @@ describe('calculate() with 2 candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
-            topsisCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-low', 'Bob', 20.0, 50.0, 30.0, 0, 40.0),
+            topsisCandidate('emp-high', 'Alice', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -137,8 +126,8 @@ describe('calculate() with 2 candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
-            topsisCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-low', 'Bob', 20.0, 50.0, 30.0, 0, 40.0),
+            topsisCandidate('emp-high', 'Alice', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -152,8 +141,8 @@ describe('calculate() with 2 candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
-            topsisCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-low', 'Bob', 20.0, 50.0, 30.0, 0, 40.0),
+            topsisCandidate('emp-high', 'Alice', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -167,8 +156,8 @@ describe('calculate() with 2 candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
-            topsisCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-low', 'Bob', 20.0, 50.0, 30.0, 0, 40.0),
+            topsisCandidate('emp-high', 'Alice', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -189,9 +178,9 @@ describe('calculate() with 3+ candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-mid', 'Charlie', 3.0, 3.0, 50.0, 0.5, 3, 70.0, 65.0),
-            topsisCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
-            topsisCandidate('emp-low', 'Bob', 1.0, 1.0, 10.0, 0.1, 0, 40.0, 35.0),
+            topsisCandidate('emp-mid', 'Charlie', 60.0, 70.0, 50.0, 3, 65.0),
+            topsisCandidate('emp-high', 'Alice', 100.0, 98.0, 100.0, 10, 95.0),
+            topsisCandidate('emp-low', 'Bob', 20.0, 40.0, 10.0, 0, 35.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -217,11 +206,11 @@ describe('calculate() with 3+ candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-3', 'Charlie', 3.0, 3.0, 50.0, 0.5, 3, 75.0, 70.0),
-            topsisCandidate('emp-5', 'Eve', 5.0, 5.0, 100.0, 1.0, 10, 99.0, 99.0),
-            topsisCandidate('emp-1', 'Alice', 1.0, 1.0, 10.0, 0.1, 0, 40.0, 35.0),
-            topsisCandidate('emp-4', 'Diana', 4.0, 4.0, 75.0, 0.8, 7, 88.0, 86.0),
-            topsisCandidate('emp-2', 'Bob', 2.0, 2.0, 30.0, 0.3, 1, 60.0, 55.0),
+            topsisCandidate('emp-3', 'Charlie', 60.0, 75.0, 50.0, 3, 70.0),
+            topsisCandidate('emp-5', 'Eve', 100.0, 99.0, 100.0, 10, 99.0),
+            topsisCandidate('emp-1', 'Alice', 20.0, 40.0, 10.0, 0, 35.0),
+            topsisCandidate('emp-4', 'Diana', 80.0, 88.0, 75.0, 7, 86.0),
+            topsisCandidate('emp-2', 'Bob', 40.0, 60.0, 30.0, 1, 55.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -257,7 +246,7 @@ describe('buildSingleResult() with 1 candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -278,7 +267,7 @@ describe('buildSingleResult() with 1 candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -293,19 +282,17 @@ describe('buildSingleResult() with 1 candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
 
         expect($result['ideal_positive'])->toBe([
-            'avg_manager_rating' => 4.5,
-            'final_rating' => 4.0,
-            'avg_goal_completion' => 80.0,
-            'goal_completion_ratio' => 0.9,
-            'positive_feedback_count' => 5.0,
-            'attendance_quality' => 95.0,
-            'task_completion_quality' => 90.0,
+            'performance_score' => 90.0,
+            'attendance_rate' => 95.0,
+            'goal_completion' => 80.0,
+            'feedback_score' => 5.0,
+            'tenure_factor' => 90.0,
         ]);
     });
 
@@ -313,15 +300,14 @@ describe('buildSingleResult() with 1 candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
 
         $expected = array_fill_keys([
-            'avg_manager_rating', 'final_rating', 'avg_goal_completion',
-            'goal_completion_ratio', 'positive_feedback_count',
-            'attendance_quality', 'task_completion_quality',
+            'performance_score', 'attendance_rate', 'goal_completion',
+            'feedback_score', 'tenure_factor',
         ], 0);
 
         expect($result['ideal_negative'])->toBe($expected);
@@ -331,7 +317,7 @@ describe('buildSingleResult() with 1 candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0, 'Product'),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0, 'Product'),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -345,13 +331,11 @@ describe('buildSingleResult() with 1 candidate', function () {
         $candidate = [
             'staff_member_id' => 'emp-1',
             'employee_name' => 'Alice',
-            'avg_manager_rating' => 4.5,
-            'final_rating' => 4.0,
-            'avg_goal_completion' => 80.0,
-            'goal_completion_ratio' => 0.9,
-            'positive_feedback_count' => 5,
-            'attendance_quality' => 95.0,
-            'task_completion_quality' => 90.0,
+            'performance_score' => 90.0,
+            'attendance_rate' => 95.0,
+            'goal_completion' => 80.0,
+            'feedback_score' => 5,
+            'tenure_factor' => 90.0,
         ];
 
         $result = $service->calculate([$candidate], topsisWeights());
@@ -396,20 +380,18 @@ describe('buildSingleResult() with 0 candidates', function () {
         expect($result['weights'])->toBe($weights);
     });
 
-    it('lists all 7 criteria and their types', function () {
+    it('lists all 5 criteria and their types', function () {
         $service = new TopsisService;
 
         $result = $service->calculate([], topsisWeights());
 
-        expect($result['criteria'])->toHaveCount(7);
+        expect($result['criteria'])->toHaveCount(5);
         expect($result['criteria'])->toContain(
-            'avg_manager_rating',
-            'final_rating',
-            'avg_goal_completion',
-            'goal_completion_ratio',
-            'positive_feedback_count',
-            'attendance_quality',
-            'task_completion_quality'
+            'performance_score',
+            'attendance_rate',
+            'goal_completion',
+            'feedback_score',
+            'tenure_factor'
         );
 
         // All benefit type
@@ -439,8 +421,8 @@ describe('getRatingLabel() — all 5 rating boundaries', function () {
 
         // Best candidate in a 2-candidate set → CC = 1.0 → Outstanding
         $candidates = [
-            topsisCandidate('emp-a', 'Alice', 1.0, 1.0, 10.0, 0.1, 0, 40.0, 35.0),
-            topsisCandidate('emp-b', 'Bob', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-a', 'Alice', 20.0, 40.0, 10.0, 0, 35.0),
+            topsisCandidate('emp-b', 'Bob', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -456,11 +438,11 @@ describe('getRatingLabel() — all 5 rating boundaries', function () {
         // Use a broad set of candidates and verify label/CC consistency
         // for the one that lands in [0.65, 0.80)
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 1.0, 1.0, 5.0, 0.05, 0, 10.0, 10.0),
-            topsisCandidate('emp-2', 'Bob', 2.0, 2.0, 25.0, 0.25, 2, 45.0, 45.0),
-            topsisCandidate('emp-3', 'Charlie', 3.5, 3.5, 55.0, 0.55, 5, 70.0, 70.0),
-            topsisCandidate('emp-4', 'Diana', 4.0, 4.0, 80.0, 0.8, 8, 90.0, 90.0),
-            topsisCandidate('emp-5', 'Eve', 5.0, 5.0, 100.0, 1.0, 10, 100.0, 100.0),
+            topsisCandidate('emp-1', 'Alice', 20.0, 10.0, 5.0, 0, 10.0),
+            topsisCandidate('emp-2', 'Bob', 40.0, 45.0, 25.0, 2, 45.0),
+            topsisCandidate('emp-3', 'Charlie', 70.0, 70.0, 55.0, 5, 70.0),
+            topsisCandidate('emp-4', 'Diana', 80.0, 90.0, 80.0, 8, 90.0),
+            topsisCandidate('emp-5', 'Eve', 100.0, 100.0, 100.0, 10, 100.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -491,11 +473,11 @@ describe('getRatingLabel() — all 5 rating boundaries', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 1.0, 1.0, 5.0, 0.05, 0, 10.0, 10.0),
-            topsisCandidate('emp-2', 'Bob', 2.5, 2.5, 35.0, 0.35, 3, 55.0, 55.0),
-            topsisCandidate('emp-3', 'Charlie', 3.5, 3.5, 60.0, 0.6, 5, 75.0, 75.0),
-            topsisCandidate('emp-4', 'Diana', 4.5, 4.5, 90.0, 0.9, 9, 95.0, 95.0),
-            topsisCandidate('emp-5', 'Eve', 5.0, 5.0, 100.0, 1.0, 10, 100.0, 100.0),
+            topsisCandidate('emp-1', 'Alice', 20.0, 10.0, 5.0, 0, 10.0),
+            topsisCandidate('emp-2', 'Bob', 50.0, 55.0, 35.0, 3, 55.0),
+            topsisCandidate('emp-3', 'Charlie', 70.0, 75.0, 60.0, 5, 75.0),
+            topsisCandidate('emp-4', 'Diana', 90.0, 95.0, 90.0, 9, 95.0),
+            topsisCandidate('emp-5', 'Eve', 100.0, 100.0, 100.0, 10, 100.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -529,11 +511,11 @@ describe('getRatingLabel() — all 5 rating boundaries', function () {
         // This tests the label mapping correctness even if we can't guarantee
         // a candidate lands in every specific sub-range.
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 1.0, 1.0, 5.0, 0.05, 0, 10.0, 10.0),
-            topsisCandidate('emp-2', 'Bob', 2.0, 2.0, 25.0, 0.25, 2, 45.0, 45.0),
-            topsisCandidate('emp-3', 'Charlie', 3.5, 3.5, 55.0, 0.55, 5, 70.0, 70.0),
-            topsisCandidate('emp-4', 'Diana', 4.0, 4.0, 80.0, 0.8, 8, 90.0, 90.0),
-            topsisCandidate('emp-5', 'Eve', 5.0, 5.0, 100.0, 1.0, 10, 100.0, 100.0),
+            topsisCandidate('emp-1', 'Alice', 20.0, 10.0, 5.0, 0, 10.0),
+            topsisCandidate('emp-2', 'Bob', 40.0, 45.0, 25.0, 2, 45.0),
+            topsisCandidate('emp-3', 'Charlie', 70.0, 70.0, 55.0, 5, 70.0),
+            topsisCandidate('emp-4', 'Diana', 80.0, 90.0, 80.0, 8, 90.0),
+            topsisCandidate('emp-5', 'Eve', 100.0, 100.0, 100.0, 10, 100.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -567,8 +549,8 @@ describe('getRatingLabel() — all 5 rating boundaries', function () {
 
         // Worst candidate in a 2-candidate set → CC = 0.0 → Unsatisfactory
         $candidates = [
-            topsisCandidate('emp-a', 'Alice', 1.0, 1.0, 10.0, 0.1, 0, 40.0, 35.0),
-            topsisCandidate('emp-b', 'Bob', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-a', 'Alice', 20.0, 40.0, 10.0, 0, 35.0),
+            topsisCandidate('emp-b', 'Bob', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -582,9 +564,9 @@ describe('getRatingLabel() — all 5 rating boundaries', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0),
-            topsisCandidate('emp-2', 'Bob', 2.5, 2.0, 40.0, 0.4, 2, 60.0, 55.0),
-            topsisCandidate('emp-3', 'Charlie', 3.5, 3.0, 60.0, 0.6, 4, 78.0, 72.0),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
+            topsisCandidate('emp-2', 'Bob', 50.0, 60.0, 40.0, 2, 55.0),
+            topsisCandidate('emp-3', 'Charlie', 70.0, 78.0, 60.0, 4, 72.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -614,9 +596,9 @@ describe('identical scores — all candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
-            topsisCandidate('emp-2', 'Bob', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
-            topsisCandidate('emp-3', 'Charlie', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
+            topsisCandidate('emp-1', 'Alice', 70.0, 80.0, 60.0, 4, 80.0),
+            topsisCandidate('emp-2', 'Bob', 70.0, 80.0, 60.0, 4, 80.0),
+            topsisCandidate('emp-3', 'Charlie', 70.0, 80.0, 60.0, 4, 80.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -634,8 +616,8 @@ describe('identical scores — all candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
-            topsisCandidate('emp-2', 'Bob', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
+            topsisCandidate('emp-1', 'Alice', 70.0, 80.0, 60.0, 4, 80.0),
+            topsisCandidate('emp-2', 'Bob', 70.0, 80.0, 60.0, 4, 80.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -655,8 +637,8 @@ describe('identical scores — all candidates', function () {
 
         // All candidates have all-zero scores → every column sum of squares = 0
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
-            topsisCandidate('emp-2', 'Bob', 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
+            topsisCandidate('emp-1', 'Alice', 0.0, 0.0, 0.0, 0, 0.0),
+            topsisCandidate('emp-2', 'Bob', 0.0, 0.0, 0.0, 0, 0.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -684,8 +666,8 @@ describe('identical scores — all candidates', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
-            topsisCandidate('emp-2', 'Bob', 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
+            topsisCandidate('emp-1', 'Alice', 0.0, 0.0, 0.0, 0, 0.0),
+            topsisCandidate('emp-2', 'Bob', 0.0, 0.0, 0.0, 0, 0.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -708,8 +690,8 @@ describe('candidate with all-zero raw scores', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-zero', 'Zero', 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
-            topsisCandidate('emp-normal', 'Normal', 4.0, 4.0, 75.0, 0.8, 6, 90.0, 85.0),
+            topsisCandidate('emp-zero', 'Zero', 0.0, 0.0, 0.0, 0, 0.0),
+            topsisCandidate('emp-normal', 'Normal', 80.0, 90.0, 75.0, 6, 85.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -743,8 +725,8 @@ describe('candidate with all-zero raw scores', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-zero', 'Zero', 0.0, 0.0, 0.0, 0.0, 0, 0.0, 0.0),
-            topsisCandidate('emp-normal', 'Normal', 4.0, 4.0, 75.0, 0.8, 6, 90.0, 85.0),
+            topsisCandidate('emp-zero', 'Zero', 0.0, 0.0, 0.0, 0, 0.0),
+            topsisCandidate('emp-normal', 'Normal', 80.0, 90.0, 75.0, 6, 85.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -756,11 +738,11 @@ describe('candidate with all-zero raw scores', function () {
     it('handles one column being all-zero while others are non-zero', function () {
         $service = new TopsisService;
 
-        // positive_feedback_count = 0 for all candidates
+        // feedback_score = 0 for all candidates
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.0, 80.0, 0.9, 0, 95.0, 92.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.0, 60.0, 0.5, 0, 80.0, 75.0),
-            topsisCandidate('emp-3', 'Charlie', 2.0, 2.0, 40.0, 0.3, 0, 60.0, 58.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 95.0, 80.0, 0, 92.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 0, 75.0),
+            topsisCandidate('emp-3', 'Charlie', 40.0, 60.0, 40.0, 0, 58.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -771,10 +753,10 @@ describe('candidate with all-zero raw scores', function () {
         expect($result['ranking'][0]['staff_member_id'])->toBe('emp-1');
         expect($result['ranking'][2]['staff_member_id'])->toBe('emp-3');
 
-        // All positive_feedback_count normalized values should be 0.0 (not NaN)
+        // All feedback_score normalized values should be 0.0 (not NaN)
         foreach ($result['ranking'] as $ranked) {
-            expect(is_nan($ranked['normalized_scores']['positive_feedback_count']))->toBeFalse();
-            expect($ranked['normalized_scores']['positive_feedback_count'])->toBe(0.0);
+            expect(is_nan($ranked['normalized_scores']['feedback_score']))->toBeFalse();
+            expect($ranked['normalized_scores']['feedback_score'])->toBe(0.0);
         }
     });
 });
@@ -789,28 +771,26 @@ describe('weight = 0 for a criterion', function () {
     it('excludes that criterion from influencing the ranking', function () {
         $service = new TopsisService;
 
-        // Alice: high avg_manager_rating (5.0), low final_rating (1.0)
-        // Bob: low avg_manager_rating (1.0), high final_rating (5.0)
+        // Alice: high performance_score (100), low attendance_rate (50)
+        // Bob: low performance_score (20), high attendance_rate (100)
         // All other criteria identical
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 5.0, 1.0, 50.0, 0.5, 3, 80.0, 80.0),
-            topsisCandidate('emp-2', 'Bob', 1.0, 5.0, 50.0, 0.5, 3, 80.0, 80.0),
+            topsisCandidate('emp-1', 'Alice', 100.0, 50.0, 50.0, 3, 80.0),
+            topsisCandidate('emp-2', 'Bob', 20.0, 100.0, 50.0, 3, 80.0),
         ];
 
-        // Weight avg_manager_rating = 0 → only final_rating matters
+        // Weight performance_score = 0 → only attendance_rate matters
         $weightsZeroC1 = [
-            'avg_manager_rating' => 0.00,
-            'final_rating' => 0.80,
-            'avg_goal_completion' => 0.05,
-            'goal_completion_ratio' => 0.05,
-            'positive_feedback_count' => 0.05,
-            'attendance_quality' => 0.025,
-            'task_completion_quality' => 0.025,
+            'performance_score' => 0.00,
+            'attendance_rate' => 0.80,
+            'goal_completion' => 0.05,
+            'feedback_score' => 0.05,
+            'tenure_factor' => 0.10,
         ];
 
         $result = $service->calculate($candidates, $weightsZeroC1);
 
-        // Bob has higher final_rating → should rank first
+        // Bob has higher attendance_rate → should rank first
         expect($result['ranking'][0]['staff_member_id'])->toBe('emp-2');
         expect($result['ranking'][1]['staff_member_id'])->toBe('emp-1');
     });
@@ -819,18 +799,18 @@ describe('weight = 0 for a criterion', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.0, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.0, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
-        // Set avg_manager_rating weight to 0
+        // Set performance_score weight to 0
         $weights = topsisWeights();
-        $weights['avg_manager_rating'] = 0.0;
+        $weights['performance_score'] = 0.0;
 
         $result = $service->calculate($candidates, $weights);
 
         foreach ($result['ranking'] as $ranked) {
-            expect($ranked['weighted_scores']['avg_manager_rating'])->toBe(0.0);
+            expect($ranked['weighted_scores']['performance_score'])->toBe(0.0);
         }
     });
 
@@ -838,18 +818,16 @@ describe('weight = 0 for a criterion', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.0, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.0, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $zeroWeights = [
-            'avg_manager_rating' => 0.0,
-            'final_rating' => 0.0,
-            'avg_goal_completion' => 0.0,
-            'goal_completion_ratio' => 0.0,
-            'positive_feedback_count' => 0.0,
-            'attendance_quality' => 0.0,
-            'task_completion_quality' => 0.0,
+            'performance_score' => 0.0,
+            'attendance_rate' => 0.0,
+            'goal_completion' => 0.0,
+            'feedback_score' => 0.0,
+            'tenure_factor' => 0.0,
         ];
 
         $result = $service->calculate($candidates, $zeroWeights);
@@ -867,17 +845,18 @@ describe('weight = 0 for a criterion', function () {
     it('reverses ranking when the only non-zero weight shifts from C1 to C2', function () {
         $service = new TopsisService;
 
-        // Alice: high C1, low C2 — Bob: low C1, high C2
+        // Alice: high performance_score, low attendance_rate
+        // Bob: low performance_score, high attendance_rate
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 5.0, 2.0, 50.0, 0.5, 3, 85.0, 80.0),
-            topsisCandidate('emp-2', 'Bob', 2.0, 5.0, 50.0, 0.5, 3, 85.0, 80.0),
+            topsisCandidate('emp-1', 'Alice', 100.0, 50.0, 50.0, 3, 80.0),
+            topsisCandidate('emp-2', 'Bob', 40.0, 95.0, 50.0, 3, 80.0),
         ];
 
-        // Heavy C1 → Alice wins
+        // Heavy C1 (performance_score) → Alice wins
         $resultC1 = $service->calculate($candidates, topsisWeightsC1Heavy());
         expect($resultC1['ranking'][0]['staff_member_id'])->toBe('emp-1');
 
-        // Heavy C2 → Bob wins
+        // Heavy C2 (attendance_rate) → Bob wins
         $resultC2 = $service->calculate($candidates, topsisWeightsC2Heavy());
         expect($resultC2['ranking'][0]['staff_member_id'])->toBe('emp-2');
     });
@@ -894,8 +873,8 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -915,9 +894,9 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
-            topsisCandidate('emp-3', 'Charlie', 2.5, 2.0, 40.0, 0.4, 1, 70.0, 68.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
+            topsisCandidate('emp-3', 'Charlie', 50.0, 70.0, 40.0, 1, 68.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -939,20 +918,19 @@ describe('output structure completeness', function () {
         }
     });
 
-    it('each ranking entry has sub-arrays with all 7 criteria keys', function () {
+    it('each ranking entry has sub-arrays with all 5 criteria keys', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
 
         $criteriaKeys = [
-            'avg_manager_rating', 'final_rating', 'avg_goal_completion',
-            'goal_completion_ratio', 'positive_feedback_count',
-            'attendance_quality', 'task_completion_quality',
+            'performance_score', 'attendance_rate', 'goal_completion',
+            'feedback_score', 'tenure_factor',
         ];
 
         foreach ($result['ranking'] as $ranked) {
@@ -968,9 +946,9 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
-            topsisCandidate('emp-3', 'Charlie', 2.5, 2.0, 40.0, 0.4, 1, 70.0, 68.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
+            topsisCandidate('emp-3', 'Charlie', 50.0, 70.0, 40.0, 1, 68.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -985,8 +963,8 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1001,16 +979,15 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
 
         $criteriaKeys = [
-            'avg_manager_rating', 'final_rating', 'avg_goal_completion',
-            'goal_completion_ratio', 'positive_feedback_count',
-            'attendance_quality', 'task_completion_quality',
+            'performance_score', 'attendance_rate', 'goal_completion',
+            'feedback_score', 'tenure_factor',
         ];
 
         foreach ($criteriaKeys as $key) {
@@ -1024,8 +1001,8 @@ describe('output structure completeness', function () {
         $weights = topsisWeights();
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, $weights);
@@ -1037,8 +1014,8 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1060,11 +1037,11 @@ describe('output structure completeness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.0, 55.0, 0.5, 3, 75.0, 70.0),
-            topsisCandidate('emp-3', 'Charlie', 2.0, 2.0, 30.0, 0.3, 1, 55.0, 50.0),
-            topsisCandidate('emp-4', 'Diana', 4.0, 3.5, 70.0, 0.7, 6, 85.0, 80.0),
-            topsisCandidate('emp-5', 'Eve', 1.0, 1.0, 15.0, 0.1, 0, 40.0, 35.0),
+            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 75.0, 55.0, 3, 70.0),
+            topsisCandidate('emp-3', 'Charlie', 40.0, 55.0, 30.0, 1, 50.0),
+            topsisCandidate('emp-4', 'Diana', 80.0, 85.0, 70.0, 6, 80.0),
+            topsisCandidate('emp-5', 'Eve', 20.0, 40.0, 15.0, 0, 35.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1085,9 +1062,9 @@ describe('mathematical correctness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
-            topsisCandidate('emp-3', 'Charlie', 2.5, 2.0, 40.0, 0.4, 1, 70.0, 68.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
+            topsisCandidate('emp-3', 'Charlie', 50.0, 70.0, 40.0, 1, 68.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1104,8 +1081,8 @@ describe('mathematical correctness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1122,8 +1099,8 @@ describe('mathematical correctness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1140,8 +1117,8 @@ describe('mathematical correctness', function () {
         $service = new TopsisService;
 
         $candidates = [
-            topsisCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-            topsisCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
+            topsisCandidate('emp-1', 'Alice', 80.0, 90.0, 75.0, 5, 88.0),
+            topsisCandidate('emp-2', 'Bob', 60.0, 80.0, 60.0, 3, 76.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1166,8 +1143,8 @@ describe('mathematical correctness', function () {
         // When there are only 2 candidates, the best one IS the ideal positive
         // and the worst one IS the ideal negative
         $candidates = [
-            topsisCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
-            topsisCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+            topsisCandidate('emp-low', 'Bob', 20.0, 50.0, 30.0, 0, 40.0),
+            topsisCandidate('emp-high', 'Alice', 100.0, 98.0, 100.0, 10, 95.0),
         ];
 
         $result = $service->calculate($candidates, topsisWeights());
@@ -1188,12 +1165,11 @@ describe('mathematical correctness', function () {
             'staff_member_id' => 'emp-partial',
             'employee_name' => 'Partial',
             'department' => 'HR',
-            'avg_manager_rating' => 3.0,
-            // Missing: final_rating, avg_goal_completion, goal_completion_ratio,
-            // positive_feedback_count, attendance_quality, task_completion_quality
+            'performance_score' => 60.0,
+            // Missing: attendance_rate, goal_completion, feedback_score, tenure_factor
         ];
 
-        $candidateFull = topsisCandidate('emp-full', 'Full', 4.0, 4.0, 70.0, 0.7, 5, 85.0, 80.0);
+        $candidateFull = topsisCandidate('emp-full', 'Full', 80.0, 90.0, 70.0, 5, 80.0);
 
         $result = $service->calculate([$candidatePartial, $candidateFull], topsisWeights());
 
@@ -1202,11 +1178,9 @@ describe('mathematical correctness', function () {
         $partial = collect($result['ranking'])->firstWhere('staff_member_id', 'emp-partial');
 
         // Missing keys should have raw_scores = 0.0
-        expect($partial['raw_scores']['final_rating'])->toBe(0.0);
-        expect($partial['raw_scores']['avg_goal_completion'])->toBe(0.0);
-        expect($partial['raw_scores']['goal_completion_ratio'])->toBe(0.0);
-        expect($partial['raw_scores']['positive_feedback_count'])->toBe(0.0);
-        expect($partial['raw_scores']['attendance_quality'])->toBe(0.0);
-        expect($partial['raw_scores']['task_completion_quality'])->toBe(0.0);
+        expect($partial['raw_scores']['attendance_rate'])->toBe(0.0);
+        expect($partial['raw_scores']['goal_completion'])->toBe(0.0);
+        expect($partial['raw_scores']['feedback_score'])->toBe(0.0);
+        expect($partial['raw_scores']['tenure_factor'])->toBe(0.0);
     });
 });

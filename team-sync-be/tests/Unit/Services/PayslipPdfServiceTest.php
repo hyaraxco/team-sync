@@ -81,12 +81,14 @@ class PayslipPdfServiceTest extends TestCase
         ];
 
         $this->taxService
-            ->method('calculateMonthlyPph21')
+            ->method('calculateMonthlyTer')
             ->willReturn([
                 'pph21_monthly' => $pph21Monthly,
                 'has_npwp' => true,
                 'ptkp_status' => 'TK/0',
-                'meta' => ['pkp' => 100_000_000],
+                'ter_category' => 'A',
+                'ter_rate' => 0.04,
+                'meta' => ['gross_monthly' => 10_000_000, 'ter_category' => 'A', 'ter_rate' => 0.04, 'ter_rate_pct' => '4%'],
             ]);
 
         $this->taxService

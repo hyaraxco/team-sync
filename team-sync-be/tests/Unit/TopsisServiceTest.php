@@ -3,31 +3,27 @@
 use App\Services\TopsisService;
 
 /**
- * Helper: buat data kandidat dengan 7 kriteria TOPSIS.
+ * Helper: buat data kandidat dengan 5 kriteria TOPSIS.
  */
 function makeCandidate(
     string $id,
     string $name,
-    float $c1,
-    float $c2,
-    float $c3,
-    float $c4,
-    float $c5,
-    float $c6,
-    float $c7,
+    float $performanceScore,
+    float $attendanceRate,
+    float $goalCompletion,
+    float $feedbackScore,
+    float $tenureFactor,
     ?string $department = 'Engineering'
 ): array {
     return [
         'staff_member_id' => $id,
         'employee_name' => $name,
         'department' => $department,
-        'avg_manager_rating' => $c1,
-        'final_rating' => $c2,
-        'avg_goal_completion' => $c3,
-        'goal_completion_ratio' => $c4,
-        'positive_feedback_count' => $c5,
-        'attendance_quality' => $c6,
-        'task_completion_quality' => $c7,
+        'performance_score' => $performanceScore,
+        'attendance_rate' => $attendanceRate,
+        'goal_completion' => $goalCompletion,
+        'feedback_score' => $feedbackScore,
+        'tenure_factor' => $tenureFactor,
     ];
 }
 
@@ -37,13 +33,11 @@ function makeCandidate(
 function defaultWeights(): array
 {
     return [
-        'avg_manager_rating' => 0.30,
-        'final_rating' => 0.30,
-        'avg_goal_completion' => 0.20,
-        'goal_completion_ratio' => 0.05,
-        'positive_feedback_count' => 0.05,
-        'attendance_quality' => 0.05,
-        'task_completion_quality' => 0.05,
+        'performance_score' => 0.30,
+        'attendance_rate' => 0.20,
+        'goal_completion' => 0.25,
+        'feedback_score' => 0.15,
+        'tenure_factor' => 0.10,
     ];
 }
 
@@ -70,7 +64,7 @@ it('returns empty ranking when no candidates provided', function () {
 // --- Test 2: Single candidate ---
 it('ranks single candidate as rank 1 with coefficient 1.0', function () {
     $service = new TopsisService;
-    $candidates = [makeCandidate('emp-1', 'Alice', 4.5, 4.0, 80.0, 0.9, 5, 95.0, 90.0)];
+    $candidates = [makeCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5.0, 85.0)];
     $result = $service->calculate($candidates, defaultWeights());
 
     expect($result['total_candidates'])->toBe(1);
@@ -88,8 +82,8 @@ it('ranks single candidate as rank 1 with coefficient 1.0', function () {
 it('ranks high performer above low performer with two candidates', function () {
     $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-low', 'Bob', 2.0, 2.0, 30.0, 0.3, 0, 50.0, 40.0),
-        makeCandidate('emp-high', 'Alice', 5.0, 5.0, 100.0, 1.0, 10, 98.0, 95.0),
+        makeCandidate('emp-low', 'Bob', 30.0, 40.0, 20.0, 1.0, 25.0),
+        makeCandidate('emp-high', 'Alice', 95.0, 98.0, 100.0, 10.0, 95.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -119,11 +113,11 @@ it('ranks high performer above low performer with two candidates', function () {
 it('sorts five candidates by closeness coefficient descending', function () {
     $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-3', 'Charlie', 3.0, 3.0, 50.0, 0.5, 3, 75.0, 70.0),
-        makeCandidate('emp-5', 'Eve', 5.0, 5.0, 100.0, 1.0, 10, 99.0, 99.0),
-        makeCandidate('emp-1', 'Alice', 1.0, 1.0, 10.0, 0.1, 0, 40.0, 35.0),
-        makeCandidate('emp-4', 'Diana', 4.0, 4.0, 75.0, 0.8, 7, 88.0, 86.0),
-        makeCandidate('emp-2', 'Bob', 2.0, 2.0, 30.0, 0.3, 1, 60.0, 55.0),
+        makeCandidate('emp-3', 'Charlie', 50.0, 75.0, 55.0, 3.0, 60.0),
+        makeCandidate('emp-5', 'Eve', 100.0, 99.0, 100.0, 10.0, 99.0),
+        makeCandidate('emp-1', 'Alice', 10.0, 40.0, 15.0, 0.0, 30.0),
+        makeCandidate('emp-4', 'Diana', 75.0, 88.0, 80.0, 7.0, 85.0),
+        makeCandidate('emp-2', 'Bob', 30.0, 60.0, 35.0, 1.0, 50.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -155,9 +149,9 @@ it('sorts five candidates by closeness coefficient descending', function () {
 it('handles identical scores without NaN or Infinity', function () {
     $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
-        makeCandidate('emp-2', 'Bob', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
-        makeCandidate('emp-3', 'Charlie', 3.5, 3.5, 60.0, 0.7, 4, 80.0, 80.0),
+        makeCandidate('emp-1', 'Alice', 60.0, 80.0, 70.0, 5.0, 75.0),
+        makeCandidate('emp-2', 'Bob', 60.0, 80.0, 70.0, 5.0, 75.0),
+        makeCandidate('emp-3', 'Charlie', 60.0, 80.0, 70.0, 5.0, 75.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -183,11 +177,11 @@ it('handles identical scores without NaN or Infinity', function () {
 // --- Test 6: All-zero values in one criterion column ---
 it('handles all-zero values in one criterion column', function () {
     $service = new TopsisService;
-    // C5 (positive_feedback_count) = 0 for all candidates
+    // feedback_score = 0 for all candidates
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 4.0, 4.0, 80.0, 0.9, 0, 95.0, 92.0),
-        makeCandidate('emp-2', 'Bob', 3.0, 3.0, 60.0, 0.5, 0, 80.0, 75.0),
-        makeCandidate('emp-3', 'Charlie', 2.0, 2.0, 40.0, 0.3, 0, 60.0, 58.0),
+        makeCandidate('emp-1', 'Alice', 90.0, 95.0, 85.0, 0.0, 88.0),
+        makeCandidate('emp-2', 'Bob', 60.0, 80.0, 65.0, 0.0, 75.0),
+        makeCandidate('emp-3', 'Charlie', 40.0, 60.0, 45.0, 0.0, 55.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -197,10 +191,10 @@ it('handles all-zero values in one criterion column', function () {
     expect($result['ranking'][0]['staff_member_id'])->toBe('emp-1'); // Alice best
     expect($result['ranking'][2]['staff_member_id'])->toBe('emp-3'); // Charlie worst
 
-    // All C5 normalized values should be 0 (not NaN)
+    // All feedback_score normalized values should be 0 (not NaN)
     foreach ($result['ranking'] as $ranked) {
-        expect(is_nan($ranked['normalized_scores']['positive_feedback_count']))->toBeFalse();
-        expect($ranked['normalized_scores']['positive_feedback_count'])->toBe(0.0);
+        expect(is_nan($ranked['normalized_scores']['feedback_score']))->toBeFalse();
+        expect($ranked['normalized_scores']['feedback_score'])->toBe(0.0);
         expect(is_nan($ranked['closeness_coefficient']))->toBeFalse();
     }
 });
@@ -209,38 +203,34 @@ it('handles all-zero values in one criterion column', function () {
 it('produces different rankings when weights change', function () {
     $service = new TopsisService;
 
-    // Alice: high competency (C1), low KPI (C2)
-    // Bob: low competency (C1), high KPI (C2)
+    // Alice: high performance_score, low attendance_rate
+    // Bob: low performance_score, high attendance_rate
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 5.0, 2.0, 50.0, 0.5, 3, 85.0, 80.0),
-        makeCandidate('emp-2', 'Bob', 2.0, 5.0, 50.0, 0.5, 3, 85.0, 80.0),
+        makeCandidate('emp-1', 'Alice', 90.0, 50.0, 60.0, 5.0, 70.0),
+        makeCandidate('emp-2', 'Bob', 40.0, 95.0, 60.0, 5.0, 70.0),
     ];
 
-    // Weight heavily on C1 (competency) → Alice should win
-    $weightsC1Heavy = [
-        'avg_manager_rating' => 0.70,
-        'final_rating' => 0.05,
-        'avg_goal_completion' => 0.10,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.05,
-        'attendance_quality' => 0.00,
-        'task_completion_quality' => 0.00,
+    // Weight heavily on performance_score → Alice should win
+    $weightsPerfHeavy = [
+        'performance_score' => 0.70,
+        'attendance_rate' => 0.05,
+        'goal_completion' => 0.10,
+        'feedback_score' => 0.10,
+        'tenure_factor' => 0.05,
     ];
-    $resultC1 = $service->calculate($candidates, $weightsC1Heavy);
-    expect($resultC1['ranking'][0]['staff_member_id'])->toBe('emp-1'); // Alice wins
+    $resultPerf = $service->calculate($candidates, $weightsPerfHeavy);
+    expect($resultPerf['ranking'][0]['staff_member_id'])->toBe('emp-1'); // Alice wins
 
-    // Weight heavily on C2 (KPI) → Bob should win
-    $weightsC2Heavy = [
-        'avg_manager_rating' => 0.05,
-        'final_rating' => 0.70,
-        'avg_goal_completion' => 0.10,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.05,
-        'attendance_quality' => 0.00,
-        'task_completion_quality' => 0.00,
+    // Weight heavily on attendance_rate → Bob should win
+    $weightsAttendHeavy = [
+        'performance_score' => 0.05,
+        'attendance_rate' => 0.70,
+        'goal_completion' => 0.10,
+        'feedback_score' => 0.10,
+        'tenure_factor' => 0.05,
     ];
-    $resultC2 = $service->calculate($candidates, $weightsC2Heavy);
-    expect($resultC2['ranking'][0]['staff_member_id'])->toBe('emp-2'); // Bob wins
+    $resultAttend = $service->calculate($candidates, $weightsAttendHeavy);
+    expect($resultAttend['ranking'][0]['staff_member_id'])->toBe('emp-2'); // Bob wins
 });
 
 // --- Test 8: Rating label boundaries ---
@@ -251,8 +241,8 @@ it('assigns correct labels based on closeness coefficient boundaries', function 
     // Best candidate gets coefficient = 1.0 (Outstanding)
     // Worst candidate gets coefficient = 0.0 (Unsatisfactory)
     $candidates = [
-        makeCandidate('emp-best', 'Best', 5.0, 5.0, 100.0, 1.0, 10, 100.0, 100.0),
-        makeCandidate('emp-worst', 'Worst', 1.0, 1.0, 0.0, 0.0, 0, 0.0, 0.0),
+        makeCandidate('emp-best', 'Best', 100.0, 100.0, 100.0, 10.0, 100.0),
+        makeCandidate('emp-worst', 'Worst', 0.0, 0.0, 0.0, 0.0, 0.0),
     ];
     $result = $service->calculate($candidates, defaultWeights());
 
@@ -271,9 +261,9 @@ it('assigns correct labels based on closeness coefficient boundaries', function 
 it('returns complete output structure with all required keys', function () {
     $service = new TopsisService;
     $candidates = [
-        makeCandidate('emp-1', 'Alice', 4.0, 4.5, 75.0, 0.8, 5, 90.0, 88.0),
-        makeCandidate('emp-2', 'Bob', 3.0, 3.5, 60.0, 0.6, 3, 80.0, 76.0),
-        makeCandidate('emp-3', 'Charlie', 2.5, 2.0, 40.0, 0.4, 1, 70.0, 68.0),
+        makeCandidate('emp-1', 'Alice', 85.0, 92.0, 78.0, 6.0, 80.0),
+        makeCandidate('emp-2', 'Bob', 65.0, 80.0, 62.0, 3.0, 70.0),
+        makeCandidate('emp-3', 'Charlie', 45.0, 70.0, 48.0, 1.0, 55.0),
     ];
     $weights = defaultWeights();
     $result = $service->calculate($candidates, $weights);
@@ -292,16 +282,14 @@ it('returns complete output structure with all required keys', function () {
     // Weights should match input
     expect($result['weights'])->toBe($weights);
 
-    // Criteria should list all 7
-    expect($result['criteria'])->toHaveCount(7);
+    // Criteria should list all 5
+    expect($result['criteria'])->toHaveCount(5);
     expect($result['criteria'])->toContain(
-        'avg_manager_rating',
-        'final_rating',
-        'avg_goal_completion',
-        'goal_completion_ratio',
-        'positive_feedback_count',
-        'attendance_quality',
-        'task_completion_quality'
+        'performance_score',
+        'attendance_rate',
+        'goal_completion',
+        'feedback_score',
+        'tenure_factor'
     );
 
     // Ideal solutions should have all criteria keys

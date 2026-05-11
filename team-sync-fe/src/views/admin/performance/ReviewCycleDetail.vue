@@ -30,23 +30,19 @@ const { currentCycle, cyclesLoading, topsisResult, topsisLoading } = storeToRefs
 
 // ── Weight configuration ──────────────────────────────────────────────────────
 const weights = ref({
-    avg_manager_rating: 0.3,
-    final_rating: 0.3,
-    avg_goal_completion: 0.2,
-    goal_completion_ratio: 0.05,
-    positive_feedback_count: 0.05,
-    attendance_quality: 0.05,
-    task_completion_quality: 0.05,
+    performance_score: 0.30,
+    attendance_rate: 0.20,
+    goal_completion: 0.25,
+    feedback_score: 0.15,
+    tenure_factor: 0.10,
 });
 
 const weightLabels = {
-    avg_manager_rating: "Competency Score",
-    final_rating: "KPI Score",
-    avg_goal_completion: "Goal Completion %",
-    goal_completion_ratio: "Goal Completion Ratio",
-    positive_feedback_count: "Positive Feedback",
-    attendance_quality: "Attendance Quality",
-    task_completion_quality: "Task Completion Quality",
+    performance_score: "Performance Score",
+    attendance_rate: "Attendance Rate",
+    goal_completion: "Goal Completion",
+    feedback_score: "Feedback Score",
+    tenure_factor: "Tenure Factor",
 };
 
 const totalWeight = computed(() => Object.values(weights.value).reduce((s, v) => s + Number(v), 0));
