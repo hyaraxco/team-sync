@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PayrollAlreadyPaidException;
+use App\Exceptions\PayrollReconciliationBlockedException;
+use App\Exceptions\PayrollStateException;
 use App\Exports\PayrollExport;
 use App\Exports\PayrollReportExport;
 use App\Helpers\ResponseHelper;
@@ -264,7 +267,7 @@ class PayrollController extends Controller implements HasMiddleware
     {
         $validated = $request->validate([
             'notes' => 'nullable|string',
-            'final_salary' => 'nullable|numeric|min:0',
+            'final_salary' => 'nullable|integer|min:0',
         ]);
 
         try {
@@ -273,6 +276,10 @@ class PayrollController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Payroll Detail Updated Successfully', new PayrollDetailResource($payrollDetail), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Detail Not Found', null, 404);
+        } catch (PayrollStateException $e) {
+            Log::warning('PayrollController domain exception: '.$e->getMessage());
+
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Exception $e) {
             Log::warning('PayrollController domain exception: '.$e->getMessage());
 
@@ -300,6 +307,10 @@ class PayrollController extends Controller implements HasMiddleware
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
+        } catch (PayrollAlreadyPaidException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 409);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Exception $e) {
             Log::warning('PayrollController domain exception: '.$e->getMessage());
 
@@ -326,6 +337,12 @@ class PayrollController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Payroll Marked as Paid Successfully', new PayrollResource($payroll), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Payroll Not Found', null, 404);
+        } catch (PayrollAlreadyPaidException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 409);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
+        } catch (PayrollReconciliationBlockedException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), ['reconciliation' => $e->getDetails()], 422);
         } catch (\Exception $e) {
             Log::warning('PayrollController domain exception: '.$e->getMessage());
 

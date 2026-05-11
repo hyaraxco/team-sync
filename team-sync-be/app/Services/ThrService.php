@@ -199,6 +199,52 @@ class ThrService
     }
 
     /**
+     * Reopen an approved/paid THR payroll back to pending for correction.
+     *
+     * @return array{success: bool, message: string, thr_payroll: ?ThrPayroll}
+     */
+    public function reopen(int $id, User $actor): array
+    {
+        $thrPayroll = $this->repository->getById($id);
+
+        if ($thrPayroll->status === ThrPayroll::STATUS_PENDING) {
+            return [
+                'success' => false,
+                'message' => 'THR payroll is already in pending status',
+                'thr_payroll' => null,
+            ];
+        }
+
+        if ($thrPayroll->status === ThrPayroll::STATUS_PROCESSING) {
+            return [
+                'success' => false,
+                'message' => 'Processing THR payroll cannot be reopened',
+                'thr_payroll' => null,
+            ];
+        }
+
+        if (! in_array($thrPayroll->status, [ThrPayroll::STATUS_APPROVED, ThrPayroll::STATUS_PAID], true)) {
+            return [
+                'success' => false,
+                'message' => 'Only approved or paid THR payrolls can be reopened for correction',
+                'thr_payroll' => null,
+            ];
+        }
+
+        $thrPayroll = $this->repository->updateStatus($thrPayroll, ThrPayroll::STATUS_PENDING, [
+            'approved_by' => null,
+            'approved_at' => null,
+            'payment_date' => null,
+        ]);
+
+        return [
+            'success' => true,
+            'message' => 'THR payroll reopened for correction successfully',
+            'thr_payroll' => $thrPayroll,
+        ];
+    }
+
+    /**
      * Get simulation/preview of THR generation without persisting.
      */
     public function simulate(string $religionEvent, int $year, string $holidayDate): array
@@ -248,9 +294,9 @@ class ThrService
             'payment_deadline' => $paymentDeadline->format('Y-m-d'),
             'eligible_count' => count($eligible),
             'ineligible_count' => count($ineligible),
-            'total_gross_amount' => round($totalGross, 2),
-            'total_tax_amount' => round($totalTax, 2),
-            'total_net_amount' => round($totalNet, 2),
+            'total_gross_amount' => round($totalGross, 0),
+            'total_tax_amount' => round($totalTax, 0),
+            'total_net_amount' => round($totalNet, 0),
             'eligible_employees' => $eligible,
             'ineligible_employees' => $ineligible,
         ];

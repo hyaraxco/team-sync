@@ -116,6 +116,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.dashboard',
                         }"
+                        :aria-current="$route.name === 'admin.dashboard' ? 'page' : undefined"
                         class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
                         v-if="can('dashboard-menu')"
                         data-tooltip="Dashboard"
@@ -145,6 +146,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.project'),
                         }"
+                        :aria-current="$route.name?.startsWith('admin.project') ? 'page' : undefined"
                         v-if="can('project-menu')"
                         data-tooltip="Projects"
                         @click="onNavigate"
@@ -173,6 +175,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.staffMember'),
                         }"
+                        :aria-current="$route.name?.startsWith('admin.staffMember') ? 'page' : undefined"
                         v-if="can('staff-member-menu')"
                         data-tooltip="Employees"
                         @click="onNavigate"
@@ -201,6 +204,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.team'),
                         }"
+                        :aria-current="$route.name?.startsWith('admin.team') ? 'page' : undefined"
                         v-if="can('team-menu')"
                         data-tooltip="Our Teams"
                         @click="onNavigate"
@@ -229,6 +233,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.meeting'),
                         }"
+                        :aria-current="$route.name?.startsWith('admin.meeting') ? 'page' : undefined"
                         v-if="can('meeting-menu')"
                         data-tooltip="Meetings"
                         @click="onNavigate"
@@ -257,6 +262,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.attendances',
                         }"
+                        :aria-current="$route.name === 'admin.attendances' ? 'page' : undefined"
                         v-if="can('attendance-menu')"
                         data-tooltip="Attendance"
                         @click="onNavigate"
@@ -286,6 +292,7 @@ const onNavigate = () => closeMobile();
                             'nav-link-active':
                                 $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
                         }"
+                        :aria-current="$route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments' ? 'page' : undefined"
                         v-if="can('payroll-menu')"
                         data-tooltip="Payroll"
                         @click="onNavigate"
@@ -317,6 +324,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.payroll.adjustments',
                         }"
+                        :aria-current="$route.name === 'admin.payroll.adjustments' ? 'page' : undefined"
                         v-if="can('payroll-menu')"
                         data-tooltip="Payroll Adjustments"
                         @click="onNavigate"
@@ -345,6 +353,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.analytics'),
                         }"
+                        :aria-current="$route.name?.startsWith('admin.analytics') ? 'page' : undefined"
                         v-if="can('analytics-menu')"
                         data-tooltip="Analytics"
                         @click="onNavigate"
@@ -380,6 +389,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-reviews',
                         }"
+                        :aria-current="$route.name === 'admin.performance.team-reviews' ? 'page' : undefined"
                         data-tooltip="Team Reviews"
                         @click="onNavigate"
                     >
@@ -404,6 +414,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.pending-calibration',
                         }"
+                        :aria-current="$route.name === 'admin.performance.pending-calibration' ? 'page' : undefined"
                         data-tooltip="Pending Calibration"
                         @click="onNavigate"
                     >
@@ -428,6 +439,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.performance.cycles'),
                         }"
+                        :aria-current="$route.name?.startsWith('admin.performance.cycles') ? 'page' : undefined"
                         data-tooltip="Review Cycles"
                         @click="onNavigate"
                     >
@@ -451,6 +463,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.outcome-rules',
                         }"
+                        :aria-current="$route.name === 'admin.performance.outcome-rules' ? 'page' : undefined"
                         data-tooltip="Outcome Rules"
                         @click="onNavigate"
                     >
@@ -474,6 +487,7 @@ const onNavigate = () => closeMobile();
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.templates',
                         }"
+                        :aria-current="$route.name === 'admin.performance.templates' ? 'page' : undefined"
                         data-tooltip="Review Templates"
                         @click="onNavigate"
                     >
@@ -821,13 +835,13 @@ const onNavigate = () => closeMobile();
                     </p>
 
                     <!-- CTA Button -->
-                    <RouterLink :to="{ name: 'admin.upgrade-plan' }" @click="onNavigate">
-                        <button
-                            class="flex items-center justify-center w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
-                        >
-                            <span class="text-brand-white text-sm font-semibold mr-2">Upgrade Now</span>
-                            <ArrowRightIcon class="w-4 h-4 text-white" />
-                        </button>
+                    <RouterLink
+                        :to="{ name: 'admin.upgrade-plan' }"
+                        @click="onNavigate"
+                        class="flex items-center justify-center w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                    >
+                        <span class="text-brand-white text-sm font-semibold mr-2">Upgrade Now</span>
+                        <ArrowRightIcon class="w-4 h-4 text-white" aria-hidden="true" />
                     </RouterLink>
                 </div>
             </div>

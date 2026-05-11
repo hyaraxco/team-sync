@@ -29,7 +29,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
         return [
             new Middleware(PermissionMiddleware::using(['thr-list']), only: ['index', 'show', 'getDetails', 'getYearSummary']),
             new Middleware(PermissionMiddleware::using(['thr-generate']), only: ['generate', 'simulate']),
-            new Middleware(PermissionMiddleware::using(['thr-approve']), only: ['approve']),
+            new Middleware(PermissionMiddleware::using(['thr-approve']), only: ['approve', 'reopen']),
             new Middleware(PermissionMiddleware::using(['thr-process']), only: ['markAsPaid']),
         ];
     }
@@ -227,6 +227,33 @@ class ThrPayrollController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
         } catch (\Throwable $e) {
             Log::error('ThrPayrollController@markAsPaid Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * Reopen an approved/paid THR payroll back to pending for correction.
+     */
+    public function reopen(string $id, Request $request): JsonResponse
+    {
+        try {
+            $result = $this->thrService->reopen((int) $id, $request->user());
+
+            if (! $result['success']) {
+                return ResponseHelper::jsonResponse(false, $result['message'], null, 400);
+            }
+
+            return ResponseHelper::jsonResponse(
+                true,
+                $result['message'],
+                new ThrPayrollResource($result['thr_payroll']),
+                200
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
+        } catch (\Throwable $e) {
+            Log::error('ThrPayrollController@reopen Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
         }

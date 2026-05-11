@@ -3,6 +3,9 @@
 namespace App\Repositories;
 
 use App\Constants\CacheConstants;
+use App\Exceptions\PayrollAlreadyPaidException;
+use App\Exceptions\PayrollReconciliationBlockedException;
+use App\Exceptions\PayrollStateException;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
@@ -705,7 +708,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             $payrollDetail = PayrollDetail::findOrFail($id);
 
             if (in_array($payrollDetail->payroll->status, [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID], true)) {
-                throw new \Exception('Tidak dapat mengubah payroll yang sudah disetujui atau dibayar');
+                throw new PayrollStateException('Cannot update payroll details for a payroll that has already been approved or paid.');
             }
 
             $updateData = [];
@@ -750,15 +753,18 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->firstOrFail();
 
             if ($payroll->status === Payroll::STATUS_PAID) {
-                throw new \Exception('Payroll yang sudah dibayar tidak dapat disetujui ulang');
+                throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be approved.');
             }
 
             if ($payroll->status === Payroll::STATUS_APPROVED) {
-                throw new \Exception('Payroll sudah disetujui');
+                throw new PayrollStateException('Payroll has already been approved.');
             }
 
             if ($payroll->status !== Payroll::STATUS_PENDING) {
-                throw new \Exception('Payroll must be pending before it can be approved');
+                throw new PayrollStateException(sprintf(
+                    'Payroll must be in "pending" status to be approved. Current status: "%s".',
+                    $payroll->status
+                ));
             }
 
             // Check if multi-step approval policies apply
@@ -853,7 +859,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                             return $payroll->loadCount('payrollDetails');
                         }
 
-                        throw new \Exception('You do not have the required role to approve this payroll step.');
+                        throw new PayrollStateException('You do not have the required role to approve this payroll step.');
                     }
                 }
                 // All approvals complete — fall through to set status = approved
@@ -889,11 +895,14 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->firstOrFail();
 
             if ($payroll->status === Payroll::STATUS_PAID) {
-                throw new \Exception('Payroll sudah dibayar');
+                throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be modified.');
             }
 
             if ($payroll->status !== Payroll::STATUS_APPROVED) {
-                throw new \Exception('Payroll must be approved before it can be marked as paid');
+                throw new PayrollStateException(sprintf(
+                    'Payroll must be in "approved" status to be marked as paid. Current status: "%s".',
+                    $payroll->status
+                ));
             }
 
             // Check multi-step approval completion
@@ -902,7 +911,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->count();
 
             if ($pendingApprovals > 0) {
-                throw new \Exception(sprintf(
+                throw new PayrollStateException(sprintf(
                     'Payroll cannot be marked as paid because %d approval step(s) are still pending.',
                     $pendingApprovals
                 ));
@@ -930,6 +939,10 @@ class PayrollRepository implements PayrollRepositoryInterface
                         'Payroll cannot be marked as paid because %d critical reconciliation issue(s) remain. Complete employee bank information and regenerate payroll before retrying.',
                         $criticalCount
                     ),
+                    'details' => [
+                        'critical_count' => $criticalCount,
+                        'critical_staff_member_ids' => $reconciliation['summary']['critical_staff_member_ids'] ?? [],
+                    ],
                 ];
             }
 
@@ -968,8 +981,12 @@ class PayrollRepository implements PayrollRepositoryInterface
             ];
         });
 
+        // Throw after transaction commits so activity log is persisted
         if (($result['blocked'] ?? false) === true) {
-            throw new \Exception((string) ($result['message'] ?? 'Payroll payment was blocked by reconciliation issues.'));
+            throw new PayrollReconciliationBlockedException(
+                (string) ($result['message'] ?? 'Payroll payment was blocked by reconciliation issues.'),
+                (array) ($result['details'] ?? [])
+            );
         }
 
         return $result['payroll'];
