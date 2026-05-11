@@ -207,8 +207,10 @@ class DailyMetricsCalculator
                 'period_start' => $date,
             ],
             [
+                'period_end' => $date,
                 'value' => $value,
                 'metadata' => $metadata ? json_encode($metadata) : null,
+                'calculated_at' => now(),
             ]
         );
     }

@@ -42,7 +42,7 @@ class License extends Model
     public function scopeValid($query)
     {
         return $query->where('is_active', true)
-            ->whereDate('expires_at', '>=', now())
+            ->where('expires_at', '>=', now())
             ->whereDate('issued_at', '<=', now());
     }
 }

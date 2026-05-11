@@ -19,6 +19,12 @@ export const useSetupStore = defineStore("setup", {
         licenseVerifyResult: null,
         licenseVerifyLoading: false,
 
+        // License management
+        currentLicense: null,
+        currentLicenseLoading: false,
+        licenseDetail: null,
+        licenseDetailLoading: false,
+
         // Bootstrap
         bootstrapResult: null,
         bootstrapLoading: false,
@@ -101,6 +107,64 @@ export const useSetupStore = defineStore("setup", {
 
                 this.hasLicense = true;
                 return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async fetchCurrentLicense() {
+            this.currentLicenseLoading = true;
+            this.currentLicense = null;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get("/licenses/current");
+                this.currentLicense = response.data.data;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.currentLicenseLoading = false;
+            }
+        },
+
+        async fetchLicenseDetail(id) {
+            this.licenseDetailLoading = true;
+            this.licenseDetail = null;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get(`/licenses/${id}`);
+                this.licenseDetail = response.data.data;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.licenseDetailLoading = false;
+            }
+        },
+
+        async updateLicense(id, data) {
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.put(`/licenses/${id}`, data);
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
+
+        async deleteLicense(id) {
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.delete(`/licenses/${id}`);
+                return response.data;
             } catch (error) {
                 this.error = handleError(error);
                 throw error;

@@ -8,7 +8,6 @@ use App\Enums\JobStatus;
 use App\Enums\ProjectPriority;
 use App\Enums\ProjectStatus;
 use App\Enums\ProjectType;
-use App\Enums\SkillLevel;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Enums\TeamStatus;

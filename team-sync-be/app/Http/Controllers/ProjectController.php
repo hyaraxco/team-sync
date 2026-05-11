@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ProjectStatus;
 use App\Helpers\ResponseHelper;
 use App\Http\Middleware\EnsureProjectMembership;
 use App\Http\Requests\Project\ProjectListRequest;
