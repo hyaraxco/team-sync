@@ -2,24 +2,15 @@
 
 namespace App\Services\Attendance;
 
-use App\Models\AttendancePolicy;
-use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
+use App\Support\AttendanceHelper;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use Illuminate\Support\Collection;
 
 class LeaveEntitlementValidator
 {
-    private const DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE = [
-        'full_time' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'contract' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'intern' => ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
-        'part_time' => ['monday', 'wednesday', 'friday'],
-    ];
-
     public function validate(LeaveRequest $leaveRequest, CarbonInterface|string|null $asOfDate = null): array
     {
         $errors = [];
@@ -33,7 +24,7 @@ class LeaveEntitlementValidator
             ];
         }
 
-        $leaveType = $this->leaveTypeValue($leaveRequest);
+        $leaveType = AttendanceHelper::leaveTypeValue($leaveRequest);
         $entitlement = $this->resolveEntitlement($employmentType, $leaveType);
 
         if (! $entitlement || ! $entitlement->is_eligible) {
@@ -55,8 +46,8 @@ class LeaveEntitlementValidator
             }
         }
 
-        $scheduledWeekdays = $this->resolveScheduledWeekdays($employmentType);
-        $requestWorkingDays = $this->countWorkingLeaveDays(
+        $scheduledWeekdays = AttendanceHelper::resolveScheduledWeekdays($employmentType);
+        $requestWorkingDays = AttendanceHelper::countWorkingLeaveDays(
             $employmentType,
             Carbon::parse($leaveRequest->start_date)->startOfDay(),
             Carbon::parse($leaveRequest->end_date)->endOfDay(),
@@ -96,7 +87,7 @@ class LeaveEntitlementValidator
             return null;
         }
 
-        return $this->normalizeEmploymentType($employmentType);
+        return AttendanceHelper::normalizeEmploymentType($employmentType);
     }
 
     private function resolveEmployee(LeaveRequest $leaveRequest): ?StaffMemberProfile
@@ -192,8 +183,8 @@ class LeaveEntitlementValidator
         $targetDate = $asOfDate ? Carbon::parse($asOfDate)->startOfDay() : Carbon::parse($leaveRequest->start_date)->startOfDay();
         $yearStart = $targetDate->copy()->startOfYear()->toDateString();
         $yearEnd = $targetDate->copy()->endOfYear()->toDateString();
-        $leaveType = $this->leaveTypeValue($leaveRequest);
-        $scheduledWeekdays = $this->resolveScheduledWeekdays($employmentType);
+        $leaveType = AttendanceHelper::leaveTypeValue($leaveRequest);
+        $scheduledWeekdays = AttendanceHelper::resolveScheduledWeekdays($employmentType);
 
         $approvedLeavesInYear = LeaveRequest::query()
             ->where('staff_member_id', $leaveRequest->staff_member_id)
@@ -208,7 +199,7 @@ class LeaveEntitlementValidator
 
         /** @var LeaveRequest $approvedLeave */
         foreach ($approvedLeavesInYear as $approvedLeave) {
-            $usedDays += $this->countWorkingLeaveDays(
+            $usedDays += AttendanceHelper::countWorkingLeaveDays(
                 $employmentType,
                 Carbon::parse($approvedLeave->start_date)->startOfDay(),
                 Carbon::parse($approvedLeave->end_date)->endOfDay(),
@@ -219,86 +210,11 @@ class LeaveEntitlementValidator
         return ($usedDays + $requestWorkingDays) <= $quotaDays;
     }
 
-    private function countWorkingLeaveDays(
-        string $employmentType,
-        CarbonInterface $startDate,
-        CarbonInterface $endDate,
-        Collection $scheduledWeekdays
-    ): int {
-        $days = 0;
-        $cursor = Carbon::parse($startDate)->startOfDay();
-
-        while ($cursor->lessThanOrEqualTo($endDate)) {
-            if ($scheduledWeekdays->contains(strtolower($cursor->englishDayOfWeek))
-                && ! $this->isHolidayForEmploymentType($employmentType, $cursor, $scheduledWeekdays)) {
-                $days++;
-            }
-
-            $cursor->addDay();
-        }
-
-        return $days;
-    }
-
-    private function isHolidayForEmploymentType(
-        string $employmentType,
-        CarbonInterface $date,
-        Collection $scheduledWeekdays
-    ): bool {
-        if (! $scheduledWeekdays->contains(strtolower($date->englishDayOfWeek))) {
-            return false;
-        }
-
-        return HolidayCalendar::query()
-            ->whereDate('date', $date->toDateString())
-            ->get()
-            ->contains(function (HolidayCalendar $holiday) use ($employmentType) {
-                $appliesTo = $holiday->applies_to;
-
-                return $appliesTo === null || in_array($employmentType, $appliesTo, true);
-            });
-    }
-
-    private function resolveScheduledWeekdays(string $employmentType): Collection
-    {
-        $policy = AttendancePolicy::query()
-            ->where('employment_type', $employmentType)
-            ->first();
-
-        $weekdays = $policy?->default_working_weekdays
-            ?? self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE[$employmentType]
-            ?? self::DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE['full_time'];
-
-        return collect($weekdays)
-            ->map(fn ($weekday) => strtolower((string) $weekday))
-            ->values();
-    }
-
     private function resolveEntitlement(string $employmentType, string $leaveType): ?LeaveEntitlement
     {
         return LeaveEntitlement::query()
             ->where('employment_type', $employmentType)
             ->where('leave_type', $leaveType)
             ->first();
-    }
-
-    private function leaveTypeValue(LeaveRequest $leaveRequest): string
-    {
-        $leaveType = $leaveRequest->leave_type;
-
-        if ($leaveType instanceof \BackedEnum) {
-            return (string) $leaveType->value;
-        }
-
-        return (string) $leaveType;
-    }
-
-    private function normalizeEmploymentType(string $employmentType): string
-    {
-        return match ($employmentType) {
-            'internship' => 'intern',
-            'freelance' => 'contract',
-            default => $employmentType,
-        };
     }
 }
