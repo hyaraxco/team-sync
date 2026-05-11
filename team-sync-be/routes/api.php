@@ -36,10 +36,10 @@ use App\Http\Controllers\PerformanceTopsisController;
 use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ProjectTaskController;
 use App\Http\Controllers\SetupController;
-use App\Http\Middleware\EnsureProjectMembership;
 use App\Http\Controllers\StaffMemberProfileController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\ThrPayrollController;
+use App\Http\Middleware\EnsureProjectMembership;
 use Illuminate\Support\Facades\Route;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 

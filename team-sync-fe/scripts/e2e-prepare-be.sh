@@ -75,6 +75,7 @@ fi
 
 "${compose_cmd[@]}" exec -T web php artisan migrate:fresh
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=MinimalPayrollE2ESeeder
+"${compose_cmd[@]}" exec -T web php artisan db:seed --class=DemoDataSeeder
 "${compose_cmd[@]}" exec -T web php artisan attendance-periods:sync
 "${compose_cmd[@]}" exec -T web php artisan tinker --execute="
 use App\Models\AttendancePeriod;

@@ -112,7 +112,12 @@ describe("useConfirmAction", () => {
 
     it("confirmAction sets isProcessing during execution", async () => {
         let resolveCallback;
-        const callback = vi.fn().mockImplementation(() => new Promise((resolve) => { resolveCallback = resolve; }));
+        const callback = vi.fn().mockImplementation(
+            () =>
+                new Promise((resolve) => {
+                    resolveCallback = resolve;
+                }),
+        );
         action.openModal();
 
         const promise = action.confirmAction(callback);

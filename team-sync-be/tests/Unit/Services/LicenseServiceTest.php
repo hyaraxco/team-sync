@@ -10,6 +10,7 @@ use Tests\TestCase;
 class LicenseServiceTest extends TestCase
 {
     private LicenseService $service;
+
     private $repository;
 
     protected function setUp(): void
@@ -106,7 +107,7 @@ class LicenseServiceTest extends TestCase
         $key = base64_encode(json_encode($payload));
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("required");
+        $this->expectExceptionMessage('required');
 
         $this->service->validateLicense($key);
     }

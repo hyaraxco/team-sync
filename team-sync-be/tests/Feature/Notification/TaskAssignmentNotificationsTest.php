@@ -5,6 +5,8 @@ namespace Tests\Feature\Notification;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\StaffMemberProfile;
+use App\Models\Team;
+use App\Models\TeamMember;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -222,7 +224,7 @@ class TaskAssignmentNotificationsTest extends TestCase
      */
     private function createProject(int $projectLeaderId, array $memberProfileIds = []): Project
     {
-        $team = \App\Models\Team::factory()->create();
+        $team = Team::factory()->create();
 
         $project = Project::query()->create([
             'name' => 'Notification Project '.uniqid(),
@@ -238,7 +240,7 @@ class TaskAssignmentNotificationsTest extends TestCase
         $project->teams()->attach($team->id, ['assigned_at' => now()]);
 
         foreach ($memberProfileIds as $profileId) {
-            \App\Models\TeamMember::create([
+            TeamMember::create([
                 'team_id' => $team->id,
                 'staff_member_id' => $profileId,
                 'joined_at' => now(),

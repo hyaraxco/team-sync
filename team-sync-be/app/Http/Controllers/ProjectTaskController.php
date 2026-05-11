@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\ProjectTask\ProjectTaskListRequest;
 use App\Http\Requests\ProjectTaskAttachmentStoreRequest;
 use App\Http\Requests\ProjectTaskCommentStoreRequest;
 use App\Http\Requests\ProjectTaskCommentUpdateRequest;
-use App\Http\Requests\ProjectTask\ProjectTaskListRequest;
 use App\Http\Requests\ProjectTaskStoreRequest;
 use App\Http\Requests\ProjectTaskUpdateRequest;
 use App\Http\Resources\PaginateResource;

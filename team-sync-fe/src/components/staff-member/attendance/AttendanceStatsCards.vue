@@ -25,9 +25,7 @@ defineProps({
 const showLeaveBreakdown = ref(false);
 
 const formatLeaveType = (type) => {
-    return type
-        .replace(/_/g, " ")
-        .replace(/\b\w/g, (c) => c.toUpperCase());
+    return type.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 };
 </script>
 
@@ -66,10 +64,7 @@ const formatLeaveType = (type) => {
                         </p>
                         <p class="text-brand-light text-xs font-medium flex items-center gap-1">
                             Days remaining
-                            <component
-                                :is="showLeaveBreakdown ? ChevronUp : ChevronDown"
-                                class="w-3 h-3"
-                            />
+                            <component :is="showLeaveBreakdown ? ChevronUp : ChevronDown" class="w-3 h-3" />
                         </p>
                     </div>
                     <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
