@@ -50,14 +50,7 @@ describe("NotificationPanel smoke", () => {
             ],
         });
 
-<<<<<<< Updated upstream
         const items = wrapper.findAll('[data-testid^="notification-item-"]');
-=======
-    const emitted = wrapper.emitted("select");
-    expect(emitted).toHaveLength(1);
-    expect(emitted[0][0]).toMatchObject({ id: "n-9", action_url: "/admin/my-payroll/9" });
-  });
->>>>>>> Stashed changes
 
         expect(items).toHaveLength(5);
         expect(wrapper.text()).toContain("One");
@@ -65,15 +58,10 @@ describe("NotificationPanel smoke", () => {
         expect(wrapper.text()).not.toContain("Six");
     });
 
-<<<<<<< Updated upstream
     it("emits retry when retry button is clicked", async () => {
         const wrapper = factory({
             error: "Something went wrong",
         });
-=======
-    expect(wrapper.text()).toContain("New Task Assigned");
-    expect(wrapper.text()).toContain("Prepare sprint report");
->>>>>>> Stashed changes
 
         await wrapper.get('[data-testid="notification-retry"]').trigger("click");
 

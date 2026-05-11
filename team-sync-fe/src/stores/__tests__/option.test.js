@@ -18,8 +18,7 @@ describe("Option Store", () => {
         vi.clearAllMocks();
     });
 
-    afterEach(() => {
-    });
+    afterEach(() => {});
 
     it("fetchDepartments populates departments", async () => {
         const payload = [{ id: 1, name: "Engineering" }];

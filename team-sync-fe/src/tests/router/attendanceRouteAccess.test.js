@@ -1,5 +1,4 @@
 import { describe, expect, it, vi } from "vitest";
-<<<<<<< Updated upstream
 vi.mock("@/views/staff-member/MyAttendance.vue", () => ({ default: {} }));
 vi.mock("@/views/staff-member/ClockInOut.vue", () => ({ default: {} }));
 vi.mock("@/stores/auth", () => ({
@@ -9,16 +8,6 @@ vi.mock("@/router", () => ({ default: { beforeEach: vi.fn() } }));
 
 vi.mock("@/views/admin/attendance/AttendanceList.vue", () => ({
     default: {},
-=======
-vi.mock("@/views/employee/MyAttendance.vue", () => ({ default: {} }));
-vi.mock("@/views/employee/ClockInOut.vue", () => ({ default: {} }));
-vi.mock("@/views/admin/attendance/AttendanceList.vue", () => ({ default: {} }));
-vi.mock("@/views/admin/attendance/AttendanceCorrectionList.vue", () => ({ default: {} }));
-vi.mock("@/views/admin/attendance/LeaveRequestList.vue", () => ({ default: {} }));
-vi.mock("@/views/admin/attendance/AttendanceRecordList.vue", () => ({ default: {} }));
-vi.mock("@/stores/auth", () => ({
-  useAuthStore: () => ({ user: null }),
->>>>>>> Stashed changes
 }));
 
 import attendanceRoutes from "@/router/attendance";

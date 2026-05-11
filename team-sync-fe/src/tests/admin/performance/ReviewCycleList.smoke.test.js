@@ -102,21 +102,12 @@ describe("ReviewCycleList smoke", () => {
         expect(performanceReviewStoreMock.fetchCycles).toHaveBeenCalled();
     });
 
-<<<<<<< Updated upstream
     it("displays loading state", () => {
         performanceReviewRefs.cyclesLoading.value = true;
         const wrapper = factory();
         // View uses a spinner, not text
         expect(wrapper.find(".animate-spin").exists()).toBe(true);
     });
-=======
-  it("displays loading state", () => {
-    performanceReviewRefs.cyclesLoading.value = true;
-    const wrapper = factory();
-    // View uses a spinner, not text
-    expect(wrapper.find(".animate-spin").exists()).toBe(true);
-  });
->>>>>>> Stashed changes
 
     it("displays empty state when no cycles", () => {
         performanceReviewRefs.cycles.value = [];
@@ -152,7 +143,6 @@ describe("ReviewCycleList smoke", () => {
         expect(wrapper.text()).toContain("Annual Review 2026");
     });
 
-<<<<<<< Updated upstream
     it("displays cycle status badges", () => {
         performanceReviewRefs.cycles.value = [
             {
@@ -169,22 +159,4 @@ describe("ReviewCycleList smoke", () => {
         const wrapper = factory();
         expect(wrapper.text()).toContain("Active");
     });
-=======
-  it("displays cycle status badges", () => {
-    performanceReviewRefs.cycles.value = [
-      {
-        id: 1,
-        name: "Test Cycle",
-        cycle_type: "quarterly",
-        status: "active",
-        start_date: "2026-01-01",
-        end_date: "2026-12-31",
-        review_period_start: "2026-01-01",
-        review_period_end: "2026-12-31",
-      },
-    ];
-    const wrapper = factory();
-    expect(wrapper.text()).toContain("Active");
-  });
->>>>>>> Stashed changes
 });

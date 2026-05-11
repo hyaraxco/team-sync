@@ -129,13 +129,7 @@ describe("Sidebar smoke", () => {
 
         const wrapper = factory();
 
-<<<<<<< Updated upstream
         expect(wrapper.text()).not.toContain("Reports");
         expect(wrapper.find('a[href="#"]').exists()).toBe(false);
     });
-=======
-    expect(wrapper.text()).not.toContain("Reports");
-    expect(wrapper.find('a[href="#"]').exists()).toBe(false);
-  });
->>>>>>> Stashed changes
 });

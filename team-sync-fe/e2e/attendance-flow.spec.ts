@@ -6,6 +6,9 @@ const toDateInputValue = (date: Date) => date.toISOString().slice(0, 10);
 /**
  * Pick a weekday range 3-6 months in the future to avoid overlaps
  * with previous test runs or seeded data.
+ *
+ * Uses a combination of timestamp + random offset to ensure uniqueness
+ * even when tests run in quick succession.
  */
 const getNextMonthWeekdayRange = () => {
     const start = new Date();
@@ -13,9 +16,10 @@ const getNextMonthWeekdayRange = () => {
     const monthsAhead = 3 + (Math.floor(Date.now() / 1000) % 4);
     start.setMonth(start.getMonth() + monthsAhead, 1);
 
-    // Use a rotating day within the month
+    // Use a rotating day within the month with random component for extra uniqueness
     const rotatingOffset = Math.floor((Date.now() / 1_000) % 20);
-    start.setDate(5 + rotatingOffset);
+    const randomOffset = Math.floor(Math.random() * 5); // 0-4 random days
+    start.setDate(5 + rotatingOffset + randomOffset);
 
     while (start.getDay() === 0 || start.getDay() === 6) {
         start.setDate(start.getDate() + 1);

@@ -348,9 +348,6 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
                 const response = await axiosInstance.get(`/performance/reviews/${reviewId}/validate-readiness`);
                 this.readinessResult = response.data.data;
                 return response.data.data;
-            } catch (error) {
-                // Best-effort fetch — don't pollute store error state (e.g., 403 for non-HR users)
-                throw error;
             } finally {
                 this.readinessLoading = false;
             }

@@ -32,7 +32,6 @@ vi.mock("pinia", async (importOriginal) => {
     };
 });
 
-<<<<<<< Updated upstream
 vi.mock("@/helpers/permissionHelper", () => ({
     can: () => true,
     canOneOf: () => true,
@@ -43,18 +42,6 @@ vi.mock("lucide-vue-next", async (importOriginal) => {
     return {
         ...actual,
     };
-=======
-vi.mock('@/helpers/permissionHelper', () => ({
-  can: () => true,
-  canOneOf: () => true,
-}));
-
-vi.mock('lucide-vue-next', async (importOriginal) => {
-  const actual = await importOriginal();
-  return {
-    ...actual,
-  };
->>>>>>> Stashed changes
 });
 
 import AttendanceCorrectionList from "@/views/admin/attendance/AttendanceCorrectionList.vue";

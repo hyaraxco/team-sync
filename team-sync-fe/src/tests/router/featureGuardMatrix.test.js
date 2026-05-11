@@ -22,7 +22,6 @@ const routeEntries = flattenRoutes(appRoutes);
 const routeMeta = (name) => routeEntries.find((route) => route.name === name)?.meta ?? {};
 
 const rolePermissions = {
-<<<<<<< Updated upstream
     manager: [
         "dashboard-menu",
         "dashboard-view",
@@ -215,109 +214,6 @@ const rolePermissions = {
         "meeting-menu",
         "meeting-list",
     ],
-=======
-  manager: [
-    "dashboard-menu",
-    "team-menu",
-    "team-create",
-    "team-edit",
-    "employee-menu",
-    "employee-create",
-    "employee-edit",
-    "project-menu",
-    "project-list",
-    "project-create",
-    "project-edit",
-    "attendance-menu",
-    "profile-menu",
-    "profile-view",
-    "attendance-my-attendances",
-    "attendance-last-attendance",
-    "attendance-check-in",
-    "attendance-check-out",
-    "leave-request-menu",
-    "leave-request-create",
-    "leave-request-my-requests",
-    "payslip-view",
-    "performance-menu",
-    "review-self-submit",
-    "review-manager-submit",
-    "goal-create-own",
-    "goal-assign-team",
-    "feedback-give",
-  ],
-  hr: [
-    "dashboard-menu",
-    "team-menu",
-    "team-create",
-    "team-edit",
-    "employee-menu",
-    "employee-create",
-    "employee-edit",
-    "project-menu",
-    "project-list",
-    "project-create",
-    "project-edit",
-    "attendance-menu",
-    "payroll-menu",
-    "payroll-list",
-    "payroll-create",
-    "profile-menu",
-    "profile-view",
-    "attendance-my-attendances",
-    "attendance-last-attendance",
-    "attendance-check-in",
-    "attendance-check-out",
-    "leave-request-menu",
-    "leave-request-create",
-    "leave-request-my-requests",
-    "payslip-view",
-    "performance-menu",
-    "review-cycle-manage",
-    "review-calibrate",
-    "review-self-submit",
-    "review-manager-submit",
-    "goal-create-own",
-    "goal-assign-team",
-    "feedback-give",
-  ],
-  finance: [
-    "dashboard-menu",
-    "employee-menu",
-    "employee-list",
-    "attendance-menu",
-    "payroll-menu",
-    "payroll-list",
-    "payroll-edit",
-    "payroll-process",
-    "payroll-statistics",
-    "profile-menu",
-    "profile-view",
-    "attendance-my-attendances",
-    "attendance-last-attendance",
-    "attendance-check-in",
-    "attendance-check-out",
-    "leave-request-menu",
-    "leave-request-create",
-    "leave-request-my-requests",
-    "payslip-view",
-  ],
-  employee: [
-    "dashboard-menu",
-    "profile-menu",
-    "team-view",
-    "attendance-my-attendances",
-    "attendance-check-in",
-    "attendance-check-out",
-    "payslip-view",
-    "project-menu",
-    "project-list",
-    "performance-menu",
-    "review-self-submit",
-    "goal-create-own",
-    "feedback-give",
-  ],
->>>>>>> Stashed changes
 };
 
 describe("feature guard matrix", () => {
@@ -351,7 +247,6 @@ describe("feature guard matrix", () => {
         expect(hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.attendances"))).toBe(false);
     });
 
-<<<<<<< Updated upstream
     it("enforces role access for payroll and employee self-service", () => {
         // HR no longer has payroll-create (Finance-owned)
         expect(hasRoutePermissionAccess(rolePermissions.hr, routeMeta("admin.payroll.create"))).toBe(false);
@@ -443,119 +338,4 @@ describe("feature guard matrix", () => {
         expect(hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.payroll.readiness"))).toBe(true);
         expect(hasRoutePermissionAccess(rolePermissions.staff, routeMeta("admin.payroll.readiness"))).toBe(false);
     });
-=======
-  it("enforces role access for payroll and employee self-service", () => {
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.hr,
-        routeMeta("admin.payroll.create")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.hr,
-        routeMeta("admin.payroll.detail")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.finance,
-        routeMeta("admin.payroll.create")
-      )
-    ).toBe(false);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.finance,
-        routeMeta("admin.payroll.detail")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.manager,
-        routeMeta("admin.payroll.detail")
-      )
-    ).toBe(false);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("employee.payroll")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.manager,
-        routeMeta("employee.payroll")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.finance,
-        routeMeta("employee.payroll")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.hr,
-        routeMeta("employee.payroll")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("employee.profile")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.finance,
-        routeMeta("employee.profile")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.manager,
-        routeMeta("employee.attendance.my-attendances")
-      )
-    ).toBe(true);
-  });
-
-  it("enforces role access for performance calibration", () => {
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.hr,
-        routeMeta("admin.performance.pending-calibration")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.manager,
-        routeMeta("admin.performance.pending-calibration")
-      )
-    ).toBe(false);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.employee,
-        routeMeta("admin.performance.pending-calibration")
-      )
-    ).toBe(false);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.finance,
-        routeMeta("admin.performance.pending-calibration")
-      )
-    ).toBe(false);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.hr,
-        routeMeta("admin.performance.cycles")
-      )
-    ).toBe(true);
-    expect(
-      hasRoutePermissionAccess(
-        rolePermissions.manager,
-        routeMeta("admin.performance.cycles")
-      )
-    ).toBe(false);
-  });
->>>>>>> Stashed changes
 });

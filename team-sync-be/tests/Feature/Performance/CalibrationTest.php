@@ -17,12 +17,8 @@ uses(TestCase::class, RefreshDatabase::class);
 uses(ActivatesLicense::class);
 
 beforeEach(function () {
-<<<<<<< Updated upstream
     $this->activateTestLicense();
     Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
-=======
-    Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'sanctum']);
->>>>>>> Stashed changes
     Permission::firstOrCreate(['name' => 'review-calibrate', 'guard_name' => 'sanctum']);
     $role = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'sanctum']);
     $role->givePermissionTo('review-calibrate');
@@ -31,11 +27,7 @@ beforeEach(function () {
 function actingAsHR()
 {
     $user = User::factory()->create();
-<<<<<<< Updated upstream
     $employee = StaffMemberProfile::factory()->create(['user_id' => $user->id]);
-=======
-    $employee = EmployeeProfile::factory()->create(['user_id' => $user->id]);
->>>>>>> Stashed changes
     $role = Role::findByName('hr', 'sanctum');
     $user->assignRole($role);
     Sanctum::actingAs($user);
@@ -117,11 +109,7 @@ it('calibration auto-derives final_rating_label', function () {
     $response = $this->postJson("/api/v1/performance/reviews/{$review->id}/calibrate", [
         'responses' => [
             ['section_id' => $section1->id, 'rating' => 5],
-<<<<<<< Updated upstream
         ],
-=======
-        ]
->>>>>>> Stashed changes
     ]);
 
     $response->assertOk();
@@ -152,11 +140,7 @@ it('pending calibration endpoint excludes hr own review', function () {
     $hr = actingAsHR();
 
     $otherReview = createReviewForCalibration(null, 'pending_calibration');
-<<<<<<< Updated upstream
     $hrReview = createReviewForCalibration($hr['staff']->id, 'pending_calibration');
-=======
-    createReviewForCalibration($hr['employee']->id, 'pending_calibration');
->>>>>>> Stashed changes
 
     $response = $this->getJson('/api/v1/performance/reviews/pending-calibration');
 
@@ -223,35 +207,19 @@ it('calibration context returns cross-manager stats', function () {
 
 it('manager assessment auto-calculates final_rating and manager_recommended_rating', function () {
     $managerUser = User::factory()->create();
-<<<<<<< Updated upstream
     $managerProfile = StaffMemberProfile::factory()->create(['user_id' => $managerUser->id]);
     Permission::firstOrCreate(['name' => 'review-manager-submit', 'guard_name' => 'sanctum']);
     $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'sanctum']);
     $managerRole->givePermissionTo(['review-manager-submit']);
-=======
-    $managerProfile = EmployeeProfile::factory()->create(['user_id' => $managerUser->id]);
-    Permission::firstOrCreate(['name' => 'review-manager-submit', 'guard_name' => 'sanctum']);
-    Permission::firstOrCreate(['name' => 'performance-menu', 'guard_name' => 'sanctum']);
-    $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'sanctum']);
-    $managerRole->givePermissionTo(['review-manager-submit', 'performance-menu']);
->>>>>>> Stashed changes
     $managerUser->assignRole($managerRole);
     Sanctum::actingAs($managerUser);
 
     $cycle = PerformanceReviewCycle::factory()->create();
-<<<<<<< Updated upstream
     $employee = StaffMemberProfile::factory()->create();
 
     $review = PerformanceReview::create([
         'cycle_id' => $cycle->id,
         'staff_member_id' => $employee->id,
-=======
-    $employee = EmployeeProfile::factory()->create();
-
-    $review = PerformanceReview::create([
-        'cycle_id' => $cycle->id,
-        'employee_id' => $employee->id,
->>>>>>> Stashed changes
         'reviewer_id' => $managerProfile->id,
         'status' => 'pending_manager',
     ]);
@@ -289,15 +257,9 @@ it('manager assessment auto-calculates final_rating and manager_recommended_rati
 
 it('non-hr user cannot access pending-calibration endpoint', function () {
     $user = User::factory()->create();
-<<<<<<< Updated upstream
     StaffMemberProfile::factory()->create(['user_id' => $user->id]);
     $staffRole = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
     $user->assignRole($staffRole);
-=======
-    EmployeeProfile::factory()->create(['user_id' => $user->id]);
-    $employeeRole = Role::firstOrCreate(['name' => 'employee', 'guard_name' => 'sanctum']);
-    $user->assignRole($employeeRole);
->>>>>>> Stashed changes
     Sanctum::actingAs($user);
 
     $response = $this->getJson('/api/v1/performance/reviews/pending-calibration');
