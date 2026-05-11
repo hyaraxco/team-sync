@@ -957,7 +957,7 @@ class EmailService
     public function sendPayrollDraftCreatedNotification(Payroll $payroll, ?string $actorName = null): void
     {
         $hrRecipients = $this->resolveHrRecipients(null);
-        $financeRecipients = User::role('finance', 'sanctum')->get();
+        $financeRecipients = User::role('finance')->get();
 
         $recipients = $hrRecipients->merge($financeRecipients)->unique('id')->values();
 
@@ -976,7 +976,7 @@ class EmailService
     public function sendPayrollApprovedNotification(Payroll $payroll, ?string $actorName = null): void
     {
         $hrRecipients = $this->resolveHrRecipients(null);
-        $financeRecipients = User::role('finance', 'sanctum')->get();
+        $financeRecipients = User::role('finance')->get();
 
         $recipients = $hrRecipients->merge($financeRecipients)->unique('id')->values();
 

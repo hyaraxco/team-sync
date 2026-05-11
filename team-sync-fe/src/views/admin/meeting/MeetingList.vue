@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { onMounted, onUnmounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useMeetingStore } from "@/stores/meeting";
 import { can } from "@/helpers/permissionHelper";
@@ -79,6 +79,10 @@ watch(searchQuery, handleSearch);
 
 onMounted(() => {
     fetchMeetings();
+});
+
+onUnmounted(() => {
+    clearTimeout(debounceTimer);
 });
 </script>
 
