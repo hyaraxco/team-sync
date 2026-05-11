@@ -31,12 +31,11 @@ class PayslipPdfService
         // Calculate BPJS breakdown
         $bpjsBreakdown = $this->calculateBpjsBreakdown($basicSalary);
 
-        // Calculate tax
-        $taxResult = $this->taxService->calculateMonthlyPph21(
-            $basicSalary,
-            $employee?->ptkp_status,
-            ! empty($employee?->npwp)
-        );
+        // Calculate tax — TER for Jan–Nov, annualized for December
+        $isDecember = $payroll?->salary_month && Carbon::parse($payroll->salary_month)->month === 12;
+        $taxResult = $isDecember
+            ? $this->taxService->calculateAnnualizedPph21($basicSalary, $employee?->ptkp_status, ! empty($employee?->npwp))
+            : $this->taxService->calculateMonthlyTer($basicSalary, $employee?->ptkp_status, ! empty($employee?->npwp));
         $tax = $taxResult['pph21_monthly'];
 
         // Absence deduction

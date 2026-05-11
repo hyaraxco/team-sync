@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Constants\CacheConstants;
 use App\Interfaces\AnalyticsRepositoryInterface;
+use App\Models\Payroll;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -676,7 +677,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $costTrend = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
                     DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
@@ -701,8 +702,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $salaryDistribution = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', ['approved', 'paid'])
-                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
+                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('".Payroll::STATUS_APPROVED."', '".Payroll::STATUS_PAID."'))")
                 ->selectRaw("
                     CASE
                         WHEN final_salary < 3000000 THEN '<3M'
@@ -724,7 +725,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $taxBpjsTrend = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
                 ->selectRaw("
                     DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
@@ -749,8 +750,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->join('job_information', 'job_information.staff_member_id', '=', 'payroll_details.staff_member_id')
                 ->join('teams', 'teams.id', '=', 'job_information.team_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', ['approved', 'paid'])
-                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
+                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('".Payroll::STATUS_APPROVED."', '".Payroll::STATUS_PAID."'))")
                 ->whereNotNull('teams.department')
                 ->selectRaw('
                     teams.department,
@@ -773,8 +774,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $deductionBreakdown = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', ['approved', 'paid'])
-                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('approved', 'paid'))")
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
+                ->whereRaw("payrolls.salary_month = (SELECT MAX(p2.salary_month) FROM payrolls p2 WHERE p2.status IN ('".Payroll::STATUS_APPROVED."', '".Payroll::STATUS_PAID."'))")
                 ->selectRaw('
                     COALESCE(SUM(payroll_details.deduction_amount), 0) as attendance_deductions,
                     COALESCE(SUM(payroll_details.pph21_amount), 0) as tax,
@@ -1668,7 +1669,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $salaryStats = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-            ->whereIn('payrolls.status', ['approved', 'paid'])
+            ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
             ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
             ->selectRaw('
                 COALESCE(SUM(payroll_details.final_salary), 0) as total_salary,
@@ -1683,7 +1684,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $prevSalaryStats = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-            ->whereIn('payrolls.status', ['approved', 'paid'])
+            ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
             ->whereBetween('payrolls.salary_month', [$prevStart->toDateString(), $prevEnd->toDateString()])
             ->selectRaw('COALESCE(SUM(payroll_details.final_salary), 0) as total_salary')
             ->first();
@@ -1762,7 +1763,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $deductionTrend = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-            ->whereIn('payrolls.status', ['approved', 'paid'])
+            ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
             ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
                 DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
@@ -1780,7 +1781,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $monthlyCostData = DB::table('payroll_details')
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-            ->whereIn('payrolls.status', ['approved', 'paid'])
+            ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
             ->whereBetween('payrolls.salary_month', [$start->toDateString(), $end->toDateString()])
             ->selectRaw("
                 DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
@@ -2002,7 +2003,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $costPerEmployee = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->whereBetween('payrolls.salary_month', [$startDate, $endDate])
                 ->selectRaw("
                     DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
@@ -2039,7 +2040,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $endDate = $parsed['end']->toDateString();
 
             $processingTime = DB::table('payrolls')
-                ->whereIn('status', ['approved', 'paid'])
+                ->whereIn('status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->whereBetween('salary_month', [$startDate, $endDate])
                 ->whereNotNull('approved_at')
                 ->selectRaw("

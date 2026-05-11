@@ -234,7 +234,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'salary_month' => $month->format('Y-m-d'),
                     'attendance_period_id' => $attendancePeriod->id,
                     'payroll_setting_version_id' => $settingsVersion->id,
-                    'status' => 'processing',
+                    'status' => Payroll::STATUS_PROCESSING,
                     'processed_count' => 0,
                 ]);
             } catch (QueryException $e) {
@@ -306,7 +306,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'attendance_period_id' => $attendancePeriod->id,
                 ]);
 
-            $payroll->update(['status' => 'pending']);
+            $payroll->update(['status' => Payroll::STATUS_PENDING]);
             $this->attendancePeriodService->lockPeriod($attendancePeriod);
 
             $this->activityLogger->log(
@@ -386,11 +386,11 @@ class PayrollRepository implements PayrollRepositoryInterface
         $hasNpwp = ! empty($employee->npwp);
         $grossForTax = (float) $originalSalary;
 
-        $taxResult = $this->taxCalculationService->calculateMonthlyPph21(
-            $grossForTax,
-            $ptkpStatus,
-            $hasNpwp
-        );
+        // TER for Jan–Nov, annualized progressive (Pasal 17) for December true-up
+        $isDecember = $startOfMonth->month === 12;
+        $taxResult = $isDecember
+            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp)
+            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp);
 
         $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax);
 
@@ -704,7 +704,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         return DB::transaction(function () use ($id, $data, $actorId) {
             $payrollDetail = PayrollDetail::findOrFail($id);
 
-            if (in_array($payrollDetail->payroll->status, ['approved', 'paid'], true)) {
+            if (in_array($payrollDetail->payroll->status, [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID], true)) {
                 throw new \Exception('Tidak dapat mengubah payroll yang sudah disetujui atau dibayar');
             }
 
@@ -749,15 +749,15 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($payroll->status === 'paid') {
+            if ($payroll->status === Payroll::STATUS_PAID) {
                 throw new \Exception('Payroll yang sudah dibayar tidak dapat disetujui ulang');
             }
 
-            if ($payroll->status === 'approved') {
+            if ($payroll->status === Payroll::STATUS_APPROVED) {
                 throw new \Exception('Payroll sudah disetujui');
             }
 
-            if ($payroll->status !== 'pending') {
+            if ($payroll->status !== Payroll::STATUS_PENDING) {
                 throw new \Exception('Payroll must be pending before it can be approved');
             }
 
@@ -860,7 +860,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
 
             $payroll->update([
-                'status' => 'approved',
+                'status' => Payroll::STATUS_APPROVED,
             ]);
 
             $this->activityLogger->log(
@@ -888,11 +888,11 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($payroll->status === 'paid') {
+            if ($payroll->status === Payroll::STATUS_PAID) {
                 throw new \Exception('Payroll sudah dibayar');
             }
 
-            if ($payroll->status !== 'approved') {
+            if ($payroll->status !== Payroll::STATUS_APPROVED) {
                 throw new \Exception('Payroll must be approved before it can be marked as paid');
             }
 
@@ -934,7 +934,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             }
 
             $payroll->update([
-                'status' => 'paid',
+                'status' => Payroll::STATUS_PAID,
                 'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
             ]);
 
@@ -983,15 +983,15 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if ($payroll->status === 'pending') {
+            if ($payroll->status === Payroll::STATUS_PENDING) {
                 throw new \Exception('Payroll is already in pending status');
             }
 
-            if ($payroll->status === 'processing') {
+            if ($payroll->status === Payroll::STATUS_PROCESSING) {
                 throw new \Exception('Processing payroll cannot be reopened for correction');
             }
 
-            if (! in_array($payroll->status, ['approved', 'paid'], true)) {
+            if (! in_array($payroll->status, [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID], true)) {
                 throw new \Exception('Only approved or paid payroll can be reopened for correction');
             }
 
@@ -1000,7 +1000,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             $newCorrectionCount = ((int) $payroll->correction_count) + 1;
 
             $payroll->update([
-                'status' => 'pending',
+                'status' => Payroll::STATUS_PENDING,
                 'payment_date' => null,
                 'correction_count' => $newCorrectionCount,
             ]);
@@ -1028,7 +1028,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         return DB::transaction(function () use ($payrollId, $actorId) {
             $payroll = Payroll::withCount('payrollDetails')->findOrFail($payrollId);
 
-            if ($payroll->status !== 'paid') {
+            if ($payroll->status !== Payroll::STATUS_PAID) {
                 throw new \Exception('Notifications can only be resent for paid payrolls');
             }
 
@@ -1173,11 +1173,11 @@ class PayrollRepository implements PayrollRepositoryInterface
             ? $lastPayroll->payrollDetails()->sum('final_salary')
             : 0;
 
-        $paidPayrolls = Payroll::where('status', 'paid')
+        $paidPayrolls = Payroll::where('status', Payroll::STATUS_PAID)
             ->whereYear('salary_month', now()->year)
             ->count();
 
-        $pendingPayrolls = Payroll::where('status', 'pending')
+        $pendingPayrolls = Payroll::where('status', Payroll::STATUS_PENDING)
             ->count();
 
         // Calculate average salary
@@ -1220,7 +1220,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             foreach ($months as $idx => $m) {
                 $monthDate = Carbon::parse($m)->startOfMonth()->toDateString();
                 $payroll = Payroll::query()
-                    ->whereIn('status', ['approved', 'paid'])
+                    ->whereIn('status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                     ->whereDate('salary_month', $monthDate)
                     ->first();
 
@@ -1300,7 +1300,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($months) {
             $periodRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
                 ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
                 ->limit($months)
@@ -1362,7 +1362,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             // Enhanced analytics: BPJS contribution trend
             $bpjsTrendRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
                 ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
                 ->limit($months)
@@ -1378,7 +1378,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             // Enhanced analytics: top deduction reasons
             $deductionReasonRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', ['approved', 'paid'])
+                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
                 ->whereDate('payrolls.salary_month', '>=', $firstTrend['salary_month'] ?? now()->subMonths($months)->toDateString())
                 ->get([
                     DB::raw('COALESCE(SUM(payroll_details.absent_days), 0) as total_absent_days'),
@@ -1446,7 +1446,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             return [
                 'periods_requested' => $months,
                 'periods_returned' => $trends->count(),
-                'status_scope' => ['approved', 'paid'],
+                'status_scope' => [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID],
                 'reporting_period' => [
                     'start_month' => $firstTrend['salary_month'] ?? null,
                     'end_month' => $lastTrend['salary_month'] ?? null,
@@ -1752,7 +1752,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->lockForUpdate()
                 ->firstOrFail();
 
-            if (! in_array($payroll->status, ['pending', 'approved'], true)) {
+            if (! in_array($payroll->status, [Payroll::STATUS_PENDING, Payroll::STATUS_APPROVED], true)) {
                 throw new \Exception('Payroll must be pending or approved to submit approval decisions');
             }
 
@@ -1812,8 +1812,8 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
                 ->doesntExist();
 
-            if ($allApproved && $payroll->status === 'pending') {
-                $payroll->update(['status' => 'approved']);
+            if ($allApproved && $payroll->status === Payroll::STATUS_PENDING) {
+                $payroll->update(['status' => Payroll::STATUS_APPROVED]);
 
                 $this->activityLogger->log(
                     $payroll->id,
@@ -1848,7 +1848,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ])
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->where('staff_member_id', $staffMemberId)
-            ->where('payrolls.status', 'paid')
+            ->where('payrolls.status', Payroll::STATUS_PAID)
             ->when($year, function ($query, $yearValue) {
                 $query->whereYear('payrolls.salary_month', $yearValue);
             })
@@ -1870,7 +1870,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->where('id', $id)
             ->where('staff_member_id', $staffMemberId)
             ->whereHas('payroll', function ($query) {
-                $query->where('status', 'paid');
+                $query->where('status', Payroll::STATUS_PAID);
             })
             ->firstOrFail();
 
