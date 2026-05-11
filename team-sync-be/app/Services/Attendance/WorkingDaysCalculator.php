@@ -5,6 +5,7 @@ namespace App\Services\Attendance;
 use App\Models\AttendancePolicy;
 use App\Models\HolidayCalendar;
 use App\Models\StaffMemberProfile;
+use App\Support\AttendanceHelper;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use Carbon\CarbonPeriod;
@@ -53,6 +54,13 @@ class WorkingDaysCalculator
         return $scheduledDates->count() - $holidayDates->count();
     }
 
+    /**
+     * Get all applicable holiday dates within a range for the given employment type.
+     *
+     * The applies_to filter logic (null = applies to all, or employment type must be in the array)
+     * is shared with AttendanceHelper::isHolidayForEmploymentType().
+     * This method uses a bulk range query for performance rather than per-date lookups.
+     */
     public function applicableHolidayDates(
         string $employmentType,
         CarbonInterface|string $startDate,

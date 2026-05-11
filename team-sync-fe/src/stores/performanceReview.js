@@ -360,13 +360,11 @@ export const usePerformanceReviewStore = defineStore("performanceReview", {
             try {
                 const params = {};
                 if (weights) {
-                    params.w_avg_manager_rating = weights.avg_manager_rating;
-                    params.w_final_rating = weights.final_rating;
-                    params.w_avg_goal_completion = weights.avg_goal_completion;
-                    params.w_goal_completion_ratio = weights.goal_completion_ratio;
-                    params.w_positive_feedback_count = weights.positive_feedback_count;
-                    params.w_attendance_quality = weights.attendance_quality;
-                    params.w_task_completion_quality = weights.task_completion_quality;
+                    params.w_performance_score = weights.performance_score;
+                    params.w_attendance_rate = weights.attendance_rate;
+                    params.w_goal_completion = weights.goal_completion;
+                    params.w_feedback_score = weights.feedback_score;
+                    params.w_tenure_factor = weights.tenure_factor;
                 }
                 const response = await axiosInstance.get(`/performance/cycles/${cycleId}/topsis-ranking`, { params });
                 this.topsisResult = response.data.data;

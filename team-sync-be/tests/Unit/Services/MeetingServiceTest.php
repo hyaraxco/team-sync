@@ -8,6 +8,7 @@ use App\Models\Meeting;
 use App\Models\User;
 use App\Services\MeetingService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Bus;
 use Tests\TestCase;
 
@@ -81,7 +82,7 @@ class MeetingServiceTest extends TestCase
 
     public function test_get_all_paginated_delegates_to_repository(): void
     {
-        $paginator = new \Illuminate\Pagination\LengthAwarePaginator(
+        $paginator = new LengthAwarePaginator(
             collect([]), 0, 15, 1
         );
 

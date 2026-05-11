@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Services\Payroll\TaxCalculationService;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 
@@ -44,7 +45,7 @@ class RecalculatePayrollTaxCommand extends Command
             return self::FAILURE;
         }
 
-        if (! in_array($payroll->status, ['pending', 'processing', 'draft'])) {
+        if (! in_array($payroll->status, [Payroll::STATUS_PENDING, Payroll::STATUS_PROCESSING, 'draft'])) {
             $this->error("Payroll {$month} is in status '{$payroll->status}'. Only pending/processing/draft can be recalculated.");
 
             return self::FAILURE;
@@ -83,7 +84,10 @@ class RecalculatePayrollTaxCommand extends Command
             $ptkp = $employee->ptkp_status ?? null;
             $hasNpwp = ! empty($employee->npwp);
 
-            $taxResult = $taxService->calculateMonthlyPph21($gross, $ptkp, $hasNpwp);
+            $isDecember = Carbon::parse($payroll->salary_month)->month === 12;
+            $taxResult = $isDecember
+                ? $taxService->calculateAnnualizedPph21($gross, $ptkp, $hasNpwp)
+                : $taxService->calculateMonthlyTer($gross, $ptkp, $hasNpwp);
             $bpjsResult = $taxService->calculateBpjs($gross);
 
             $newPph21 = round($taxResult['pph21_monthly'], 2);

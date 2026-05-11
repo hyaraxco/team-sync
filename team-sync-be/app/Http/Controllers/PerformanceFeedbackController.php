@@ -20,10 +20,10 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
     public static function middleware(): array
     {
         return [
-            // Viewing feedback (received, given, detail): needs feedback-give as minimum baseline
+            // Self-service feedback viewing (received, detail, acknowledge): ownership-checked in controller
             new Middleware(
                 PermissionMiddleware::using('feedback-give'),
-                only: ['getReceivedFeedback', 'getGivenFeedback', 'show', 'acknowledge']
+                only: ['getGivenFeedback']
             ),
             // Giving feedback
             new Middleware(

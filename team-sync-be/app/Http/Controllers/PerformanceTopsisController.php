@@ -24,13 +24,11 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
 
     /** Bobot default jika HR tidak menentukan bobot sendiri */
     private const DEFAULT_WEIGHTS = [
-        'avg_manager_rating' => 0.30,  // C1: Competency Score
-        'final_rating' => 0.30,  // C2: KPI Score
-        'avg_goal_completion' => 0.20,  // C3: Goal Completion %
-        'goal_completion_ratio' => 0.05,  // C4: On-Time Goal Ratio
-        'positive_feedback_count' => 0.05,  // C5: Positive Feedback Count
-        'attendance_quality' => 0.05,  // C6: Attendance Quality
-        'task_completion_quality' => 0.05,  // C7: Task Completion Quality
+        'performance_score' => 0.30,
+        'attendance_rate' => 0.20,
+        'goal_completion' => 0.25,
+        'feedback_score' => 0.15,
+        'tenure_factor' => 0.10,
     ];
 
     public function __construct(
@@ -44,13 +42,11 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
      * GET /api/v1/performance/cycles/{id}/topsis-ranking
      *
      * Query params (optional):
-     *   - w_avg_manager_rating      : float (0-1) — C1: Competency Score weight
-     *   - w_final_rating            : float (0-1) — C2: KPI Score weight
-     *   - w_avg_goal_completion     : float (0-1) — C3: Goal Completion weight
-     *   - w_goal_completion_ratio   : float (0-1) — C4: On-Time Ratio weight
-     *   - w_positive_feedback_count : float (0-1) — C5: Positive Feedback weight
-     *   - w_attendance_quality      : float (0-1) — C6: Attendance Quality weight
-     *   - w_task_completion_quality : float (0-1) — C7: Task Completion Quality weight
+     *   - w_performance_score : float (0-1) — Performance Score weight
+     *   - w_attendance_rate   : float (0-1) — Attendance Rate weight
+     *   - w_goal_completion   : float (0-1) — Goal Completion weight
+     *   - w_feedback_score    : float (0-1) — Feedback Score weight
+     *   - w_tenure_factor     : float (0-1) — Tenure Factor weight
      *
      * Total bobot harus = 1.0 (jika tidak, akan dinormalisasi otomatis).
      */
@@ -112,13 +108,11 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
     private function resolveWeights(Request $request): array
     {
         $keys = [
-            'avg_manager_rating' => 'w_avg_manager_rating',
-            'final_rating' => 'w_final_rating',
-            'avg_goal_completion' => 'w_avg_goal_completion',
-            'goal_completion_ratio' => 'w_goal_completion_ratio',
-            'positive_feedback_count' => 'w_positive_feedback_count',
-            'attendance_quality' => 'w_attendance_quality',
-            'task_completion_quality' => 'w_task_completion_quality',
+            'performance_score' => 'w_performance_score',
+            'attendance_rate' => 'w_attendance_rate',
+            'goal_completion' => 'w_goal_completion',
+            'feedback_score' => 'w_feedback_score',
+            'tenure_factor' => 'w_tenure_factor',
         ];
 
         $hasCustomWeights = collect($keys)->some(fn ($param) => $request->has($param));
