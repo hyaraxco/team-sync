@@ -160,7 +160,7 @@ class PayrollEdgeCaseTest extends TestCase
         $response->assertOk();
 
         // Payroll should still be pending (CFO hasn't approved)
-        $this->assertSame('pending', $payroll->fresh()->status);
+        $this->assertSame('pending', $payroll->fresh()->status->value);
 
         // Second call: director tries again — should NOT bypass and directly approve
         $response = $this->postJson("/api/v1/payrolls/{$payroll->id}/approve");
@@ -169,7 +169,7 @@ class PayrollEdgeCaseTest extends TestCase
         $response->assertStatus(422);
 
         // Payroll should STILL be pending
-        $this->assertSame('pending', $payroll->fresh()->status);
+        $this->assertSame('pending', $payroll->fresh()->status->value);
 
         // Now CFO approves — this should complete the approval
         $cfo = $this->actingAsRole('cfo');
@@ -177,7 +177,7 @@ class PayrollEdgeCaseTest extends TestCase
         $response->assertOk();
 
         // Now payroll should be approved
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
     }
 
     private function actingAsRole(string $roleName): User

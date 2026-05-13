@@ -57,7 +57,7 @@ class PayrollReopenCycleTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.status', 'pending');
 
-        $this->assertSame('pending', $payroll->fresh()->status);
+        $this->assertSame('pending', $payroll->fresh()->status->value);
         $this->assertNull($payroll->fresh()->payment_date);
 
         // Step 2: Re-approve
@@ -65,7 +65,7 @@ class PayrollReopenCycleTest extends TestCase
             ->assertOk()
             ->assertJsonPath('data.status', 'approved');
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
 
         // Step 3: Mark as paid
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
@@ -75,7 +75,7 @@ class PayrollReopenCycleTest extends TestCase
             ->assertJsonPath('data.status', 'paid');
 
         $freshPayroll = $payroll->fresh();
-        $this->assertSame('paid', $freshPayroll->status);
+        $this->assertSame('paid', $freshPayroll->status->value);
         $this->assertSame('2026-06-01', optional($freshPayroll->payment_date)->format('Y-m-d'));
 
         // Verify audit trail has all events in correct order
@@ -87,36 +87,25 @@ class PayrollReopenCycleTest extends TestCase
         $this->assertSame(['reopened_for_correction', 'approved', 'marked_paid'], $events);
     }
 
-    public function test_reopen_paid_then_re_approve_and_re_pay_preserves_detail_data(): void
+    public function test_reopen_paid_is_rejected_with_400(): void
     {
         $finance = $this->actingAsRole('finance');
         $payroll = $this->createPayrollWithDetail(status: 'paid', paymentDate: '2026-05-30');
         $detail = $payroll->payrollDetails->first();
-        $originalFinalSalary = $detail->final_salary;
 
-        // Reopen from paid
+        // Reopen from paid should fail
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
             'reason' => 'Bank account correction requires recalculation.',
         ])
-            ->assertOk()
-            ->assertJsonPath('data.status', 'pending');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Payroll must be unapproved before it can be reopened. Please unapprove the payroll first to move it from paid to approved status.');
 
-        // payment_date should be cleared
-        $this->assertNull($payroll->fresh()->payment_date);
+        // payment_date should still be set
+        $this->assertNotNull($payroll->fresh()->payment_date);
 
         // Detail data should still be intact
         $detail->refresh();
-        $this->assertEquals($originalFinalSalary, $detail->final_salary);
-
-        // Re-approve and re-pay
-        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
-        $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-05',
-        ])->assertOk();
-
-        $freshPayroll = $payroll->fresh();
-        $this->assertSame('paid', $freshPayroll->status);
-        $this->assertSame('2026-06-05', optional($freshPayroll->payment_date)->format('Y-m-d'));
+        $this->assertEquals(9500000, $detail->final_salary);
     }
 
     public function test_reopen_then_edit_detail_then_re_approve(): void
@@ -142,7 +131,7 @@ class PayrollReopenCycleTest extends TestCase
 
         // Re-approve — edited salary should persist
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
 
         $detail->refresh();
         $this->assertEquals(11000000, $detail->final_salary);
@@ -159,7 +148,7 @@ class PayrollReopenCycleTest extends TestCase
             ->assertStatus(400)
             ->assertJsonPath('message', 'Processing payroll cannot be reopened for correction');
 
-        $this->assertSame('processing', $payroll->fresh()->status);
+        $this->assertSame('processing', $payroll->fresh()->status->value);
     }
 
     public function test_reopen_reason_is_captured_in_audit_log(): void

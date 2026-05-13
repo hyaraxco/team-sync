@@ -125,14 +125,16 @@ class PerformanceTopsisControllerTest extends TestCase
     {
         Sanctum::actingAs($this->hrAdmin);
 
-        $response = $this->getJson("/api/v1/performance/cycles/{$this->completedCycle->id}/topsis-ranking?w_performance_score=0.40&w_attendance_rate=0.20&w_goal_completion=0.20&w_feedback_score=0.10&w_tenure_factor=0.10");
+        $response = $this->getJson("/api/v1/performance/cycles/{$this->completedCycle->id}/topsis-ranking?w_avg_manager_rating=0.25&w_final_rating=0.15&w_avg_goal_completion=0.15&w_goal_completion_ratio=0.10&w_positive_feedback_count=0.15&w_attendance_quality=0.10&w_task_completion_quality=0.10");
         $response->assertStatus(200);
-        $this->assertArrayHasKey('performance_score', $response->json('data.weights'));
-        $this->assertEquals(0.40, $response->json('data.weights.performance_score'));
-        $this->assertArrayHasKey('attendance_rate', $response->json('data.weights'));
-        $this->assertArrayHasKey('goal_completion', $response->json('data.weights'));
-        $this->assertArrayHasKey('feedback_score', $response->json('data.weights'));
-        $this->assertArrayHasKey('tenure_factor', $response->json('data.weights'));
+        $this->assertArrayHasKey('avg_manager_rating', $response->json('data.weights'));
+        $this->assertEquals(0.25, $response->json('data.weights.avg_manager_rating'));
+        $this->assertArrayHasKey('final_rating', $response->json('data.weights'));
+        $this->assertArrayHasKey('avg_goal_completion', $response->json('data.weights'));
+        $this->assertArrayHasKey('goal_completion_ratio', $response->json('data.weights'));
+        $this->assertArrayHasKey('positive_feedback_count', $response->json('data.weights'));
+        $this->assertArrayHasKey('attendance_quality', $response->json('data.weights'));
+        $this->assertArrayHasKey('task_completion_quality', $response->json('data.weights'));
     }
 
     public function test_employee_cannot_access_topsis_ranking()

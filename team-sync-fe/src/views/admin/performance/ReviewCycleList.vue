@@ -8,6 +8,7 @@ import { Calendar, Plus, TrendingUp, Clock, CheckCircle2, XCircle, Play, Trash2 
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 
 const router = useRouter();
 const reviewStore = usePerformanceReviewStore();
@@ -16,6 +17,12 @@ const toast = useToast();
 
 const selectedType = ref("all");
 const selectedStatus = ref("all");
+
+// Confirmation dialog state
+const showConfirmDialog = ref(false);
+const confirmTitle = ref("");
+const confirmMessage = ref("");
+const confirmAction = ref(null);
 
 const filteredCycles = computed(() => {
     let filtered = cycles.value;
@@ -65,37 +72,39 @@ const canDeleteCycle = (cycle) => {
 };
 
 const handleGenerateReviews = async (cycle) => {
-    if (!confirm(`Generate reviews for "${cycle.name}"? This will create reviews for all active employees.`)) {
-        return;
-    }
-
-    try {
-        const result = await reviewStore.generateReviews(cycle.id);
-        toast.success("Reviews generated", `Created ${result?.generated_count ?? 0} reviews.`);
-        await reviewStore.fetchCycles();
-    } catch (error) {
-        toast.error(
-            "Failed to generate reviews",
-            reviewStore.error || error?.response?.data?.message || error?.message || "Please try again.",
-        );
-    }
+    confirmTitle.value = "Generate Reviews";
+    confirmMessage.value = `Generate reviews for "${cycle.name}"? This will create reviews for all active employees.`;
+    confirmAction.value = async () => {
+        try {
+            const result = await reviewStore.generateReviews(cycle.id);
+            toast.success("Reviews generated", `Created ${result?.generated_count ?? 0} reviews.`);
+            await reviewStore.fetchCycles();
+        } catch (error) {
+            toast.error(
+                "Failed to generate reviews",
+                reviewStore.error || error?.response?.data?.message || error?.message || "Please try again.",
+            );
+        }
+    };
+    showConfirmDialog.value = true;
 };
 
 const handleDeleteCycle = async (cycle) => {
-    if (!confirm(`Delete cycle "${cycle.name}"? This action cannot be undone.`)) {
-        return;
-    }
-
-    try {
-        await reviewStore.deleteCycle(cycle.id);
-        toast.success("Cycle deleted successfully");
-        await reviewStore.fetchCycles();
-    } catch (error) {
-        toast.error(
-            "Failed to delete cycle",
-            reviewStore.error || error?.response?.data?.message || error?.message || "Please try again.",
-        );
-    }
+    confirmTitle.value = "Delete Cycle";
+    confirmMessage.value = `Delete cycle "${cycle.name}"? This action cannot be undone.`;
+    confirmAction.value = async () => {
+        try {
+            await reviewStore.deleteCycle(cycle.id);
+            toast.success("Cycle deleted successfully");
+            await reviewStore.fetchCycles();
+        } catch (error) {
+            toast.error(
+                "Failed to delete cycle",
+                reviewStore.error || error?.response?.data?.message || error?.message || "Please try again.",
+            );
+        }
+    };
+    showConfirmDialog.value = true;
 };
 
 onMounted(async () => {
@@ -297,4 +306,16 @@ onMounted(async () => {
             </button>
         </EmptyState>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationModal
+        :show="showConfirmDialog"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        confirm-text="Confirm"
+        cancel-text="Cancel"
+        type="danger"
+        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @cancel="showConfirmDialog = false"
+    />
 </template>

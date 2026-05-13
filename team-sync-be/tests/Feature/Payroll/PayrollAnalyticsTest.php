@@ -51,7 +51,7 @@ class PayrollAnalyticsTest extends TestCase
         $this->createPayrollWithDetail('2025-10-01', 'approved', 10000000, 1100000);
         $this->createPayrollWithDetail('2025-11-01', 'pending', 11000000, 1200000);
         $this->createPayrollWithDetail('2025-12-01', 'paid', 12000000, 1300000);
-        $this->createPayrollWithDetail('2026-01-01', 'reopened', 13000000, 1400000);
+        $this->createPayrollWithDetail('2026-01-01', 'pending', 13000000, 1400000);
         $this->createPayrollWithDetail('2026-02-01', 'approved', 15000000, 1500000);
         $this->createPayrollWithDetail('2026-03-01', 'paid', 16000000, 1700000);
         $this->createPayrollWithDetail('2026-04-01', 'approved', 17000000, 1900000);

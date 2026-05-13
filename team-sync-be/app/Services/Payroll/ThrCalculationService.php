@@ -5,6 +5,7 @@ namespace App\Services\Payroll;
 use App\Models\StaffMemberProfile;
 use App\Models\ThrPayroll;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 class ThrCalculationService
@@ -46,7 +47,11 @@ class ThrCalculationService
             return $this->ineligibleResult('Monthly salary is zero or not set');
         }
 
-        // Calculate tenure in months from start_date to payment_date
+        // Calculate tenure in months from start_date to payment_date.
+        // Uses Carbon's diffInMonths which counts calendar months, not exact
+        // 30-day periods. This is the correct approach for Indonesian THR
+        // calculation — the Ministry of Manpower (Kemenaker) regulation
+        // specifies tenure in whole calendar months from date of hire.
         $startDate = Carbon::parse($jobInfo->start_date);
         $tenureMonths = (int) $startDate->diffInMonths($paymentDate);
 
@@ -135,6 +140,13 @@ class ThrCalculationService
 
     /**
      * Get eligible employees for a specific religion event.
+     *
+     * IMPORTANT: Religion string matching is case-insensitive and trimmed.
+     * Database values like 'Kristen', 'KRISTEN', ' kristen ' will all match
+     * the 'kristen' key in RELIGION_EVENT_MAP. Employees with null religion
+     * or a religion not in the map (e.g., 'protestan') are excluded — ensure
+     * religion values in the database match the exact keys defined in
+     * ThrPayroll::RELIGION_EVENT_MAP.
      */
     public function getEligibleEmployees(string $religionEvent): Collection
     {
@@ -144,7 +156,11 @@ class ThrCalculationService
         );
 
         return StaffMemberProfile::with(['user', 'jobInformation'])
-            ->whereIn('religion', $religions)
+            ->where(function (Builder $query) use ($religions) {
+                foreach ($religions as $religion) {
+                    $query->orWhereRaw('LOWER(TRIM(religion)) = ?', [$religion]);
+                }
+            })
             ->whereHas('jobInformation', function ($query) {
                 $query->where('status', 'active');
             })

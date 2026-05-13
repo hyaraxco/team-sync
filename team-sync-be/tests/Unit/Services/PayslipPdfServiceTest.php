@@ -80,16 +80,20 @@ class PayslipPdfServiceTest extends TestCase
             'bpjs_kesehatan_employer' => 200_000,
         ];
 
+        $taxReturn = [
+            'pph21_monthly' => $pph21Monthly,
+            'has_npwp' => true,
+            'ptkp_status' => 'TK/0',
+            'meta' => ['pkp' => 100_000_000],
+        ];
+
         $this->taxService
             ->method('calculateMonthlyTer')
-            ->willReturn([
-                'pph21_monthly' => $pph21Monthly,
-                'has_npwp' => true,
-                'ptkp_status' => 'TK/0',
-                'ter_category' => 'A',
-                'ter_rate' => 0.04,
-                'meta' => ['gross_monthly' => 10_000_000, 'ter_category' => 'A', 'ter_rate' => 0.04, 'ter_rate_pct' => '4%'],
-            ]);
+            ->willReturn($taxReturn);
+
+        $this->taxService
+            ->method('calculateAnnualizedPph21')
+            ->willReturn($taxReturn);
 
         $this->taxService
             ->method('calculateBpjs')

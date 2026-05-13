@@ -129,7 +129,7 @@ class PayrollAuthorizationTest extends TestCase
             ->assertOk();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/reopen", [
             'reason' => 'Need payroll correction for audit compliance.',
-        ])->assertOk();
+        ])->assertStatus(400);
 
         $this->getJson('/api/v1/payrolls/statistics')->assertOk();
         $this->getJson('/api/v1/payrolls/analytics')->assertOk();
