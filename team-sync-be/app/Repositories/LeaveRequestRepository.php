@@ -270,6 +270,19 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         });
     }
 
+    /**
+     * Upload proof document for a leave request.
+     *
+     * Currently only sick_leave supports proof upload. This is a known limitation:
+     * the PRD specifies "Leave proof upload and review" generically, but the
+     * implementation restricts it to sick leave because medical documentation
+     * (e.g. doctor's note) is the primary use case. Other leave types (annual_leave,
+     * personal_leave, etc.) do not currently require or support proof attachments.
+     *
+     * @throws \Exception If the leave type is not sick_leave
+     * @throws \Exception If the leave request has been rejected
+     * @throws \Exception If the requesting user is not authorized to upload proof
+     */
     public function uploadProof(string $id, array $data)
     {
         return DB::transaction(function () use ($id, $data) {
@@ -277,6 +290,8 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
             $this->authorizeProofUpload($leaveRequest);
 
+            // Restrict proof upload to sick leave only.
+            // See method PHPDoc for rationale behind this limitation.
             $leaveType = (string) ($leaveRequest->leave_type->value ?? $leaveRequest->leave_type);
             if ($leaveType !== 'sick_leave') {
                 throw new \Exception('Proof upload is only supported for sick leave requests.');

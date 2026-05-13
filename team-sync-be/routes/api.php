@@ -74,7 +74,9 @@ Route::prefix('v1')
 
             Route::get('meetings/all/paginated', [MeetingController::class, 'getAllPaginated']);
             Route::get('meetings/upcoming', [MeetingController::class, 'getUpcoming']);
-            Route::apiResource('meetings', MeetingController::class)->only(['index', 'show', 'store']);
+            Route::apiResource('meetings', MeetingController::class)->only(['index', 'show']);
+            Route::post('meetings', [MeetingController::class, 'store'])
+                ->middleware(PermissionMiddleware::using('meeting-create'));
 
             Route::get('my-profile', [StaffMemberProfileController::class, 'getMyProfile']);
             Route::get('my-notifications/unread-count', [NotificationController::class, 'getUnreadCount']);
@@ -280,7 +282,8 @@ Route::prefix('v1')
             Route::get('dashboard/my-statistics', [DashboardController::class, 'getEmployeeStatistics']);
             Route::get('dashboard/today-attendance-overview', [DashboardController::class, 'getTodayAttendanceOverview']);
             Route::get('dashboard/team-pulse', [DashboardController::class, 'getTeamPulse']);
-            Route::post('dashboard/team-pulse/{staffMemberId}/nudge', [DashboardController::class, 'sendTeamPulseNudge']);
+            Route::post('dashboard/team-pulse/{staffMemberId}/nudge', [DashboardController::class, 'sendTeamPulseNudge'])
+                ->middleware(PermissionMiddleware::using('review-manager-submit'));
 
             // Analytics routes
             Route::middleware('feature.enabled:analytics')->group(function () {
