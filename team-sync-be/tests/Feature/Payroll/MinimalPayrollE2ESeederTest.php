@@ -61,7 +61,7 @@ class MinimalPayrollE2ESeederTest extends TestCase
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll($payrollMonth->format('Y-m'));
 
-        $this->assertSame('pending', $payroll->status);
+        $this->assertSame('pending', $payroll->status->value);
         $this->assertGreaterThan(0, $payroll->payrollDetails()->count());
         $this->assertContains($employee->id, $payroll->payrollDetails->pluck('staff_member_id')->all());
 

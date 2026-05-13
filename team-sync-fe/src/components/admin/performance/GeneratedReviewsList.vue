@@ -5,6 +5,7 @@ import { useStaffMemberStore } from "@/stores/staffMember";
 import { Play, UserCheck, Edit3, X, User } from "lucide-vue-next";
 import { storeToRefs } from "pinia";
 import MainCard from "@/components/common/MainCard.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 
@@ -30,6 +31,12 @@ const selectedReview = ref(null);
 const selectedReviewerId = ref("");
 const assigning = ref(false);
 
+// Confirmation dialog state
+const showConfirmDialog = ref(false);
+const confirmTitle = ref("");
+const confirmMessage = ref("");
+const confirmAction = ref(null);
+
 const canGenerate = computed(() => ["draft", "active"].includes(props.cycle.status));
 
 onMounted(async () => {
@@ -39,24 +46,22 @@ onMounted(async () => {
 });
 
 const generateReviews = async () => {
-    if (
-        !confirm(
-            "Are you sure you want to generate reviews based on the assignment rules? This will only generate reviews for staff members who do not have one yet in this cycle.",
-        )
-    ) {
-        return;
-    }
-
-    generating.value = true;
-    try {
-        const res = await reviewStore.generateReviews(props.cycle.id);
-        toast.success(`Successfully generated reviews for ${res.generated_count} employees`);
-        emit("refresh");
-    } catch (error) {
-        toast.error("Failed to generate reviews: " + (error.response?.data?.message || error.message));
-    } finally {
-        generating.value = false;
-    }
+    confirmTitle.value = "Generate Reviews";
+    confirmMessage.value =
+        "Are you sure you want to generate reviews based on the assignment rules? This will only generate reviews for staff members who do not have one yet in this cycle.";
+    confirmAction.value = async () => {
+        generating.value = true;
+        try {
+            const res = await reviewStore.generateReviews(props.cycle.id);
+            toast.success(`Successfully generated reviews for ${res.generated_count} employees`);
+            emit("refresh");
+        } catch (error) {
+            toast.error("Failed to generate reviews: " + (error.response?.data?.message || error.message));
+        } finally {
+            generating.value = false;
+        }
+    };
+    showConfirmDialog.value = true;
 };
 
 const openOverrideModal = (review) => {
@@ -282,4 +287,16 @@ const getAvatarUrl = (user) => {
             </div>
         </div>
     </Teleport>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationModal
+        :show="showConfirmDialog"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        confirm-text="Generate"
+        cancel-text="Cancel"
+        type="info"
+        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @cancel="showConfirmDialog = false"
+    />
 </template>

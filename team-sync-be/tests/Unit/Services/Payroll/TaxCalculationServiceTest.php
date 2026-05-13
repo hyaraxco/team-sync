@@ -298,6 +298,143 @@ class TaxCalculationServiceTest extends TestCase
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // TER 2024 – Category & Rate Lookup Tests
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /** @test */
+    public function test_ter_zero_tax_for_income_below_threshold_category_a(): void
+    {
+        // TK/0 maps to category A, first bracket: max 5_400_000 → rate 0%
+        $result = $this->service->calculateMonthlyTer(5_000_000, 'TK/0', true);
+
+        $this->assertEquals(0, $result['pph21_monthly']);
+        $this->assertEquals('A', $result['ter_category']);
+        $this->assertEquals(0.0, $result['ter_rate']);
+    }
+
+    /** @test */
+    public function test_ter_applies_low_rate_for_salary_in_first_taxable_bracket(): void
+    {
+        // TK/0 category A: 5_650_000 bracket → 0.25%
+        $result = $this->service->calculateMonthlyTer(5_650_000, 'TK/0', true);
+
+        $this->assertEquals('A', $result['ter_category']);
+        $this->assertEquals(0.0025, $result['ter_rate']);
+        // PPh21 = 5_650_000 * 0.0025 = 14_125
+        $this->assertEquals(14125, $result['pph21_monthly']);
+    }
+
+    /** @test */
+    public function test_ter_category_b_mapping_for_k1(): void
+    {
+        // K/1 maps to category B
+        $result = $this->service->calculateMonthlyTer(10_000_000, 'K/1', true);
+
+        $this->assertEquals('B', $result['ter_category']);
+        $this->assertGreaterThan(0, $result['pph21_monthly']);
+    }
+
+    /** @test */
+    public function test_ter_category_c_mapping_for_k3(): void
+    {
+        // K/3 maps to category C
+        $result = $this->service->calculateMonthlyTer(15_000_000, 'K/3', true);
+
+        $this->assertEquals('C', $result['ter_category']);
+        $this->assertGreaterThan(0, $result['pph21_monthly']);
+    }
+
+    /** @test */
+    public function test_ter_defaults_to_category_a_for_unknown_ptkp(): void
+    {
+        $result = $this->service->calculateMonthlyTer(10_000_000, 'UNKNOWN', true);
+
+        $this->assertEquals('A', $result['ter_category']);
+    }
+
+    /** @test */
+    public function test_ter_null_ptkp_defaults_to_tk0_category_a(): void
+    {
+        $result = $this->service->calculateMonthlyTer(10_000_000, null, true);
+
+        $this->assertEquals('TK/0', $result['ptkp_status']);
+        $this->assertEquals('A', $result['ter_category']);
+    }
+
+    /** @test */
+    public function test_ter_high_salary_hits_top_rate(): void
+    {
+        // Gross 1.4B exactly → 33% (category A). Gross above → 34% top bracket
+        $atExact = $this->service->calculateMonthlyTer(1_400_000_000, 'TK/0', true);
+        $this->assertEquals(0.33, $atExact['ter_rate']);
+
+        $aboveExact = $this->service->calculateMonthlyTer(2_000_000_000, 'TK/0', true);
+        $this->assertEquals(0.34, $aboveExact['ter_rate']);
+    }
+
+    /** @test */
+    public function test_ter_npwp_surcharge_applied(): void
+    {
+        $withNpwp = $this->service->calculateMonthlyTer(10_000_000, 'TK/0', true);
+        $withoutNpwp = $this->service->calculateMonthlyTer(10_000_000, 'TK/0', false);
+
+        if ($withNpwp['pph21_monthly'] > 0) {
+            $this->assertEqualsWithDelta(
+                $withNpwp['pph21_monthly'] * 1.20,
+                $withoutNpwp['pph21_monthly'],
+                1
+            );
+        } else {
+            $this->assertEquals(0, $withoutNpwp['pph21_monthly']);
+        }
+    }
+
+    /** @test */
+    public function test_ter_returns_correct_meta_shape(): void
+    {
+        $result = $this->service->calculateMonthlyTer(10_000_000, 'TK/0', true);
+
+        $this->assertArrayHasKey('pph21_monthly', $result);
+        $this->assertArrayHasKey('has_npwp', $result);
+        $this->assertArrayHasKey('ptkp_status', $result);
+        $this->assertArrayHasKey('ter_category', $result);
+        $this->assertArrayHasKey('ter_rate', $result);
+        $this->assertArrayHasKey('method', $result);
+        $this->assertEquals('ter_2024', $result['method']);
+        $this->assertArrayHasKey('gross_monthly', $result['meta']);
+        $this->assertArrayHasKey('ter_category', $result['meta']);
+        $this->assertArrayHasKey('ter_rate', $result['meta']);
+        $this->assertArrayHasKey('ter_rate_pct', $result['meta']);
+    }
+
+    /** @test */
+    public function test_ter_different_categories_produce_different_tax_for_same_salary(): void
+    {
+        // Same salary, different PTKP status → different TER category → different tax
+        $catA = $this->service->calculateMonthlyTer(10_000_000, 'TK/0', true);
+        $catB = $this->service->calculateMonthlyTer(10_000_000, 'K/1', true);
+        $catC = $this->service->calculateMonthlyTer(10_000_000, 'K/3', true);
+
+        // Categories should be different
+        $this->assertNotEquals($catA['ter_category'], $catB['ter_category']);
+        $this->assertNotEquals($catB['ter_category'], $catC['ter_category']);
+
+        // Higher category (more dependents) should have lower effective rate at same income
+        $this->assertGreaterThanOrEqual($catB['pph21_monthly'], $catA['pph21_monthly']);
+        $this->assertGreaterThanOrEqual($catC['pph21_monthly'], $catB['pph21_monthly']);
+    }
+
+    /** @test */
+    public function test_annualized_pph21_is_alias_for_calculate_monthly_pph21(): void
+    {
+        $annualized = $this->service->calculateAnnualizedPph21(10_000_000, 'TK/0', true);
+        $direct = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
+
+        $this->assertEquals($direct['pph21_monthly'], $annualized['pph21_monthly']);
+        $this->assertEquals($direct['meta']['pph21_annual'], $annualized['meta']['pph21_annual']);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Helpers
     // ─────────────────────────────────────────────────────────────────────────
 

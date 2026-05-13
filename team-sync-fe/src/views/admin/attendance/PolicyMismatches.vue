@@ -1,148 +1,87 @@
 <template>
-    <div class="policy-mismatches-container min-h-screen bg-neutral-900 text-neutral-100 p-8">
-        <div class="max-w-7xl mx-auto space-y-8 relative">
-            <div
-                class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-rose-600/20 rounded-full blur-[120px] pointer-events-none"
-            ></div>
-
-            <header
-                class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/30 pb-8"
-            >
-                <div class="space-y-2">
-                    <h1
-                        class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500"
-                    >
-                        Policy Mismatches
-                    </h1>
-                    <p class="text-neutral-400 font-light tracking-wide max-w-xl">
-                        Review and resolve discrepancies between employee scheduled work locations and actual attendance
-                        data.
+    <div class="policy-mismatches-container p-3 sm:p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-brand-dark">Policy Mismatches</h1>
+                    <p class="text-brand-light text-sm mt-1">
+                        Review and resolve discrepancies between employee scheduled work locations and actual attendance data.
                     </p>
                 </div>
             </header>
 
-            <div class="relative z-10 space-y-6">
-                <div
-                    v-if="error"
-                    class="p-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 flex items-center gap-3"
-                >
-                    <svg class="w-6 h-6 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                        ></path>
-                    </svg>
-                    <p>Failed to load mismatches. The API endpoint might be missing or under construction.</p>
-                </div>
+            <!-- Error State -->
+            <div
+                v-if="error"
+                class="bg-white border border-red-200 rounded-[20px] p-6 flex items-center gap-3 text-red-600"
+            >
+                <AlertTriangle class="w-5 h-5 shrink-0" />
+                <p>Failed to load mismatches. The API endpoint might be missing or under construction.</p>
+            </div>
 
-                <div
-                    v-else-if="loading"
-                    class="flex justify-center p-16 border border-white/15 rounded-3xl bg-white/[0.06]"
-                >
-                    <svg
-                        class="animate-spin w-8 h-8 text-rose-500"
-                        xmlns="http://www.w3.org/2000/svg"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                    >
-                        <circle
-                            class="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            stroke-width="4"
-                        ></circle>
-                        <path
-                            class="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                        ></path>
-                    </svg>
-                </div>
+            <!-- Loading State -->
+            <div v-else-if="loading" class="space-y-4">
+                <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-[16px] animate-pulse" />
+            </div>
 
-                <div
-                    v-else-if="!mismatches.length"
-                    class="text-center p-16 border border-dashed border-white/30 rounded-3xl bg-white/[0.01] text-neutral-500"
-                >
-                    <svg
-                        class="w-16 h-16 mx-auto mb-4 opacity-50 text-emerald-500"
-                        fill="none"
-                        stroke="currentColor"
-                        viewBox="0 0 24 24"
-                    >
-                        <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="1.5"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                        ></path>
-                    </svg>
-                    <p class="font-light text-lg">No pending policy mismatches.</p>
-                    <p class="text-sm mt-1">All attendance logs match their scheduled locations.</p>
-                </div>
+            <!-- Empty State -->
+            <div
+                v-else-if="!mismatches.length"
+                class="bg-white border border-[#DCDEDD] rounded-[20px] p-12 text-center"
+            >
+                <CheckCircle class="w-12 h-12 mx-auto mb-3 text-green-500" />
+                <p class="text-brand-dark font-semibold text-lg">No pending policy mismatches</p>
+                <p class="text-brand-light text-sm mt-1">All attendance logs match their scheduled locations.</p>
+            </div>
 
-                <div
-                    v-else
-                    class="overflow-x-auto rounded-3xl border border-white/30 bg-white/[0.06] backdrop-blur-xl shadow-2xl"
-                >
-                    <table class="w-full text-left border-collapse">
+            <!-- Table -->
+            <div v-else class="bg-white border border-[#DCDEDD] rounded-[20px] overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
                         <thead>
-                            <tr
-                                class="border-b border-white/30 text-xs uppercase tracking-widest text-neutral-500 bg-white/[0.06]"
-                            >
-                                <th class="p-5 font-medium">Employee</th>
-                                <th class="p-5 font-medium">Date</th>
-                                <th class="p-5 font-medium">Scheduled</th>
-                                <th class="p-5 font-medium">Actual</th>
-                                <th class="p-5 font-medium text-right">Actions</th>
-                            </tr>
+<tr class="border-b border-[#DCDEDD]">
+                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Employee</th>
+                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
+                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled</th>
+                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Actual</th>
+                                 <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-white/5">
+                        <tbody class="divide-y divide-gray-100">
                             <tr
                                 v-for="item in mismatches"
                                 :key="item.id"
-                                class="hover:bg-white/10 transition-colors group"
+                                class="hover:bg-gray-50 transition-colors"
                             >
-                                <td class="p-5">
+                                <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
-                                        <div
-                                            class="w-8 h-8 rounded-full bg-rose-500/20 text-rose-400 flex items-center justify-center text-xs font-bold"
-                                        >
+                                        <div class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs font-bold">
                                             {{ getEmployeeName(item).charAt(0) }}
                                         </div>
-                                        <span class="font-medium text-neutral-200">{{ getEmployeeName(item) }}</span>
+                                        <span class="font-medium text-brand-dark">{{ getEmployeeName(item) }}</span>
                                     </div>
                                 </td>
-                                <td class="p-5 text-neutral-400 text-sm">{{ item.mismatch_date || item.date }}</td>
-                                <td class="p-5">
-                                    <span
-                                        class="px-2 py-1 text-xs rounded bg-white/10 text-neutral-300 border border-white/30"
-                                    >
+                                <td class="px-4 py-3 text-brand-light text-sm">{{ item.mismatch_date || item.date }}</td>
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                                         {{ formatWorkMode(item.planned_work_mode || item.scheduled_location) }}
                                     </span>
                                 </td>
-                                <td class="p-5">
-                                    <span
-                                        class="px-2 py-1 text-xs rounded bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                                    >
+                                <td class="px-4 py-3">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-red-50 text-red-700 border border-red-200">
                                         {{ formatWorkMode(item.actual_work_mode || item.actual_location) }}
                                     </span>
                                 </td>
-                                <td
-                                    class="p-5 text-right space-x-3 opacity-0 group-hover:opacity-100 transition-opacity"
-                                >
+                                <td class="px-4 py-3 text-right space-x-2">
                                     <button
                                         @click="acknowledge(item.id)"
-                                        class="text-xs px-3 py-1.5 rounded-lg bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 transition-colors"
+                                        class="text-xs px-3 py-1.5 rounded-lg border border-[#DCDEDD] text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
                                     >
                                         Acknowledge
                                     </button>
                                     <button
                                         @click="resolve(item.id)"
-                                        class="text-xs px-3 py-1.5 rounded-lg bg-emerald-500/10 text-emerald-400 hover:bg-emerald-500/20 transition-colors"
+                                        class="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors cursor-pointer"
                                     >
                                         Resolve
                                     </button>
@@ -160,6 +99,7 @@
 import { ref, onMounted } from "vue";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useToast } from "@/composables/useToast";
+import { AlertTriangle, CheckCircle } from "lucide-vue-next";
 
 const attendanceStore = useAttendanceStore();
 const toast = useToast();
@@ -205,9 +145,3 @@ const resolve = async (id) => {
     }
 };
 </script>
-
-<style scoped>
-.font-display {
-    font-family: "Outfit", "Inter", sans-serif;
-}
-</style>

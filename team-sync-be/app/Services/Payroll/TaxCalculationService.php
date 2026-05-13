@@ -29,21 +29,30 @@ class TaxCalculationService
 
     /**
      * TER 2024 — PTKP status to TER category mapping (PP 58/2023).
+     *
+     * Cat A: TK/0, TK/1, K/0 (single/no dependents or married with no dependents)
+     * Cat B: TK/2, TK/3, K/1, K/2 (single with 2+ dependents or married with 1-2 dependents)
+     * Cat C: K/3 (married with 3+ dependents)
      */
     protected const TER_CATEGORY_MAP = [
         'TK/0' => 'A',
         'TK/1' => 'A',
-        'K/0'  => 'A',
+        'K/0' => 'A',
         'TK/2' => 'B',
         'TK/3' => 'B',
-        'K/1'  => 'B',
-        'K/2'  => 'B',
-        'K/3'  => 'C',
+        'K/1' => 'B',
+        'K/2' => 'B',
+        'K/3' => 'C',
     ];
 
     /**
-     * TER 2024 Category A rates — [max_bruto, rate%].
-     * Used for TK/0, TK/1, K/0.
+     * TER 2024 Category A rates — [max_bruto_monthly, effective_rate].
+     * Used for PTKP status: TK/0, TK/1, K/0.
+     * Source: Peraturan Pemerintah PP 58/2023, Kep-16/PJ/2024 (revoked & reissued).
+     *
+     * The rate represents the effective tax rate already accounting for PTKP deduction,
+     * biaya jabatan (5%), and pension contributions (JHT/JP employee share).
+     * Applied directly on gross monthly income.
      */
     protected const TER_RATES_A = [
         [5_400_000, 0.00],
@@ -93,8 +102,8 @@ class TaxCalculationService
     ];
 
     /**
-     * TER 2024 Category B rates — [max_bruto, rate%].
-     * Used for TK/2, TK/3, K/1, K/2.
+     * TER 2024 Category B rates — [max_bruto_monthly, effective_rate].
+     * Used for PTKP status: TK/2, TK/3, K/1, K/2.
      */
     protected const TER_RATES_B = [
         [6_200_000, 0.00],
@@ -142,6 +151,8 @@ class TaxCalculationService
     /**
      * TER 2024 Category C rates — [max_bruto, rate%].
      * Used for K/3.
+     * TER 2024 Category C rates — [max_bruto_monthly, effective_rate].
+     * Used for PTKP status: K/3.
      */
     protected const TER_RATES_C = [
         [6_600_000, 0.00],
@@ -332,11 +343,17 @@ class TaxCalculationService
     }
 
     /**
-     * Calculate monthly PPh 21 using TER (Tarif Efektif Rata-rata) 2024 method (PP 58/2023).
+     * Calculate monthly PPh 21 using TER (Tarif Efektif Rata-rata) 2024 method.
      *
-     * TER is applied directly on gross monthly income — PTKP and typical deductions
-     * (biaya jabatan, pension contributions) are already factored into the rate table.
-     * Use this for Jan–Nov payroll. For December, use calculateAnnualizedPph21() for true-up.
+     * TER is the simplified effective-rate method per PP 58/2023 (Kep-16/PJ/2024).
+     * It applies a fixed effective tax rate directly on gross monthly income.
+     * PTKP deduction, biaya jabatan (5%), and pension contributions (JHT/JP employee)
+     * are already factored into the TER rate tables.
+     *
+     * Use this method for **January–November** payroll runs.
+     * For December year-end true-up, use calculateAnnualizedPph21() instead.
+     *
+     * @see https://peraturan.go.id/pp-58-2023.pdf
      *
      * @return array{
      *     pph21_monthly: float,
@@ -344,6 +361,7 @@ class TaxCalculationService
      *     ptkp_status: string,
      *     ter_category: string,
      *     ter_rate: float,
+     *     method: string,
      *     meta: array{
      *         gross_monthly: float,
      *         ter_category: string,
@@ -373,6 +391,7 @@ class TaxCalculationService
             'ptkp_status' => $ptkpStatusToUse,
             'ter_category' => $category,
             'ter_rate' => $terRate,
+            'method' => 'ter_2024',
             'meta' => [
                 'gross_monthly' => round($grossMonthly, 0),
                 'ter_category' => $category,
@@ -383,8 +402,10 @@ class TaxCalculationService
     }
 
     /**
-     * Annualized PPh 21 using Pasal 17 progressive brackets.
-     * Use for December year-end true-up or when annual method is explicitly required.
+     * Annualized PPh 21 using Pasal 17 progressive brackets (UU HPP).
+     *
+     * Use for **December** year-end true-up or when the annual method is explicitly required.
+     * This is the same as calculateMonthlyPph21() — provided as a semantic alias.
      *
      * @return array Same structure as calculateMonthlyPph21
      */
@@ -394,7 +415,10 @@ class TaxCalculationService
     }
 
     /**
-     * Look up the TER rate for a given category and gross monthly income.
+     * Look up the TER effective rate for a given category and gross monthly income.
+     *
+     * The TER table is structured as ascending brackets [max_bruto, rate].
+     * The first bracket whose max_bruto >= gross determines the applicable rate.
      */
     protected function lookupTerRate(string $category, float $grossMonthly): float
     {

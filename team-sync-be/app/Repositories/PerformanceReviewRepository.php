@@ -23,6 +23,20 @@ use Illuminate\Support\Facades\DB;
 
 class PerformanceReviewRepository implements PerformanceReviewRepositoryInterface
 {
+    /**
+     * Valid status transitions for review cycles.
+     *
+     * Lifecycle: draft → active → completed → archived
+     * Any status can transition to 'cancelled'.
+     */
+    private const VALID_STATUS_TRANSITIONS = [
+        'draft' => ['active', 'cancelled'],
+        'active' => ['completed', 'cancelled'],
+        'completed' => ['archived', 'cancelled'],
+        'archived' => [],
+        'cancelled' => [],
+    ];
+
     public function getCycles(array $filters = []): LengthAwarePaginator
     {
         $query = PerformanceReviewCycle::query();
@@ -51,20 +65,62 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function createCycle(array $data)
     {
+        // Validate initial status — new cycles must start as 'draft'
+        $initialStatus = $data['status'] ?? 'draft';
+        if ($initialStatus !== 'draft') {
+            throw new \InvalidArgumentException(
+                "New review cycle must start with status 'draft'. Got: '{$initialStatus}'"
+            );
+        }
+
+        $data['status'] = 'draft';
+
         return PerformanceReviewCycle::create($data);
     }
 
     public function updateCycle(int $id, array $data)
     {
         $cycle = $this->getCycleById($id);
+
+        // Validate status transition if status is being changed
+        if (isset($data['status']) && $data['status'] !== $cycle->status) {
+            $this->validateStatusTransition($cycle->status, $data['status']);
+        }
+
         $cycle->update($data);
 
         return $cycle;
     }
 
+    /**
+     * Validate that the status transition is allowed.
+     *
+     * @throws \InvalidArgumentException if transition is invalid
+     */
+    private function validateStatusTransition(string $from, string $to): void
+    {
+        $allowed = self::VALID_STATUS_TRANSITIONS[$from] ?? [];
+
+        if (! in_array($to, $allowed)) {
+            throw new \InvalidArgumentException(
+                "Invalid status transition from '{$from}' to '{$to}'. "
+                .'Allowed transitions: '.implode(', ', $allowed ?: ['none (terminal state)'])
+            );
+        }
+    }
+
     public function deleteCycle(int $id): bool
     {
         $cycle = $this->getCycleById($id);
+
+        // Prevent deletion when reviews exist — would orphan review records
+        $reviewCount = $cycle->reviews()->count();
+        if ($reviewCount > 0) {
+            throw new \RuntimeException(
+                "Cannot delete review cycle '{$cycle->name}' — it has {$reviewCount} associated review(s). "
+                .'Please delete or move the reviews first, or archive the cycle instead.'
+            );
+        }
 
         return $cycle->delete();
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Resources;
 
+use App\Enums\PayrollStatus;
 use App\Models\PayrollReconciliationResolution;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -48,7 +49,7 @@ class PayrollResource extends JsonResource
 
             // Lightweight reconciliation summary for dashboard badges
             'reconciliation_summary' => $this->whenLoaded('payrollDetails', function () {
-                if (! in_array($this->status, ['pending', 'approved'], true)) {
+                if (! in_array($this->status, [PayrollStatus::PENDING, PayrollStatus::APPROVED], true)) {
                     return null;
                 }
 

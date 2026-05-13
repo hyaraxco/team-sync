@@ -4,6 +4,7 @@ namespace Tests\Unit\Services;
 
 use App\Models\JobInformation;
 use App\Models\StaffMemberProfile;
+use App\Models\ThrPayroll;
 use App\Services\Payroll\TaxCalculationService;
 use App\Services\Payroll\ThrCalculationService;
 use Carbon\Carbon;
@@ -281,6 +282,98 @@ class ThrCalculationServiceTest extends TestCase
         $deadline = $this->service->calculatePaymentDeadline($holiday);
 
         $this->assertEquals('2026-06-08', $deadline->toDateString());
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // getEligibleEmployees — Religion Filter
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function test_get_eligible_employees_matches_exact_religion(): void
+    {
+        $employee = StaffMemberProfile::factory()->create(['religion' => 'islam']);
+
+        JobInformation::factory()->active()->fullTime()->create([
+            'staff_member_id' => $employee->id,
+            'monthly_salary' => 10_000_000,
+        ]);
+
+        $result = $this->service->getEligibleEmployees(ThrPayroll::EVENT_IDUL_FITRI);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals($employee->id, $result->first()->id);
+    }
+
+    public function test_get_eligible_employees_matches_case_insensitive_religion(): void
+    {
+        $employee = StaffMemberProfile::factory()->create(['religion' => 'Kristen']);
+
+        JobInformation::factory()->active()->fullTime()->create([
+            'staff_member_id' => $employee->id,
+            'monthly_salary' => 10_000_000,
+        ]);
+
+        $result = $this->service->getEligibleEmployees(ThrPayroll::EVENT_NATAL);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals($employee->id, $result->first()->id);
+    }
+
+    public function test_get_eligible_employees_matches_trimmed_religion(): void
+    {
+        $employee = StaffMemberProfile::factory()->create(['religion' => '  hindu  ']);
+
+        JobInformation::factory()->active()->fullTime()->create([
+            'staff_member_id' => $employee->id,
+            'monthly_salary' => 10_000_000,
+        ]);
+
+        $result = $this->service->getEligibleEmployees(ThrPayroll::EVENT_NYEPI);
+
+        $this->assertCount(1, $result);
+        $this->assertEquals($employee->id, $result->first()->id);
+    }
+
+    public function test_get_eligible_employees_excludes_null_religion(): void
+    {
+        $employee = StaffMemberProfile::factory()->create(['religion' => null]);
+
+        JobInformation::factory()->active()->fullTime()->create([
+            'staff_member_id' => $employee->id,
+            'monthly_salary' => 10_000_000,
+        ]);
+
+        $result = $this->service->getEligibleEmployees(ThrPayroll::EVENT_IDUL_FITRI);
+
+        $this->assertCount(0, $result);
+    }
+
+    public function test_get_eligible_employees_excludes_unmapped_religion(): void
+    {
+        $employee = StaffMemberProfile::factory()->create(['religion' => 'protestan']);
+
+        JobInformation::factory()->active()->fullTime()->create([
+            'staff_member_id' => $employee->id,
+            'monthly_salary' => 10_000_000,
+        ]);
+
+        $result = $this->service->getEligibleEmployees(ThrPayroll::EVENT_NATAL);
+
+        $this->assertCount(0, $result);
+    }
+
+    public function test_get_eligible_employees_excludes_inactive_employees(): void
+    {
+        $employee = StaffMemberProfile::factory()->create(['religion' => 'islam']);
+
+        JobInformation::factory()->create([
+            'staff_member_id' => $employee->id,
+            'status' => 'inactive',
+            'monthly_salary' => 10_000_000,
+        ]);
+
+        $result = $this->service->getEligibleEmployees(ThrPayroll::EVENT_IDUL_FITRI);
+
+        $this->assertCount(0, $result);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
