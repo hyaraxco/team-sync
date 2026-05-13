@@ -159,7 +159,7 @@ function handlePageChange(page) {
                 <p class="text-sm text-gray-500 mt-1">Tunjangan Hari Raya — Religious Holiday Bonus</p>
             </div>
             <div class="flex items-center gap-3">
-                <select v-model="selectedYear" @change="handleYearChange" class="rounded-lg border-gray-300 text-sm">
+                <select v-model="selectedYear" @change="handleYearChange" aria-label="Select year" class="rounded-lg border-gray-300 text-sm">
                     <option v-for="y in [2024, 2025, 2026, 2027]" :key="y" :value="y">{{ y }}</option>
                 </select>
                 <button

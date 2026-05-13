@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Constants\CacheConstants;
+use App\Enums\PayrollStatus;
 use App\Interfaces\AnalyticsRepositoryInterface;
 use App\Models\Payroll;
 use Carbon\Carbon;
