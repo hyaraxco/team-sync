@@ -24,6 +24,7 @@ import { useTaskStore } from "@/stores/task";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
 
 const toast = useToast();
@@ -77,6 +78,12 @@ const newComment = ref("");
 const editingCommentId = ref(null);
 const editingCommentText = ref("");
 const isSubmittingComment = ref(false);
+
+// Confirmation dialog state
+const showConfirmDialog = ref(false);
+const confirmTitle = ref("");
+const confirmMessage = ref("");
+const confirmAction = ref(null);
 const isUploadingAttachment = ref(false);
 const commentsLoading = ref(false);
 const attachmentsLoading = ref(false);
@@ -211,10 +218,13 @@ const closeModal = () => {
 };
 
 const handleDelete = () => {
-    if (confirm("Are you sure you want to delete this task?")) {
+    confirmTitle.value = "Delete Task";
+    confirmMessage.value = "Are you sure you want to delete this task? This action cannot be undone.";
+    confirmAction.value = () => {
         emit("deleted", props.task.id);
         closeModal();
-    }
+    };
+    showConfirmDialog.value = true;
 };
 
 const handleUpdateStatus = async (status, extraPayload = {}) => {
@@ -354,9 +364,18 @@ const handleDeleteComment = async (comment) => {
         return;
     }
 
-    if (!confirm("Delete this comment?")) {
-        return;
-    }
+    confirmTitle.value = "Delete Comment";
+    confirmMessage.value = "Are you sure you want to delete this comment?";
+    confirmAction.value = async () => {
+        try {
+            await deleteTaskComment(props.task.id, comment.id);
+            await loadTaskComments();
+            emit("updated");
+        } catch (error) {
+            toast.error("Failed to delete comment. Please try again.");
+        }
+    };
+    showConfirmDialog.value = true;
 
     try {
         await deleteTaskComment(props.task.id, comment.id);
@@ -398,16 +417,17 @@ const handleDeleteAttachment = async (attachment) => {
         return;
     }
 
-    if (!confirm("Delete this attachment?")) {
-        return;
-    }
-
-    try {
-        await deleteTaskAttachment(props.task.id, attachment.id);
-        await loadTaskAttachments();
-    } catch (error) {
-        toast.error("Failed to delete attachment. Please try again.");
-    }
+    confirmTitle.value = "Delete Attachment";
+    confirmMessage.value = "Are you sure you want to delete this attachment?";
+    confirmAction.value = async () => {
+        try {
+            await deleteTaskAttachment(props.task.id, attachment.id);
+            await loadTaskAttachments();
+        } catch (error) {
+            toast.error("Failed to delete attachment. Please try again.");
+        }
+    };
+    showConfirmDialog.value = true;
 };
 
 const toggleAssigneeDropdown = () => {
@@ -1082,4 +1102,16 @@ watch(
             </div>
         </div>
     </ModalWrapper>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationModal
+        :show="showConfirmDialog"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        confirm-text="Delete"
+        cancel-text="Cancel"
+        type="danger"
+        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @cancel="showConfirmDialog = false"
+    />
 </template>

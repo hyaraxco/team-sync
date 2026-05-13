@@ -52,16 +52,24 @@ class PerformanceReviewCycleController extends Controller implements HasMiddlewa
 
     public function update(UpdateReviewCycleRequest $request, int $id)
     {
-        $cycle = $this->repository->updateCycle($id, $request->validated());
+        try {
+            $cycle = $this->repository->updateCycle($id, $request->validated());
 
-        return ResponseHelper::jsonResponse(true, 'Review cycle updated successfully', $cycle, 200);
+            return ResponseHelper::jsonResponse(true, 'Review cycle updated successfully', $cycle, 200);
+        } catch (\InvalidArgumentException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
+        }
     }
 
     public function destroy(int $id)
     {
-        $this->repository->deleteCycle($id);
+        try {
+            $this->repository->deleteCycle($id);
 
-        return ResponseHelper::jsonResponse(true, 'Review cycle deleted successfully', null, 200);
+            return ResponseHelper::jsonResponse(true, 'Review cycle deleted successfully', null, 200);
+        } catch (\RuntimeException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
+        }
     }
 
     public function generateReviews(int $id)

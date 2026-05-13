@@ -8,6 +8,40 @@ namespace App\Services;
  * Algoritma Multi-Criteria Decision Making untuk meranking karyawan berdasarkan
  * kinerja komprehensif dalam satu review cycle.
  *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * PRD vs Implementation Mapping (PRD Section 3.2 — Kriteria Penilaian)
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * PRD specifies 5 criteria. The implementation uses 7 criteria for a more
+ * granular analysis. The mapping is as follows:
+ *
+ *   PRD Criteria (5)          → Implementation Criteria (7)
+ *   ─────────────────────────────────────────────────────────────
+ *   Performance Score (30%)   → C1: avg_manager_rating (15%)
+ *                                + C2: final_rating (15%)
+ *                              The PRD's single "Performance Score" is split into
+ *                              competency (C1) and KPI (C2) for finer granularity.
+ *
+ *   Attendance Rate (20%)     → C6: attendance_quality (20%)
+ *                              Direct 1:1 mapping.
+ *
+ *   Goal Completion (25%)     → C3: avg_goal_completion (15%)
+ *                                + C4: goal_completion_ratio (10%)
+ *                              Split into completion % and on-time ratio for
+ *                              richer goal performance signal.
+ *
+ *   Feedback Score (15%)      → C5: positive_feedback_count (15%)
+ *                              Direct 1:1 mapping.
+ *
+ *   Tenure Factor (10%)       → C7: task_completion_quality (10%)
+ *                              Tenure Factor was not implemented as it requires
+ *                              historical employment start_date data. Instead,
+ *                              task_completion_quality (ratio of done/review tasks
+ *                              relative to total assigned tasks) serves as a proxy
+ *                              for work experience and productivity.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
  * Kriteria (semua Benefit — semakin besar semakin baik):
  *   C1 - performance_score  : Skor kinerja (30%) — gabungan kompetensi + KPI (0-100)
  *   C2 - attendance_rate    : Tingkat kehadiran (20%) — persentase hari masuk (0-100)

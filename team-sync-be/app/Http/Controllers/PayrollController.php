@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\PayrollStatus;
 use App\Exceptions\PayrollAlreadyPaidException;
 use App\Exceptions\PayrollReconciliationBlockedException;
 use App\Exceptions\PayrollStateException;
@@ -276,7 +277,7 @@ class PayrollController extends Controller implements HasMiddleware
                 'Payroll generation is being processed in the background. Please check back shortly.',
                 [
                     'salary_month' => $month->format('F Y'),
-                    'status' => Payroll::STATUS_PROCESSING,
+                    'status' => PayrollStatus::PROCESSING->value,
                 ],
                 200
             );

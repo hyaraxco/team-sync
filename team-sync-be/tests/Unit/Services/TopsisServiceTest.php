@@ -48,16 +48,25 @@ function topsisCandidate(
 }
 
 /**
- * Helper: default weights that sum to 1.0.
+ * Helper: default weights matching PRD Section 3.2 (total = 1.0).
+ *
+ * PRD Mapping:
+ *   Performance Score (30%) → avg_manager_rating (15%) + final_rating (15%)
+ *   Attendance Rate (20%)   → attendance_quality (20%)
+ *   Goal Completion (25%)   → avg_goal_completion (15%) + goal_completion_ratio (10%)
+ *   Feedback Score (15%)    → positive_feedback_count (15%)
+ *   Tenure Factor (10%)     → task_completion_quality (10%) [proxy]
  */
 function topsisWeights(): array
 {
     return [
-        'performance_score' => 0.30,
-        'attendance_rate' => 0.20,
-        'goal_completion' => 0.25,
-        'feedback_score' => 0.15,
-        'tenure_factor' => 0.10,
+        'avg_manager_rating' => 0.15,
+        'final_rating' => 0.15,
+        'avg_goal_completion' => 0.15,
+        'goal_completion_ratio' => 0.10,
+        'positive_feedback_count' => 0.15,
+        'attendance_quality' => 0.20,
+        'task_completion_quality' => 0.10,
     ];
 }
 

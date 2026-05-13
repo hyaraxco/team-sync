@@ -106,7 +106,7 @@ class PayrollBatchProcessingTest extends TestCase
         $freshPayroll = Payroll::find($payroll->id);
         $this->assertNotNull($freshPayroll);
         // processed_count is updated during processing; final status is 'pending'
-        $this->assertEquals('pending', $freshPayroll->status);
+        $this->assertEquals('pending', $freshPayroll->status->value);
         $this->assertEquals(5, $freshPayroll->payrollDetails()->count());
     }
 

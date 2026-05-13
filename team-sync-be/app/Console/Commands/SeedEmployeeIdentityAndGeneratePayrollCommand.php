@@ -56,7 +56,7 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
         // Check if payroll already exists for this month
         $existing = Payroll::whereDate('salary_month', $month.'-01')->first();
         if ($existing) {
-            $this->warn("Payroll for {$month} already exists (status: {$existing->status}).");
+            $this->warn("Payroll for {$month} already exists (status: {$existing->status->value}).");
             $this->warn('Choose a different month with --month=YYYY-MM');
 
             return self::FAILURE;
@@ -160,7 +160,7 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
         try {
             $payroll = $payrollRepository->generatePayroll($month.'-01', $actorId);
 
-            $this->info("✓ Payroll generated! ID: {$payroll->id} | Month: {$month} | Status: {$payroll->status}");
+            $this->info("✓ Payroll generated! ID: {$payroll->id} | Month: {$month} | Status: {$payroll->status->value}");
             $this->newLine();
 
             // Show summary of tax & BPJS

@@ -203,7 +203,7 @@ class PayrollAuditTrailTest extends TestCase
             'event_type' => 'notifications_resent',
             'actor_id' => $finance->id,
         ]);
-        $this->assertSame('paid', $payroll->fresh()->status);
+        $this->assertSame('paid', $payroll->fresh()->status->value);
     }
 
     public function test_resend_notifications_requires_paid_payroll(): void
@@ -286,7 +286,7 @@ class PayrollAuditTrailTest extends TestCase
         ]);
     }
 
-    public function test_finance_can_reopen_paid_payroll_and_activity_log_captures_reason(): void
+    public function test_finance_cannot_reopen_paid_payroll_directly(): void
     {
         $finance = $this->createRoleUser('finance');
         Sanctum::actingAs($finance);
@@ -297,26 +297,15 @@ class PayrollAuditTrailTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
             'reason' => $reason,
         ])
-            ->assertOk()
-            ->assertJsonPath('data.status', 'pending');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Payroll must be unapproved before it can be reopened. Please unapprove the payroll first to move it from paid to approved status.');
 
-        $this->assertNull($payroll->fresh()->payment_date);
+        $this->assertNotNull($payroll->fresh()->payment_date);
 
-        $this->assertDatabaseHas('payroll_activity_logs', [
+        $this->assertDatabaseMissing('payroll_activity_logs', [
             'payroll_id' => $payroll->id,
             'event_type' => 'reopened_for_correction',
-            'actor_id' => $finance->id,
         ]);
-
-        $log = PayrollActivityLog::query()
-            ->where('payroll_id', $payroll->id)
-            ->where('event_type', 'reopened_for_correction')
-            ->latest('occurred_at')
-            ->firstOrFail();
-
-        $this->assertSame($reason, $log->metadata['reason'] ?? null);
-        $this->assertSame('paid', $log->metadata['previous_status'] ?? null);
-        $this->assertSame('2026-04-28', $log->metadata['previous_payment_date'] ?? null);
     }
 
     private function createRoleUser(string $roleName): User

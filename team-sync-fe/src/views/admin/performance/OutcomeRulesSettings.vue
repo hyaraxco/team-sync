@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { Plus, Edit3, Trash2, Settings, X, Award, AlertTriangle } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
 
 const store = usePerformanceReviewStore();
@@ -13,6 +14,12 @@ const toast = useToast();
 const showModal = ref(false);
 const editingRule = ref(null);
 const saving = ref(false);
+
+// Confirmation dialog state
+const showConfirmDialog = ref(false);
+const confirmTitle = ref("");
+const confirmMessage = ref("");
+const confirmAction = ref(null);
 
 const defaultForm = () => ({
     label: "",
@@ -85,13 +92,17 @@ const saveRule = async () => {
 };
 
 const deleteRule = async (rule) => {
-    if (!confirm(`Delete rule "${rule.label}"? This cannot be undone.`)) return;
-    try {
-        await store.deleteOutcomeRule(rule.id);
-        toast.success("Rule deleted successfully");
-    } catch (error) {
-        toast.error(extractErrorMessage(error));
-    }
+    confirmTitle.value = "Delete Rule";
+    confirmMessage.value = `Delete rule "${rule.label}"? This cannot be undone.`;
+    confirmAction.value = async () => {
+        try {
+            await store.deleteOutcomeRule(rule.id);
+            toast.success("Rule deleted successfully");
+        } catch (error) {
+            toast.error(extractErrorMessage(error));
+        }
+    };
+    showConfirmDialog.value = true;
 };
 
 onMounted(() => {
@@ -388,4 +399,16 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationModal
+        :show="showConfirmDialog"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        confirm-text="Delete"
+        cancel-text="Cancel"
+        type="danger"
+        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @cancel="showConfirmDialog = false"
+    />
 </template>

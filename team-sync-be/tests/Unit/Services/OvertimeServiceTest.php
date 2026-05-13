@@ -156,6 +156,82 @@ class OvertimeServiceTest extends TestCase
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // Midnight Wrap Handling
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public function test_create_handles_midnight_wrap_23_to_01(): void
+    {
+        $validated = [
+            'staff_member_id' => 1,
+            'date' => '2026-05-15',
+            'start_time' => '23:00',
+            'end_time' => '01:00',
+            'overtime_type' => 'workday',
+        ];
+
+        $this->repository
+            ->method('getWeeklyHoursForStaffMemberLocked')
+            ->willReturn(0.0);
+
+        $this->repository
+            ->method('create')
+            ->willReturnCallback(function (array $data) {
+                return OvertimeRecord::factory()->make($data);
+            });
+
+        $result = $this->service->create($validated);
+
+        $this->assertTrue($result['success']);
+        $this->assertEquals(2.0, $result['record']->hours);
+    }
+
+    public function test_create_handles_midnight_wrap_22_to_02(): void
+    {
+        $validated = [
+            'staff_member_id' => 1,
+            'date' => '2026-05-15',
+            'start_time' => '22:00',
+            'end_time' => '02:00',
+            'overtime_type' => 'workday',
+        ];
+
+        $this->repository
+            ->method('getWeeklyHoursForStaffMemberLocked')
+            ->willReturn(0.0);
+
+        $this->repository
+            ->method('create')
+            ->willReturnCallback(function (array $data) {
+                return OvertimeRecord::factory()->make($data);
+            });
+
+        $result = $this->service->create($validated);
+
+        $this->assertTrue($result['success']);
+        $this->assertEquals(4.0, $result['record']->hours);
+    }
+
+    public function test_create_rejects_midnight_wrap_exceeding_daily_max(): void
+    {
+        $validated = [
+            'staff_member_id' => 1,
+            'date' => '2026-05-15',
+            'start_time' => '21:00',
+            'end_time' => '02:00',
+            'overtime_type' => 'workday',
+        ];
+
+        $this->repository
+            ->method('getWeeklyHoursForStaffMemberLocked')
+            ->willReturn(0.0);
+
+        $result = $this->service->create($validated);
+
+        $this->assertFalse($result['success']);
+        $this->assertStringContainsString('Overtime hours exceed maximum', $result['message']);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Approve
     // ─────────────────────────────────────────────────────────────────────────
 

@@ -34,6 +34,6 @@ class PreparePayrollQaCommandTest extends TestCase
         $this->assertNotNull(User::where('email', 'dwimeta@teamsync.com')->first());
 
         $payroll = Payroll::whereDate('salary_month', now()->startOfMonth()->toDateString())->firstOrFail();
-        $this->assertSame('paid', $payroll->status);
+        $this->assertSame('paid', $payroll->status->value);
     }
 }

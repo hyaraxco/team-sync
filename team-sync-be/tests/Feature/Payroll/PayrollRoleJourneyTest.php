@@ -74,7 +74,7 @@ class PayrollRoleJourneyTest extends TestCase
 
         $payroll = Payroll::whereDate('salary_month', $payrollDate)->firstOrFail();
 
-        $this->assertSame('pending', $payroll->status);
+        $this->assertSame('pending', $payroll->status->value);
         $this->assertGreaterThan(0, $payroll->payrollDetails()->count());
 
         // HR should NOT have payroll-create (read-only readiness only)
@@ -109,7 +109,7 @@ class PayrollRoleJourneyTest extends TestCase
             ->postJson("/api/v1/payrolls/{$payroll->id}/approve")
             ->assertOk();
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
 
         $this
             ->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
@@ -117,7 +117,7 @@ class PayrollRoleJourneyTest extends TestCase
             ])
             ->assertOk();
 
-        $this->assertSame('paid', $payroll->fresh()->status);
+        $this->assertSame('paid', $payroll->fresh()->status->value);
 
         $employeeUser = User::where('email', 'agung@teamsync.com')->firstOrFail();
         $employeePayslip = $payroll->fresh()->payrollDetails()->where('staff_member_id', $employeeUser->staffMemberProfile?->id)->firstOrFail();

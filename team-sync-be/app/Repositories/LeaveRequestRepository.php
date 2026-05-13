@@ -155,6 +155,14 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         });
     }
 
+    /**
+     * Approve a pending leave request.
+     *
+     * Authorization: Calls getById() which internally invokes authorizeManagerScope(),
+     * ensuring managers can only approve/reject leave requests from their direct reports.
+     * Non-manager roles (HR, superadmin) bypass the scope check via the early return
+     * in authorizeManagerScope() when getManageableEmployeeIdsForManager() returns null.
+     */
     public function approve(string $id)
     {
         return DB::transaction(function () use ($id) {
@@ -184,6 +192,14 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         });
     }
 
+    /**
+     * Reject a pending leave request.
+     *
+     * Authorization: Calls getById() which internally invokes authorizeManagerScope(),
+     * ensuring managers can only approve/reject leave requests from their direct reports.
+     * Non-manager roles (HR, superadmin) bypass the scope check via the early return
+     * in authorizeManagerScope() when getManageableEmployeeIdsForManager() returns null.
+     */
     public function reject(string $id)
     {
         return DB::transaction(function () use ($id) {
@@ -212,6 +228,14 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         });
     }
 
+    /**
+     * Bulk approve or reject multiple leave requests.
+     *
+     * Authorization: Calls authorizeManagerScope() for each leave request individually,
+     * ensuring managers can only approve/reject leave requests from their direct reports.
+     * Non-manager roles (HR, superadmin) bypass the scope check via the early return
+     * in authorizeManagerScope() when getManageableEmployeeIdsForManager() returns null.
+     */
     public function bulkAction(array $ids, string $action)
     {
         return DB::transaction(function () use ($ids, $action) {

@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\PayrollStatus;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\User;
@@ -149,7 +150,7 @@ class PreparePayrollQaCommand extends Command
         $hasPaidPayslip = PayrollDetail::query()
             ->where('staff_member_id', $employee->staffMemberProfile?->id)
             ->whereHas('payroll', function ($query) {
-                $query->where('status', Payroll::STATUS_PAID);
+                $query->where('status', PayrollStatus::PAID);
             })
             ->exists();
 
@@ -161,7 +162,7 @@ class PreparePayrollQaCommand extends Command
             ->whereDate('salary_month', now()->startOfMonth()->toDateString())
             ->first();
 
-        if (! $payroll || $payroll->status !== Payroll::STATUS_PAID) {
+        if (! $payroll || $payroll->status !== PayrollStatus::PAID) {
             throw new RuntimeException('Payroll readiness check failed. Current month payroll is not paid.');
         }
 

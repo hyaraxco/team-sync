@@ -145,7 +145,7 @@ class PayrollDetailUpdateTest extends TestCase
 
         // Approve
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
 
         // Mark paid
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
@@ -155,7 +155,7 @@ class PayrollDetailUpdateTest extends TestCase
         // Verify the edited salary persisted through the entire lifecycle
         $detail->refresh();
         $this->assertEquals(11500000, $detail->final_salary);
-        $this->assertSame('paid', $payroll->fresh()->status);
+        $this->assertSame('paid', $payroll->fresh()->status->value);
     }
 
     private function actingAsRole(string $roleName): User

@@ -51,7 +51,7 @@ class PayrollStateTransitionTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('message', 'Payroll must be in "pending" status to be approved. Current status: "processing".');
 
-        $this->assertSame('processing', $payroll->fresh()->status);
+        $this->assertSame('processing', $payroll->fresh()->status->value);
     }
 
     public function test_finance_cannot_mark_pending_payroll_as_paid_without_approval(): void
@@ -65,7 +65,7 @@ class PayrollStateTransitionTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('message', 'Payroll must be in "approved" status to be marked as paid. Current status: "pending".');
 
-        $this->assertSame('pending', $payroll->fresh()->status);
+        $this->assertSame('pending', $payroll->fresh()->status->value);
     }
 
     public function test_finance_cannot_approve_payroll_twice(): void
@@ -77,7 +77,7 @@ class PayrollStateTransitionTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('message', 'Payroll has already been approved.');
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
     }
 
     public function test_finance_sequential_approve_requests_only_first_transitions_payroll(): void
@@ -93,7 +93,7 @@ class PayrollStateTransitionTest extends TestCase
             ->assertStatus(422)
             ->assertJsonPath('message', 'Payroll has already been approved.');
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
     }
 
     public function test_finance_cannot_mark_paid_payroll_twice(): void
@@ -107,7 +107,7 @@ class PayrollStateTransitionTest extends TestCase
             ->assertStatus(409)
             ->assertJsonPath('message', 'Payroll has already been paid and cannot be modified.');
 
-        $this->assertSame('paid', $payroll->fresh()->status);
+        $this->assertSame('paid', $payroll->fresh()->status->value);
     }
 
     public function test_finance_sequential_mark_paid_requests_keep_first_payment_date(): void
@@ -129,7 +129,7 @@ class PayrollStateTransitionTest extends TestCase
 
         $freshPayroll = $payroll->fresh();
 
-        $this->assertSame('paid', $freshPayroll->status);
+        $this->assertSame('paid', $freshPayroll->status->value);
         $this->assertSame('2026-05-30', (string) optional($freshPayroll->payment_date)->format('Y-m-d'));
     }
 
@@ -146,11 +146,11 @@ class PayrollStateTransitionTest extends TestCase
             ->assertJsonPath('message', 'Payroll Reopened for Correction Successfully');
 
         $freshPayroll = $payroll->fresh();
-        $this->assertSame('pending', $freshPayroll->status);
+        $this->assertSame('pending', $freshPayroll->status->value);
         $this->assertNull($freshPayroll->payment_date);
     }
 
-    public function test_finance_can_reopen_paid_payroll_for_correction_and_clear_payment_date(): void
+    public function test_finance_cannot_reopen_paid_payroll_directly(): void
     {
         $this->actingAsRole('finance');
         $payroll = $this->createPayrollWithDetail(status: 'paid', paymentDate: '2026-05-30');
@@ -158,12 +158,12 @@ class PayrollStateTransitionTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
             'reason' => 'Bank account correction requires payroll recalculation.',
         ])
-            ->assertOk()
-            ->assertJsonPath('data.status', 'pending');
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Payroll must be unapproved before it can be reopened. Please unapprove the payroll first to move it from paid to approved status.');
 
         $freshPayroll = $payroll->fresh();
-        $this->assertSame('pending', $freshPayroll->status);
-        $this->assertNull($freshPayroll->payment_date);
+        $this->assertSame('paid', $freshPayroll->status->value);
+        $this->assertNotNull($freshPayroll->payment_date);
     }
 
     public function test_finance_cannot_reopen_pending_payroll(): void
@@ -177,7 +177,7 @@ class PayrollStateTransitionTest extends TestCase
             ->assertStatus(400)
             ->assertJsonPath('message', 'Payroll is already in pending status');
 
-        $this->assertSame('pending', $payroll->fresh()->status);
+        $this->assertSame('pending', $payroll->fresh()->status->value);
     }
 
     private function actingAsRole(string $roleName): User

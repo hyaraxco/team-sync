@@ -51,7 +51,7 @@ class PayrollApprovalMatrixTest extends TestCase
         $response->assertOk()
             ->assertJsonPath('data.status', 'approved');
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
     }
 
     public function test_multi_step_blocks_mark_as_paid_until_all_approved(): void
@@ -76,7 +76,7 @@ class PayrollApprovalMatrixTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
 
         // Payroll should still be pending (finance doesn't have director role)
-        $this->assertSame('pending', $payroll->fresh()->status);
+        $this->assertSame('pending', $payroll->fresh()->status->value);
 
         // Verify approval records were created
         $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
@@ -96,7 +96,7 @@ class PayrollApprovalMatrixTest extends TestCase
         ])->assertOk();
 
         // Now payroll should be approved
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
 
         // Switch back to finance (has payroll-process permission) to mark as paid
         $this->actingAsRole('finance');
@@ -104,7 +104,7 @@ class PayrollApprovalMatrixTest extends TestCase
             'payment_date' => '2026-06-01',
         ])->assertOk();
 
-        $this->assertSame('paid', $payroll->fresh()->status);
+        $this->assertSame('paid', $payroll->fresh()->status->value);
     }
 
     public function test_policy_crud_operations(): void
