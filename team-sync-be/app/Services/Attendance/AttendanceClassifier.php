@@ -475,7 +475,6 @@ class AttendanceClassifier
         return self::DEFAULT_POLICIES[$employmentType] ?? self::DEFAULT_POLICIES['full_time'];
     }
 
-
     private function buildWarningFlags(
         array $context,
         array $summary,
