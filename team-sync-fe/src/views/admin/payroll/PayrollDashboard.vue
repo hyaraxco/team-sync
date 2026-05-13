@@ -4,6 +4,7 @@ import { usePayrollStore } from "@/stores/payroll";
 import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { can } from "@/helpers/permissionHelper";
+import { DateTime } from "luxon";
 import {
     UserCheck,
     Banknote,
@@ -49,18 +50,11 @@ onMounted(async () => {
 });
 
 const formatDate = (date) => {
-    return new Date(date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "long",
-    });
+    return DateTime.fromISO(date).setLocale("id").toLocaleString({ year: "numeric", month: "long" });
 };
 
 const formatProcessedDate = (date) => {
-    return new Date(date).toLocaleDateString("id-ID", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-    });
+    return DateTime.fromISO(date).setLocale("id").toLocaleString({ year: "numeric", month: "long", day: "numeric" });
 };
 
 const formatSignedPercent = (value) => {

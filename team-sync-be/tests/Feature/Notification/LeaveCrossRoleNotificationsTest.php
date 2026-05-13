@@ -9,6 +9,7 @@ use App\Models\Team;
 use App\Models\User;
 use Carbon\Carbon;
 use Database\Seeders\AttendancePolicySeeder;
+use Database\Seeders\LeaveEntitlementSeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -37,6 +38,7 @@ class LeaveCrossRoleNotificationsTest extends TestCase
             PermissionSeeder::class,
             RoleSeeder::class,
             RolePermissionSeeder::class,
+            LeaveEntitlementSeeder::class,
         ]);
 
         $this->activateTestLicense();

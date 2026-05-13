@@ -61,7 +61,7 @@ class ThrCalculationService
             : round($tenureMonths / ThrPayroll::FULL_THR_TENURE_MONTHS, 4);
 
         // Calculate gross THR
-        $grossThr = round($monthlySalary * $prorationFactor, 2);
+        $grossThr = round($monthlySalary * $prorationFactor, 0);
 
         // Calculate PPh 21 on THR (treated as irregular/bonus income)
         $taxResult = $this->calculateThrTax(
@@ -72,7 +72,7 @@ class ThrCalculationService
         );
 
         $pph21Amount = $taxResult['pph21_on_thr'];
-        $netThr = round($grossThr - $pph21Amount, 2);
+        $netThr = round($grossThr - $pph21Amount, 0);
 
         return [
             'eligible' => true,
@@ -109,14 +109,14 @@ class ThrCalculationService
         $withThrAnnualPph21 = $withThrTax['meta']['pph21_annual'];
 
         // Step 3: Difference = tax attributable to THR
-        $pph21OnThr = max(0, round($withThrAnnualPph21 - $regularAnnualPph21, 2));
+        $pph21OnThr = max(0, round($withThrAnnualPph21 - $regularAnnualPph21, 0));
 
         return [
             'pph21_on_thr' => $pph21OnThr,
             'meta' => [
                 'method' => 'annualization_difference',
-                'regular_annual_pph21' => round($regularAnnualPph21, 2),
-                'with_thr_annual_pph21' => round($withThrAnnualPph21, 2),
+                'regular_annual_pph21' => round($regularAnnualPph21, 0),
+                'with_thr_annual_pph21' => round($withThrAnnualPph21, 0),
                 'thr_amount' => $thrAmount,
                 'monthly_salary' => $monthlySalary,
                 'ptkp_status' => $ptkpStatus,

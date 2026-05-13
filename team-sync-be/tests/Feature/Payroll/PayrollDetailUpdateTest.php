@@ -67,8 +67,8 @@ class PayrollDetailUpdateTest extends TestCase
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
             'final_salary' => 8000000,
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Tidak dapat mengubah payroll yang sudah disetujui atau dibayar');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Cannot update payroll details for a payroll that has already been approved or paid.');
 
         // Verify detail unchanged
         $detail->refresh();
@@ -83,8 +83,8 @@ class PayrollDetailUpdateTest extends TestCase
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
             'notes' => 'Attempt edit after payment.',
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Tidak dapat mengubah payroll yang sudah disetujui atau dibayar');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Cannot update payroll details for a payroll that has already been approved or paid.');
 
         // Verify detail unchanged
         $detail->refresh();

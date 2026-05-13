@@ -94,9 +94,9 @@ class ThrPayroll extends Model
             'religion_holiday_date' => 'date',
             'payment_deadline' => 'date',
             'payment_date' => 'date',
-            'total_thr_amount' => 'decimal:2',
-            'total_tax_amount' => 'decimal:2',
-            'total_net_amount' => 'decimal:2',
+            'total_thr_amount' => 'decimal:0',
+            'total_tax_amount' => 'decimal:0',
+            'total_net_amount' => 'decimal:0',
             'approved_at' => 'datetime',
         ];
     }

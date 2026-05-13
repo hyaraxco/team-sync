@@ -143,6 +143,7 @@ onUnmounted(() => {
                 <input
                     v-model="searchQuery"
                     type="text"
+                    aria-label="Search"
                     class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                     :placeholder="placeholder"
                 />
@@ -157,6 +158,7 @@ onUnmounted(() => {
                     </div>
                     <select
                         v-model="filterValues[filter.key]"
+                        :aria-label="filter.label"
                         class="w-full sm:w-auto pl-10 pr-8 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 transition-all duration-300 bg-white appearance-none font-semibold"
                     >
                         <option value="">{{ filter.label }}</option>

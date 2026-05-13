@@ -128,9 +128,9 @@ class ThrPayrollRepository implements ThrPayrollRepositoryInterface
             'year' => $year,
             'total_events' => $thrPayrolls->count(),
             'total_employees' => $totalEmployees,
-            'total_thr_amount' => round($totalAmount, 2),
-            'total_tax_amount' => round($totalTax, 2),
-            'total_net_amount' => round($totalNet, 2),
+            'total_thr_amount' => round($totalAmount, 0),
+            'total_tax_amount' => round($totalTax, 0),
+            'total_net_amount' => round($totalNet, 0),
             'by_event' => $byEvent->values()->toArray(),
         ];
     }

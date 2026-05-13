@@ -166,7 +166,7 @@ class PayrollEdgeCaseTest extends TestCase
         $response = $this->postJson("/api/v1/payrolls/{$payroll->id}/approve");
 
         // Director has no pending approval left, so this should fail
-        $response->assertStatus(400);
+        $response->assertStatus(422);
 
         // Payroll should STILL be pending
         $this->assertSame('pending', $payroll->fresh()->status);

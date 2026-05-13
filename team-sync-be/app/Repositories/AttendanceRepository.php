@@ -96,7 +96,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             ->findOrFail($id);
     }
 
-    public function getMyAttendances(): Collection
+    public function getMyAttendances(?string $from = null, ?string $to = null): Collection
     {
         $profileId = Auth::user()->staffMemberProfile?->id;
 
@@ -104,10 +104,17 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             return new Collection;
         }
 
+        $fromDate = $from
+            ? Carbon::parse($from)->startOfDay()
+            : now()->subDays(6)->startOfDay();
+
+        $toDate = $to
+            ? Carbon::parse($to)->endOfDay()
+            : now()->endOfDay();
+
         return Attendance::with(['staffMember.user'])
             ->where('staff_member_id', $profileId)
-            ->whereDate('date', '>=', now()->subDays(6)->startOfDay())
-            ->whereDate('date', '<=', now()->endOfDay())
+            ->whereBetween('date', [$fromDate, $toDate])
             ->orderBy('date', 'desc')
             ->get();
     }

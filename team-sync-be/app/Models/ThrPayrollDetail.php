@@ -29,12 +29,12 @@ class ThrPayrollDetail extends Model
     protected function casts(): array
     {
         return [
-            'monthly_salary' => 'decimal:2',
+            'monthly_salary' => 'decimal:0',
             'tenure_months' => 'integer',
             'proration_factor' => 'decimal:4',
-            'gross_thr_amount' => 'decimal:2',
-            'pph21_amount' => 'decimal:2',
-            'net_thr_amount' => 'decimal:2',
+            'gross_thr_amount' => 'decimal:0',
+            'pph21_amount' => 'decimal:0',
+            'net_thr_amount' => 'decimal:0',
             'has_npwp' => 'boolean',
             'join_date' => 'date',
             'tax_calculation_meta' => 'array',

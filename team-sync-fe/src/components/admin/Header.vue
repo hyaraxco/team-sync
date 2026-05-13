@@ -6,7 +6,7 @@ import { useNotificationStore } from "@/stores/notifications";
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
-import _ from "lodash";
+import { join } from "lodash-es";
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
@@ -388,7 +388,7 @@ onUnmounted(() => {
                                 {{ user?.name }}
                             </p>
                             <p class="text-brand-dark text-sm sm:text-base font-normal leading-7">
-                                {{ _.join(user?.roles, ", ").toUpperCase() }}
+                                {{ join(user?.roles, ", ").toUpperCase() }}
                             </p>
                         </div>
                         <ChevronDownIcon
@@ -411,7 +411,7 @@ onUnmounted(() => {
                             </p>
                             <p class="text-xs text-gray-600">{{ user?.email }}</p>
                             <p class="text-xs text-gray-500">
-                                {{ _.join(user?.roles, ", ").toUpperCase() }}
+                                {{ join(user?.roles, ", ").toUpperCase() }}
                             </p>
                         </div>
 
