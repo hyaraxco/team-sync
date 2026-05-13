@@ -207,7 +207,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function generateReadiness(Request $request)
     {
         $validated = $request->validate([
-            'salary_month' => 'required|date_format:Y-m',
+            'salary_month' => 'required|date_format:Y-m|before_or_equal:'.now()->format('Y-m'),
         ]);
 
         try {
