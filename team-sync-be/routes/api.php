@@ -214,6 +214,7 @@ Route::prefix('v1')
                 Route::get('thr/{id}', [ThrPayrollController::class, 'show']);
                 Route::get('thr/{id}/details', [ThrPayrollController::class, 'getDetails']);
                 Route::post('thr/{id}/approve', [ThrPayrollController::class, 'approve']);
+                Route::post('thr/{id}/reopen', [ThrPayrollController::class, 'reopen']);
                 Route::post('thr/{id}/mark-as-paid', [ThrPayrollController::class, 'markAsPaid']);
             });
 

@@ -145,6 +145,8 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             $leaveRequestDto = LeaveRequestDto::fromArray($data);
             $leaveRequest = LeaveRequest::create($leaveRequestDto->toArray());
 
+            $this->ensureEntitlementIsValidForSubmission($leaveRequest);
+
             DB::afterCommit(function () use ($leaveRequest) {
                 $this->emailService->sendLeaveRequestCreatedNotification($leaveRequest);
             });
@@ -505,6 +507,36 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
         if (! ($result['valid'] ?? false)) {
             $errors = implode(', ', $result['errors'] ?? ['leave_entitlement_invalid']);
             throw new \Exception("Leave request cannot be approved: {$errors}.");
+        }
+    }
+
+    /**
+     * Validate entitlement/quota at submission time.
+     *
+     * Reuses the same LeaveEntitlementValidator but filters out proof-related
+     * errors since sick-leave proof is uploaded separately after the request is
+     * created.
+     */
+    private function ensureEntitlementIsValidForSubmission(LeaveRequest $leaveRequest): void
+    {
+        $result = $this->leaveEntitlementValidator->validate($leaveRequest->loadMissing('staffMember.jobInformation'));
+
+        if ($result['valid'] ?? false) {
+            return;
+        }
+
+        $proofErrors = [
+            'sick_leave_proof_required',
+            'sick_leave_proof_not_approved',
+            'sick_leave_invalid_mime_type',
+            'sick_leave_attachment_too_large',
+        ];
+
+        $submissionErrors = array_values(array_diff($result['errors'] ?? [], $proofErrors));
+
+        if (! empty($submissionErrors)) {
+            $errors = implode(', ', $submissionErrors);
+            throw new \Exception("Leave request cannot be submitted: {$errors}.");
         }
     }
 

@@ -10,6 +10,7 @@ use App\Http\Requests\AttendancePolicyMismatchAcknowledgeRequest;
 use App\Http\Requests\AttendancePolicyMismatchListRequest;
 use App\Http\Requests\AttendancePolicyMismatchResolveRequest;
 use App\Http\Requests\EmployeeAttendanceStatisticsRequest;
+use App\Http\Requests\MyAttendancesRequest;
 use App\Http\Resources\AttendancePolicyMismatchResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\PaginateResource;
@@ -82,10 +83,15 @@ class AttendanceController extends Controller implements HasMiddleware
         }
     }
 
-    public function getMyAttendances()
+    public function getMyAttendances(MyAttendancesRequest $request)
     {
         try {
-            $attendances = $this->attendanceRepository->getMyAttendances();
+            $validated = $request->validated();
+
+            $attendances = $this->attendanceRepository->getMyAttendances(
+                $validated['from'] ?? null,
+                $validated['to'] ?? null
+            );
 
             return ResponseHelper::jsonResponse(true, 'My Attendances Retrieved Successfully', AttendanceResource::collection($attendances), 200);
         } catch (\Throwable $e) {

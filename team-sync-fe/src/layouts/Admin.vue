@@ -8,6 +8,14 @@ const { isOpen, toggleMobile, closeMobile } = provideSidebar();
 
 <template>
     <div class="flex h-screen overflow-hidden">
+        <!-- Skip to main content link for keyboard users -->
+        <a
+            href="#main-content"
+            class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[10000] focus:px-4 focus:py-2 focus:bg-white focus:shadow-lg focus:rounded-lg focus:text-brand-dark focus:font-semibold"
+        >
+            Skip to main content
+        </a>
+
         <!-- Sidebar Slot - can be replaced with custom content -->
         <slot name="sidebar">
             <Sidebar />

@@ -16,7 +16,7 @@ interface AttendanceRepositoryInterface
         int $rowPerPage
     );
 
-    public function getMyAttendances();
+    public function getMyAttendances(?string $from = null, ?string $to = null);
 
     public function getMyAttendanceStatistics();
 

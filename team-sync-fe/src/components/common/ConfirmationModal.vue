@@ -46,6 +46,8 @@ const handleCancel = () => {
 <template>
     <div
         v-if="show"
+        role="dialog"
+        aria-modal="true"
         class="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4"
         @click.self="handleCancel"
     >
@@ -78,9 +80,10 @@ const handleCancel = () => {
                     <button
                         type="button"
                         @click="handleCancel"
+                        aria-label="Close"
                         class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
                     >
-                        <X class="w-5 h-5 text-gray-600" />
+                        <X class="w-5 h-5 text-gray-600" aria-hidden="true" />
                     </button>
                 </div>
             </div>

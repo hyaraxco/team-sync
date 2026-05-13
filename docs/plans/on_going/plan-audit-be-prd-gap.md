@@ -31,7 +31,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 1.2 [CRITICAL] Payroll `markAsPaid` — Reconciliation Blocks Without Clear Error
+### 1.2 [CRITICAL] Payroll `markAsPaid` — Reconciliation Blocks Without Clear Error ✅ DONE
 **Category**: edge case  
 **Priority**: CRITICAL  
 **File**: `app/Repositories/PayrollRepository.php:910-934`  
@@ -47,7 +47,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 1.3 [HIGH] Payroll `approvePayroll` — No Guard Against Processing Status
+### 1.3 [HIGH] Payroll `approvePayroll` — No Guard Against Processing Status ✅ DONE
 **Category**: state  
 **Priority**: HIGH  
 **File**: `app/Repositories/PayrollRepository.php:744-881`  
@@ -73,7 +73,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 1.5 [HIGH] Payroll Detail Update — No Validation on `final_salary` Minimum
+### 1.5 [HIGH] Payroll Detail Update — No Validation on `final_salary` Minimum ✅ DONE
 **Category**: validation  
 **Priority**: HIGH  
 **File**: `app/Http/Controllers/PayrollController.php:263-285`  
@@ -148,7 +148,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 2.2 [HIGH] THR No Reopen Endpoint
+### 2.2 [HIGH] THR No Reopen Endpoint ✅ DONE
 **Category**: missing  
 **Priority**: HIGH  
 **File**: `routes/api.php:208-218`  
@@ -160,7 +160,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 2.3 [HIGH] THR Simulation — Amounts Use Float Instead of Integer IDR
+### 2.3 [HIGH] THR Simulation — Amounts Use Float Instead of Integer IDR ✅ DONE
 **Category**: domain  
 **Priority**: HIGH  
 **File**: `app/Services/ThrService.php:250-253`  
@@ -186,7 +186,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ## 3. ATTENDANCE
 
-### 3.1 [HIGH] `getMyAttendances` — Hardcoded 7-Day Window
+### 3.1 [HIGH] `getMyAttendances` — Hardcoded 7-Day Window ✅ DONE
 **Category**: edge case  
 **Priority**: HIGH  
 **File**: `app/Repositories/AttendanceRepository.php:99-113`  
@@ -236,7 +236,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ## 4. LEAVE MANAGEMENT
 
-### 4.1 [HIGH] Leave Request `store` — No Entitlement Validation on Create
+### 4.1 [HIGH] Leave Request `store` — No Entitlement Validation on Create ✅ DONE
 **Category**: validation  
 **Priority**: HIGH  
 **File**: `app/Repositories/LeaveRequestRepository.php:107-154`  

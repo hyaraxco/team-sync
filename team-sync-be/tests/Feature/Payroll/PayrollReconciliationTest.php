@@ -72,7 +72,7 @@ class PayrollReconciliationTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => '2026-05-30',
         ])
-            ->assertStatus(400)
+            ->assertStatus(422)
             ->assertJsonPath(
                 'message',
                 'Payroll cannot be marked as paid because 1 critical reconciliation issue(s) remain. Complete employee bank information and regenerate payroll before retrying.'
@@ -280,7 +280,7 @@ class PayrollReconciliationTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => '2026-05-30',
         ])
-            ->assertStatus(400);
+            ->assertStatus(422);
 
         $this->assertSame('approved', $payroll->fresh()->status);
     }

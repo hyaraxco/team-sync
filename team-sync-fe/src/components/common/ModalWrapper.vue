@@ -1,6 +1,6 @@
 <script setup>
 import { X } from "lucide-vue-next";
-import { onMounted, onUnmounted, watch } from "vue";
+import { onMounted, onUnmounted, watch, ref, nextTick } from "vue";
 
 const props = defineProps({
     show: {
@@ -19,6 +19,9 @@ const props = defineProps({
 
 const emit = defineEmits(["close"]);
 
+const dialogRef = ref(null);
+const titleId = ref(`modal-title-${Math.random().toString(36).slice(2, 8)}`);
+
 const close = () => {
     emit("close");
 };
@@ -27,6 +30,34 @@ const close = () => {
 const handleKeydown = (e) => {
     if (e.key === "Escape" && props.show) {
         close();
+    }
+    // Focus trap: keep Tab inside modal
+    if (e.key === "Tab" && props.show && dialogRef.value) {
+        const focusable = dialogRef.value.querySelectorAll(
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
+};
+
+// Focus first focusable element when modal opens
+const focusFirst = async () => {
+    await nextTick();
+    if (!dialogRef.value) return;
+    const focusable = dialogRef.value.querySelectorAll(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    if (focusable.length > 0) {
+        focusable[0].focus();
     }
 };
 
@@ -45,6 +76,7 @@ watch(
     (val) => {
         if (val) {
             document.body.style.overflow = "hidden";
+            focusFirst();
         } else {
             document.body.style.overflow = "";
         }
@@ -64,6 +96,10 @@ watch(
         >
             <div
                 v-if="show"
+                role="dialog"
+                aria-modal="true"
+                :aria-labelledby="title ? titleId : undefined"
+                ref="dialogRef"
                 class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999]"
                 style="margin: 0; padding: 0"
                 @click.self="close"
@@ -92,13 +128,17 @@ watch(
                         <!-- Header -->
                         <div v-if="$slots.header || title" class="flex items-center justify-between mb-4 shrink-0">
                             <slot name="header">
-                                <h3 class="text-brand-dark text-xl font-bold">
+                                <h3 :id="titleId" class="text-brand-dark text-xl font-bold">
                                     {{ title }}
                                 </h3>
                             </slot>
 
-                            <button @click="close" class="text-gray-400 hover:text-gray-600 transition-colors ml-4">
-                                <X class="w-5 h-5" />
+                            <button
+                                @click="close"
+                                aria-label="Close"
+                                class="text-gray-400 hover:text-gray-600 transition-colors ml-4"
+                            >
+                                <X class="w-5 h-5" aria-hidden="true" />
                             </button>
                         </div>
 
