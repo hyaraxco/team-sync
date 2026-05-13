@@ -48,8 +48,8 @@ class PayrollStateTransitionTest extends TestCase
         $payroll = $this->createPayrollWithDetail(status: 'processing');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Payroll must be pending before it can be approved');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Payroll must be in "pending" status to be approved. Current status: "processing".');
 
         $this->assertSame('processing', $payroll->fresh()->status);
     }
@@ -62,8 +62,8 @@ class PayrollStateTransitionTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => '2026-05-30',
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Payroll must be approved before it can be marked as paid');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Payroll must be in "approved" status to be marked as paid. Current status: "pending".');
 
         $this->assertSame('pending', $payroll->fresh()->status);
     }
@@ -74,8 +74,8 @@ class PayrollStateTransitionTest extends TestCase
         $payroll = $this->createPayrollWithDetail(status: 'approved');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Payroll sudah disetujui');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Payroll has already been approved.');
 
         $this->assertSame('approved', $payroll->fresh()->status);
     }
@@ -90,8 +90,8 @@ class PayrollStateTransitionTest extends TestCase
             ->assertJsonPath('data.status', 'approved');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Payroll sudah disetujui');
+            ->assertStatus(422)
+            ->assertJsonPath('message', 'Payroll has already been approved.');
 
         $this->assertSame('approved', $payroll->fresh()->status);
     }
@@ -104,8 +104,8 @@ class PayrollStateTransitionTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => '2026-05-31',
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Payroll sudah dibayar');
+            ->assertStatus(409)
+            ->assertJsonPath('message', 'Payroll has already been paid and cannot be modified.');
 
         $this->assertSame('paid', $payroll->fresh()->status);
     }
@@ -124,8 +124,8 @@ class PayrollStateTransitionTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => '2026-05-31',
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('message', 'Payroll sudah dibayar');
+            ->assertStatus(409)
+            ->assertJsonPath('message', 'Payroll has already been paid and cannot be modified.');
 
         $freshPayroll = $payroll->fresh();
 

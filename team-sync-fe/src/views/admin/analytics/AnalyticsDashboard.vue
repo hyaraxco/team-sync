@@ -255,6 +255,7 @@ onUnmounted(() => {
                     <select
                         v-model="period"
                         @change="onFilterChange"
+                        aria-label="Filter by period"
                         class="text-sm text-brand-dark bg-transparent border-none outline-none cursor-pointer pr-6"
                     >
                         <option v-for="opt in periodOptions" :key="opt.value" :value="opt.value">
@@ -266,6 +267,7 @@ onUnmounted(() => {
                 <select
                     v-model="department"
                     @change="onFilterChange"
+                    aria-label="Filter by department"
                     class="text-sm text-brand-dark bg-white border border-[#DCDEDD] rounded-[12px] px-3 py-2 outline-none cursor-pointer"
                 >
                     <option :value="null">All Departments</option>
@@ -310,11 +312,14 @@ onUnmounted(() => {
 
         <!-- Tab Navigation -->
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6">
-            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" role="tablist">
                 <button
                     v-for="tab in tabs"
                     :key="tab.id"
                     type="button"
+                    role="tab"
+                    :aria-selected="activeTab === tab.id"
+                    :id="`tab-${tab.id}`"
                     @click="activeTab = tab.id"
                     class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
@@ -327,6 +332,7 @@ onUnmounted(() => {
                         :is="tab.icon"
                         class="w-4 h-4"
                         :class="activeTab === tab.id ? 'text-white' : 'text-gray-600'"
+                        aria-hidden="true"
                     />
                     <span class="text-sm font-semibold">{{ tab.label }}</span>
                 </button>
@@ -334,7 +340,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Tab Content -->
-        <div v-if="activeTab === 'executive'">
+        <div v-if="activeTab === 'executive'" role="tabpanel" :aria-labelledby="'tab-executive'">
             <!-- Loading State -->
             <div v-if="executiveSummaryLoading" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

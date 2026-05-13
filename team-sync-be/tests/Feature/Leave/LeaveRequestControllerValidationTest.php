@@ -5,6 +5,7 @@ namespace Tests\Feature\Leave;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
+use Database\Seeders\LeaveEntitlementSeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -27,6 +28,7 @@ class LeaveRequestControllerValidationTest extends TestCase
             RoleSeeder::class,
             PermissionSeeder::class,
             RolePermissionSeeder::class,
+            LeaveEntitlementSeeder::class,
         ]);
 
         $this->activateTestLicense();
@@ -82,7 +84,30 @@ class LeaveRequestControllerValidationTest extends TestCase
         $profile = StaffMemberProfile::factory()->create([
             'user_id' => $user->id,
         ]);
+        $profile->jobInformation()->create([
+            'staff_member_id' => $profile->id,
+            'job_title' => 'Software Engineer',
+            'years_experience' => 3,
+            'status' => 'active',
+            'employment_type' => 'full_time',
+            'work_location' => 'remote',
+            'start_date' => '2024-01-01',
+            'monthly_salary' => 9000000,
+            'skill_level' => 'intermediate',
+        ]);
+
         $otherProfile = StaffMemberProfile::factory()->create();
+        $otherProfile->jobInformation()->create([
+            'staff_member_id' => $otherProfile->id,
+            'job_title' => 'Software Engineer',
+            'years_experience' => 3,
+            'status' => 'active',
+            'employment_type' => 'full_time',
+            'work_location' => 'remote',
+            'start_date' => '2024-01-01',
+            'monthly_salary' => 9000000,
+            'skill_level' => 'intermediate',
+        ]);
 
         $response = $this->postJson('/api/v1/leave-requests', [
             'staff_member_id' => $otherProfile->id,

@@ -96,6 +96,7 @@ const styleMap = {
                         <!-- Close button -->
                         <button
                             @click="removeToast(toast.id)"
+                            aria-label="Dismiss notification"
                             class="flex-shrink-0 p-1 rounded-lg hover:bg-black/5 transition-colors duration-200"
                         >
                             <X class="w-4 h-4 text-gray-400" />
