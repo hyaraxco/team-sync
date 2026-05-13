@@ -502,8 +502,8 @@ onMounted(() => {
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-[#0C1C3C] text-[20px] font-bold">{{ currentMonth.toFormat("MMMM yyyy") }}</h3>
             <div class="flex gap-2">
-                <button @click="prevMonth" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
-                    <ChevronLeft class="w-5 h-5 text-gray-600" />
+                <button @click="prevMonth" aria-label="Previous month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
+                    <ChevronLeft class="w-5 h-5 text-gray-600" aria-hidden="true" />
                 </button>
                 <button
                     @click="
@@ -515,8 +515,8 @@ onMounted(() => {
                 >
                     Today
                 </button>
-                <button @click="nextMonth" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
-                    <ChevronRight class="w-5 h-5 text-gray-600" />
+                <button @click="nextMonth" aria-label="Next month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
+                    <ChevronRight class="w-5 h-5 text-gray-600" aria-hidden="true" />
                 </button>
             </div>
         </div>
