@@ -1,32 +1,38 @@
+import TeamList from "@/views/admin/team/TeamList.vue";
+import TeamCreate from "@/views/admin/team/TeamCreate.vue";
+import TeamEdit from "@/views/admin/team/TeamEdit.vue";
+import TeamDetail from "@/views/admin/team/TeamDetail.vue";
+
+// team routes
 export default [
     {
-        path: "teams",
+        path: "/admin/teams",
         name: "admin.teams",
-        component: () => import("@/views/admin/team/TeamList.vue"),
+        component: TeamList,
         meta: {
             requiredPermission: "team-menu",
         },
     },
     {
-        path: "teams/create",
+        path: "/admin/teams/create",
         name: "admin.team.create",
-        component: () => import("@/views/admin/team/TeamCreate.vue"),
+        component: TeamCreate,
         meta: {
             requiredPermission: "team-create",
         },
     },
     {
-        path: "teams/:id",
+        path: "/admin/teams/:id",
         name: "admin.team.detail",
-        component: () => import("@/views/admin/team/TeamDetail.vue"),
+        component: TeamDetail,
         meta: {
-            requiredPermission: "team-view",
+            requiredPermission: "team-menu",
         },
     },
     {
-        path: "teams/:id/edit",
+        path: "/admin/teams/edit/:id",
         name: "admin.team.edit",
-        component: () => import("@/views/admin/team/TeamEdit.vue"),
+        component: TeamEdit,
         meta: {
             requiredPermission: "team-edit",
         },
