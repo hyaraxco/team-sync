@@ -1,32 +1,37 @@
+import ProjectList from "@/views/admin/project/ProjectList.vue";
+import ProjectCreate from "@/views/admin/project/ProjectCreate.vue";
+import ProjectEdit from "@/views/admin/project/ProjectEdit.vue";
+import ProjectDetail from "@/views/admin/project/ProjectDetail.vue";
+
 export default [
     {
-        path: "projects",
+        path: "/admin/projects",
         name: "admin.projects",
-        component: () => import("@/views/admin/project/ProjectList.vue"),
+        component: ProjectList,
         meta: {
             requiredPermission: "project-menu",
         },
     },
     {
-        path: "projects/create",
-        name: "admin.project.create",
-        component: () => import("@/views/admin/project/ProjectCreate.vue"),
+        path: "/admin/projects/:id",
+        name: "admin.projects.detail",
+        component: ProjectDetail,
+        meta: {
+            requiredPermission: "project-list",
+        },
+    },
+    {
+        path: "/admin/projects/create",
+        name: "admin.projects.create",
+        component: ProjectCreate,
         meta: {
             requiredPermission: "project-create",
         },
     },
     {
-        path: "projects/:id",
-        name: "admin.project.detail",
-        component: () => import("@/views/admin/project/ProjectDetail.vue"),
-        meta: {
-            requiredPermission: "project-view",
-        },
-    },
-    {
-        path: "projects/:id/edit",
-        name: "admin.project.edit",
-        component: () => import("@/views/admin/project/ProjectEdit.vue"),
+        path: "/admin/projects/:id/edit",
+        name: "admin.projects.edit",
+        component: ProjectEdit,
         meta: {
             requiredPermission: "project-edit",
         },
