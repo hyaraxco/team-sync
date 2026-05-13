@@ -1,18 +1,21 @@
+import StaffMemberList from "@/views/admin/staff-member/StaffMemberList.vue";
+import StaffMemberSuccess from "@/views/admin/staff-member/StaffMemberSuccess.vue";
+
 export default [
     {
         path: "staff-members",
-        name: "staffMember.list",
-        component: () => import("@/views/admin/staff-member/StaffMemberList.vue"),
+        name: "admin.staffMembers",
+        component: StaffMemberList,
         meta: {
             requiredPermission: "staff-member-menu",
         },
     },
     {
-        path: "staff-members/:id",
-        name: "staffMember.detail",
-        component: () => import("@/views/admin/staff-member/StaffMemberDetail.vue"),
+        path: "staff-members/success",
+        name: "admin.staffMembers.success",
+        component: StaffMemberSuccess,
         meta: {
-            requiredPermission: "staff-member-view",
+            requiredPermission: "staff-member-create",
         },
     },
 ];

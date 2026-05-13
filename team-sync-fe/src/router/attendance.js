@@ -1,8 +1,17 @@
+import MyAttendance from "@/views/staff-member/MyAttendance.vue";
+import AttendanceList from "@/views/admin/attendance/AttendanceList.vue";
+import AttendanceCorrectionList from "@/views/admin/attendance/AttendanceCorrectionList.vue";
+import LeaveRequestList from "@/views/admin/attendance/LeaveRequestList.vue";
+import AttendanceSettings from "@/views/admin/attendance/AttendanceSettings.vue";
+import AttendancePeriods from "@/views/admin/attendance/AttendancePeriods.vue";
+import PolicyMismatches from "@/views/admin/attendance/PolicyMismatches.vue";
+import OvertimeManagement from "@/views/admin/attendance/OvertimeManagement.vue";
+
 export default [
     {
         path: "attendances",
         name: "admin.attendances",
-        component: () => import("@/views/admin/attendance/AttendanceList.vue"),
+        component: AttendanceList,
         meta: {
             requiredPermission: "attendance-menu",
         },
@@ -10,7 +19,7 @@ export default [
     {
         path: "attendance-settings",
         name: "admin.attendance.settings",
-        component: () => import("@/views/admin/attendance/AttendanceSettings.vue"),
+        component: AttendanceSettings,
         meta: {
             requiredPermission: "attendance-menu",
         },
@@ -18,7 +27,7 @@ export default [
     {
         path: "attendance-periods",
         name: "admin.attendance.periods",
-        component: () => import("@/views/admin/attendance/AttendancePeriods.vue"),
+        component: AttendancePeriods,
         meta: {
             requiredPermission: "attendance-menu",
         },
@@ -26,7 +35,7 @@ export default [
     {
         path: "attendance-policy-mismatches",
         name: "admin.attendance.mismatches",
-        component: () => import("@/views/admin/attendance/PolicyMismatches.vue"),
+        component: PolicyMismatches,
         meta: {
             requiredPermission: "attendance-menu",
         },
@@ -34,7 +43,7 @@ export default [
     {
         path: "attendance-corrections",
         name: "admin.attendance.corrections",
-        component: () => import("@/views/admin/attendance/AttendanceCorrectionList.vue"),
+        component: AttendanceCorrectionList,
         meta: {
             requiredPermission: "attendance-correction-list",
         },
@@ -50,7 +59,7 @@ export default [
     {
         path: "leave-requests",
         name: "admin.attendance.leave-requests",
-        component: () => import("@/views/admin/attendance/LeaveRequestList.vue"),
+        component: LeaveRequestList,
         meta: {
             requiredPermission: "leave-request-list",
         },
@@ -74,7 +83,7 @@ export default [
     {
         path: "overtime",
         name: "admin.attendance.overtime",
-        component: () => import("@/views/admin/attendance/OvertimeManagement.vue"),
+        component: OvertimeManagement,
         meta: {
             requiredPermission: "overtime-list",
         },
@@ -82,7 +91,7 @@ export default [
     {
         path: "attendance/my-attendances",
         name: "staffMember.attendance.my-attendances",
-        component: () => import("@/views/staff-member/MyAttendance.vue"),
+        component: MyAttendance,
         meta: {
             requiredAnyPermissions: ["attendance-my-attendances", "attendance-check-in", "attendance-check-out"],
         },

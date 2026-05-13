@@ -58,8 +58,8 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
             <!-- Trending Badge -->
             <div v-if="trendLabel" class="flex items-center gap-2 mb-3">
                 <div class="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
-                    <TrendingUp v-if="isTrendUp" class="w-3 h-3 text-white" />
-                    <TrendingDown v-else class="w-3 h-3 text-white" />
+                    <TrendingUp v-if="isTrendUp" aria-hidden="true" class="w-3 h-3 text-white" />
+                    <TrendingDown v-else aria-hidden="true" class="w-3 h-3 text-white" />
                     <span class="text-brand-white text-xs font-semibold">{{ trendLabel }}</span>
                 </div>
             </div>
@@ -77,7 +77,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
                 <div
                     class="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-[20px] flex items-center justify-center shrink-0"
                 >
-                    <component :is="resolveIcon" class="w-6 h-6 sm:w-8 sm:h-8 text-white" />
+                    <component :is="resolveIcon" aria-hidden="true" class="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>
             </div>
 
