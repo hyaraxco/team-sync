@@ -1,5 +1,5 @@
 <template>
-    <div class="min-h-screen flex items-center justify-center bg-gray-50">
+    <main class="min-h-screen flex items-center justify-center bg-gray-50">
         <div class="text-center space-y-6 p-8">
             <h1 class="text-6xl font-bold text-gray-300">404</h1>
             <h2 class="text-xl font-semibold text-gray-700">Page Not Found</h2>
@@ -11,5 +11,5 @@
                 Back to Dashboard
             </router-link>
         </div>
-    </div>
+    </main>
 </template>

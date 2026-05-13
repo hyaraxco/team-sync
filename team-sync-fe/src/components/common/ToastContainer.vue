@@ -50,6 +50,9 @@ const styleMap = {
 <template>
     <Teleport to="body">
         <div
+            role="status"
+            aria-live="polite"
+            aria-relevant="additions"
             class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none"
             style="min-width: 360px; max-width: 420px"
         >
