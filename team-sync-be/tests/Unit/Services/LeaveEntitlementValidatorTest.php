@@ -13,7 +13,7 @@ use Tests\TestCase;
 uses(TestCase::class, RefreshDatabase::class);
 
 beforeEach(function () {
-    $this->service = new LeaveEntitlementValidator();
+    $this->service = new LeaveEntitlementValidator;
 
     Role::create(['name' => 'staff', 'guard_name' => 'sanctum']);
 });

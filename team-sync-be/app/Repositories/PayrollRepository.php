@@ -746,11 +746,13 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function approvePayroll(string $payrollId, ?int $actorId = null): Payroll
     {
-        return DB::transaction(function () use ($payrollId, $actorId) {
-            $payroll = Payroll::query()
-                ->whereKey($payrollId)
-                ->lockForUpdate()
-                ->firstOrFail();
+        // Use NOWAIT to fail immediately if another process holds the lock,
+        try {
+            return DB::transaction(function () use ($payrollId, $actorId) {
+                $payroll = Payroll::query()
+                    ->whereKey($payrollId)
+                    ->lock('for update nowait')
+                    ->firstOrFail();
 
             if ($payroll->status === Payroll::STATUS_PAID) {
                 throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be approved.');
@@ -884,15 +886,23 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             return $payroll->loadCount('payrollDetails');
         });
+        } catch (QueryException $e) {
+            if ($this->isLockContentionError($e)) {
+                throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
+            }
+            throw $e;
+        }
     }
 
     public function markAsPaid(string $payrollId, string $paymentDate, ?int $actorId = null): Payroll
     {
-        $result = DB::transaction(function () use ($payrollId, $paymentDate, $actorId) {
-            $payroll = Payroll::query()
-                ->whereKey($payrollId)
-                ->lockForUpdate()
-                ->firstOrFail();
+        // Use NOWAIT to fail immediately if another process holds the lock,
+        try {
+            $result = DB::transaction(function () use ($payrollId, $paymentDate, $actorId) {
+                $payroll = Payroll::query()
+                    ->whereKey($payrollId)
+                    ->lock('for update nowait')
+                    ->firstOrFail();
 
             if ($payroll->status === Payroll::STATUS_PAID) {
                 throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be modified.');
@@ -990,15 +1000,23 @@ class PayrollRepository implements PayrollRepositoryInterface
         }
 
         return $result['payroll'];
+        } catch (QueryException $e) {
+            if ($this->isLockContentionError($e)) {
+                throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
+            }
+            throw $e;
+        }
     }
 
     public function reopenPayroll(string $payrollId, string $reason, ?int $actorId = null): Payroll
     {
-        return DB::transaction(function () use ($payrollId, $reason, $actorId) {
-            $payroll = Payroll::query()
-                ->whereKey($payrollId)
-                ->lockForUpdate()
-                ->firstOrFail();
+        // Use NOWAIT to fail immediately if another process holds the lock,
+        try {
+            return DB::transaction(function () use ($payrollId, $reason, $actorId) {
+                $payroll = Payroll::query()
+                    ->whereKey($payrollId)
+                    ->lock('for update nowait')
+                    ->firstOrFail();
 
             if ($payroll->status === Payroll::STATUS_PENDING) {
                 throw new \Exception('Payroll is already in pending status');
@@ -1038,6 +1056,12 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             return $payroll->loadCount('payrollDetails');
         });
+        } catch (QueryException $e) {
+            if ($this->isLockContentionError($e)) {
+                throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
+            }
+            throw $e;
+        }
     }
 
     public function resendNotifications(string $payrollId, ?int $actorId = null): Payroll
@@ -1763,11 +1787,13 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function submitApprovalDecision(string $payrollId, array $data, ?int $actorId = null): array
     {
-        return DB::transaction(function () use ($payrollId, $data, $actorId) {
-            $payroll = Payroll::query()
-                ->whereKey($payrollId)
-                ->lockForUpdate()
-                ->firstOrFail();
+        // Use NOWAIT to fail immediately if another process holds the lock,
+        try {
+            return DB::transaction(function () use ($payrollId, $data, $actorId) {
+                $payroll = Payroll::query()
+                    ->whereKey($payrollId)
+                    ->lock('for update nowait')
+                    ->firstOrFail();
 
             if (! in_array($payroll->status, [Payroll::STATUS_PENDING, Payroll::STATUS_APPROVED], true)) {
                 throw new \Exception('Payroll must be pending or approved to submit approval decisions');
@@ -1848,6 +1874,12 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             return $this->getApprovalStatus($payrollId);
         });
+        } catch (QueryException $e) {
+            if ($this->isLockContentionError($e)) {
+                throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
+            }
+            throw $e;
+        }
     }
 
     public function getMyPayslipsPaginated(
@@ -2987,6 +3019,29 @@ class PayrollRepository implements PayrollRepositoryInterface
             '{absent_days}' => (string) $context['absent_days'],
             '{deduction}' => number_format((float) $context['deduction'], 0, ',', '.'),
         ]);
+    }
+
+    /**
+     * Determine if a QueryException is caused by a lock contention (NOWAIT conflict).
+     * Checks SQLSTATE code for lock-related errors across MySQL drivers.
+     */
+    private function isLockContentionError(QueryException $e): bool
+    {
+        $code = $e->getCode();
+        // SQLSTATE 40001 = serialization failure (deadlock / lock timeout)
+        if ($code === '40001') {
+            return true;
+        }
+        // MySQL NOWAIT-specific: error 3572 (Statement aborted because lock(s) could not be acquired immediately)
+        $previous = $e->getPrevious();
+        if ($previous && str_contains($previous->getMessage(), 'lock(s) could not be acquired immediately')) {
+            return true;
+        }
+        // SQLite: NOWAIT not supported but catch the pattern for test environments
+        if ($code === 'HY000' && str_contains($e->getMessage(), 'database is locked')) {
+            return true;
+        }
+        return false;
     }
 
     private function applyApprovedAdjustmentsToPayroll(Payroll $payroll, AttendancePeriod $targetPeriod): int

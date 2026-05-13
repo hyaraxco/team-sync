@@ -160,7 +160,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             ->whereBetween('date', [$startOfMonth, $today])
             ->selectRaw("
                 COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as present_days,
-                COUNT(CASE WHEN status = 'sick' THEN 1 END) as sick_days,
+                COUNT(CASE WHEN status = 'sick_leave' THEN 1 END) as sick_days,
                 COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
                 AVG({$this->minuteDiffExpression('check_in', 'check_out')}) as avg_minutes
             ")
@@ -651,7 +651,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
                 COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as present_days,
                 COUNT(CASE WHEN status = 'late' THEN 1 END) as late_days,
                 COUNT(CASE WHEN status = 'half_day' THEN 1 END) as half_day_count,
-                COUNT(CASE WHEN status = 'sick' THEN 1 END) as sick_days,
+                COUNT(CASE WHEN status = 'sick_leave' THEN 1 END) as sick_days,
                 COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
                 AVG({$this->minuteDiffExpression('check_in', 'check_out')}) as avg_minutes
             ")

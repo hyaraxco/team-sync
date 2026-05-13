@@ -151,7 +151,7 @@ class EmployeeAttendanceStatisticsTest extends TestCase
             'attendance_period_id' => $this->period->id,
             'date' => $sickDate,
             'check_in' => $sickDate->copy()->setTime(8, 0),
-            'status' => 'sick',
+            'status' => 'sick_leave',
         ]);
 
         $this->withoutExceptionHandling();

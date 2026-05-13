@@ -10,8 +10,33 @@ use App\Support\AttendanceHelper;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
+/**
+ * Service for calculating employee leave balances.
+ *
+ * Known limitation — no carry-forward:
+ * Balance calculation is strictly year-scoped. Each call to getEmployeeBalances()
+ * resolves the quota and usage for the current year only. There is no mechanism
+ * to carry forward unused leave days from one year to the next, and previous
+ * year's usage does not influence the current year's quota or remaining balance.
+ *
+ * When a new calendar year begins, entitlements reset to the full annual quota
+ * as defined in LeaveEntitlement, regardless of how many days were left unused
+ * in the prior year.
+ */
 class LeaveBalanceService
 {
+    /**
+     * Get leave balances for an employee, scoped to the current year only.
+     *
+     * Each entitlement's quota is compared against approved leave requests
+     * that overlap the current calendar year (Jan 1 – Dec 31 of the target date's year).
+     * No carry-forward from previous years is applied — remaining_days is always
+     * calculated as quota_days minus used_days within the current year.
+     *
+     * @param  int  $employeeId  The staff member's ID
+     * @param  string|null  $asOfDate  Optional date to scope the calculation (defaults to now)
+     * @return Collection Array of balance records per leave type
+     */
     public function getEmployeeBalances(int $employeeId, ?string $asOfDate = null): Collection
     {
         $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);

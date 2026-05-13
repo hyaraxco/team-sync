@@ -5,7 +5,7 @@ use App\Models\HolidayCalendar;
 use App\Models\JobInformation;
 use App\Models\StaffMemberProfile;
 use App\Services\Attendance\WorkingDaysCalculator;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
@@ -264,7 +264,7 @@ it('throws ModelNotFoundException when employee does not exist', function () {
         '2026-01-05',
         '2026-01-11'
     );
-})->throws(Illuminate\Database\Eloquent\ModelNotFoundException::class);
+})->throws(ModelNotFoundException::class);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // applicableHolidayDates – empty scheduledDateKeys

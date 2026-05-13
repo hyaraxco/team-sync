@@ -25,6 +25,8 @@ class CreateGoalRequest extends FormRequest
             'weight' => 'nullable|numeric|min:0',
             'start_date' => 'required|date',
             'due_date' => 'required|date|after:start_date',
+            'status' => 'nullable|in:not_started,in_progress,at_risk,completed,cancelled',
+            'completion_percentage' => 'nullable|integer|min:0|max:100',
             'assigned_by' => 'nullable|exists:staff_member_profiles,id',
             'linked_review_id' => 'nullable|exists:performance_reviews,id',
         ];

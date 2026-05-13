@@ -44,9 +44,9 @@ final class AttendanceHelper
     /**
      * Check if a date is a holiday applicable to the given employment type.
      *
-     * @param  string         $employmentType  Normalized employment type
-     * @param  CarbonInterface $date           Date to check
-     * @param  Collection     $scheduledWeekdays  Lowercase weekday names the employee works
+     * @param  string  $employmentType  Normalized employment type
+     * @param  CarbonInterface  $date  Date to check
+     * @param  Collection  $scheduledWeekdays  Lowercase weekday names the employee works
      */
     public static function isHolidayForEmploymentType(
         string $employmentType,
@@ -71,10 +71,8 @@ final class AttendanceHelper
      * Count working leave days between two dates (inclusive),
      * excluding weekends (per schedule) and holidays.
      *
-     * @param  string         $employmentType  Normalized employment type
-     * @param  CarbonInterface $startDate
-     * @param  CarbonInterface $endDate
-     * @param  Collection     $scheduledWeekdays  Lowercase weekday names
+     * @param  string  $employmentType  Normalized employment type
+     * @param  Collection  $scheduledWeekdays  Lowercase weekday names
      */
     public static function countWorkingLeaveDays(
         string $employmentType,
@@ -102,7 +100,7 @@ final class AttendanceHelper
      *
      * Queries AttendancePolicy first, falls back to DEFAULT_WORKING_WEEKDAYS_BY_EMPLOYMENT_TYPE.
      *
-     * @return Collection<string>  Lowercase weekday names
+     * @return Collection<string> Lowercase weekday names
      */
     public static function resolveScheduledWeekdays(string $employmentType): Collection
     {
