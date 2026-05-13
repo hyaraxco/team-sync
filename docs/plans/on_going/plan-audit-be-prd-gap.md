@@ -198,7 +198,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 3.2 [MEDIUM] `checkIn` — No Duplicate Check-In Guard
+### 3.2 [MEDIUM] `checkIn` — No Duplicate Check-In Guard ✅ DONE
 **Category**: edge case  
 **Priority**: MEDIUM  
 **File**: `app/Repositories/AttendanceRepository.php` (checkIn method)  
@@ -210,7 +210,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 3.3 [MEDIUM] `getMyAttendanceStatistics` — Sick Days Count Mismatch
+### 3.3 [MEDIUM] `getMyAttendanceStatistics` — Sick Days Count Mismatch ✅ DONE
 **Category**: edge case  
 **Priority**: MEDIUM  
 **File**: `app/Repositories/AttendanceRepository.php:152-158`  
@@ -222,7 +222,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 3.4 [MEDIUM] Attendance Period `lockForUpdate` — No Timeout Guard
+### 3.4 [MEDIUM] Attendance Period `lockForUpdate` — No Timeout Guard ✅ DONE
 **Category**: edge case  
 **Priority**: MEDIUM  
 **File**: `app/Repositories/PayrollRepository.php:747-750`  
@@ -248,7 +248,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 4.2 [MEDIUM] Leave Proof Upload — Only For Sick Leave, No PRD Documented Limitation
+### 4.2 [MEDIUM] Leave Proof Upload — Only For Sick Leave, No PRD Documented Limitation ✅ DONE
 **Category**: validation  
 **Priority**: MEDIUM  
 **File**: `app/Repositories/LeaveRequestRepository.php:271-279`  
@@ -260,7 +260,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 4.3 [MEDIUM] Leave Balance Service — No Year Rollover Logic
+### 4.3 [MEDIUM] Leave Balance Service — No Year Rollover Logic ✅ DONE
 **Category**: edge case  
 **Priority**: MEDIUM  
 **File**: `app/Services/Attendance/LeaveBalanceService.php:15-65`  
@@ -288,7 +288,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 5.2 [MEDIUM] Goal Status — No Valid Status Values in Create/Update Request
+### 5.2 [MEDIUM] Goal Status — No Valid Status Values in Create/Update Request ✅ DONE
 **Category**: validation  
 **Priority**: MEDIUM  
 **File**: `app/Http/Requests/Performance/CreateGoalRequest.php` and `UpdateGoalRequest.php`  
@@ -300,7 +300,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 5.3 [MEDIUM] Goal `completion_percentage` — No Range Validation
+### 5.3 [MEDIUM] Goal `completion_percentage` — No Range Validation ✅ DONE
 **Category**: validation  
 **Priority**: MEDIUM  
 **File**: `app/Http/Requests/Performance/ProgressUpdateGoalRequest.php`  
@@ -312,7 +312,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 5.4 [LOW] Performance Feedback — No `feedback_type` Validation on Store
+### 5.4 [LOW] Performance Feedback — No `feedback_type` Validation on Store ✅ DONE
 **Category**: validation  
 **Priority**: LOW  
 **File**: `app/Http/Requests/Performance/CreateFeedbackRequest.php`  
@@ -326,7 +326,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ## 6. ROLE/PERMISSION ENFORCEMENT
 
-### 6.1 [MEDIUM] Payroll Routes — No Role-Based Scope Filtering
+### 6.1 [MEDIUM] Payroll Routes — No Role-Based Scope Filtering ✅ DONE
 **Category**: permission  
 **Priority**: MEDIUM  
 **File**: `app/Http/Controllers/PayrollController.php:43-53`  
@@ -349,7 +349,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 6.3 [LOW] Dashboard Team Pulse — Nudge Endpoint Missing Permission
+### 6.3 [LOW] Dashboard Team Pulse — Nudge Endpoint Missing Permission ✅ DONE
 **Category**: permission  
 **Priority**: LOW  
 **File**: `routes/api.php:282`  
@@ -361,7 +361,7 @@ Audited the full BE codebase (`team-sync-be/`) against `docs/references/prd.md`.
 
 ---
 
-### 6.4 [LOW] Meeting Create — No Permission Middleware
+### 6.4 [LOW] Meeting Create — No Permission Middleware ✅ DONE
 **Category**: permission  
 **Priority**: LOW  
 **File**: `routes/api.php:75-77`  

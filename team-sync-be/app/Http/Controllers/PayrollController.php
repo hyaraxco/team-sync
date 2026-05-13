@@ -28,6 +28,31 @@ use Maatwebsite\Excel\Facades\Excel;
 use Spatie\Permission\Middleware\PermissionMiddleware;
 use ZipArchive;
 
+/**
+ * PayrollController — Handles payroll CRUD, generation, approval, and export operations.
+ *
+ * Access Control (Permission-Based):
+ *   - payroll-list:        index, getAllPaginated, show, getDetails, getReconciliation,
+ *                          getReconciliationResolutions, exportExcel, exportPdf, exportReport,
+ *                          getActivityLogs
+ *   - payroll-create:      generate, generateReadiness
+ *   - payroll-create OR payroll-readiness-view: readinessDashboard, readinessTeamSummary
+ *   - payroll-edit:        updateDetail, approvePayroll
+ *   - payroll-process:     markAsPaid, reopenPayroll, resendNotifications,
+ *                          getNotificationDeliveries, resolveReconciliationException
+ *   - payroll-statistics:  getStatistics, getAnalytics, getComparison, getPayrollStatistics
+ *
+ * Why permission-only (no role-based scoping):
+ *   In a single-tenant deployment, permission assignment IS the access control mechanism.
+ *   Finance role receives all payroll permissions; HR receives only payroll-readiness-view;
+ *   other roles receive none. This is enforced by Spatie middleware — no additional
+ *   data-scoping layer is needed until multi-tenant is introduced.
+ *
+ * Multi-Tenant Note:
+ *   When multi-tenancy is added, this controller will need tenant-scoped queries
+ *   (e.g., via a TenantScope middleware or global scope on Payroll model) to prevent
+ *   cross-tenant data leakage. Permission checks alone will not suffice.
+ */
 class PayrollController extends Controller implements HasMiddleware
 {
     private PayrollRepositoryInterface $payrollRepository;
@@ -43,6 +68,12 @@ class PayrollController extends Controller implements HasMiddleware
         $this->activityLogger = $activityLogger;
     }
 
+    /**
+     * Register route-level permission middleware.
+     *
+     * Each action group maps to a specific payroll permission defined in PermissionSeeder.
+     * Middleware is applied via Spatie's PermissionMiddleware using the 'sanctum' guard.
+     */
     public static function middleware()
     {
         return [
