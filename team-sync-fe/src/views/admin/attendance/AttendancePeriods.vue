@@ -55,11 +55,12 @@
 
                     <!-- Period List -->
                     <div v-else class="space-y-3">
-                        <div
+                        <button
                             v-for="period in periods"
                             :key="period.id"
+                            type="button"
                             @click="selectPeriod(period)"
-                            class="group flex items-center justify-between p-4 bg-white border rounded-[16px] transition-all duration-200 cursor-pointer"
+                            class="group flex items-center justify-between p-4 bg-white border rounded-[16px] transition-all duration-200 cursor-pointer text-left w-full"
                             :class="
                                 selectedPeriod?.id === period.id
                                     ? 'border-[#0C51D9] shadow-md'
@@ -96,7 +97,7 @@
                                 </span>
                                 <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-brand-dark transition-colors" />
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </div>
 

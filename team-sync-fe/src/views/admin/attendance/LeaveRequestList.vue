@@ -254,7 +254,7 @@ onMounted(() => {
 <template>
     <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-brand-dark">Leave Requests</h2>
+            <h1 class="text-2xl font-bold text-brand-dark">Leave Requests</h1>
             <p class="text-sm text-brand-light mt-1">Manage and monitor employee leave requests.</p>
         </div>
 
