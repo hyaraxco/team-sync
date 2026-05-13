@@ -55,6 +55,8 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     private const HIGH_HALF_DAY_TREND_RATIO = 0.1;
 
+    private const MAX_CORRECTION_COUNT = 3;
+
     protected EmailService $emailService;
 
     protected PayrollActivityLogger $activityLogger;
@@ -1033,6 +1035,14 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             if ($payroll->status !== PayrollStatus::APPROVED) {
                 throw new \Exception('Only approved payroll can be reopened for correction');
+            }
+
+            // Check correction count limit
+            if ($payroll->correction_count >= self::MAX_CORRECTION_COUNT) {
+                throw new PayrollStateException(sprintf(
+                    'Payroll has reached maximum correction limit (%d). Cannot reopen further.',
+                    self::MAX_CORRECTION_COUNT
+                ));
             }
 
             $previousStatus = $payroll->status;

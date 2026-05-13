@@ -722,17 +722,19 @@ onUnmounted(() => {
                         <button
                             type="button"
                             @click="goToPreviousMonth"
+                            aria-label="Previous month"
                             class="w-9 h-9 border border-[#DCDEDD] rounded-[10px] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
                         >
-                            <ChevronLeft class="w-4 h-4 text-brand-dark" />
+                            <ChevronLeft class="w-4 h-4 text-brand-dark" aria-hidden="true" />
                         </button>
                         <p class="text-brand-dark text-base font-bold">{{ calendarMonthLabel }}</p>
                         <button
                             type="button"
                             @click="goToNextMonth"
+                            aria-label="Next month"
                             class="w-9 h-9 border border-[#DCDEDD] rounded-[10px] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
                         >
-                            <ChevronRight class="w-4 h-4 text-brand-dark" />
+                            <ChevronRight class="w-4 h-4 text-brand-dark" aria-hidden="true" />
                         </button>
                     </div>
 
