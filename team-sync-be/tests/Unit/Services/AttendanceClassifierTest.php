@@ -749,14 +749,15 @@ it('triggers absent_pct_threshold_reached when absent percentage meets warning t
 it('does not trigger absent_pct_threshold_reached when below threshold', function () {
     $employee = createFullTimeEmployee();
     createAttendancePolicy(warningAbsentPct: 25.0);
+    $period = AttendancePeriod::factory()->create();
 
     // Mon → absent (no check_in record)
-    createAttendanceRecord($employee, '2026-05-11', null, null, null);
+    createAttendanceRecord($employee, '2026-05-11', null, null, null, attendancePeriodId: $period->id);
     // Tue-Fri → present
-    createAttendanceRecord($employee, '2026-05-12', '2026-05-12 08:50:00', '2026-05-12 17:00:00', 490);
-    createAttendanceRecord($employee, '2026-05-13', '2026-05-13 08:50:00', '2026-05-13 17:00:00', 490);
-    createAttendanceRecord($employee, '2026-05-14', '2026-05-14 08:50:00', '2026-05-14 17:00:00', 490);
-    createAttendanceRecord($employee, '2026-05-15', '2026-05-15 08:50:00', '2026-05-15 17:00:00', 490);
+    createAttendanceRecord($employee, '2026-05-12', '2026-05-12 08:50:00', '2026-05-12 17:00:00', 490, attendancePeriodId: $period->id);
+    createAttendanceRecord($employee, '2026-05-13', '2026-05-13 08:50:00', '2026-05-13 17:00:00', 490, attendancePeriodId: $period->id);
+    createAttendanceRecord($employee, '2026-05-14', '2026-05-14 08:50:00', '2026-05-14 17:00:00', 490, attendancePeriodId: $period->id);
+    createAttendanceRecord($employee, '2026-05-15', '2026-05-15 08:50:00', '2026-05-15 17:00:00', 490, attendancePeriodId: $period->id);
 
     $result = $this->classifier->summarizePeriod($employee->id, '2026-05-11', '2026-05-16');
 

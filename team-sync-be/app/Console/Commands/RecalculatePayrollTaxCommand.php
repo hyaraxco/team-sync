@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Enums\PayrollStatus;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Services\Payroll\TaxCalculationService;
@@ -45,13 +46,13 @@ class RecalculatePayrollTaxCommand extends Command
             return self::FAILURE;
         }
 
-        if (! in_array($payroll->status, [Payroll::STATUS_PENDING, Payroll::STATUS_PROCESSING, 'draft'])) {
-            $this->error("Payroll {$month} is in status '{$payroll->status}'. Only pending/processing/draft can be recalculated.");
+        if (! in_array($payroll->status, [PayrollStatus::PENDING, PayrollStatus::PROCESSING, 'draft'])) {
+            $this->error("Payroll {$month} is in status '{$payroll->status->value}'. Only pending/processing/draft can be recalculated.");
 
             return self::FAILURE;
         }
 
-        $this->info("Found payroll ID={$payroll->id} | month={$month} | status={$payroll->status}");
+        $this->info("Found payroll ID={$payroll->id} | month={$month} | status={$payroll->status->value}");
         $this->newLine();
 
         // Load all payroll details with employee profile
@@ -84,7 +85,8 @@ class RecalculatePayrollTaxCommand extends Command
             $ptkp = $employee->ptkp_status ?? null;
             $hasNpwp = ! empty($employee->npwp);
 
-            $isDecember = Carbon::parse($payroll->salary_month)->month === 12;
+            // Use TER for Jan–Nov, annualized for December
+            $isDecember = Carbon::parse($month.'-01')->month === 12;
             $taxResult = $isDecember
                 ? $taxService->calculateAnnualizedPph21($gross, $ptkp, $hasNpwp)
                 : $taxService->calculateMonthlyTer($gross, $ptkp, $hasNpwp);

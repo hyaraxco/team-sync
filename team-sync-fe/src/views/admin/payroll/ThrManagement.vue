@@ -7,6 +7,7 @@ import { formatDateShort } from "@/utils/dateUtils";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
 
@@ -20,6 +21,12 @@ const showSimulationModal = ref(false);
 const showPaymentModal = ref(false);
 const selectedThr = ref(null);
 const paymentDate = ref("");
+
+// Confirmation dialog state
+const showConfirmDialog = ref(false);
+const confirmTitle = ref("");
+const confirmMessage = ref("");
+const confirmAction = ref(null);
 
 const generateForm = ref({
     religion_event: "",
@@ -90,14 +97,18 @@ async function handleGenerate() {
 }
 
 async function handleApprove(thr) {
-    if (!confirm(`Approve THR ${thr.event_label} ${thr.year}?`)) return;
-    try {
-        const result = await store.approve(thr.id);
-        toast.success(result.message || "THR approved");
-        await fetchData();
-    } catch (_e) {
-        toast.error(store.error || "Approval failed");
-    }
+    confirmTitle.value = "Approve THR";
+    confirmMessage.value = `Approve THR ${thr.event_label} ${thr.year}?`;
+    confirmAction.value = async () => {
+        try {
+            const result = await store.approve(thr.id);
+            toast.success(result.message || "THR approved");
+            await fetchData();
+        } catch (_e) {
+            toast.error(store.error || "Approval failed");
+        }
+    };
+    showConfirmDialog.value = true;
 }
 
 function openPaymentModal(thr) {
@@ -401,4 +412,16 @@ function handlePageChange(page) {
             </div>
         </ModalWrapper>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationModal
+        :show="showConfirmDialog"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        confirm-text="Approve"
+        cancel-text="Cancel"
+        type="info"
+        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @cancel="showConfirmDialog = false"
+    />
 </template>

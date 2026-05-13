@@ -1,34 +1,23 @@
 <template>
-    <div class="attendance-periods-container min-h-screen bg-neutral-900 text-neutral-100 p-8">
-        <div class="max-w-7xl mx-auto space-y-8 relative">
-            <div
-                class="absolute top-0 right-0 -mr-32 -mt-32 w-96 h-96 bg-indigo-600/20 rounded-full blur-[120px] pointer-events-none"
-            ></div>
-
-            <header
-                class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-end gap-6 border-b border-white/30 pb-8"
-            >
-                <div class="space-y-2">
-                    <h1
-                        class="text-5xl font-extralight tracking-tight font-display bg-clip-text text-transparent bg-gradient-to-r from-white to-neutral-500"
-                    >
-                        Attendance Periods
-                    </h1>
-                    <p class="text-neutral-400 font-light tracking-wide max-w-xl">
-                        Monitor period statuses, review timesheets, and access the payroll readiness workspace before
-                        cutoff.
+    <div class="attendance-periods-container p-3 sm:p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
+                <div>
+                    <h1 class="text-2xl font-bold text-brand-dark">Attendance Periods</h1>
+                    <p class="text-brand-light text-sm mt-1">
+                        Monitor period statuses, review timesheets, and access the payroll readiness workspace before cutoff.
                     </p>
                 </div>
                 <div class="flex items-center gap-3">
                     <button
-                        class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300 shadow-lg shadow-white/10"
+                        class="px-4 py-2 rounded-[8px] border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
                         @click="openCreateModal"
                     >
-                        <Plus class="w-4 h-4 inline mr-2" />
+                        <Plus class="w-4 h-4 inline mr-1" />
                         Create Period
                     </button>
                     <button
-                        class="px-6 py-2.5 rounded-full bg-white/10 text-white font-medium text-sm hover:bg-white/20 transition-colors duration-300"
+                        class="px-4 py-2 rounded-[8px] border border-[#DCDEDD] text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
                         @click="fetchData"
                     >
                         Sync Latest
@@ -36,202 +25,127 @@
                 </div>
             </header>
 
-            <div class="relative z-10 grid gap-8 lg:grid-cols-3">
+            <div class="grid gap-6 lg:grid-cols-3">
                 <div class="lg:col-span-2 space-y-4">
-                    <h2 class="text-xl font-light mb-4">Period History</h2>
+                    <h2 class="text-lg font-bold text-brand-dark">Period History</h2>
 
+                    <!-- Error State -->
                     <div
                         v-if="periodStore.error"
-                        class="p-6 rounded-2xl border border-rose-500/20 bg-rose-500/5 text-rose-400 flex items-center gap-3"
+                        class="bg-white border border-red-200 rounded-[20px] p-6 flex items-center gap-3 text-red-600"
                     >
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-                            ></path>
-                        </svg>
+                        <AlertTriangle class="w-5 h-5 shrink-0" />
                         <p>Failed to load attendance periods. Please try again later.</p>
                     </div>
 
-                    <div v-else-if="periodStore.loading" class="flex justify-center p-12">
-                        <svg
-                            class="animate-spin w-8 h-8 text-indigo-500"
-                            xmlns="http://www.w3.org/2000/svg"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <circle
-                                class="opacity-25"
-                                cx="12"
-                                cy="12"
-                                r="10"
-                                stroke="currentColor"
-                                stroke-width="4"
-                            ></circle>
-                            <path
-                                class="opacity-75"
-                                fill="currentColor"
-                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-                            ></path>
-                        </svg>
+                    <!-- Loading State -->
+                    <div v-else-if="periodStore.loading" class="space-y-3">
+                        <div v-for="i in 4" :key="i" class="h-20 bg-gray-100 rounded-[16px] animate-pulse" />
                     </div>
 
+                    <!-- Empty State -->
                     <div
                         v-else-if="!periods.length"
-                        class="text-center p-12 border border-dashed border-white/30 rounded-2xl text-neutral-500"
+                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-12 text-center"
                     >
-                        <p class="font-light italic">No attendance periods found.</p>
+                        <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-400" />
+                        <p class="text-brand-dark font-semibold">No attendance periods found</p>
+                        <p class="text-brand-light text-sm mt-1">Create a period to get started.</p>
                     </div>
 
+                    <!-- Period List -->
                     <div v-else class="space-y-3">
                         <div
                             v-for="period in periods"
                             :key="period.id"
                             @click="selectPeriod(period)"
-                            class="group flex items-center justify-between p-5 rounded-2xl bg-white/[0.08] border transition-all duration-300 cursor-pointer"
+                            class="group flex items-center justify-between p-4 bg-white border rounded-[16px] transition-all duration-200 cursor-pointer"
                             :class="
                                 selectedPeriod?.id === period.id
-                                    ? 'border-indigo-500/50 bg-white/[0.12] shadow-[0_0_30px_rgba(99,102,241,0.15)]'
-                                    : 'border-white/15 hover:bg-white/[0.12] hover:border-white/30'
+                                    ? 'border-[#0C51D9] shadow-md'
+                                    : 'border-[#DCDEDD] hover:border-[#0C51D9] hover:border-2'
                             "
                         >
-                            <div class="flex items-center gap-5">
+                            <div class="flex items-center gap-4">
                                 <div
-                                    class="w-12 h-12 rounded-full flex items-center justify-center font-display font-medium text-lg"
+                                    class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm"
                                     :class="{
-                                        'bg-emerald-500/10 text-emerald-400': period.status === 'open',
-                                        'bg-amber-500/10 text-amber-400': period.status === 'review',
-                                        'bg-neutral-500/10 text-neutral-400': period.status === 'locked',
+                                        'bg-green-50 text-green-700': period.status === 'open',
+                                        'bg-yellow-50 text-yellow-700': period.status === 'review',
+                                        'bg-gray-100 text-gray-600': period.status === 'locked',
                                     }"
                                 >
                                     {{ new Date(period.start_date).toLocaleString("default", { month: "short" }) }}
                                 </div>
                                 <div>
-                                    <h3
-                                        class="text-lg font-medium text-white group-hover:text-indigo-300 transition-colors"
-                                    >
-                                        {{ period.month }}
-                                    </h3>
-                                    <p class="text-sm text-neutral-500 font-light">
-                                        {{ period.start_date }} — {{ period.end_date }}
-                                    </p>
+                                    <h3 class="font-semibold text-brand-dark">{{ period.month }}</h3>
+                                    <p class="text-sm text-brand-light">{{ period.start_date }} — {{ period.end_date }}</p>
                                 </div>
                             </div>
 
-                            <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-3">
                                 <span
-                                    class="px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border"
+                                    class="px-2 py-1 text-xs font-semibold uppercase rounded-full border"
                                     :class="{
-                                        'bg-emerald-500/10 border-emerald-500/20 text-emerald-400':
-                                            period.status === 'open',
-                                        'bg-amber-500/10 border-amber-500/20 text-amber-400':
-                                            period.status === 'review',
-                                        'bg-neutral-500/10 border-neutral-500/20 text-neutral-400':
-                                            period.status === 'locked',
+                                        'bg-green-50 border-green-200 text-green-700': period.status === 'open',
+                                        'bg-yellow-50 border-yellow-200 text-yellow-700': period.status === 'review',
+                                        'bg-gray-100 border-gray-200 text-gray-600': period.status === 'locked',
                                     }"
                                 >
                                     {{ period.status }}
                                 </span>
-                                <svg
-                                    class="w-5 h-5 text-neutral-600 group-hover:text-white transition-colors"
-                                    fill="none"
-                                    stroke="currentColor"
-                                    viewBox="0 0 24 24"
-                                >
-                                    <path
-                                        stroke-linecap="round"
-                                        stroke-linejoin="round"
-                                        stroke-width="2"
-                                        d="M9 5l7 7-7 7"
-                                    ></path>
-                                </svg>
+                                <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-brand-dark transition-colors" />
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Readiness Sidebar -->
                 <div class="lg:col-span-1">
-                    <div
-                        class="sticky top-8 p-6 rounded-3xl bg-neutral-800/50 backdrop-blur-xl border border-white/30 shadow-2xl"
-                    >
-                        <h2 class="text-xl font-light mb-6 flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-                                ></path>
-                            </svg>
+                    <div class="sticky top-8 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                        <h2 class="text-lg font-bold text-brand-dark mb-4 flex items-center gap-2">
+                            <CheckCircle class="w-5 h-5 text-green-500" />
                             Readiness Workspace
                         </h2>
 
-                        <div v-if="!selectedPeriod" class="text-center py-12 px-4 opacity-50">
-                            <svg
-                                class="w-12 h-12 mx-auto mb-4 text-neutral-500"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                            >
-                                <path
-                                    stroke-linecap="round"
-                                    stroke-linejoin="round"
-                                    stroke-width="1.5"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
-                                ></path>
-                            </svg>
-                            <p class="text-sm font-light">Select an attendance period to view payroll readiness.</p>
+                        <div v-if="!selectedPeriod" class="text-center py-12 px-4">
+                            <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                            <p class="text-brand-light text-sm">Select an attendance period to view payroll readiness.</p>
                         </div>
 
-                        <div v-else class="space-y-6">
-                            <div class="p-4 rounded-xl bg-white/10 border border-white/15">
-                                <h3 class="text-sm text-neutral-400 font-light mb-1">Selected Period</h3>
-                                <p class="text-lg font-medium text-white">{{ selectedPeriod.month }}</p>
+                        <div v-else class="space-y-4">
+                            <div class="p-4 rounded-[12px] bg-gray-50 border border-[#DCDEDD]">
+                                <p class="text-sm text-brand-light mb-1">Selected Period</p>
+                                <p class="text-lg font-semibold text-brand-dark">{{ selectedPeriod.month }}</p>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="p-4 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-                                    <p class="text-2xl font-light text-emerald-400 mb-1">{{ readinessCounts.ready }}</p>
-                                    <p class="text-xs uppercase tracking-wider text-emerald-500/70 font-semibold">
-                                        Ready
-                                    </p>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div class="p-3 rounded-[12px] bg-green-50 border border-green-200">
+                                    <p class="text-2xl font-bold text-green-700">{{ readinessCounts.ready }}</p>
+                                    <p class="text-xs text-green-600 font-semibold">Ready</p>
                                 </div>
-                                <div class="p-4 rounded-xl bg-amber-500/5 border border-amber-500/10">
-                                    <p class="text-2xl font-light text-amber-400 mb-1">
-                                        {{ readinessCounts.warnings }}
-                                    </p>
-                                    <p class="text-xs uppercase tracking-wider text-amber-500/70 font-semibold">
-                                        Warnings
-                                    </p>
+                                <div class="p-3 rounded-[12px] bg-yellow-50 border border-yellow-200">
+                                    <p class="text-2xl font-bold text-yellow-700">{{ readinessCounts.warnings }}</p>
+                                    <p class="text-xs text-yellow-600 font-semibold">Warnings</p>
                                 </div>
-                                <div
-                                    class="p-4 rounded-xl bg-rose-500/5 border border-rose-500/10 col-span-2 flex justify-between items-center"
-                                >
+                                <div class="p-3 rounded-[12px] bg-red-50 border border-red-200 col-span-2 flex justify-between items-center">
                                     <div>
-                                        <p class="text-2xl font-light text-rose-400 mb-1">
-                                            {{ readinessCounts.blocked }}
-                                        </p>
-                                        <p class="text-xs uppercase tracking-wider text-rose-500/70 font-semibold">
-                                            Blocked
-                                        </p>
+                                        <p class="text-2xl font-bold text-red-700">{{ readinessCounts.blocked }}</p>
+                                        <p class="text-xs text-red-600 font-semibold">Blocked</p>
                                     </div>
-                                    <button
-                                        class="px-4 py-1.5 rounded-lg bg-rose-500/20 text-rose-300 text-sm hover:bg-rose-500/30 transition-colors"
-                                    >
+                                    <button class="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition-colors cursor-pointer">
                                         Review
                                     </button>
                                 </div>
                             </div>
 
-                            <div class="pt-6 border-t border-white/30">
+                            <div class="pt-4 border-t border-[#DCDEDD]">
                                 <button
-                                    class="w-full py-3 rounded-xl font-medium tracking-wide transition-all"
+                                    class="w-full py-3 rounded-[8px] font-semibold transition-all cursor-pointer"
                                     :class="
                                         selectedPeriod.status === 'review'
-                                            ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-500/25'
-                                            : 'bg-white/10 text-neutral-500 cursor-not-allowed'
+                                            ? 'border border-[#2151A0] blue-gradient blue-btn-shadow text-white hover:brightness-110'
+                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     "
                                     :disabled="selectedPeriod.status !== 'review'"
                                 >
@@ -253,32 +167,35 @@
         >
             <form class="space-y-4" @submit.prevent="submitCreateForm">
                 <div>
-                    <label class="block text-sm font-medium text-neutral-300 mb-2">Start Date</label>
+                    <label for="start-date" class="block text-sm font-medium text-brand-dark mb-2">Start Date</label>
                     <input
+                        id="start-date"
                         v-model="createForm.start_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none transition-colors"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-neutral-300 mb-2">End Date</label>
+                    <label for="end-date" class="block text-sm font-medium text-brand-dark mb-2">End Date</label>
                     <input
+                        id="end-date"
                         v-model="createForm.end_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none transition-colors"
                     />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-medium text-neutral-300 mb-2">Cutoff Date</label>
+                    <label for="cutoff-date" class="block text-sm font-medium text-brand-dark mb-2">Cutoff Date</label>
                     <input
+                        id="cutoff-date"
                         v-model="createForm.cutoff_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none transition-colors"
                     />
                 </div>
 
@@ -286,7 +203,7 @@
                     <button
                         type="button"
                         :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-lg border border-white/20 text-white font-medium text-sm hover:bg-white/10 transition-colors"
+                        class="flex-1 px-4 py-2.5 rounded-[8px] border border-[#DCDEDD] text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
                         @click="closeCreateModal"
                     >
                         Cancel
@@ -294,7 +211,7 @@
                     <button
                         type="submit"
                         :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-lg bg-indigo-600 text-white font-medium text-sm hover:bg-indigo-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 px-4 py-2.5 rounded-[8px] border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         {{ isSubmitting ? "Creating..." : "Create Period" }}
                     </button>
@@ -307,7 +224,7 @@
 <script setup>
 import { computed, ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
-import { Plus } from "lucide-vue-next";
+import { Plus, Calendar, CheckCircle, AlertTriangle, ChevronRight } from "lucide-vue-next";
 import { useAttendancePeriodStore } from "@/stores/attendancePeriod";
 import { useToast } from "@/composables/useToast";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
@@ -397,9 +314,3 @@ onMounted(async () => {
     }
 });
 </script>
-
-<style scoped>
-.font-display {
-    font-family: "Outfit", "Inter", sans-serif;
-}
-</style>

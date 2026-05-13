@@ -47,6 +47,13 @@ class OvertimeService
     }
 
     /**
+     * Create a new overtime record.
+     *
+     * Handles midnight wrap: when start_time > end_time (e.g., 23:00–01:00),
+     * the end time is treated as falling on the next calendar day. This
+     * correctly calculates 2 hours instead of the 22-hour diff that naive
+     * same-day subtraction would produce.
+     *
      * @return array{success: bool, message: string, record: ?OvertimeRecord}
      */
     public function create(array $validated): array
@@ -66,7 +73,16 @@ class OvertimeService
 
         $start = Carbon::createFromFormat('H:i', $validated['start_time']);
         $end = Carbon::createFromFormat('H:i', $validated['end_time']);
-        $hours = round(abs($end->diffInMinutes($start)) / 60, 2);
+
+        // Handle midnight wrap: if end time is before start time (e.g., 23:00–01:00),
+        // the overtime crosses midnight. Carbon::createFromFormat sets both times on
+        // the same date, so diffInMinutes would return ~22 hours instead of the
+        // correct 2 hours. Adding 1 day to end corrects this.
+        if ($end->lessThan($start)) {
+            $end->addDay();
+        }
+
+        $hours = round($start->diffInMinutes($end) / 60, 2);
 
         if ($hours > OvertimeRecord::MAX_HOURS_PER_DAY) {
             return [

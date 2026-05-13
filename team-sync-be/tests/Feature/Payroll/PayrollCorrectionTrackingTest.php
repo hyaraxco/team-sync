@@ -59,13 +59,13 @@ class PayrollCorrectionTrackingTest extends TestCase
             'payment_date' => '2026-06-01',
         ])->assertOk();
 
-        // Second reopen
+        // Second reopen from paid should be rejected
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
             'reason' => 'Second correction needed for bank account fix.',
-        ])->assertOk();
+        ])->assertStatus(400);
 
         $payroll->refresh();
-        $this->assertSame(2, (int) $payroll->correction_count);
+        $this->assertSame(1, (int) $payroll->correction_count);
     }
 
     public function test_correction_count_returned_in_resource(): void
@@ -87,7 +87,7 @@ class PayrollCorrectionTrackingTest extends TestCase
     public function test_correction_notification_sent_when_corrected_payroll_is_repaid(): void
     {
         $this->actingAsRole('finance');
-        $payroll = $this->createPayrollWithDetail(status: 'paid', paymentDate: '2026-05-30');
+        $payroll = $this->createPayrollWithDetail(status: 'approved');
         $employeeUser = $payroll->payrollDetails->first()->staffMember->user;
 
         // Reopen (correction_count becomes 1)

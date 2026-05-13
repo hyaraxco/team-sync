@@ -78,7 +78,7 @@ class PayrollReconciliationTest extends TestCase
                 'Payroll cannot be marked as paid because 1 critical reconciliation issue(s) remain. Complete employee bank information and regenerate payroll before retrying.'
             );
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
 
         $this->assertDatabaseHas('payroll_activity_logs', [
             'payroll_id' => $payroll->id,
@@ -282,7 +282,7 @@ class PayrollReconciliationTest extends TestCase
         ])
             ->assertStatus(422);
 
-        $this->assertSame('approved', $payroll->fresh()->status);
+        $this->assertSame('approved', $payroll->fresh()->status->value);
     }
 
     public function test_resolution_history_endpoint_returns_correct_data(): void

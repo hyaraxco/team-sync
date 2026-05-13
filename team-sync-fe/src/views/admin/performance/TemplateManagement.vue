@@ -4,6 +4,7 @@ import { storeToRefs } from "pinia";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { Plus, Edit3, Trash2, Layout, X, Info, Scale, Check } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
 
 const store = usePerformanceReviewStore();
@@ -14,6 +15,12 @@ const showModal = ref(false);
 const editingTemplate = ref(null);
 const saving = ref(false);
 const formErrors = ref({});
+
+// Confirmation dialog state
+const showConfirmDialog = ref(false);
+const confirmTitle = ref("");
+const confirmMessage = ref("");
+const confirmAction = ref(null);
 
 const defaultForm = () => ({
     name: "",
@@ -116,13 +123,17 @@ const saveTemplate = async () => {
 };
 
 const deleteTemplate = async (template) => {
-    if (!confirm(`Delete template "${template.name}"?`)) return;
-    try {
-        await store.deleteTemplate(template.id);
-        toast.success("Template deleted successfully");
-    } catch (error) {
-        toast.error(error.response?.data?.message || "Failed to delete template");
-    }
+    confirmTitle.value = "Delete Template";
+    confirmMessage.value = `Delete template "${template.name}"? This action cannot be undone.`;
+    confirmAction.value = async () => {
+        try {
+            await store.deleteTemplate(template.id);
+            toast.success("Template deleted successfully");
+        } catch (error) {
+            toast.error(error.response?.data?.message || "Failed to delete template");
+        }
+    };
+    showConfirmDialog.value = true;
 };
 
 onMounted(() => {
@@ -374,4 +385,16 @@ onMounted(() => {
             </div>
         </div>
     </div>
+
+    <!-- Confirmation Dialog -->
+    <ConfirmationModal
+        :show="showConfirmDialog"
+        :title="confirmTitle"
+        :message="confirmMessage"
+        confirm-text="Delete"
+        cancel-text="Cancel"
+        type="danger"
+        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @cancel="showConfirmDialog = false"
+    />
 </template>

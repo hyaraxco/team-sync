@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PayrollStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -33,6 +34,7 @@ class Payroll extends Model
         return [
             'salary_month' => 'date',
             'payment_date' => 'date',
+            'status' => PayrollStatus::class,
         ];
     }
 

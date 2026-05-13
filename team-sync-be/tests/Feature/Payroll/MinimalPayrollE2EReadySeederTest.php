@@ -35,7 +35,7 @@ class MinimalPayrollE2EReadySeederTest extends TestCase
         $payroll = Payroll::whereDate('salary_month', now()->startOfMonth()->toDateString())
             ->firstOrFail();
 
-        $this->assertSame('paid', $payroll->status);
+        $this->assertSame('paid', $payroll->status->value);
         $this->assertGreaterThan(0, $payroll->payrollDetails()->count());
 
         $employee = User::where('email', 'agung@teamsync.com')->firstOrFail();
