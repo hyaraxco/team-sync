@@ -60,13 +60,11 @@ function topsisCandidate(
 function topsisWeights(): array
 {
     return [
-        'avg_manager_rating' => 0.15,
-        'final_rating' => 0.15,
-        'avg_goal_completion' => 0.15,
-        'goal_completion_ratio' => 0.10,
-        'positive_feedback_count' => 0.15,
-        'attendance_quality' => 0.20,
-        'task_completion_quality' => 0.10,
+        'performance_score' => 0.30,
+        'attendance_rate' => 0.20,
+        'goal_completion' => 0.25,
+        'feedback_score' => 0.15,
+        'tenure_factor' => 0.10,
     ];
 }
 

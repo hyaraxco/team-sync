@@ -766,7 +766,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             if ($payroll->status !== PayrollStatus::PENDING) {
                 throw new PayrollStateException(sprintf(
                     'Payroll must be in "pending" status to be approved. Current status: "%s".',
-                    $payroll->status
+                    $payroll->status->value
                 ));
             }
 
@@ -912,7 +912,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             if ($payroll->status !== PayrollStatus::APPROVED) {
                 throw new PayrollStateException(sprintf(
                     'Payroll must be in "approved" status to be marked as paid. Current status: "%s".',
-                    $payroll->status
+                    $payroll->status->value
                 ));
             }
 
@@ -1224,11 +1224,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->count();
 
         $pendingPayrolls = Payroll::where('status', PayrollStatus::PENDING)
-        $paidPayrolls = Payroll::where('status', PayrollStatus::PAID)
-            ->whereYear('salary_month', now()->year)
-            ->count();
-
-        $pendingPayrolls = Payroll::where('status', PayrollStatus::PENDING)
             ->count();
 
         // Calculate average salary
@@ -1271,7 +1266,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             foreach ($months as $idx => $m) {
                 $monthDate = Carbon::parse($m)->startOfMonth()->toDateString();
                 $payroll = Payroll::query()
-                    ->whereIn('status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
                     ->whereIn('status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
                     ->whereDate('salary_month', $monthDate)
                     ->first();
@@ -1353,7 +1347,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             $periodRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
                 ->whereIn('payrolls.status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
-                ->whereIn('payrolls.status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
                 ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
                 ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
                 ->limit($months)
@@ -1416,7 +1409,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             $bpjsTrendRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
                 ->whereIn('payrolls.status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
-                ->whereIn('payrolls.status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
                 ->groupBy(DB::raw('DATE(payrolls.salary_month)'))
                 ->orderByDesc(DB::raw('DATE(payrolls.salary_month)'))
                 ->limit($months)
@@ -1432,7 +1424,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             // Enhanced analytics: top deduction reasons
             $deductionReasonRows = Payroll::query()
                 ->leftJoin('payroll_details', 'payroll_details.payroll_id', '=', 'payrolls.id')
-                ->whereIn('payrolls.status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
                 ->whereIn('payrolls.status', [PayrollStatus::APPROVED, PayrollStatus::PAID])
                 ->whereDate('payrolls.salary_month', '>=', $firstTrend['salary_month'] ?? now()->subMonths($months)->toDateString())
                 ->get([
@@ -1501,7 +1492,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             return [
                 'periods_requested' => $months,
                 'periods_returned' => $trends->count(),
-                'status_scope' => [PayrollStatus::APPROVED, PayrollStatus::PAID],
                 'status_scope' => [PayrollStatus::APPROVED->value, PayrollStatus::PAID->value],
                 'reporting_period' => [
                     'start_month' => $firstTrend['salary_month'] ?? null,
@@ -1811,7 +1801,6 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ->firstOrFail();
 
             if (! in_array($payroll->status, [PayrollStatus::PENDING, PayrollStatus::APPROVED], true)) {
-            if (! in_array($payroll->status, [PayrollStatus::PENDING, PayrollStatus::APPROVED], true)) {
                 throw new \Exception('Payroll must be pending or approved to submit approval decisions');
             }
 
@@ -1871,8 +1860,6 @@ class PayrollRepository implements PayrollRepositoryInterface
                 ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
                 ->doesntExist();
 
-            if ($allApproved && $payroll->status === PayrollStatus::PENDING) {
-                $payroll->update(['status' => PayrollStatus::APPROVED]);
             if ($allApproved && $payroll->status === PayrollStatus::PENDING) {
                 $payroll->update(['status' => PayrollStatus::APPROVED]);
 
