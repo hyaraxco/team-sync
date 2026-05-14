@@ -22,12 +22,16 @@ class UserResource extends JsonResource
             'email_verified_at' => $this->email_verified_at,
             'has_verified_email' => method_exists($this->resource, 'hasVerifiedEmail') ? $this->hasVerifiedEmail() : false,
             'employee_profile' => new StaffMemberProfileResource($this->whenLoaded('staffMemberProfile')),
+            'company_timezone' => $this->whenLoaded('staffMemberProfile', function () {
+                return $this->staffMemberProfile?->company?->timezone ?? 'Asia/Jakarta';
+            }),
             'roles' => $this->whenLoaded('roles', function () {
                 return $this->roles->pluck('name');
             }),
             'permissions' => $this->whenLoaded('permissions', function () {
                 return $this->getAllPermissions()->pluck('name');
             }),
+            'company_timezone' => $this->staffMemberProfile?->company?->timezone ?? 'Asia/Jakarta',
             'token' => $this->when(isset($this->token), $this->token),
             'created_at' => $this->created_at,
         ];

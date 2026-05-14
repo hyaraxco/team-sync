@@ -60,6 +60,8 @@ Folder [plans/archive/](plans/archive/) menyimpan dokumen selesai, superseded, a
 | [references/employee.md](references/employee.md) | Employee/self-service domain guide |
 | [references/payroll.md](references/payroll.md) | Payroll domain guide and cross-links |
 | [references/authorization-leak-or-grouped-middleware.md](references/authorization-leak-or-grouped-middleware.md) | Authorization patterns & anti-patterns |
+| [references/be-fe-integration-patterns.md](references/be-fe-integration-patterns.md) | **BE-FE integration patterns** (API contract, error handling, auth, state mgmt, file uploads, permissions) |
+| [references/be-fe-integration-summary.md](references/be-fe-integration-summary.md) | Quick reference for BE-FE integration |
 
 ## Conventions
 
