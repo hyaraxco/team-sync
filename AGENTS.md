@@ -14,6 +14,40 @@ This root file covers cross-cutting concerns: domain rules, role hierarchy, stac
 
 ---
 
+# Workflow Kerja Team Sync
+
+1. Baca Context 📖
+- ✅ @AGENTS.md (root) — domain rules, stack, architecture
+- ✅ Sub-repo AGENTS.md (team-sync-be/AGENTS.md, team-sync-fe/AGENTS.md) — detailed conventions
+- ✅ @docs/party-mode.md — multi-persona collaboration guide
+2. Panggil Agents/Sub-agents 🤖
+Gunakan specialized agents sesuai kebutuhan:
+- @oracle — strategic decisions, architecture, compliance analysis
+- @fixer — implementation execution
+- @librarian — docs/reference lookup
+- @designer — UI/UX design
+- @explorer — codebase exploration
+Load skills yang dibutuhkan (brainstorming, writing-plans, test-driven-development, dll)
+3. Buat Plan 📋
+Dari hasil agent yang bekerja, buat detailed plan di docs/plans/on_going/
+4. Rundingkan dengan Party Mode 🎉
+Untuk keputusan kompleks, invoke party mode:
+Party mode: [complex decision/problem]
+Dispatch 2-3 personas yang relevan in parallel, collect results, synthesize recommendation.
+5. Execute Plan ⚙️
+- Dispatch @fixer atau specialized agents untuk implementasi
+- Follow architecture rules (Controller → Service → Repository)
+- Write tests (TDD when applicable)
+- Verify dengan semua unit testing yang ada di dalam repo dan sub repo
+6. Create PR & Review 🔍
+- Commit changes
+- Push to feature branch
+- Create PR
+- Wait for CI (BE tests, FE tests, screenshots)
+- Squash & merge
+7. Archive Plan 📦
+Move completed plan dari on_going/ ke archive/, update status to COMPLETED
+
 ## Overview
 
 Team Sync — HRIS monorepo. Laravel 12 API backend (`team-sync-be`) + Vue 3 SPA frontend (`team-sync-fe`). Manages staff, attendance, payroll, leave, projects, performance reviews, and analytics for an Indonesian workforce context (BPJS, PTKP, tax brackets).
