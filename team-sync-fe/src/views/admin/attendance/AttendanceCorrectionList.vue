@@ -117,7 +117,7 @@ const onRejectAction = (req) => {
     <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h3 class="text-[#0C1C3C] font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</h3>
+                <h1 class="text-[#0C1C3C] font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</h1>
                 <p class="text-[#6B7280] font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
                     Showing {{ meta.from || 0 }} - {{ meta.to || 0 }} of {{ meta.total || 0 }} requests
                 </p>

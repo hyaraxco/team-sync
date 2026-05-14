@@ -138,7 +138,7 @@ onMounted(async () => {
     <div class="flex-1 flex flex-col overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-brand-dark">Attendance Overview</h2>
+                <h1 class="text-2xl font-bold text-brand-dark">Attendance Overview</h1>
                 <p class="text-sm text-brand-light mt-1">Monitor real-time presence and manage requests.</p>
             </div>
         </div>
