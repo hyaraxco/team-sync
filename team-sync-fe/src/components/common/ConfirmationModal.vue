@@ -1,7 +1,8 @@
 <script setup>
 import { X, AlertTriangle } from "lucide-vue-next";
+import { ref, watch, onMounted, onUnmounted, nextTick } from "vue";
 
-defineProps({
+const props = defineProps({
     show: {
         type: Boolean,
         default: false,
@@ -33,14 +34,62 @@ defineProps({
 });
 
 const emit = defineEmits(["confirm", "cancel"]);
+const modalRef = ref(null);
+let previouslyFocused = null;
 
-const handleConfirm = () => {
-    emit("confirm");
+const handleConfirm = () => emit("confirm");
+const handleCancel = () => emit("cancel");
+
+const getFocusableElements = () => {
+    if (!modalRef.value) return [];
+    return Array.from(
+        modalRef.value.querySelectorAll(
+            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )
+    );
 };
 
-const handleCancel = () => {
-    emit("cancel");
+const handleKeydown = (e) => {
+    if (!props.show) return;
+    if (e.key === "Escape") {
+        handleCancel();
+        return;
+    }
+    if (e.key === "Tab") {
+        const focusable = getFocusableElements();
+        if (focusable.length === 0) return;
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    }
 };
+
+watch(
+    () => props.show,
+    async (val) => {
+        if (val) {
+            previouslyFocused = document.activeElement;
+            await nextTick();
+            const focusable = getFocusableElements();
+            if (focusable.length > 0) focusable[0].focus();
+        } else {
+            if (previouslyFocused) previouslyFocused.focus();
+        }
+    }
+);
+
+onMounted(() => document.addEventListener("keydown", handleKeydown));
+onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
 </script>
 
 <template>
@@ -48,10 +97,11 @@ const handleCancel = () => {
         v-if="show"
         role="dialog"
         aria-modal="true"
+        :aria-labelledby="`confirm-title-${title.replace(/\s+/g, '-').toLowerCase()}`"
         class="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4"
         @click.self="handleCancel"
     >
-        <div class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-md overflow-hidden">
+        <div ref="modalRef" class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-md overflow-hidden">
             <!-- Header -->
             <div class="p-6 border-b border-[#DCDEDD]">
                 <div class="flex items-center justify-between">
@@ -74,7 +124,7 @@ const handleCancel = () => {
                             />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">{{ title }}</h3>
+                            <h3 :id="`confirm-title-${title.replace(/\s+/g, '-').toLowerCase()}`" class="text-brand-dark text-xl font-bold">{{ title }}</h3>
                         </div>
                     </div>
                     <button

@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import Alert from "@/components/common/Alert.vue";
@@ -18,10 +18,8 @@ const form = ref({
 
 const rememberMe = ref(false);
 
-type LoginFieldErrors = Partial<Record<"email" | "password", string[]>>;
-
-const fieldErrors = computed<LoginFieldErrors>(() =>
-    error.value && typeof error.value === "object" ? (error.value as LoginFieldErrors) : {},
+const fieldErrors = computed(() =>
+    error.value && typeof error.value === "object" ? error.value : {},
 );
 
 const hasAuthError = computed(() => error.value === "Unauthorized");

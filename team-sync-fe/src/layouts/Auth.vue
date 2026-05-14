@@ -3,7 +3,7 @@
         <a
             href="#auth-main"
             class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#0C51D9] focus:shadow-lg"
-        ></a>
+        >Skip to main content</a>
 
         <div class="flex min-h-screen w-full">
             <!-- Left Side - Visual (35%) -->

@@ -153,10 +153,10 @@ onMounted(() => {
     <MainCard>
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h2 class="text-2xl font-bold text-brand-dark flex items-center gap-2">
+                <h1 class="text-2xl font-bold text-brand-dark flex items-center gap-2">
                     <Calendar class="w-6 h-6" />
                     Holiday Calendar
-                </h2>
+                </h1>
                 <p class="text-sm text-brand-light mt-1">Manage national holidays and collective leave dates.</p>
             </div>
 
