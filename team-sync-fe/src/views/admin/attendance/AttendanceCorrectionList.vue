@@ -161,7 +161,7 @@ const onRejectAction = (req) => {
                     >
                         <td class="py-4 px-4">
                             <div class="flex items-center gap-3">
-                                <img
+                                <img loading="lazy"
                                     :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                                     alt="Avatar"
                                     class="w-10 h-10 rounded-full object-cover"
@@ -314,7 +314,7 @@ const onRejectAction = (req) => {
             <!-- Details Card -->
             <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm mb-5 shadow-sm">
                 <div class="flex items-center gap-3 mb-3 border-b border-gray-200 pb-3">
-                    <img
+                    <img loading="lazy"
                         :src="selectedRejectCorrection.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                         class="w-10 h-10 rounded-full object-cover"
                     />

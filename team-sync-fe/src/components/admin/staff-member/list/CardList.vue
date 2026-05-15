@@ -33,7 +33,7 @@ const goToDetail = () => {
     >
         <div class="flex flex-col items-center mb-3">
             <div class="relative">
-                <img
+                <img loading="lazy"
                     :src="data?.user?.profile_photo || DEFAULT_AVATAR"
                     alt="Sarah Johnson"
                     class="w-20 h-20 rounded-full object-cover mb-3"

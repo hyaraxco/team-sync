@@ -162,7 +162,7 @@ const getAvatarUrl = (user) => {
                     >
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
-                                <img
+                                <img loading="lazy"
                                     :src="getAvatarUrl(review.staff_member?.user)"
                                     class="w-8 h-8 rounded-full bg-gray-100"
                                 />
@@ -178,7 +178,7 @@ const getAvatarUrl = (user) => {
                         </td>
                         <td class="py-3 px-4">
                             <div v-if="review.reviewer" class="flex items-center gap-3">
-                                <img
+                                <img loading="lazy"
                                     :src="getAvatarUrl(review.reviewer?.user)"
                                     class="w-8 h-8 rounded-full bg-gray-100"
                                 />

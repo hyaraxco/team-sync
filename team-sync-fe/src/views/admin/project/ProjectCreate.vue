@@ -180,7 +180,7 @@ watch(
                                         <div
                                             class="w-64 h-40 relative z-10 flex items-center justify-center rounded-[16px] overflow-hidden"
                                         >
-                                            <img
+                                            <img loading="lazy"
                                                 :src="form.photo_url"
                                                 alt="Project Photo"
                                                 class="w-64 h-40 object-cover rounded-[16px]"
@@ -499,7 +499,7 @@ watch(
                                 v-if="selectedLeader"
                             >
                                 <div class="flex items-center gap-3">
-                                    <img
+                                    <img loading="lazy"
                                         :src="selectedLeader?.user?.profile_photo || DEFAULT_AVATAR"
                                         alt="Leader Photo"
                                         class="w-12 h-12 rounded-full object-cover"
@@ -857,7 +857,7 @@ watch(
                             <div
                                 class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden"
                             >
-                                <img
+                                <img loading="lazy"
                                     :src="employee.user?.profile_photo || DEFAULT_AVATAR"
                                     alt="Employee Photo"
                                     class="w-14 h-14 rounded-[12px] object-cover"

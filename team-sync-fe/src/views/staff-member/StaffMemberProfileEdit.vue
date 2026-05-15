@@ -141,7 +141,7 @@ const handleSubmit = async () => {
                                         class="w-32 h-32 absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full"
                                     ></div>
                                     <div class="w-32 h-32 relative z-10 flex items-center justify-center">
-                                        <img
+                                        <img loading="lazy"
                                             :src="form.profile_photo_url || DEFAULT_AVATAR"
                                             alt="Profile Photo"
                                             class="w-16 h-16 object-cover rounded-full"

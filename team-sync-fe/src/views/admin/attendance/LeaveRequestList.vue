@@ -385,7 +385,7 @@ onMounted(() => {
                             </td>
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-3">
-                                    <img
+                                    <img loading="lazy"
                                         :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                                         alt="Avatar"
                                         class="w-10 h-10 rounded-full object-cover"
