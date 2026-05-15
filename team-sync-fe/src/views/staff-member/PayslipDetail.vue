@@ -19,6 +19,7 @@ import {
     ChevronDown,
     ChevronUp,
 } from "lucide-vue-next";
+import EmptyState from "@/components/common/EmptyState.vue";
 
 const route = useRoute();
 const router = useRouter();
@@ -515,9 +516,7 @@ const getAdjustmentStatusClass = (status) => {
                 </div>
             </div>
 
-            <div v-else class="text-center py-12">
-                <p class="text-gray-500">Payroll detail not found</p>
-            </div>
+            <EmptyState v-else icon="FileText" title="Payroll detail not found" size="lg" />
         </div>
     </div>
 </template>

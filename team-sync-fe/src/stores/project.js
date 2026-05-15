@@ -122,6 +122,7 @@ export const useProjectStore = defineStore("project", {
                 this.success = response.data.message;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -151,6 +152,7 @@ export const useProjectStore = defineStore("project", {
                 this.success = response.data.message;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -182,6 +184,7 @@ export const useProjectStore = defineStore("project", {
                 this.success = response.data.message;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
