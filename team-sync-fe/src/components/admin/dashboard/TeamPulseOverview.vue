@@ -173,7 +173,7 @@ const formatTime = (value) => {
             >
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div class="flex items-start gap-3 min-w-0">
-                        <img
+                        <img loading="lazy"
                             :src="member.profile_photo || DEFAULT_AVATAR"
                             :alt="member.name"
                             class="w-12 h-12 rounded-full object-cover flex-shrink-0"

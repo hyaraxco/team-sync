@@ -106,7 +106,7 @@ onMounted(() => {
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
             <div class="flex items-center gap-6">
                 <div class="relative">
-                    <img
+                    <img loading="lazy"
                         :src="staffMember.user?.profile_photo"
                         v-if="staffMember.user?.profile_photo"
                         alt="Staff Member"

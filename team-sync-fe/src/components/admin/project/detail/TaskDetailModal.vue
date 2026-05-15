@@ -817,7 +817,7 @@ watch(
                         <!-- Selected Assignee Display -->
                         <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 mb-2" v-if="selectedAssignee">
                             <div class="flex items-center gap-3">
-                                <img
+                                <img loading="lazy"
                                     :src="selectedAssignee?.user?.profile_photo || DEFAULT_AVATAR"
                                     :alt="selectedAssignee?.user?.name"
                                     class="w-10 h-10 rounded-full object-cover"
@@ -887,7 +887,7 @@ watch(
                                     @click="handleSelectAssignee(staffMember)"
                                     class="w-full p-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
                                 >
-                                    <img
+                                    <img loading="lazy"
                                         :src="staffMember.user?.profile_photo || DEFAULT_AVATAR"
                                         :alt="staffMember.user?.name"
                                         class="w-8 h-8 rounded-full object-cover"
