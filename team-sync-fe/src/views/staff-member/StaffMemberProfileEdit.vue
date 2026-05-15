@@ -49,9 +49,9 @@ const handleSubmit = async () => {
 
 <template>
     <div class="p-5">
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 mb-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <UserIcon class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
@@ -159,7 +159,7 @@ const handleSubmit = async () => {
                                 />
                                 <button
                                     type="button"
-                                    class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2 cursor-pointer"
+                                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2 cursor-pointer"
                                     @click="photoInput?.click()"
                                 >
                                     <Upload class="w-4 h-4 text-gray-600" />
@@ -175,7 +175,7 @@ const handleSubmit = async () => {
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3"
                     >
                         <span class="text-brand-white text-base font-semibold">
                             {{ loading ? "Saving..." : "Save Changes" }}

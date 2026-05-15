@@ -12,14 +12,14 @@ defineProps({
 </script>
 <template>
     <div
-        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4"
+        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4"
     >
         <div class="flex items-center justify-between mb-3">
             <div class="flex items-center gap-3">
-                <div class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden">
+                <div class="w-14 h-14 relative flex items-center justify-center rounded-xl overflow-hidden">
                     <!-- Main blue background -->
                     <div
-                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[12px]"
+                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
                     ></div>
                     <!-- Lucide icon -->
                     <img loading="lazy" :src="data.icon" alt="Team Icon" class="w-6 h-6 text-white relative z-10" />
@@ -33,7 +33,7 @@ defineProps({
         </div>
 
         <!-- Border Divider -->
-        <div class="border-b border-[#DCDEDD] mb-4"></div>
+        <div class="border-b border-brand-border mb-4"></div>
 
         <!-- Team Leader Section -->
         <div class="mb-4" v-if="data.leader">
@@ -83,14 +83,14 @@ defineProps({
         <div class="flex gap-2">
             <RouterLink
                 :to="{ name: 'admin.team.detail', params: { id: data.id } }"
-                class="btn-secondary flex-1 text-brand-dark text-sm font-semibold border border-[#DCDEDD] rounded-[8px] px-4 py-3 hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2"
+                class="btn-secondary flex-1 text-brand-dark text-sm font-semibold border border-brand-border rounded-lg px-4 py-3 hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2"
             >
                 <Eye class="w-4 h-4" />
                 <span>View</span>
             </RouterLink>
             <RouterLink
                 :to="{ name: 'admin.team.edit', params: { id: data.id } }"
-                class="btn-secondary flex-1 text-brand-dark text-sm font-semibold border border-[#DCDEDD] rounded-[8px] px-4 py-3 hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2"
+                class="btn-secondary flex-1 text-brand-dark text-sm font-semibold border border-brand-border rounded-lg px-4 py-3 hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 flex items-center justify-center gap-2"
             >
                 <Edit class="w-4 h-4" />
                 <span>Edit</span>

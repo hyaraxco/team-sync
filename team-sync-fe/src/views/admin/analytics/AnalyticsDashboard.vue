@@ -250,7 +250,7 @@ onUnmounted(() => {
 
             <!-- Global Filters + Export -->
             <div class="flex items-center gap-3 flex-wrap">
-                <div class="flex items-center gap-2 px-3 py-2 bg-white border border-[#DCDEDD] rounded-[12px]">
+                <div class="flex items-center gap-2 px-3 py-2 bg-white border border-brand-border rounded-xl">
                     <FilterIcon class="w-4 h-4 text-gray-400" />
                     <select
                         v-model="period"
@@ -268,7 +268,7 @@ onUnmounted(() => {
                     v-model="department"
                     @change="onFilterChange"
                     aria-label="Filter by department"
-                    class="text-sm text-brand-dark bg-white border border-[#DCDEDD] rounded-[12px] px-3 py-2 outline-none cursor-pointer"
+                    class="text-sm text-brand-dark bg-white border border-brand-border rounded-xl px-3 py-2 outline-none cursor-pointer"
                 >
                     <option :value="null">All Departments</option>
                     <option v-for="dept in departments" :key="dept.value" :value="dept.value">
@@ -281,7 +281,7 @@ onUnmounted(() => {
                     <button
                         @click="showExportMenu = !showExportMenu"
                         :disabled="exportLoading"
-                        class="flex items-center gap-2 px-3 py-2 bg-[#0C51D9] text-white text-sm font-medium rounded-[12px] hover:bg-[#0a44b8] transition-colors disabled:opacity-50"
+                        class="flex items-center gap-2 px-3 py-2 bg-primary-500 text-white text-sm font-medium rounded-xl hover:bg-[#0a44b8] transition-colors disabled:opacity-50"
                     >
                         <DownloadIcon class="w-4 h-4" />
                         <span v-if="exportLoading">Exporting...</span>
@@ -289,7 +289,7 @@ onUnmounted(() => {
                     </button>
                     <div
                         v-if="showExportMenu"
-                        class="absolute right-0 mt-2 w-48 bg-white border border-[#DCDEDD] rounded-[12px] shadow-lg z-10 overflow-hidden"
+                        class="absolute right-0 mt-2 w-48 bg-white border border-brand-border rounded-xl shadow-lg z-10 overflow-hidden"
                     >
                         <button
                             @click="handleExportExcel"
@@ -311,7 +311,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" role="tablist">
                 <button
                     v-for="tab in tabs"
@@ -321,11 +321,11 @@ onUnmounted(() => {
                     :aria-selected="activeTab === tab.id"
                     :id="`tab-${tab.id}`"
                     @click="activeTab = tab.id"
-                    class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                    class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === tab.id
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                     "
                 >
                     <component
@@ -344,11 +344,11 @@ onUnmounted(() => {
             <!-- Loading State -->
             <div v-if="executiveSummaryLoading" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div v-for="i in 6" :key="i" class="h-28 bg-gray-100 rounded-[16px] animate-pulse" />
+                    <div v-for="i in 6" :key="i" class="h-28 bg-gray-100 rounded-2xl animate-pulse" />
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="h-96 bg-gray-100 rounded-[20px] animate-pulse" />
-                    <div class="h-96 bg-gray-100 rounded-[20px] animate-pulse" />
+                    <div class="h-96 bg-gray-100 rounded-2xl animate-pulse" />
+                    <div class="h-96 bg-gray-100 rounded-2xl animate-pulse" />
                 </div>
             </div>
 
@@ -356,7 +356,7 @@ onUnmounted(() => {
             <div v-else-if="executiveSummary" class="space-y-6">
                 <!-- Period Label -->
                 <div class="flex items-center gap-2 text-sm text-gray-500">
-                    <span class="inline-block w-2 h-2 rounded-full bg-[#0C51D9]"></span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
                     {{ executiveSummary.period?.label }}
                     <span class="text-gray-300">|</span>
                     {{ executiveSummary.period?.start }} - {{ executiveSummary.period?.end }}
@@ -440,7 +440,7 @@ onUnmounted(() => {
                 <!-- Charts Row 1: Attendance vs Deduction + HR Cost -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Attendance vs Deduction Trend -->
-                    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                    <div class="bg-white border border-brand-border rounded-2xl p-6">
                         <h3 class="text-base font-semibold text-brand-dark mb-1">Attendance vs Deduction Impact</h3>
                         <p class="text-xs text-gray-400 mb-4">
                             Correlation between attendance rate and payroll deductions
@@ -458,7 +458,7 @@ onUnmounted(() => {
                     </div>
 
                     <!-- Monthly HR Cost Breakdown -->
-                    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                    <div class="bg-white border border-brand-border rounded-2xl p-6">
                         <h3 class="text-base font-semibold text-brand-dark mb-1">Monthly HR Cost Breakdown</h3>
                         <p class="text-xs text-gray-400 mb-4">Salary, tax, BPJS contributions, and deductions</p>
                         <VueApexCharts
@@ -475,7 +475,7 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Charts Row 2: Team Performance -->
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                <div class="bg-white border border-brand-border rounded-2xl p-6">
                     <h3 class="text-base font-semibold text-brand-dark mb-1">Team Performance Comparison</h3>
                     <p class="text-xs text-gray-400 mb-4">Attendance rate and task completion by team</p>
                     <VueApexCharts

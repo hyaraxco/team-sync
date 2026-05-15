@@ -186,7 +186,7 @@ const getIconTextClass = (notification) => {
         return "text-[#F97316]";
     }
 
-    return "text-[#0C51D9]";
+    return "text-primary-500";
 };
 </script>
 
@@ -202,14 +202,14 @@ const getIconTextClass = (notification) => {
         <div class="notification-panel__header border-b border-[#E4EBF9] px-4 py-3">
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#0C51D9]">Notifications</p>
+                    <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-500">Notifications</p>
                     <p class="text-xs text-[#5D6882]">Latest updates</p>
                 </div>
                 <button
                     v-if="visibleNotifications.length > 0"
                     type="button"
                     data-testid="mark-all-read-btn"
-                    class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-2.5 py-1 text-[10px] font-semibold text-[#0C51D9] transition-colors hover:bg-[#E1ECFF] disabled:opacity-50"
+                    class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-2.5 py-1 text-[10px] font-semibold text-primary-500 transition-colors hover:bg-[#E1ECFF] disabled:opacity-50"
                     :disabled="markingAllRead"
                     @click="emit('mark-all-read')"
                 >
@@ -234,7 +234,7 @@ const getIconTextClass = (notification) => {
             <button
                 type="button"
                 data-testid="notification-retry"
-                class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-3 py-1.5 text-xs font-semibold text-[#0C51D9] transition-colors hover:bg-[#E1ECFF]"
+                class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-3 py-1.5 text-xs font-semibold text-primary-500 transition-colors hover:bg-[#E1ECFF]"
                 @click="emit('retry')"
             >
                 Retry
@@ -247,9 +247,9 @@ const getIconTextClass = (notification) => {
             class="px-4 py-8 text-center"
         >
             <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF4FF] text-lg">
-                <BellIcon class="h-5 w-5 text-[#0C51D9]" />
+                <BellIcon class="h-5 w-5 text-primary-500" />
             </div>
-            <p class="text-sm font-semibold text-[#0C1C3C]">You are all caught up</p>
+            <p class="text-sm font-semibold text-brand-dark">You are all caught up</p>
             <p class="mt-1 text-xs text-[#64748B]">No notifications yet.</p>
         </div>
 
@@ -267,7 +267,7 @@ const getIconTextClass = (notification) => {
                     @click="emit('select', notification)"
                 >
                     <div
-                        class="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-[12px]"
+                        class="relative flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl"
                         :class="getIconContainerClass(notification)"
                     >
                         <component
@@ -278,7 +278,7 @@ const getIconTextClass = (notification) => {
                     </div>
 
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-semibold leading-5 text-[#0C1C3C]">
+                        <p class="text-sm font-semibold leading-5 text-brand-dark">
                             {{ notification.title }}
                         </p>
                         <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-[#4B5563]">

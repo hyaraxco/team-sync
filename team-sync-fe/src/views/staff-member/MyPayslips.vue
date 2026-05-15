@@ -135,7 +135,7 @@ const clearSearch = () => {
 <template>
     <div>
         <div class="mb-6">
-            <h2 class="text-[#0C1C3C] font-bold text-2xl mb-2">My Payroll</h2>
+            <h2 class="text-brand-dark font-bold text-2xl mb-2">My Payroll</h2>
             <p class="text-gray-600">View and download your payroll history</p>
         </div>
 
@@ -150,10 +150,10 @@ const clearSearch = () => {
             />
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-12 h-12 bg-green-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
                         <ArrowUpRight class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
@@ -165,10 +165,10 @@ const clearSearch = () => {
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-12 h-12 bg-red-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center">
                         <ArrowDownRight class="w-6 h-6 text-red-600" />
                     </div>
                 </div>
@@ -180,10 +180,10 @@ const clearSearch = () => {
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-12 h-12 bg-blue-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
                         <TrendingUp class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -195,7 +195,7 @@ const clearSearch = () => {
             </div>
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-4 dark:bg-gray-800 dark:border-gray-700">
+        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-4">
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1 relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -203,7 +203,7 @@ const clearSearch = () => {
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 transition-all duration-300"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 transition-all duration-300"
                         placeholder="Search payroll periods by month or year..."
                         v-model="filters.search"
                     />
@@ -212,7 +212,7 @@ const clearSearch = () => {
                 <select
                     v-model.number="filters.year"
                     data-testid="my-payroll-year"
-                    class="px-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 transition-all duration-300"
+                    class="px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 transition-all duration-300"
                 >
                     <option v-for="year in availableYears" :key="year" :value="year">
                         {{ year }}
@@ -222,7 +222,7 @@ const clearSearch = () => {
 
             <div
                 v-if="filters.search"
-                class="mt-4 flex items-center justify-between gap-4 rounded-[16px] bg-blue-50 px-4 py-3"
+                class="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-blue-50 px-4 py-3"
             >
                 <p class="text-sm text-blue-900">
                     Showing results for
@@ -240,9 +240,9 @@ const clearSearch = () => {
             </div>
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6 dark:bg-gray-800 dark:border-gray-700">
+        <div class="bg-white border border-brand-border rounded-2xl p-5 mb-6">
             <div class="mb-6">
-                <h3 class="text-[#0C1C3C] font-bold text-xl">All Payroll Periods</h3>
+                <h3 class="text-brand-dark font-bold text-xl">All Payroll Periods</h3>
                 <p class="text-gray-600 text-sm mt-1">
                     Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} payroll periods
                 </p>
@@ -253,12 +253,12 @@ const clearSearch = () => {
                     v-for="payslip in payslips"
                     :key="payslip.id"
                     :data-testid="`my-payroll-card-${payslip.id}`"
-                    class="border border-[#DCDEDD] rounded-[16px] p-5 hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                    class="border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                     @click="viewDetails(payslip.id)"
                 >
                     <div class="flex items-start justify-between mb-4">
                         <div
-                            class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center group-hover:bg-blue-100 transition-all duration-300"
+                            class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-all duration-300"
                         >
                             <FileText class="w-6 h-6 text-blue-600" />
                         </div>
@@ -301,7 +301,7 @@ const clearSearch = () => {
                         <button
                             :data-testid="`my-payroll-view-${payslip.id}`"
                             @click.stop="viewDetails(payslip.id)"
-                            class="flex-1 px-3 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
+                            class="flex-1 px-3 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
                         >
                             <Eye class="w-4 h-4" />
                             View
@@ -309,7 +309,7 @@ const clearSearch = () => {
                         <button
                             :data-testid="`my-payroll-download-${payslip.id}`"
                             @click.stop="handleDownload(payslip.id)"
-                            class="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-[8px] hover:brightness-110 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
+                            class="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:brightness-110 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
                         >
                             <Download class="w-4 h-4" />
                             PDF

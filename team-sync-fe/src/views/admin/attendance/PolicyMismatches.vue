@@ -13,7 +13,7 @@
             <!-- Error State -->
             <div
                 v-if="error"
-                class="bg-white border border-red-200 rounded-[20px] p-6 flex items-center gap-3 text-red-600"
+                class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
             >
                 <AlertTriangle class="w-5 h-5 shrink-0" />
                 <p>Failed to load mismatches. The API endpoint might be missing or under construction.</p>
@@ -21,13 +21,13 @@
 
             <!-- Loading State -->
             <div v-else-if="loading" class="space-y-4">
-                <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-[16px] animate-pulse" />
+                <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-2xl animate-pulse" />
             </div>
 
             <!-- Empty State -->
             <div
                 v-else-if="!mismatches.length"
-                class="bg-white border border-[#DCDEDD] rounded-[20px] p-12 text-center"
+                class="bg-white border border-brand-border rounded-2xl p-12 text-center"
             >
                 <CheckCircle class="w-12 h-12 mx-auto mb-3 text-green-500" />
                 <p class="text-brand-dark font-semibold text-lg">No pending policy mismatches</p>
@@ -35,11 +35,11 @@
             </div>
 
             <!-- Table -->
-            <div v-else class="bg-white border border-[#DCDEDD] rounded-[20px] overflow-hidden">
+            <div v-else class="bg-white border border-brand-border rounded-2xl overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
-<tr class="border-b border-[#DCDEDD]">
+<tr class="border-b border-brand-border">
                                  <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Employee</th>
                                  <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
                                  <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled</th>
@@ -75,7 +75,7 @@
                                 <td class="px-4 py-3 text-right space-x-2">
                                     <button
                                         @click="acknowledge(item.id)"
-                                        class="text-xs px-3 py-1.5 rounded-lg border border-[#DCDEDD] text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
+                                        class="text-xs px-3 py-1.5 rounded-lg border border-brand-border text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
                                     >
                                         Acknowledge
                                     </button>

@@ -187,7 +187,7 @@ const correctionSeries = computed(() => {
     <!-- Loading State -->
     <div v-if="attendanceLoading" class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div v-for="i in 8" :key="i" class="h-80 bg-gray-100 rounded-[20px] animate-pulse" />
+            <div v-for="i in 8" :key="i" class="h-80 bg-gray-100 rounded-2xl animate-pulse" />
         </div>
     </div>
 
@@ -195,7 +195,7 @@ const correctionSeries = computed(() => {
     <div v-else-if="attendance" class="space-y-6">
         <!-- Period Label -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
-            <span class="inline-block w-2 h-2 rounded-full bg-[#0C51D9]"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
             {{ attendance.period?.label }}
             <span class="text-gray-300">|</span>
             {{ attendance.period?.start }} - {{ attendance.period?.end }}
@@ -203,7 +203,7 @@ const correctionSeries = computed(() => {
 
         <!-- Row 1: Monthly Rate + Status Distribution -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Monthly Attendance Rate</h3>
                 <p class="text-xs text-gray-400 mb-4">Percentage of employees present (including late & half-day)</p>
                 <VueApexCharts
@@ -216,7 +216,7 @@ const correctionSeries = computed(() => {
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Status Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Breakdown of attendance statuses</p>
                 <VueApexCharts
@@ -232,7 +232,7 @@ const correctionSeries = computed(() => {
 
         <!-- Row 2: Lateness Trend + Average Hours -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Weekly Lateness Trend</h3>
                 <p class="text-xs text-gray-400 mb-4">Number of late arrivals per week</p>
                 <VueApexCharts
@@ -245,7 +245,7 @@ const correctionSeries = computed(() => {
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Average Hours Worked</h3>
                 <p class="text-xs text-gray-400 mb-4">Monthly average working hours per employee</p>
                 <VueApexCharts
@@ -261,7 +261,7 @@ const correctionSeries = computed(() => {
 
         <!-- Row 3: Work Mode + Top Late Employees -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Work Mode Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Office vs Remote vs Hybrid attendance by month</p>
                 <VueApexCharts
@@ -274,7 +274,7 @@ const correctionSeries = computed(() => {
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Top Late Employees</h3>
                 <p class="text-xs text-gray-400 mb-4">Most frequent late arrivals</p>
                 <div v-if="attendance.top_late_employees?.length" class="space-y-3 mt-2">
@@ -304,7 +304,7 @@ const correctionSeries = computed(() => {
 
         <!-- Row 4: Policy Mismatch + Correction Requests -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Policy Mismatch Trend</h3>
                 <p class="text-xs text-gray-400 mb-4">Work mode mismatches vs resolved cases</p>
                 <VueApexCharts
@@ -317,7 +317,7 @@ const correctionSeries = computed(() => {
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Correction Requests</h3>
                 <p class="text-xs text-gray-400 mb-4">Attendance correction submissions and approval rate</p>
                 <VueApexCharts

@@ -39,9 +39,9 @@
         <!-- Timeline Adherence Details -->
         <div
             v-if="timelineAdherence"
-            class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+            class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
         >
-            <h3 class="text-lg font-bold text-[#202020] mb-6">Project Timeline Performance</h3>
+            <h3 class="text-lg font-bold text-brand-dark mb-6">Project Timeline Performance</h3>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div class="bg-green-50 rounded-lg p-4">
                     <div class="text-sm text-green-600 font-medium mb-1">On Time</div>
@@ -94,9 +94,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Project Status Distribution -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Project Status</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Project Status</h3>
                 <VueApexCharts
                     v-if="!projectsLoading && projects?.project_status_overview"
                     type="donut"
@@ -108,9 +108,9 @@
 
             <!-- Task Status Distribution -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Task Status</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Task Status</h3>
                 <VueApexCharts
                     v-if="!projectsLoading && projects?.task_status_distribution"
                     type="donut"
@@ -124,9 +124,9 @@
         <!-- Team Productivity -->
         <div
             v-if="projects?.team_productivity"
-            class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+            class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
         >
-            <h3 class="text-lg font-bold text-[#202020] mb-6">Team Productivity</h3>
+            <h3 class="text-lg font-bold text-brand-dark mb-6">Team Productivity</h3>
             <VueApexCharts
                 type="bar"
                 height="300"

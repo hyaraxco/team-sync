@@ -66,7 +66,7 @@ const handleSubmit = async () => {
 
         <!-- Form Card -->
         <div
-            class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+            class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-md"
         >
             <form class="space-y-5 mb-4" @submit.prevent="handleSubmit" novalidate>
                 <Input
@@ -110,7 +110,7 @@ const handleSubmit = async () => {
                             v-model="rememberMe"
                             name="remember"
                             type="checkbox"
-                            class="h-4 w-4 cursor-pointer rounded border-gray-300 text-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9]/20"
+                            class="h-4 w-4 cursor-pointer rounded border-gray-300 text-primary-500 focus:ring-2 focus:ring-primary-500/20"
                         />
                         <label
                             for="remember"
@@ -122,7 +122,7 @@ const handleSubmit = async () => {
 
                     <RouterLink
                         :to="{ name: 'forgot-password' }"
-                        class="text-sm font-semibold text-[#0C51D9] hover:text-[#083da6] transition-colors"
+                        class="text-sm font-semibold text-primary-500 hover:text-primary-700 transition-colors"
                     >
                         Forgot password?
                     </RouterLink>
@@ -132,7 +132,7 @@ const handleSubmit = async () => {
                 <button
                     type="submit"
                     data-testid="login-submit"
-                    class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-[#0C51D9] disabled:hover:shadow-sm overflow-hidden mt-2"
+                    class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-primary-500 disabled:hover:shadow-sm overflow-hidden mt-2"
                     :disabled="loading"
                 >
                     <span class="relative z-10 flex items-center gap-2 text-white">
@@ -183,21 +183,6 @@ const handleSubmit = async () => {
 </template>
 
 <style>
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.animate-fadeIn {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
 .fade-slide-enter-active,
 .fade-slide-leave-active {
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);

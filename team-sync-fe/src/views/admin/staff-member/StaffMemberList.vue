@@ -59,25 +59,25 @@ onMounted(async () => {
 
     <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-5">
+    <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h3 class="text-[#0C1C3C] font-['Plus_Jakarta_Sans'] text-[20px] font-bold">All Staff Members</h3>
-                <p class="text-[#6B7280] font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
+                <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">All Staff Members</h3>
+                <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
                     Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} employees
                 </p>
             </div>
             <div class="flex items-center gap-[10px]">
                 <button
                     v-if="can('staff-member-create')"
-                    class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2"
                 >
                     <Upload class="w-4 h-4 text-gray-600" />
                     <span class="text-brand-dark text-sm font-semibold">Import CSV</span>
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.staffMembers.create' }"
-                    class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
                     v-if="can('staff-member-create')"
                 >
                     <UserPlus class="w-4 h-4 text-white" />

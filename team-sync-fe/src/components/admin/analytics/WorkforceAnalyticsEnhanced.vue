@@ -64,8 +64,8 @@
         />
 
         <!-- Existing Workforce Analytics -->
-        <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
-            <h3 class="text-lg font-bold text-[#202020] mb-6">Headcount Trend</h3>
+        <div class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6">
+            <h3 class="text-lg font-bold text-brand-dark mb-6">Headcount Trend</h3>
             <VueApexCharts
                 v-if="!workforceLoading && workforce?.headcount_trend"
                 type="area"
@@ -82,9 +82,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Gender Distribution -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Gender Distribution</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Gender Distribution</h3>
                 <VueApexCharts
                     v-if="!workforceLoading && workforce?.gender_distribution"
                     type="donut"
@@ -96,9 +96,9 @@
 
             <!-- Employment Type Distribution -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Employment Type</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Employment Type</h3>
                 <VueApexCharts
                     v-if="!workforceLoading && workforce?.employment_types"
                     type="donut"
@@ -110,8 +110,8 @@
         </div>
 
         <!-- Department Distribution -->
-        <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
-            <h3 class="text-lg font-bold text-[#202020] mb-6">Department Headcount</h3>
+        <div class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6">
+            <h3 class="text-lg font-bold text-brand-dark mb-6">Department Headcount</h3>
             <VueApexCharts
                 v-if="!workforceLoading && workforce?.department_headcount"
                 type="bar"

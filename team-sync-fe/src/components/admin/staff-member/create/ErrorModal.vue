@@ -28,7 +28,7 @@ const emit = defineEmits(["close"]);
             <button
                 type="button"
                 @click="emit('close')"
-                class="w-full btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-red-600 transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3"
+                class="w-full btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-red-600 transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3"
             >
                 <span class="text-white text-base font-semibold">OK, I'll Fix It</span>
             </button>

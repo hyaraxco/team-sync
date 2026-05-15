@@ -359,7 +359,7 @@ onMounted(() => {
                 type="button"
                 data-testid="payroll-settings-back"
                 @click="router.push({ name: 'admin.payroll.dashboard' })"
-                class="mb-4 border border-[#DCDEDD] rounded-[8px] px-4 py-3 flex items-center gap-2 hover:border-[#0C51D9] transition-all duration-300"
+                class="mb-4 border border-brand-border rounded-lg px-4 py-3 flex items-center gap-2 hover:border-primary-500 transition-all duration-300"
             >
                 <ArrowLeft class="w-4 h-4 text-gray-600" />
                 <span class="text-brand-dark text-sm font-semibold">Back</span>
@@ -372,7 +372,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="bg-blue-50 border border-blue-200 rounded-[20px] px-5 py-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4">
             <div class="flex items-start justify-between gap-3">
                 <p class="text-blue-900 text-sm font-semibold">Applies to future payroll drafts only</p>
                 <span
@@ -391,15 +391,15 @@ onMounted(() => {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3 mb-6" data-testid="payroll-settings-tabs">
+        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6" data-testid="payroll-settings-tabs">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <button
                     @click="activeTab = 'schedule'"
-                    class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                    class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'schedule'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                     "
                     data-testid="tab-schedule"
                 >
@@ -408,11 +408,11 @@ onMounted(() => {
                 </button>
                 <button
                     @click="activeTab = 'rules'"
-                    class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                    class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'rules'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                     "
                     data-testid="tab-rules"
                 >
@@ -421,11 +421,11 @@ onMounted(() => {
                 </button>
                 <button
                     @click="activeTab = 'bank_notes'"
-                    class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                    class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'bank_notes'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                     "
                     data-testid="tab-bank-notes"
                 >
@@ -434,11 +434,11 @@ onMounted(() => {
                 </button>
                 <button
                     @click="activeTab = 'history'"
-                    class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                    class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'history'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                     "
                     data-testid="tab-history"
                 >
@@ -452,10 +452,10 @@ onMounted(() => {
             <div class="space-y-6 min-w-0 pb-10">
                 <section
                     v-show="activeTab === 'schedule'"
-                    class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)] animate-fade-in"
+                    class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <Calendar class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
@@ -473,7 +473,7 @@ onMounted(() => {
                                 type="number"
                                 min="1"
                                 max="31"
-                                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                             />
                         </div>
                         <div>
@@ -486,7 +486,7 @@ onMounted(() => {
                                 type="number"
                                 min="1"
                                 max="31"
-                                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                             />
                         </div>
                     </div>
@@ -494,10 +494,10 @@ onMounted(() => {
 
                 <section
                     v-show="activeTab === 'rules'"
-                    class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)] animate-fade-in"
+                    class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-emerald-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
                             <Calculator class="w-6 h-6 text-emerald-600" />
                         </div>
                         <div>
@@ -514,7 +514,7 @@ onMounted(() => {
                             <select
                                 v-model="form.working_days_mode"
                                 data-testid="payroll-settings-working-days-mode"
-                                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                             >
                                 <option value="auto_business_days">Auto business days</option>
                                 <option value="fixed">Fixed working days</option>
@@ -529,7 +529,7 @@ onMounted(() => {
                                 type="number"
                                 min="1"
                                 max="31"
-                                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                             />
                         </div>
 
@@ -544,7 +544,7 @@ onMounted(() => {
                                 min="0"
                                 max="5"
                                 step="0.01"
-                                class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                             />
                             <p class="text-brand-light text-xs mt-2">
                                 `1.00` means one daily salary per absent day. Higher values increase the deduction.
@@ -557,7 +557,7 @@ onMounted(() => {
                                 <select
                                     v-model="form.rounding_mode"
                                     data-testid="payroll-settings-rounding-mode"
-                                    class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                    class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                                 >
                                     <option value="none">No rounding</option>
                                     <option value="nearest">Nearest</option>
@@ -574,7 +574,7 @@ onMounted(() => {
                                     min="1"
                                     step="1"
                                     :disabled="form.rounding_mode === 'none'"
-                                    class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                    class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -583,10 +583,10 @@ onMounted(() => {
 
                 <div v-show="activeTab === 'bank_notes'" class="space-y-6 animate-fade-in">
                     <section
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+                        class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-amber-50 rounded-[12px] flex items-center justify-center">
+                            <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
                                 <FileText class="w-6 h-6 text-amber-600" />
                             </div>
                             <div>
@@ -602,7 +602,7 @@ onMounted(() => {
                             v-model="form.note_template"
                             data-testid="payroll-settings-note-template"
                             rows="5"
-                            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 resize-none"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 resize-none"
                         />
                         <p class="text-brand-light text-xs mt-2">
                             Available placeholders: `{working_days}`, `{attended_days}`, `{late_days}`, `{sick_days}`,
@@ -612,10 +612,10 @@ onMounted(() => {
 
                     <!-- Payroll Bank Partner -->
                     <section
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+                        class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                                 <Landmark class="w-6 h-6 text-green-600" />
                             </div>
                             <div>
@@ -636,7 +636,7 @@ onMounted(() => {
                                     :value="form.payroll_bank_code"
                                     @change="handleBankChange"
                                     data-testid="payroll-settings-bank-select"
-                                    class="w-full h-[48px] px-4 py-2 bg-white border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300"
+                                    class="w-full h-[48px] px-4 py-2 bg-white border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
                                 >
                                     <option value="">Select a Bank...</option>
                                     <option v-for="bank in popularBanks" :key="bank.code" :value="bank.code">
@@ -658,7 +658,7 @@ onMounted(() => {
                                     placeholder="e.g. 014 (BCA)"
                                     maxlength="10"
                                     disabled
-                                    class="w-full h-[48px] px-4 py-2 border border-[#DCDEDD] rounded-[12px] bg-gray-50 text-gray-500 cursor-not-allowed transition-all duration-300"
+                                    class="w-full h-[48px] px-4 py-2 border border-brand-border rounded-xl bg-gray-50 text-gray-500 cursor-not-allowed transition-all duration-300"
                                 />
                                 <p class="text-brand-light text-xs mt-2">
                                     Bank code based on BI RTGS / SKNBI (3 digits, optional).
@@ -669,10 +669,10 @@ onMounted(() => {
 
                     <!-- Preview block moved to Bank & Note -->
                     <section
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)]"
+                        class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center shrink-0">
+                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
                                 <FileText class="w-6 h-6 text-blue-600" />
                             </div>
                             <div>
@@ -683,7 +683,7 @@ onMounted(() => {
                             </div>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50">
+                            <div class="border border-brand-border rounded-2xl px-4 py-3 bg-gray-50/50">
                                 <p class="text-brand-light text-xs font-semibold uppercase">Future draft note</p>
                                 <p
                                     class="text-brand-dark text-sm mt-2 leading-6"
@@ -692,7 +692,7 @@ onMounted(() => {
                                     {{ notePreview }}
                                 </p>
                             </div>
-                            <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3 bg-gray-50/50">
+                            <div class="border border-brand-border rounded-2xl px-4 py-3 bg-gray-50/50">
                                 <p class="text-brand-light text-xs font-semibold uppercase">Summary config</p>
                                 <p class="text-brand-dark text-sm mt-2">
                                     Payday day
@@ -710,10 +710,10 @@ onMounted(() => {
 
                 <div
                     v-show="activeTab === 'history'"
-                    class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 overflow-hidden shadow-[0_1px_2px_rgba(15,23,42,0.03)] animate-fade-in"
+                    class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-violet-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
                             <History class="w-6 h-6 text-violet-600" />
                         </div>
                         <div>
@@ -729,7 +729,7 @@ onMounted(() => {
                     <div
                         v-else-if="settingsHistory.length === 0"
                         data-testid="payroll-settings-history-empty"
-                        class="rounded-[12px] border border-dashed border-[#DCDEDD] px-4 py-4 text-sm text-brand-light"
+                        class="rounded-xl border border-dashed border-brand-border px-4 py-4 text-sm text-brand-light"
                     >
                         No settings history is available yet.
                     </div>
@@ -739,10 +739,10 @@ onMounted(() => {
                             <div
                                 data-testid="payroll-settings-history-item"
                                 :class="[
-                                    'rounded-[12px] border px-3 py-3 transition-colors duration-200',
+                                    'rounded-xl border px-3 py-3 transition-colors duration-200',
                                     selectedHistoryVersionId === version.id
                                         ? 'border-blue-300 bg-blue-50'
-                                        : 'border-[#DCDEDD]',
+                                        : 'border-brand-border',
                                 ]"
                             >
                                 <div class="flex items-center justify-between gap-3">
@@ -778,7 +778,7 @@ onMounted(() => {
                             <div
                                 v-if="selectedHistoryVersionId === version.id"
                                 data-testid="payroll-settings-history-compare-panel"
-                                class="mt-2 rounded-[12px] border border-blue-100 bg-white shadow-sm px-4 py-4 mb-2 animate-fade-in"
+                                class="mt-2 rounded-xl border border-blue-100 bg-white shadow-sm px-4 py-4 mb-2 animate-fade-in"
                             >
                                 <p class="text-xs uppercase tracking-wide text-brand-light">Version Comparison</p>
                                 <p class="text-sm font-semibold text-brand-dark mt-1">
@@ -810,7 +810,7 @@ onMounted(() => {
                                         v-for="row in historyComparisonRows"
                                         :key="row.field"
                                         data-testid="payroll-settings-history-compare-row"
-                                        class="rounded-[10px] border border-[#DCDEDD] bg-gray-50 px-3 py-2"
+                                        class="rounded-lg border border-brand-border bg-gray-50 px-3 py-2"
                                     >
                                         <p class="text-xs font-semibold text-brand-dark">
                                             {{ row.label }}
@@ -829,7 +829,7 @@ onMounted(() => {
 
                     <section class="mt-6 border-t border-[#E5E7EB] pt-6">
                         <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 bg-emerald-50 rounded-[12px] flex items-center justify-center">
+                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
                                 <Calculator class="w-6 h-6 text-emerald-600" />
                             </div>
                             <div>
@@ -847,7 +847,7 @@ onMounted(() => {
                         <div
                             v-else-if="bpjsRateHistory.length === 0"
                             data-testid="payroll-settings-bpjs-history-empty"
-                            class="rounded-[12px] border border-dashed border-[#DCDEDD] px-4 py-4 text-sm text-brand-light"
+                            class="rounded-xl border border-dashed border-brand-border px-4 py-4 text-sm text-brand-light"
                         >
                             No BPJS rate history is available yet.
                         </div>
@@ -855,7 +855,7 @@ onMounted(() => {
                         <div
                             v-else
                             data-testid="payroll-settings-bpjs-history-table"
-                            class="overflow-x-auto rounded-[12px] border border-[#DCDEDD]"
+                            class="overflow-x-auto rounded-xl border border-brand-border"
                         >
                             <table class="min-w-full divide-y divide-[#E5E7EB] text-sm">
                                 <thead class="bg-gray-50">
@@ -914,7 +914,7 @@ onMounted(() => {
             <!-- Save Settings Sticky Footer / Action Bar -->
             <div v-show="activeTab !== 'history'" class="sticky bottom-6 z-20 mt-4 animate-fade-in">
                 <div
-                    class="bg-white/80 backdrop-blur-md border border-[#DCDEDD] rounded-[20px] p-5 flex flex-col md:flex-row items-center justify-between shadow-[0_8px_30px_rgb(0,0,0,0.12)] gap-4"
+                    class="bg-white/80 backdrop-blur-md border border-brand-border rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
                 >
                     <div>
                         <h3 class="text-brand-dark text-base font-bold">Ready to save your changes?</h3>
@@ -925,7 +925,7 @@ onMounted(() => {
                         data-testid="payroll-settings-save"
                         :disabled="loading"
                         @click="handleSubmit"
-                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
+                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
                     >
                         <Settings class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">

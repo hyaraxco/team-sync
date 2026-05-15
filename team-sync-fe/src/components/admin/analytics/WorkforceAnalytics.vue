@@ -201,8 +201,8 @@ const tenureSeries = computed(() => [
     <!-- Loading State -->
     <div v-if="workforceLoading" class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="lg:col-span-2 h-80 bg-gray-100 rounded-[20px] animate-pulse" />
-            <div v-for="i in 6" :key="i" class="h-80 bg-gray-100 rounded-[20px] animate-pulse" />
+            <div class="lg:col-span-2 h-80 bg-gray-100 rounded-2xl animate-pulse" />
+            <div v-for="i in 6" :key="i" class="h-80 bg-gray-100 rounded-2xl animate-pulse" />
         </div>
     </div>
 
@@ -210,7 +210,7 @@ const tenureSeries = computed(() => [
     <div v-else-if="workforce" class="space-y-6">
         <!-- Period Label -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
-            <span class="inline-block w-2 h-2 rounded-full bg-[#0C51D9]"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
             {{ workforce.period?.label }}
             <span class="text-gray-300">|</span>
             {{ workforce.period?.start }} - {{ workforce.period?.end }}
@@ -218,7 +218,7 @@ const tenureSeries = computed(() => [
 
         <!-- Row 1: Headcount Trend (full width) -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Headcount Trend</h3>
                 <p class="text-xs text-gray-400 mb-4">Monthly employee headcount over time</p>
                 <VueApexCharts
@@ -234,7 +234,7 @@ const tenureSeries = computed(() => [
 
         <!-- Row 2: Gender Distribution + Employment Type -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Gender Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Breakdown of employees by gender</p>
                 <VueApexCharts
@@ -247,7 +247,7 @@ const tenureSeries = computed(() => [
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Employment Type</h3>
                 <p class="text-xs text-gray-400 mb-4">Distribution of employment types</p>
                 <VueApexCharts
@@ -263,7 +263,7 @@ const tenureSeries = computed(() => [
 
         <!-- Row 3: Work Location + Department Headcount -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Work Location</h3>
                 <p class="text-xs text-gray-400 mb-4">Employee distribution by work location</p>
                 <VueApexCharts
@@ -276,7 +276,7 @@ const tenureSeries = computed(() => [
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Department Headcount</h3>
                 <p class="text-xs text-gray-400 mb-4">Number of employees per department</p>
                 <VueApexCharts
@@ -292,7 +292,7 @@ const tenureSeries = computed(() => [
 
         <!-- Row 4: Skill Level + Age Distribution -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Skill Level</h3>
                 <p class="text-xs text-gray-400 mb-4">Employee distribution by skill level</p>
                 <VueApexCharts
@@ -305,7 +305,7 @@ const tenureSeries = computed(() => [
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Age Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Employee count by age range</p>
                 <VueApexCharts
@@ -321,7 +321,7 @@ const tenureSeries = computed(() => [
 
         <!-- Row 5: Tenure Distribution -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Tenure Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Employee count by length of service</p>
                 <VueApexCharts

@@ -1,22 +1,22 @@
 <template>
     <div
-        class="rounded-[20px] transition-all duration-300 p-6 group relative overflow-hidden flex flex-col justify-between"
+        class="rounded-2xl transition-all duration-300 p-6 group relative overflow-hidden flex flex-col justify-between"
         :class="[
             highlight
-                ? 'min-h-[220px] bg-gradient-to-br from-[#0B1238] to-[#04081E] border border-[#ffffff10] shadow-xl'
-                : 'bg-white border border-[#DCDEDD] hover:border-[#0C51D9] hover:shadow-lg',
+                ? 'min-h-[220px] bg-gradient-to-br from-gray-900 to-gray-950 border border-white/5 shadow-xl'
+                : 'bg-white border border-brand-border hover:border-primary-500 hover:shadow-lg',
         ]"
     >
         <div class="relative z-10 flex flex-col justify-between h-full">
             <!-- Non-Highlight Header -->
             <div v-if="!highlight" class="flex items-center justify-between mb-4">
                 <h3
-                    class="text-xs font-semibold uppercase tracking-wider text-[#737373] group-hover:text-[#0C51D9] transition-colors"
+                    class="text-xs font-semibold uppercase tracking-wider text-brand-light group-hover:text-primary-500 transition-colors"
                 >
                     {{ title }}
                 </h3>
-                <div v-if="icon" class="p-2.5 bg-[#F4F7FF] rounded-[10px] group-hover:bg-[#0C51D9] transition-colors">
-                    <component :is="icon" class="w-5 h-5 text-[#0C51D9] group-hover:text-white transition-colors" />
+                <div v-if="icon" class="p-2.5 bg-primary-50 rounded-lg group-hover:bg-primary-500 transition-colors">
+                    <component :is="icon" class="w-5 h-5 text-primary-500 group-hover:text-white transition-colors" />
                 </div>
             </div>
 
@@ -46,7 +46,7 @@
                                 :class="
                                     highlight
                                         ? 'text-brand-white text-3xl sm:text-5xl font-extrabold leading-none my-4'
-                                        : 'text-[28px] leading-tight font-extrabold text-[#202020]'
+                                        : 'text-[28px] leading-tight font-extrabold text-brand-dark'
                                 "
                             >
                                 {{ formattedValue }}
@@ -74,7 +74,7 @@
                             :class="
                                 highlight
                                     ? 'text-brand-white-80 text-base font-normal'
-                                    : 'text-sm font-medium text-[#8F8F8F]'
+                                    : 'text-sm font-medium text-gray-400'
                             "
                         >
                             {{ subtitle }}
