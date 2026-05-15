@@ -103,7 +103,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                         <!-- Employee Column -->
                         <td class="py-4 px-6">
                             <div class="flex items-center gap-3">
-                                <img
+                                <img loading="lazy"
                                     :src="attendance.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                                     class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
                                     alt="Profile"
@@ -166,7 +166,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
             <div v-for="attendance in paginatedAttendances" :key="attendance.id" class="p-4 space-y-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <img
+                        <img loading="lazy"
                             :src="attendance.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                             class="w-10 h-10 rounded-full object-cover shadow-sm"
                             alt="Profile"

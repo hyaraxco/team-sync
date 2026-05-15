@@ -139,7 +139,7 @@ watch(
 
                         <!-- User Profile -->
                         <div class="flex items-center gap-3">
-                            <img
+                            <img loading="lazy"
                                 :src="user?.profile_photo || DEFAULT_AVATAR"
                                 alt="User Avatar"
                                 class="w-12 h-12 rounded-full object-cover"

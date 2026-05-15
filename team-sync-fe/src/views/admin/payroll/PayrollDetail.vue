@@ -1050,7 +1050,7 @@ const handleApprovePayroll = () => {
                         >
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-3">
-                                    <img
+                                    <img loading="lazy"
                                         :src="emp.profile_photo || DEFAULT_AVATAR"
                                         :alt="emp.name"
                                         class="w-10 h-10 rounded-full object-cover"

@@ -78,7 +78,7 @@ onMounted(() => {
         <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
             <div class="flex items-center gap-6">
                 <div class="relative">
-                    <img
+                    <img loading="lazy"
                         :src="resolvedProfile?.user?.profile_photo || DEFAULT_AVATAR"
                         :alt="resolvedProfile?.user?.name"
                         class="w-32 h-32 rounded-full object-cover"

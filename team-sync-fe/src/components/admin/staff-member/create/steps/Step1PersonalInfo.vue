@@ -106,7 +106,7 @@ const showPasswordConfirmation = ref(false);
                     <!-- Photo Preview -->
                     <div class="mb-4">
                         <div class="relative w-48 h-48">
-                            <img
+                            <img loading="lazy"
                                 :src="form.profile_photo_url || DEFAULT_AVATAR"
                                 alt="Profile"
                                 class="w-48 h-48 rounded-full object-cover border-2 border-[#DCDEDD]"
