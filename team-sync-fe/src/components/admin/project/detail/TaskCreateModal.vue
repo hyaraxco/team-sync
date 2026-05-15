@@ -102,7 +102,7 @@ const handleSubmit = async () => {
                 <input
                     v-model="formData.name"
                     type="text"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
                     placeholder="Enter task name"
                     required
                 />
@@ -114,7 +114,7 @@ const handleSubmit = async () => {
                 <textarea
                     v-model="formData.description"
                     rows="4"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all resize-none"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all resize-none"
                     placeholder="Enter task description"
                 ></textarea>
             </div>
@@ -126,7 +126,7 @@ const handleSubmit = async () => {
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
                     <select
                         v-model="formData.priority"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
                     >
                         <option value="low">Low</option>
                         <option value="medium">Medium</option>
@@ -140,7 +140,7 @@ const handleSubmit = async () => {
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
                     <select
                         v-model="formData.status"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
                     >
                         <option v-for="status in availableStatuses" :key="status.value" :value="status.value">
                             {{ status.label }}
@@ -155,7 +155,7 @@ const handleSubmit = async () => {
                 <input
                     v-model="formData.due_date"
                     type="date"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-[#0C51D9] focus:ring-2 focus:ring-[#0C51D9] focus:ring-opacity-20 transition-all"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
                 />
             </div>
         </form>
@@ -174,7 +174,7 @@ const handleSubmit = async () => {
                     type="button"
                     @click="handleSubmit"
                     :disabled="isSubmitting"
-                    class="px-6 py-3 bg-[#0C51D9] hover:bg-[#0a42b3] text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-6 py-3 bg-primary-500 hover:bg-[#0a42b3] text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {{ isSubmitting ? "Creating..." : "Create Task" }}
                 </button>

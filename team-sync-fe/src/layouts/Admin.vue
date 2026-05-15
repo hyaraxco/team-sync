@@ -8,7 +8,7 @@ const { isOpen, toggleMobile, closeMobile } = provideSidebar();
 </script>
 
 <template>
-    <div class="flex h-screen overflow-hidden">
+    <div class="flex min-h-[100dvh] overflow-hidden">
         <!-- Skip to main content link for keyboard users -->
         <a
             href="#main-content"
@@ -25,7 +25,7 @@ const { isOpen, toggleMobile, closeMobile } = provideSidebar();
         <!-- Main Content -->
         <div
             id="main-content"
-            class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300 dark:bg-gray-900"
+            class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300"
         >
             <!-- Top Navbar -->
             <Header @toggle-sidebar="toggleMobile" />

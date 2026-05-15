@@ -60,7 +60,7 @@ const handleSubmit = () => {
 
 <template>
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-dark/50 p-4">
-        <div class="bg-white rounded-[24px] w-full max-w-lg overflow-hidden shadow-2xl">
+        <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
             <div class="px-6 py-4 flex items-center justify-between border-b">
                 <h3 class="text-lg font-bold text-brand-dark">Request Correction</h3>
                 <button @click="$emit('close')" class="text-brand-light hover:text-brand-dark transition-colors">
@@ -79,7 +79,7 @@ const handleSubmit = () => {
                         <input
                             v-model="form.requested_check_in"
                             type="datetime-local"
-                            class="w-full px-4 py-2 border rounded-[8px]"
+                            class="w-full px-4 py-2 border rounded-lg"
                         />
                     </div>
 
@@ -88,7 +88,7 @@ const handleSubmit = () => {
                         <input
                             v-model="form.requested_check_out"
                             type="datetime-local"
-                            class="w-full px-4 py-2 border rounded-[8px]"
+                            class="w-full px-4 py-2 border rounded-lg"
                         />
                     </div>
 
@@ -96,7 +96,7 @@ const handleSubmit = () => {
                         <label class="block text-sm font-semibold text-brand-dark mb-1">Reason</label>
                         <textarea
                             v-model="form.reason"
-                            class="w-full px-4 py-2 border rounded-[8px]"
+                            class="w-full px-4 py-2 border rounded-lg"
                             rows="3"
                             placeholder="Why are you making this correction?"
                             required
@@ -108,14 +108,14 @@ const handleSubmit = () => {
                     <button
                         type="button"
                         @click="$emit('close')"
-                        class="px-5 py-2.5 text-brand-light font-medium border rounded-[8px] hover:bg-gray-50"
+                        class="px-5 py-2.5 text-brand-light font-medium border rounded-lg hover:bg-gray-50"
                     >
                         Cancel
                     </button>
                     <button
                         @click="handleSubmit"
                         :disabled="loading || !form.reason"
-                        class="btn-primary blue-gradient blue-btn-shadow px-6 py-2.5 text-white font-semibold rounded-[8px] flex items-center justify-center gap-2 disabled:opacity-50"
+                        class="btn-primary blue-gradient blue-btn-shadow px-6 py-2.5 text-white font-semibold rounded-lg flex items-center justify-center gap-2 disabled:opacity-50"
                     >
                         <Clock class="w-4 h-4" v-if="!loading" />
                         <span>{{ loading ? "Submitting..." : "Submit Request" }}</span>

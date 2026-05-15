@@ -12,7 +12,7 @@ defineProps({
 });
 </script>
 <template>
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
+    <div class="bg-white border border-brand-border rounded-2xl mb-6 p-6">
         <div class="flex items-center gap-6">
             <div class="relative">
                 <div class="w-32 h-32 relative flex items-center justify-center rounded-full overflow-hidden">
@@ -49,13 +49,13 @@ defineProps({
             <div class="flex gap-3">
                 <RouterLink
                     :to="{ name: 'admin.team.edit', params: { id: team.id } }"
-                    class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                 >
                     <Edit class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Edit Team</span>
                 </RouterLink>
                 <button
-                    class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    class="bg-white border border-brand-border text-brand-dark py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
                 >
                     <Share class="w-4 h-4" />
                     Share Team

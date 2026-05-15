@@ -91,9 +91,9 @@ const showPasswordConfirmation = ref(false);
     <div class="flex flex-col 2xl:flex-row gap-6 items-start">
         <!-- Profile Photo Card -->
         <div class="w-full max-w-xl mx-auto 2xl:mx-0 2xl:max-w-none 2xl:w-80 2xl:flex-shrink-0">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                         <Camera class="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
@@ -109,7 +109,7 @@ const showPasswordConfirmation = ref(false);
                             <img loading="lazy"
                                 :src="form.profile_photo_url || DEFAULT_AVATAR"
                                 alt="Profile"
-                                class="w-48 h-48 rounded-full object-cover border-2 border-[#DCDEDD]"
+                                class="w-48 h-48 rounded-full object-cover border-2 border-brand-border"
                             />
                             <button
                                 v-if="form.profile_photo_url"
@@ -133,7 +133,7 @@ const showPasswordConfirmation = ref(false);
                         <button
                             type="button"
                             @click="profilePhotoInput?.click()"
-                            class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                            class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
                         >
                             <FolderOpen class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-base font-semibold">Browse Photo</span>
@@ -154,9 +154,9 @@ const showPasswordConfirmation = ref(false);
         <!-- Form Section -->
         <div class="flex-1 w-full">
             <!-- Account Credentials Section -->
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 mb-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                         <Lock class="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
@@ -219,7 +219,7 @@ const showPasswordConfirmation = ref(false);
                                 <button
                                     type="button"
                                     :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                                    class="text-gray-500 hover:text-[#0C51D9] transition-colors"
+                                    class="text-gray-500 hover:text-primary-500 transition-colors"
                                     @click="showPassword = !showPassword"
                                 >
                                     <EyeOff v-if="showPassword" class="h-4 w-4" />
@@ -251,7 +251,7 @@ const showPasswordConfirmation = ref(false);
                                             ? 'Hide password confirmation'
                                             : 'Show password confirmation'
                                     "
-                                    class="text-gray-500 hover:text-[#0C51D9] transition-colors"
+                                    class="text-gray-500 hover:text-primary-500 transition-colors"
                                     @click="showPasswordConfirmation = !showPasswordConfirmation"
                                 >
                                     <EyeOff v-if="showPasswordConfirmation" class="h-4 w-4" />
@@ -282,9 +282,9 @@ const showPasswordConfirmation = ref(false);
             </div>
 
             <!-- Personal Information Section -->
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <User class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
@@ -334,7 +334,7 @@ const showPasswordConfirmation = ref(false);
                             id="religion"
                             name="religion"
                             v-model="form.religion"
-                            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 bg-white"
                         >
                             <option value="">Select religion</option>
                             <option value="islam">Islam</option>
@@ -356,7 +356,7 @@ const showPasswordConfirmation = ref(false);
                             id="marital_status"
                             name="marital_status"
                             v-model="form.marital_status"
-                            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 bg-white"
                         >
                             <option value="">Select marital status</option>
                             <option value="single">Single / Belum Menikah</option>
@@ -376,7 +376,7 @@ const showPasswordConfirmation = ref(false);
                             id="blood_type"
                             name="blood_type"
                             v-model="form.blood_type"
-                            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 bg-white"
                         >
                             <option value="">Select blood type</option>
                             <option value="A">A</option>
@@ -408,10 +408,10 @@ const showPasswordConfirmation = ref(false);
                         <div class="flex flex-col sm:flex-row gap-4">
                             <!-- Male Option -->
                             <label
-                                class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                             >
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                                         <User class="w-5 h-5 text-blue-600" />
                                     </div>
                                     <div class="flex flex-col">
@@ -419,7 +419,7 @@ const showPasswordConfirmation = ref(false);
                                     </div>
                                 </div>
                                 <div
-                                    class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                    class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                 >
                                     <input
                                         type="radio"
@@ -429,7 +429,7 @@ const showPasswordConfirmation = ref(false);
                                         v-model="form.gender"
                                     />
                                     <div
-                                        class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                        class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                     ></div>
                                     <p
                                         class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -439,10 +439,10 @@ const showPasswordConfirmation = ref(false);
 
                             <!-- Female Option -->
                             <label
-                                class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                             >
                                 <div class="flex items-center gap-3">
-                                    <div class="w-10 h-10 bg-pink-50 rounded-[12px] flex items-center justify-center">
+                                    <div class="w-10 h-10 bg-pink-50 rounded-xl flex items-center justify-center">
                                         <User class="w-5 h-5 text-pink-600" />
                                     </div>
                                     <div class="flex flex-col">
@@ -450,7 +450,7 @@ const showPasswordConfirmation = ref(false);
                                     </div>
                                 </div>
                                 <div
-                                    class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                    class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                 >
                                     <input
                                         type="radio"
@@ -460,7 +460,7 @@ const showPasswordConfirmation = ref(false);
                                         v-model="form.gender"
                                     />
                                     <div
-                                        class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                        class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                     ></div>
                                     <p
                                         class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"

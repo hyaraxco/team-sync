@@ -140,15 +140,15 @@ const statusConfig = (status) => {
     <div class="space-y-6">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-[#0C51D9]">Self Service</p>
-                <h1 class="text-2xl font-bold text-[#0C1C3C]">My Overtime</h1>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-primary-500">Self Service</p>
+                <h1 class="text-2xl font-bold text-brand-dark">My Overtime</h1>
                 <p class="mt-1 text-sm text-gray-500">
                     Track submitted overtime hours, approvals, and rejection notes.
                 </p>
             </div>
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-[12px] border border-[#D5E2FB] px-4 py-2 text-sm font-semibold text-[#0C51D9] transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#D5E2FB] px-4 py-2 text-sm font-semibold text-primary-500 transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
                 :disabled="loading"
                 @click="fetchData"
             >
@@ -158,47 +158,47 @@ const statusConfig = (status) => {
         </div>
 
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-5">
-                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-[16px] bg-blue-50">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
+                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50">
                     <Timer class="h-6 w-6 text-blue-600" />
                 </div>
                 <p class="text-sm font-medium text-gray-500">Loaded Hours</p>
-                <p class="mt-1 text-2xl font-extrabold text-[#0C1C3C]">
+                <p class="mt-1 text-2xl font-extrabold text-brand-dark">
                     {{ formatHours(totalHours) }}
                 </p>
             </div>
 
-            <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-5">
-                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-[16px] bg-green-50">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
+                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-green-50">
                     <CheckCircle2 class="h-6 w-6 text-green-600" />
                 </div>
                 <p class="text-sm font-medium text-gray-500">Approved Hours</p>
-                <p class="mt-1 text-2xl font-extrabold text-[#0C1C3C]">
+                <p class="mt-1 text-2xl font-extrabold text-brand-dark">
                     {{ formatHours(approvedHours) }}
                 </p>
             </div>
 
-            <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-5">
-                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-[16px] bg-yellow-50">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
+                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-yellow-50">
                     <Hourglass class="h-6 w-6 text-yellow-600" />
                 </div>
                 <p class="text-sm font-medium text-gray-500">Pending Records</p>
-                <p class="mt-1 text-2xl font-extrabold text-[#0C1C3C]">{{ pendingCount }}</p>
+                <p class="mt-1 text-2xl font-extrabold text-brand-dark">{{ pendingCount }}</p>
             </div>
 
-            <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-5">
-                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-[16px] bg-red-50">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
+                <div class="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-red-50">
                     <XCircle class="h-6 w-6 text-red-600" />
                 </div>
                 <p class="text-sm font-medium text-gray-500">Rejected Records</p>
-                <p class="mt-1 text-2xl font-extrabold text-[#0C1C3C]">{{ rejectedCount }}</p>
+                <p class="mt-1 text-2xl font-extrabold text-brand-dark">{{ rejectedCount }}</p>
             </div>
         </div>
 
-        <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-4 sm:p-5">
+        <div class="rounded-2xl border border-brand-border bg-white p-4 sm:p-5">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-[#0C1C3C]">Overtime history</h2>
+                    <h2 class="text-lg font-bold text-brand-dark">Overtime history</h2>
                     <p class="text-sm text-gray-500">
                         Showing {{ meta.from || 0 }} - {{ meta.to || myRecords.length }} of
                         {{ meta.total || 0 }} records
@@ -207,7 +207,7 @@ const statusConfig = (status) => {
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <select
                         v-model="filters.status"
-                        class="rounded-[12px] border border-[#DCDEDD] px-4 py-2 text-sm text-[#0C1C3C] outline-none transition-all hover:border-[#0C51D9] focus:border-[#0C51D9]"
+                        class="rounded-xl border border-brand-border px-4 py-2 text-sm text-brand-dark outline-none transition-all hover:border-primary-500 focus:border-primary-500"
                     >
                         <option v-for="option in statusOptions" :key="option.value" :value="option.value">
                             {{ option.label }}
@@ -216,7 +216,7 @@ const statusConfig = (status) => {
                     <button
                         v-if="hasActiveFilter"
                         type="button"
-                        class="rounded-[12px] px-3 py-2 text-sm font-semibold text-[#0C51D9] hover:bg-[#EFF5FF]"
+                        class="rounded-xl px-3 py-2 text-sm font-semibold text-primary-500 hover:bg-[#EFF5FF]"
                         @click="clearFilters"
                     >
                         Clear
@@ -226,7 +226,7 @@ const statusConfig = (status) => {
 
             <div
                 v-if="error"
-                class="mt-5 flex items-start gap-3 rounded-[16px] border border-red-100 bg-red-50 px-4 py-3 text-red-700"
+                class="mt-5 flex items-start gap-3 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-red-700"
             >
                 <AlertCircle class="mt-0.5 h-5 w-5 flex-shrink-0" />
                 <div>
@@ -239,7 +239,7 @@ const statusConfig = (status) => {
                 <div
                     v-for="index in 4"
                     :key="`my-overtime-skeleton-${index}`"
-                    class="h-24 animate-pulse rounded-[16px] bg-[#F1F5F9]"
+                    class="h-24 animate-pulse rounded-2xl bg-[#F1F5F9]"
                 ></div>
             </div>
 
@@ -259,7 +259,7 @@ const statusConfig = (status) => {
                 <article
                     v-for="record in myRecords"
                     :key="record.id"
-                    class="rounded-[16px] border border-[#E7ECF4] p-4 transition-all hover:border-[#0C51D9] hover:shadow-sm"
+                    class="rounded-2xl border border-[#E7ECF4] p-4 transition-all hover:border-primary-500 hover:shadow-sm"
                     :data-testid="`my-overtime-record-${record.id}`"
                 >
                     <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
@@ -272,7 +272,7 @@ const statusConfig = (status) => {
                             </div>
                             <div>
                                 <div class="flex flex-wrap items-center gap-2">
-                                    <h3 class="font-bold text-[#0C1C3C]">
+                                    <h3 class="font-bold text-brand-dark">
                                         {{ formatType(record.overtime_type) }}
                                     </h3>
                                     <span
@@ -297,7 +297,7 @@ const statusConfig = (status) => {
                                 </p>
                                 <p
                                     v-if="record.rejection_reason"
-                                    class="mt-3 rounded-[12px] bg-red-50 px-3 py-2 text-sm text-red-700"
+                                    class="mt-3 rounded-xl bg-red-50 px-3 py-2 text-sm text-red-700"
                                 >
                                     {{ record.rejection_reason }}
                                 </p>
@@ -305,7 +305,7 @@ const statusConfig = (status) => {
                         </div>
                         <div class="rounded-[14px] bg-[#F8FAFC] px-4 py-3 text-left md:text-right">
                             <p class="text-xs font-semibold uppercase tracking-[0.1em] text-gray-500">Hours</p>
-                            <p class="text-2xl font-extrabold text-[#0C1C3C]">
+                            <p class="text-2xl font-extrabold text-brand-dark">
                                 {{ formatHours(record.hours) }}
                             </p>
                         </div>

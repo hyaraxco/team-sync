@@ -29,7 +29,7 @@ const handleClose = () => {
             @click.self="handleClose"
         >
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-md mx-4 overflow-hidden animate-scale-in"
+                class="bg-white rounded-2xl border border-brand-border w-full max-w-md mx-4 overflow-hidden animate-scale-in"
             >
                 <!-- Success Icon Header -->
                 <div class="bg-gradient-to-br from-green-50 to-green-100 p-8 text-center">
@@ -44,7 +44,7 @@ const handleClose = () => {
 
                 <!-- Request Details -->
                 <div class="p-6 space-y-4" v-if="leaveData">
-                    <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-4 space-y-3">
+                    <div class="bg-white border border-brand-border rounded-2xl p-4 space-y-3">
                         <!-- Leave Type -->
                         <div class="flex items-center justify-between">
                             <span class="text-brand-dark text-sm font-medium">Leave Type</span>
@@ -79,7 +79,7 @@ const handleClose = () => {
                     </div>
 
                     <!-- Info Message -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-[12px] p-4 flex gap-3">
+                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
                         <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
                             <span class="text-blue-600 text-lg">ℹ️</span>
                         </div>
@@ -91,7 +91,7 @@ const handleClose = () => {
                     <!-- Close Button -->
                     <button
                         @click="handleClose"
-                        class="btn-primary w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
+                        class="btn-primary w-full rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Got it!</span>
                     </button>

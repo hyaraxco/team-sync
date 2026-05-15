@@ -42,9 +42,9 @@ const formatText = (text: string) => {
 <template>
     <div class="space-y-6">
         <!-- Preview Header -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-[20px] p-6 text-white">
+        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-12 h-12 bg-white/20 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                     <CheckCircle class="w-6 h-6 text-white" />
                 </div>
                 <div>
@@ -55,9 +55,9 @@ const formatText = (text: string) => {
         </div>
 
         <!-- Personal Information -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <User class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
@@ -73,7 +73,7 @@ const formatText = (text: string) => {
                         <img loading="lazy"
                             :src="step1Data.profile_photo_url || DEFAULT_AVATAR"
                             alt="Profile Photo"
-                            class="w-20 h-20 rounded-full object-cover border-2 border-[#DCDEDD]"
+                            class="w-20 h-20 rounded-full object-cover border-2 border-brand-border"
                         />
                     </div>
                 </div>
@@ -159,9 +159,9 @@ const formatText = (text: string) => {
         </div>
 
         <!-- Job Information -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                     <Briefcase class="w-6 h-6 text-green-600" />
                 </div>
                 <div>
@@ -247,9 +247,9 @@ const formatText = (text: string) => {
         </div>
 
         <!-- Bank Information -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                     <CreditCard class="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
@@ -281,9 +281,9 @@ const formatText = (text: string) => {
         </div>
 
         <!-- Emergency Contact -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                     <Phone class="w-6 h-6 text-red-600" />
                 </div>
                 <div>

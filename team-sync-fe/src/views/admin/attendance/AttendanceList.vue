@@ -147,7 +147,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.records' }"
                 v-if="can('attendance-list')"
-                class="bg-white border border-[#DCDEDD] rounded-[16px] p-4 flex items-center gap-4 hover:border-[#0C51D9] hover:shadow-md transition-all duration-300 group"
+                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary-500 hover:shadow-md transition-all duration-300 group"
             >
                 <div
                     class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
@@ -155,7 +155,7 @@ onMounted(async () => {
                     <CalendarDays class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-[#0C51D9] transition-colors">
+                    <h3 class="text-brand-dark font-bold text-base group-hover:text-primary-500 transition-colors">
                         Attendance Logs
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">View historical records</p>
@@ -165,7 +165,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.leave-requests' }"
                 v-if="can('leave-request-list')"
-                class="bg-white border border-[#DCDEDD] rounded-[16px] p-4 flex items-center gap-4 hover:border-[#0C51D9] hover:shadow-md transition-all duration-300 group"
+                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary-500 hover:shadow-md transition-all duration-300 group"
             >
                 <div
                     class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors"
@@ -173,7 +173,7 @@ onMounted(async () => {
                     <CalendarClock class="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-[#0C51D9] transition-colors">
+                    <h3 class="text-brand-dark font-bold text-base group-hover:text-primary-500 transition-colors">
                         Leave Requests
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">Manage employee time off</p>
@@ -183,7 +183,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.corrections' }"
                 v-if="can('attendance-correction-list')"
-                class="bg-white border border-[#DCDEDD] rounded-[16px] p-4 flex items-center gap-4 hover:border-[#0C51D9] hover:shadow-md transition-all duration-300 group"
+                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary-500 hover:shadow-md transition-all duration-300 group"
             >
                 <div
                     class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition-colors"
@@ -191,7 +191,7 @@ onMounted(async () => {
                     <Clock class="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-[#0C51D9] transition-colors">
+                    <h3 class="text-brand-dark font-bold text-base group-hover:text-primary-500 transition-colors">
                         Corrections
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">Manage clock-in disputes</p>
@@ -200,7 +200,7 @@ onMounted(async () => {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="main-card rounded-[20px] border border-[#0B1042] relative overflow-hidden p-5">
+            <div class="main-card rounded-2xl border border-[#0B1042] relative overflow-hidden p-5">
                 <div class="flex flex-col justify-center h-full relative z-10">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
@@ -219,7 +219,7 @@ onMounted(async () => {
                             </p>
                             <p class="text-brand-white-80 text-base font-normal">Active employees</p>
                         </div>
-                        <div class="w-16 h-16 bg-white/20 rounded-[20px] flex items-center justify-center">
+                        <div class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center">
                             <CheckCircle class="w-8 h-8 text-white" />
                         </div>
                     </div>
@@ -310,10 +310,10 @@ onMounted(async () => {
                 can('leave-request-list') && can('attendance-correction-list') ? 'lg:grid-cols-2' : '',
             ]"
         >
-            <div v-if="can('leave-request-list')" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div v-if="can('leave-request-list')" class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-orange-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                             <CalendarClock class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
@@ -330,7 +330,7 @@ onMounted(async () => {
                     <div
                         v-for="request in leaveRequests"
                         :key="request.id"
-                        class="flex items-center gap-4 p-4 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                     >
                         <img loading="lazy"
                             :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
@@ -359,14 +359,14 @@ onMounted(async () => {
                         >
                             <button
                                 @click="showApproveModal(request)"
-                                class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
+                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
                             >
                                 <Check class="w-4 h-4 text-green-600" />
                                 <span class="text-brand-dark text-xs font-semibold">Approve</span>
                             </button>
                             <button
                                 @click="showRejectModal(request)"
-                                class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
+                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
                             >
                                 <X class="w-4 h-4 text-red-600" />
                                 <span class="text-brand-dark text-xs font-semibold">Reject</span>
@@ -384,10 +384,10 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div v-if="can('attendance-correction-list')" class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div v-if="can('attendance-correction-list')" class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <Clock class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
@@ -404,7 +404,7 @@ onMounted(async () => {
                     <div
                         v-for="correction in pendingCorrections"
                         :key="correction.id"
-                        class="flex items-center gap-4 p-4 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                     >
                         <img loading="lazy"
                             :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
@@ -464,7 +464,7 @@ onMounted(async () => {
             </div>
 
             <div v-if="selectedApproveRequest" class="mb-6 space-y-3">
-                <div class="border border-[#DCDEDD] rounded-[12px] p-4">
+                <div class="border border-brand-border rounded-xl p-4">
                     <p class="text-brand-dark text-sm font-semibold mb-2">
                         {{ selectedApproveRequest.staff_member?.user?.name }}
                     </p>
@@ -487,14 +487,14 @@ onMounted(async () => {
                     <button
                         @click="closeApproveModal"
                         :disabled="processingApprove"
-                        class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                        class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                     >
                         Cancel
                     </button>
                     <button
                         @click="confirmApprove"
                         :disabled="processingApprove"
-                        class="flex-1 px-4 py-3 bg-green-600 text-white rounded-[12px] text-sm font-semibold hover:bg-green-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {{ processingApprove ? "Approving..." : "Approve" }}
                     </button>
@@ -513,7 +513,7 @@ onMounted(async () => {
             </div>
 
             <div v-if="selectedRejectRequest" class="mb-6 space-y-3">
-                <div class="border border-[#DCDEDD] rounded-[12px] p-4">
+                <div class="border border-brand-border rounded-xl p-4">
                     <p class="text-brand-dark text-sm font-semibold mb-2">
                         {{ selectedRejectRequest.staff_member?.user?.name }}
                     </p>
@@ -536,14 +536,14 @@ onMounted(async () => {
                     <button
                         @click="closeRejectModal"
                         :disabled="processingReject"
-                        class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                        class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                     >
                         Cancel
                     </button>
                     <button
                         @click="confirmReject"
                         :disabled="processingReject"
-                        class="flex-1 px-4 py-3 bg-red-600 text-white rounded-[12px] text-sm font-semibold hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {{ processingReject ? "Rejecting..." : "Reject" }}
                     </button>

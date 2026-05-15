@@ -10,7 +10,7 @@
                 </div>
                 <button
                     @click="showOverrideModal = true"
-                    class="px-4 py-2 rounded-[8px] border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
+                    class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
                 >
                     Request Override
                 </button>
@@ -20,7 +20,7 @@
                 <!-- Error State -->
                 <div
                     v-if="error"
-                    class="bg-white border border-red-200 rounded-[20px] p-6 flex items-center gap-3 text-red-600"
+                    class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
                 >
                     <AlertTriangle class="w-5 h-5 shrink-0" />
                     <p>Failed to load schedule. The service might be temporarily unavailable.</p>
@@ -28,7 +28,7 @@
 
                 <!-- Loading State -->
                 <div v-else-if="loading" class="space-y-4">
-                    <div v-for="i in 5" :key="i" class="h-14 bg-gray-100 rounded-[12px] animate-pulse" />
+                    <div v-for="i in 5" :key="i" class="h-14 bg-gray-100 rounded-xl animate-pulse" />
                 </div>
 
                 <div v-else class="grid gap-6 lg:grid-cols-2">
@@ -41,7 +41,7 @@
                             <div
                                 v-for="(location, day) in baseSchedule"
                                 :key="day"
-                                class="flex items-center justify-between p-3 bg-white border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-colors"
+                                class="flex items-center justify-between p-3 bg-white border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-colors"
                             >
                                 <span class="font-medium text-brand-dark capitalize">{{ day }}</span>
                                 <span
@@ -66,7 +66,7 @@
 
                         <div
                             v-if="!schedule.overrides?.length"
-                            class="bg-white border border-[#DCDEDD] rounded-[16px] p-8 text-center"
+                            class="bg-white border border-brand-border rounded-2xl p-8 text-center"
                         >
                             <p class="text-brand-light">No override requests yet.</p>
                         </div>
@@ -75,7 +75,7 @@
                             <div
                                 v-for="override in schedule.overrides"
                                 :key="override.id"
-                                class="p-4 bg-white border border-[#DCDEDD] rounded-[12px]"
+                                class="p-4 bg-white border border-brand-border rounded-xl"
                             >
                                 <div class="flex justify-between items-start mb-2">
                                     <div>
@@ -107,7 +107,7 @@
 
     <!-- Override Modal -->
     <div v-if="showOverrideModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-        <div class="w-full max-w-md bg-white rounded-[20px] p-6 space-y-4">
+        <div class="w-full max-w-md bg-white rounded-2xl p-6 space-y-4">
             <h2 class="text-xl font-bold text-brand-dark">Request Schedule Override</h2>
             <form @submit.prevent="submitOverride" class="space-y-4">
                 <div>
@@ -117,7 +117,7 @@
                         v-model="overrideForm.date"
                         type="date"
                         required
-                        class="w-full border border-[#DCDEDD] rounded-[8px] px-3 py-2 focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none"
+                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
                     />
                 </div>
                 <div>
@@ -126,7 +126,7 @@
                         id="override-mode"
                         v-model="overrideForm.planned_work_mode"
                         required
-                        class="w-full border border-[#DCDEDD] rounded-[8px] px-3 py-2 focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none"
+                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
                     >
                         <option value="office">Office</option>
                         <option value="remote">Remote</option>
@@ -139,13 +139,13 @@
                         v-model="overrideForm.reason"
                         rows="3"
                         required
-                        class="w-full border border-[#DCDEDD] rounded-[8px] px-3 py-2 focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none"
+                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
                     ></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-2">
                     <button
                         type="button"
-                        class="px-4 py-2 rounded-[8px] border border-[#DCDEDD] text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 rounded-lg border border-brand-border text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
                         @click="showOverrideModal = false"
                     >
                         Cancel
@@ -153,7 +153,7 @@
                     <button
                         type="submit"
                         :disabled="submittingOverride"
-                        class="px-4 py-2 rounded-[8px] border border-[#2151A0] blue-gradient blue-btn-shadow text-white hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
+                        class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
                     >
                         {{ submittingOverride ? "Submitting..." : "Submit" }}
                     </button>

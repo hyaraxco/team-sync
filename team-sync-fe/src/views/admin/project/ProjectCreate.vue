@@ -153,9 +153,9 @@ watch(
         <div class="flex-1">
             <form class="space-y-6" @submit.prevent="handleSubmit">
                 <!-- Project Information Section -->
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                <div class="bg-white border border-brand-border rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <Briefcase class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
@@ -174,16 +174,16 @@ watch(
                                     <div class="relative w-64 h-40">
                                         <!-- Default background -->
                                         <div
-                                            class="w-64 h-40 absolute bg-gray-50 rounded-[16px] border-2 border-dashed border-[#DCDEDD]"
+                                            class="w-64 h-40 absolute bg-gray-50 rounded-2xl border-2 border-dashed border-brand-border"
                                         ></div>
 
                                         <div
-                                            class="w-64 h-40 relative z-10 flex items-center justify-center rounded-[16px] overflow-hidden"
+                                            class="w-64 h-40 relative z-10 flex items-center justify-center rounded-2xl overflow-hidden"
                                         >
                                             <img loading="lazy"
                                                 :src="form.photo_url"
                                                 alt="Project Photo"
-                                                class="w-64 h-40 object-cover rounded-[16px]"
+                                                class="w-64 h-40 object-cover rounded-2xl"
                                                 v-if="form.photo_url"
                                             />
                                             <div v-else class="flex flex-col items-center justify-center text-gray-400">
@@ -194,10 +194,10 @@ watch(
 
                                         <!-- Upload overlay (shown on hover) - only when no photo uploaded -->
                                         <div
-                                            class="absolute inset-0 rounded-[16px] flex items-center justify-center transition-all duration-300 cursor-pointer z-20 group"
+                                            class="absolute inset-0 rounded-2xl flex items-center justify-center transition-all duration-300 cursor-pointer z-20 group"
                                         >
                                             <div
-                                                class="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 rounded-[16px] transition-opacity duration-300"
+                                                class="absolute inset-0 bg-black opacity-0 group-hover:opacity-30 rounded-2xl transition-opacity duration-300"
                                             ></div>
                                             <Upload
                                                 class="w-10 h-10 text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 relative z-10"
@@ -216,21 +216,21 @@ watch(
                                     />
                                     <button
                                         type="button"
-                                        class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <ImagePlus class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Select Photo</span>
                                     </button>
                                     <button
                                         type="button"
-                                        class="hidden border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <Eye class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Preview Photo</span>
                                     </button>
                                     <button
                                         type="button"
-                                        class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <X class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Remove Photo</span>
@@ -263,11 +263,11 @@ watch(
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Low Priority -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-gray-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center"
                                         >
                                             <Minus class="w-5 h-5 text-gray-600" />
                                         </div>
@@ -276,7 +276,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -286,7 +286,7 @@ watch(
                                             v-model="form.priority"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -296,11 +296,11 @@ watch(
 
                                 <!-- Medium Priority -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-yellow-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center"
                                         >
                                             <Flag class="w-5 h-5 text-yellow-600" />
                                         </div>
@@ -309,7 +309,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -319,7 +319,7 @@ watch(
                                             v-model="form.priority"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -329,11 +329,11 @@ watch(
 
                                 <!-- High Priority -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-red-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-red-50 rounded-xl flex items-center justify-center"
                                         >
                                             <Zap class="w-5 h-5 text-red-600" />
                                         </div>
@@ -342,7 +342,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -352,7 +352,7 @@ watch(
                                             v-model="form.priority"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -458,9 +458,9 @@ watch(
                 </div>
 
                 <!-- Project Leader Section -->
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                <div class="bg-white border border-brand-border rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                             <Crown class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
@@ -478,7 +478,7 @@ watch(
                             <button
                                 type="button"
                                 @click="leaderModal = true"
-                                class="w-full border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+                                class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                             >
                                 <UserCheck class="w-5 h-5 text-gray-400" />
                                 <span class="text-[#0D2929] font-normal flex-1">
@@ -495,7 +495,7 @@ watch(
 
                             <!-- Selected Leader Info -->
                             <div
-                                class="mt-3 p-4 bg-gray-50 rounded-[12px] border border-[#DCDEDD]"
+                                class="mt-3 p-4 bg-gray-50 rounded-xl border border-brand-border"
                                 v-if="selectedLeader"
                             >
                                 <div class="flex items-center gap-3">
@@ -526,9 +526,9 @@ watch(
                 </div>
 
                 <!-- Team Assignment Section -->
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                <div class="bg-white border border-brand-border rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                             <Users class="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
@@ -546,17 +546,17 @@ watch(
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Product Development Team -->
                                 <label
-                                    class="group team-card flex items-center justify-between w-full min-h-[70px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer hover:border-[#0C51D9] hover:border-2"
+                                    class="group team-card flex items-center justify-between w-full min-h-[70px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer hover:ring-2 hover:ring-primary-500/20"
                                     v-for="(team, index) in teams"
                                     :key="index"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-12 h-12 relative flex items-center justify-center rounded-[12px] overflow-hidden"
+                                            class="w-12 h-12 relative flex items-center justify-center rounded-xl overflow-hidden"
                                         >
                                             <!-- Main blue background -->
                                             <div
-                                                class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[12px]"
+                                                class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
                                             ></div>
                                             <!-- Lucide icon -->
                                             <Code class="w-5 h-5 text-white relative z-10" />
@@ -571,7 +571,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="checkbox"
@@ -581,7 +581,7 @@ watch(
                                             v-model="form.teams"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded border border-[#DCDEDD] group-has-[:checked]:bg-[#0C51D9] group-has-[:checked]:border-[#0C51D9] transition-all duration-300 items-center justify-center"
+                                            class="flex size-[18px] rounded border border-brand-border group-has-[:checked]:bg-primary-500 group-has-[:checked]:border-primary-500 transition-all duration-300 items-center justify-center"
                                         >
                                             <Check
                                                 class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity duration-300"
@@ -597,7 +597,7 @@ watch(
 
                         <!-- Selected Teams Summary -->
                         <div id="selectedTeamsSummary" class="hidden">
-                            <div class="border-t border-[#DCDEDD] pt-4">
+                            <div class="border-t border-brand-border pt-4">
                                 <div class="flex items-center justify-between mb-3">
                                     <label class="block text-brand-dark text-base font-semibold">Selected Teams</label>
                                     <button
@@ -615,9 +615,9 @@ watch(
                 </div>
 
                 <!-- Project Settings Section -->
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                <div class="bg-white border border-brand-border rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-orange-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                             <Settings class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
@@ -647,11 +647,11 @@ watch(
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Active Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-green-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center"
                                         >
                                             <PlayCircle class="w-5 h-5 text-green-600" />
                                         </div>
@@ -660,7 +660,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -670,7 +670,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -680,11 +680,11 @@ watch(
 
                                 <!-- Planning Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-blue-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"
                                         >
                                             <ClipboardList class="w-5 h-5 text-blue-600" />
                                         </div>
@@ -693,7 +693,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -703,7 +703,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -713,11 +713,11 @@ watch(
 
                                 <!-- On Hold Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-yellow-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-yellow-50 rounded-xl flex items-center justify-center"
                                         >
                                             <PauseCircle class="w-5 h-5 text-yellow-600" />
                                         </div>
@@ -726,7 +726,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -736,7 +736,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -746,11 +746,11 @@ watch(
 
                                 <!-- Draft Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-[16px] border border-[#DCDEDD] p-4 has-[:checked]:ring-2 has-[:checked]:ring-[#0C51D9] has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-gray-50 rounded-[12px] flex items-center justify-center"
+                                            class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center"
                                         >
                                             <FileText class="w-5 h-5 text-gray-600" />
                                         </div>
@@ -759,7 +759,7 @@ watch(
                                         </div>
                                     </div>
                                     <div
-                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-[#DCDEDD] py-2 px-3 gap-2"
+                                        class="relative flex items-center justify-center w-fit h-8 shrink-0 rounded-xl border border-brand-border py-2 px-3 gap-2"
                                     >
                                         <input
                                             type="radio"
@@ -769,7 +769,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-[#DCDEDD] group-has-[:checked]:border-[5px] group-has-[:checked]:border-[#0C51D9] transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -785,7 +785,7 @@ watch(
                 <div class="flex items-center gap-4 pb-6">
                     <button
                         type="submit"
-                        class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Create Project</span>
                         <Plus class="w-4 h-4 text-white" />
@@ -793,7 +793,7 @@ watch(
                     <button
                         type="button"
                         onclick="window.history.back()"
-                        class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-dark text-base font-semibold">Cancel</span>
                     </button>
@@ -806,12 +806,12 @@ watch(
 
     <!-- Project Leader Selection Modal -->
     <div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center" v-if="leaderModal">
-        <div class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden">
+        <div class="bg-white rounded-2xl border border-brand-border w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden">
             <!-- Modal Header -->
-            <div class="p-6 border-b border-[#DCDEDD]">
+            <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                             <Crown class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
@@ -822,7 +822,7 @@ watch(
                     <button
                         type="button"
                         @click="leaderModal = false"
-                        class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                     >
                         <X class="w-5 h-5 text-gray-600" />
                     </button>
@@ -830,14 +830,14 @@ watch(
             </div>
 
             <!-- Search Bar -->
-            <div class="p-6 border-b border-[#DCDEDD]">
+            <div class="p-6 border-b border-brand-border">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Search class="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                         placeholder="Search staffMembers..."
                         v-model="searchLeader"
                     />
@@ -848,19 +848,19 @@ watch(
             <div class="p-6 overflow-y-auto max-h-96">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
-                        class="leader-card border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="leader-card border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
                         v-for="employee in staffMembers"
                         :key="employee.id"
                         @click="handleSelectLeader(employee)"
                     >
                         <div class="flex items-center gap-4">
                             <div
-                                class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden"
+                                class="w-14 h-14 relative flex items-center justify-center rounded-xl overflow-hidden"
                             >
                                 <img loading="lazy"
                                     :src="employee.user?.profile_photo || DEFAULT_AVATAR"
                                     alt="Employee Photo"
-                                    class="w-14 h-14 rounded-[12px] object-cover"
+                                    class="w-14 h-14 rounded-xl object-cover"
                                 />
                             </div>
                             <div class="flex-1">

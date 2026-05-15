@@ -10,14 +10,14 @@
                 </div>
                 <div class="flex items-center gap-3">
                     <button
-                        class="px-4 py-2 rounded-[8px] border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
+                        class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
                         @click="openCreateModal"
                     >
                         <Plus class="w-4 h-4 inline mr-1" />
                         Create Period
                     </button>
                     <button
-                        class="px-4 py-2 rounded-[8px] border border-[#DCDEDD] text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
                         @click="fetchData"
                     >
                         Sync Latest
@@ -32,7 +32,7 @@
                     <!-- Error State -->
                     <div
                         v-if="periodStore.error"
-                        class="bg-white border border-red-200 rounded-[20px] p-6 flex items-center gap-3 text-red-600"
+                        class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
                     >
                         <AlertTriangle class="w-5 h-5 shrink-0" />
                         <p>Failed to load attendance periods. Please try again later.</p>
@@ -40,13 +40,13 @@
 
                     <!-- Loading State -->
                     <div v-else-if="periodStore.loading" class="space-y-3">
-                        <div v-for="i in 4" :key="i" class="h-20 bg-gray-100 rounded-[16px] animate-pulse" />
+                        <div v-for="i in 4" :key="i" class="h-20 bg-gray-100 rounded-2xl animate-pulse" />
                     </div>
 
                     <!-- Empty State -->
                     <div
                         v-else-if="!periods.length"
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-12 text-center"
+                        class="bg-white border border-brand-border rounded-2xl p-12 text-center"
                     >
                         <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-400" />
                         <p class="text-brand-dark font-semibold">No attendance periods found</p>
@@ -60,11 +60,11 @@
                             :key="period.id"
                             type="button"
                             @click="selectPeriod(period)"
-                            class="group flex items-center justify-between p-4 bg-white border rounded-[16px] transition-all duration-200 cursor-pointer text-left w-full"
+                            class="group flex items-center justify-between p-4 bg-white border rounded-2xl transition-all duration-200 cursor-pointer text-left w-full"
                             :class="
                                 selectedPeriod?.id === period.id
-                                    ? 'border-[#0C51D9] shadow-md'
-                                    : 'border-[#DCDEDD] hover:border-[#0C51D9] hover:border-2'
+                                    ? 'border-primary-500 shadow-md'
+                                    : 'border-brand-border hover:ring-2 hover:ring-primary-500/20'
                             "
                         >
                             <div class="flex items-center gap-4">
@@ -103,7 +103,7 @@
 
                 <!-- Readiness Sidebar -->
                 <div class="lg:col-span-1">
-                    <div class="sticky top-8 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+                    <div class="sticky top-8 bg-white border border-brand-border rounded-2xl p-6">
                         <h2 class="text-lg font-bold text-brand-dark mb-4 flex items-center gap-2">
                             <CheckCircle class="w-5 h-5 text-green-500" />
                             Readiness Workspace
@@ -115,21 +115,21 @@
                         </div>
 
                         <div v-else class="space-y-4">
-                            <div class="p-4 rounded-[12px] bg-gray-50 border border-[#DCDEDD]">
+                            <div class="p-4 rounded-xl bg-gray-50 border border-brand-border">
                                 <p class="text-sm text-brand-light mb-1">Selected Period</p>
                                 <p class="text-lg font-semibold text-brand-dark">{{ selectedPeriod.month }}</p>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="p-3 rounded-[12px] bg-green-50 border border-green-200">
+                                <div class="p-3 rounded-xl bg-green-50 border border-green-200">
                                     <p class="text-2xl font-bold text-green-700">{{ readinessCounts.ready }}</p>
                                     <p class="text-xs text-green-600 font-semibold">Ready</p>
                                 </div>
-                                <div class="p-3 rounded-[12px] bg-yellow-50 border border-yellow-200">
+                                <div class="p-3 rounded-xl bg-yellow-50 border border-yellow-200">
                                     <p class="text-2xl font-bold text-yellow-700">{{ readinessCounts.warnings }}</p>
                                     <p class="text-xs text-yellow-600 font-semibold">Warnings</p>
                                 </div>
-                                <div class="p-3 rounded-[12px] bg-red-50 border border-red-200 col-span-2 flex justify-between items-center">
+                                <div class="p-3 rounded-xl bg-red-50 border border-red-200 col-span-2 flex justify-between items-center">
                                     <div>
                                         <p class="text-2xl font-bold text-red-700">{{ readinessCounts.blocked }}</p>
                                         <p class="text-xs text-red-600 font-semibold">Blocked</p>
@@ -140,9 +140,9 @@
                                 </div>
                             </div>
 
-                            <div class="pt-4 border-t border-[#DCDEDD]">
+                            <div class="pt-4 border-t border-brand-border">
                                 <button
-                                    class="w-full py-3 rounded-[8px] font-semibold transition-all cursor-pointer"
+                                    class="w-full py-3 rounded-lg font-semibold transition-all cursor-pointer"
                                     :class="
                                         selectedPeriod.status === 'review'
                                             ? 'border border-[#2151A0] blue-gradient blue-btn-shadow text-white hover:brightness-110'
@@ -174,7 +174,7 @@
                         v-model="createForm.start_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
                     />
                 </div>
 
@@ -185,7 +185,7 @@
                         v-model="createForm.end_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
                     />
                 </div>
 
@@ -196,7 +196,7 @@
                         v-model="createForm.cutoff_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] focus:border-[#0C51D9] focus:ring-1 focus:ring-[#0C51D9] outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
                     />
                 </div>
 
@@ -204,7 +204,7 @@
                     <button
                         type="button"
                         :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-[8px] border border-[#DCDEDD] text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="flex-1 px-4 py-2.5 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
                         @click="closeCreateModal"
                     >
                         Cancel
@@ -212,7 +212,7 @@
                     <button
                         type="submit"
                         :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-[8px] border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+                        class="flex-1 px-4 py-2.5 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                         {{ isSubmitting ? "Creating..." : "Create Period" }}
                     </button>

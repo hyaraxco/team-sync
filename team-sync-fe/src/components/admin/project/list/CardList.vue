@@ -44,26 +44,26 @@ const handleDeleteProject = async () => {
 <template>
     <div
         @click="navigateToDetail"
-        class="border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
     >
         <!-- Project Image -->
         <div
-            class="w-full h-32 bg-gradient-to-br from-blue-100 to-purple-100 relative overflow-hidden rounded-[12px] mb-4"
+            class="w-full h-32 bg-gradient-to-br from-primary-50 to-primary-100 relative overflow-hidden rounded-xl mb-4"
         >
-            <img loading="lazy" class="w-full h-full object-cover rounded-[12px]" :src="data.photo" />
+            <img loading="lazy" class="w-full h-full object-cover rounded-xl" :src="data.photo" />
             <!-- Priority Badge Overlay -->
             <StatusBadge
                 v-if="data.priority"
                 type="priority"
                 :value="data.priority"
-                class="absolute bottom-2 left-2 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+                class="absolute bottom-2 left-2 shadow-sm"
             />
             <!-- Status Badge Overlay -->
             <StatusBadge
                 v-if="data.status"
                 type="project"
                 :value="data.status"
-                class="absolute bottom-2 right-2 shadow-[0_2px_8px_rgba(0,0,0,0.08)]"
+                class="absolute bottom-2 right-2 shadow-sm"
             />
         </div>
         <div class="flex items-start justify-between mb-4">
@@ -77,7 +77,7 @@ const handleDeleteProject = async () => {
             </div>
         </div>
 
-        <div class="border-t border-[#DCDEDD] pt-4 mb-4" v-if="data.leader">
+        <div class="border-t border-brand-border pt-4 mb-4" v-if="data.leader">
             <div class="flex items-center gap-3">
                 <img loading="lazy"
                     :src="data.leader?.user?.profile_photo || DEFAULT_AVATAR"
@@ -97,7 +97,7 @@ const handleDeleteProject = async () => {
                     <span class="text-green-700 text-xs font-medium">Leader</span>
                 </div>
             </div>
-            <div class="border-b border-[#DCDEDD] pb-4"></div>
+            <div class="border-b border-brand-border pb-4"></div>
         </div>
 
         <div class="mb-4">
@@ -128,7 +128,7 @@ const handleDeleteProject = async () => {
         <div class="flex gap-2" v-if="can('project-edit')">
             <RouterLink
                 :to="{ name: 'admin.projects.edit', params: { id: data.id } }"
-                class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+                class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
                 @click.stop
             >
                 <Edit class="w-4 h-4 text-gray-600" />
@@ -137,7 +137,7 @@ const handleDeleteProject = async () => {
             <button
                 v-if="can('project-delete')"
                 @click.stop="showDeleteModal = true"
-                class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-red-500 hover:border-2 hover:bg-red-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+                class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-red-500/20 hover:bg-red-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
             >
                 <Trash2 class="w-4 h-4 text-gray-600 hover:text-red-600" />
                 <span class="text-brand-dark text-sm font-semibold">Delete</span>

@@ -151,10 +151,10 @@ onMounted(async () => {
 
 <template>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-        <div class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Briefcase class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
@@ -179,9 +179,9 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
-                <img loading="lazy" :src="project.photo" alt="Project Image" class="w-full h-full object-cover rounded-[12px]" />
+                <img loading="lazy" :src="project.photo" alt="Project Image" class="w-full h-full object-cover rounded-xl" />
             </div>
 
             <!-- Project Basic Info -->
@@ -212,14 +212,14 @@ onMounted(async () => {
                         <div
                             v-for="team in project.teams"
                             :key="team.id"
-                            class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:shadow-lg transition-all duration-300 p-4"
+                            class="border border-brand-border rounded-2xl hover:border-primary-500 hover:shadow-lg transition-all duration-300 p-4"
                         >
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 relative flex items-center justify-center rounded-[12px] overflow-hidden flex-shrink-0"
+                                    class="w-12 h-12 relative flex items-center justify-center rounded-xl overflow-hidden flex-shrink-0"
                                 >
                                     <div
-                                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[12px]"
+                                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
                                     ></div>
                                     <component :is="Briefcase" class="w-5 h-5 text-white relative z-10" />
                                 </div>
@@ -234,7 +234,7 @@ onMounted(async () => {
                                 </div>
                             </div>
 
-                            <div class="mt-4 pt-4 border-t border-[#DCDEDD]">
+                            <div class="mt-4 pt-4 border-t border-brand-border">
                                 <div v-if="team.leader" class="flex items-center gap-3">
                                     <img loading="lazy"
                                         :src="team.leader.profile_photo || DEFAULT_AVATAR"
@@ -262,9 +262,9 @@ onMounted(async () => {
         </div>
 
         <div class="space-y-4">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 h-fit">
+            <div class="bg-white border border-brand-border rounded-2xl p-6 h-fit">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                         <Crown class="w-6 h-6 text-green-600" />
                     </div>
                     <div>
@@ -292,7 +292,7 @@ onMounted(async () => {
                             name: 'admin.staffMembers.detail',
                             params: { id: project.leader.id },
                         }"
-                        class="border border-[#DCDEDD] text-brand-dark py-2 px-4 rounded-[8px] font-medium hover:bg-gray-50 hover:border-[#0C51D9] hover:border-2 transition-all duration-300 flex items-center gap-2"
+                        class="border border-brand-border text-brand-dark py-2 px-4 rounded-lg font-medium hover:bg-gray-50 hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 flex items-center gap-2"
                     >
                         <User class="w-4 h-4" />
                         <span class="text-sm font-semibold">Profile</span>
@@ -301,7 +301,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -311,7 +311,7 @@ onMounted(async () => {
                         </p>
                         <p class="text-purple-600 text-sm font-medium">Project completion</p>
                     </div>
-                    <div class="w-14 h-14 bg-purple-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center">
                         <Target class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
@@ -325,14 +325,14 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-brand-dark text-sm font-medium">Squad Snapshot</p>
                         <p class="text-brand-light text-xs font-normal">Team and task distribution for this project</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Users class="w-5 h-5 text-blue-600" />
                     </div>
                 </div>
@@ -345,12 +345,12 @@ onMounted(async () => {
 
                 <template v-else>
                     <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div class="rounded-[12px] border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
-                            <p class="text-[11px] uppercase tracking-wide text-[#0C51D9] font-semibold">Members</p>
+                        <div class="rounded-xl border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
+                            <p class="text-[11px] uppercase tracking-wide text-primary-500 font-semibold">Members</p>
                             <p class="text-brand-dark text-lg font-bold">{{ totalHeadcount }}</p>
                         </div>
-                        <div class="rounded-[12px] border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
-                            <p class="text-[11px] uppercase tracking-wide text-[#0C51D9] font-semibold">Tasks</p>
+                        <div class="rounded-xl border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
+                            <p class="text-[11px] uppercase tracking-wide text-primary-500 font-semibold">Tasks</p>
                             <p class="text-brand-dark text-lg font-bold">{{ totalTaskCount }}</p>
                         </div>
                     </div>
@@ -394,7 +394,7 @@ onMounted(async () => {
 
             <!-- Budget Card -->
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -404,14 +404,14 @@ onMounted(async () => {
                         </p>
                         <p class="text-success text-sm font-medium">Project budget</p>
                     </div>
-                    <div class="w-14 h-14 bg-green-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center">
                         <DollarSign class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -421,14 +421,14 @@ onMounted(async () => {
                         </p>
                         <p class="text-indigo-600 text-sm font-medium">Project kickoff</p>
                     </div>
-                    <div class="w-14 h-14 bg-indigo-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center">
                         <Calendar class="w-6 h-6 text-indigo-600" />
                     </div>
                 </div>
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -438,14 +438,14 @@ onMounted(async () => {
                         </p>
                         <p class="text-orange-600 text-sm font-medium">Project deadline</p>
                     </div>
-                    <div class="w-14 h-14 bg-orange-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center">
                         <CalendarCheck class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
             </div>
 
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -455,7 +455,7 @@ onMounted(async () => {
                         </p>
                         <p class="text-blue-600 text-sm font-medium">Project timeline</p>
                     </div>
-                    <div class="w-14 h-14 bg-blue-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
                         <Clock class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
@@ -464,9 +464,9 @@ onMounted(async () => {
     </div>
 
     <!-- Danger Zone -->
-    <div class="bg-white border border-[#FEE2E2] rounded-[20px] p-6">
+    <div class="bg-white border border-[#FEE2E2] rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center">
+            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
             <div>
@@ -475,7 +475,7 @@ onMounted(async () => {
             </div>
         </div>
         <div
-            class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-[16px]"
+            class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-2xl"
         >
             <div class="flex-1">
                 <h4 class="text-brand-dark text-base font-bold mb-1">Delete Project</h4>
@@ -485,7 +485,7 @@ onMounted(async () => {
             </div>
             <button
                 @click="showDeleteModal = true"
-                class="btn-primary rounded-[8px] border border-[#A02121] hover:brightness-110 focus:ring-2 focus:ring-[#D90C0C] transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg border border-[#A02121] hover:brightness-110 focus:ring-2 focus:ring-[#D90C0C] transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
             >
                 <Trash2 class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Delete Project</span>

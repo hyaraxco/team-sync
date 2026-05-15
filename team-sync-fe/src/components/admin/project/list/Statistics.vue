@@ -153,13 +153,13 @@ const chartSeries = ref([
         <div class="xl:col-span-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
             <!-- Total Projects Card -->
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
             >
                 <!-- Header with title and icon -->
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-brand-dark text-base font-medium">Total Projects</p>
                     <div
-                        class="w-12 h-12 bg-blue-50 rounded-[16px] flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-300"
+                        class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-300"
                     >
                         <Briefcase class="w-6 h-6 text-blue-600" />
                     </div>
@@ -176,13 +176,13 @@ const chartSeries = ref([
 
             <!-- Active Projects Card -->
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
             >
                 <!-- Header with title and icon -->
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-brand-dark text-base font-medium">Active Projects</p>
                     <div
-                        class="w-12 h-12 bg-green-50 rounded-[16px] flex items-center justify-center group-hover:bg-green-100 transition-colors duration-300"
+                        class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover:bg-green-100 transition-colors duration-300"
                     >
                         <PlayCircle class="w-6 h-6 text-green-600" />
                     </div>
@@ -200,10 +200,10 @@ const chartSeries = ref([
 
         <!-- Charts Column -->
         <div
-            class="xl:col-span-2 bg-white border border-[#DCDEDD] rounded-[16px] p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300"
+            class="xl:col-span-2 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300"
         >
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center flex-shrink-0">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
                     <TrendingUp class="w-6 h-6 text-purple-600" />
                 </div>
                 <div class="flex-1">

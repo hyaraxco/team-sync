@@ -152,7 +152,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-3 mb-4">
                     <div
-                        class="w-12 h-12 bg-gradient-to-br from-[#0C51D9] to-[#3B82F6] rounded-xl flex items-center justify-center"
+                        class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
                     >
                         <span class="text-white text-lg font-bold">TS</span>
                     </div>
@@ -168,7 +168,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all"
                         :class="
                             currentStep === step.number
-                                ? 'bg-[#0C51D9] text-white'
+                                ? 'bg-primary-500 text-white'
                                 : currentStep > step.number
                                   ? 'bg-green-100 text-green-700'
                                   : 'bg-gray-100 text-gray-400'
@@ -189,11 +189,11 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             <!-- Step 1: License Upload -->
             <div
                 v-if="currentStep === 1 && !setupComplete"
-                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm"
+                class="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm"
             >
                 <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-blue-50 rounded-[16px] flex items-center justify-center mx-auto mb-4">
-                        <KeyRound class="w-8 h-8 text-[#0C51D9]" />
+                    <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                        <KeyRound class="w-8 h-8 text-primary-500" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Aktivasi Lisensi</h2>
                     <p class="text-gray-500 text-sm mt-2">
@@ -208,13 +208,13 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             v-model="licenseKey"
                             rows="5"
                             placeholder="Paste kunci lisensi di sini..."
-                            class="w-full rounded-[16px] border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#0C51D9] focus:border-[#0C51D9] font-mono break-all"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono break-all"
                         ></textarea>
                     </div>
 
                     <div
                         v-if="setupStore.error"
-                        class="rounded-[12px] bg-red-50 border border-red-200 p-3 text-sm text-red-700 flex items-start gap-2"
+                        class="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700 flex items-start gap-2"
                     >
                         <AlertCircle class="w-5 h-5 flex-shrink-0 mt-0.5" />
                         <span>
@@ -224,7 +224,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
 
                     <button
                         type="button"
-                        class="w-full flex items-center justify-center gap-2 rounded-[16px] bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
+                        class="w-full flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
                         :disabled="!licenseKey.trim() || setupStore.licenseVerifyLoading"
                         @click="verifyAndActivateLicense"
                     >
@@ -240,10 +240,10 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             <!-- Step 2: System Health -->
             <div
                 v-if="currentStep === 2 && !setupComplete"
-                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm"
+                class="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm"
             >
                 <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-green-50 rounded-[16px] flex items-center justify-center mx-auto mb-4">
+                    <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <Stethoscope class="w-8 h-8 text-green-600" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Lisensi Valid! Mari periksa kesiapan server.</h2>
@@ -251,14 +251,14 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                 </div>
 
                 <div v-if="setupStore.doctorLoading" class="space-y-3">
-                    <div v-for="i in 5" :key="i" class="h-14 rounded-[12px] bg-gray-100 animate-pulse"></div>
+                    <div v-for="i in 5" :key="i" class="h-14 rounded-xl bg-gray-100 animate-pulse"></div>
                 </div>
 
                 <div v-else-if="setupStore.doctorChecks.length > 0" class="space-y-3">
                     <div
                         v-for="check in setupStore.doctorChecks"
                         :key="check.label"
-                        class="flex items-start gap-3 rounded-[12px] border p-3"
+                        class="flex items-start gap-3 rounded-xl border p-3"
                         :class="doctorStatusBg(check.status)"
                     >
                         <component
@@ -276,7 +276,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                 <div class="flex items-center gap-3 mt-6">
                     <button
                         type="button"
-                        class="flex items-center gap-2 rounded-[16px] border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-[#0C51D9]"
+                        class="flex items-center gap-2 rounded-2xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-primary-500"
                         @click="runDoctor"
                     >
                         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': setupStore.doctorLoading }" />
@@ -284,7 +284,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                     </button>
                     <button
                         type="button"
-                        class="flex-1 flex items-center justify-center gap-2 rounded-[16px] bg-[#0C51D9] px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
+                        class="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
                         :disabled="!canProceedStep2"
                         @click="currentStep = 3"
                     >
@@ -297,10 +297,10 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             <!-- Step 3: Superadmin Setup -->
             <div
                 v-if="currentStep === 3 && !setupComplete"
-                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm"
+                class="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm"
             >
                 <div class="text-center mb-6">
-                    <div class="w-16 h-16 bg-purple-50 rounded-[16px] flex items-center justify-center mx-auto mb-4">
+                    <div class="w-16 h-16 bg-purple-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
                         <UserPlus class="w-8 h-8 text-purple-600" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Buat Akun Superadmin</h2>
@@ -317,7 +317,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             type="text"
                             required
                             placeholder="Nama administrator"
-                            class="w-full rounded-[16px] border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#0C51D9]"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
                         />
                     </div>
 
@@ -328,7 +328,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             type="email"
                             required
                             placeholder="admin@perusahaan.com"
-                            class="w-full rounded-[16px] border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#0C51D9]"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
                         />
                     </div>
 
@@ -340,7 +340,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             required
                             minlength="8"
                             placeholder="Minimal 8 karakter"
-                            class="w-full rounded-[16px] border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#0C51D9]"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
                         />
                     </div>
 
@@ -352,13 +352,13 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             required
                             minlength="8"
                             placeholder="Ulangi password"
-                            class="w-full rounded-[16px] border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-[#0C51D9]"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
                         />
                     </div>
 
                     <div
                         v-if="setupStore.error"
-                        class="rounded-[12px] bg-red-50 border border-red-200 p-3 text-sm text-red-700"
+                        class="rounded-xl bg-red-50 border border-red-200 p-3 text-sm text-red-700"
                     >
                         <template v-if="typeof setupStore.error === 'object'">
                             <ul class="list-disc list-inside">
@@ -373,7 +373,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                     <div class="flex items-center gap-3">
                         <button
                             type="button"
-                            class="flex items-center gap-2 rounded-[16px] border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700"
+                            class="flex items-center gap-2 rounded-2xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700"
                             @click="currentStep = 2"
                         >
                             <ArrowLeft class="w-4 h-4" />
@@ -381,7 +381,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         </button>
                         <button
                             type="submit"
-                            class="flex-1 flex items-center justify-center gap-2 rounded-[16px] bg-[#0C51D9] px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
+                            class="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
                             :disabled="setupStore.bootstrapLoading"
                         >
                             <RefreshCw v-if="setupStore.bootstrapLoading" class="w-4 h-4 animate-spin" />
@@ -397,7 +397,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             <!-- Setup Complete -->
             <div
                 v-if="setupComplete"
-                class="bg-white rounded-[24px] border border-gray-200 p-6 sm:p-8 shadow-sm text-center"
+                class="bg-white rounded-3xl border border-gray-200 p-6 sm:p-8 shadow-sm text-center"
             >
                 <div class="w-20 h-20 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-6">
                     <PartyPopper class="w-10 h-10 text-green-600" />
@@ -406,7 +406,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                 <p class="text-gray-500 mb-6">Instance Team Sync Pro siap digunakan. Silakan masuk ke dashboard.</p>
                 <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-[16px] bg-[#0C51D9] px-6 py-3 text-sm font-semibold text-white hover:brightness-110 transition-all"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-primary-500 px-6 py-3 text-sm font-semibold text-white hover:brightness-110 transition-all"
                     @click="goToDashboard"
                 >
                     Masuk ke Dashboard

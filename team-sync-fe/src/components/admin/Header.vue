@@ -159,7 +159,7 @@ const unreadBadgeClass = computed(() => {
             : 0;
         const sizeClass = safeCount > 9 ? "w-6 px-1" : "w-5";
 
-        return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-[#0C51D9] text-[10px] font-bold leading-none text-white`;
+        return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-primary-500 text-[10px] font-bold leading-none text-white`;
     }
 
     return "absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-[#EE2A3B] px-1.5 text-[11px] font-bold leading-none tracking-tight text-white";
@@ -289,14 +289,14 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <header class="page-header bg-white border-b border-[#DCDEDD] px-4 sm:px-6 py-3.5 sm:py-4">
+    <header class="page-header bg-white border-b border-brand-border px-4 sm:px-6 py-3.5 sm:py-4">
         <div class="flex items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div class="min-w-0 flex items-start sm:items-center gap-3 sm:gap-4">
                 <button
                     type="button"
                     aria-label="Toggle sidebar"
                     data-testid="header-mobile-menu-toggle"
-                    class="lg:hidden w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                    class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                     @click="emit('toggle-sidebar')"
                 >
                     <MenuIcon class="w-5 h-5 text-gray-600" />
@@ -322,7 +322,7 @@ onUnmounted(() => {
                             aria-haspopup="dialog"
                             :aria-expanded="isNotificationPanelOpen ? 'true' : 'false'"
                             :aria-controls="notificationPanelId"
-                            class="relative w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                            class="relative w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                             @click="toggleNotificationPanel"
                         >
                             <BellIcon class="w-5 h-5 text-gray-600" />
@@ -350,7 +350,7 @@ onUnmounted(() => {
                     <button
                         type="button"
                         aria-label="Messages"
-                        class="hidden sm:flex w-10 h-10 rounded-full border border-[#DCDEDD] items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                        class="hidden sm:flex w-10 h-10 rounded-full border border-brand-border items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                     >
                         <MessageCircleIcon class="w-5 h-5 text-gray-600" />
                     </button>
@@ -402,10 +402,10 @@ onUnmounted(() => {
                         id="header-account-menu"
                         data-testid="header-account-menu"
                         role="menu"
-                        class="absolute right-0 top-full mt-2 w-56 bg-white border border-[#DCDEDD] rounded-lg shadow-md py-2 z-[9999]"
+                        class="absolute right-0 top-full mt-2 w-56 bg-white border border-brand-border rounded-lg shadow-md py-2 z-[9999]"
                         :class="{ hidden: !isAccountMenuOpen }"
                     >
-                        <div class="px-4 py-3 border-b border-[#DCDEDD]">
+                        <div class="px-4 py-3 border-b border-brand-border">
                             <p class="text-sm font-semibold text-gray-900">
                                 {{ user?.name }}
                             </p>
@@ -428,7 +428,7 @@ onUnmounted(() => {
                             </RouterLink>
                         </div>
 
-                        <div class="border-t border-[#DCDEDD] py-1">
+                        <div class="border-t border-brand-border py-1">
                             <button
                                 type="button"
                                 role="menuitem"
