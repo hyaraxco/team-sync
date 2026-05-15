@@ -137,13 +137,11 @@ const calculateRanking = async () => {
 
 const resetWeights = () => {
     weights.value = {
-        avg_manager_rating: 0.3,
-        final_rating: 0.3,
-        avg_goal_completion: 0.2,
-        goal_completion_ratio: 0.05,
-        positive_feedback_count: 0.05,
-        attendance_quality: 0.05,
-        task_completion_quality: 0.05,
+        performance_score: 0.30,
+        attendance_rate: 0.20,
+        goal_completion: 0.25,
+        feedback_score: 0.15,
+        tenure_factor: 0.10,
     };
 };
 
@@ -386,7 +384,7 @@ onMounted(async () => {
                         <div v-for="(label, key) in weightLabels" :key="key" class="text-center">
                             <p class="text-xs font-semibold text-brand-dark">{{ label }}</p>
                             <p class="text-xs text-brand-light">
-                                weight {{ (topsisResult.weights[key] * 100).toFixed(0) }}%
+                                weight {{ ((topsisResult.weights[key] ?? 0) * 100).toFixed(0) }}%
                             </p>
                         </div>
                     </div>
@@ -487,31 +485,31 @@ onMounted(async () => {
                                         </td>
                                         <!-- C1-C5 raw scores -->
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ item.raw_scores.avg_manager_rating.toFixed(2) }}
+                                            {{ (item.raw_scores.avg_manager_rating ?? 0).toFixed(2) }}
                                         </td>
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ item.raw_scores.final_rating.toFixed(2) }}
+                                            {{ (item.raw_scores.final_rating ?? 0).toFixed(2) }}
                                         </td>
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ item.raw_scores.avg_goal_completion.toFixed(1) }}%
+                                            {{ (item.raw_scores.avg_goal_completion ?? 0).toFixed(1) }}%
                                         </td>
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ (item.raw_scores.goal_completion_ratio * 100).toFixed(0) }}%
+                                            {{ ((item.raw_scores.goal_completion_ratio ?? 0) * 100).toFixed(0) }}%
                                         </td>
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
                                             {{ item.raw_scores.positive_feedback_count }}
                                         </td>
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ item.raw_scores.attendance_quality.toFixed(1) }}%
+                                            {{ (item.raw_scores.attendance_quality ?? 0).toFixed(1) }}%
                                         </td>
                                         <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ item.raw_scores.task_completion_quality.toFixed(1) }}%
+                                            {{ (item.raw_scores.task_completion_quality ?? 0).toFixed(1) }}%
                                         </td>
                                         <!-- Closeness coefficient + bar -->
                                         <td class="py-4 px-3">
                                             <div class="flex flex-col gap-1">
                                                 <span class="text-center text-sm font-bold text-brand-dark">
-                                                    {{ (item.closeness_coefficient * 100).toFixed(2) }}%
+                                                    {{ ((item.closeness_coefficient ?? 0) * 100).toFixed(2) }}%
                                                 </span>
                                                 <div class="w-full bg-gray-200 rounded-full h-1.5">
                                                     <div
@@ -567,7 +565,7 @@ onMounted(async () => {
                                                                 <td class="py-1 text-right font-mono text-brand-dark">
                                                                     {{
                                                                         typeof item.raw_scores[key] === "number"
-                                                                            ? item.raw_scores[key].toFixed(4)
+                                                                            ? (item.raw_scores[key] ?? 0).toFixed(4)
                                                                             : item.raw_scores[key]
                                                                     }}
                                                                 </td>
@@ -595,7 +593,7 @@ onMounted(async () => {
                                                                 D⁺ (distance to positive ideal)
                                                             </span>
                                                             <span class="font-mono text-red-600">
-                                                                {{ item.distance_positive.toFixed(6) }}
+                                                                {{ (item.distance_positive ?? 0).toFixed(6) }}
                                                             </span>
                                                         </div>
                                                         <div
@@ -605,7 +603,7 @@ onMounted(async () => {
                                                                 D⁻ (distance to negative ideal)
                                                             </span>
                                                             <span class="font-mono text-green-600">
-                                                                {{ item.distance_negative.toFixed(6) }}
+                                                                {{ (item.distance_negative ?? 0).toFixed(6) }}
                                                             </span>
                                                         </div>
                                                         <div
@@ -615,7 +613,7 @@ onMounted(async () => {
                                                                 Ci = D⁻ / (D⁺ + D⁻)
                                                             </span>
                                                             <span class="font-mono font-bold text-brand-primary">
-                                                                {{ item.closeness_coefficient.toFixed(6) }}
+                                                                {{ (item.closeness_coefficient ?? 0).toFixed(6) }}
                                                             </span>
                                                         </div>
                                                     </div>
