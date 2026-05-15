@@ -3,7 +3,7 @@
         <!-- Key Metrics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MetricCard
-                class="lg rounded-[20px] border border-[#0B1042] relative overflow-hidden main-card p-5"
+                class="lg rounded-2xl border border-gray-800 relative overflow-hidden main-card p-5"
                 title="Total Payroll Cost"
                 :value="payroll?.total_payroll_cost || 0"
                 format="currency"
@@ -43,9 +43,9 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
             <!-- Total Cost Trend -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Payroll Cost Trends</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Payroll Cost Trends</h3>
                 <VueApexCharts
                     v-if="payrollCostTrends?.total_cost_trend"
                     type="line"
@@ -55,17 +55,17 @@
                 />
                 <div
                     v-else
-                    class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200"
+                    class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-xl border border-dashed border-gray-200"
                 >
-                    <p class="text-sm font-medium text-[#737373]">No trend data</p>
+                    <p class="text-sm font-medium text-brand-light">No trend data</p>
                 </div>
             </div>
 
             <!-- Salary Distribution -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Salary Distribution</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Salary Distribution</h3>
                 <VueApexCharts
                     type="bar"
                     height="300"
@@ -92,9 +92,9 @@
 
             <!-- Cost by Department -->
             <div
-                class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
-                <h3 class="text-lg font-bold text-[#202020] mb-6">Cost by Department</h3>
+                <h3 class="text-lg font-bold text-brand-dark mb-6">Cost by Department</h3>
                 <VueApexCharts
                     v-if="!payrollLoading && payroll?.department_costs"
                     type="donut"
@@ -104,9 +104,9 @@
                 />
                 <div
                     v-else
-                    class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200"
+                    class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-xl border border-dashed border-gray-200"
                 >
-                    <p class="text-sm font-medium text-[#737373]">No department data</p>
+                    <p class="text-sm font-medium text-brand-light">No department data</p>
                 </div>
             </div>
         </div>

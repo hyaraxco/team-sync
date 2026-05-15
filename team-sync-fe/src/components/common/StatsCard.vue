@@ -77,12 +77,12 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 
 <template>
     <div
-        class="stats-card bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-4 sm:p-5 dark:bg-gray-800 dark:border-gray-700"
+        class="stats-card bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-200 p-4 sm:p-5"
     >
         <div class="flex items-center justify-between">
             <div>
                 <p class="text-brand-dark text-sm font-medium">{{ title }}</p>
-                <p class="text-brand-dark text-2xl sm:text-3xl font-extrabold leading-tight my-2">
+                <p class="text-brand-dark text-2xl sm:text-3xl font-extrabold leading-tight my-2 tabular-nums">
                     {{ animatedDisplay }}
                 </p>
                 <p v-if="subtitle" :class="subtitleColor" class="text-xs sm:text-sm font-medium">
@@ -91,7 +91,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
             </div>
             <div
                 :class="backgroundClass"
-                class="w-10 h-10 sm:w-12 sm:h-12 rounded-[12px] sm:rounded-[16px] flex items-center justify-center shrink-0 ml-2"
+                class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 ml-2"
             >
                 <component :is="resolveIcon" class="w-5 h-5 sm:w-6 sm:h-6" :class="iconTextClass" />
             </div>

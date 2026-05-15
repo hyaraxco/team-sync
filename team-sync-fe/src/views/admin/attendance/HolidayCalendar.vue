@@ -188,18 +188,18 @@ onMounted(() => {
             <div class="overflow-x-auto w-full mb-6">
                 <table class="w-full min-w-[700px]">
                     <thead>
-                        <tr class="border-y border-[#DCDEDD]">
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Date</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Name</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Type</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Actions</th>
+                        <tr class="border-y border-brand-border">
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Date</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Name</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Type</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             v-for="holiday in paginatedHolidays"
                             :key="holiday.id"
-                            class="border-b border-[#DCDEDD] hover:bg-gray-50 transition-colors"
+                            class="border-b border-brand-border hover:bg-gray-50 transition-colors"
                         >
                             <td class="py-4 px-4 text-sm text-brand-dark font-medium">
                                 {{ holiday.date }}
@@ -220,14 +220,14 @@ onMounted(() => {
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="inline-flex items-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                        class="inline-flex items-center gap-2 border border-brand-border rounded-lg hover:border-primary-500 hover:bg-blue-50 transition-all duration-300 px-3 py-2"
                                         @click="openEditModal(holiday)"
                                     >
                                         <Pencil class="w-4 h-4 text-blue-600" />
                                         <span class="text-xs font-semibold">Edit</span>
                                     </button>
                                     <button
-                                        class="inline-flex items-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
+                                        class="inline-flex items-center gap-2 border border-brand-border rounded-lg hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
                                         @click="openDeleteModal(holiday)"
                                     >
                                         <Trash2 class="w-4 h-4 text-red-600" />
@@ -261,7 +261,7 @@ onMounted(() => {
                     v-model="form.date"
                     type="date"
                     required
-                    class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9]"
+                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
                 />
             </div>
 
@@ -272,7 +272,7 @@ onMounted(() => {
                     type="text"
                     required
                     placeholder="e.g., Independence Day"
-                    class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9]"
+                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
                 />
             </div>
 
@@ -281,7 +281,7 @@ onMounted(() => {
                 <select
                     v-model="form.type"
                     required
-                    class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9]"
+                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
                 >
                     <option value="national_holiday">National Holiday</option>
                     <option value="collective_leave">Collective Leave (Cuti Bersama)</option>
@@ -295,7 +295,7 @@ onMounted(() => {
                 <button
                     type="button"
                     :disabled="isSubmitting"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:border-primary-500 transition-all duration-300"
                     @click="closeFormModal"
                 >
                     Cancel
@@ -303,7 +303,7 @@ onMounted(() => {
                 <button
                     type="submit"
                     :disabled="isSubmitting"
-                    class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-[12px] text-sm font-semibold hover:bg-opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     {{ isSubmitting ? "Saving..." : isEditing ? "Update Holiday" : "Create Holiday" }}
                 </button>
@@ -325,7 +325,7 @@ onMounted(() => {
                 <button
                     type="button"
                     :disabled="isSubmitting"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:border-primary-500 transition-all duration-300"
                     @click="closeDeleteModal"
                 >
                     Cancel
@@ -333,7 +333,7 @@ onMounted(() => {
                 <button
                     type="button"
                     :disabled="isSubmitting"
-                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-[12px] text-sm font-semibold hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                     @click="confirmDelete"
                 >
                     {{ isSubmitting ? "Deleting..." : "Delete" }}

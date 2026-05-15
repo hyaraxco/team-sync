@@ -211,9 +211,9 @@ watch(
     <div class="flex flex-col 2xl:flex-row gap-5 items-stretch 2xl:items-start pr-0">
         <div class="flex-1 w-full space-y-6">
             <!-- Job Information Section -->
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                         <Briefcase class="w-6 h-6 text-green-600" />
                     </div>
                     <div>
@@ -273,7 +273,7 @@ watch(
                             </div>
                             <div
                                 @click="teamModal = true"
-                                class="w-full pl-12 pr-10 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 cursor-pointer bg-white"
+                                class="w-full pl-12 pr-10 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 cursor-pointer bg-white"
                             >
                                 <span :class="[selectedTeam ? 'text-brand-dark' : 'text-gray-500']">
                                     {{ selectedTeam ? selectedTeam.name : "Select team" }}
@@ -285,13 +285,13 @@ watch(
                         </div>
 
                         <!-- Selected Team Display -->
-                        <div v-if="selectedTeam" class="mt-3 p-3 bg-gray-50 rounded-[12px] border border-gray-200">
+                        <div v-if="selectedTeam" class="mt-3 p-3 bg-gray-50 rounded-xl border border-gray-200">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-10 h-10 relative flex items-center justify-center rounded-[8px] overflow-hidden"
+                                    class="w-10 h-10 relative flex items-center justify-center rounded-lg overflow-hidden"
                                 >
                                     <div
-                                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[8px]"
+                                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg"
                                     ></div>
                                     <Building2 class="w-5 h-5 text-white relative z-10" />
                                 </div>
@@ -419,9 +419,9 @@ watch(
             </div>
 
             <!-- Tax & BPJS Identity Section -->
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-emerald-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
                         <ShieldCheck class="w-6 h-6 text-emerald-600" />
                     </div>
                     <div>
@@ -458,7 +458,7 @@ watch(
                             id="ptkp_status"
                             name="ptkp_status"
                             v-model="form.ptkp_status"
-                            class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] transition-all duration-300 bg-white"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 bg-white"
                         >
                             <option value="">Select PTKP status</option>
                             <option value="TK/0">TK/0 – Tidak Kawin, Tanpa Tanggungan</option>
@@ -516,9 +516,9 @@ watch(
             </div>
 
             <!-- Bank Information Section -->
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <CreditCard class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
@@ -535,7 +535,7 @@ watch(
                         <template v-if="loadingPayrollSettings">
                             <label class="block text-sm font-medium text-gray-700 mb-1.5">Bank Name *</label>
                             <div
-                                class="w-full h-[50px] bg-gray-100 border border-[#DCDEDD] rounded-[16px] animate-pulse"
+                                class="w-full h-[50px] bg-gray-100 border border-brand-border rounded-2xl animate-pulse"
                             ></div>
                             <p class="text-brand-light text-xs mt-1">Loading bank configuration...</p>
                         </template>
@@ -548,7 +548,7 @@ watch(
                                     <Building2 class="h-5 w-5 text-gray-400" />
                                 </div>
                                 <div
-                                    class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] bg-gray-50 text-brand-dark font-semibold cursor-not-allowed flex items-center justify-between"
+                                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl bg-gray-50 text-brand-dark font-semibold cursor-not-allowed flex items-center justify-between"
                                     data-testid="bank-name-locked"
                                 >
                                     <span>{{ companyBankName }}</span>
@@ -649,13 +649,13 @@ watch(
     >
         <div
             @click.stop
-            class="bg-white rounded-[20px] border border-[#DCDEDD] w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden"
+            class="bg-white rounded-2xl border border-brand-border w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden"
         >
             <!-- Modal Header -->
-            <div class="p-6 border-b border-[#DCDEDD]">
+            <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                             <Users class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
@@ -666,7 +666,7 @@ watch(
                     <button
                         type="button"
                         @click="teamModal = false"
-                        class="w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                     >
                         <X class="w-5 h-5 text-gray-600" />
                     </button>
@@ -674,14 +674,14 @@ watch(
             </div>
 
             <!-- Search Bar -->
-            <div class="p-6 border-b border-[#DCDEDD]">
+            <div class="p-6 border-b border-brand-border">
                 <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <Search class="h-5 w-5 text-gray-400" />
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                         placeholder="Search teams..."
                         v-model="searchTeam"
                     />
@@ -692,17 +692,17 @@ watch(
             <div class="p-6 overflow-y-auto max-h-96">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
-                        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
                         v-for="team in filteredTeams"
                         :key="team.id"
                         @click="handleSelectTeam(team)"
                     >
                         <div class="flex items-center gap-4">
                             <div
-                                class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden"
+                                class="w-14 h-14 relative flex items-center justify-center rounded-xl overflow-hidden"
                             >
                                 <div
-                                    class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[12px]"
+                                    class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
                                 ></div>
                                 <Building2 class="w-6 h-6 text-white relative z-10" />
                             </div>

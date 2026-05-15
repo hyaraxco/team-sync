@@ -155,9 +155,9 @@ watch(
 <template>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Team Growth Chart (Employee Joining) -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                     <UserPlus class="w-6 h-6 text-green-600" />
                 </div>
                 <div>
@@ -182,9 +182,9 @@ watch(
         </div>
 
         <!-- Tasks Growth Chart -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <TrendingUp class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>

@@ -39,7 +39,7 @@ const onNavigate = () => closeMobile();
     <!-- Sidebar -->
     <aside
         id="sidebar"
-        class="fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out dark:bg-gray-800 dark:border-gray-700 overflow-hidden"
+        class="fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out"
         :style="{ width: isCollapsed ? '68px' : '256px', minWidth: isCollapsed ? '68px' : '256px' }"
         :class="[
             isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -49,7 +49,7 @@ const onNavigate = () => closeMobile();
     >
         <!-- Logo Section -->
         <div
-            class="border-b border-[#DCDEDD] flex dark:border-gray-700 transition-all duration-300 shrink-0"
+            class="border-b border-brand-border flex transition-all duration-300 shrink-0"
             :class="isCollapsed ? 'px-3 py-3 flex-col items-center gap-2' : 'px-6 py-3 items-center justify-between'"
         >
             <div class="flex items-center" :class="isCollapsed ? '' : 'gap-4'">
@@ -82,7 +82,7 @@ const onNavigate = () => closeMobile();
             <button
                 type="button"
                 aria-label="Close sidebar"
-                class="lg:hidden w-10 h-10 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                 @click="onNavigate"
             >
                 <XIcon class="w-5 h-5 text-gray-600" />
@@ -118,7 +118,7 @@ const onNavigate = () => closeMobile();
                             'nav-link-active': $route.name === 'admin.dashboard',
                         }"
                         :aria-current="$route.name === 'admin.dashboard' ? 'page' : undefined"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         v-if="can('dashboard-menu')"
                         data-tooltip="Dashboard"
                         @click="onNavigate"
@@ -143,7 +143,7 @@ const onNavigate = () => closeMobile();
                     <!-- 2. Projects (employee daily, manager daily) -->
                     <RouterLink
                         :to="{ name: 'admin.projects' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.project'),
                         }"
@@ -172,7 +172,7 @@ const onNavigate = () => closeMobile();
                     <!-- 3. Employees (HR/Manager core) -->
                     <RouterLink
                         :to="{ name: 'admin.staffMembers' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.staffMember'),
                         }"
@@ -201,7 +201,7 @@ const onNavigate = () => closeMobile();
                     <!-- 4. Our Teams (HR/Manager) -->
                     <RouterLink
                         :to="{ name: 'admin.teams' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.team'),
                         }"
@@ -230,7 +230,7 @@ const onNavigate = () => closeMobile();
                     <!-- 5. Meetings -->
                     <RouterLink
                         :to="{ name: 'admin.meetings' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.meeting'),
                         }"
@@ -259,7 +259,7 @@ const onNavigate = () => closeMobile();
                     <!-- 6. Attendance (HR/Manager admin) -->
                     <RouterLink
                         :to="{ name: 'admin.attendances' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.attendances',
                         }"
@@ -288,7 +288,7 @@ const onNavigate = () => closeMobile();
                     <!-- 6. Payroll (HR/Finance core) -->
                     <RouterLink
                         :to="{ name: 'admin.payroll.dashboard' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active':
                                 $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
@@ -321,7 +321,7 @@ const onNavigate = () => closeMobile();
 
                     <RouterLink
                         :to="{ name: 'admin.payroll.adjustments' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.payroll.adjustments',
                         }"
@@ -350,7 +350,7 @@ const onNavigate = () => closeMobile();
                     <!-- 7. Analytics (periodic) -->
                     <RouterLink
                         :to="{ name: 'admin.analytics' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.analytics'),
                         }"
@@ -386,7 +386,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-manager-submit')"
                         :to="{ name: 'admin.performance.team-reviews' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-reviews',
                         }"
@@ -411,7 +411,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-calibrate')"
                         :to="{ name: 'admin.performance.pending-calibration' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.pending-calibration',
                         }"
@@ -436,7 +436,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-cycle-manage')"
                         :to="{ name: 'admin.performance.cycles' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.performance.cycles'),
                         }"
@@ -460,7 +460,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-cycle-manage')"
                         :to="{ name: 'admin.performance.outcome-rules' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.outcome-rules',
                         }"
@@ -484,7 +484,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-cycle-manage')"
                         :to="{ name: 'admin.performance.templates' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.templates',
                         }"
@@ -508,7 +508,7 @@ const onNavigate = () => closeMobile();
                     <!-- 3. My Reviews (personal) -->
                     <RouterLink
                         :to="{ name: 'admin.performance.my-reviews' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.my-reviews',
                         }"
@@ -532,7 +532,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('goal-assign-team')"
                         :to="{ name: 'admin.performance.team-goals' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-goals',
                         }"
@@ -555,7 +555,7 @@ const onNavigate = () => closeMobile();
                     <!-- 5. My Goals (personal) -->
                     <RouterLink
                         :to="{ name: 'admin.performance.my-goals' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.my-goals',
                         }"
@@ -578,7 +578,7 @@ const onNavigate = () => closeMobile();
                     <!-- 6. Feedback (least frequent) -->
                     <RouterLink
                         :to="{ name: 'admin.performance.feedback.received' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active':
                                 $route.name === 'admin.performance.feedback.received' ||
@@ -625,7 +625,7 @@ const onNavigate = () => closeMobile();
                     <!-- 1. My Attendance (daily check-in/out) -->
                     <RouterLink
                         :to="{ name: 'staffMember.attendance.my-attendances' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active':
                                 $route.name === 'staffMember.attendance.my-attendances' ||
@@ -659,7 +659,7 @@ const onNavigate = () => closeMobile();
                     <!-- 2. My Overtime (payroll/attendance self service) -->
                     <RouterLink
                         :to="{ name: 'staffMember.attendance.my-overtime' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'staffMember.attendance.my-overtime',
                         }"
@@ -687,7 +687,7 @@ const onNavigate = () => closeMobile();
                     <!-- 3. My Team (frequent collaboration) -->
                     <RouterLink
                         :to="{ name: 'staffMember.team' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'staffMember.team',
                         }"
@@ -715,7 +715,7 @@ const onNavigate = () => closeMobile();
                     <!-- 4. My Payroll (monthly) -->
                     <RouterLink
                         :to="{ name: 'staffMember.payroll' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active':
                                 $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
@@ -748,7 +748,7 @@ const onNavigate = () => closeMobile();
                     <!-- 5. My Profile (rarely used) -->
                     <RouterLink
                         :to="{ name: 'staffMember.profile' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'staffMember.profile',
                         }"
@@ -781,7 +781,7 @@ const onNavigate = () => closeMobile();
                 <div class="space-y-3">
                     <RouterLink
                         :to="{ name: 'admin.settings' }"
-                        class="nav-link border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:bg-white transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.settings',
                         }"
@@ -812,7 +812,7 @@ const onNavigate = () => closeMobile();
         <!-- Upgrade to Pro Box -->
         <div v-show="!isCollapsed" class="px-6 pb-6 mt-auto">
             <div
-                class="upgrade-card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-[16px] relative overflow-hidden p-5"
+                class="upgrade-card bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-2xl relative overflow-hidden p-5"
             >
                 <!-- Background Pattern -->
                 <div class="absolute inset-0 opacity-5">
@@ -824,7 +824,7 @@ const onNavigate = () => closeMobile();
                 <div class="relative z-10">
                     <!-- Icon -->
                     <div
-                        class="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-[12px] flex items-center justify-center mb-3"
+                        class="w-10 h-10 bg-gradient-to-r from-primary-500 to-primary-600 rounded-xl flex items-center justify-center mb-3"
                     >
                         <CrownIcon class="w-5 h-5 text-white" />
                     </div>
@@ -839,7 +839,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         :to="{ name: 'admin.upgrade-plan' }"
                         @click="onNavigate"
-                        class="flex items-center justify-center w-full rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                        class="flex items-center justify-center w-full rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
                     >
                         <span class="text-brand-white text-sm font-semibold mr-2">Upgrade Now</span>
                         <ArrowRightIcon class="w-4 h-4 text-white" aria-hidden="true" />

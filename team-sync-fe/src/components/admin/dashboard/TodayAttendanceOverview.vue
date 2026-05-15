@@ -36,11 +36,11 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
 </script>
 
 <template>
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5">
+    <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-5">
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 bg-gradient-to-br from-[#0C51D9] to-[#3B82F6] rounded-[12px] flex items-center justify-center"
+                    class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
                 >
                     <Clock class="w-5 h-5 text-white" />
                 </div>
@@ -78,7 +78,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
                 </div>
                 <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                        class="h-full bg-gradient-to-r from-[#0C51D9] to-[#3B82F6] rounded-full transition-all duration-500"
+                        class="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-500"
                         :style="{ width: checkedInPercentage + '%' }"
                     ></div>
                 </div>

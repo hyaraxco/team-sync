@@ -14,9 +14,9 @@ const props = withDefaults(defineProps<Props>(), {
 
 <template>
     <!-- Vertical Step Progress -->
-    <aside class="hidden lg:flex lg:w-48 xl:w-52 2xl:w-56 bg-white border-r border-[#DCDEDD] flex-col">
+    <aside class="hidden lg:flex lg:w-48 xl:w-52 2xl:w-56 bg-white border-r border-brand-border flex-col">
         <!-- Logo Section -->
-        <div class="px-4 py-4 border-b border-[#DCDEDD]">
+        <div class="px-4 py-4 border-b border-brand-border">
             <div class="flex items-center gap-3">
                 <div class="w-11 h-11 relative flex items-center justify-center">
                     <!-- Background circle -->

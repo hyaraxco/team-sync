@@ -238,7 +238,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+    <div class="bg-white border border-brand-border rounded-2xl p-6">
         <div v-if="notice.open" class="mb-4">
             <div
                 :class="[
@@ -253,7 +253,7 @@ onMounted(async () => {
         </div>
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                     <ListChecks class="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
@@ -264,7 +264,7 @@ onMounted(async () => {
             <button
                 v-if="canCreateTask"
                 @click="openCreateModal"
-                class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
             >
                 <Plus class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Create New Task</span>
@@ -279,7 +279,7 @@ onMounted(async () => {
                 </div>
                 <input
                     type="text"
-                    class="w-full pl-12 pr-4 py-3 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 focus:border-[#0C51D9] focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                     placeholder="Search tasks..."
                     v-model="searchQuery"
                 />
@@ -289,7 +289,7 @@ onMounted(async () => {
         <!-- Task Management Columns -->
         <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
             <!-- To Do Column -->
-            <div class="bg-gray-50 rounded-[16px] p-4 flex-shrink-0 w-72">
+            <div class="bg-gray-50 rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
@@ -311,7 +311,7 @@ onMounted(async () => {
             </div>
 
             <!-- In Progress Column -->
-            <div class="bg-blue-50 rounded-[16px] p-4 flex-shrink-0 w-72">
+            <div class="bg-blue-50 rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -338,7 +338,7 @@ onMounted(async () => {
             </div>
 
             <!-- Review Column -->
-            <div class="bg-yellow-50 rounded-[16px] p-4 flex-shrink-0 w-72">
+            <div class="bg-yellow-50 rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -360,7 +360,7 @@ onMounted(async () => {
             </div>
 
             <!-- Done Column -->
-            <div class="bg-green-50 rounded-[16px] p-4 flex-shrink-0 w-72">
+            <div class="bg-green-50 rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-green-500 rounded-full"></div>
