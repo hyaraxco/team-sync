@@ -2175,10 +2175,21 @@ const handleApprovePayroll = () => {
             @close="closeReopenPayrollModal"
         >
             <div class="mb-6">
-                <p class="text-brand-light text-sm mb-4">
+                <p class="text-brand-light text-sm mb-3">
                     Reopening will move this payroll back to pending status and clear payment date so Finance can apply
                     corrections safely.
                 </p>
+
+                <div class="flex items-start gap-2 rounded-[10px] border border-amber-200 bg-amber-50 px-3 py-2.5 mb-4">
+                    <svg class="w-4 h-4 text-amber-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" /></svg>
+                    <div class="text-xs text-amber-800">
+                        <span class="font-semibold">Re-approval required.</span>
+                        After correction, payroll must go through the approval process again before payment.
+                        <span v-if="correctionCount > 0" class="block mt-0.5 text-amber-700">
+                            This payroll has been corrected {{ correctionCount }} time{{ correctionCount === 1 ? '' : 's' }} previously.
+                        </span>
+                    </div>
+                </div>
 
                 <div>
                     <label class="block text-brand-dark text-sm font-semibold mb-2">Reopen reason *</label>

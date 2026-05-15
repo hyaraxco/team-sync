@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\Employee;
 
+use App\Models\AttendancePeriod;
 use App\Models\User;
+use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -14,6 +16,8 @@ class DualRoleSelfServiceAccessTest extends TestCase
 {
     use ActivatesLicense, RefreshDatabase;
 
+    protected Carbon $leaveDate;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -21,6 +25,26 @@ class DualRoleSelfServiceAccessTest extends TestCase
         $this->seed(MinimalPayrollE2ESeeder::class);
         $this->activateTestLicense();
         app(PermissionRegistrar::class)->forgetCachedPermissions();
+
+        // Ensure attendance period covering leave date is open for leave requests
+        // (MinimalPayrollE2ESeeder sets attendance_cutoff_day=1 which transitions current period to 'review')
+        $leaveDate = now()->addDays(1);
+        // Find next weekday (Mon-Fri) to avoid leave_has_no_working_days error
+        while ($leaveDate->isWeekend()) {
+            $leaveDate->addDay();
+        }
+        $this->leaveDate = $leaveDate;
+
+        AttendancePeriod::updateOrCreate(
+            [
+                'start_date' => $leaveDate->copy()->startOfMonth()->toDateString(),
+                'end_date' => $leaveDate->copy()->endOfMonth()->toDateString(),
+            ],
+            [
+                'status' => 'open',
+                'cutoff_date' => $leaveDate->copy()->endOfMonth()->toDateString(),
+            ]
+        );
     }
 
     public function test_internal_admin_roles_can_access_personal_attendance_and_leave_endpoints(): void
@@ -38,8 +62,8 @@ class DualRoleSelfServiceAccessTest extends TestCase
 
             $payload = [
                 'leave_type' => 'annual_leave',
-                'start_date' => now()->addDays(1)->toDateString(),
-                'end_date' => now()->addDays(1)->toDateString(),
+                'start_date' => $this->leaveDate->toDateString(),
+                'end_date' => $this->leaveDate->toDateString(),
                 'reason' => 'Personal leave for '.$email,
                 'emergency_contact' => '081234567890',
             ];
