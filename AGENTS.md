@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
 > Context engineering untuk AI agents. Dibaca otomatis oleh Pi, Claude Code, Codex.
-> Last updated: 2026-05-15
+> Last updated: 2026-05-16
 
 ## Sub-Repo Context
 
@@ -14,45 +14,17 @@ This root file covers cross-cutting concerns: domain rules, role hierarchy, stac
 
 ---
 
-# Workflow Kerja Team Sync
+## Workflow Kerja Team Sync
 
-1. Baca Context 📖
-- ✅ @AGENTS.md (root) — domain rules, stack, architecture
-- ✅ Sub-repo AGENTS.md (team-sync-be/AGENTS.md, team-sync-fe/AGENTS.md) — detailed conventions
-- ✅ @docs/party-mode.md — multi-persona collaboration guide
-2. Panggil Agents/Sub-agents 🤖
-Gunakan specialized agents sesuai kebutuhan:
-- @oracle — strategic decisions, architecture, compliance analysis
-- @fixer — implementation execution
-- @librarian — docs/reference lookup
-- @designer — UI/UX design
-- @explorer — codebase exploration
-Load skills yang dibutuhkan (brainstorming, writing-plans, test-driven-development, dll)
-3. Buat Plan 📋
-Dari hasil agent yang bekerja, buat detailed plan di docs/plans/on_going/
-4. Rundingkan dengan Party Mode 🎉
-Untuk keputusan kompleks, invoke party mode:
-Party mode: [complex decision/problem]
-Dispatch 2-3 personas yang relevan in parallel, collect results, synthesize recommendation.
-5. Execute Plan ⚙️
-- Dispatch @fixer atau specialized agents untuk implementasi
-- Follow architecture rules (Controller → Service → Repository)
-- Write tests (TDD when applicable)
-- Verify dengan semua unit testing yang ada di dalam repo dan sub repo
-6. Create PR & Review 🔍
-- Branch selalu dari `main`
-- Commit bebas selama kerja
-- **Sebelum PR: squash** semua commit jadi 1 commit dengan format:
-  - `chore: add ...` (fitur baru)
-  - `chore: fix ...` (bug fix)
-- Push → open PR ke `main`
-- Wait for CI (BE tests, FE tests, screenshots) — harus ✅
-- Jika conflict dengan main, fix dulu
-- **Tunggu approval reviewer**
-- **Rebase & merge** ke main (bukan squash merge)
-- Hapus branch setelah merge
-7. Archive Plan 📦
-Move completed plan dari on_going/ ke archive/, update status to COMPLETED
+1. **Baca Context** — AGENTS.md (root + sub-repo), docs/party-mode.md
+2. **Panggil Agents** — @oracle (strategy), @fixer (implementation), @librarian (docs), @designer (UI/UX), @explorer (codebase). Load skills sesuai kebutuhan.
+3. **Buat Plan** — Tulis di `docs/plans/on_going/`
+4. **Party Mode** (opsional) — Untuk keputusan kompleks: `Party mode: [problem]`. Dispatch 2-3 persona parallel. Lihat `docs/party-mode.md`.
+5. **Execute Plan** — @fixer/subagents, follow architecture rules, write tests, verify semua test suites
+6. **Create PR & Review** — Branch dari `main`, squash jadi 1 commit (`chore: add/fix ...`), push, wait CI, tunggu approval, rebase & merge, hapus branch
+7. **Archive Plan** — Pindah ke `docs/plans/archive/`, update status COMPLETED
+
+---
 
 ## Overview
 
@@ -65,7 +37,7 @@ team-sync/
 ├── team-sync-be/          # Laravel 12 API (PHP 8.2+, Sanctum auth)
 ├── team-sync-fe/          # Vue 3 SPA (Vite, Pinia, Tailwind CSS)
 ├── docs/                  # Plans, references, testing docs (NO executable code)
-├── .github/workflows/     # CI: Playwright E2E, smoke tests
+├── .github/workflows/     # CI: be-tests, fe-tests, pr-screenshots, auto-tag
 └── package.json           # Root workspace (minimal — real deps in subdirs)
 ```
 
@@ -81,7 +53,7 @@ team-sync/
 | Frontend views       | `team-sync-fe/src/views/`                                    | Split: `admin/` vs `staff-member/`               |
 | State management     | `team-sync-fe/src/stores/`                                   | 25 Pinia stores, one per domain                  |
 | Routing              | `team-sync-fe/src/router/`                                   | Split by domain module (10 files)                |
-| CI workflows         | `.github/workflows/`                                         | `fe-guard-smoke.yml`, `payroll-ui-e2e.yml`, `playwright.yml` |
+| CI workflows         | `.github/workflows/`                                         | `be-tests.yml`, `fe-tests.yml`, `pr-screenshots.yml`, `auto-tag.yml` |
 | E2E prep script      | `team-sync-fe/scripts/e2e-prepare-be.sh`                     | Seeds/resets BE for E2E runs                     |
 
 ---
@@ -136,7 +108,7 @@ team-sync/
 
 ### Frontend Patterns
 - **API calls live in Pinia stores only** — components dispatch store actions, never call Axios directly
-- One Pinia store per domain (21 stores matching backend domains)
+- One Pinia store per domain (25 stores matching backend domains)
 - Composables in `src/composables/use{Name}.js` — reusable logic hooks
 - Route guards centralized in `src/router/permissionAccess.js`
 - Views split by role: `views/admin/` (HR/manager) vs `views/staff-member/` (employee self-service)
@@ -240,11 +212,12 @@ docker compose up -d queue scheduler
 
 ### Testing
 
-| Suite | Command | Notes |
-|-------|---------|-------|
-| Backend (Pest) | `composer test` | SQLite :memory:, queue=sync |
-| Frontend (Vitest) | `bun run test` | jsdom, globals=true |
-| E2E (Playwright) | `bun run e2e` | Sequential (1 worker), needs backend seeded |
+| Suite | Command | Count | Notes |
+|-------|---------|-------|-------|
+| Backend (Pest) | `composer test` | 1478 tests | SQLite :memory:, queue=sync |
+| Frontend (Vitest) | `bun run test` | 981 tests | jsdom, globals=true |
+| E2E (Playwright) | `bun run e2e` | 109 tests | Sequential (1 worker), needs backend seeded |
+| Accessibility | `bun run test:a11y` | — | Runs after build in CI |
 
 ### Cache Invalidation
 - After `.env` change: `php artisan config:clear`
@@ -287,3 +260,4 @@ docker compose up -d queue scheduler
 - **ApexCharts**: Registered globally as `VueApexCharts`
 - **Schedule Meeting**: HR broadcasts meeting links to divisions/teams via queued notifications
 - **Constants** (`app/Constants/CacheConstants.php`): `PAYROLL_BULK_INSERT_CHUNK_SIZE = 500`, `DEFAULT_PAGINATION_SIZE = 50`
+- **Meilisearch proxy fix**: OrbStack injects `http_proxy` into Docker containers. `NO_PROXY` must include `localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal` in `docker-compose.yml`
