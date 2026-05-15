@@ -6,6 +6,7 @@ import { can } from "@/helpers/permissionHelper";
 import { Video, Plus, Search, ChevronLeft, ChevronRight, Calendar, ExternalLink } from "lucide-vue-next";
 import { DateTime } from "luxon";
 import MeetingCreateModal from "@/components/admin/meeting/MeetingCreateModal.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 
 const meetingStore = useMeetingStore();
 const { meetings, meta, loading } = storeToRefs(meetingStore);
@@ -120,11 +121,7 @@ onUnmounted(() => {
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
 
-            <div v-else-if="!meetings || meetings.length === 0" class="text-center py-12">
-                <Video class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <p class="text-gray-500 font-medium">No meetings scheduled yet</p>
-                <p class="text-gray-400 text-sm mt-1">Create your first meeting to get started</p>
-            </div>
+            <EmptyState v-else-if="!meetings || meetings.length === 0" icon="Video" title="No meetings scheduled yet" subtitle="Create your first meeting to get started" size="lg" />
 
             <div v-else class="overflow-x-auto">
                 <table class="w-full text-sm">

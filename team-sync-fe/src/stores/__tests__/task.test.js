@@ -76,17 +76,17 @@ describe("Task Store", () => {
         expect(store.loading).toBe(false);
     });
 
-    it("createTask sets error on failure", async () => {
-        axiosInstance.post.mockRejectedValueOnce({
+    it("createTask throws and sets error on failure", async () => {
+        const mockError = {
             response: {
                 data: {
                     message: "Task creation failed",
                 },
             },
-        });
+        };
+        axiosInstance.post.mockRejectedValueOnce(mockError);
 
-        await store.createTask({ title: "Invalid task" });
-
+        await expect(store.createTask({ title: "Invalid task" })).rejects.toEqual(mockError);
         expect(store.error).toBe("Task creation failed");
         expect(store.loading).toBe(false);
     });
@@ -114,17 +114,17 @@ describe("Task Store", () => {
         expect(store.loading).toBe(false);
     });
 
-    it("updateTask sets error on failure", async () => {
-        axiosInstance.post.mockRejectedValueOnce({
+    it("updateTask throws and sets error on failure", async () => {
+        const mockError = {
             response: {
                 data: {
                     message: "Task update failed",
                 },
             },
-        });
+        };
+        axiosInstance.post.mockRejectedValueOnce(mockError);
 
-        await store.updateTask(10, { title: "x" });
-
+        await expect(store.updateTask(10, { title: "x" })).rejects.toEqual(mockError);
         expect(store.error).toBe("Task update failed");
         expect(store.loading).toBe(false);
     });
@@ -143,17 +143,17 @@ describe("Task Store", () => {
         expect(store.loading).toBe(false);
     });
 
-    it("deleteTask sets error on failure", async () => {
-        axiosInstance.delete.mockRejectedValueOnce({
+    it("deleteTask throws and sets error on failure", async () => {
+        const mockError = {
             response: {
                 data: {
                     message: "Task delete failed",
                 },
             },
-        });
+        };
+        axiosInstance.delete.mockRejectedValueOnce(mockError);
 
-        await store.deleteTask(15);
-
+        await expect(store.deleteTask(15)).rejects.toEqual(mockError);
         expect(store.error).toBe("Task delete failed");
         expect(store.loading).toBe(false);
     });

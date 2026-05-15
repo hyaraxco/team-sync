@@ -22,6 +22,7 @@ import StatusBadge from "@/components/common/StatusBadge.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import MainCard from "@/components/common/MainCard.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 import { formatRupiah, formatRupiahCompact } from "@/utils/formatUtils";
 import { useToast } from "@/composables/useToast";
 
@@ -451,12 +452,7 @@ const handleExportReport = async () => {
                     />
                 </template>
 
-                <div v-else data-testid="payroll-analytics-empty" class="py-10 text-center">
-                    <p class="text-brand-dark text-base font-semibold">No analytics data yet</p>
-                    <p class="text-brand-light text-sm mt-1">
-                        Analytics will appear once approved or paid payroll periods are available.
-                    </p>
-                </div>
+                <EmptyState v-else data-testid="payroll-analytics-empty" icon="FileText" title="No analytics data yet" subtitle="Generate your first payroll to see analytics here." size="lg" />
             </div>
 
             <!-- Finance Insights Section -->

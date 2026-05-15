@@ -1,6 +1,7 @@
 <script setup>
 import Sidebar from "@/components/admin/Sidebar.vue";
 import Header from "@/components/admin/Header.vue";
+import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
 import { provideSidebar } from "@/composables/useSidebar";
 
 const { isOpen, toggleMobile, closeMobile } = provideSidebar();
@@ -30,7 +31,9 @@ const { isOpen, toggleMobile, closeMobile } = provideSidebar();
             <Header @toggle-sidebar="toggleMobile" />
             <!-- Dashboard Content -->
             <main class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
-                <RouterView />
+                <ErrorBoundary>
+                    <RouterView />
+                </ErrorBoundary>
             </main>
         </div>
     </div>

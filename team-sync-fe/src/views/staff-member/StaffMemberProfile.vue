@@ -7,6 +7,7 @@ import { storeToRefs } from "pinia";
 import { can } from "@/helpers/permissionHelper";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import StatusBadge from "@/components/common/StatusBadge.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
 import { formatRupiah as formatCurrency, capitalize } from "@/utils/formatUtils.js";
 import { useToast } from "@/composables/useToast";
@@ -283,7 +284,7 @@ onMounted(() => {
                             </span>
                         </div>
                     </div>
-                    <div v-else class="text-center text-gray-500 py-4">No emergency contact added</div>
+                    <EmptyState v-else icon="Users" title="No emergency contact added" size="sm" />
                 </div>
             </div>
 
