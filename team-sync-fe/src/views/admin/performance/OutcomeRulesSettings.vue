@@ -244,12 +244,14 @@ onMounted(() => {
                                 <div class="flex items-center justify-end gap-2">
                                     <button
                                         @click="openEdit(rule)"
+                                        title="Edit rule"
                                         class="p-1.5 text-brand-light hover:text-brand-primary hover:bg-gray-100 rounded-lg transition-colors"
                                     >
                                         <Edit3 class="w-4 h-4" />
                                     </button>
                                     <button
                                         @click="deleteRule(rule)"
+                                        title="Delete rule"
                                         class="p-1.5 text-brand-light hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                                     >
                                         <Trash2 class="w-4 h-4" />
