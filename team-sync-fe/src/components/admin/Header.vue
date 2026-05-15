@@ -371,7 +371,7 @@ onUnmounted(() => {
                         class="flex items-center gap-2 sm:gap-3 cursor-pointer"
                         @click="toggleAccountMenu"
                     >
-                        <img
+                        <img loading="eager"
                             :src="user?.profile_photo"
                             alt="User Avatar"
                             class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"

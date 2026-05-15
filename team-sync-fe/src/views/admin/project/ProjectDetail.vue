@@ -181,7 +181,7 @@ onMounted(async () => {
             <div
                 class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
             >
-                <img :src="project.photo" alt="Project Image" class="w-full h-full object-cover rounded-[12px]" />
+                <img loading="lazy" :src="project.photo" alt="Project Image" class="w-full h-full object-cover rounded-[12px]" />
             </div>
 
             <!-- Project Basic Info -->
@@ -236,7 +236,7 @@ onMounted(async () => {
 
                             <div class="mt-4 pt-4 border-t border-[#DCDEDD]">
                                 <div v-if="team.leader" class="flex items-center gap-3">
-                                    <img
+                                    <img loading="lazy"
                                         :src="team.leader.profile_photo || DEFAULT_AVATAR"
                                         :alt="team.leader.name"
                                         class="w-9 h-9 rounded-full object-cover"
@@ -274,7 +274,7 @@ onMounted(async () => {
                 </div>
 
                 <div v-if="project.leader" class="flex items-center gap-4">
-                    <img
+                    <img loading="lazy"
                         :src="project.leader?.user?.profile_photo || DEFAULT_AVATAR"
                         :alt="project.leader?.user?.name"
                         class="w-16 h-16 rounded-full object-cover"

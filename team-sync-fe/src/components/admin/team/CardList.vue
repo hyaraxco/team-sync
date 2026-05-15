@@ -22,7 +22,7 @@ defineProps({
                         class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[12px]"
                     ></div>
                     <!-- Lucide icon -->
-                    <img :src="data.icon" alt="Team Icon" class="w-6 h-6 text-white relative z-10" />
+                    <img loading="lazy" :src="data.icon" alt="Team Icon" class="w-6 h-6 text-white relative z-10" />
                 </div>
                 <div>
                     <h4 class="text-brand-dark text-base font-bold">{{ data.name }}</h4>
@@ -38,7 +38,7 @@ defineProps({
         <!-- Team Leader Section -->
         <div class="mb-4" v-if="data.leader">
             <div class="flex items-center gap-3">
-                <img
+                <img loading="lazy"
                     :src="data.leader.profile_photo || DEFAULT_AVATAR"
                     alt="Team Lead"
                     class="w-12 h-12 rounded-full object-cover"

@@ -50,7 +50,7 @@ const handleDeleteProject = async () => {
         <div
             class="w-full h-32 bg-gradient-to-br from-blue-100 to-purple-100 relative overflow-hidden rounded-[12px] mb-4"
         >
-            <img class="w-full h-full object-cover rounded-[12px]" :src="data.photo" />
+            <img loading="lazy" class="w-full h-full object-cover rounded-[12px]" :src="data.photo" />
             <!-- Priority Badge Overlay -->
             <StatusBadge
                 v-if="data.priority"
@@ -79,7 +79,7 @@ const handleDeleteProject = async () => {
 
         <div class="border-t border-[#DCDEDD] pt-4 mb-4" v-if="data.leader">
             <div class="flex items-center gap-3">
-                <img
+                <img loading="lazy"
                     :src="data.leader?.user?.profile_photo || DEFAULT_AVATAR"
                     class="w-10 h-10 rounded-full object-cover"
                 />

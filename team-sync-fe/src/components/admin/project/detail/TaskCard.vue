@@ -56,7 +56,7 @@ const formatStatusLabel = (status) => {
         <div class="flex items-center justify-between pt-3 border-t border-gray-100">
             <!-- Assignee Avatar -->
             <div class="flex items-center gap-2">
-                <img
+                <img loading="lazy"
                     :src="task.assignee?.user?.profile_photo || DEFAULT_AVATAR"
                     :alt="task.assignee?.user?.name || 'Unassigned'"
                     class="w-7 h-7 rounded-full object-cover ring-2 ring-white"

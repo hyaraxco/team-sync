@@ -73,7 +73,7 @@ const goToEmployeeDetail = (id: number) => {
                 :key="employee.id"
                 class="flex flex-col sm:flex-row sm:items-center gap-3"
             >
-                <img
+                <img loading="lazy"
                     :src="employee.user?.profile_photo || DEFAULT_AVATAR"
                     :alt="employee.user?.name"
                     class="w-12 h-12 sm:w-16 sm:h-16 rounded-full object-cover"

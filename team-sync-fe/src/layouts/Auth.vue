@@ -11,7 +11,7 @@
                 class="relative hidden w-1/2 overflow-hidden bg-gray-900 text-white lg:flex flex-col items-start justify-between"
             >
                 <!-- Background Image with Overlay -->
-                <img
+                <img loading="eager"
                     src="https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=2940&auto=format&fit=crop"
                     alt="Team collaboration"
                     class="absolute inset-0 h-full w-full object-cover"
