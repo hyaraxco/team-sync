@@ -210,12 +210,14 @@ onMounted(() => {
                                 <div class="flex items-center justify-end gap-2">
                                     <button
                                         @click="openEdit(tpl)"
+                                        title="Edit template"
                                         class="p-1.5 text-brand-light hover:text-brand-primary rounded-lg"
                                     >
                                         <Edit3 class="w-4 h-4" />
                                     </button>
                                     <button
                                         @click="deleteTemplate(tpl)"
+                                        title="Delete template"
                                         class="p-1.5 text-brand-light hover:text-red-600 rounded-lg"
                                     >
                                         <Trash2 class="w-4 h-4" />
@@ -351,6 +353,7 @@ onMounted(() => {
                                 </div>
                                 <button
                                     @click="removeSection(mappedSection.id)"
+                                    title="Remove section"
                                     class="p-2 text-gray-400 hover:text-red-600 transition-colors"
                                 >
                                     <Trash2 class="w-4 h-4" />

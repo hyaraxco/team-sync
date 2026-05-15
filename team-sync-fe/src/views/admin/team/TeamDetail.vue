@@ -418,6 +418,7 @@ watch(
                 <button
                     @click="openRemoveMemberModal(member)"
                     :disabled="removingMember"
+                    title="Remove member"
                     class="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-50 border border-red-200 hover:bg-red-100 transition-all duration-300 flex items-center justify-center disabled:opacity-60"
                 >
                     <Trash2 class="w-4 h-4 text-red-600" />
