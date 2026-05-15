@@ -6,6 +6,7 @@ import { Plus, Edit3, Trash2, Layout, X, Info, Scale, Check } from "lucide-vue-n
 import MainCard from "@/components/common/MainCard.vue";
 import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
+import EmptyState from "@/components/common/EmptyState.vue";
 
 const store = usePerformanceReviewStore();
 const { templates, templatesLoading, sections } = storeToRefs(store);
@@ -163,11 +164,7 @@ onMounted(() => {
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
             </div>
 
-            <div v-else-if="!templates.length" class="text-center py-12">
-                <Layout class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <h3 class="text-lg font-medium text-brand-dark">No templates found</h3>
-                <p class="text-sm text-brand-light mt-1">Create your first performance review template.</p>
-            </div>
+            <EmptyState v-else-if="!templates.length" icon="Layout" title="No templates found" subtitle="Create your first performance review template." size="lg" />
 
             <div v-else class="overflow-x-auto">
                 <table class="w-full">
@@ -241,7 +238,7 @@ onMounted(() => {
                     <h3 class="text-lg font-bold text-brand-dark">
                         {{ editingTemplate ? "Edit Template" : "New Template" }}
                     </h3>
-                    <button @click="closeModal" class="p-1 hover:bg-gray-100 rounded-lg"><X class="w-5 h-5" /></button>
+                    <button @click="closeModal" class="p-1 hover:bg-gray-100 rounded-lg min-w-6 min-h-6 flex items-center justify-center"><X class="w-5 h-5" /></button>
                 </div>
 
                 <div class="flex-1 overflow-y-auto p-6 flex gap-8">

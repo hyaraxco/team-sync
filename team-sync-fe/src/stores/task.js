@@ -41,6 +41,7 @@ export const useTaskStore = defineStore("task", {
                 return response.data.data;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -66,6 +67,7 @@ export const useTaskStore = defineStore("task", {
                 return response.data.data;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -81,6 +83,7 @@ export const useTaskStore = defineStore("task", {
                 this.success = response.data.message;
             } catch (error) {
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }

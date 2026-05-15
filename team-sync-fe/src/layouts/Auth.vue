@@ -1,3 +1,7 @@
+<script setup>
+import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
+</script>
+
 <template>
     <div class="auth-shell min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
         <a
@@ -82,7 +86,9 @@
                 id="auth-main"
                 class="flex w-full flex-1 items-center justify-center px-6 py-12 lg:w-[65%] lg:px-16 xl:w-[60%] xl:px-24"
             >
-                <RouterView />
+                <ErrorBoundary>
+                    <RouterView />
+                </ErrorBoundary>
             </main>
         </div>
     </div>
