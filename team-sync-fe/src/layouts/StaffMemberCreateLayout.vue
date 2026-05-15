@@ -1,5 +1,6 @@
 <script setup>
 import Stepper from "@/components/admin/staff-member/create/Stepper.vue";
+import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
 import { BellIcon, SettingsIcon, ChevronDownIcon, MessageCircleIcon, ArrowLeft } from "lucide-vue-next";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
@@ -159,7 +160,9 @@ watch(
             </header>
             <!-- Dashboard Content -->
             <main ref="mainContentRef" class="main-content flex-1 overflow-auto p-4 md:p-5">
-                <RouterView />
+                <ErrorBoundary>
+                    <RouterView />
+                </ErrorBoundary>
             </main>
         </div>
     </div>

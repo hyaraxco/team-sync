@@ -136,7 +136,7 @@ watch(
                             <button
                                 @click="close"
                                 aria-label="Close"
-                                class="text-gray-400 hover:text-gray-600 transition-colors ml-4"
+                                class="text-gray-400 hover:text-gray-600 transition-colors ml-4 min-w-6 min-h-6 flex items-center justify-center rounded-lg hover:bg-gray-100"
                             >
                                 <X class="w-5 h-5" aria-hidden="true" />
                             </button>
