@@ -225,7 +225,7 @@ watch(
                     <div class="flex items-center justify-between">
                         <div class="flex items-center gap-4">
                             <div class="relative">
-                                <img
+                                <img loading="lazy"
                                     :src="team.leader.profile_photo"
                                     alt="Team Lead"
                                     class="w-16 h-16 rounded-full object-cover"
@@ -346,7 +346,7 @@ watch(
             </div>
 
             <div class="mt-4">
-                <img
+                <img loading="lazy"
                     src="https://images.unsplash.com/photo-1557804506-669a67965ba0"
                     alt="Team Banner"
                     class="w-full h-[138px] object-cover rounded-[12px]"
@@ -424,7 +424,7 @@ watch(
                 </button>
                 <div class="flex flex-col items-center mb-3">
                     <div class="relative">
-                        <img
+                        <img loading="lazy"
                             :src="member.staff_member.user?.profile_photo"
                             alt="Team Member"
                             class="w-[100px] h-[100px] rounded-full object-cover mb-3"
@@ -688,7 +688,7 @@ watch(
                             <div
                                 class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden"
                             >
-                                <img
+                                <img loading="lazy"
                                     :src="employee.user?.profile_photo"
                                     :alt="employee.user?.name"
                                     class="w-14 h-14 rounded-[12px] object-cover"

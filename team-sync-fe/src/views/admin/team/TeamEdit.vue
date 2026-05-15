@@ -176,7 +176,7 @@ watch(
                                             id="teamIconDisplay"
                                             class="w-32 h-32 relative z-10 flex items-center justify-center"
                                         >
-                                            <img
+                                            <img loading="lazy"
                                                 id="uploadedTeamIcon"
                                                 :src="form.icon_url"
                                                 alt="Team Icon"
@@ -330,7 +330,7 @@ watch(
 
                             <div class="mt-3 p-4 bg-gray-50 rounded-[12px] border border-[#DCDEDD]" v-if="selectedLead">
                                 <div class="flex items-center gap-3">
-                                    <img
+                                    <img loading="lazy"
                                         :src="selectedLead?.user?.profile_photo || DEFAULT_AVATAR"
                                         alt="Lead Photo"
                                         class="w-12 h-12 rounded-full object-cover"
@@ -671,7 +671,7 @@ watch(
                             <div
                                 class="w-14 h-14 relative flex items-center justify-center rounded-[12px] overflow-hidden"
                             >
-                                <img
+                                <img loading="lazy"
                                     :src="employee.user?.profile_photo || DEFAULT_AVATAR"
                                     alt="Sarah Johnson"
                                     class="w-14 h-14 rounded-[12px] object-cover"

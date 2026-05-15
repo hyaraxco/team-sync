@@ -327,7 +327,7 @@ onMounted(async () => {
                         >
                             <div class="flex flex-col items-center mb-3">
                                 <div class="relative">
-                                    <img
+                                    <img loading="lazy"
                                         :src="member.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                                         :alt="member.staff_member?.user?.name"
                                         class="w-[100px] h-[100px] rounded-full object-cover mb-3"

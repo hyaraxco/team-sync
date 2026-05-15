@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
 > Context engineering untuk AI agents. Dibaca otomatis oleh Pi, Claude Code, Codex.
-> Last updated: 2026-05-07
+> Last updated: 2026-05-15
 
 ## Sub-Repo Context
 
@@ -40,11 +40,17 @@ Dispatch 2-3 personas yang relevan in parallel, collect results, synthesize reco
 - Write tests (TDD when applicable)
 - Verify dengan semua unit testing yang ada di dalam repo dan sub repo
 6. Create PR & Review 🔍
-- Commit changes
-- Push to feature branch
-- Create PR
-- Wait for CI (BE tests, FE tests, screenshots)
-- Squash & merge
+- Branch selalu dari `main`
+- Commit bebas selama kerja
+- **Sebelum PR: squash** semua commit jadi 1 commit dengan format:
+  - `chore: add ...` (fitur baru)
+  - `chore: fix ...` (bug fix)
+- Push → open PR ke `main`
+- Wait for CI (BE tests, FE tests, screenshots) — harus ✅
+- Jika conflict dengan main, fix dulu
+- **Tunggu approval reviewer**
+- **Rebase & merge** ke main (bukan squash merge)
+- Hapus branch setelah merge
 7. Archive Plan 📦
 Move completed plan dari on_going/ ke archive/, update status to COMPLETED
 

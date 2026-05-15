@@ -70,7 +70,7 @@ const formatText = (text: string) => {
                 <div>
                     <p class="text-brand-light text-xs font-semibold mb-1">Profile Photo</p>
                     <div>
-                        <img
+                        <img loading="lazy"
                             :src="step1Data.profile_photo_url || DEFAULT_AVATAR"
                             alt="Profile Photo"
                             class="w-20 h-20 rounded-full object-cover border-2 border-[#DCDEDD]"

@@ -125,7 +125,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
                     class="flex items-center gap-3 py-1.5"
                 >
                     <div class="relative">
-                        <img
+                        <img loading="lazy"
                             :src="employee.profile_photo || DEFAULT_AVATAR"
                             :alt="employee.name"
                             class="w-8 h-8 rounded-full object-cover"
@@ -163,7 +163,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
                         class="flex items-center gap-3 py-1.5 opacity-60"
                     >
                         <div class="relative">
-                            <img
+                            <img loading="lazy"
                                 :src="employee.profile_photo || DEFAULT_AVATAR"
                                 :alt="employee.name"
                                 class="w-8 h-8 rounded-full object-cover grayscale"

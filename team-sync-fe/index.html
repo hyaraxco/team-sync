@@ -9,6 +9,10 @@
   <meta property="og:title" content="Team Sync Pro">
   <meta property="og:description" content="HRIS platform for managing staff, attendance, payroll, leave, projects, and performance reviews.">
   <meta property="og:type" content="website">
+  <meta property="og:image" content="/og-image.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Team Sync Pro">
+  <meta name="twitter:description" content="HRIS platform for managing staff, attendance, payroll, leave, projects, and performance reviews.">
   <title>Team Sync Pro</title>
 
   <link rel="preconnect" href="http://localhost:8000" crossorigin>
@@ -16,6 +20,19 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap"
     rel="stylesheet">
+  <script type="speculationrules">
+    {
+      "prefetch": [
+        {
+          "source": "document",
+          "where": {
+            "href_matches": "/admin/*"
+          },
+          "eagerness": "moderate"
+        }
+      ]
+    }
+  </script>
 </head>
 
 <body>

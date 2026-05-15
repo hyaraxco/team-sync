@@ -332,7 +332,7 @@ onMounted(async () => {
                         :key="request.id"
                         class="flex items-center gap-4 p-4 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
                     >
-                        <img
+                        <img loading="lazy"
                             :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                             :alt="request.staff_member?.user?.name"
                             class="w-12 h-12 rounded-full object-cover"
@@ -406,7 +406,7 @@ onMounted(async () => {
                         :key="correction.id"
                         class="flex items-center gap-4 p-4 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
                     >
-                        <img
+                        <img loading="lazy"
                             :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                             :alt="correction.staff_member?.user?.name"
                             class="w-12 h-12 rounded-full object-cover"

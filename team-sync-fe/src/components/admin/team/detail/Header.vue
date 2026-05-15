@@ -21,7 +21,7 @@ defineProps({
                         class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full"
                     ></div>
                     <!-- Lucide icon -->
-                    <img class="w-16 h-16 text-white relative z-10" :src="team.icon" alt="Team Icon" />
+                    <img loading="lazy" class="w-16 h-16 text-white relative z-10" :src="team.icon" alt="Team Icon" />
                 </div>
             </div>
             <div class="flex-1">
