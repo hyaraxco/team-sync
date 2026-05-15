@@ -5,6 +5,10 @@ services:
             dockerfile: ./.docker/php/Dockerfile.local
         ports:
             - ${APP_PORT:-8000}:80
+        environment:
+            # Bypass host-inherited proxy (e.g. OrbStack) for intra-network services
+            NO_PROXY: localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal
+            no_proxy: localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal
         volumes:
             - ./:/var/www/html:cached
 
@@ -22,6 +26,9 @@ services:
             dockerfile: ./.docker/php/Dockerfile.local
         command: php artisan queue:work --queue=default,meetings --tries=3 --timeout=600 --sleep=3
         restart: unless-stopped
+        environment:
+            NO_PROXY: localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal
+            no_proxy: localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal
         healthcheck:
             disable: true
         volumes:
@@ -39,6 +46,9 @@ services:
             dockerfile: ./.docker/php/Dockerfile.local
         command: php artisan schedule:work
         restart: unless-stopped
+        environment:
+            NO_PROXY: localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal
+            no_proxy: localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal
         volumes:
             - ./:/var/www/html:cached
             - laravel-storage:/var/www/html/storage

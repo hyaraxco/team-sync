@@ -23,11 +23,10 @@ test.describe.serial("Performance Reviewer Override Journey", () => {
     // Check if the "Generate Reviews" button exists and click it
     const generateBtn = page.getByRole("button", { name: /Generate Reviews/i });
     if (await generateBtn.isVisible()) {
-      // Mock window.confirm to always return true
-      page.on("dialog", async dialog => {
-        await dialog.accept();
-      });
       await generateBtn.click();
+      // ConfirmationModal component with confirm-text="Generate"
+      await expect(page.getByRole("heading", { name: /Generate Reviews/i })).toBeVisible();
+      await page.getByRole("button", { name: /^Generate$/ }).click();
       
       // Wait for success toast (using vue-toastification standard classes or just wait for text)
       await expect(page.getByText(/Successfully generated/i)).toBeVisible({ timeout: 15_000 });
