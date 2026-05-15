@@ -20,10 +20,12 @@
                 v-model="modelValue"
                 :placeholder="placeholder"
                 :required="required"
+                :aria-invalid="error ? 'true' : undefined"
+                :aria-describedby="error ? errorId : undefined"
                 :min="min"
                 :step="step"
                 :autocomplete="autocomplete"
-                class="peer w-full h-full bg-white text-gray-900 border text-sm rounded-xl outline-none transition-all duration-200 placeholder:text-gray-400 placeholder:font-normal font-medium"
+                class="peer w-full h-full bg-white text-gray-950 border text-sm rounded-xl outline-none transition-all duration-200 placeholder:text-gray-600 placeholder:font-normal font-medium"
                 :class="[
                     hasIcon ? 'pl-12' : 'pl-4',
                     hasSuffix ? 'pr-12' : 'pr-4',
@@ -42,8 +44,13 @@
         </div>
 
         <!-- Error Message -->
-        <div v-if="error" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
-            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <div
+            v-if="error"
+            :id="errorId"
+            role="alert"
+            class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1"
+        >
+            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -86,6 +93,8 @@ const fieldId = computed(() => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")}`;
 });
+
+const errorId = computed(() => `${fieldId.value}-error`);
 
 const modelValue = computed({
     get: () => props.modelValue || "",

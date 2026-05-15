@@ -17,6 +17,8 @@
                 :rows="rows"
                 :placeholder="placeholder"
                 :required="required"
+                :aria-invalid="error ? 'true' : undefined"
+                :aria-describedby="error ? errorId : undefined"
                 :class="[
                     'w-full pr-4 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
@@ -29,7 +31,7 @@
             ></textarea>
         </div>
 
-        <p v-if="error" class="mt-2" :style="errorStyle">
+        <p v-if="error" :id="errorId" role="alert" class="mt-2" :style="errorStyle">
             {{ error }}
         </p>
     </div>
@@ -62,6 +64,8 @@ const fieldId = computed(() => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")}`;
 });
+
+const errorId = computed(() => `${fieldId.value}-error`);
 
 const modelValue = computed({
     get: () => props.modelValue || "",

@@ -46,3 +46,11 @@ jobs:
       - name: Run Vitest tests
         working-directory: team-sync-fe
         run: bun run test
+
+      - name: Build and run accessibility audit
+        working-directory: team-sync-fe
+        run: |
+          bun run build
+          bun run preview -- --host 127.0.0.1 > /tmp/teamsync-vite-preview.log 2>&1 &
+          sleep 5
+          bun run test:a11y
