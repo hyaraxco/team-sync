@@ -135,7 +135,7 @@ const handleSubmit = async () => {
                     class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-[#0C51D9] disabled:hover:shadow-sm overflow-hidden mt-2"
                     :disabled="loading"
                 >
-                    <span class="relative z-10 flex items-center gap-2">
+                    <span class="relative z-10 flex items-center gap-2 text-white">
                         {{ loading ? "Signing in…" : "Sign in" }}
                         <ArrowRight
                             v-if="!loading"
