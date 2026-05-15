@@ -4,7 +4,7 @@ import { storeToRefs } from "pinia";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { useRouter } from "vue-router";
 import { useToast } from "@/composables/useToast";
-import { Calendar, Plus, TrendingUp, Clock, CheckCircle2, XCircle, Play, Trash2 } from "lucide-vue-next";
+import { Calendar, Plus, TrendingUp, Clock, CheckCircle2, XCircle, X, Play, Trash2 } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
@@ -17,6 +17,15 @@ const toast = useToast();
 
 const selectedType = ref("all");
 const selectedStatus = ref("all");
+
+const hasActiveFilters = computed(() => {
+    return selectedType.value !== "all" || selectedStatus.value !== "all";
+});
+
+const clearFilters = () => {
+    selectedType.value = "all";
+    selectedStatus.value = "all";
+};
 
 // Confirmation dialog state
 const showConfirmDialog = ref(false);
@@ -131,7 +140,7 @@ onMounted(async () => {
 
         <!-- Filters -->
         <MainCard>
-            <div class="flex flex-wrap gap-4">
+            <div class="flex flex-wrap items-end gap-4">
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-sm font-medium text-brand-dark mb-2">Cycle Type</label>
                     <select
@@ -157,6 +166,14 @@ onMounted(async () => {
                         <option value="cancelled">Cancelled</option>
                     </select>
                 </div>
+                <button
+                    v-if="hasActiveFilters"
+                    @click="clearFilters"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 transition-all duration-200"
+                >
+                    <X class="w-4 h-4 text-red-500" />
+                    <span class="text-red-500 text-sm font-medium">Clear filters</span>
+                </button>
             </div>
         </MainCard>
 
