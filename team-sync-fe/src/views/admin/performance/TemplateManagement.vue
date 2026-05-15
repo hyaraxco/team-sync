@@ -250,12 +250,15 @@ onMounted(() => {
                         <div>
                             <label class="block text-sm font-medium mb-1">Template Name</label>
                             <input
+                                id="template-name"
                                 v-model="form.name"
                                 type="text"
+                                :aria-invalid="formErrors.name ? 'true' : undefined"
+                                :aria-describedby="formErrors.name ? 'template-name-error' : undefined"
                                 class="w-full px-3 py-2 border rounded-lg focus:ring-brand-primary"
                                 placeholder="e.g. Senior Software Engineer"
                             />
-                            <p v-if="formErrors.name" class="text-xs text-red-600 mt-1">{{ formErrors.name }}</p>
+                            <p v-if="formErrors.name" id="template-name-error" role="alert" class="text-xs text-red-600 mt-1">{{ formErrors.name }}</p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium mb-1">Description</label>
@@ -291,7 +294,7 @@ onMounted(() => {
                                     <Plus class="w-3 h-3 text-brand-primary opacity-0 group-hover:opacity-100" />
                                 </button>
                             </div>
-                            <p v-if="formErrors.sections" class="text-xs text-red-600 mt-2">
+                            <p v-if="formErrors.sections" id="template-sections-error" role="alert" class="text-xs text-red-600 mt-2">
                                 {{ formErrors.sections }}
                             </p>
                         </div>
@@ -342,6 +345,8 @@ onMounted(() => {
                                             type="number"
                                             min="0"
                                             max="100"
+                                            :aria-invalid="formErrors.weight ? 'true' : undefined"
+                                            :aria-describedby="formErrors.weight ? 'template-weight-error' : undefined"
                                             class="w-full pl-3 pr-8 py-2 border rounded-lg text-right"
                                         />
                                         <span class="absolute right-3 top-2 text-gray-400">%</span>
@@ -363,7 +368,7 @@ onMounted(() => {
                             <Info class="w-4 h-4 flex-shrink-0" />
                             Weights must total exactly 100%. Current gap: {{ 100 - totalWeight }}%
                         </div>
-                        <p v-if="formErrors.weight" class="text-xs text-red-600">{{ formErrors.weight }}</p>
+                        <p v-if="formErrors.weight" id="template-weight-error" role="alert" class="text-xs text-red-600">{{ formErrors.weight }}</p>
                     </div>
                 </div>
 

@@ -1,6 +1,5 @@
-import { createApp } from "vue";
+import { createApp, defineAsyncComponent } from "vue";
 import { createPinia } from "pinia";
-import VueApexCharts from "vue3-apexcharts";
 
 import "./assets/css/main.css";
 
@@ -8,6 +7,7 @@ import App from "./App.vue";
 import router from "./router";
 
 const app = createApp(App);
+const VueApexCharts = defineAsyncComponent(() => import("vue3-apexcharts"));
 
 app.use(createPinia());
 app.use(router);

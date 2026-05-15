@@ -24,5 +24,17 @@ export default defineConfig(({ mode }) => ({
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin'
     }
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'vue-router', 'pinia', 'axios'],
+          'vendor-ui': ['lucide-vue-next'],
+          'vendor-charts': ['vue3-apexcharts', 'apexcharts'],
+          'vendor-utils': ['luxon']
+        }
+      }
+    }
   }
 }))
