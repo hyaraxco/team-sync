@@ -15,6 +15,8 @@
                 :name="name"
                 v-model="modelValue"
                 :required="required"
+                :aria-invalid="error ? 'true' : undefined"
+                :aria-describedby="error ? errorId : undefined"
                 :class="[
                     'appearance-none w-full pr-10 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
@@ -40,8 +42,8 @@
             </svg>
         </div>
 
-        <p v-if="error" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
-            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <p v-if="error" :id="errorId" role="alert" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
+            <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path
                     stroke-linecap="round"
                     stroke-linejoin="round"
@@ -82,6 +84,8 @@ const fieldId = computed(() => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/^-|-$/g, "")}`;
 });
+
+const errorId = computed(() => `${fieldId.value}-error`);
 
 const modelValue = computed({
     get: () => props.modelValue || "",
