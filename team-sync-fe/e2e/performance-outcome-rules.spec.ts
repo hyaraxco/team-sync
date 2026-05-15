@@ -62,9 +62,11 @@ test.describe.serial("Performance Outcome Rules CRUD", () => {
       await expect(page.getByText(/updated successfully/i)).toBeVisible({ timeout: 5_000 });
 
       // Delete
-      page.on("dialog", async dialog => await dialog.accept());
       const updatedRow = page.locator("table tbody tr", { hasText: "E2E Updated Rule" });
       await updatedRow.locator("button").last().click();
+      // ConfirmationModal component — click its "Delete" button
+      await expect(page.getByRole("heading", { name: /Delete Rule/i })).toBeVisible();
+      await page.getByRole("button", { name: /^Delete$/ }).click();
       await expect(page.getByText(/deleted successfully/i)).toBeVisible({ timeout: 5_000 });
       await expect(page.getByText("E2E Updated Rule")).not.toBeVisible();
     } else {
