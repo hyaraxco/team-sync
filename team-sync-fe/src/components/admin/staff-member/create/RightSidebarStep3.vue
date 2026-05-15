@@ -31,7 +31,7 @@ onMounted(() => {
         sidebarTop.value = sidebarRef.value.offsetTop;
         sidebarWidth.value = sidebarRef.value.offsetWidth;
     }
-    window.addEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
     window.addEventListener("resize", handleResize);
     handleScroll();
 });

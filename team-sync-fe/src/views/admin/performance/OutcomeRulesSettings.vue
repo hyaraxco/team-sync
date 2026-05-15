@@ -272,7 +272,7 @@ onMounted(() => {
                     <h3 class="text-lg font-bold text-brand-dark">
                         {{ editingRule ? "Edit Rule" : "Add Outcome Rule" }}
                     </h3>
-                    <button @click="closeModal" class="p-1 hover:bg-gray-100 rounded-lg text-gray-500">
+                    <button @click="closeModal" class="p-1 hover:bg-gray-100 rounded-lg text-gray-500 min-w-6 min-h-6 flex items-center justify-center">
                         <X class="w-5 h-5" />
                     </button>
                 </div>

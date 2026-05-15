@@ -1,0 +1,33 @@
+# Cache configuration for Team Sync Pro SPA
+# Copy relevant sections to your Nginx server block
+
+# Hashed assets (JS, CSS, images in /assets/) — cache 1 year (immutable)
+location /assets/ {
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
+# Service worker and manifest — no cache
+location /sw.js {
+    expires -1;
+    add_header Cache-Control "no-store, no-cache, must-revalidate";
+}
+
+# HTML entry point — short cache with revalidation
+location / {
+    expires -1;
+    add_header Cache-Control "no-cache, must-revalidate";
+    try_files $uri $uri/ /index.html;
+}
+
+# Fonts — cache 1 year
+location ~* \.(woff2?|ttf|otf|eot)$ {
+    expires 1y;
+    add_header Cache-Control "public, max-age=31536000, immutable";
+}
+
+# Images — cache 1 month
+location ~* \.(png|jpg|jpeg|gif|svg|ico|webp)$ {
+    expires 30d;
+    add_header Cache-Control "public, max-age=2592000";
+}
