@@ -33,6 +33,15 @@ const toast = useToast();
 
 const selectedType = ref("all");
 const selectedStatus = ref("all");
+
+const hasActiveFilters = computed(() => {
+    return selectedType.value !== "all" || selectedStatus.value !== "all";
+});
+
+const clearFilters = () => {
+    selectedType.value = "all";
+    selectedStatus.value = "all";
+};
 const showCreateModal = ref(false);
 const createLoading = ref(false);
 const editingGoalId = ref(null);
@@ -262,7 +271,7 @@ onMounted(async () => {
         </div>
 
         <MainCard>
-            <div class="flex flex-wrap gap-4">
+            <div class="flex flex-wrap items-end gap-4">
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-sm font-medium text-brand-dark mb-2">Goal Type</label>
                     <select
@@ -288,6 +297,14 @@ onMounted(async () => {
                         <option value="completed">Completed</option>
                     </select>
                 </div>
+                <button
+                    v-if="hasActiveFilters"
+                    @click="clearFilters"
+                    class="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 transition-all duration-200"
+                >
+                    <X class="w-4 h-4 text-red-500" />
+                    <span class="text-red-500 text-sm font-medium">Clear filters</span>
+                </button>
             </div>
         </MainCard>
 
@@ -314,6 +331,7 @@ onMounted(async () => {
                         <div v-if="canManageGoal(goal)" class="relative">
                             <button
                                 class="p-1.5 rounded-md hover:bg-gray-100 transition-colors"
+                                title="Actions"
                                 @click.stop="toggleActionMenu(goal.id)"
                             >
                                 <MoreVertical class="w-4 h-4 text-brand-light" />
