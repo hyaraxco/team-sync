@@ -1,7 +1,7 @@
 # Team Sync — Frontend Design System
 
 > **Stack:** Vue 3 · Vite 7 · Tailwind CSS · Plus Jakarta Sans · Lucide Vue Next
-> **Last updated:** 2026-05-14
+> **Last updated:** 2026-05-16
 
 ---
 
@@ -56,20 +56,21 @@ All tokens live in two places: `tailwind.config.js` (extended theme) and `src/as
 | `primary-700` | `#1d4ed8` | `bg-primary-700` | Button hover |
 | `primary-900` | `#1e3a8a` | `bg-primary-900` | Deep accents |
 
-### Brand Colors (CSS custom classes)
+### Brand Colors
 
-| Token | Hex | Class | Usage |
-|-------|-----|-------|-------|
-| Brand Dark | `#0C1C3C` | `.text-brand-dark` | Primary text |
-| Brand Light | `#6B7280` | `.text-brand-light` | Secondary / muted text |
+| Token | Hex | Tailwind Class | Usage |
+|-------|-----|----------------|-------|
+| Brand Dark | `#0C1C3C` | `text-brand-dark` / `bg-brand-dark` | Primary text |
+| Brand Light | `#6B7280` | `text-brand-light` / `bg-brand-light` | Secondary / muted text |
+| Brand Border | `#DCDEDD` | `border-brand-border` | All card / input borders |
+| Brand Primary | `#0C51D9` | `border-brand-primary` / `text-brand-primary` | Focus rings, interactive borders |
 | Brand White | `#FFFFFF` | `.text-brand-white` | Text on dark surfaces |
 | Brand White 90 | `rgba(255,255,255,0.9)` | `.text-brand-white-90` | Card titles on dark bg |
 | Brand White 80 | `rgba(255,255,255,0.8)` | `.text-brand-white-80` | Card subtitles on dark bg |
 | Brand White 70 | `rgba(255,255,255,0.7)` | `.text-brand-white-70` | Tertiary on dark bg |
-| CTA Blue | `#0C51D9` | — | Interactive borders, focus rings |
-| Border Default | `#DCDEDD` | `border-[#DCDEDD]` | All card / input borders |
-| Success | `#059669` | `.text-success` | Positive trends |
-| Danger | `#DC2626` | `.text-danger` | Error states |
+| Success | `#059669` | `.text-success` / `bg-success-*` | Positive trends |
+| Danger | `#DC2626` | `.text-danger` / `bg-danger-*` | Error states |
+| Warning | (amber scale) | `bg-warning-*` | Warning states |
 
 ### Gradient Tokens
 
@@ -116,15 +117,17 @@ html {
 
 ### Semantic Colors
 
-| Intent | Light Mode | Dark Mode | Tailwind |
-|--------|-----------|-----------|---------|
-| Background (app) | `gray-50` | `gray-900` | `bg-gray-50 dark:bg-gray-900` |
-| Surface (card) | `white` | `gray-800` | `bg-white dark:bg-gray-800` |
-| Border | `#DCDEDD` | `gray-700` | `border-[#DCDEDD] dark:border-gray-700` |
-| Text primary | `#0C1C3C` | `gray-50` | `.text-brand-dark` |
-| Text muted | `#6B7280` | `gray-400` | `.text-brand-light` |
-| Nav link bg | `white` | `gray-800` | `.nav-link` |
-| Nav link active | Dark navy gradient | (same) | `.nav-link-active` |
+| Intent | Tailwind |
+|--------|---------|
+| Background (app) | `bg-gray-50` |
+| Surface (card) | `bg-white` |
+| Border | `border-brand-border` |
+| Text primary | `text-brand-dark` (`#0C1C3C`) |
+| Text muted | `text-brand-light` (`#6B7280`) |
+| Nav link bg | `.nav-link` (white) |
+| Nav link active | `.nav-link-active` (dark navy gradient) |
+
+> **Note:** Dark mode `dark:` classes have been removed. The `useDarkMode` composable and Tailwind `darkMode: 'class'` config remain for future full dark mode implementation.
 
 ### Status / Semantic Palette
 
@@ -162,17 +165,21 @@ The project uses **Tailwind's default spacing scale**. Recurring patterns:
 
 ### Border Radius
 
+All arbitrary `rounded-[Npx]` values have been standardized to Tailwind defaults:
+
 | Component | Radius | Tailwind |
 |-----------|--------|---------|
-| Cards (all) | `20px` | `rounded-[20px]` |
-| Inputs, Selects, Textareas | `16px` | `rounded-[16px]` |
-| Buttons | `8px` | `rounded-[8px]` |
-| Icon containers (large) | `20px` | `rounded-[20px]` |
-| Icon containers (small) | `12px–16px` | `rounded-[12px]` / `rounded-[16px]` |
+| Cards (all) | `20px` | `rounded-2xl` |
+| Inputs, Selects, Textareas | `16px` | `rounded-2xl` |
+| Buttons | `8px` | `rounded-lg` |
+| Icon containers (large) | `20px` | `rounded-2xl` |
+| Icon containers (small) | `12px` | `rounded-xl` |
 | Avatar / user photo | full circle | `rounded-full` |
 | Badges | `6px` | `rounded-md` |
 | Tooltip | `8px` | inline style |
-| Notification panel items | `16px` | `rounded-[16px]` |
+| Notification panel items | `16px` | `rounded-2xl` |
+
+> **Anti-pattern:** Do not use `rounded-[Npx]` arbitrary values. Use Tailwind's built-in scale (`rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`).
 
 ---
 
@@ -180,14 +187,18 @@ The project uses **Tailwind's default spacing scale**. Recurring patterns:
 
 | Layer | Value | Usage |
 |-------|-------|-------|
-| Card default | `border border-[#DCDEDD]` | All white cards |
-| Card hover | `hover:border-[#0C51D9] hover:border-2` | StatsCard, SearchFilter inputs |
+| Card default | `border border-brand-border` | All white cards |
+| Card hover | `hover:ring-2 hover:ring-primary-500/20` | StatsCard, SearchFilter inputs |
+| StatsCard left border | `border-l-4 border-l-{color}-500` | Color-coded accent matching `colorScheme` |
 | Dark card (MainCard) | `box-shadow: -2px 2px 1px 0 #1A2570 inset, 2px 2px 1px 0 rgba(26,37,112,0.55) inset` | `.main-card` |
 | Modal backdrop | `bg-black bg-opacity-50` | `ModalWrapper` |
 | Confirmation backdrop | `backdrop-blur-sm bg-black/30` | `ConfirmationModal` |
 | Toast | `shadow-lg shadow-black/5` | `ToastContainer` |
 | Dropdown menu | `shadow-md` | Header account menu |
 | Tooltip | `box-shadow: 0 4px 12px rgba(0,0,0,0.15)` | `SidebarTooltip` |
+
+> **Anti-pattern:** Do not use `hover:border-2` — it causes 1px layout shift. Use `hover:ring-2` instead.
+> **Anti-pattern:** Do not use arbitrary `shadow-[...]` values. Use Tailwind defaults (`shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl`).
 
 ---
 
@@ -247,9 +258,11 @@ Full-screen two-column shell: fixed sidebar + scrollable main area.
 
 - **Sidebar width:** `256px` expanded · `68px` collapsed (persisted in `localStorage`)
 - **Mobile:** sidebar is off-canvas (`-translate-x-full`), opened by a hamburger button; black overlay `bg-black/30` shown behind
-- **Main bg:** `bg-gray-50 dark:bg-gray-900`
-- **Sidebar bg:** `bg-white dark:bg-gray-800`
+- **Main bg:** `bg-gray-50`
+- **Sidebar bg:** `bg-white`
+- **Layout height:** `min-h-[100dvh]` (NOT `h-screen` — iOS Safari viewport bug)
 - **Skip-link:** `<a href="#main-content">Skip to main content</a>` for keyboard accessibility
+- **ErrorBoundary:** wraps `<RouterView />` in all 3 layouts (Admin, Auth, StaffMemberCreateLayout)
 
 ### Auth Layout (`layouts/Auth.vue`)
 
@@ -377,9 +390,11 @@ Secondary metric card — white background, colored icon container.
 
 #### Visual Spec
 
-- `bg-white border border-[#DCDEDD] rounded-[20px]`
-- Hover: `hover:border-[#0C51D9] hover:border-2`
+- `bg-white border border-brand-border rounded-2xl`
+- Hover: `hover:ring-2 hover:ring-primary-500/20`
+- Left accent: `border-l-4 border-l-{colorScheme}-500` (color-coded per scheme)
 - Value animates from 0 → target with ease-out cubic
+- Numeric values use `tabular-nums` for proper alignment
 
 #### Usage
 
@@ -434,8 +449,9 @@ Secondary metric card — white background, colored icon container.
 
 - `.main-card` class: `background: linear-gradient(266deg, #040724, #0C1448, #040724)`
 - Inset box-shadow for depth
-- `rounded-[20px] border border-[#0B1042]`
+- `rounded-2xl border border-gray-800`
 - All text uses `.text-brand-white*` classes
+- Numeric values use `tabular-nums`
 
 ---
 
@@ -555,9 +571,9 @@ Combined search input + dynamic dropdown filters bar.
 
 #### Visual Spec
 
-- Container: `bg-white border border-[#DCDEDD] rounded-[20px] p-4`
-- Input: `rounded-[16px]`, focus border `#0C51D9` 2px
-- Dropdowns: `rounded-[16px]`, `appearance-none` with custom chevron
+- Container: `bg-white border border-brand-border rounded-2xl p-4`
+- Input: `rounded-2xl`, focus border `primary-500` with ring
+- Dropdowns: `rounded-2xl`, `appearance-none` with custom chevron
 - Reset button only shown when `hasActiveFilters` is true
 
 #### Usage
@@ -618,7 +634,7 @@ General-purpose accessible modal dialog with focus trap and scroll lock.
 
 #### Visual Spec
 
-- `bg-white rounded-[20px] p-6 max-h-[90vh]`
+- `bg-white rounded-2xl p-6 max-h-[90vh]`
 - Header: `text-brand-dark text-xl font-bold`
 - Close button: `X` icon, `text-gray-400 hover:text-gray-600`
 - Body: `overflow-y-auto` with thin custom scrollbar
@@ -710,7 +726,7 @@ Powered by `useToast()` composable — no props needed.
 
 - Fixed `top-6 right-6 z-[9999]`
 - `min-width: 360px; max-width: 420px`
-- `rounded-[16px] border shadow-lg` with left accent bar
+- `rounded-2xl border shadow-lg` with left accent bar
 - `TransitionGroup` with slide-from-right + scale animation
 - Progress bar shrinks over `duration` ms
 
@@ -765,7 +781,7 @@ Standard text / number input with label, optional icon, optional suffix, and err
 |-------|--------|------|
 | Default | `border-gray-200` | — |
 | Hover | `hover:border-gray-300` | — |
-| Focus | `border-[#0C51D9]` | `ring-4 ring-[#0C51D9]/10` |
+| Focus | `border-primary-500` | `ring-4 ring-primary-500/10` |
 | Error | `border-red-300` | `ring-4 ring-red-500/10` |
 
 - Fixed height `h-12` for consistent alignment
@@ -803,13 +819,13 @@ Styled `<select>` with label, optional icon, and error state.
 
 | State | Class |
 |-------|-------|
-| Default | `border-[#DCDEDD]` |
-| Hover | `hover:border-[#0C51D9] hover:border-2` |
-| Focus | `focus:border-[#0C51D9] focus:border-2` |
-| Error | `border-[#DC2626] border-2` |
+| Default | `border-brand-border` |
+| Hover | `hover:ring-2 hover:ring-primary-500/20` |
+| Focus | `focus:border-primary-500 focus:ring-primary-500` |
+| Error | `border-danger-500 border-2` |
 
 - `appearance-none` with custom SVG chevron
-- `rounded-[16px]`, `font-semibold`
+- `rounded-2xl`, `font-semibold`
 
 #### Usage
 
@@ -845,7 +861,7 @@ Multi-line text input with label, optional icon, and error state.
 | `required` | `Boolean` | `false` | — |
 | `error` | `String` | `""` | Error message |
 
-Same border/hover/focus/error states as Select. `rounded-[16px]`.
+Same border/hover/focus/error states as Select. `rounded-2xl`.
 
 ---
 
@@ -903,9 +919,9 @@ Collapsed state persisted in `localStorage` key `"sidebar-collapsed"`.
 |---------|-------|-------------|
 | Inactive | `.nav-link` | White bg, gray icon + text |
 | Active | `.nav-link-active` | Dark navy gradient, white icon + text |
-| Hover (inactive) | `hover:border-[#0C51D9] hover:border-2` | Blue border |
+| Hover (inactive) | `hover:ring-2 hover:ring-primary-500/20` | Subtle ring highlight |
 
-Both share: `border border-[#DCDEDD] rounded-[20px] transition-all duration-300`
+Both share: `border border-brand-border rounded-2xl transition-all duration-300`
 
 #### Logo
 
@@ -932,7 +948,7 @@ Top navigation bar with dynamic page title, notifications, and user menu.
 2. **Page title block** — dynamic `title` + `subtitle` from route name map
 3. **Notification bell** — `BellIcon` with unread count badge
 4. **Messages button** — `MessageCircleIcon` (hidden on mobile)
-5. **Vertical divider** — `w-px h-8 bg-[#DCDEDD]`
+5. **Vertical divider** — `w-px h-8 bg-brand-border`
 6. **User profile** — avatar/initials + name + roles + `ChevronDownIcon` + dropdown menu
 
 #### Notification Badge
@@ -947,7 +963,7 @@ Unread count polled every **15 seconds**, paused when tab is hidden.
 
 #### Account Dropdown
 
-- `bg-white border border-[#DCDEDD] rounded-lg shadow-md`
+- `bg-white border border-brand-border rounded-lg shadow-md`
 - Links: Profile → `staffMember.profile`, Sign Out (red)
 - Closes on outside click
 
@@ -1142,39 +1158,19 @@ getJobStatusText('on_leave') // → "On Leave"
 
 ## 12. Dark Mode
 
-Dark mode uses **Tailwind's `class` strategy** — toggled by adding/removing `dark` on `<html>`.
+> **Status:** Partially scaffolded but NOT active. All `dark:` utility classes have been removed from components. The infrastructure remains for future full implementation.
 
-### Managed by
+### Infrastructure (in place)
 
-`useDarkMode()` composable:
-- Persists preference in `localStorage` as `"dark"` or `"light"`
-- Falls back to `prefers-color-scheme` media query
-- Re-syncs if the OS preference changes and no explicit choice was stored
+- `useDarkMode()` composable toggles `dark` class on `<html>` + persists in `localStorage`
+- `tailwind.config.js` has `darkMode: 'class'`
+- `.nav-link-active` and `.main-card` are dark navy by design — work on both themes
 
-### Applying Dark Styles
+### Current State
 
-Use Tailwind's `dark:` prefix on any element:
-
-```html
-<div class="bg-white dark:bg-gray-800 border-[#DCDEDD] dark:border-gray-700">
-```
-
-### Dark Mode Coverage (existing)
-
-| Element | Light | Dark |
-|---------|-------|------|
-| App background | `bg-gray-50` | `bg-gray-900` |
-| Card surface | `bg-white` | `bg-gray-800` |
-| Card border | `border-[#DCDEDD]` | `dark:border-gray-700` |
-| Sidebar bg | `bg-white` | `bg-gray-800` |
-| Sidebar border | `border-gray-200` | `dark:border-gray-700` |
-| Nav link (inactive) | `bg-white` | `bg-gray-800` |
-| Nav link hover | — | `dark:hover:bg-gray-700` |
-| Section title | `#0C1C3C` | `dark:text-gray-400` |
-| Text primary | `.text-brand-dark` → `#0C1C3C` | `dark:text-gray-50` (via override) |
-| Text muted | `.text-brand-light` → `#6B7280` | `dark:text-gray-400` (via override) |
-
-> **Note:** The dark-gradient `.main-card` and `.nav-link-active` are unchanged in dark mode — their dark navy appearance works on both themes.
+- **Zero `dark:` classes** in any `.vue` file
+- Dark mode toggle exists but produces no visual change
+- Future: when dark mode is fully implemented, add `dark:` classes systematically using design tokens
 
 ---
 
@@ -1247,6 +1243,14 @@ These patterns **must not** be used in this project:
 | `npm` lockfile (`package-lock.json` in FE) | `bun.lock` only |
 | Mix `@/` alias inconsistently | Always use `@/` → `src/` alias |
 | Inline `style=` for colours | Tailwind classes (or CSS custom classes for brand tokens) |
+| `h-screen` for full-height layouts | `min-h-[100dvh]` (iOS Safari viewport bug) |
+| `hover:border-2` for hover states | `hover:ring-2 hover:ring-primary-500/20` (no layout shift) |
+| `dark:` classes on components | Remove — dark mode not yet fully implemented |
+| `rounded-[Npx]` arbitrary radius | `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl` |
+| `shadow-[...]` arbitrary shadows | `shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl` |
+| `border-[#DCDEDD]` hardcoded border | `border-brand-border` (Tailwind config token) |
+| `focus:ring-[#0C51D9]` hardcoded focus | `focus:ring-primary-500` (Tailwind config token) |
+| Proportional font for numbers | `tabular-nums` class on financial/data values |
 
 ---
 
@@ -1254,16 +1258,18 @@ These patterns **must not** be used in this project:
 
 | File | Purpose |
 |------|---------|
-| `tailwind.config.js` | Extends primary palette, `darkMode: 'class'` |
-| `src/assets/css/input.css` | Global brand tokens, gradient classes, nav classes |
-| `src/components/common/` | 10 shared UI components |
+| `tailwind.config.js` | Design tokens: primary, brand-dark/light/border/primary, success/danger/warning, border radius, animations |
+| `src/assets/css/input.css` | Global brand tokens, gradient classes, nav classes, badge classes, tooltips |
+| `src/components/common/` | 11 shared UI components (Alert, AnimatedValue, ConfirmationModal, EmptyState, ErrorBoundary, MainCard, ModalWrapper, SearchFilter, StatsCard, StatusBadge, ToastContainer) |
 | `src/components/common/form/` | Input, Select, TextArea |
 | `src/components/ui/` | SidebarTooltip |
 | `src/components/admin/Sidebar.vue` | Navigation rail |
 | `src/components/admin/Header.vue` | Top bar |
-| `src/layouts/Admin.vue` | Two-column app shell |
-| `src/layouts/Auth.vue` | Split-screen auth shell |
+| `src/layouts/Admin.vue` | Two-column app shell (ErrorBoundary wraps RouterView) |
+| `src/layouts/Auth.vue` | Split-screen auth shell (ErrorBoundary wraps RouterView) |
+| `src/layouts/StaffMemberCreateLayout.vue` | Staff creation wizard (ErrorBoundary wraps RouterView) |
 | `src/composables/` | 6 reusable logic hooks |
 | `src/utils/badgeUtils.js` | All status → CSS class mappings |
 | `src/utils/formatUtils.js` | Number, currency, string formatters |
 | `src/helpers/permissionHelper.js` | `can()`, `canOneOf()` permission checks |
+| `src/helpers/errorHelper.js` | `handleError()` — extracts user-friendly error messages |

@@ -10,10 +10,11 @@ ehthumbs.db
 Thumbs.db
 
 # ====================
-# IDE / Editor
+# IDE / Editor / Agent
 # ====================
 .idea/
 .vscode/
+.opencode/
 *.swp
 *.swo
 *~
@@ -63,9 +64,8 @@ public/storage/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
-<<<<<<< Updated upstream
 coverage/
-*.local
+playwright-artifacts/
 
 # ====================
 # Logs
@@ -90,6 +90,12 @@ storage/logs/*.log
 .ralph/
 PI_SETUP_GUIDE.md
 benchmarks/
+.github/context-mode/content/
+
+# ====================
+# Search Indexes
+# ====================
+storage/tntsearch/
 
 # ====================
 # Cache
@@ -104,8 +110,5 @@ benchmarks/
 *.tgz
 *.tar.gz
 *.zip
-=======
-
-# Local git worktrees
-.worktrees/
->>>>>>> Stashed changes
+*.local
+/package-lock.json
