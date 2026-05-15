@@ -159,7 +159,7 @@ onMounted(loadPolicies);
             </div>
             <button
                 type="button"
-                class="inline-flex items-center gap-2 rounded-[12px] bg-brand-dark px-4 py-3 text-sm font-semibold text-white hover:bg-opacity-90"
+                class="inline-flex items-center gap-2 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white hover:bg-opacity-90"
                 @click="openCreate"
             >
                 <Plus class="w-4 h-4" />
@@ -167,7 +167,7 @@ onMounted(loadPolicies);
             </button>
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div v-if="loading" class="py-12 text-center text-brand-light">Loading approval policies...</div>
             <EmptyState
                 v-else-if="sortedPolicies.length === 0"
@@ -209,7 +209,7 @@ onMounted(loadPolicies);
                             <td class="px-4 py-3 text-right">
                                 <button
                                     type="button"
-                                    class="mr-2 inline-flex items-center gap-1 rounded-lg border border-[#DCDEDD] px-3 py-2 text-xs font-semibold"
+                                    class="mr-2 inline-flex items-center gap-1 rounded-lg border border-brand-border px-3 py-2 text-xs font-semibold"
                                     @click="openEdit(policy)"
                                 >
                                     <Pencil class="w-3.5 h-3.5" />
@@ -243,7 +243,7 @@ onMounted(loadPolicies);
                         v-model="form.name"
                         required
                         type="text"
-                        class="w-full rounded-[10px] border border-[#DCDEDD] px-4 py-3"
+                        class="w-full rounded-lg border border-brand-border px-4 py-3"
                     />
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -254,7 +254,7 @@ onMounted(loadPolicies);
                             required
                             min="0"
                             type="number"
-                            class="w-full rounded-[10px] border border-[#DCDEDD] px-4 py-3"
+                            class="w-full rounded-lg border border-brand-border px-4 py-3"
                         />
                     </div>
                     <div>
@@ -264,7 +264,7 @@ onMounted(loadPolicies);
                             min="0"
                             type="number"
                             placeholder="No maximum"
-                            class="w-full rounded-[10px] border border-[#DCDEDD] px-4 py-3"
+                            class="w-full rounded-lg border border-brand-border px-4 py-3"
                         />
                     </div>
                 </div>
@@ -276,7 +276,7 @@ onMounted(loadPolicies);
                             required
                             type="text"
                             placeholder="finance-manager"
-                            class="w-full rounded-[10px] border border-[#DCDEDD] px-4 py-3"
+                            class="w-full rounded-lg border border-brand-border px-4 py-3"
                         />
                     </div>
                     <div>
@@ -286,18 +286,18 @@ onMounted(loadPolicies);
                             required
                             min="1"
                             type="number"
-                            class="w-full rounded-[10px] border border-[#DCDEDD] px-4 py-3"
+                            class="w-full rounded-lg border border-brand-border px-4 py-3"
                         />
                     </div>
                 </div>
                 <label class="inline-flex items-center gap-2 text-sm font-semibold text-brand-dark">
-                    <input v-model="form.is_active" type="checkbox" class="rounded border-[#DCDEDD]" />
+                    <input v-model="form.is_active" type="checkbox" class="rounded border-brand-border" />
                     Active policy
                 </label>
                 <div class="flex justify-end gap-3 pt-2">
                     <button
                         type="button"
-                        class="rounded-[10px] border border-[#DCDEDD] px-4 py-3 text-sm font-semibold"
+                        class="rounded-lg border border-brand-border px-4 py-3 text-sm font-semibold"
                         @click="closeForm"
                     >
                         Cancel
@@ -305,7 +305,7 @@ onMounted(loadPolicies);
                     <button
                         type="submit"
                         :disabled="isSubmitting"
-                        class="rounded-[10px] bg-brand-dark px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                        class="rounded-lg bg-brand-dark px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
                     >
                         {{ isSubmitting ? "Saving..." : "Save Policy" }}
                     </button>
@@ -323,7 +323,7 @@ onMounted(loadPolicies);
                 <div class="flex gap-3">
                     <button
                         type="button"
-                        class="flex-1 rounded-[10px] border border-[#DCDEDD] px-4 py-3 text-sm font-semibold"
+                        class="flex-1 rounded-lg border border-brand-border px-4 py-3 text-sm font-semibold"
                         @click="closeDelete"
                     >
                         Cancel
@@ -331,7 +331,7 @@ onMounted(loadPolicies);
                     <button
                         type="button"
                         :disabled="isSubmitting"
-                        class="flex-1 rounded-[10px] bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
+                        class="flex-1 rounded-lg bg-red-600 px-4 py-3 text-sm font-semibold text-white disabled:opacity-50"
                         @click="confirmDelete"
                     >
                         {{ isSubmitting ? "Deleting..." : "Delete" }}

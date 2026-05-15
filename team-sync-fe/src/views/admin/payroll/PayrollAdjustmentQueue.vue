@@ -164,7 +164,7 @@ onMounted(loadAdjustments);
             </div>
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-[12px] border border-[#DCDEDD] bg-white px-4 py-3 text-sm font-semibold text-brand-dark hover:border-[#0C51D9] disabled:opacity-50"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-border bg-white px-4 py-3 text-sm font-semibold text-brand-dark hover:border-primary-500 disabled:opacity-50"
                 :disabled="loading"
                 @click="loadAdjustments"
             >
@@ -174,28 +174,28 @@ onMounted(loadAdjustments);
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="rounded-[18px] border border-[#DCDEDD] bg-white p-5">
+            <div class="rounded-[18px] border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <SlidersHorizontal class="w-4 h-4" />
                     Loaded Adjustments
                 </div>
                 <p class="mt-3 text-3xl font-bold text-brand-dark">{{ meta.total || payrollAdjustments.length }}</p>
             </div>
-            <div class="rounded-[18px] border border-[#DCDEDD] bg-white p-5">
+            <div class="rounded-[18px] border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <Clock3 class="w-4 h-4 text-amber-600" />
                     Pending on This Page
                 </div>
                 <p class="mt-3 text-3xl font-bold text-amber-700">{{ pendingCount }}</p>
             </div>
-            <div class="rounded-[18px] border border-[#DCDEDD] bg-white p-5">
+            <div class="rounded-[18px] border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <BadgeCheck class="w-4 h-4 text-blue-600" />
                     Approved on This Page
                 </div>
                 <p class="mt-3 text-3xl font-bold text-blue-700">{{ approvedCount }}</p>
             </div>
-            <div class="rounded-[18px] border border-[#DCDEDD] bg-white p-5">
+            <div class="rounded-[18px] border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <BadgeCheck class="w-4 h-4 text-green-600" />
                     Page Net Impact
@@ -210,7 +210,7 @@ onMounted(loadAdjustments);
             </div>
         </div>
 
-        <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-5">
+        <div class="rounded-2xl border border-brand-border bg-white p-5">
             <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h2 class="text-lg font-bold text-brand-dark">Adjustment Records</h2>
@@ -220,7 +220,7 @@ onMounted(loadAdjustments);
                     Status
                     <select
                         v-model="filters.status"
-                        class="rounded-[10px] border border-[#DCDEDD] bg-white px-3 py-2 text-sm font-medium"
+                        class="rounded-lg border border-brand-border bg-white px-3 py-2 text-sm font-medium"
                         @change="handleStatusChange"
                     >
                         <option v-for="option in statusOptions" :key="option.value" :value="option.value">
@@ -290,7 +290,7 @@ onMounted(loadAdjustments);
                                 <button
                                     v-if="adjustment.status === 'pending'"
                                     type="button"
-                                    class="inline-flex items-center justify-center rounded-[10px] bg-brand-dark px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
+                                    class="inline-flex items-center justify-center rounded-lg bg-brand-dark px-3 py-2 text-xs font-semibold text-white disabled:opacity-50"
                                     :disabled="approvingId === adjustment.id"
                                     @click="approveAdjustment(adjustment)"
                                 >
@@ -313,7 +313,7 @@ onMounted(loadAdjustments);
                 <div class="flex gap-2">
                     <button
                         type="button"
-                        class="rounded-[10px] border border-[#DCDEDD] px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                        class="rounded-lg border border-brand-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
                         :disabled="meta.current_page <= 1 || loading"
                         @click="handlePageChange(meta.current_page - 1)"
                     >
@@ -321,7 +321,7 @@ onMounted(loadAdjustments);
                     </button>
                     <button
                         type="button"
-                        class="rounded-[10px] border border-[#DCDEDD] px-4 py-2 text-sm font-semibold disabled:opacity-50"
+                        class="rounded-lg border border-brand-border px-4 py-2 text-sm font-semibold disabled:opacity-50"
                         :disabled="meta.current_page >= meta.last_page || loading"
                         @click="handlePageChange(meta.current_page + 1)"
                     >

@@ -51,12 +51,12 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
     <Alert v-if="error" type="error" :message="error" class="mb-6" dismissible @close="error = null" />
 
     <!-- Main Content Card -->
-    <div class="bg-white rounded-[20px] theme-card-shadow border border-[#DCDEDD] overflow-hidden">
+    <div class="bg-white rounded-2xl theme-card-shadow border border-brand-border overflow-hidden">
         <!-- Desktop Table View -->
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-50/50 border-b border-[#DCDEDD]">
+                    <tr class="bg-gray-50/50 border-b border-brand-border">
                         <th class="py-4 px-6 text-xs font-semibold text-brand-dark uppercase tracking-wider w-[30%]">
                             Employee
                         </th>
@@ -201,7 +201,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
         </div>
 
         <!-- Pagination -->
-        <div class="p-4 border-t border-[#DCDEDD] bg-gray-50/30">
+        <div class="p-4 border-t border-brand-border bg-gray-50/30">
             <Pagination
                 v-if="meta.total > 0"
                 :current-page="meta.current_page"

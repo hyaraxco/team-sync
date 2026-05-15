@@ -68,7 +68,7 @@ const styleMap = {
                     v-for="toast in toasts"
                     :key="toast.id"
                     :class="[styleMap[toast.type]?.bg, styleMap[toast.type]?.border]"
-                    class="pointer-events-auto relative overflow-hidden rounded-[16px] border shadow-lg shadow-black/5 backdrop-blur-sm"
+                    class="pointer-events-auto relative overflow-hidden rounded-2xl border shadow-lg shadow-black/5 backdrop-blur-sm"
                 >
                     <!-- Accent bar -->
                     <div

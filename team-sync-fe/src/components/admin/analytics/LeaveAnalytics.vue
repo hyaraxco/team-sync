@@ -179,7 +179,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
     <!-- Loading State -->
     <div v-if="leaveLoading" class="space-y-6">
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div v-for="i in 8" :key="i" class="h-80 bg-gray-100 rounded-[20px] animate-pulse" />
+            <div v-for="i in 8" :key="i" class="h-80 bg-gray-100 rounded-2xl animate-pulse" />
         </div>
     </div>
 
@@ -187,7 +187,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
     <div v-else-if="leave" class="space-y-6">
         <!-- Period Label -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
-            <span class="inline-block w-2 h-2 rounded-full bg-[#0C51D9]"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
             {{ leave.period?.label }}
             <span class="text-gray-300">|</span>
             {{ leave.period?.start }} - {{ leave.period?.end }}
@@ -195,7 +195,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
 
         <!-- Row 1: Monthly Leave Requests + Leave Type Distribution -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Monthly Leave Requests</h3>
                 <p class="text-xs text-gray-400 mb-4">Approved, rejected, and pending requests per month</p>
                 <VueApexCharts
@@ -208,7 +208,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Leave Type Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Breakdown of leave requests by type</p>
                 <VueApexCharts
@@ -224,7 +224,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
 
         <!-- Row 2: Approval Rate + Average Duration by Type -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Approval Rate</h3>
                 <p class="text-xs text-gray-400 mb-4">Overall leave request approval percentage</p>
                 <VueApexCharts
@@ -251,7 +251,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Average Duration by Type</h3>
                 <p class="text-xs text-gray-400 mb-4">Average number of days per leave type</p>
                 <VueApexCharts
@@ -267,7 +267,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
 
         <!-- Row 3: Leave by Department + Top Leave Takers -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Leave by Department</h3>
                 <p class="text-xs text-gray-400 mb-4">Total leave days taken per department</p>
                 <VueApexCharts
@@ -280,7 +280,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Top Leave Takers</h3>
                 <p class="text-xs text-gray-400 mb-4">Employees with the most leave days</p>
                 <div v-if="leave.top_leave_takers?.length" class="space-y-3 mt-2">
@@ -313,7 +313,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
 
         <!-- Row 4: Sick Leave Proof Compliance -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Sick Leave Proof Compliance</h3>
                 <p class="text-xs text-gray-400 mb-4">Percentage of sick leaves with valid proof</p>
                 <VueApexCharts

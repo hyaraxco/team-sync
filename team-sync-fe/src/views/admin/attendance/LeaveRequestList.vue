@@ -315,27 +315,27 @@ onMounted(() => {
                 <button
                     @click="runBulkAction('approve')"
                     :disabled="loading || processingBulkAction || selectedPendingCount === 0"
-                    class="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-[10px] hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    class="px-4 py-2 bg-green-600 text-white text-sm font-semibold rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     {{ processingBulkAction ? "Processing..." : "Approve Selected" }}
                 </button>
                 <button
                     @click="runBulkAction('reject')"
                     :disabled="loading || processingBulkAction || selectedPendingCount === 0"
-                    class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-[10px] hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    class="px-4 py-2 bg-red-600 text-white text-sm font-semibold rounded-lg hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                     {{ processingBulkAction ? "Processing..." : "Reject Selected" }}
                 </button>
             </div>
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-5">
+        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
             <!-- Table -->
             <div class="overflow-x-auto w-full mb-6">
                 <table class="w-full min-w-[860px]">
                     <thead>
-                        <tr class="border-y border-[#DCDEDD]">
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm w-[48px]">
+                        <tr class="border-y border-brand-border">
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm w-[48px]">
                                 <input
                                     type="checkbox"
                                     :checked="allSelectableSelected"
@@ -345,19 +345,19 @@ onMounted(() => {
                                     title="Select all pending requests"
                                 />
                             </th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Employee</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Date</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Reason & Type</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Proof</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Status</th>
-                            <th class="py-4 px-4 text-left text-[#6B7280] font-semibold text-sm">Actions</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Employee</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Date</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Reason & Type</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Proof</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Status</th>
+                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-if="loading" class="border-b border-[#DCDEDD] animate-pulse">
+                        <tr v-if="loading" class="border-b border-brand-border animate-pulse">
                             <td colspan="8" class="py-8 text-center text-gray-500">Loading...</td>
                         </tr>
-                        <tr v-else-if="!leaveRequests || leaveRequests.length === 0" class="border-b border-[#DCDEDD]">
+                        <tr v-else-if="!leaveRequests || leaveRequests.length === 0" class="border-b border-brand-border">
                             <td colspan="8" class="py-8">
                                 <EmptyState
                                     icon="ClipboardList"
@@ -370,7 +370,7 @@ onMounted(() => {
                             v-else
                             v-for="request in leaveRequests"
                             :key="request.id"
-                            class="border-b border-[#DCDEDD] hover:bg-gray-50 transition-colors"
+                            class="border-b border-brand-border hover:bg-gray-50 transition-colors"
                         >
                             <td class="py-4 px-4">
                                 <input
@@ -456,7 +456,7 @@ onMounted(() => {
                                         v-if="request.status === 'pending'"
                                         @click="showApproveModal(request)"
                                         title="Approve Leave"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-primary-500 hover:bg-blue-50 transition-all duration-300 px-3 py-2"
                                     >
                                         <Check class="w-4 h-4 text-green-600" />
                                     </button>
@@ -464,7 +464,7 @@ onMounted(() => {
                                         v-if="request.status === 'pending'"
                                         @click="showRejectModal(request)"
                                         title="Reject Leave"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
+                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
                                     >
                                         <X class="w-4 h-4 text-red-600" />
                                     </button>
@@ -476,7 +476,7 @@ onMounted(() => {
                                         "
                                         @click="openReviewProof(request)"
                                         title="Review Proof"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-[#DCDEDD] rounded-[8px] hover:border-yellow-500 hover:bg-yellow-50 transition-all duration-300 px-3 py-2"
+                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-yellow-500 hover:bg-yellow-50 transition-all duration-300 px-3 py-2"
                                     >
                                         <FileSearch class="w-4 h-4 text-yellow-600" />
                                     </button>
@@ -498,9 +498,9 @@ onMounted(() => {
     </div>
 
     <!-- CALENDAR VIEW -->
-    <div v-else class="bg-white border border-[#DCDEDD] rounded-[20px] p-5">
+    <div v-else class="bg-white border border-brand-border rounded-2xl p-5">
         <div class="flex items-center justify-between mb-6">
-            <h3 class="text-[#0C1C3C] text-[20px] font-bold">{{ currentMonth.toFormat("MMMM yyyy") }}</h3>
+            <h3 class="text-brand-dark text-[20px] font-bold">{{ currentMonth.toFormat("MMMM yyyy") }}</h3>
             <div class="flex gap-2">
                 <button @click="prevMonth" aria-label="Previous month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
                     <ChevronLeft class="w-5 h-5 text-gray-600" aria-hidden="true" />
@@ -586,14 +586,14 @@ onMounted(() => {
                 <button
                     @click="closeApproveModal"
                     :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                 >
                     Cancel
                 </button>
                 <button
                     @click="confirmApprove"
                     :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 bg-green-600 text-white rounded-[12px] text-sm font-semibold hover:bg-green-700 transition-all duration-300"
+                    class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-all duration-300"
                 >
                     {{ processingApprove ? "Approving..." : "Approve" }}
                 </button>
@@ -614,14 +614,14 @@ onMounted(() => {
                 <button
                     @click="closeRejectModal"
                     :disabled="processingReject"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                 >
                     Cancel
                 </button>
                 <button
                     @click="confirmReject"
                     :disabled="processingReject"
-                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-[12px] text-sm font-semibold hover:bg-red-700 transition-all duration-300"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all duration-300"
                 >
                     {{ processingReject ? "Rejecting..." : "Reject" }}
                 </button>
@@ -661,7 +661,7 @@ onMounted(() => {
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Decision *</label>
                     <select
                         v-model="proofReviewForm.status"
-                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9]"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
                     >
                         <option value="approved">Approve Proof</option>
                         <option value="rejected">Reject Proof</option>
@@ -672,7 +672,7 @@ onMounted(() => {
                     <textarea
                         v-model="proofReviewForm.notes"
                         rows="3"
-                        class="w-full px-4 py-2 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] focus:border-[#0C51D9] resize-none"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500 resize-none"
                         placeholder="Add any notes about this proof..."
                     ></textarea>
                 </div>
@@ -683,14 +683,14 @@ onMounted(() => {
                 <button
                     @click="closeReviewProofModal"
                     :disabled="processingProofReview"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                 >
                     Cancel
                 </button>
                 <button
                     @click="confirmReviewProof"
                     :disabled="processingProofReview"
-                    class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-[12px] text-sm font-semibold hover:bg-opacity-90 transition-all duration-300"
+                    class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-all duration-300"
                 >
                     {{ processingProofReview ? "Submitting..." : "Submit Review" }}
                 </button>

@@ -174,7 +174,7 @@ const getAdjustmentStatusClass = (status) => {
             <button
                 @click="router.back()"
                 data-testid="payslip-detail-back"
-                class="flex items-center gap-2 px-4 py-2 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
             >
                 <ArrowLeft class="w-5 h-5" />
                 <span class="font-semibold">Back</span>
@@ -184,7 +184,7 @@ const getAdjustmentStatusClass = (status) => {
                 <button
                     @click="handlePrint"
                     data-testid="payslip-detail-print"
-                    class="flex items-center gap-2 px-4 py-2 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                    class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                 >
                     <Printer class="w-5 h-5" />
                     <span class="font-semibold">Print</span>
@@ -193,7 +193,7 @@ const getAdjustmentStatusClass = (status) => {
                     @click="handleEmailPayslip"
                     data-testid="payslip-detail-email"
                     :disabled="emailingPayslip"
-                    class="flex items-center gap-2 px-4 py-2 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Mail class="w-5 h-5" />
                     <span class="font-semibold">{{ emailingPayslip ? "Sending..." : "Email Payslip" }}</span>
@@ -201,7 +201,7 @@ const getAdjustmentStatusClass = (status) => {
                 <button
                     @click="handleDownload"
                     data-testid="payslip-detail-download"
-                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-[12px] hover:brightness-110 transition-all duration-300"
+                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:brightness-110 transition-all duration-300"
                 >
                     <Download class="w-5 h-5" />
                     <span class="font-semibold">Download PDF</span>
@@ -209,7 +209,7 @@ const getAdjustmentStatusClass = (status) => {
             </div>
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-8 max-w-4xl mx-auto">
+        <div class="bg-white border border-brand-border rounded-2xl p-8 max-w-4xl mx-auto">
             <div v-if="loading" class="text-center py-12">
                 <p class="text-gray-500">Loading payslip...</p>
             </div>
@@ -236,7 +236,7 @@ const getAdjustmentStatusClass = (status) => {
                         </div>
                         <div class="text-right">
                             <div
-                                class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-[16px] flex items-center justify-center mb-2 ml-auto"
+                                class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-2 ml-auto"
                             >
                                 <Building class="w-8 h-8 text-white" />
                             </div>
@@ -251,19 +251,19 @@ const getAdjustmentStatusClass = (status) => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-                    <div class="rounded-[16px] border border-[#DCDEDD] p-5">
+                    <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Payroll Period</p>
                         <p class="text-lg font-bold text-brand-dark">
                             {{ formatPeriod(payslip.period) }}
                         </p>
                     </div>
-                    <div class="rounded-[16px] border border-[#DCDEDD] p-5">
+                    <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Payment Date</p>
                         <p class="text-lg font-bold text-brand-dark">
                             {{ formatDate(payslip.payment_date || payslip.created_at) }}
                         </p>
                     </div>
-                    <div class="rounded-[16px] border border-[#DCDEDD] p-5">
+                    <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Take Home Pay</p>
                         <p class="text-lg font-bold text-brand-dark">
                             {{ formatCurrency(payslip.net_salary) }}
@@ -276,7 +276,7 @@ const getAdjustmentStatusClass = (status) => {
                         <h3 class="text-sm font-semibold text-gray-500 mb-4">EMPLOYEE INFORMATION</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
                                     <FileText class="w-5 h-5 text-blue-600" />
                                 </div>
                                 <div>
@@ -290,7 +290,7 @@ const getAdjustmentStatusClass = (status) => {
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
                                     <Building class="w-5 h-5 text-purple-600" />
                                 </div>
                                 <div>
@@ -307,7 +307,7 @@ const getAdjustmentStatusClass = (status) => {
                         <h3 class="text-sm font-semibold text-gray-500 mb-4">CONTACT INFORMATION</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-green-50 rounded-[12px] flex items-center justify-center">
+                                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
                                     <Mail class="w-5 h-5 text-green-600" />
                                 </div>
                                 <div>
@@ -318,7 +318,7 @@ const getAdjustmentStatusClass = (status) => {
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-orange-50 rounded-[12px] flex items-center justify-center">
+                                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center">
                                     <Calendar class="w-5 h-5 text-orange-600" />
                                 </div>
                                 <div>
@@ -333,7 +333,7 @@ const getAdjustmentStatusClass = (status) => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-green-50 rounded-[16px] p-6">
+                    <div class="bg-green-50 rounded-2xl p-6">
                         <div class="flex items-center gap-2 mb-4">
                             <TrendingUp class="w-5 h-5 text-green-600" />
                             <h3 class="text-lg font-bold text-green-900">Earnings</h3>
@@ -366,7 +366,7 @@ const getAdjustmentStatusClass = (status) => {
                         </div>
                     </div>
 
-                    <div class="bg-red-50 rounded-[16px] p-6">
+                    <div class="bg-red-50 rounded-2xl p-6">
                         <div class="flex items-center gap-2 mb-4">
                             <TrendingDown class="w-5 h-5 text-red-600" />
                             <h3 class="text-lg font-bold text-red-900">Deductions</h3>
@@ -403,7 +403,7 @@ const getAdjustmentStatusClass = (status) => {
                 <div
                     v-if="adjustments.length > 0"
                     data-testid="payslip-adjustments"
-                    class="bg-amber-50 rounded-[16px] p-6 mb-8"
+                    class="bg-amber-50 rounded-2xl p-6 mb-8"
                 >
                     <div class="flex items-center gap-2 mb-4">
                         <BadgeCheck class="w-5 h-5 text-amber-700" />
@@ -413,7 +413,7 @@ const getAdjustmentStatusClass = (status) => {
                         <div
                             v-for="adjustment in adjustments"
                             :key="adjustment.id"
-                            class="rounded-[12px] border border-amber-200 bg-white/80 px-4 py-3"
+                            class="rounded-xl border border-amber-200 bg-white/80 px-4 py-3"
                         >
                             <div class="flex items-start justify-between gap-3">
                                 <div>
@@ -487,7 +487,7 @@ const getAdjustmentStatusClass = (status) => {
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-[20px] p-6 text-white">
+                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-white/80 text-sm font-medium mb-2">NET SALARY (TAKE HOME)</p>
@@ -496,14 +496,14 @@ const getAdjustmentStatusClass = (status) => {
                             </p>
                         </div>
                         <div
-                            class="w-16 h-16 bg-white/20 rounded-[20px] flex items-center justify-center backdrop-blur-sm"
+                            class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm"
                         >
                             <DollarSign class="w-8 h-8 text-white" />
                         </div>
                     </div>
                 </div>
 
-                <div v-if="payslip.notes" class="mt-6 p-4 bg-gray-50 rounded-[12px]">
+                <div v-if="payslip.notes" class="mt-6 p-4 bg-gray-50 rounded-xl">
                     <p class="text-sm font-semibold text-gray-700 mb-2">Payroll Notes</p>
                     <p class="text-sm text-gray-600">{{ payslip.notes }}</p>
                 </div>

@@ -103,7 +103,7 @@ onMounted(() => {
     </div>
 
     <div v-else-if="staffMember">
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
+        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-6">
             <div class="flex items-center gap-6">
                 <div class="relative">
                     <img loading="lazy"
@@ -150,14 +150,14 @@ onMounted(() => {
                     <button
                         v-if="can('staff-member-edit')"
                         @click="editStaffMember"
-                        class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
                     </button>
                     <button
                         @click="shareProfile"
-                        class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-6 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        class="bg-white border border-brand-border text-brand-dark py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
                     >
                         <Share2 class="w-4 h-4" />
                         Share Profile
@@ -168,7 +168,7 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -179,13 +179,13 @@ onMounted(() => {
                         </p>
                         <p class="text-success text-base font-medium">This month</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
                         <CheckCircle class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -198,13 +198,13 @@ onMounted(() => {
                             {{ performanceStatistics.attendance_rate >= 80 ? "Above average" : "Below average" }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
                         <CalendarCheck class="w-6 h-6 text-green-600" />
                     </div>
                 </div>
             </div>
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -215,13 +215,13 @@ onMounted(() => {
                         </p>
                         <p class="text-success text-base font-medium">Active projects</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center">
                         <Folder class="w-6 h-6 text-purple-600" />
                     </div>
                 </div>
             </div>
             <div
-                class="bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -249,7 +249,7 @@ onMounted(() => {
                             }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-50 rounded-[16px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
                         <TrendingUp class="w-6 h-6 text-orange-600" />
                     </div>
                 </div>
@@ -257,9 +257,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-indigo-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
                         <Users class="w-6 h-6 text-indigo-600" />
                     </div>
                     <div>
@@ -289,9 +289,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-teal-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
                         <Contact class="w-6 h-6 text-teal-600" />
                     </div>
                     <div>
@@ -323,9 +323,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Calendar class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
@@ -373,9 +373,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                         <Phone class="w-6 h-6 text-red-600" />
                     </div>
                     <div>
@@ -419,9 +419,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                         <MapPin class="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
@@ -451,9 +451,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                         <Briefcase class="w-6 h-6 text-green-600" />
                     </div>
                     <div>
@@ -515,9 +515,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-orange-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                         <FileText class="w-6 h-6 text-orange-600" />
                     </div>
                     <div>
@@ -535,9 +535,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-[#DCDEDD] rounded-[16px] p-6">
+            <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-cyan-50 rounded-[12px] flex items-center justify-center">
+                    <div class="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center">
                         <Briefcase class="w-6 h-6 text-cyan-600" />
                     </div>
                     <div>
@@ -568,9 +568,9 @@ onMounted(() => {
             </div>
         </div>
 
-        <div v-if="can('staff-member-delete')" class="bg-white border border-[#FEE2E2] rounded-[16px] p-6">
+        <div v-if="can('staff-member-delete')" class="bg-white border border-[#FEE2E2] rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                     <AlertTriangle class="w-6 h-6 text-red-600" />
                 </div>
                 <div>
@@ -579,7 +579,7 @@ onMounted(() => {
                 </div>
             </div>
             <div
-                class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-[12px]"
+                class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
             >
                 <div class="flex-1">
                     <h4 class="text-brand-dark text-base font-bold mb-1">Delete Staff Member Profile</h4>
@@ -590,7 +590,7 @@ onMounted(() => {
                 <div class="flex gap-3">
                     <button
                         @click="showDeleteModal = true"
-                        class="bg-red-600 border border-red-700 text-white py-3 px-6 rounded-[8px] font-semibold hover:bg-red-700 transition-colors flex items-center gap-2"
+                        class="bg-red-600 border border-red-700 text-white py-3 px-6 rounded-lg font-semibold hover:bg-red-700 transition-colors flex items-center gap-2"
                     >
                         <Trash2 class="w-4 h-4" />
                         Delete Staff Member

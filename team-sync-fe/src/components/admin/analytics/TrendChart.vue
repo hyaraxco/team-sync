@@ -1,24 +1,24 @@
 <template>
-    <div class="bg-white rounded-[20px] border border-[#DCDEDD] hover:shadow-md transition-shadow duration-300 p-6">
+    <div class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
-                <h3 class="text-lg font-bold text-[#202020]">{{ title }}</h3>
-                <p v-if="subtitle" class="text-sm font-medium text-[#737373] mt-1">{{ subtitle }}</p>
+                <h3 class="text-lg font-bold text-brand-dark">{{ title }}</h3>
+                <p v-if="subtitle" class="text-sm font-medium text-brand-light mt-1">{{ subtitle }}</p>
             </div>
         </div>
 
-        <div v-if="loading" class="flex items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px]">
+        <div v-if="loading" class="flex items-center justify-center h-[300px] bg-gray-50/50 rounded-xl">
             <div class="relative w-12 h-12">
                 <div class="absolute inset-0 rounded-full border-2 border-gray-200"></div>
                 <div
-                    class="absolute inset-0 rounded-full border-2 border-[#0C51D9] border-t-transparent animate-spin"
+                    class="absolute inset-0 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"
                 ></div>
             </div>
         </div>
 
         <div
             v-else-if="!chartData || chartData.length === 0"
-            class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-[12px] border border-dashed border-gray-200"
+            class="flex flex-col items-center justify-center h-[300px] bg-gray-50/50 rounded-xl border border-dashed border-gray-200"
         >
             <div class="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mb-3">
                 <svg class="w-6 h-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -30,7 +30,7 @@
                     />
                 </svg>
             </div>
-            <p class="text-sm font-medium text-[#737373]">No data available</p>
+            <p class="text-sm font-medium text-brand-light">No data available</p>
         </div>
 
         <VueApexCharts v-else :type="chartType" height="300" :options="apexOptions" :series="apexSeries" />

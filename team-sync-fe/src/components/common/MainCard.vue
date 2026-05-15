@@ -47,13 +47,13 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
     <!-- Wrapper mode: when default slot content is provided, render as a plain card -->
     <div
         v-if="$slots.default"
-        class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5 dark:bg-gray-800 dark:border-gray-700"
+        class="bg-white border border-brand-border rounded-2xl p-4 sm:p-5"
     >
         <slot></slot>
     </div>
 
     <!-- Stat card mode: when no default slot, render the metric card -->
-    <div v-else class="main-card rounded-[20px] border border-[#0B1042] relative overflow-hidden p-4 sm:p-5">
+    <div v-else class="main-card rounded-2xl border border-[#0B1042] relative overflow-hidden p-4 sm:p-5">
         <div class="flex flex-col justify-center h-full relative z-10">
             <!-- Trending Badge -->
             <div v-if="trendLabel" class="flex items-center gap-2 mb-3">
@@ -67,7 +67,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
                 <div>
                     <p class="text-brand-white-90 text-sm font-medium">{{ title }}</p>
-                    <p class="text-brand-white text-3xl sm:text-5xl font-extrabold leading-none my-4">
+                    <p class="text-brand-white text-3xl sm:text-5xl font-extrabold leading-none my-4 tabular-nums">
                         {{ animatedDisplay }}
                     </p>
                     <p class="text-brand-white-80 text-base font-normal">
@@ -75,7 +75,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
                     </p>
                 </div>
                 <div
-                    class="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-[20px] flex items-center justify-center shrink-0"
+                    class="w-12 h-12 sm:w-16 sm:h-16 bg-white/20 rounded-2xl flex items-center justify-center shrink-0"
                 >
                     <component :is="resolveIcon" aria-hidden="true" class="w-6 h-6 sm:w-8 sm:h-8 text-white" />
                 </div>

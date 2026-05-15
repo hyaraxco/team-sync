@@ -82,14 +82,14 @@ const handleUpgrade = (planId) => {
         <!-- Billing Toggle -->
         <div class="flex justify-center mb-16">
             <div
-                class="inline-flex items-center bg-white rounded-full border border-[#DCDEDD] shadow-sm p-1 dark:bg-gray-800 dark:border-gray-700"
+                class="inline-flex items-center bg-white rounded-full border border-brand-border shadow-sm p-1"
             >
                 <button
                     class="px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-2"
                     :class="
                         billingCycle === 'annual'
-                            ? 'bg-[#1e1e1e] shadow-sm text-white dark:bg-blue-600'
-                            : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                            ? 'bg-[#1e1e1e] shadow-sm text-white'
+                            : 'text-gray-500 hover:text-gray-900'
                     "
                     @click="billingCycle = 'annual'"
                 >
@@ -99,7 +99,7 @@ const handleUpgrade = (planId) => {
                         :class="
                             billingCycle === 'annual'
                                 ? 'bg-white/20 text-white'
-                                : 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400'
+                                : 'bg-green-100 text-green-700'
                         "
                     >
                         Save 20%
@@ -109,8 +109,8 @@ const handleUpgrade = (planId) => {
                     class="px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200"
                     :class="
                         billingCycle === 'monthly'
-                            ? 'bg-[#1e1e1e] shadow-sm text-white dark:bg-blue-600'
-                            : 'text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200'
+                            ? 'bg-[#1e1e1e] shadow-sm text-white'
+                            : 'text-gray-500 hover:text-gray-900'
                     "
                     @click="billingCycle = 'monthly'"
                 >
@@ -124,14 +124,14 @@ const handleUpgrade = (planId) => {
             <!-- Highlighted Card (PRO) -->
             <div class="w-full lg:w-1/3 relative z-10 lg:-mr-4 group">
                 <div
-                    class="bg-white rounded-[32px] shadow-[0_20px_50px_rgba(12,81,217,0.15)] border-2 border-[#0C51D9] flex flex-col h-full overflow-hidden transition-all duration-300 dark:bg-gray-800 dark:border-blue-500 dark:shadow-[0_20px_50px_rgba(0,0,0,0.3)]"
+                    class="bg-white rounded-3xl shadow-xl border-2 border-primary-500 flex flex-col h-full overflow-hidden transition-all duration-300"
                 >
                     <!-- Top Badge -->
                     <div
-                        class="bg-blue-50 py-3 text-center border-b border-blue-100 dark:bg-blue-900/20 dark:border-blue-800"
+                        class="bg-blue-50 py-3 text-center border-b border-blue-100"
                     >
                         <span
-                            class="text-[11px] font-black text-[#0C51D9] uppercase tracking-[0.2em] dark:text-blue-400"
+                            class="text-[11px] font-black text-primary-500 uppercase tracking-[0.2em]"
                         >
                             {{ plans[0].headerBadge }}
                         </span>
@@ -140,12 +140,12 @@ const handleUpgrade = (planId) => {
                     <div class="p-8 sm:p-10 flex flex-col h-full">
                         <!-- Header -->
                         <div class="flex items-center justify-between mb-8">
-                            <h3 class="text-xl font-black text-gray-900 tracking-tight dark:text-white">
+                            <h3 class="text-xl font-black text-gray-900 tracking-tight">
                                 {{ plans[0].name }}
                             </h3>
                             <span
                                 v-if="billingCycle === 'annual' && plans[0].savings"
-                                class="px-3 py-1 bg-yellow-100 text-yellow-800 text-[10px] font-black rounded-full uppercase dark:bg-yellow-900/30 dark:text-yellow-400"
+                                class="px-3 py-1 bg-yellow-100 text-yellow-800 text-[10px] font-black rounded-full uppercase"
                             >
                                 {{ plans[0].savings }}
                             </span>
@@ -153,21 +153,21 @@ const handleUpgrade = (planId) => {
 
                         <!-- Price -->
                         <div class="mb-2 flex items-baseline gap-1">
-                            <span class="text-xs font-bold text-gray-400 uppercase dark:text-gray-500">Rp</span>
-                            <span class="text-6xl font-black text-gray-900 tracking-tighter dark:text-white">
+                            <span class="text-xs font-bold text-gray-400 uppercase">Rp</span>
+                            <span class="text-6xl font-black text-gray-900 tracking-tighter">
                                 {{ (plans[0].price[billingCycle] / 1000).toString() }}
                                 <span class="text-4xl">k</span>
                             </span>
-                            <span class="text-sm font-bold text-gray-400 ml-1 dark:text-gray-500">
+                            <span class="text-sm font-bold text-gray-400 ml-1">
                                 {{ plans[0].priceSuffix }}
                             </span>
                         </div>
-                        <p class="text-sm font-semibold text-gray-500 mb-8 dark:text-gray-400">
+                        <p class="text-sm font-semibold text-gray-500 mb-8">
                             {{ plans[0].description }}
                         </p>
 
                         <!-- Divider -->
-                        <div class="h-px bg-gray-100 mb-8 dark:bg-gray-700"></div>
+                        <div class="h-px bg-gray-100 mb-8"></div>
 
                         <!-- Features -->
                         <ul class="space-y-5 mb-10 flex-1">
@@ -177,11 +177,11 @@ const handleUpgrade = (planId) => {
                                 class="flex items-start gap-3.5"
                             >
                                 <div
-                                    class="mt-0.5 bg-blue-600 rounded-full p-0.5 shrink-0 shadow-sm shadow-blue-200 dark:shadow-none"
+                                    class="mt-0.5 bg-blue-600 rounded-full p-0.5 shrink-0 shadow-sm shadow-blue-200"
                                 >
                                     <CircleCheck class="w-4 h-4 text-white" stroke-width="3" />
                                 </div>
-                                <span class="text-sm text-gray-700 font-bold leading-tight dark:text-gray-200">
+                                <span class="text-sm text-gray-700 font-bold leading-tight">
                                     {{ feature }}
                                 </span>
                             </li>
@@ -190,14 +190,14 @@ const handleUpgrade = (planId) => {
                         <!-- CTA -->
                         <div class="mt-auto text-center">
                             <button
-                                class="w-full rounded-2xl py-4 px-6 text-base font-black bg-[#0C51D9] text-white hover:bg-[#093d9e] transition-all duration-300 shadow-xl shadow-blue-500/25 active:scale-[0.98] dark:bg-blue-600 dark:hover:bg-blue-700"
+                                class="w-full rounded-2xl py-4 px-6 text-base font-black bg-primary-500 text-white hover:bg-[#093d9e] transition-all duration-300 shadow-xl shadow-blue-500/25 active:scale-[0.98]"
                                 @click="handleUpgrade(plans[0].id)"
                             >
                                 {{ plans[0].cta }}
                             </button>
                             <p
                                 v-if="plans[0].footerText"
-                                class="text-[11px] text-gray-400 mt-4 font-black uppercase tracking-widest dark:text-gray-500"
+                                class="text-[11px] text-gray-400 mt-4 font-black uppercase tracking-widest"
                             >
                                 {{ plans[0].footerText }}
                             </p>
@@ -208,21 +208,21 @@ const handleUpgrade = (planId) => {
 
             <!-- Standard Cards Container -->
             <div
-                class="w-full lg:w-2/3 flex flex-col sm:flex-row bg-white rounded-[32px] border border-[#DCDEDD] shadow-xl relative z-0 overflow-hidden transition-all duration-300 dark:bg-gray-800 dark:border-gray-700"
+                class="w-full lg:w-2/3 flex flex-col sm:flex-row bg-white rounded-3xl border border-brand-border shadow-xl relative z-0 overflow-hidden transition-all duration-300"
             >
                 <!-- Loop untuk plan sisanya -->
                 <div
                     v-for="(plan, idx) in plans.slice(1)"
                     :key="plan.id"
                     class="w-full sm:w-1/2 flex flex-col p-8 sm:p-10 transition-colors duration-300"
-                    :class="{ 'border-t sm:border-t-0 sm:border-l border-[#DCDEDD] dark:border-gray-700': idx > 0 }"
+                    :class="{ 'border-t sm:border-t-0 sm:border-l border-brand-border': idx > 0 }"
                 >
                     <!-- Header -->
                     <div class="flex items-center justify-between mb-8">
-                        <h3 class="text-xl font-black text-gray-900 tracking-tight dark:text-white">{{ plan.name }}</h3>
+                        <h3 class="text-xl font-black text-gray-900 tracking-tight">{{ plan.name }}</h3>
                         <span
                             v-if="billingCycle === 'annual' && plan.savings"
-                            class="px-3 py-1 bg-gray-100 text-gray-700 text-[10px] font-black rounded-full uppercase dark:bg-gray-700 dark:text-gray-300"
+                            class="px-3 py-1 bg-gray-100 text-gray-700 text-[10px] font-black rounded-full uppercase"
                         >
                             {{ plan.savings }}
                         </span>
@@ -230,27 +230,27 @@ const handleUpgrade = (planId) => {
 
                     <!-- Price -->
                     <div class="mb-2 flex items-baseline gap-1">
-                        <span class="text-xs font-bold text-gray-400 uppercase dark:text-gray-500">Rp</span>
-                        <span class="text-5xl font-black text-gray-900 tracking-tighter dark:text-white">
+                        <span class="text-xs font-bold text-gray-400 uppercase">Rp</span>
+                        <span class="text-5xl font-black text-gray-900 tracking-tighter">
                             {{ (plan.price[billingCycle] / 1000).toString() }}
                             <span class="text-3xl">k</span>
                         </span>
-                        <span class="text-sm font-bold text-gray-400 ml-1 dark:text-gray-500">
+                        <span class="text-sm font-bold text-gray-400 ml-1">
                             {{ plan.priceSuffix }}
                         </span>
                     </div>
-                    <p class="text-sm font-semibold text-gray-500 mb-8 dark:text-gray-400">{{ plan.description }}</p>
+                    <p class="text-sm font-semibold text-gray-500 mb-8">{{ plan.description }}</p>
 
                     <!-- Divider -->
-                    <div class="h-px bg-gray-100 mb-8 dark:bg-gray-700"></div>
+                    <div class="h-px bg-gray-100 mb-8"></div>
 
                     <!-- Features -->
                     <ul class="space-y-5 mb-10 flex-1">
                         <li v-for="(feature, index) in plan.features" :key="index" class="flex items-start gap-3.5">
-                            <div class="mt-0.5 bg-gray-100 rounded-full p-0.5 shrink-0 dark:bg-gray-700">
-                                <CircleCheck class="w-4 h-4 text-gray-400 dark:text-gray-500" stroke-width="3" />
+                            <div class="mt-0.5 bg-gray-100 rounded-full p-0.5 shrink-0">
+                                <CircleCheck class="w-4 h-4 text-gray-400" stroke-width="3" />
                             </div>
-                            <span class="text-sm text-gray-600 font-bold leading-tight dark:text-gray-300">
+                            <span class="text-sm text-gray-600 font-bold leading-tight">
                                 {{ feature }}
                             </span>
                         </li>
@@ -262,8 +262,8 @@ const handleUpgrade = (planId) => {
                             class="w-full rounded-2xl py-4 px-6 text-base font-black transition-all duration-300 active:scale-[0.98]"
                             :class="[
                                 plan.isCurrent
-                                    ? 'bg-gray-50 text-gray-400 cursor-default dark:bg-gray-900/50 dark:text-gray-600'
-                                    : 'bg-[#1e1e1e] text-white hover:bg-black dark:bg-white dark:text-gray-900 dark:hover:bg-gray-200',
+                                    ? 'bg-gray-50 text-gray-400 cursor-default'
+                                    : 'bg-[#1e1e1e] text-white hover:bg-black',
                             ]"
                             :disabled="plan.isCurrent"
                             @click="handleUpgrade(plan.id)"

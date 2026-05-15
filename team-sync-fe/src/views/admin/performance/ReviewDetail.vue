@@ -464,18 +464,18 @@ watch(
 
         <template v-else-if="review">
             <!-- Tab Navigation -->
-            <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-3">
+            <div class="bg-white border border-brand-border rounded-2xl p-3">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <button
                         v-for="tab in tabs"
                         :key="tab.id"
                         type="button"
                         @click="activeTab = tab.id"
-                        class="rounded-[8px] px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                        class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                         :class="
                             activeTab === tab.id
                                 ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                                : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                         "
                     >
                         <component
@@ -1530,7 +1530,7 @@ watch(
                                     :class="
                                         isCalibrationValid && !submitting
                                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                                            : 'border-[#DCDEDD] text-brand-dark hover:border-[#0C51D9] hover:border-2 bg-white'
+                                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
                                     "
                                 >
                                     <ScaleIcon class="w-4 h-4" />

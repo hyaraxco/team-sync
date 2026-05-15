@@ -20,10 +20,10 @@
                 :aria-invalid="error ? 'true' : undefined"
                 :aria-describedby="error ? errorId : undefined"
                 :class="[
-                    'w-full pr-4 py-3 border rounded-[16px] transition-all duration-300 font-semibold',
+                    'w-full pr-4 py-3 border rounded-2xl transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
-                    'hover:border-[#0C51D9] hover:border-2',
-                    'focus:border-[#0C51D9] focus:border-2 focus:bg-white',
+                    'hover:ring-2 hover:ring-primary-500/20',
+                    'focus:border-primary-500 focus:border-2 focus:bg-white',
                     borderColor,
                 ]"
                 :style="textareaStyle"
@@ -72,7 +72,7 @@ const modelValue = computed({
     set: (value) => emit("update:modelValue", value),
 });
 
-const borderColor = computed(() => (props.error ? "border-[#DC2626] border-2" : "border-[#DCDEDD]"));
+const borderColor = computed(() => (props.error ? "border-[#DC2626] border-2" : "border-brand-border"));
 
 const labelStyle = {
     color: "#4b5563",

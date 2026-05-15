@@ -42,7 +42,7 @@ const goToEmployeeDetail = (id: number) => {
 
 <template>
     <!-- Latest Staff Members -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5">
+    <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-5">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-brand-dark text-lg font-bold">Latest Staff Members</h3>
         </div>
@@ -97,7 +97,7 @@ const goToEmployeeDetail = (id: number) => {
                 </div>
                 <button
                     @click="goToEmployeeDetail(employee.id)"
-                    class="btn-details w-full sm:w-auto border border-[#DCDEDD] rounded-xl hover:ring-2 hover:ring-[#0C51D9] hover:text-[#0C51D9] transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
+                    class="btn-details w-full sm:w-auto border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500 hover:text-primary-500 transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
                 >
                     <span class="text-brand-dark text-sm sm:text-base font-medium">Details</span>
                 </button>

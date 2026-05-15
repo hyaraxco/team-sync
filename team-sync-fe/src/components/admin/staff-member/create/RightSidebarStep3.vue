@@ -47,13 +47,13 @@ onUnmounted(() => {
         <div
             ref="sidebarRef"
             :class="[
-                'bg-white border border-[#DCDEDD] rounded-[20px] p-6 transition-all duration-300 ease-in-out',
+                'bg-white border border-brand-border rounded-2xl p-6 transition-all duration-300 ease-in-out',
                 isSticky ? 'fixed top-5 z-10' : 'relative',
             ]"
             :style="isSticky ? { width: `${sidebarWidth}px` } : {}"
         >
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                     <Lightbulb class="w-6 h-6 text-green-600" />
                 </div>
                 <div>

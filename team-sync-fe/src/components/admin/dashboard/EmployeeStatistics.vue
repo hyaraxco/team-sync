@@ -206,52 +206,52 @@ const getActivityIconBgClass = (notification: any) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
-        return "bg-[#EAF8EE]";
+        return "bg-green-50";
     }
 
     if (category.includes("attendance") || category.includes("check")) {
-        return "bg-[#F0ECFF]";
+        return "bg-purple-50";
     }
 
     if (category.includes("payroll") || category.includes("salary")) {
-        return "bg-[#FFF4E8]";
+        return "bg-orange-50";
     }
 
     if (category.includes("comment") || category.includes("message")) {
-        return "bg-[#EAF0FF]";
+        return "bg-blue-50";
     }
 
     if (category.includes("meeting") || category.includes("team")) {
-        return "bg-[#FFF1E8]";
+        return "bg-orange-50";
     }
 
-    return "bg-[#EEF4FF]";
+    return "bg-primary-50";
 };
 
 const getActivityIconClass = (notification: any) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
-        return "text-[#16A34A]";
+        return "text-green-600";
     }
 
     if (category.includes("attendance") || category.includes("check")) {
-        return "text-[#7C3AED]";
+        return "text-purple-600";
     }
 
     if (category.includes("payroll") || category.includes("salary")) {
-        return "text-[#EA580C]";
+        return "text-orange-600";
     }
 
     if (category.includes("comment") || category.includes("message")) {
-        return "text-[#2563EB]";
+        return "text-blue-600";
     }
 
     if (category.includes("meeting") || category.includes("team")) {
-        return "text-[#F97316]";
+        return "text-orange-500";
     }
 
-    return "text-[#0C51D9]";
+    return "text-primary-500";
 };
 
 const getActivityTime = (notification: any) => {
@@ -415,17 +415,17 @@ onMounted(() => {
     <!-- Additional Sections -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
         <!-- Upcoming Tasks -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-base sm:text-lg font-bold">Upcoming Tasks</h3>
-                <a href="#" class="text-[#0C51D9] text-xs sm:text-sm font-medium hover:underline">View All</a>
+                <a href="#" class="text-primary-500 text-xs sm:text-sm font-medium hover:underline">View All</a>
             </div>
 
             <div class="space-y-3">
                 <div
                     v-for="task in upcomingTasks"
                     :key="task.id"
-                    class="p-4 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] transition-all duration-300"
+                    class="p-4 border border-brand-border rounded-xl hover:border-primary-500 transition-all duration-300"
                 >
                     <div class="flex items-start justify-between mb-2">
                         <div class="flex-1">
@@ -458,13 +458,13 @@ onMounted(() => {
         </div>
 
         <!-- Recent Activities -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-6">
+        <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-base sm:text-lg font-bold">Recent Activities</h3>
                 <RouterLink
                     :to="{ name: 'admin.notifications' }"
                     data-testid="recent-activities-view-all"
-                    class="text-[#0C51D9] text-xs sm:text-sm font-medium hover:underline"
+                    class="text-primary-500 text-xs sm:text-sm font-medium hover:underline"
                 >
                     View All
                 </RouterLink>
@@ -476,7 +476,7 @@ onMounted(() => {
                     :key="`activity-skeleton-${index}`"
                     class="flex items-start gap-3 animate-pulse"
                 >
-                    <div class="h-10 w-10 rounded-[12px] bg-[#EEF4FF]"></div>
+                    <div class="h-10 w-10 rounded-xl bg-primary-50"></div>
                     <div class="flex-1 space-y-2">
                         <div class="h-2.5 w-3/4 rounded-full bg-[#E8EEF8]"></div>
                         <div class="h-2 w-1/3 rounded-full bg-[#EFF3FA]"></div>
@@ -484,7 +484,7 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div v-else-if="recentActivitiesError" class="rounded-[12px] border border-red-100 bg-red-50 px-3 py-3">
+            <div v-else-if="recentActivitiesError" class="rounded-xl border border-red-100 bg-red-50 px-3 py-3">
                 <p class="text-xs text-red-700">Failed to load activities.</p>
                 <button
                     type="button"
@@ -497,7 +497,7 @@ onMounted(() => {
 
             <div
                 v-else-if="recentActivities.length === 0"
-                class="rounded-[12px] border border-[#E7ECF4] bg-[#F8FAFC] px-3 py-4 text-center"
+                class="rounded-xl border border-[#E7ECF4] bg-[#F8FAFC] px-3 py-4 text-center"
             >
                 <p class="text-sm font-medium text-[#334155]">No activities yet.</p>
             </div>
@@ -507,12 +507,12 @@ onMounted(() => {
                     v-for="activity in recentActivities"
                     :key="activity.id"
                     type="button"
-                    class="flex w-full items-start gap-3 rounded-[12px] px-2 py-2 text-left transition-colors hover:bg-[#F7FAFF]"
+                    class="flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-[#F7FAFF]"
                     :disabled="!activity.action_url"
                     @click="handleActivitySelect(activity)"
                 >
                     <div
-                        class="relative h-10 w-10 flex-shrink-0 rounded-[12px] flex items-center justify-center"
+                        class="relative h-10 w-10 flex-shrink-0 rounded-xl flex items-center justify-center"
                         :class="getActivityIconBgClass(activity)"
                     >
                         <component
@@ -522,7 +522,7 @@ onMounted(() => {
                         />
                         <span
                             v-if="!activity.is_read"
-                            class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#0C51D9] ring-2 ring-white"
+                            class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-2 ring-white"
                         ></span>
                     </div>
 

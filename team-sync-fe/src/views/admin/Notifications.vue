@@ -110,7 +110,7 @@ const getActivityIconClass = (notification: any) => {
         return "text-[#F97316]";
     }
 
-    return "text-[#0C51D9]";
+    return "text-primary-500";
 };
 
 const getNotificationTime = (notification: any) => {
@@ -157,16 +157,16 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="rounded-[20px] border border-[#DCDEDD] bg-white p-4 sm:p-6">
+    <div class="rounded-2xl border border-brand-border bg-white p-4 sm:p-6">
         <div class="mb-4 flex items-center justify-between gap-3">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.1em] text-[#0C51D9]">Activity Feed</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.1em] text-primary-500">Activity Feed</p>
                 <h3 class="text-brand-dark text-lg sm:text-xl font-bold">All Notifications</h3>
             </div>
             <div class="flex items-center gap-2">
                 <button
                     type="button"
-                    class="inline-flex items-center gap-1.5 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-[#0C51D9] transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+                    class="inline-flex items-center gap-1.5 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-primary-500 transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
                     :disabled="markingAllRead || notifications.length === 0"
                     @click="handleMarkAllRead"
                 >
@@ -175,7 +175,7 @@ onMounted(() => {
                 </button>
                 <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-[#0C51D9] transition-colors hover:bg-[#EFF5FF]"
+                    class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-primary-500 transition-colors hover:bg-[#EFF5FF]"
                     @click="fetchNotifications(currentPage)"
                 >
                     <RefreshCw class="h-3.5 w-3.5" />
@@ -190,7 +190,7 @@ onMounted(() => {
                 :key="`notifications-skeleton-${index}`"
                 class="flex items-start gap-3 animate-pulse"
             >
-                <div class="h-11 w-11 rounded-[12px] bg-[#EEF4FF]"></div>
+                <div class="h-11 w-11 rounded-xl bg-[#EEF4FF]"></div>
                 <div class="flex-1 space-y-2 pt-1">
                     <div class="h-2.5 w-3/4 rounded-full bg-[#E8EEF8]"></div>
                     <div class="h-2 w-1/2 rounded-full bg-[#EFF3FA]"></div>
@@ -198,7 +198,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div v-else-if="error" class="rounded-[12px] border border-red-100 bg-red-50 px-4 py-3">
+        <div v-else-if="error" class="rounded-xl border border-red-100 bg-red-50 px-4 py-3">
             <p class="text-sm text-red-700">Unable to load notifications.</p>
             <button
                 type="button"
@@ -211,7 +211,7 @@ onMounted(() => {
 
         <div
             v-else-if="notifications.length === 0"
-            class="rounded-[12px] border border-[#E7ECF4] bg-[#F8FAFC] px-4 py-8 text-center"
+            class="rounded-xl border border-[#E7ECF4] bg-[#F8FAFC] px-4 py-8 text-center"
         >
             <p class="text-base font-semibold text-[#334155]">No notifications yet.</p>
             <p class="mt-1 text-sm text-[#64748B]">New updates will appear here.</p>
@@ -222,12 +222,12 @@ onMounted(() => {
                 v-for="notification in notifications"
                 :key="notification.id"
                 type="button"
-                class="flex w-full items-start gap-3 rounded-[12px] px-2.5 py-2.5 text-left transition-colors hover:bg-[#F7FAFF]"
+                class="flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-[#F7FAFF]"
                 :disabled="!notification.action_url"
                 @click="openNotification(notification)"
             >
                 <div
-                    class="relative h-11 w-11 flex-shrink-0 rounded-[12px] flex items-center justify-center"
+                    class="relative h-11 w-11 flex-shrink-0 rounded-xl flex items-center justify-center"
                     :class="getActivityIconBgClass(notification)"
                 >
                     <component
@@ -237,7 +237,7 @@ onMounted(() => {
                     />
                     <span
                         v-if="!notification.is_read"
-                        class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#0C51D9] ring-2 ring-white"
+                        class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-2 ring-white"
                     ></span>
                 </div>
 
@@ -266,7 +266,7 @@ onMounted(() => {
                 <div class="flex items-center gap-1">
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[#DCDEDD] text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
                         :disabled="currentPage <= 1"
                         @click="goToPage(currentPage - 1)"
                     >
@@ -274,7 +274,7 @@ onMounted(() => {
                     </button>
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-[#DCDEDD] text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
                         :disabled="currentPage >= meta.last_page"
                         @click="goToPage(currentPage + 1)"
                     >

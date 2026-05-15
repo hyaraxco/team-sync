@@ -87,7 +87,70 @@ html {
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
-/* Button and link styles */
+/* Button styles */
+.btn-primary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background-color: #0C51D9;
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0a44b8;
+}
+
+.btn-primary:active {
+    transform: scale(0.97);
+}
+
+.btn-secondary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    background-color: #fff;
+    color: #374151;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border: 1px solid #DCDEDD;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s ease, transform 0.1s ease;
+}
+
+.btn-secondary:hover {
+    background-color: #f9fafb;
+}
+
+.btn-secondary:active {
+    transform: scale(0.97);
+}
+
+.btn-details {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    color: #0C51D9;
+    font-weight: 500;
+    font-size: 0.875rem;
+    border-radius: 0.5rem;
+    transition: background-color 0.15s ease;
+}
+
+.btn-details:hover {
+    background-color: #eff6ff;
+}
+
+/* Navigation styles */
 .nav-link {
     display: flex;
     padding: 14px 20px;
@@ -107,27 +170,6 @@ html {
     align-self: stretch;
     background: linear-gradient(266deg, #040724 5.45%, #0C1448 52%, #040724 100.36%);
     box-shadow: -2px 2px 1px 0 #1A2570 inset, 2px 2px 1px 0 rgba(26, 37, 112, 0.55) inset;
-}
-
-.btn-primary {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-secondary {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
-}
-
-.btn-details {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
 }
 
 /* Card styles */
@@ -150,45 +192,45 @@ html {
     padding-left: 12px;
 }
 
-/* Badge styles */
+/* Badge styles — unique colors per level */
 .badge-expert {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #ecfdf5;
+    color: #047857;
 }
 
 .badge-intermediate {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #eff6ff;
+    color: #1d4ed8;
 }
 
 .badge-beginner {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #fffbeb;
+    color: #b45309;
 }
 
 .badge-active {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #ecfdf5;
+    color: #059669;
 }
 
 .badge-growing {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #fef3c7;
+    color: #d97706;
 }
 
 .badge-creative {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #f5f3ff;
+    color: #6d28d9;
 }
 
 .badge-high-performing {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #ecfdf5;
+    color: #047857;
 }
 
 .badge-247 {
-    background-color: #EBF8FF;
-    color: #1E40AF;
+    background-color: #fef2f2;
+    color: #b91c1c;
 }
 
 /* Sidebar collapsed state */
@@ -250,27 +292,6 @@ html {
 .sidebar-collapsed .nav-link:hover::before,
 .sidebar-collapsed .nav-link-active:hover::before {
     opacity: 1;
-}
-
-/* Dark mode overrides */
-.dark .nav-link {
-    background: #1f2937; /* gray-800 */
-}
-
-.dark .nav-link:hover {
-    background: #374151; /* gray-700 */
-}
-
-.dark .section-title {
-    color: #9CA3AF; /* gray-400 */
-}
-
-.dark .text-brand-dark {
-    color: #F9FAFB; /* gray-50 */
-}
-
-.dark .text-brand-light {
-    color: #9CA3AF; /* gray-400 */
 }
 
 /* View Transitions API (progressive enhancement) */

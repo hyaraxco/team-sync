@@ -11,7 +11,7 @@
             </header>
 
             <!-- Tabs Navigation -->
-            <nav class="flex gap-6 border-b border-[#DCDEDD]" aria-label="Tabs">
+            <nav class="flex gap-6 border-b border-brand-border" aria-label="Tabs">
                 <button
                     v-for="tab in ['Attendance Policies', 'Leave Entitlements', 'Holiday Calendars']"
                     :key="tab"
@@ -22,7 +22,7 @@
                     {{ tab }}
                     <span
                         class="absolute bottom-0 left-0 w-full h-[2px] transition-all duration-200"
-                        :class="activeTab === tab ? 'bg-[#0C51D9]' : 'bg-transparent'"
+                        :class="activeTab === tab ? 'bg-primary-500' : 'bg-transparent'"
                     ></span>
                 </button>
             </nav>
@@ -50,7 +50,7 @@
                         <div
                             v-for="policy in policyStore.policies"
                             :key="policy.id"
-                            class="policy-card group p-5 bg-white border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                            class="policy-card group p-5 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                         >
                             <div class="flex justify-between items-start mb-4">
                                 <h3 class="text-lg font-semibold text-brand-dark capitalize">
@@ -86,7 +86,7 @@
                             </div>
 
                             <button
-                                class="w-full mt-8 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-[#DCDEDD] text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-[#0C51D9]"
+                                class="w-full mt-8 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
                                 type="button"
                                 @click="openPolicyModal(policy)"
                             >
@@ -139,7 +139,7 @@
                             <div
                                 v-for="entitlement in group"
                                 :key="entitlement.id"
-                                class="policy-card p-4 bg-white border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                                class="policy-card p-4 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                             >
                                 <div class="flex justify-between items-start mb-3">
                                     <h4 class="text-base font-semibold text-brand-dark capitalize">
@@ -204,7 +204,7 @@
                                 </div>
 
                                 <button
-                                    class="w-full mt-6 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-[#DCDEDD] text-xs tracking-wide font-medium text-brand-dark transition-all"
+                                    class="w-full mt-6 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-brand-border text-xs tracking-wide font-medium text-brand-dark transition-all"
                                      type="button"
                                      @click="openEntitlementModal(entitlement)"
                                  >
@@ -227,10 +227,10 @@
                         </button>
                     </div>
 
-<div class="overflow-x-auto rounded-2xl border border-[#DCDEDD]">
+<div class="overflow-x-auto rounded-2xl border border-brand-border">
                          <table class="w-full text-left border-collapse">
                              <thead>
-                                 <tr class="border-b border-[#DCDEDD]">
+                                 <tr class="border-b border-brand-border">
                                      <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Holiday Name</th>
                                      <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
                                      <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</th>
@@ -391,7 +391,7 @@
                         <label
                             v-for="day in weekdays"
                             :key="day.value"
-                            class="flex items-center gap-2 text-sm text-brand-dark border border-[#DCDEDD] rounded-lg px-3 py-2"
+                            class="flex items-center gap-2 text-sm text-brand-dark border border-brand-border rounded-lg px-3 py-2"
                         >
                             <input
                                 v-model="policyForm.default_working_weekdays"
@@ -441,25 +441,25 @@
 
                 <div class="grid gap-3 md:grid-cols-3">
                     <label
-                        class="flex items-center gap-2 text-sm text-brand-dark border border-[#DCDEDD] rounded-lg px-3 py-2"
+                        class="flex items-center gap-2 text-sm text-brand-dark border border-brand-border rounded-lg px-3 py-2"
                     >
                         <input v-model="entitlementForm.is_eligible" type="checkbox" class="rounded" />
                         Eligible
                     </label>
                     <label
-                        class="flex items-center gap-2 text-sm text-brand-dark border border-[#DCDEDD] rounded-lg px-3 py-2"
+                        class="flex items-center gap-2 text-sm text-brand-dark border border-brand-border rounded-lg px-3 py-2"
                     >
                         <input v-model="entitlementForm.is_paid" type="checkbox" class="rounded" />
                         Paid Leave
                     </label>
                     <label
-                        class="flex items-center gap-2 text-sm text-brand-dark border border-[#DCDEDD] rounded-lg px-3 py-2"
+                        class="flex items-center gap-2 text-sm text-brand-dark border border-brand-border rounded-lg px-3 py-2"
                     >
                         <input v-model="entitlementForm.requires_reason" type="checkbox" class="rounded" />
                         Requires Reason
                     </label>
                     <label
-                        class="flex items-center gap-2 text-sm text-brand-dark border border-[#DCDEDD] rounded-lg px-3 py-2"
+                        class="flex items-center gap-2 text-sm text-brand-dark border border-brand-border rounded-lg px-3 py-2"
                     >
                         <input v-model="entitlementForm.requires_attachment" type="checkbox" class="rounded" />
                         Requires Proof

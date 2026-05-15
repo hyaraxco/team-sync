@@ -86,7 +86,7 @@ const averageSalaryChartSeries = computed(() => [
 const averageSalaryChartOptions = computed(() => ({
     chart: { type: "area", toolbar: { show: false }, sparkline: { enabled: false } },
     stroke: { width: 2, curve: "smooth" },
-    colors: ["#8B5CF6"],
+    colors: ["#0C51D9"],
     fill: { type: "gradient", gradient: { shadeIntensity: 1, opacityFrom: 0.3, opacityTo: 0.05 } },
     xaxis: {
         categories: averageSalaryTrend.value.map((p) => p.label),
@@ -288,14 +288,14 @@ const handleExportReport = async () => {
 
                 <!-- Quick Actions Card (spans 2 rows on the right) -->
                 <div
-                    class="lg:row-span-2 bg-white border border-[#DCDEDD] rounded-[20px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300 p-5 dark:bg-gray-800 dark:border-gray-700"
+                    class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
                 >
                     <h3 class="text-brand-dark text-lg font-bold mb-4">Payroll Actions</h3>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -305,7 +305,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link"
-                            class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:rounded-xl focus:border-primary-500 focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <UserCheck class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
@@ -316,7 +316,7 @@ const handleExportReport = async () => {
                             type="button"
                             data-testid="payroll-export-report-open"
                             @click="openExportReportModal"
-                            class="btn-secondary w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:rounded-xl focus:border-primary-500 focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <Download class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Export Payroll Report</span>
@@ -326,7 +326,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollStatistics"
                             :to="{ name: 'admin.payroll.comparison' }"
                             data-testid="payroll-comparison-link"
-                            class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:rounded-xl focus:border-primary-500 focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <Banknote class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">MoM Comparison</span>
@@ -336,7 +336,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollList"
                             :to="{ name: 'admin.payroll.adjustments' }"
                             data-testid="payroll-adjustment-queue-link"
-                            class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:rounded-xl focus:border-primary-500 focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <FileWarning class="w-4 h-4 text-gray-600" />
                             <div class="flex flex-col items-start">
@@ -351,7 +351,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollStatistics"
                             :to="{ name: 'admin.payroll.settings' }"
                             data-testid="payroll-settings-link"
-                            class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:rounded-xl focus:border-primary-500 focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <Settings class="w-4 h-4 text-gray-400" />
                             <div class="flex items-center justify-between w-full gap-2">
@@ -390,7 +390,7 @@ const handleExportReport = async () => {
 
             <div
                 data-testid="payroll-analytics-section"
-                class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 mb-6 dark:bg-gray-800 dark:border-gray-700"
+                class="bg-white border border-brand-border rounded-2xl p-5 mb-6"
             >
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <div>
@@ -418,7 +418,7 @@ const handleExportReport = async () => {
                 <template v-else-if="hasAnalyticsData">
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
                         <div
-                            class="border border-[#DCDEDD] rounded-[16px] p-4"
+                            class="border border-brand-border rounded-2xl p-4"
                             data-testid="payroll-analytics-total-amount"
                         >
                             <p class="text-xs uppercase tracking-wide text-brand-light mb-1">Total Amount</p>
@@ -427,7 +427,7 @@ const handleExportReport = async () => {
                             </p>
                         </div>
                         <div
-                            class="border border-[#DCDEDD] rounded-[16px] p-4"
+                            class="border border-brand-border rounded-2xl p-4"
                             data-testid="payroll-analytics-deduction-rate"
                         >
                             <p class="text-xs uppercase tracking-wide text-brand-light mb-1">Average Deduction Rate</p>
@@ -435,7 +435,7 @@ const handleExportReport = async () => {
                                 {{ formatPercent(analytics.summary.average_deduction_rate) }}
                             </p>
                         </div>
-                        <div class="border border-[#DCDEDD] rounded-[16px] p-4" data-testid="payroll-analytics-growth">
+                        <div class="border border-brand-border rounded-2xl p-4" data-testid="payroll-analytics-growth">
                             <p class="text-xs uppercase tracking-wide text-brand-light mb-1">Salary Growth</p>
                             <p class="text-brand-dark text-lg font-bold">
                                 {{ formatSignedPercent(analytics.growth_metrics.salary_growth_percentage) }}
@@ -466,7 +466,7 @@ const handleExportReport = async () => {
                     <!-- Average Salary Trend -->
                     <div
                         data-testid="payroll-insights-avg-salary"
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
+                        class="bg-white border border-brand-border rounded-2xl p-5"
                     >
                         <h4 class="text-brand-dark text-base font-bold mb-3">Average Salary Trend</h4>
                         <VueApexCharts
@@ -480,7 +480,7 @@ const handleExportReport = async () => {
                     <!-- BPJS Contribution Trend -->
                     <div
                         data-testid="payroll-insights-bpjs"
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
+                        class="bg-white border border-brand-border rounded-2xl p-5"
                     >
                         <h4 class="text-brand-dark text-base font-bold mb-3">BPJS Contribution Trend</h4>
                         <VueApexCharts type="bar" height="200" :options="bpjsChartOptions" :series="bpjsChartSeries" />
@@ -489,7 +489,7 @@ const handleExportReport = async () => {
                     <!-- Top Deduction Reasons -->
                     <div
                         data-testid="payroll-insights-deduction-reasons"
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
+                        class="bg-white border border-brand-border rounded-2xl p-5"
                     >
                         <h4 class="text-brand-dark text-base font-bold mb-3">Top Deduction Reasons</h4>
                         <div class="space-y-3">
@@ -521,7 +521,7 @@ const handleExportReport = async () => {
                     <!-- Headcount vs Payroll Growth -->
                     <div
                         data-testid="payroll-insights-headcount"
-                        class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700"
+                        class="bg-white border border-brand-border rounded-2xl p-5"
                     >
                         <h4 class="text-brand-dark text-base font-bold mb-3">Headcount vs Payroll</h4>
                         <div class="space-y-2">
@@ -547,10 +547,10 @@ const handleExportReport = async () => {
         <template v-else>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
                 <div
-                    class="lg:col-span-2 bg-white border border-[#DCDEDD] rounded-[20px] p-6 dark:bg-gray-800 dark:border-gray-700"
+                    class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6"
                 >
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <FileText class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
@@ -561,13 +561,13 @@ const handleExportReport = async () => {
                         </div>
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div class="border border-[#DCDEDD] rounded-[16px] p-4">
+                        <div class="border border-brand-border rounded-2xl p-4">
                             <p class="text-brand-dark text-sm font-semibold mb-1">Your responsibility</p>
                             <p class="text-brand-light text-sm">
                                 Generate payroll drafts and monitor each period until Finance finalizes payment.
                             </p>
                         </div>
-                        <div class="border border-[#DCDEDD] rounded-[16px] p-4">
+                        <div class="border border-brand-border rounded-2xl p-4">
                             <p class="text-brand-dark text-sm font-semibold mb-1">Restricted data</p>
                             <p class="text-brand-light text-sm">
                                 Company-wide payroll statistics stay hidden in this view to keep salary reporting with
@@ -577,13 +577,13 @@ const handleExportReport = async () => {
                     </div>
                 </div>
 
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700">
+                <div class="bg-white border border-brand-border rounded-2xl p-5">
                     <h3 class="text-brand-dark text-lg font-bold mb-4">Payroll Actions</h3>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -592,12 +592,12 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link-alt"
-                            class="w-full text-left border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:rounded-[12px] focus:border-[#0C51D9] focus:border-2 focus:rounded-[12px] focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:rounded-xl focus:border-primary-500 focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <UserCheck class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
                         </RouterLink>
-                        <div class="border border-[#DCDEDD] rounded-[16px] px-4 py-3">
+                        <div class="border border-brand-border rounded-2xl px-4 py-3">
                             <p class="text-brand-dark text-sm font-semibold">Draft monitoring</p>
                             <p class="text-brand-light text-xs mt-1">
                                 Review payroll periods below and open details when a draft is ready.
@@ -611,7 +611,7 @@ const handleExportReport = async () => {
         <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
         <!-- Monthly Payroll Periods -->
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-5 dark:bg-gray-800 dark:border-gray-700">
+        <div class="bg-white border border-brand-border rounded-2xl p-5">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-lg font-bold">Monthly Payroll Periods</h3>
             </div>
@@ -621,12 +621,12 @@ const handleExportReport = async () => {
                     :key="payroll.id"
                     :data-testid="`payroll-row-${payroll.id}`"
                     :data-payroll-period="payroll.period"
-                    class="flex items-center gap-4 p-4 border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 transition-all duration-300"
+                    class="flex items-center gap-4 p-4 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
                 >
-                    <div class="w-16 h-16 relative flex items-center justify-center rounded-[12px] overflow-hidden">
+                    <div class="w-16 h-16 relative flex items-center justify-center rounded-xl overflow-hidden">
                         <!-- Background -->
                         <div
-                            class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[12px]"
+                            class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
                         ></div>
                         <!-- Icon -->
                         <Calendar class="w-8 h-8 text-white relative z-10" />
@@ -683,7 +683,7 @@ const handleExportReport = async () => {
                     <button
                         @click="viewDetails(payroll.id)"
                         :data-testid="`payroll-detail-btn-${payroll.id}`"
-                        class="btn-details border border-[#DCDEDD] rounded-xl hover:ring-2 hover:ring-[#0C51D9] hover:text-[#0C51D9] transition-all duration-300 py-[14px] px-5 flex items-center justify-center"
+                        class="btn-details border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500 hover:text-primary-500 transition-all duration-300 py-[14px] px-5 flex items-center justify-center"
                     >
                         <span class="text-brand-dark text-base font-medium">Details</span>
                     </button>
@@ -708,7 +708,7 @@ const handleExportReport = async () => {
                     <select
                         v-model="exportFilters.report_type"
                         data-testid="payroll-report-type"
-                        class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     >
                         <option value="summary">Summary</option>
                         <option value="detail">Detail per Employee</option>
@@ -727,7 +727,7 @@ const handleExportReport = async () => {
                     <select
                         v-model="exportFilters.status"
                         data-testid="payroll-report-status"
-                        class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     >
                         <option value="all">All</option>
                         <option value="pending">Pending</option>
@@ -740,7 +740,7 @@ const handleExportReport = async () => {
                     <select
                         v-model="exportFilters.period_type"
                         data-testid="payroll-report-period-type"
-                        class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     >
                         <option value="monthly">Monthly</option>
                         <option value="yearly">Yearly</option>
@@ -753,7 +753,7 @@ const handleExportReport = async () => {
                         v-model="exportFilters.month"
                         type="month"
                         data-testid="payroll-report-month"
-                        class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     />
                 </div>
 
@@ -765,7 +765,7 @@ const handleExportReport = async () => {
                         min="2000"
                         max="2100"
                         data-testid="payroll-report-year"
-                        class="w-full px-4 py-3 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] focus:border-[#0C51D9] focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     />
                 </div>
             </div>
@@ -776,7 +776,7 @@ const handleExportReport = async () => {
                         type="button"
                         @click="handleExportReport"
                         data-testid="payroll-report-submit"
-                        class="flex-1 btn-primary rounded-[12px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
+                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <Download class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -786,7 +786,7 @@ const handleExportReport = async () => {
                     <button
                         type="button"
                         @click="closeExportReportModal"
-                        class="flex-1 border border-[#DCDEDD] rounded-[12px] hover:border-[#0C51D9] hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2"
+                        class="flex-1 border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Cancel</span>
                     </button>

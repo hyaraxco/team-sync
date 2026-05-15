@@ -42,7 +42,7 @@ const goToTeamDetail = (id: number) => {
 
 <template>
     <!-- Latest Teams -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 sm:p-5">
+    <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-5">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-brand-dark text-lg font-bold">Latest Teams</h3>
         </div>
@@ -67,11 +67,11 @@ const goToTeamDetail = (id: number) => {
         <div v-else class="space-y-4">
             <div v-for="team in latestTeams" :key="team.id" class="flex flex-col sm:flex-row sm:items-center gap-3">
                 <div
-                    class="w-14 h-12 sm:w-16 sm:h-14 relative flex items-center justify-center rounded-[8px] overflow-hidden"
+                    class="w-14 h-12 sm:w-16 sm:h-14 relative flex items-center justify-center rounded-lg overflow-hidden"
                 >
                     <!-- Main blue background -->
                     <div
-                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-[8px]"
+                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg"
                     ></div>
                     <!-- Lucide icon -->
                     <img loading="lazy" :src="team.icon" class="w-6 h-6 relative z-10" />
@@ -98,7 +98,7 @@ const goToTeamDetail = (id: number) => {
                 <!-- Details Button -->
                 <button
                     @click="goToTeamDetail(team.id)"
-                    class="btn-details w-full sm:w-auto border border-[#DCDEDD] rounded-xl hover:ring-2 hover:ring-[#0C51D9] hover:text-[#0C51D9] transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
+                    class="btn-details w-full sm:w-auto border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500 hover:text-primary-500 transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
                 >
                     <span class="text-brand-dark text-sm sm:text-base font-medium">Details</span>
                 </button>

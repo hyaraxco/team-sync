@@ -29,7 +29,7 @@ const goToDetail = () => {
 <template>
     <!-- Employee Card 1 -->
     <div
-        class="border border-[#DCDEDD] rounded-[16px] hover:border-[#0C51D9] hover:border-2 hover:shadow-lg transition-all duration-300 p-4"
+        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4"
     >
         <div class="flex flex-col items-center mb-3">
             <div class="relative">
@@ -48,10 +48,10 @@ const goToDetail = () => {
         </div>
         <div class="flex items-center justify-between mb-3">
             <div class="text-left">
-                <h4 class="text-[#0C1C3C] font-['Plus_Jakarta_Sans'] text-[16px] font-bold">
+                <h4 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[16px] font-bold">
                     {{ data?.user?.name }}
                 </h4>
-                <p class="mt-1 text-[#6B7280] font-['Plus_Jakarta_Sans'] text-[14px] font-normal">
+                <p class="mt-1 text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal">
                     {{ _.capitalize(data?.job_information?.job_title) }}
                 </p>
             </div>
@@ -61,7 +61,7 @@ const goToDetail = () => {
         </div>
 
         <!-- Divider -->
-        <div class="border-b border-[#DCDEDD] mb-3"></div>
+        <div class="border-b border-brand-border mb-3"></div>
 
         <!-- Staff Member Details -->
         <div class="space-y-2 mb-4">
@@ -81,7 +81,7 @@ const goToDetail = () => {
         <div class="flex gap-2">
             <button
                 @click="goToEdit"
-                class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2"
+                class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2"
                 v-if="can('staff-member-edit')"
             >
                 <Edit class="w-4 h-4 text-gray-600" />
@@ -89,7 +89,7 @@ const goToDetail = () => {
             </button>
             <button
                 @click="goToDetail"
-                class="flex-1 border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2"
+                class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2"
             >
                 <Eye class="w-4 h-4 text-gray-600" />
                 <span class="text-brand-dark text-sm font-semibold">View</span>
