@@ -393,6 +393,7 @@ watch(
                                     </Input>
                                     <button
                                         type="button"
+                                        title="Remove responsibility"
                                         class="w-12 h-12 border border-brand-border rounded-xl hover:border-red-500 hover:bg-red-50 transition-all duration-300 flex items-center justify-center mt-7 cursor-pointer"
                                         @click="removeResponsibility(index)"
                                     >
