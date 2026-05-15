@@ -42,7 +42,7 @@ const handleSubmit = async () => {
             </div>
             <RouterLink
                 :to="{ name: 'login' }"
-                class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20"
+                class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20"
             >
                 <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
                 Return to sign in
@@ -72,7 +72,7 @@ const handleSubmit = async () => {
 
             <!-- Form Card -->
             <div
-                class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]"
+                class="bg-white/80 backdrop-blur-xl rounded-2xl border border-gray-200/60 p-8 shadow-md"
             >
                 <form class="space-y-6" @submit.prevent="handleSubmit" novalidate>
                     <Input
@@ -94,7 +94,7 @@ const handleSubmit = async () => {
                     <!-- Submit Button -->
                     <button
                         type="submit"
-                        class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-[#0C51D9] px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow-md focus:outline-none focus:ring-4 focus:ring-[#0C51D9]/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-[#0C51D9] overflow-hidden"
+                        class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-primary-500 overflow-hidden"
                         :disabled="loading"
                     >
                         <span class="relative z-10 flex items-center gap-2">

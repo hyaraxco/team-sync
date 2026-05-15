@@ -40,10 +40,10 @@ onMounted(async () => {
     <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
     <!-- Projects Grid Section -->
-    <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-6 mb-6">
+    <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-blue-50 rounded-[12px] flex items-center justify-center">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <Briefcase class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
@@ -53,13 +53,13 @@ onMounted(async () => {
             </div>
             <div class="flex items-center gap-4" v-if="can('project-create')">
                 <button
-                    class="bg-white border border-[#DCDEDD] text-brand-dark py-3 px-4 rounded-[8px] font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                    class="bg-white border border-brand-border text-brand-dark py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
                 >
                     <Upload class="w-4 h-4" />
                     <span class="text-sm font-semibold">Import CSV</span>
                 </button>
                 <RouterLink
-                    class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                     :to="{ name: 'admin.projects.create' }"
                 >
                     <Plus class="w-4 h-4 text-white" />

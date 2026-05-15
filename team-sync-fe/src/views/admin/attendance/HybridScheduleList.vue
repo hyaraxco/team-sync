@@ -156,8 +156,8 @@ const confirmReject = () =>
 <template>
     <div class="space-y-6">
         <div>
-            <h1 class="text-[#0C1C3C] font-['Plus_Jakarta_Sans'] text-[28px] font-bold">Hybrid Work Schedules</h1>
-            <p class="text-[#6B7280] text-sm mt-1">Manage employee hybrid schedules and approve override requests.</p>
+            <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[28px] font-bold">Hybrid Work Schedules</h1>
+            <p class="text-brand-light text-sm mt-1">Manage employee hybrid schedules and approve override requests.</p>
         </div>
 
         <MainCard>
@@ -166,10 +166,10 @@ const confirmReject = () =>
                     <button
                         @click="activeTab = 'schedules'"
                         :class="[
-                            'px-4 py-2 rounded-[10px] text-sm font-semibold transition-all',
+                            'px-4 py-2 rounded-lg text-sm font-semibold transition-all',
                             activeTab === 'schedules'
-                                ? 'bg-[#0C51D9] text-white'
-                                : 'bg-white text-[#344054] border border-[#D0D5DD] hover:border-[#0C51D9]',
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-white text-[#344054] border border-gray-300 hover:border-primary-500',
                         ]"
                     >
                         Schedules
@@ -178,10 +178,10 @@ const confirmReject = () =>
                     <button
                         @click="activeTab = 'overrides'"
                         :class="[
-                            'px-4 py-2 rounded-[10px] text-sm font-semibold transition-all inline-flex items-center gap-2',
+                            'px-4 py-2 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-2',
                             activeTab === 'overrides'
-                                ? 'bg-[#0C51D9] text-white'
-                                : 'bg-white text-[#344054] border border-[#D0D5DD] hover:border-[#0C51D9]',
+                                ? 'bg-primary-500 text-white'
+                                : 'bg-white text-[#344054] border border-gray-300 hover:border-primary-500',
                         ]"
                     >
                         <Clock class="w-4 h-4" />
@@ -190,7 +190,7 @@ const confirmReject = () =>
                 </div>
 
                 <div v-if="loading" class="flex justify-center py-14">
-                    <div class="w-8 h-8 border-4 border-[#D0D5DD] border-t-[#0C51D9] rounded-full animate-spin"></div>
+                    <div class="w-8 h-8 border-4 border-gray-300 border-t-primary-500 rounded-full animate-spin"></div>
                 </div>
 
                 <div
@@ -388,7 +388,7 @@ const confirmReject = () =>
                                         <div class="flex items-center gap-2">
                                             <button
                                                 @click="showApproveModal(override)"
-                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#D0D5DD] hover:border-green-500 hover:bg-green-50 transition-all"
+                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 hover:border-green-500 hover:bg-green-50 transition-all"
                                             >
                                                 <Check class="w-4 h-4 text-green-600" />
                                                 <span class="text-xs font-semibold text-[#344054]">Approve</span>
@@ -396,7 +396,7 @@ const confirmReject = () =>
 
                                             <button
                                                 @click="onRejectAction(override)"
-                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-[#D0D5DD] hover:border-red-500 hover:bg-red-50 transition-all"
+                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 hover:border-red-500 hover:bg-red-50 transition-all"
                                             >
                                                 <X class="w-4 h-4 text-red-600" />
                                                 <span class="text-xs font-semibold text-[#344054]">Reject</span>
@@ -454,14 +454,14 @@ const confirmReject = () =>
                 <button
                     @click="closeApproveModal"
                     :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold"
                 >
                     Cancel
                 </button>
                 <button
                     @click="confirmApprove"
                     :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 bg-green-600 text-white rounded-[12px] text-sm font-semibold disabled:opacity-50"
+                    class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold disabled:opacity-50"
                 >
                     {{ processingApprove ? "Approving..." : "Approve" }}
                 </button>
@@ -509,7 +509,7 @@ const confirmReject = () =>
                 <textarea
                     v-model="rejectReason"
                     rows="4"
-                    class="w-full border border-[#D0D5DD] rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     placeholder="Please provide a clear rejection reason..."
                 ></textarea>
             </div>
@@ -520,14 +520,14 @@ const confirmReject = () =>
                 <button
                     @click="closeRejectModal"
                     :disabled="processingReject"
-                    class="flex-1 px-4 py-3 border border-[#DCDEDD] rounded-[12px] text-brand-dark text-sm font-semibold"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold"
                 >
                     Cancel
                 </button>
                 <button
                     @click="confirmReject"
                     :disabled="processingReject || !rejectReason.trim()"
-                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-[12px] text-sm font-semibold disabled:opacity-50"
+                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-semibold disabled:opacity-50"
                 >
                     {{ processingReject ? "Rejecting..." : "Reject" }}
                 </button>

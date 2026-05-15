@@ -33,7 +33,7 @@ const success = computed(() => status.value === "success");
         <!-- Action Button -->
         <RouterLink
             :to="{ name: 'login' }"
-            class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-[#0C51D9] px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#083da6] hover:shadow focus:outline-none focus:ring-2 focus:ring-[#0C51D9] focus:ring-offset-2"
+            class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-primary-500 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2"
         >
             <ArrowLeft class="h-4 w-4" aria-hidden="true" />
             Go to sign in

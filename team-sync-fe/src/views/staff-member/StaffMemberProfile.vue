@@ -71,12 +71,12 @@ onMounted(() => {
     <div v-else-if="resolvedProfile">
         <div
             v-if="typeof error === 'string' && !hasDetailedProfile"
-            class="bg-amber-50 border border-amber-200 text-amber-900 rounded-[16px] px-5 py-4 mb-6"
+            class="bg-amber-50 border border-amber-200 text-amber-900 rounded-2xl px-5 py-4 mb-6"
         >
             {{ error }}. Showing basic account information while the full employee profile is unavailable.
         </div>
 
-        <div class="bg-white border border-[#DCDEDD] rounded-[20px] mb-6 p-6">
+        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-6">
             <div class="flex items-center gap-6">
                 <div class="relative">
                     <img loading="lazy"
@@ -128,7 +128,7 @@ onMounted(() => {
                             name: 'admin.staffMembers.edit',
                             params: { id: resolvedProfile.id },
                         }"
-                        class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
@@ -136,7 +136,7 @@ onMounted(() => {
                     <RouterLink
                         v-else
                         :to="{ name: 'staffMember.profile.edit' }"
-                        class="btn-primary rounded-[8px] border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-[#0C51D9] transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
@@ -147,9 +147,9 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 items-start">
             <div class="space-y-6">
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
+                <div class="bg-white border border-brand-border rounded-2xl p-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-teal-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
                             <Contact class="w-6 h-6 text-teal-600" />
                         </div>
                         <div>
@@ -197,9 +197,9 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
+                <div class="bg-white border border-brand-border rounded-2xl p-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-purple-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                             <MapPin class="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
@@ -245,9 +245,9 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
+                <div class="bg-white border border-brand-border rounded-2xl p-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-red-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                             <Phone class="w-6 h-6 text-red-600" />
                         </div>
                         <div>
@@ -289,9 +289,9 @@ onMounted(() => {
             </div>
 
             <div class="space-y-6">
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4">
+                <div class="bg-white border border-brand-border rounded-2xl p-4">
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-green-50 rounded-[12px] flex items-center justify-center">
+                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                             <Briefcase class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
@@ -341,10 +341,10 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="bg-white border border-[#DCDEDD] rounded-[20px] p-4 h-fit" v-if="resolvedProfile?.team">
+                <div class="bg-white border border-brand-border rounded-2xl p-4 h-fit" v-if="resolvedProfile?.team">
                     <div class="flex items-center justify-between mb-4">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-indigo-50 rounded-[12px] flex items-center justify-center">
+                            <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
                                 <Users class="w-6 h-6 text-indigo-600" />
                             </div>
                             <div>
@@ -353,7 +353,7 @@ onMounted(() => {
                             </div>
                         </div>
                         <button
-                            class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                            class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                         >
                             <Users class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-semibold">View Team</span>
@@ -361,10 +361,10 @@ onMounted(() => {
                     </div>
 
                     <div
-                        class="flex items-center gap-4 mb-4 p-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-[16px]"
+                        class="flex items-center gap-4 mb-4 p-4 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl"
                     >
-                        <div class="w-16 h-16 relative flex items-center justify-center rounded-[12px] overflow-hidden">
-                            <div class="w-full h-full absolute bg-white/20 rounded-[12px]"></div>
+                        <div class="w-16 h-16 relative flex items-center justify-center rounded-xl overflow-hidden">
+                            <div class="w-full h-full absolute bg-white/20 rounded-xl"></div>
                             <Code class="w-8 h-8 text-white relative z-10" />
                         </div>
                         <div class="flex-1">
@@ -412,7 +412,7 @@ onMounted(() => {
         </div>
     </div>
 
-    <div v-else class="bg-white border border-[#DCDEDD] rounded-[20px] p-8 text-center text-gray-600">
+    <div v-else class="bg-white border border-brand-border rounded-2xl p-8 text-center text-gray-600">
         Your employee profile is not available yet.
     </div>
 </template>

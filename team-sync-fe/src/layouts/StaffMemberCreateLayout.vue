@@ -95,12 +95,12 @@ watch(
         <!-- Main Content -->
         <div class="flex-1 flex flex-col">
             <!-- Top Navbar -->
-            <header class="page-header bg-white border-b border-[#DCDEDD] px-4 md:px-5 py-3 md:py-4">
+            <header class="page-header bg-white border-b border-brand-border px-4 md:px-5 py-3 md:py-4">
                 <div class="flex items-start md:items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
                         <button
                             @click="previousStep"
-                            class="border border-[#DCDEDD] rounded-[8px] hover:border-[#0C51D9] hover:border-2 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-2"
+                            class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-2"
                         >
                             <ArrowLeft class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-base font-semibold">Back</span>
@@ -119,17 +119,17 @@ watch(
                         <!-- Action Buttons -->
                         <div class="flex items-center gap-3">
                             <button
-                                class="w-14 h-14 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                                class="w-14 h-14 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                             >
                                 <BellIcon class="w-5 h-5 text-gray-600" />
                             </button>
                             <button
-                                class="w-14 h-14 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                                class="w-14 h-14 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                             >
                                 <MessageCircleIcon class="w-5 h-5 text-gray-600" />
                             </button>
                             <button
-                                class="w-14 h-14 rounded-full border border-[#DCDEDD] flex items-center justify-center hover:border-[#0C51D9] hover:border-2 transition-all duration-200"
+                                class="w-14 h-14 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
                             >
                                 <SettingsIcon class="w-5 h-5 text-gray-600" />
                             </button>
