@@ -106,11 +106,12 @@ test.describe.serial("Performance Review Templates CRUD", () => {
         ).toBeVisible({ timeout: 5_000 });
 
         // Delete
-        page.on("dialog", async (dialog) => await dialog.accept());
         const updatedRow = page.locator("table tbody tr", {
           hasText: "E2E Updated Template",
         });
         await updatedRow.locator("button").last().click();
+        await expect(page.getByRole("heading", { name: /Delete Template/i })).toBeVisible();
+        await page.getByRole("button", { name: /^Delete$/ }).click();
         await expect(
           page.getByText(/deleted successfully/i)
         ).toBeVisible({ timeout: 5_000 });
