@@ -10,9 +10,9 @@ Laravel 12 REST API. PHP 8.2+. Sanctum auth. Repository pattern with interface b
 app/
 ├── Console/              # Artisan commands
 ├── Constants/            # App-wide constants (CacheConstants, etc.)
-├── DTOs/                 # 10 data transfer objects (cross-layer)
+├── DTOs/                 # 10+ data transfer objects (cross-layer)
 │   └── Performance/      # Performance-specific DTOs
-├── Enums/                # 21 enums (all fixed option sets)
+├── Enums/                # 20 enums (all fixed option sets)
 ├── Exports/              # Excel exports (Maatwebsite)
 ├── Helpers/              # Utility functions
 ├── Http/
@@ -21,9 +21,9 @@ app/
 │   ├── Requests/         # Form request validation
 │   └── Resources/        # API resource transformers
 ├── Interfaces/           # 25 repository contracts
-├── Jobs/                 # GeneratePayrollJob (queued, unique per month)
-├── Models/               # 53 Eloquent models
-├── Notifications/        # 32 notification classes (queued)
+├── Jobs/                 # GeneratePayrollJob (queued, unique, 3 retries, 10min timeout)
+├── Models/               # 53 Eloquent models (17 soft-deletable)
+├── Notifications/        # 32 notification classes (all ShouldQueue)
 │   └── Performance/      # Performance-specific notifications
 ├── Providers/            # Service providers (interface bindings)
 ├── Repositories/         # 25 repository implementations
@@ -32,10 +32,16 @@ app/
     ├── Attendance/       # Check-in/out, policy enforcement, hybrid resolver
     ├── Payroll/          # Generation, tax calc, BPJS, reconciliation
     └── Performance/      # Reviews, goals, TOPSIS ranking
+
 database/
 ├── factories/            # Model factories for testing
 ├── migrations/           # 88 migrations (NEVER modify old ones)
 └── seeders/              # Role, permission, demo data, E2E seeders
+
+tests/
+├── Feature/              # Integration tests (endpoints, flows, permissions)
+├── Unit/                 # Unit tests (services, DTOs, helpers, jobs)
+└── Concerns/             # Test traits (ActivatesLicense)
 ```
 
 ## WHERE TO LOOK
@@ -97,7 +103,7 @@ Key models by domain:
 
 ```bash
 composer dev                               # Server + queue + scheduler + logs (PREFERRED)
-composer test                              # Clears config, runs Pest
+composer test                              # Clears config, runs Pest (1478 tests)
 ./vendor/bin/pint                          # PHP formatting
 php artisan migrate                        # Run migrations
 php artisan migrate:rollback               # Rollback last batch
@@ -118,3 +124,7 @@ docker compose up -d queue scheduler       # Queue + scheduler via Docker
 - **Payroll settings versioning**: `PayrollSetting` → `PayrollSettingVersion` (immutable versions)
 - **Attendance periods**: `open → review → locked` lifecycle, tied to payroll generation
 - **Feature flags**: `feature.enabled:{module}` middleware gates analytics and performance routes
+- **GeneratePayrollJob**: queued, unique per salary_month (1hr lock), 3 retries, 10min timeout
+- **Constants** (`app/Constants/CacheConstants.php`): `PAYROLL_BULK_INSERT_CHUNK_SIZE = 500`, `DEFAULT_PAGINATION_SIZE = 50`
+- **Meilisearch + OrbStack**: Docker containers need `NO_PROXY=localhost,127.0.0.1,mysql,redis,meilisearch,phpmyadmin,*.orb.internal` to avoid proxy routing
+- **E2E seeders**: `database/seeders/E2E/` — used by `e2e-prepare-be.sh` to reset state before Playwright runs

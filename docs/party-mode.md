@@ -21,6 +21,27 @@ The orchestrator will:
 
 ---
 
+## When to Use Party Mode (Trigger Criteria)
+
+### Use Party Mode When:
+- Changes touch **2+ domains** (e.g., BE+FE, FE+compliance, DB+API)
+- Making **architecture decisions** (multi-tenancy, caching strategy, queue design)
+- Implementing **new features** with business logic + UI + compliance
+- **Compliance/regulation** questions (BPJS, PPh 21, labor law)
+- **Security review** of auth flows, permission checks, data access
+- **Performance issues** that need multi-layer analysis
+
+### Do NOT Use Party Mode For:
+- Single-file bug fixes
+- CSS/style changes (use design skills directly)
+- Adding tests to existing code
+- Refactoring within one layer (controller-only, component-only)
+- Dependency updates or config changes
+
+**Rule of thumb:** If the change affects only one file or one layer, skip party mode. If it touches BE+FE, or involves compliance/security, use party mode.
+
+---
+
 ## Sub-Agent Mapping
 
 Each persona is backed by a specialized sub-agent. When party mode activates, the orchestrator spawns these agents **concurrently** for maximum speed.
@@ -32,20 +53,48 @@ Each persona is backed by a specialized sub-agent. When party mode activates, th
 | ⚙️ Dede (Backend) | `@fixer` + `@librarian` | Implementation execution + Laravel docs lookup |
 | 🎨 Eka (Frontend) | `@designer` + `@fixer` | UI/UX design + Vue component implementation |
 | 🧪 Fitri (QA) | `@fixer` + `@oracle` | Test writing + test strategy review |
-| 🇮🇩 Gani (HR Expert) | `@librarian` + `@oracle` | Indonesian regulation research + compliance analysis |
+| 🇮🇩 Gani (HR Expert) | `@librarian` + `@oracle` + `@fixer` | Indonesian regulation research + compliance analysis + implementation |
 | 🔒 Hasan (Security) | `@oracle` | Security review, threat modeling |
 | 🚀 Indra (DevOps) | `@fixer` + `@oracle` | CI/CD implementation + infrastructure decisions |
 | 💰 Joko (Finance) | `@oracle` | Financial analysis, pricing strategy |
 
-### Parallel Execution Flow
+### Other Available Agents (Not Persona-Mapped)
+
+| Agent | Role | When to Use Directly |
+|-------|------|---------------------|
+| `@explorer` | Fast codebase search | Pre-party research — find files, patterns, symbols before dispatching personas |
+| `@council` | Multi-LLM consensus | Alternative to party mode for simpler decisions needing multiple perspectives |
+
+> **Tip:** Use `@explorer` to gather codebase context before party mode — it helps personas start with concrete file references instead of guessing.
+
+### Fallback Strategy (Agent Unavailable)
+
+When a sub-agent returns `ProviderModelNotFoundError` or is otherwise unavailable, **fall back to free built-in models**:
+
+| Workload Type | Fallback Model | Use For |
+|--------------|---------------|---------|
+| **Lightweight analysis** | `Qwen 3.6 Plus Free` | Code exploration, pattern matching, grep-based audits, documentation review |
+| **Read-only research** | `DeepSeek V3 Flash` | Library lookup, API docs, best practices, convention checks |
+| **Simple code changes** | `Qwen 3.6 Plus Free` | CSS fixes, attribute additions, import updates, test additions |
+| **Complex implementation** | Wait for premium agent | New features, multi-file refactors, architecture changes |
+
+**Fallback flow:**
+1. Try the mapped sub-agent first
+2. If `ProviderModelNotFoundError` → fall back to free model matching the workload type
+3. If free model also fails → perform the analysis directly using loaded skills + grep/read tools
+4. Always note in the synthesis: "Note: [Persona] analysis done via [fallback model] due to agent unavailability"
+
+---
+
+## Parallel Execution Flow
 
 ```
 User: "Party mode: How should we implement overtime?"
 
 Orchestrator:
-  ├─→ @oracle (as Gani) — Indonesian overtime regulations, compliance
+  ├─→ @librarian + @oracle + @fixer (as Gani) — Indonesian overtime regulations + compliance + implementation
   ├─→ @fixer + @librarian (as Dede) — Laravel implementation + API patterns
-  └─→ @designer (as Eka) — Overtime form UI/UX
+  └─→ @designer + @fixer (as Eka) — Overtime form UI/UX
   
   [All 3 run in parallel]
 
@@ -54,10 +103,88 @@ Orchestrator:
 
 ### When Multiple Sub-Agents Are Mapped
 
-Some personas map to 2 sub-agents (e.g., Dede → `@fixer` + `@librarian`). In this case:
-- Both sub-agents run **in parallel** for that persona
+Some personas map to 2-3 sub-agents (e.g., Gani → `@librarian` + `@oracle` + `@fixer`). In this case:
+- All sub-agents run **in parallel** for that persona
 - `@librarian` fetches docs/references while `@fixer` prepares implementation
 - Results are merged before the persona's perspective is synthesized
+
+---
+
+## Integration with AGENTS.md Workflow
+
+Party mode fits into the AGENTS.md workflow at **Step 2 → Step 4**:
+
+```
+Step 1: Baca Context (AGENTS.md, sub-repo AGENTS.md, party-mode.md)
+Step 2: Panggil Agents → Party Mode dispatches personas in parallel
+Step 3: Buat Plan → Synthesis output becomes the plan document
+Step 4: Party Mode (opsional) → For complex decisions requiring multi-perspective analysis
+Step 5: Execute Plan → Dispatch @fixer or subagents for implementation
+Step 6: Create PR & Review → Branch, squash, push, CI, approval, merge
+Step 7: Archive Plan → Move to docs/plans/archive/
+```
+
+**After party mode synthesis:**
+1. Write the design/decision to `docs/plans/on_going/YYYY-MM-DD-<topic>.md`
+2. Get user approval
+3. Proceed to Step 5 (Execute Plan)
+
+---
+
+## Output Format (Standardized)
+
+Every party mode synthesis must follow this structure:
+
+```markdown
+## Party Mode Synthesis: [Topic]
+
+### Participants
+- [Persona 1] — [key conclusion in 1 sentence]
+- [Persona 2] — [key conclusion in 1 sentence]
+- [Persona 3] — [key conclusion in 1 sentence]
+
+### Agreements
+- [What all personas agree on]
+
+### Disagreements
+- [Where personas differ, with each position]
+
+### Decision
+**What to do:** [clear, actionable decision]
+
+### Rationale
+**Why this wins:** [1-2 paragraphs]
+
+### Trade-offs
+- **Gaining:** [what we get]
+- **Giving up:** [what we sacrifice]
+
+### Risks
+| Risk | Likelihood | Mitigation |
+|------|-----------|------------|
+| [risk] | [Low/Med/High] | [mitigation] |
+
+### Action Items
+1. [ ] [specific, actionable next step]
+2. [ ] [specific, actionable next step]
+
+---
+*Note: [Any fallback notes if agents were unavailable]*
+```
+
+---
+
+## Abort Conditions
+
+Party mode should be **aborted and skipped** when:
+
+1. **All personas agree in round 1** — no debate needed, go straight to plan
+2. **The problem is simpler than expected** — downgrade to direct implementation
+3. **No relevant personas exist** — the problem is outside all persona domains
+4. **User says "just do it"** — user overrides, execute directly
+5. **Agent + fallback both unavailable** — perform analysis directly with skills + tools
+
+When aborting, log: "Party mode aborted: [reason]. Proceeding with [alternative approach]."
 
 ---
 
