@@ -1,9 +1,0 @@
-{
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "css.lint.unknownAtRules": "ignore",
-  "css.lint.vendorPrefix": "ignore",
-  "css.lint.propertyIgnoredDueToDisplay": "ignore",
-  "files.associations": {
-    "bun.lock": "jsonc"
-  }
-}
