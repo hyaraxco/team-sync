@@ -12,6 +12,25 @@
     }
 }
 
+@layer base {
+    *:focus:not(:focus-visible) {
+        outline: none;
+    }
+
+    *:focus-visible {
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+        scroll-margin-top: 5rem;
+        scroll-margin-bottom: 5rem;
+    }
+
+    @media (prefers-contrast: more) {
+        *:focus-visible {
+            outline-width: 3px;
+        }
+    }
+}
+
 
 html {
     font-family: "Plus Jakarta Sans", sans-serif;

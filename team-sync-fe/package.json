@@ -15,6 +15,7 @@
     "lint:fix": "eslint src/ --fix",
     "format": "prettier --write 'src/**/*.{js,vue}'",
     "format:check": "prettier --check 'src/**/*.{js,vue}'",
+    "test:a11y": "axe http://127.0.0.1:4173 --timeout 30000",
     "test:guards": "vitest run src/tests/router/routerGuard.integration.test.js src/tests/router/featureGuardMatrix.test.js src/tests/admin/components/Sidebar.smoke.test.js src/tests/admin/components/Header.smoke.test.js src/tests/admin/components/NotificationPanel.smoke.test.js src/tests/admin/dashboard/QuickActions.smoke.test.js src/tests/admin/payroll/PayrollDashboard.smoke.test.js src/tests/admin/payroll/PayrollCreate.smoke.test.js src/tests/admin/payroll/PayrollDetail.smoke.test.js src/tests/admin/payroll/PayrollSettings.smoke.test.js src/tests/employee/EmployeeProfile.smoke.test.js src/tests/employee/MyAttendance.smoke.test.js src/tests/employee/MyPayslips.smoke.test.js src/tests/employee/PayslipDetail.smoke.test.js src/tests/employee/EmployeeTeam.smoke.test.js",
     "test:watch": "vitest",
     "tw:watch": "tailwindcss -i ./src/assets/css/input.css -o ./src/assets/css/main.css --watch",
@@ -45,6 +46,7 @@
     "vue3-emoji-picker": "^1.1.8"
   },
   "devDependencies": {
+    "@axe-core/cli": "^4.11.3",
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.59.1",
     "@vitejs/plugin-vue": "^6.0.1",
