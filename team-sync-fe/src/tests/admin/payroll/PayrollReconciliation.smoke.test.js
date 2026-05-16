@@ -31,7 +31,7 @@ const reconciliationWithResolved = {
     exceptions: [
         {
             staff_member_id: 1,
-            employee_name: "John Doe",
+            employee_name: "Ahmad Fauzi",
             employee_code: "EMP001",
             severity: "critical",
             type: "missing_bank_account",

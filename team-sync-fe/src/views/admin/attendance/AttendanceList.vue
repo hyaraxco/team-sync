@@ -148,7 +148,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.records' }"
                 v-if="can('attendance-list')"
-                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary-500 hover:shadow-md transition-all duration-300 group"
+                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-brand-primary hover:shadow-md transition-all duration-300 group"
             >
                 <div
                     class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
@@ -156,7 +156,7 @@ onMounted(async () => {
                     <CalendarDays class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-primary-500 transition-colors">
+                    <h3 class="text-brand-dark font-bold text-base group-hover:text-brand-primary transition-colors">
                         Attendance Logs
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">View historical records</p>
@@ -166,7 +166,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.leave-requests' }"
                 v-if="can('leave-request-list')"
-                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary-500 hover:shadow-md transition-all duration-300 group"
+                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-brand-primary hover:shadow-md transition-all duration-300 group"
             >
                 <div
                     class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors"
@@ -174,7 +174,7 @@ onMounted(async () => {
                     <CalendarClock class="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-primary-500 transition-colors">
+                    <h3 class="text-brand-dark font-bold text-base group-hover:text-brand-primary transition-colors">
                         Leave Requests
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">Manage employee time off</p>
@@ -184,7 +184,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.corrections' }"
                 v-if="can('attendance-correction-list')"
-                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-primary-500 hover:shadow-md transition-all duration-300 group"
+                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-brand-primary hover:shadow-md transition-all duration-300 group"
             >
                 <div
                     class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition-colors"
@@ -192,7 +192,7 @@ onMounted(async () => {
                     <Clock class="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-primary-500 transition-colors">
+                    <h3 class="text-brand-dark font-bold text-base group-hover:text-brand-primary transition-colors">
                         Corrections
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">Manage clock-in disputes</p>
@@ -331,7 +331,7 @@ onMounted(async () => {
                     <div
                         v-for="request in leaveRequests"
                         :key="request.id"
-                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                     >
                         <img loading="lazy"
                             :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
@@ -360,14 +360,14 @@ onMounted(async () => {
                         >
                             <button
                                 @click="showApproveModal(request)"
-                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
+                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
                             >
                                 <Check class="w-4 h-4 text-green-600" />
                                 <span class="text-brand-dark text-xs font-semibold">Approve</span>
                             </button>
                             <button
                                 @click="showRejectModal(request)"
-                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
+                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
                             >
                                 <X class="w-4 h-4 text-red-600" />
                                 <span class="text-brand-dark text-xs font-semibold">Reject</span>
@@ -402,7 +402,7 @@ onMounted(async () => {
                     <div
                         v-for="correction in pendingCorrections"
                         :key="correction.id"
-                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                     >
                         <img loading="lazy"
                             :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
@@ -479,7 +479,7 @@ onMounted(async () => {
                     <button
                         @click="closeApproveModal"
                         :disabled="processingApprove"
-                        class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                        class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                     >
                         Cancel
                     </button>
@@ -528,7 +528,7 @@ onMounted(async () => {
                     <button
                         @click="closeRejectModal"
                         :disabled="processingReject"
-                        class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                        class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                     >
                         Cancel
                     </button>

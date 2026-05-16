@@ -22,7 +22,7 @@
                     {{ tab }}
                     <span
                         class="absolute bottom-0 left-0 w-full h-[2px] transition-all duration-200"
-                        :class="activeTab === tab ? 'bg-primary-500' : 'bg-transparent'"
+                        :class="activeTab === tab ? 'bg-brand-primary' : 'bg-transparent'"
                     ></span>
                 </button>
             </nav>
@@ -50,7 +50,7 @@
                         <div
                             v-for="policy in policyStore.policies"
                             :key="policy.id"
-                            class="policy-card group p-5 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                            class="policy-card group p-5 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                         >
                             <div class="flex justify-between items-start mb-4">
                                 <h3 class="text-lg font-semibold text-brand-dark capitalize">
@@ -86,7 +86,7 @@
                             </div>
 
                             <button
-                                class="w-full mt-8 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                class="w-full mt-8 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary"
                                 type="button"
                                 @click="openPolicyModal(policy)"
                             >
@@ -139,7 +139,7 @@
                             <div
                                 v-for="entitlement in group"
                                 :key="entitlement.id"
-                                class="policy-card p-4 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                                class="policy-card p-4 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                             >
                                 <div class="flex justify-between items-start mb-3">
                                     <h4 class="text-base font-semibold text-brand-dark capitalize">
@@ -821,7 +821,7 @@ onMounted(async () => {
 
 <style scoped>
 .font-display {
-    font-family: "Outfit", "Inter", sans-serif;
+    font-family: "Outfit", sans-serif;
 }
 
 .form-input {

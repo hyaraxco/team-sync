@@ -11,7 +11,7 @@
             <div class="relative w-12 h-12">
                 <div class="absolute inset-0 rounded-full border-2 border-gray-200"></div>
                 <div
-                    class="absolute inset-0 rounded-full border-2 border-primary-500 border-t-transparent animate-spin"
+                    class="absolute inset-0 rounded-full border-2 border-brand-primary border-t-transparent animate-spin"
                 ></div>
             </div>
         </div>

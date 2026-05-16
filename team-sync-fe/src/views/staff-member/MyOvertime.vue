@@ -140,7 +140,7 @@ const statusConfig = (status) => {
     <div class="space-y-6">
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-primary-500">Self Service</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-primary">Self Service</p>
                 <h1 class="text-2xl font-bold text-brand-dark">My Overtime</h1>
                 <p class="mt-1 text-sm text-gray-500">
                     Track submitted overtime hours, approvals, and rejection notes.
@@ -148,7 +148,7 @@ const statusConfig = (status) => {
             </div>
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#D5E2FB] px-4 py-2 text-sm font-semibold text-primary-500 transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#D5E2FB] px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
                 :disabled="loading"
                 @click="fetchData"
             >
@@ -207,7 +207,7 @@ const statusConfig = (status) => {
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
                     <select
                         v-model="filters.status"
-                        class="rounded-xl border border-brand-border px-4 py-2 text-sm text-brand-dark outline-none transition-all hover:border-primary-500 focus:border-primary-500"
+                        class="rounded-xl border border-brand-border px-4 py-2 text-sm text-brand-dark outline-none transition-all hover:border-brand-primary focus:border-brand-primary"
                     >
                         <option v-for="option in statusOptions" :key="option.value" :value="option.value">
                             {{ option.label }}
@@ -216,7 +216,7 @@ const statusConfig = (status) => {
                     <button
                         v-if="hasActiveFilter"
                         type="button"
-                        class="rounded-xl px-3 py-2 text-sm font-semibold text-primary-500 hover:bg-[#EFF5FF]"
+                        class="rounded-xl px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-[#EFF5FF]"
                         @click="clearFilters"
                     >
                         Clear
@@ -259,7 +259,7 @@ const statusConfig = (status) => {
                 <article
                     v-for="record in myRecords"
                     :key="record.id"
-                    class="rounded-2xl border border-[#E7ECF4] p-4 transition-all hover:border-primary-500 hover:shadow-sm"
+                    class="rounded-2xl border border-[#E7ECF4] p-4 transition-all hover:border-brand-primary hover:shadow-sm"
                     :data-testid="`my-overtime-record-${record.id}`"
                 >
                     <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">

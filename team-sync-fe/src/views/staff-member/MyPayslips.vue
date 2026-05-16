@@ -150,7 +150,7 @@ const clearSearch = () => {
             />
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
@@ -165,7 +165,7 @@ const clearSearch = () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center">
@@ -180,7 +180,7 @@ const clearSearch = () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
                     <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
@@ -203,7 +203,7 @@ const clearSearch = () => {
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 transition-all duration-300"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 transition-all duration-300"
                         placeholder="Search payroll periods by month or year..."
                         v-model="filters.search"
                     />
@@ -212,7 +212,7 @@ const clearSearch = () => {
                 <select
                     v-model.number="filters.year"
                     data-testid="my-payroll-year"
-                    class="px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 transition-all duration-300"
+                    class="px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 transition-all duration-300"
                 >
                     <option v-for="year in availableYears" :key="year" :value="year">
                         {{ year }}
@@ -253,7 +253,7 @@ const clearSearch = () => {
                     v-for="payslip in payslips"
                     :key="payslip.id"
                     :data-testid="`my-payroll-card-${payslip.id}`"
-                    class="border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                    class="border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 cursor-pointer group"
                     @click="viewDetails(payslip.id)"
                 >
                     <div class="flex items-start justify-between mb-4">
@@ -301,7 +301,7 @@ const clearSearch = () => {
                         <button
                             :data-testid="`my-payroll-view-${payslip.id}`"
                             @click.stop="viewDetails(payslip.id)"
-                            class="flex-1 px-3 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
+                            class="flex-1 px-3 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
                         >
                             <Eye class="w-4 h-4" />
                             View

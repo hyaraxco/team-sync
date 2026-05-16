@@ -58,8 +58,8 @@
                             class="group flex items-center justify-between p-4 bg-white border rounded-2xl transition-all duration-200 cursor-pointer text-left w-full"
                             :class="
                                 selectedPeriod?.id === period.id
-                                    ? 'border-primary-500 shadow-md'
-                                    : 'border-brand-border hover:ring-2 hover:ring-primary-500/20'
+                                    ? 'border-brand-primary shadow-md'
+                                    : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                             "
                         >
                             <div class="flex items-center gap-4">
@@ -178,7 +178,7 @@
                         v-model="createForm.start_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
                     />
                 </div>
 
@@ -189,7 +189,7 @@
                         v-model="createForm.end_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
                     />
                 </div>
 
@@ -200,7 +200,7 @@
                         v-model="createForm.cutoff_date"
                         type="date"
                         required
-                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none transition-colors"
                     />
                 </div>
 

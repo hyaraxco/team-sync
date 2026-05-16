@@ -455,7 +455,7 @@ onMounted(() => {
                                         v-if="request.status === 'pending'"
                                         @click="showApproveModal(request)"
                                         title="Approve Leave"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-primary-500 hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
                                     >
                                         <Check class="w-4 h-4 text-green-600" />
                                     </button>
@@ -585,7 +585,7 @@ onMounted(() => {
                 <button
                     @click="closeApproveModal"
                     :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
                     Cancel
                 </button>
@@ -613,7 +613,7 @@ onMounted(() => {
                 <button
                     @click="closeRejectModal"
                     :disabled="processingReject"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
                     Cancel
                 </button>
@@ -660,7 +660,7 @@ onMounted(() => {
                     <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Decision *</label>
                     <select
                         v-model="proofReviewForm.status"
-                        class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary"
                     >
                         <option value="approved">Approve Proof</option>
                         <option value="rejected">Reject Proof</option>
@@ -671,7 +671,7 @@ onMounted(() => {
                     <textarea
                         v-model="proofReviewForm.notes"
                         rows="3"
-                        class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500 resize-none"
+                        class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary resize-none"
                         placeholder="Add any notes about this proof..."
                     ></textarea>
                 </div>
@@ -682,7 +682,7 @@ onMounted(() => {
                 <button
                     @click="closeReviewProofModal"
                     :disabled="processingProofReview"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
                     Cancel
                 </button>

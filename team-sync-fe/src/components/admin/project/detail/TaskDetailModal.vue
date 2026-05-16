@@ -668,7 +668,7 @@ watch(
                                         <button
                                             type="button"
                                             @click="startEditComment(comment)"
-                                            class="text-gray-400 hover:text-primary-500 transition-colors"
+                                            class="text-gray-400 hover:text-brand-primary transition-colors"
                                         >
                                             <Pencil class="w-3.5 h-3.5" />
                                         </button>
@@ -687,13 +687,13 @@ watch(
                                         <textarea
                                             v-model="editingCommentText"
                                             rows="3"
-                                            class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
+                                            class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
                                         ></textarea>
                                         <div class="mt-2 flex items-center gap-2">
                                             <button
                                                 type="button"
                                                 @click="handleUpdateComment(comment.id)"
-                                                class="px-3 py-1.5 bg-primary-500 text-white rounded-lg text-xs font-medium hover:bg-[#0a42b3] transition-colors"
+                                                class="px-3 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-[#0a42b3] transition-colors"
                                             >
                                                 Save
                                             </button>
@@ -726,7 +726,7 @@ watch(
                                 <div class="flex-1">
                                     <textarea
                                         v-model="newComment"
-                                        class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                        class="w-full border border-gray-200 rounded-lg p-3 text-sm resize-none focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all disabled:bg-gray-100 disabled:cursor-not-allowed"
                                         :placeholder="
                                             canCollaborateTask
                                                 ? 'Write a comment...'
@@ -740,7 +740,7 @@ watch(
                                             type="button"
                                             @click="handleCreateComment"
                                             :disabled="!canCollaborateTask || !newComment.trim() || isSubmittingComment"
-                                            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-primary-500 text-white hover:bg-[#0a42b3] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-brand-primary text-white hover:bg-[#0a42b3] disabled:bg-gray-300 disabled:cursor-not-allowed"
                                         >
                                             {{ isSubmittingComment ? "Posting..." : "Post Comment" }}
                                         </button>
@@ -791,7 +791,7 @@ watch(
                                         :href="attachment.file_url"
                                         target="_blank"
                                         rel="noreferrer"
-                                        class="text-sm font-medium text-primary-500 hover:underline break-all"
+                                        class="text-sm font-medium text-brand-primary hover:underline break-all"
                                     >
                                         {{ attachment.file_name }}
                                     </a>
@@ -850,7 +850,7 @@ watch(
                         <button
                             v-if="canManageAssignee"
                             type="button"
-                            class="w-full border border-gray-200 rounded-lg hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-3 text-left"
+                            class="w-full border border-gray-200 rounded-lg hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-3 text-left"
                             @click="toggleAssigneeDropdown"
                         >
                             <UserCheck class="w-4 h-4 text-gray-400" />
@@ -878,7 +878,7 @@ watch(
                                         type="text"
                                         v-model="searchAssignee"
                                         placeholder="Search employees..."
-                                        class="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-500 focus:outline-none"
+                                        class="w-full pl-10 pr-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-brand-primary focus:outline-none"
                                     />
                                 </div>
                             </div>
@@ -924,7 +924,7 @@ watch(
                                 v-if="!dueDateEditing && canEditDueDate"
                                 type="button"
                                 @click="toggleDueDateEdit"
-                                class="text-gray-400 hover:text-primary-500 transition-colors"
+                                class="text-gray-400 hover:text-brand-primary transition-colors"
                             >
                                 <Pencil class="w-3 h-3" />
                             </button>
@@ -947,13 +947,13 @@ watch(
                             <input
                                 type="date"
                                 v-model="editedDueDate"
-                                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-primary-500 focus:outline-none"
+                                class="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg focus:border-brand-primary focus:outline-none"
                             />
                             <div class="flex gap-2">
                                 <button
                                     type="button"
                                     @click="handleUpdateDueDate"
-                                    class="flex-1 px-3 py-1.5 bg-primary-500 text-white rounded-lg text-xs font-medium hover:bg-[#0a42b3] transition-colors flex items-center justify-center gap-1"
+                                    class="flex-1 px-3 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-[#0a42b3] transition-colors flex items-center justify-center gap-1"
                                 >
                                     <Check class="w-3 h-3" />
                                     Save
@@ -1041,7 +1041,7 @@ watch(
                             <button
                                 v-if="canStartTask"
                                 @click="handleUpdateStatus('in_progress')"
-                                class="w-full px-4 py-2 bg-primary-500 hover:bg-[#0a42b3] text-white rounded-lg text-sm font-medium transition-colors"
+                                class="w-full px-4 py-2 bg-brand-primary hover:bg-[#0a42b3] text-white rounded-lg text-sm font-medium transition-colors"
                             >
                                 Start Task
                             </button>

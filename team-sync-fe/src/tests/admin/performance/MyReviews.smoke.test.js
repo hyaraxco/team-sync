@@ -33,7 +33,7 @@ const { routeState, routerPushMock, performanceReviewStoreMock, performanceRevie
                 __v_isRef: true,
                 value: {
                     id: 1,
-                    name: "John Doe",
+                    name: "Ahmad Fauzi",
                     email: "john@example.com",
                     roles: ["staff"],
                 },
@@ -126,7 +126,7 @@ describe("MyReviews smoke", () => {
                 cycle: { name: "Q1 2026 Review" },
                 cycle_id: 1,
                 status: "pending_self",
-                staff_member: { full_name: "John Doe" },
+                staff_member: { full_name: "Ahmad Fauzi" },
             },
         ];
         const wrapper = factory();

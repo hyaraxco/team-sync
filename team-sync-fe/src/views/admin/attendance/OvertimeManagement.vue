@@ -373,7 +373,7 @@ const submitCreate = async () => {
                     <textarea
                         v-model="rejectionReason"
                         rows="3"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         placeholder="Provide a reason for rejection (min 10 characters)..."
                     ></textarea>
                     <p
@@ -409,7 +409,7 @@ const submitCreate = async () => {
                     <input
                         v-model="createForm.staff_member_id"
                         type="number"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         placeholder="Staff member ID"
                     />
                 </div>
@@ -418,7 +418,7 @@ const submitCreate = async () => {
                     <input
                         v-model="createForm.date"
                         type="date"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                     />
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -427,7 +427,7 @@ const submitCreate = async () => {
                         <input
                             v-model="createForm.start_time"
                             type="time"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         />
                     </div>
                     <div>
@@ -435,7 +435,7 @@ const submitCreate = async () => {
                         <input
                             v-model="createForm.end_time"
                             type="time"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         />
                     </div>
                 </div>
@@ -443,7 +443,7 @@ const submitCreate = async () => {
                     <label class="block text-sm font-medium text-gray-700 mb-1">Overtime Type</label>
                     <select
                         v-model="createForm.overtime_type"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                     >
                         <option value="workday">Workday</option>
                         <option value="weekend">Weekend</option>
@@ -455,7 +455,7 @@ const submitCreate = async () => {
                     <textarea
                         v-model="createForm.notes"
                         rows="2"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500 text-sm"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         placeholder="Optional notes..."
                     ></textarea>
                 </div>

@@ -4,19 +4,19 @@
         :class="[
             highlight
                 ? 'min-h-[220px] bg-gradient-to-br from-gray-900 to-gray-950 border border-white/5 shadow-xl'
-                : 'bg-white border border-brand-border hover:border-primary-500 hover:shadow-lg',
+                : 'bg-white border border-brand-border hover:ring-2 hover:ring-brand-primary/20',
         ]"
     >
         <div class="relative z-10 flex flex-col justify-between h-full">
             <!-- Non-Highlight Header -->
             <div v-if="!highlight" class="flex items-center justify-between mb-4">
                 <h3
-                    class="text-xs font-semibold uppercase tracking-wider text-brand-light group-hover:text-primary-500 transition-colors"
+                    class="text-xs font-semibold uppercase tracking-wider text-brand-light group-hover:text-brand-primary transition-colors"
                 >
                     {{ title }}
                 </h3>
-                <div v-if="icon" class="p-2.5 bg-primary-50 rounded-lg group-hover:bg-primary-500 transition-colors">
-                    <component :is="icon" class="w-5 h-5 text-primary-500 group-hover:text-white transition-colors" />
+                <div v-if="icon" class="p-2.5 bg-primary-50 rounded-lg group-hover:bg-brand-primary transition-colors">
+                    <component :is="icon" class="w-5 h-5 text-brand-primary group-hover:text-white transition-colors" />
                 </div>
             </div>
 

@@ -110,7 +110,7 @@ const handleSubmit = async () => {
                             v-model="rememberMe"
                             name="remember"
                             type="checkbox"
-                            class="h-4 w-4 cursor-pointer rounded border-gray-300 text-primary-500 focus:ring-2 focus:ring-primary-500/20"
+                            class="h-4 w-4 cursor-pointer rounded border-gray-300 text-brand-primary focus:ring-2 focus:ring-brand-primary/20"
                         />
                         <label
                             for="remember"
@@ -122,7 +122,7 @@ const handleSubmit = async () => {
 
                     <RouterLink
                         :to="{ name: 'forgot-password' }"
-                        class="text-sm font-semibold text-primary-500 hover:text-primary-700 transition-colors"
+                        class="text-sm font-semibold text-brand-primary hover:text-brand-primary transition-colors"
                     >
                         Forgot password?
                     </RouterLink>
@@ -132,7 +132,7 @@ const handleSubmit = async () => {
                 <button
                     type="submit"
                     data-testid="login-submit"
-                    class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-primary-500 disabled:hover:shadow-sm overflow-hidden mt-2"
+                    class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70 overflow-hidden mt-2"
                     :disabled="loading"
                 >
                     <span class="relative z-10 flex items-center gap-2 text-white">

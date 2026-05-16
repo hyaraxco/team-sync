@@ -41,7 +41,7 @@ const handleSubmit = async () => {
             </p>
             <RouterLink
                 :to="{ name: 'login' }"
-                class="group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20"
+                class="group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20"
             >
                 <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
                 Return to sign in
@@ -61,7 +61,7 @@ const handleSubmit = async () => {
             </p>
             <RouterLink
                 :to="{ name: 'forgot-password' }"
-                class="group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20"
+                class="group mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20"
             >
                 Request new link
             </RouterLink>
@@ -83,7 +83,7 @@ const handleSubmit = async () => {
                 <div
                     class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-blue-50 mb-6 ring-4 ring-white shadow-sm"
                 >
-                    <KeyRound class="h-6 w-6 text-primary-500" aria-hidden="true" stroke-width="1.5" />
+                    <KeyRound class="h-6 w-6 text-brand-primary" aria-hidden="true" stroke-width="1.5" />
                 </div>
                 <h1 class="text-3xl font-bold text-gray-900 tracking-tight">New password</h1>
                 <p class="mt-2 text-[15px] text-gray-500">Create a strong password for your account</p>
@@ -157,7 +157,7 @@ const handleSubmit = async () => {
                     <!-- Submit Button -->
                     <button
                         type="submit"
-                        class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-500/20 disabled:cursor-not-allowed disabled:opacity-70 disabled:hover:bg-primary-500 mt-2 overflow-hidden"
+                        class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70 mt-2 overflow-hidden"
                         :disabled="loading"
                     >
                         <span class="relative z-10 flex items-center gap-2">
