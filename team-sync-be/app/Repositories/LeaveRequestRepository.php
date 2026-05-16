@@ -291,7 +291,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
                         $this->emailService->sendLeaveRequestRejectedNotification($updatedLeaveRequest);
                     });
-                } catch (\Exception $e) {
+                } catch (\Throwable $e) {
                     $failed[] = ['id' => $id, 'reason' => $e->getMessage()];
                 }
             }
