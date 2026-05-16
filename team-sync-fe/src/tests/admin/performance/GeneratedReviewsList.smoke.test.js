@@ -6,6 +6,8 @@ import GeneratedReviewsList from "@/components/admin/performance/GeneratedReview
 vi.mock("vue-router", () => ({
     useRouter: () => ({ push: vi.fn() }),
     useRoute: () => ({ params: { id: 1 } }),
+    createRouter: vi.fn(() => ({ push: vi.fn(), beforeEach: vi.fn() })),
+    createWebHistory: vi.fn(),
 }));
 
 import { ref } from "vue";

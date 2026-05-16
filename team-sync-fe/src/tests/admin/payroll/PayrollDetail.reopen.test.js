@@ -64,6 +64,8 @@ vi.mock("@/stores/payroll", () => ({
 vi.mock("vue-router", () => ({
     useRoute: () => ({ params: { id: "1" } }),
     useRouter: () => ({ back: vi.fn() }),
+    createRouter: vi.fn(() => ({ push: vi.fn(), beforeEach: vi.fn() })),
+    createWebHistory: vi.fn(),
 }));
 
 vi.mock("@/composables/useToast", () => ({
