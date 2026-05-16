@@ -55,6 +55,12 @@ vi.mock("@/stores/staffMember", () => ({
     useStaffMemberStore: () => staffMemberStoreMock,
 }));
 
+vi.mock("@/stores/auth", () => ({
+    useAuthStore: () => ({
+        user: { company_timezone: "Asia/Jakarta" },
+    }),
+}));
+
 vi.mock("vue-router", () => ({
     useRoute: () => routeState,
     useRouter: () => ({

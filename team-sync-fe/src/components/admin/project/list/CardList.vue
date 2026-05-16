@@ -44,7 +44,7 @@ const handleDeleteProject = async () => {
 <template>
     <div
         @click="navigateToDetail"
-        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
     >
         <!-- Project Image -->
         <div
@@ -128,7 +128,7 @@ const handleDeleteProject = async () => {
         <div class="flex gap-2" v-if="can('project-edit')">
             <RouterLink
                 :to="{ name: 'admin.projects.edit', params: { id: data.id } }"
-                class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+                class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
                 @click.stop
             >
                 <Edit class="w-4 h-4 text-gray-600" />

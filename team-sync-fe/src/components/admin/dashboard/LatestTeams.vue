@@ -71,7 +71,7 @@ const goToTeamDetail = (id: number) => {
                 >
                     <!-- Main blue background -->
                     <div
-                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg"
+                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-lg"
                     ></div>
                     <!-- Lucide icon -->
                     <img loading="lazy" :src="team.icon" class="w-6 h-6 relative z-10" />
@@ -98,7 +98,7 @@ const goToTeamDetail = (id: number) => {
                 <!-- Details Button -->
                 <button
                     @click="goToTeamDetail(team.id)"
-                    class="btn-details w-full sm:w-auto border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500 hover:text-primary-500 transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
+                    class="btn-details w-full sm:w-auto border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary hover:text-brand-primary transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
                 >
                     <span class="text-brand-dark text-sm sm:text-base font-medium">Details</span>
                 </button>

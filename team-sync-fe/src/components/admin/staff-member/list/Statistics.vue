@@ -69,7 +69,7 @@ const loading = computed(() => staffMemberStore.loadingStatistics);
         <!-- Row 1 Stats Cards -->
         <!-- Active Staff Members -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -90,7 +90,7 @@ const loading = computed(() => staffMemberStore.loadingStatistics);
 
         <!-- New Hires -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -110,7 +110,7 @@ const loading = computed(() => staffMemberStore.loadingStatistics);
         <!-- Row 2 Stats Cards -->
         <!-- Average Salary -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -128,7 +128,7 @@ const loading = computed(() => staffMemberStore.loadingStatistics);
 
         <!-- On Leave -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>

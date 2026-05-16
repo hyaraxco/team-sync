@@ -27,10 +27,10 @@ const formatStatusLabel = (status) => {
 <template>
     <div
         @click="handleClick"
-        class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 p-4 cursor-pointer group border border-gray-100 hover:border-primary-500"
+        class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-4 cursor-pointer group border border-gray-100 hover:border-brand-primary"
     >
         <!-- Task Title -->
-        <h5 class="text-sm font-semibold text-gray-900 mb-3 leading-snug group-hover:text-primary-500 transition-colors">
+        <h5 class="text-sm font-semibold text-gray-900 mb-3 leading-snug group-hover:text-brand-primary transition-colors">
             {{ task.name }}
         </h5>
 

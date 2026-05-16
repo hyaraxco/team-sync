@@ -89,7 +89,7 @@ watch(
 </script>
 
 <template>
-    <div class="flex h-screen overflow-hidden bg-[#F8FAFC]">
+    <div class="flex min-h-[100dvh] overflow-hidden bg-[#F8FAFC]">
         <Stepper :current-step="currentStep" :is-editing="isEditing" />
 
         <!-- Main Content -->

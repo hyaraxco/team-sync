@@ -112,7 +112,7 @@ onUnmounted(() => {
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search meetings by title..."
-                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     />
                 </div>
             </div>

@@ -131,7 +131,7 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                         type="button"
                         @click="handleCancel"
                         aria-label="Close"
-                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     >
                         <X class="w-5 h-5 text-gray-600" aria-hidden="true" />
                     </button>
@@ -149,7 +149,7 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                     type="button"
                     @click="handleCancel"
                     :disabled="loading"
-                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3"
+                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3"
                 >
                     <span class="text-brand-dark text-base font-semibold">{{ cancelText }}</span>
                 </button>
@@ -163,7 +163,7 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                             type === 'danger',
                         'border-[#A07621] bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-lg focus:ring-yellow-500':
                             type === 'warning',
-                        'border-[#2151A0] blue-gradient blue-btn-shadow focus:ring-primary-500': type === 'info',
+                        'border-[#2151A0] blue-gradient blue-btn-shadow focus:ring-brand-primary': type === 'info',
                     }"
                 >
                     <span class="text-brand-white text-base font-semibold">

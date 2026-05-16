@@ -110,7 +110,7 @@ const getActivityIconClass = (notification: any) => {
         return "text-[#F97316]";
     }
 
-    return "text-primary-500";
+    return "text-brand-primary";
 };
 
 const getNotificationTime = (notification: any) => {
@@ -160,13 +160,13 @@ onMounted(() => {
     <div class="rounded-2xl border border-brand-border bg-white p-4 sm:p-6">
         <div class="mb-4 flex items-center justify-between gap-3">
             <div>
-                <p class="text-xs font-semibold uppercase tracking-[0.1em] text-primary-500">Activity Feed</p>
+                <p class="text-xs font-semibold uppercase tracking-[0.1em] text-brand-primary">Activity Feed</p>
                 <h3 class="text-brand-dark text-lg sm:text-xl font-bold">All Notifications</h3>
             </div>
             <div class="flex items-center gap-2">
                 <button
                     type="button"
-                    class="inline-flex items-center gap-1.5 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-primary-500 transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+                    class="inline-flex items-center gap-1.5 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
                     :disabled="markingAllRead || notifications.length === 0"
                     @click="handleMarkAllRead"
                 >
@@ -175,7 +175,7 @@ onMounted(() => {
                 </button>
                 <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-primary-500 transition-colors hover:bg-[#EFF5FF]"
+                    class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-[#EFF5FF]"
                     @click="fetchNotifications(currentPage)"
                 >
                     <RefreshCw class="h-3.5 w-3.5" />
@@ -237,7 +237,7 @@ onMounted(() => {
                     />
                     <span
                         v-if="!notification.is_read"
-                        class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-2 ring-white"
+                        class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand-primary ring-2 ring-white"
                     ></span>
                 </div>
 

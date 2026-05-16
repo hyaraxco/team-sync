@@ -220,7 +220,7 @@ onMounted(() => {
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="inline-flex items-center gap-2 border border-brand-border rounded-lg hover:border-primary-500 hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                        class="inline-flex items-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
                                         @click="openEditModal(holiday)"
                                     >
                                         <Pencil class="w-4 h-4 text-blue-600" />
@@ -261,7 +261,7 @@ onMounted(() => {
                     v-model="form.date"
                     type="date"
                     required
-                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
+                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary"
                 />
             </div>
 
@@ -272,7 +272,7 @@ onMounted(() => {
                     type="text"
                     required
                     placeholder="e.g., Independence Day"
-                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
+                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary"
                 />
             </div>
 
@@ -281,7 +281,7 @@ onMounted(() => {
                 <select
                     v-model="form.type"
                     required
-                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500"
+                    class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary"
                 >
                     <option value="national_holiday">National Holiday</option>
                     <option value="collective_leave">Collective Leave (Cuti Bersama)</option>
@@ -295,7 +295,7 @@ onMounted(() => {
                 <button
                     type="button"
                     :disabled="isSubmitting"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:border-primary-500 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:border-brand-primary transition-all duration-300"
                     @click="closeFormModal"
                 >
                     Cancel
@@ -325,7 +325,7 @@ onMounted(() => {
                 <button
                     type="button"
                     :disabled="isSubmitting"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:border-primary-500 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:border-brand-primary transition-all duration-300"
                     @click="closeDeleteModal"
                 >
                     Cancel

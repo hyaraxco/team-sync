@@ -359,7 +359,7 @@ onMounted(() => {
                 type="button"
                 data-testid="payroll-settings-back"
                 @click="router.push({ name: 'admin.payroll.dashboard' })"
-                class="mb-4 border border-brand-border rounded-lg px-4 py-3 flex items-center gap-2 hover:border-primary-500 transition-all duration-300"
+                class="mb-4 border border-brand-border rounded-lg px-4 py-3 flex items-center gap-2 hover:border-brand-primary transition-all duration-300"
             >
                 <ArrowLeft class="w-4 h-4 text-gray-600" />
                 <span class="text-brand-dark text-sm font-semibold">Back</span>
@@ -399,7 +399,7 @@ onMounted(() => {
                     :class="
                         activeTab === 'schedule'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-schedule"
                 >
@@ -412,7 +412,7 @@ onMounted(() => {
                     :class="
                         activeTab === 'rules'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-rules"
                 >
@@ -425,7 +425,7 @@ onMounted(() => {
                     :class="
                         activeTab === 'bank_notes'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-bank-notes"
                 >
@@ -438,7 +438,7 @@ onMounted(() => {
                     :class="
                         activeTab === 'history'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-history"
                 >
@@ -473,7 +473,7 @@ onMounted(() => {
                                 type="number"
                                 min="1"
                                 max="31"
-                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                             />
                         </div>
                         <div>
@@ -486,7 +486,7 @@ onMounted(() => {
                                 type="number"
                                 min="1"
                                 max="31"
-                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                             />
                         </div>
                     </div>
@@ -514,7 +514,7 @@ onMounted(() => {
                             <select
                                 v-model="form.working_days_mode"
                                 data-testid="payroll-settings-working-days-mode"
-                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                             >
                                 <option value="auto_business_days">Auto business days</option>
                                 <option value="fixed">Fixed working days</option>
@@ -529,7 +529,7 @@ onMounted(() => {
                                 type="number"
                                 min="1"
                                 max="31"
-                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                             />
                         </div>
 
@@ -544,7 +544,7 @@ onMounted(() => {
                                 min="0"
                                 max="5"
                                 step="0.01"
-                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                             />
                             <p class="text-brand-light text-xs mt-2">
                                 `1.00` means one daily salary per absent day. Higher values increase the deduction.
@@ -557,7 +557,7 @@ onMounted(() => {
                                 <select
                                     v-model="form.rounding_mode"
                                     data-testid="payroll-settings-rounding-mode"
-                                    class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                    class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                                 >
                                     <option value="none">No rounding</option>
                                     <option value="nearest">Nearest</option>
@@ -574,7 +574,7 @@ onMounted(() => {
                                     min="1"
                                     step="1"
                                     :disabled="form.rounding_mode === 'none'"
-                                    class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                                    class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300 disabled:bg-gray-100 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -602,7 +602,7 @@ onMounted(() => {
                             v-model="form.note_template"
                             data-testid="payroll-settings-note-template"
                             rows="5"
-                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 resize-none"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300 resize-none"
                         />
                         <p class="text-brand-light text-xs mt-2">
                             Available placeholders: `{working_days}`, `{attended_days}`, `{late_days}`, `{sick_days}`,
@@ -636,7 +636,7 @@ onMounted(() => {
                                     :value="form.payroll_bank_code"
                                     @change="handleBankChange"
                                     data-testid="payroll-settings-bank-select"
-                                    class="w-full h-[48px] px-4 py-2 bg-white border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                                    class="w-full h-[48px] px-4 py-2 bg-white border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                                 >
                                     <option value="">Select a Bank...</option>
                                     <option v-for="bank in popularBanks" :key="bank.code" :value="bank.code">
@@ -925,7 +925,7 @@ onMounted(() => {
                         data-testid="payroll-settings-save"
                         :disabled="loading"
                         @click="handleSubmit"
-                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
+                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
                     >
                         <Settings class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">

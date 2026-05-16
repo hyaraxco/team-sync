@@ -391,7 +391,7 @@ watch(salaryMonth, () => {
                             type="month"
                             v-model="salaryMonth"
                             data-testid="readiness-month-selector"
-                            class="pl-10 pr-4 py-2 border border-brand-border rounded-xl text-sm font-semibold hover:border-primary-500 focus:border-primary-500 transition-all duration-300"
+                            class="pl-10 pr-4 py-2 border border-brand-border rounded-xl text-sm font-semibold hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                         />
                     </div>
                     <button
@@ -399,7 +399,7 @@ watch(salaryMonth, () => {
                         data-testid="readiness-refresh-btn"
                         @click="fetchData"
                         :disabled="loading"
-                        class="border border-brand-border rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:border-primary-500 hover:text-primary-500 transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+                        class="border border-brand-border rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
                     >
                         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
                         Refresh
@@ -543,7 +543,7 @@ watch(salaryMonth, () => {
                                 type="button"
                                 data-testid="readiness-export-btn"
                                 @click="exportCsv"
-                                class="border border-brand-border rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 hover:border-primary-500 hover:text-primary-500 transition-all duration-300 flex items-center gap-1.5"
+                                class="border border-brand-border rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300 flex items-center gap-1.5"
                             >
                                 <Download class="w-3.5 h-3.5" />
                                 Export CSV
@@ -561,8 +561,8 @@ watch(salaryMonth, () => {
                             class="text-xs px-3 py-1.5 rounded-full border transition-all duration-300"
                             :class="
                                 readinessStatusFilter === filter.value && !activeBlockerFilter && !activeWarningFilter
-                                    ? 'border-primary-500 bg-blue-50 text-primary-500'
-                                    : 'border-slate-200 bg-white text-slate-600 hover:border-primary-500 hover:text-primary-500'
+                                    ? 'border-brand-primary bg-blue-50 text-brand-primary'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:border-brand-primary hover:text-brand-primary'
                             "
                             @click="setStatusFilter(filter.value)"
                         >
@@ -589,7 +589,7 @@ watch(salaryMonth, () => {
                             data-testid="readiness-search"
                             type="text"
                             placeholder="Search by name or employee code..."
-                            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:border-primary-500 outline-none transition-all duration-300"
+                            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:border-brand-primary outline-none transition-all duration-300"
                         />
                     </div>
 
@@ -734,7 +734,7 @@ watch(salaryMonth, () => {
                                                 type="button"
                                                 :data-testid="`readiness-open-attendance-${row.staff_member_id}`"
                                                 @click.stop="openAttendanceWorkspace(row)"
-                                                class="text-xs font-semibold text-primary-500 hover:underline flex items-center gap-1 ml-auto"
+                                                class="text-xs font-semibold text-brand-primary hover:underline flex items-center gap-1 ml-auto"
                                             >
                                                 <ExternalLink class="w-3 h-3" />
                                                 Attendance
@@ -868,7 +868,7 @@ watch(salaryMonth, () => {
                         type="button"
                         data-testid="readiness-go-generate"
                         @click="goToGeneratePayroll"
-                        class="w-full rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
+                        class="w-full rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-white text-sm font-semibold">Go to Generate Payroll</span>
                         <ArrowRight class="w-4 h-4 text-white" />
@@ -877,7 +877,7 @@ watch(salaryMonth, () => {
                         type="button"
                         data-testid="readiness-export-report-btn"
                         @click="exportCsv"
-                        class="w-full border border-brand-border rounded-xl hover:border-primary-500 hover:text-primary-500 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 text-sm font-semibold text-slate-700"
+                        class="w-full border border-brand-border rounded-xl hover:border-brand-primary hover:text-brand-primary transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 text-sm font-semibold text-slate-700"
                     >
                         <Download class="w-4 h-4" />
                         Export Readiness Report

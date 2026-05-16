@@ -41,7 +41,7 @@
                             <div
                                 v-for="(location, day) in baseSchedule"
                                 :key="day"
-                                class="flex items-center justify-between p-3 bg-white border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-colors"
+                                class="flex items-center justify-between p-3 bg-white border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-colors"
                             >
                                 <span class="font-medium text-brand-dark capitalize">{{ day }}</span>
                                 <span
@@ -117,7 +117,7 @@
                         v-model="overrideForm.date"
                         type="date"
                         required
-                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
+                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none"
                     />
                 </div>
                 <div>
@@ -126,7 +126,7 @@
                         id="override-mode"
                         v-model="overrideForm.planned_work_mode"
                         required
-                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
+                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none"
                     >
                         <option value="office">Office</option>
                         <option value="remote">Remote</option>
@@ -139,7 +139,7 @@
                         v-model="overrideForm.reason"
                         rows="3"
                         required
-                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none"
+                        class="w-full border border-brand-border rounded-lg px-3 py-2 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none"
                     ></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-2">
@@ -233,6 +233,6 @@ const submitOverride = async () => {
 
 <style scoped>
 .font-display {
-    font-family: "Outfit", "Inter", sans-serif;
+    font-family: "Outfit", sans-serif;
 }
 </style>

@@ -179,7 +179,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <img loading="lazy" :src="project.photo" alt="Project Image" class="w-full h-full object-cover rounded-xl" />
             </div>
@@ -212,14 +212,14 @@ onMounted(async () => {
                         <div
                             v-for="team in project.teams"
                             :key="team.id"
-                            class="border border-brand-border rounded-2xl hover:border-primary-500 hover:shadow-lg transition-all duration-300 p-4"
+                            class="border border-brand-border rounded-2xl hover:border-brand-primary hover:shadow-lg transition-all duration-300 p-4"
                         >
                             <div class="flex items-center gap-3">
                                 <div
                                     class="w-12 h-12 relative flex items-center justify-center rounded-xl overflow-hidden flex-shrink-0"
                                 >
                                     <div
-                                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
+                                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
                                     ></div>
                                     <component :is="Briefcase" class="w-5 h-5 text-white relative z-10" />
                                 </div>
@@ -292,7 +292,7 @@ onMounted(async () => {
                             name: 'admin.staffMembers.detail',
                             params: { id: project.leader.id },
                         }"
-                        class="border border-brand-border text-brand-dark py-2 px-4 rounded-lg font-medium hover:bg-gray-50 hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 flex items-center gap-2"
+                        class="border border-brand-border text-brand-dark py-2 px-4 rounded-lg font-medium hover:bg-gray-50 hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 flex items-center gap-2"
                     >
                         <User class="w-4 h-4" />
                         <span class="text-sm font-semibold">Profile</span>
@@ -301,7 +301,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -325,7 +325,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-4">
                     <div>
@@ -346,11 +346,11 @@ onMounted(async () => {
                 <template v-else>
                     <div class="grid grid-cols-2 gap-3 mb-4">
                         <div class="rounded-xl border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
-                            <p class="text-[11px] uppercase tracking-wide text-primary-500 font-semibold">Members</p>
+                            <p class="text-[11px] uppercase tracking-wide text-brand-primary font-semibold">Members</p>
                             <p class="text-brand-dark text-lg font-bold">{{ totalHeadcount }}</p>
                         </div>
                         <div class="rounded-xl border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
-                            <p class="text-[11px] uppercase tracking-wide text-primary-500 font-semibold">Tasks</p>
+                            <p class="text-[11px] uppercase tracking-wide text-brand-primary font-semibold">Tasks</p>
                             <p class="text-brand-dark text-lg font-bold">{{ totalTaskCount }}</p>
                         </div>
                     </div>
@@ -394,7 +394,7 @@ onMounted(async () => {
 
             <!-- Budget Card -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -411,7 +411,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -428,7 +428,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -445,7 +445,7 @@ onMounted(async () => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>

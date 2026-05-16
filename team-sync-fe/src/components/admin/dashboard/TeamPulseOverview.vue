@@ -104,7 +104,7 @@ const formatTime = (value) => {
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center"
+                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-primary flex items-center justify-center"
                 >
                     <MessageCircleHeart class="w-5 h-5 text-white" />
                 </div>
@@ -121,7 +121,7 @@ const formatTime = (value) => {
                 </div>
                 <button
                     type="button"
-                    class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                    class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     @click="dashboardStore.fetchTeamPulse()"
                 >
                     <RefreshCw class="w-4 h-4 text-brand-dark" :class="{ 'animate-spin': teamPulseLoading }" />
@@ -208,7 +208,7 @@ const formatTime = (value) => {
                             </div>
                             <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
                                 <div
-                                    class="h-full rounded-full bg-primary-500"
+                                    class="h-full rounded-full bg-brand-primary"
                                     :style="{ width: member.attendance.score + '%' }"
                                 ></div>
                             </div>
@@ -243,18 +243,20 @@ const formatTime = (value) => {
                     <div class="flex items-center gap-2 self-start sm:self-auto">
                         <button
                             type="button"
-                            class="inline-flex items-center gap-2 rounded-2xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60"
+                            class="inline-flex items-center gap-2 rounded-2xl bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all shadow-sm hover:shadow-md"
                             :disabled="isNudging(member.id)"
                             @click="openNudgeModal(member)"
                         >
-                            <LoaderCircle v-if="isNudging(member.id)" class="w-4 h-4 animate-spin" />
-                            <MessageCircleHeart v-else class="w-4 h-4" />
-                            Tanya Kabar
+                            <LoaderCircle
+                                v-if="isNudging(member.id)"
+                                class="w-4 h-4 animate-spin"
+                            />
+                            <span>{{ isNudging(member.id) ? "Mengirim..." : "Sapa Kabar" }}</span>
                         </button>
 
                         <RouterLink
                             :to="member.detail_url"
-                            class="inline-flex items-center rounded-2xl border border-brand-border px-4 py-2.5 text-sm font-semibold text-brand-dark hover:border-primary-500 hover:text-primary-500"
+                            class="inline-flex items-center rounded-2xl border border-brand-border px-4 py-2.5 text-sm font-semibold text-brand-dark hover:border-brand-primary hover:text-brand-primary"
                         >
                             View Details
                         </RouterLink>
@@ -268,7 +270,7 @@ const formatTime = (value) => {
                 v-if="isNudgeModalOpen"
                 class="fixed inset-0 z-[9998] bg-black/40 flex items-center justify-center p-4"
             >
-                <div class="w-full max-w-xl rounded-3xl bg-white border border-brand-border p-6 shadow-xl">
+                <div class="w-full max-w-xl rounded-3xl bg-white border border-brand-border p-6 shadow-md">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h4 class="text-xl font-bold text-brand-dark">Kirim Tanya Kabar</h4>
@@ -286,7 +288,7 @@ const formatTime = (value) => {
                         <textarea
                             v-model="draftMessage"
                             rows="5"
-                            class="w-full rounded-2xl border border-brand-border px-4 py-3 text-sm text-brand-dark outline-none focus:ring-2 focus:ring-primary-500"
+                            class="w-full rounded-2xl border border-brand-border px-4 py-3 text-sm text-brand-dark outline-none focus:ring-2 focus:ring-brand-primary"
                         ></textarea>
                     </div>
 
@@ -300,7 +302,7 @@ const formatTime = (value) => {
                         </button>
                         <button
                             type="button"
-                            class="rounded-2xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
+                            class="rounded-2xl bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60"
                             :disabled="!selectedMember || isNudging(selectedMember.id)"
                             @click="submitNudge"
                         >

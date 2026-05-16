@@ -76,14 +76,14 @@ onMounted(async () => {
             </div>
             <div class="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
                 <button
-                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
+                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
                 >
                     <Upload class="w-4 h-4 text-gray-600" />
                     <span class="text-brand-dark text-sm font-semibold">Import CSV</span>
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.team.create' }"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
                 >
                     <Users class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Add Team</span>

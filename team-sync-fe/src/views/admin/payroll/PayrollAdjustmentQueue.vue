@@ -164,7 +164,7 @@ onMounted(loadAdjustments);
             </div>
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-border bg-white px-4 py-3 text-sm font-semibold text-brand-dark hover:border-primary-500 disabled:opacity-50"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-border bg-white px-4 py-3 text-sm font-semibold text-brand-dark hover:border-brand-primary disabled:opacity-50"
                 :disabled="loading"
                 @click="loadAdjustments"
             >

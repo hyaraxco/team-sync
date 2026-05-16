@@ -34,7 +34,7 @@ const formatLeaveType = (type) => {
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- This Month Attendance -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -53,7 +53,7 @@ const formatLeaveType = (type) => {
 
             <!-- Leave Balance (clickable to expand breakdown) -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5 cursor-pointer"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5 cursor-pointer"
                 @click="showLeaveBreakdown = !showLeaveBreakdown"
             >
                 <div class="flex items-center justify-between">
@@ -75,7 +75,7 @@ const formatLeaveType = (type) => {
 
             <!-- Pending Requests -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -93,7 +93,7 @@ const formatLeaveType = (type) => {
 
             <!-- Average Hours -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
