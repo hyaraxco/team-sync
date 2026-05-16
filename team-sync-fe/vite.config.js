@@ -3,14 +3,12 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
-import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   plugins: [
     vue(),
     vueJsx(),
-    ...(mode === 'development' ? [vueDevTools()] : []),
   ],
   resolve: {
     alias: {
@@ -19,7 +17,7 @@ export default defineConfig(({ mode }) => ({
   },
   server: {
     headers: {
-      'Content-Security-Policy-Report-Only': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' http://localhost:8000; font-src 'self' data:;",
+      'Content-Security-Policy-Report-Only': "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: http://localhost:8000; connect-src 'self' http://localhost:8000; font-src 'self' data: https://fonts.gstatic.com;",
       'X-Content-Type-Options': 'nosniff',
       'X-Frame-Options': 'DENY',
       'Referrer-Policy': 'strict-origin-when-cross-origin'
