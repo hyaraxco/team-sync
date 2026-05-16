@@ -20,8 +20,8 @@
                 :class="[
                     'appearance-none w-full pr-10 py-3 border rounded-2xl transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
-                    'hover:ring-2 hover:ring-primary-500/20',
-                    'focus:border-primary-500 focus:border-2 focus:bg-white',
+                    'hover:ring-2 hover:ring-brand-primary/20',
+                    'focus:border-brand-primary focus:border-2 focus:bg-white',
                     'cursor-pointer',
                     borderColor,
                 ]"

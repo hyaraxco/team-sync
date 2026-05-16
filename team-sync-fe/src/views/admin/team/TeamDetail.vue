@@ -290,13 +290,13 @@ watch(
 
                 <div class="flex gap-2 mt-4 pt-4 border-t border-brand-border">
                     <button
-                        class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+                        class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
                     >
                         <MessageCircle class="w-5 h-5 text-brand-light" />
                         <span class="text-brand-dark text-base font-semibold">Message</span>
                     </button>
                     <button
-                        class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+                        class="flex-1 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
                     >
                         <UserCheck class="w-5 h-5 text-brand-light" />
                         <span class="text-brand-dark text-base font-semibold">View Profile</span>
@@ -401,7 +401,7 @@ watch(
                 </button>
                 <button
                     @click="openAddMemberModal"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                 >
                     <UserPlus class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Add Member</span>
@@ -411,7 +411,7 @@ watch(
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             <div
-                class="relative border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4"
+                class="relative border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4"
                 v-for="member in team.members"
                 :key="member.id"
             >
@@ -459,7 +459,7 @@ watch(
                         name: 'admin.staffMembers.detail',
                         params: { id: member.staff_member.id },
                     }"
-                    class="w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
+                    class="w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center justify-center gap-2"
                 >
                     <Eye class="w-5 h-5 text-gray-600" />
                     <span class="text-brand-dark text-base font-semibold">View Profile</span>
@@ -472,7 +472,7 @@ watch(
                     :class="
                         isCurrentTeamLead(member)
                             ? 'border-green-200 bg-green-50 text-green-700 cursor-default'
-                            : 'border-brand-border text-brand-dark hover:border-primary-500 hover:bg-gray-50 disabled:opacity-60'
+                            : 'border-brand-border text-brand-dark hover:border-brand-primary hover:bg-gray-50 disabled:opacity-60'
                     "
                 >
                     <Crown class="w-4 h-4" />
@@ -656,7 +656,7 @@ watch(
                     <button
                         type="button"
                         @click="closeAddMemberModal"
-                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     >
                         <X class="w-5 h-5 text-gray-600" />
                     </button>
@@ -670,7 +670,7 @@ watch(
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                         placeholder="Search staffMembers..."
                         v-model="searchMember"
                     />
@@ -680,7 +680,7 @@ watch(
             <div class="p-6 overflow-y-auto max-h-96">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
-                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
                         v-for="employee in availableEmployees"
                         :key="employee.id"
                         @click="handleAddMember(employee)"

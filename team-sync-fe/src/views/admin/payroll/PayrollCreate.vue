@@ -395,7 +395,7 @@ watch(
                                 :class="
                                     readiness && !readiness.can_generate
                                         ? 'border-red-300 ring-2 ring-red-500/20 focus:border-red-500'
-                                        : 'border-brand-border hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2'
+                                        : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2'
                                 "
                             />
                         </div>
@@ -527,8 +527,8 @@ watch(
                                     class="text-[11px] px-3 py-1 rounded-full border transition-all duration-300"
                                     :class="
                                         readinessStatusFilter === filter.value
-                                            ? 'border-primary-500 bg-blue-50 text-primary-500'
-                                            : 'border-slate-200 bg-white text-slate-600 hover:border-primary-500 hover:text-primary-500'
+                                            ? 'border-brand-primary bg-blue-50 text-brand-primary'
+                                            : 'border-slate-200 bg-white text-slate-600 hover:border-brand-primary hover:text-brand-primary'
                                     "
                                     @click="setReadinessStatusFilter(filter.value)"
                                 >
@@ -544,7 +544,7 @@ watch(
                                     data-testid="payroll-readiness-search"
                                     type="text"
                                     placeholder="Search employee name or code"
-                                    class="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:border-primary-500 outline-none"
+                                    class="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:border-brand-primary outline-none"
                                 />
                             </div>
 
@@ -615,7 +615,7 @@ watch(
                                     type="button"
                                     :data-testid="`payroll-readiness-open-attendance-${row.staff_member_id}`"
                                     @click="openAttendanceWorkspace(row)"
-                                    class="mt-3 w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 hover:border-primary-500 hover:text-primary-500 transition-all duration-300"
+                                    class="mt-3 w-full border border-slate-200 rounded-lg px-3 py-2 text-xs font-semibold text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300"
                                 >
                                     Open Attendance Workspace
                                 </button>
@@ -625,7 +625,7 @@ watch(
                                 v-if="canToggleReadinessExpansion"
                                 type="button"
                                 data-testid="payroll-readiness-toggle"
-                                class="w-full text-xs font-semibold border border-slate-200 bg-white rounded-lg px-3 py-2 text-slate-700 hover:border-primary-500 hover:text-primary-500 transition-all duration-300"
+                                class="w-full text-xs font-semibold border border-slate-200 bg-white rounded-lg px-3 py-2 text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300"
                                 @click="toggleReadinessExpanded"
                             >
                                 {{ readinessExpanded ? "Show less" : `Show ${hiddenReadinessCount} more` }}
@@ -640,7 +640,7 @@ watch(
                             data-testid="payroll-create-submit"
                             @click="handleSubmit"
                             :disabled="isSubmitDisabled"
-                            class="btn-primary w-full rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="btn-primary w-full rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span class="text-brand-white text-base font-semibold">
                                 {{ loading ? "Generating..." : "Generate Payroll" }}
@@ -651,7 +651,7 @@ watch(
                             type="button"
                             @click="router.back()"
                             :disabled="loading"
-                            class="w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <ArrowLeft class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-base font-semibold">Cancel</span>

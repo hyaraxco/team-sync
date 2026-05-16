@@ -156,7 +156,7 @@ onMounted(async () => {
                                 class="w-32 h-32 relative flex items-center justify-center rounded-full overflow-hidden"
                             >
                                 <div
-                                    class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full"
+                                    class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full"
                                 ></div>
                                 <Users class="w-16 h-16 text-white relative z-10" />
                             </div>
@@ -195,7 +195,7 @@ onMounted(async () => {
                 <!-- Team Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -213,7 +213,7 @@ onMounted(async () => {
                         </div>
                     </div>
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -229,7 +229,7 @@ onMounted(async () => {
                         </div>
                     </div>
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -245,7 +245,7 @@ onMounted(async () => {
                         </div>
                     </div>
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -269,8 +269,8 @@ onMounted(async () => {
                             @click="activeTab = 'members'"
                             :class="
                                 activeTab === 'members'
-                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-base transition-all duration-300'
-                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-primary-500/20 transition-all duration-300'
+                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-brand-primary to-brand-primary text-white font-semibold text-base transition-all duration-300'
+                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
                             <Users class="w-5 h-5 inline mr-2" />
@@ -280,8 +280,8 @@ onMounted(async () => {
                             @click="activeTab = 'projects'"
                             :class="
                                 activeTab === 'projects'
-                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-base transition-all duration-300'
-                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-primary-500/20 transition-all duration-300'
+                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-brand-primary to-brand-primary text-white font-semibold text-base transition-all duration-300'
+                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
                             <Folder class="w-5 h-5 inline mr-2" />
@@ -291,8 +291,8 @@ onMounted(async () => {
                             @click="activeTab = 'description'"
                             :class="
                                 activeTab === 'description'
-                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-primary-500 to-primary-600 text-white font-semibold text-base transition-all duration-300'
-                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-primary-500/20 transition-all duration-300'
+                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-brand-primary to-brand-primary text-white font-semibold text-base transition-all duration-300'
+                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
                             <FileText class="w-5 h-5 inline mr-2" />
@@ -323,7 +323,7 @@ onMounted(async () => {
                         <div
                             v-for="member in members"
                             :key="member.id"
-                            class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4"
+                            class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4"
                         >
                             <div class="flex flex-col items-center mb-3">
                                 <div class="relative">

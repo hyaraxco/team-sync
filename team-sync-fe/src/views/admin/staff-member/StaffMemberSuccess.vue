@@ -18,7 +18,7 @@ const addAnotherEmployee = () => {
     <main class="flex items-center justify-center py-12 min-h-[calc(100vh-80px)]">
         <div class="max-w-md mx-auto text-center px-4">
             <!-- Success Card -->
-            <div class="bg-white border border-brand-border rounded-2xl p-8 shadow-sm">
+            <div class="bg-white border border-brand-border rounded-2xl p-8 shadow-md">
                 <!-- Success Icon -->
                 <div class="flex justify-center mb-6">
                     <div class="w-32 h-32 flex items-center justify-center">
@@ -50,7 +50,7 @@ const addAnotherEmployee = () => {
                     <!-- Primary CTA -->
                     <button
                         @click="goToEmployees"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">View All Staff Members</span>
                         <Users class="w-4 h-4 text-white" />
@@ -59,7 +59,7 @@ const addAnotherEmployee = () => {
                     <!-- Secondary CTA -->
                     <button
                         @click="addAnotherEmployee"
-                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center justify-center gap-2"
+                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-dark text-base font-semibold">Add Another Employee</span>
                         <Plus class="w-4 h-4 text-gray-600" />

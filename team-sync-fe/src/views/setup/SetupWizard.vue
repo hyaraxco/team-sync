@@ -145,14 +145,14 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
 
 <template>
     <div
-        class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex flex-col items-center justify-center p-4 sm:p-8"
+        class="min-h-[100dvh] bg-gradient-to-br from-slate-50 via-white to-blue-50 flex flex-col items-center justify-center p-4 sm:p-8"
     >
         <div class="w-full max-w-2xl">
             <!-- Logo -->
             <div class="text-center mb-8">
                 <div class="inline-flex items-center gap-3 mb-4">
                     <div
-                        class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
+                        class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
                     >
                         <span class="text-white text-lg font-bold">TS</span>
                     </div>
@@ -168,7 +168,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         class="flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold transition-all"
                         :class="
                             currentStep === step.number
-                                ? 'bg-primary-500 text-white'
+                                ? 'bg-brand-primary text-white'
                                 : currentStep > step.number
                                   ? 'bg-green-100 text-green-700'
                                   : 'bg-gray-100 text-gray-400'
@@ -193,7 +193,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
             >
                 <div class="text-center mb-6">
                     <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <KeyRound class="w-8 h-8 text-primary-500" />
+                        <KeyRound class="w-8 h-8 text-brand-primary" />
                     </div>
                     <h2 class="text-xl font-bold text-gray-900">Aktivasi Lisensi</h2>
                     <p class="text-gray-500 text-sm mt-2">
@@ -208,7 +208,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             v-model="licenseKey"
                             rows="5"
                             placeholder="Paste kunci lisensi di sini..."
-                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 font-mono break-all"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-primary focus:border-brand-primary font-mono break-all"
                         ></textarea>
                     </div>
 
@@ -224,7 +224,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
 
                     <button
                         type="button"
-                        class="w-full flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
+                        class="w-full flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
                         :disabled="!licenseKey.trim() || setupStore.licenseVerifyLoading"
                         @click="verifyAndActivateLicense"
                     >
@@ -276,7 +276,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                 <div class="flex items-center gap-3 mt-6">
                     <button
                         type="button"
-                        class="flex items-center gap-2 rounded-2xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-primary-500"
+                        class="flex items-center gap-2 rounded-2xl border border-gray-200 px-4 py-2.5 text-sm font-semibold text-gray-700 hover:border-brand-primary"
                         @click="runDoctor"
                     >
                         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': setupStore.doctorLoading }" />
@@ -284,7 +284,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                     </button>
                     <button
                         type="button"
-                        class="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
+                        class="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
                         :disabled="!canProceedStep2"
                         @click="currentStep = 3"
                     >
@@ -317,7 +317,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             type="text"
                             required
                             placeholder="Nama administrator"
-                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-primary"
                         />
                     </div>
 
@@ -328,7 +328,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             type="email"
                             required
                             placeholder="admin@perusahaan.com"
-                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-primary"
                         />
                     </div>
 
@@ -340,7 +340,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             required
                             minlength="8"
                             placeholder="Minimal 8 karakter"
-                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-primary"
                         />
                     </div>
 
@@ -352,7 +352,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                             required
                             minlength="8"
                             placeholder="Ulangi password"
-                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-primary-500"
+                            class="w-full rounded-2xl border border-gray-200 px-4 py-3 text-sm text-gray-900 outline-none focus:ring-2 focus:ring-brand-primary"
                         />
                     </div>
 
@@ -381,7 +381,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                         </button>
                         <button
                             type="submit"
-                            class="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-primary-500 px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
+                            class="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all"
                             :disabled="setupStore.bootstrapLoading"
                         >
                             <RefreshCw v-if="setupStore.bootstrapLoading" class="w-4 h-4 animate-spin" />
@@ -406,7 +406,7 @@ const canProceedStep2 = computed(() => setupStore.isDoctorHealthy);
                 <p class="text-gray-500 mb-6">Instance Team Sync Pro siap digunakan. Silakan masuk ke dashboard.</p>
                 <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-2xl bg-primary-500 px-6 py-3 text-sm font-semibold text-white hover:brightness-110 transition-all"
+                    class="inline-flex items-center gap-2 rounded-2xl bg-brand-primary px-6 py-3 text-sm font-semibold text-white hover:brightness-110 transition-all"
                     @click="goToDashboard"
                 >
                     Masuk ke Dashboard

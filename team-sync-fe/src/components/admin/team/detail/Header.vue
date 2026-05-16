@@ -18,7 +18,7 @@ defineProps({
                 <div class="w-32 h-32 relative flex items-center justify-center rounded-full overflow-hidden">
                     <!-- Main blue background -->
                     <div
-                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-full"
+                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full"
                     ></div>
                     <!-- Lucide icon -->
                     <img loading="lazy" class="w-16 h-16 text-white relative z-10" :src="team.icon" alt="Team Icon" />
@@ -49,7 +49,7 @@ defineProps({
             <div class="flex gap-3">
                 <RouterLink
                     :to="{ name: 'admin.team.edit', params: { id: team.id } }"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                 >
                     <Edit class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Edit Team</span>

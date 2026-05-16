@@ -112,20 +112,20 @@ const hasVisibleItems = (section) => {
                     <RouterLink
                         v-if="!item.permission || can(item.permission)"
                         :to="{ name: item.routeName }"
-                        class="group bg-white border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 flex flex-col justify-between"
+                        class="group bg-white border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 flex flex-col justify-between"
                     >
                         <div class="space-y-4">
                             <div
                                 class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
                             >
-                                <component :is="item.icon" class="w-6 h-6 text-primary-500" />
+                                <component :is="item.icon" class="w-6 h-6 text-brand-primary" />
                             </div>
                             <div>
                                 <h3 class="text-brand-dark text-base font-bold">{{ item.title }}</h3>
                                 <p class="text-brand-light text-sm font-normal mt-1">{{ item.description }}</p>
                             </div>
                         </div>
-                        <div class="mt-6 flex items-center text-primary-500 text-sm font-semibold">
+                        <div class="mt-6 flex items-center text-brand-primary text-sm font-semibold">
                             <span>Configure</span>
                             <ChevronRightIcon
                                 class="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform"

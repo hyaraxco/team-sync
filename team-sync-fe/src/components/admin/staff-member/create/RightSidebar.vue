@@ -90,7 +90,7 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
 
             <div class="space-y-3">
                 <button
-                    class="w-full border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+                    class="w-full border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                 >
                     <Users class="w-5 h-5 text-gray-600" />
                     <div class="flex-1">
@@ -100,7 +100,7 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
                 </button>
 
                 <button
-                    class="w-full border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+                    class="w-full border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                 >
                     <Copy class="w-5 h-5 text-gray-600" />
                     <div class="flex-1">
@@ -110,7 +110,7 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
                 </button>
 
                 <button
-                    class="w-full border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+                    class="w-full border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                 >
                     <BookOpenCheck class="w-5 h-5 text-gray-600" />
                     <div class="flex-1">

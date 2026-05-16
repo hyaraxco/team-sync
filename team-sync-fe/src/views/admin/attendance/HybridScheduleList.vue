@@ -168,8 +168,8 @@ const confirmReject = () =>
                         :class="[
                             'px-4 py-2 rounded-lg text-sm font-semibold transition-all',
                             activeTab === 'schedules'
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-white text-[#344054] border border-gray-300 hover:border-primary-500',
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white text-[#344054] border border-gray-300 hover:border-brand-primary',
                         ]"
                     >
                         Schedules
@@ -180,8 +180,8 @@ const confirmReject = () =>
                         :class="[
                             'px-4 py-2 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-2',
                             activeTab === 'overrides'
-                                ? 'bg-primary-500 text-white'
-                                : 'bg-white text-[#344054] border border-gray-300 hover:border-primary-500',
+                                ? 'bg-brand-primary text-white'
+                                : 'bg-white text-[#344054] border border-gray-300 hover:border-brand-primary',
                         ]"
                     >
                         <Clock class="w-4 h-4" />
@@ -190,7 +190,7 @@ const confirmReject = () =>
                 </div>
 
                 <div v-if="loading" class="flex justify-center py-14">
-                    <div class="w-8 h-8 border-4 border-gray-300 border-t-primary-500 rounded-full animate-spin"></div>
+                    <div class="w-8 h-8 border-4 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
                 </div>
 
                 <div

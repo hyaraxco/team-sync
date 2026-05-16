@@ -174,7 +174,7 @@ const getAdjustmentStatusClass = (status) => {
             <button
                 @click="router.back()"
                 data-testid="payslip-detail-back"
-                class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
             >
                 <ArrowLeft class="w-5 h-5" />
                 <span class="font-semibold">Back</span>
@@ -184,7 +184,7 @@ const getAdjustmentStatusClass = (status) => {
                 <button
                     @click="handlePrint"
                     data-testid="payslip-detail-print"
-                    class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                    class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
                     <Printer class="w-5 h-5" />
                     <span class="font-semibold">Print</span>
@@ -193,7 +193,7 @@ const getAdjustmentStatusClass = (status) => {
                     @click="handleEmailPayslip"
                     data-testid="payslip-detail-email"
                     :disabled="emailingPayslip"
-                    class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="flex items-center gap-2 px-4 py-2 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Mail class="w-5 h-5" />
                     <span class="font-semibold">{{ emailingPayslip ? "Sending..." : "Email Payslip" }}</span>
@@ -236,7 +236,7 @@ const getAdjustmentStatusClass = (status) => {
                         </div>
                         <div class="text-right">
                             <div
-                                class="w-16 h-16 bg-gradient-to-br from-primary-500 to-primary-600 rounded-2xl flex items-center justify-center mb-2 ml-auto"
+                                class="w-16 h-16 bg-gradient-to-br from-brand-primary to-brand-primary rounded-2xl flex items-center justify-center mb-2 ml-auto"
                             >
                                 <Building class="w-8 h-8 text-white" />
                             </div>

@@ -233,7 +233,7 @@ const getAvatarUrl = (user) => {
             v-if="showOverrideModal"
             class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
         >
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-md overflow-hidden">
+            <div class="bg-white rounded-xl shadow-md w-full max-w-md overflow-hidden">
                 <div class="flex items-center justify-between p-4 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-brand-dark">Assign Reviewer</h3>
                     <button @click="closeOverrideModal" class="p-1 hover:bg-gray-100 rounded-lg text-gray-500 min-w-6 min-h-6 flex items-center justify-center">

@@ -251,7 +251,7 @@ const getActivityIconClass = (notification: any) => {
         return "text-orange-500";
     }
 
-    return "text-primary-500";
+    return "text-brand-primary";
 };
 
 const getActivityTime = (notification: any) => {
@@ -418,14 +418,14 @@ onMounted(() => {
         <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-base sm:text-lg font-bold">Upcoming Tasks</h3>
-                <a href="#" class="text-primary-500 text-xs sm:text-sm font-medium hover:underline">View All</a>
+                <a href="#" class="text-brand-primary text-xs sm:text-sm font-medium hover:underline">View All</a>
             </div>
 
             <div class="space-y-3">
                 <div
                     v-for="task in upcomingTasks"
                     :key="task.id"
-                    class="p-4 border border-brand-border rounded-xl hover:border-primary-500 transition-all duration-300"
+                    class="p-4 border border-brand-border rounded-xl hover:border-brand-primary transition-all duration-300"
                 >
                     <div class="flex items-start justify-between mb-2">
                         <div class="flex-1">
@@ -464,7 +464,7 @@ onMounted(() => {
                 <RouterLink
                     :to="{ name: 'admin.notifications' }"
                     data-testid="recent-activities-view-all"
-                    class="text-primary-500 text-xs sm:text-sm font-medium hover:underline"
+                    class="text-brand-primary text-xs sm:text-sm font-medium hover:underline"
                 >
                     View All
                 </RouterLink>
@@ -522,7 +522,7 @@ onMounted(() => {
                         />
                         <span
                             v-if="!activity.is_read"
-                            class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-primary-500 ring-2 ring-white"
+                            class="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-brand-primary ring-2 ring-white"
                         ></span>
                     </div>
 

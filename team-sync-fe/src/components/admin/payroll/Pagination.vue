@@ -110,7 +110,7 @@ const goToNext = () => {
                     :value="perPage"
                     @change="handlePerPageChange(parseInt($event.target.value))"
                     :disabled="loading"
-                    class="px-3 py-2 border border-brand-border rounded-lg hover:border-primary-500 focus:border-primary-500 transition-all duration-300 bg-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary transition-all duration-300 bg-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <option v-for="option in perPageOptions" :key="option" :value="option">
                         {{ option }}
@@ -126,7 +126,7 @@ const goToNext = () => {
             <button
                 @click="goToPrevious"
                 :disabled="currentPage <= 1 || loading"
-                class="px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <ChevronLeft class="w-4 h-4" />
             </button>
@@ -141,7 +141,7 @@ const goToNext = () => {
                         'px-4 py-2 border rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
                         page === currentPage
                             ? 'border-[#2151A0] blue-gradient blue-btn-shadow text-white'
-                            : 'border-brand-border hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50',
+                            : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50',
                     ]"
                 >
                     {{ page }}
@@ -153,7 +153,7 @@ const goToNext = () => {
             <button
                 @click="goToNext"
                 :disabled="currentPage >= lastPage || loading"
-                class="px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <ChevronRight class="w-4 h-4" />
             </button>

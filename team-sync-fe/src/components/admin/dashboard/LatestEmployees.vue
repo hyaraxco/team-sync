@@ -97,7 +97,7 @@ const goToEmployeeDetail = (id: number) => {
                 </div>
                 <button
                     @click="goToEmployeeDetail(employee.id)"
-                    class="btn-details w-full sm:w-auto border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500 hover:text-primary-500 transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
+                    class="btn-details w-full sm:w-auto border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary hover:text-brand-primary transition-all duration-300 py-2 sm:py-[14px] px-3 sm:px-5 flex items-center justify-center"
                 >
                     <span class="text-brand-dark text-sm sm:text-base font-medium">Details</span>
                 </button>
