@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, reactive } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import { useAuthStore } from "@/stores/auth";
@@ -206,30 +206,4 @@ const handleSubmit = async () => {
     </div>
 </template>
 
-<style>
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-.animate-fadeIn {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-</style>

@@ -182,15 +182,4 @@ const handleSubmit = async () => {
     </div>
 </template>
 
-<style>
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
 
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-</style>
