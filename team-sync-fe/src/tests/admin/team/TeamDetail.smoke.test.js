@@ -41,6 +41,12 @@ const { routeState, routerPushMock, teamStoreMock, teamStoreRefs, staffMemberSto
         },
     }));
 
+vi.mock("@/stores/auth", () => ({
+    useAuthStore: () => ({
+        user: { company_timezone: "Asia/Jakarta" },
+    }),
+}));
+
 vi.mock("@/stores/team", () => ({
     useTeamStore: () => teamStoreMock,
 }));
@@ -54,6 +60,8 @@ vi.mock("vue-router", () => ({
     useRouter: () => ({
         push: routerPushMock,
     }),
+    createRouter: vi.fn(() => ({ push: vi.fn(), beforeEach: vi.fn() })),
+    createWebHistory: vi.fn(),
 }));
 
 vi.mock("pinia", async (importOriginal) => {

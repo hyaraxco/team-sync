@@ -55,6 +55,8 @@ vi.mock("vue-router", () => ({
         push: routerPushMock,
         back: routerBackMock,
     }),
+    createRouter: vi.fn(() => ({ push: vi.fn(), beforeEach: vi.fn() })),
+    createWebHistory: vi.fn(),
 }));
 
 vi.mock("pinia", async (importOriginal) => {
