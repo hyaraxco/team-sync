@@ -115,7 +115,7 @@ const handleSubmit = async () => {
                 <input
                     v-model="formData.title"
                     type="text"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
                     placeholder="Meeting title"
                     required
                 />
@@ -127,7 +127,7 @@ const handleSubmit = async () => {
                 <textarea
                     v-model="formData.description"
                     rows="3"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all resize-none"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all resize-none"
                     placeholder="Agenda or notes"
                 ></textarea>
             </div>
@@ -143,7 +143,7 @@ const handleSubmit = async () => {
                         v-model="formData.scheduled_at"
                         type="datetime-local"
                         :min="minDateTime"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
                         required
                     />
                 </div>
@@ -152,7 +152,7 @@ const handleSubmit = async () => {
                     <label class="block text-sm font-semibold text-gray-700 mb-2">Duration</label>
                     <select
                         v-model="formData.duration_minutes"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
+                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
                     >
                         <option v-for="option in durationOptions" :key="option.value" :value="option.value">
                             {{ option.label }}
@@ -167,7 +167,7 @@ const handleSubmit = async () => {
                 <input
                     v-model="formData.location"
                     type="text"
-                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-primary-500 focus:ring-2 focus:ring-primary-500 focus:ring-opacity-20 transition-all"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
                     placeholder="Paste GMeet/Zoom link or enter location"
                 />
             </div>
@@ -187,7 +187,7 @@ const handleSubmit = async () => {
                                 type="checkbox"
                                 :value="dept.value"
                                 v-model="formData.departments"
-                                class="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                                class="w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
                             />
                             <span class="text-sm text-gray-600">{{ dept.label }}</span>
                         </label>
@@ -207,7 +207,7 @@ const handleSubmit = async () => {
                                 type="checkbox"
                                 :value="team.id"
                                 v-model="formData.team_ids"
-                                class="w-4 h-4 text-primary-500 border-gray-300 rounded focus:ring-primary-500"
+                                class="w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
                             />
                             <span class="text-sm text-gray-600">{{ team.name }}</span>
                         </label>
@@ -237,7 +237,7 @@ const handleSubmit = async () => {
                     type="button"
                     @click="handleSubmit"
                     :disabled="isSubmitting || !isValid"
-                    class="px-6 py-3 bg-primary-500 hover:bg-[#0a42b3] text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-6 py-3 bg-brand-primary hover:bg-[#0a42b3] text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     :class="{ 'blue-gradient': isValid && !isSubmitting }"
                 >
                     {{ isSubmitting ? "Scheduling..." : "Schedule Meeting" }}

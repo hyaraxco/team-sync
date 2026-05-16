@@ -162,7 +162,7 @@ const unreadBadgeClass = computed(() => {
             : 0;
         const sizeClass = safeCount > 9 ? "w-6 px-1" : "w-5";
 
-        return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-primary-500 text-[10px] font-bold leading-none text-white`;
+        return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-brand-primary text-[10px] font-bold leading-none text-white`;
     }
 
     return "absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-[#EE2A3B] px-1.5 text-[11px] font-bold leading-none tracking-tight text-white";
@@ -304,7 +304,7 @@ onUnmounted(() => {
                     type="button"
                     aria-label="Toggle sidebar"
                     data-testid="header-mobile-menu-toggle"
-                    class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                    class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     @click="emit('toggle-sidebar')"
                 >
                     <MenuIcon class="w-5 h-5 text-gray-600" />
@@ -330,7 +330,7 @@ onUnmounted(() => {
                             aria-haspopup="dialog"
                             :aria-expanded="isNotificationPanelOpen ? 'true' : 'false'"
                             :aria-controls="notificationPanelId"
-                            class="relative w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                            class="relative w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                             @click="toggleNotificationPanel"
                         >
                             <BellIcon class="w-5 h-5 text-gray-600" />
@@ -358,7 +358,7 @@ onUnmounted(() => {
                     <button
                         type="button"
                         aria-label="Messages"
-                        class="hidden sm:flex w-10 h-10 rounded-full border border-brand-border items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                        class="hidden sm:flex w-10 h-10 rounded-full border border-brand-border items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     >
                         <MessageCircleIcon class="w-5 h-5 text-gray-600" />
                     </button>

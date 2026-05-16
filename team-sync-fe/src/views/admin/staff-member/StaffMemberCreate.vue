@@ -481,7 +481,7 @@ const closeErrorModal = () => {
                         v-if="currentStep > 1"
                         type="button"
                         @click="previousStep"
-                        class="w-full sm:w-auto justify-center border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 sm:px-6 py-3 flex items-center gap-2"
+                        class="w-full sm:w-auto justify-center border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 sm:px-6 py-3 flex items-center gap-2"
                     >
                         <ArrowLeft class="w-4 h-4 text-gray-600" />
                         <span class="text-brand-dark text-sm sm:text-base font-semibold">Previous</span>
@@ -490,7 +490,7 @@ const closeErrorModal = () => {
                         v-else
                         type="button"
                         @click="previousStep"
-                        class="w-full sm:w-auto justify-center border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 sm:px-6 py-3 flex items-center gap-2"
+                        class="w-full sm:w-auto justify-center border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 sm:px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-dark text-sm sm:text-base font-semibold">Cancel</span>
                     </button>
@@ -499,7 +499,7 @@ const closeErrorModal = () => {
                         v-if="currentStep < totalSteps"
                         type="button"
                         @click="handleNextStep"
-                        class="w-full sm:w-auto justify-center btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 sm:px-6 py-3 flex items-center gap-2"
+                        class="w-full sm:w-auto justify-center btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 sm:px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-sm sm:text-base font-semibold whitespace-nowrap">
                             <span class="lg:hidden">Next</span>
@@ -516,7 +516,7 @@ const closeErrorModal = () => {
                         v-else
                         type="submit"
                         :disabled="loading"
-                        class="w-full sm:w-auto justify-center btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 sm:px-6 py-3 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full sm:w-auto justify-center btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 sm:px-6 py-3 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <UserPlus class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm sm:text-base font-semibold whitespace-nowrap">

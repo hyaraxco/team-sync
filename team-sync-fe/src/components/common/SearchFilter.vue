@@ -144,7 +144,7 @@ onUnmounted(() => {
                     v-model="searchQuery"
                     type="text"
                     aria-label="Search"
-                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                     :placeholder="placeholder"
                 />
             </div>
@@ -159,7 +159,7 @@ onUnmounted(() => {
                     <select
                         v-model="filterValues[filter.key]"
                         :aria-label="filter.label"
-                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 transition-all duration-300 bg-white appearance-none font-semibold"
+                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 transition-all duration-300 bg-white appearance-none font-semibold"
                     >
                         <option value="">{{ filter.label }}</option>
                         <option v-for="opt in filter.options" :key="opt.value" :value="opt.value">
@@ -185,7 +185,7 @@ onUnmounted(() => {
                 <button
                     v-if="showSearchButton"
                     @click="handleSearchClick"
-                    class="btn-primary w-full sm:w-auto rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
+                    class="btn-primary w-full sm:w-auto rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
                 >
                     <SearchIcon class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-base font-semibold">Search</span>

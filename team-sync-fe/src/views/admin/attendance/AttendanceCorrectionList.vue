@@ -213,7 +213,7 @@ const onRejectAction = (req) => {
                             >
                                 <button
                                     @click="showApproveModal(correction)"
-                                    class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-primary-500 hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                    class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
                                 >
                                     <Check class="w-4 h-4 text-green-600" />
                                     <span class="text-brand-dark text-xs font-semibold">Approve</span>
@@ -285,7 +285,7 @@ const onRejectAction = (req) => {
                 <button
                     @click="closeApproveModal"
                     :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
                     Cancel
                 </button>
@@ -366,7 +366,7 @@ const onRejectAction = (req) => {
                 <button
                     @click="closeRejectModal"
                     :disabled="processingReject"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-primary-500/20 transition-all duration-300"
+                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
                     Cancel
                 </button>

@@ -12,7 +12,7 @@ describe("PolicyMismatches.vue", () => {
             data: [
                 {
                     id: 1,
-                    employee_name: "John Doe",
+                    employee_name: "Ahmad Fauzi",
                     date: "2026-04-20",
                     scheduled_location: "Remote",
                     actual_location: "Office",
@@ -34,6 +34,6 @@ describe("PolicyMismatches.vue", () => {
         expect(wrapper.text()).toContain("Policy Mismatches");
         expect(wrapper.text()).toContain("Acknowledge");
         expect(wrapper.text()).toContain("Resolve");
-        expect(wrapper.text()).toContain("John Doe");
+        expect(wrapper.text()).toContain("Ahmad Fauzi");
     });
 });

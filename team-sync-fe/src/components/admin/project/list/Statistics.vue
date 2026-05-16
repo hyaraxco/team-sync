@@ -153,7 +153,7 @@ const chartSeries = ref([
         <div class="xl:col-span-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
             <!-- Total Projects Card -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
             >
                 <!-- Header with title and icon -->
                 <div class="flex items-center justify-between mb-4">
@@ -176,7 +176,7 @@ const chartSeries = ref([
 
             <!-- Active Projects Card -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
             >
                 <!-- Header with title and icon -->
                 <div class="flex items-center justify-between mb-4">
@@ -200,7 +200,7 @@ const chartSeries = ref([
 
         <!-- Charts Column -->
         <div
-            class="xl:col-span-2 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 hover:shadow-lg transition-shadow duration-300"
+            class="xl:col-span-2 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 hover:shadow-md transition-shadow duration-300"
         >
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
                 <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">

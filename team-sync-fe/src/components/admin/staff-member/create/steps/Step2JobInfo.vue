@@ -273,7 +273,7 @@ watch(
                             </div>
                             <div
                                 @click="teamModal = true"
-                                class="w-full pl-12 pr-10 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 cursor-pointer bg-white"
+                                class="w-full pl-12 pr-10 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 cursor-pointer bg-white"
                             >
                                 <span :class="[selectedTeam ? 'text-brand-dark' : 'text-gray-500']">
                                     {{ selectedTeam ? selectedTeam.name : "Select team" }}
@@ -291,7 +291,7 @@ watch(
                                     class="w-10 h-10 relative flex items-center justify-center rounded-lg overflow-hidden"
                                 >
                                     <div
-                                        class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg"
+                                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-lg"
                                     ></div>
                                     <Building2 class="w-5 h-5 text-white relative z-10" />
                                 </div>
@@ -458,7 +458,7 @@ watch(
                             id="ptkp_status"
                             name="ptkp_status"
                             v-model="form.ptkp_status"
-                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 transition-all duration-300 bg-white"
+                            class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300 bg-white"
                         >
                             <option value="">Select PTKP status</option>
                             <option value="TK/0">TK/0 – Tidak Kawin, Tanpa Tanggungan</option>
@@ -621,7 +621,7 @@ watch(
                             type="text"
                             v-model="form.account_holder_name"
                             label="Account Holder Name *"
-                            placeholder="e.g. John Doe Smith"
+                            placeholder="e.g. Ahmad Fauzi"
                             :error="errors?.account_holder_name?.join(', ')"
                             required
                         >
@@ -666,7 +666,7 @@ watch(
                     <button
                         type="button"
                         @click="teamModal = false"
-                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     >
                         <X class="w-5 h-5 text-gray-600" />
                     </button>
@@ -681,7 +681,7 @@ watch(
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                         placeholder="Search teams..."
                         v-model="searchTeam"
                     />
@@ -692,7 +692,7 @@ watch(
             <div class="p-6 overflow-y-auto max-h-96">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
-                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
                         v-for="team in filteredTeams"
                         :key="team.id"
                         @click="handleSelectTeam(team)"
@@ -702,7 +702,7 @@ watch(
                                 class="w-14 h-14 relative flex items-center justify-center rounded-xl overflow-hidden"
                             >
                                 <div
-                                    class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
+                                    class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
                                 ></div>
                                 <Building2 class="w-6 h-6 text-white relative z-10" />
                             </div>

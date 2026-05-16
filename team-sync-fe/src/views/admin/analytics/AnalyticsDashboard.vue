@@ -281,7 +281,7 @@ onUnmounted(() => {
                     <button
                         @click="showExportMenu = !showExportMenu"
                         :disabled="exportLoading"
-                        class="flex items-center gap-2 px-3 py-2 bg-primary-500 text-white text-sm font-medium rounded-xl hover:bg-[#0a44b8] transition-colors disabled:opacity-50"
+                        class="flex items-center gap-2 px-3 py-2 bg-brand-primary text-white text-sm font-medium rounded-xl hover:bg-[#0a44b8] transition-colors disabled:opacity-50"
                     >
                         <DownloadIcon class="w-4 h-4" />
                         <span v-if="exportLoading">Exporting...</span>
@@ -325,7 +325,7 @@ onUnmounted(() => {
                     :class="
                         activeTab === tab.id
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                 >
                     <component
@@ -356,7 +356,7 @@ onUnmounted(() => {
             <div v-else-if="executiveSummary" class="space-y-6">
                 <!-- Period Label -->
                 <div class="flex items-center gap-2 text-sm text-gray-500">
-                    <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
+                    <span class="inline-block w-2 h-2 rounded-full bg-brand-primary"></span>
                     {{ executiveSummary.period?.label }}
                     <span class="text-gray-300">|</span>
                     {{ executiveSummary.period?.start }} - {{ executiveSummary.period?.end }}

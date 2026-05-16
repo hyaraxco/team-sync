@@ -41,7 +41,7 @@ watch(
 <template>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -69,7 +69,7 @@ watch(
             </div>
         </div>
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -88,7 +88,7 @@ watch(
             </div>
         </div>
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -110,7 +110,7 @@ watch(
             </div>
         </div>
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-5"
+            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
         >
             <div class="flex items-center justify-between">
                 <div>

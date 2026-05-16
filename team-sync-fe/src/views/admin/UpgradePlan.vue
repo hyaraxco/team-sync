@@ -124,14 +124,14 @@ const handleUpgrade = (planId) => {
             <!-- Highlighted Card (PRO) -->
             <div class="w-full lg:w-1/3 relative z-10 lg:-mr-4 group">
                 <div
-                    class="bg-white rounded-3xl shadow-xl border-2 border-primary-500 flex flex-col h-full overflow-hidden transition-all duration-300"
+                    class="bg-white rounded-3xl shadow-md border-2 border-brand-primary flex flex-col h-full overflow-hidden transition-all duration-300"
                 >
                     <!-- Top Badge -->
                     <div
                         class="bg-blue-50 py-3 text-center border-b border-blue-100"
                     >
                         <span
-                            class="text-[11px] font-black text-primary-500 uppercase tracking-[0.2em]"
+                            class="text-[11px] font-black text-brand-primary uppercase tracking-[0.2em]"
                         >
                             {{ plans[0].headerBadge }}
                         </span>
@@ -190,7 +190,7 @@ const handleUpgrade = (planId) => {
                         <!-- CTA -->
                         <div class="mt-auto text-center">
                             <button
-                                class="w-full rounded-2xl py-4 px-6 text-base font-black bg-primary-500 text-white hover:bg-[#093d9e] transition-all duration-300 shadow-xl shadow-blue-500/25 active:scale-[0.98]"
+                                class="w-full rounded-2xl py-4 px-6 text-base font-black bg-brand-primary text-white hover:bg-[#093d9e] transition-all duration-300 shadow-xl shadow-blue-500/25 active:scale-[0.98]"
                                 @click="handleUpgrade(plans[0].id)"
                             >
                                 {{ plans[0].cta }}
@@ -208,7 +208,7 @@ const handleUpgrade = (planId) => {
 
             <!-- Standard Cards Container -->
             <div
-                class="w-full lg:w-2/3 flex flex-col sm:flex-row bg-white rounded-3xl border border-brand-border shadow-xl relative z-0 overflow-hidden transition-all duration-300"
+                class="w-full lg:w-2/3 flex flex-col sm:flex-row bg-white rounded-3xl border border-brand-border shadow-md relative z-0 overflow-hidden transition-all duration-300"
             >
                 <!-- Loop untuk plan sisanya -->
                 <div
