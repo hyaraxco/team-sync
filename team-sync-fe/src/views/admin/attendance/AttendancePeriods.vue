@@ -350,6 +350,7 @@ const handleGeneratePayroll = () => {
 };
 
 
+
 onMounted(async () => {
     try {
         await periodStore.fetchAllPaginated();
