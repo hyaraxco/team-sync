@@ -17,9 +17,9 @@ class MeEndpointTest extends TestCase
         $company = Company::factory()->create(['timezone' => 'Asia/Tokyo']);
         $user = User::factory()->create();
         StaffMemberProfile::factory()->for($user)->create(['company_id' => $company->id]);
-        
+
         $response = $this->actingAs($user)->getJson('/api/v1/me');
-        
+
         $response->assertOk()
             ->assertJsonPath('data.company_timezone', 'Asia/Tokyo');
     }
@@ -27,9 +27,9 @@ class MeEndpointTest extends TestCase
     public function test_returns_default_timezone_when_user_has_no_staff_member_profile(): void
     {
         $user = User::factory()->create();
-        
+
         $response = $this->actingAs($user)->getJson('/api/v1/me');
-        
+
         $response->assertOk()
             ->assertJsonPath('data.company_timezone', 'Asia/Jakarta');
     }
@@ -38,9 +38,9 @@ class MeEndpointTest extends TestCase
     {
         $user = User::factory()->create();
         StaffMemberProfile::factory()->for($user)->create(['company_id' => null]);
-        
+
         $response = $this->actingAs($user)->getJson('/api/v1/me');
-        
+
         $response->assertOk()
             ->assertJsonPath('data.company_timezone', 'Asia/Jakarta');
     }
@@ -50,12 +50,12 @@ class MeEndpointTest extends TestCase
         $company = Company::factory()->create(['timezone' => 'America/New_York']);
         $user = User::factory()->create();
         StaffMemberProfile::factory()->for($user)->create(['company_id' => $company->id]);
-        
+
         $response = $this->actingAs($user)->getJson('/api/v1/me');
-        
+
         $response->assertOk()
             ->assertJsonPath('data.company_timezone', 'America/New_York');
-        
+
         $this->assertContains('America/New_York', \DateTimeZone::listIdentifiers());
     }
 
@@ -64,12 +64,12 @@ class MeEndpointTest extends TestCase
         $company = Company::factory()->create(['timezone' => 'Asia/Jakarta']);
         $user = User::factory()->create();
         StaffMemberProfile::factory()->for($user)->create(['company_id' => $company->id]);
-        
+
         $response1 = $this->actingAs($user)->getJson('/api/v1/me');
         $response1->assertJsonPath('data.company_timezone', 'Asia/Jakarta');
-        
+
         $company->update(['timezone' => 'Asia/Tokyo']);
-        
+
         $response2 = $this->actingAs($user)->getJson('/api/v1/me');
         $response2->assertJsonPath('data.company_timezone', 'Asia/Tokyo');
     }
@@ -77,14 +77,14 @@ class MeEndpointTest extends TestCase
     public function test_returns_company_timezone_for_different_timezones(): void
     {
         $timezones = ['Asia/Singapore', 'Europe/London', 'America/Los_Angeles'];
-        
+
         foreach ($timezones as $tz) {
             $company = Company::factory()->create(['timezone' => $tz]);
             $user = User::factory()->create();
             StaffMemberProfile::factory()->for($user)->create(['company_id' => $company->id]);
-            
+
             $response = $this->actingAs($user)->getJson('/api/v1/me');
-            
+
             $response->assertOk()
                 ->assertJsonPath('data.company_timezone', $tz);
         }

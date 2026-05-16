@@ -3,6 +3,7 @@ import { BellIcon, ChevronDownIcon, MessageCircleIcon, UserIcon, LogOutIcon, Men
 import NotificationPanel from "@/components/admin/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notifications";
+import { useToast } from "@/composables/useToast";
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
@@ -13,12 +14,14 @@ const notificationStore = useNotificationStore();
 const { user } = storeToRefs(authStore);
 const { logout } = authStore;
 const router = useRouter();
+const { info: toastInfo } = useToast();
 
 const isAccountMenuOpen = ref(false);
 const isNotificationPanelOpen = ref(false);
 const notificationPanelId = "header-notification-panel";
 const unreadPollingIntervalMs = 15000;
 const unreadPollingIntervalId = ref(null);
+const previousUnreadCount = ref(0);
 const emit = defineEmits(["toggle-sidebar"]);
 
 const route = useRoute();
@@ -237,8 +240,12 @@ const startUnreadPolling = () => {
         return;
     }
 
-    unreadPollingIntervalId.value = window.setInterval(() => {
-        fetchUnreadCount();
+    unreadPollingIntervalId.value = window.setInterval(async () => {
+        await fetchUnreadCount();
+        if (unreadNotificationCount.value > previousUnreadCount.value && previousUnreadCount.value > 0) {
+            toastInfo("New Notification", "You have new notifications");
+        }
+        previousUnreadCount.value = unreadNotificationCount.value;
     }, unreadPollingIntervalMs);
 };
 
@@ -274,10 +281,11 @@ const handleClickOutside = (event) => {
     }
 };
 
-onMounted(() => {
+onMounted(async () => {
     document.addEventListener("click", handleClickOutside);
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    fetchUnreadCount();
+    await fetchUnreadCount();
+    previousUnreadCount.value = unreadNotificationCount.value;
     startUnreadPolling();
 });
 

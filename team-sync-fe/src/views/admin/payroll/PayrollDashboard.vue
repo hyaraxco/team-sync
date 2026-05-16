@@ -689,10 +689,7 @@ const handleExportReport = async () => {
                     </button>
                 </div>
 
-                <div v-if="!loading && payrolls.length === 0" class="text-center py-12 text-gray-500">
-                    <p class="text-lg font-semibold">No payroll data found</p>
-                    <p class="text-sm">Create your first payroll to get started</p>
-                </div>
+                <EmptyState v-if="!loading && payrolls.length === 0" icon="Inbox" title="No payroll data found" subtitle="Create your first payroll to get started" />
             </div>
         </div>
 

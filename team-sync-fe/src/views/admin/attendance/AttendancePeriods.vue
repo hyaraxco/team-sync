@@ -44,13 +44,8 @@
                     </div>
 
                     <!-- Empty State -->
-                    <div
-                        v-else-if="!periods.length"
-                        class="bg-white border border-brand-border rounded-2xl p-12 text-center"
-                    >
-                        <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-400" />
-                        <p class="text-brand-dark font-semibold">No attendance periods found</p>
-                        <p class="text-brand-light text-sm mt-1">Create a period to get started.</p>
+                    <div v-else-if="!periods.length" class="bg-white border border-brand-border rounded-2xl p-12">
+                        <EmptyState icon="CalendarClock" title="No attendance periods found" subtitle="Create a period to get started." />
                     </div>
 
                     <!-- Period List -->
@@ -140,7 +135,15 @@
                                 </div>
                             </div>
 
-                            <div class="pt-4 border-t border-brand-border">
+                            <div class="pt-4 border-t border-brand-border space-y-3">
+                                <button
+                                    v-if="selectedPeriod.status === 'review'"
+                                    @click="handleLockPeriod"
+                                    :disabled="periodStore.loading"
+                                    class="w-full py-3 rounded-lg font-semibold transition-all cursor-pointer bg-amber-500 text-white hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Lock Period
+                                </button>
                                 <button
                                     class="w-full py-3 rounded-lg font-semibold transition-all cursor-pointer"
                                     :class="
@@ -149,6 +152,7 @@
                                             : 'bg-gray-100 text-gray-400 cursor-not-allowed'
                                     "
                                     :disabled="selectedPeriod.status !== 'review'"
+                                    @click="handleGeneratePayroll"
                                 >
                                     Generate Payroll
                                 </button>
@@ -219,17 +223,33 @@
                 </div>
             </form>
         </ModalWrapper>
+
+        <ConfirmationModal
+            :show="showLockConfirm"
+            :loading="periodStore.loading"
+            title="Lock Attendance Period?"
+            :message="`Locking '${selectedPeriod?.month}' will prevent any further attendance modifications. This action cannot be undone.`"
+            confirm-text="Lock Period"
+            cancel-text="Cancel"
+            type="warning"
+            @confirm="confirmLockPeriod"
+            @cancel="showLockConfirm = false"
+        />
     </div>
 </template>
 
 <script setup>
 import { computed, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
 import { Plus, Calendar, CheckCircle, AlertTriangle, ChevronRight } from "lucide-vue-next";
 import { useAttendancePeriodStore } from "@/stores/attendancePeriod";
 import { useToast } from "@/composables/useToast";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 
+const router = useRouter();
 const periodStore = useAttendancePeriodStore();
 const { paginatedPeriods, meta, loading, error } = storeToRefs(periodStore);
 const toast = useToast();
@@ -246,6 +266,7 @@ const createForm = ref({
 });
 
 const isSubmitting = ref(false);
+const showLockConfirm = ref(false);
 
 const readinessCounts = computed(() => {
     const summary = periodStore.readinessSummary || {};
@@ -302,6 +323,30 @@ const submitCreateForm = async () => {
 
 const fetchData = async () => {
     await periodStore.fetchAllPaginated();
+};
+
+const handleLockPeriod = () => {
+    showLockConfirm.value = true;
+};
+
+const confirmLockPeriod = async () => {
+    try {
+        await periodStore.lockPeriod(selectedPeriod.value.id);
+        toast.success("Locked", "Attendance period has been locked.");
+        selectedPeriod.value.status = 'locked';
+        showLockConfirm.value = false;
+        await fetchData();
+    } catch (error) {
+        toast.error("Failed to lock", periodStore.error || "Failed to lock attendance period.");
+    }
+};
+
+const handleGeneratePayroll = () => {
+    if (!selectedPeriod.value || selectedPeriod.value.status !== 'review') return;
+    router.push({
+        name: 'admin.payroll.create',
+        query: { salary_month: selectedPeriod.value.month },
+    });
 };
 
 onMounted(async () => {
