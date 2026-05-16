@@ -313,6 +313,8 @@ class PayrollController extends Controller implements HasMiddleware
             Log::warning('PayrollController domain exception: '.$e->getMessage());
 
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
+        } catch (\App\Exceptions\ConcurrentModificationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 409);
         } catch (\Exception $e) {
             Log::warning('PayrollController domain exception: '.$e->getMessage());
 
