@@ -14,6 +14,7 @@ import {
     Grid3x3,
     ChevronLeft,
     ChevronRight,
+    FileText,
 } from "lucide-vue-next";
 import { DateTime } from "luxon";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
@@ -355,6 +356,27 @@ const openLeaveDetailsModal = (requestId) => {
 const closeLeaveDetailsModal = () => {
     showLeaveDetailsModal.value = false;
     selectedLeaveRequest.value = null;
+};
+
+const handleReuploadProof = async (event) => {
+    const file = event.target.files[0];
+    event.target.value = "";
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+        toast.warning("File Too Large", "Proof file must be less than 5MB.");
+        return;
+    }
+
+    try {
+        await leaveRequestStore.uploadProof(selectedLeaveRequest.value.id, file);
+        toast.success("Proof Uploaded", "New proof has been submitted for review");
+        const updated = await leaveRequestStore.fetchLeaveRequest(selectedLeaveRequest.value.id);
+        selectedLeaveRequest.value = updated;
+        await fetchMyLeaveRequests();
+    } catch (error) {
+        toast.error("Upload Failed", leaveRequestStore.error || "Failed to upload proof");
+    }
 };
 
 const updateEndDateMin = () => {
@@ -1287,6 +1309,96 @@ onUnmounted(() => {
                                             </span>
                                         </div>
                                     </div>
+                                </div>
+                            </div>
+
+                            <!-- Proof Document Section -->
+                            <div
+                                v-if="selectedLeaveRequest.leave_type === 'sick_leave' && selectedLeaveRequest.proof_file_path"
+                                class="bg-white border border-brand-border rounded-2xl p-6"
+                            >
+                                <div class="space-y-4">
+                                    <div>
+                                        <label class="block text-brand-dark text-base font-semibold mb-2">
+                                            Proof Document
+                                        </label>
+                                        <div class="p-4 bg-gray-50 rounded-xl border border-brand-border">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3">
+                                                    <div
+                                                        class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"
+                                                    >
+                                                        <FileText class="w-5 h-5 text-blue-600" />
+                                                    </div>
+                                                    <div>
+                                                        <p class="text-brand-dark text-base font-medium">
+                                                            {{ selectedLeaveRequest.proof_file_name || 'Proof Document' }}
+                                                        </p>
+                                                        <p class="text-brand-light text-sm">
+                                                            {{ selectedLeaveRequest.proof_size_kb ? `${selectedLeaveRequest.proof_size_kb} KB` : '' }}
+                                                            {{ selectedLeaveRequest.proof_uploaded_at ? `• Uploaded ${formatRequestDateLong(selectedLeaveRequest.proof_uploaded_at)}` : '' }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="flex items-center gap-2">
+                                                    <span
+                                                        v-if="selectedLeaveRequest.proof_review_status === 'approved'"
+                                                        class="px-2 py-1 text-xs font-semibold rounded-full bg-green-50 border border-green-200 text-green-700"
+                                                    >
+                                                        Approved
+                                                    </span>
+                                                    <span
+                                                        v-else-if="selectedLeaveRequest.proof_review_status === 'rejected'"
+                                                        class="px-2 py-1 text-xs font-semibold rounded-full bg-red-50 border border-red-200 text-red-700"
+                                                    >
+                                                        Rejected
+                                                    </span>
+                                                    <span
+                                                        v-else
+                                                        class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-50 border border-yellow-200 text-yellow-700"
+                                                    >
+                                                        Pending Review
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <!-- Rejection notes -->
+                                            <div
+                                                v-if="selectedLeaveRequest.proof_review_status === 'rejected' && selectedLeaveRequest.proof_review_notes"
+                                                class="mt-3 p-3 bg-red-50 rounded-lg border border-red-200"
+                                            >
+                                                <p class="text-sm text-red-700">
+                                                    <span class="font-semibold">Rejection reason:</span>
+                                                    {{ selectedLeaveRequest.proof_review_notes }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Re-upload section for rejected proofs -->
+                            <div
+                                v-if="selectedLeaveRequest.leave_type === 'sick_leave' && selectedLeaveRequest.proof_review_status === 'rejected'"
+                                class="bg-white border border-brand-border rounded-2xl p-6"
+                            >
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <h4 class="text-brand-dark text-base font-semibold">Re-upload Proof</h4>
+                                        <p class="text-brand-light text-sm mt-1">
+                                            Your proof was rejected. You can upload a new document.
+                                        </p>
+                                    </div>
+                                    <label
+                                        class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
+                                    >
+                                        <input
+                                            type="file"
+                                            class="hidden"
+                                            accept=".pdf,.jpg,.jpeg,.png"
+                                            @change="handleReuploadProof"
+                                        />
+                                        Upload New Proof
+                                    </label>
                                 </div>
                             </div>
 

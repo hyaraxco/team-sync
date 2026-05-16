@@ -47,7 +47,7 @@ class AuthRepository implements AuthRepositoryInterface
             'roles',
             'permissions',
             'staffMemberProfile.company',
-            'staffMemberProfile.jobInformation'
+            'staffMemberProfile.jobInformation',
         ]);
 
         return $user;

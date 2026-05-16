@@ -26,6 +26,7 @@ const paymentDate = ref("");
 const showConfirmDialog = ref(false);
 const confirmTitle = ref("");
 const confirmMessage = ref("");
+const confirmText = ref("Confirm");
 const confirmAction = ref(null);
 
 const generateForm = ref({
@@ -99,6 +100,7 @@ async function handleGenerate() {
 async function handleApprove(thr) {
     confirmTitle.value = "Approve THR";
     confirmMessage.value = `Approve THR ${thr.event_label} ${thr.year}?`;
+    confirmText.value = "Approve";
     confirmAction.value = async () => {
         try {
             const result = await store.approve(thr.id);
@@ -106,6 +108,22 @@ async function handleApprove(thr) {
             await fetchData();
         } catch (_e) {
             toast.error(store.error || "Approval failed");
+        }
+    };
+    showConfirmDialog.value = true;
+}
+
+async function handleReopen(thr) {
+    confirmTitle.value = "Reopen THR";
+    confirmMessage.value = `Reopen THR ${thr.event_label} ${thr.year}? This will move it back to pending status and require re-approval.`;
+    confirmText.value = "Reopen";
+    confirmAction.value = async () => {
+        try {
+            const result = await store.reopenThr(thr.id);
+            toast.success(result.message || "THR reopened");
+            await fetchData();
+        } catch (_e) {
+            toast.error(store.error || "Reopen failed");
         }
     };
     showConfirmDialog.value = true;
@@ -273,6 +291,13 @@ function handlePageChange(page) {
                                     >
                                         Mark Paid
                                     </button>
+                                    <button
+                                        v-if="(thr.status === 'approved' || thr.status === 'paid') && can('thr-approve')"
+                                        @click="handleReopen(thr)"
+                                        class="text-amber-600 hover:text-amber-800 text-xs font-medium"
+                                    >
+                                        Reopen
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -418,7 +443,7 @@ function handlePageChange(page) {
         :show="showConfirmDialog"
         :title="confirmTitle"
         :message="confirmMessage"
-        confirm-text="Approve"
+        :confirm-text="confirmText"
         cancel-text="Cancel"
         type="info"
         @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
