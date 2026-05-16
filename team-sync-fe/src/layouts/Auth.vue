@@ -6,7 +6,7 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
     <div class="auth-shell min-h-[100dvh] bg-gradient-to-br from-slate-50 via-white to-blue-50">
         <a
             href="#auth-main"
-            class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#0C51D9] focus:shadow-lg"
+            class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-brand-primary focus:shadow-lg"
         >Skip to main content</a>
 
         <div class="flex min-h-[100dvh] w-full">
@@ -24,7 +24,7 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
                     fetchpriority="high"
                 />
                 <div
-                    class="absolute inset-0 bg-gradient-to-br from-[#0C51D9]/90 via-[#1a3a6e]/85 to-[#0a1f44]/95"
+                    class="absolute inset-0 bg-gradient-to-br from-brand-primary/90 via-[#1a3a6e]/85 to-[#0a1f44]/95"
                 ></div>
 
                 <!-- Decorative Elements -->
@@ -55,7 +55,7 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
                         <h1 class="text-2xl font-bold leading-tight text-white xl:text-3xl">
                             Streamline your workforce operations
                         </h1>
-                        <p class="text-sm leading-relaxed text-white/75 max-w-xs">
+                        <p class="text-sm leading-relaxed text-white/90 max-w-xs">
                             Payroll, attendance, and employee management in one secure platform.
                         </p>
 
@@ -63,28 +63,28 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
                         <div class="flex gap-6 pt-4">
                             <div>
                                 <p class="text-2xl font-bold text-white">6</p>
-                                <p class="text-xs text-white/80">HR Modules</p>
+                                <p class="text-xs text-white/90">HR Modules</p>
                             </div>
                             <div>
                                 <p class="text-2xl font-bold text-white">4</p>
-                                <p class="text-xs text-white/80">User Roles</p>
+                                <p class="text-xs text-white/90">User Roles</p>
                             </div>
                             <div>
                                 <p class="text-2xl font-bold text-white">99%</p>
-                                <p class="text-xs text-white/80">Uptime</p>
+                                <p class="text-xs text-white/90">Uptime</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Footer -->
-                    <p class="text-xs text-white/70">© 2026 TeamSync. All rights reserved.</p>
+                    <p class="text-xs text-white/85">© 2026 TeamSync. All rights reserved.</p>
                 </div>
             </aside>
 
             <!-- Right Side - Form (65%) -->
             <main
                 id="auth-main"
-                class="flex w-full flex-1 items-center justify-center px-6 py-12 lg:w-[65%] lg:px-16 xl:w-[60%] xl:px-24"
+                class="flex w-full flex-1 items-center justify-center px-6 py-12 lg:w-[65%] lg:px-12 xl:w-[60%] xl:px-16"
             >
                 <ErrorBoundary>
                     <RouterView />
