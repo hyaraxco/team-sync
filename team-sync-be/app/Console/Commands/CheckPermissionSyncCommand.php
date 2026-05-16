@@ -22,6 +22,7 @@ class CheckPermissionSyncCommand extends Command
 
         if (empty($routePermissions)) {
             $this->warn('No permissions found in routes file.');
+
             return self::SUCCESS;
         }
 
@@ -36,6 +37,7 @@ class CheckPermissionSyncCommand extends Command
 
         if (empty($missing)) {
             $this->info('✅ All route permissions exist in database. No sync issues found.');
+
             return self::SUCCESS;
         }
 
@@ -50,6 +52,7 @@ class CheckPermissionSyncCommand extends Command
         }
 
         $this->warn('Run with --fail-on-missing to exit with code 1 when permissions are missing.');
+
         return self::SUCCESS;
     }
 

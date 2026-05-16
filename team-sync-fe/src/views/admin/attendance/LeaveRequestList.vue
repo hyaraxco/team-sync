@@ -187,13 +187,12 @@ const runBulkAction = async (action) => {
     processingBulkAction.value = true;
 
     try {
-        await store.bulkAction(selectedIds.value, action);
-        const count = selectedIds.value.length;
-        toast.success(
-            action === "approve" ? "Approved" : "Rejected",
-            `${count} leave request${count > 1 ? "s" : ""} ${action === "approve" ? "approved" : "rejected"} successfully.`,
-        );
-
+        const result = await store.bulkAction(selectedIds.value, action);
+        if (result.failed && result.failed.length > 0) {
+            toast.warning("Partial Success", `${result.succeeded.length} ${action}d, ${result.failed.length} failed`);
+        } else {
+            toast.success("Success", `${result.succeeded.length} requests ${action}d`);
+        }
         selectedIds.value = [];
         await fetchData();
     } catch (axiosError) {

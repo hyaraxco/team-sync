@@ -205,4 +205,68 @@ class PayrollDetailUpdateTest extends TestCase
 
         return [$payroll, $detail];
     }
+
+    public function test_update_with_stale_updated_at_returns_400(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
+
+        // Record original updated_at
+        $originalUpdatedAt = $detail->updated_at->toISOString();
+
+        // Advance time to ensure updated_at changes
+        Carbon::setTestNow(Carbon::now()->addMinute());
+
+        // Simulate another user updating the record
+        $detail->update(['notes' => 'Modified by another user']);
+
+        // Try to update with stale updated_at
+        $this->putJson("/api/v1/payroll-details/{$detail->id}", [
+            'final_salary' => 8000000,
+            'updated_at' => $originalUpdatedAt,
+        ])
+            ->assertStatus(400)
+            ->assertJsonPath('message', 'Record was modified by another user. Please refresh and try again.');
+
+        // Verify detail was NOT updated with the stale request
+        $detail->refresh();
+        $this->assertEquals(9500000, $detail->final_salary);
+        $this->assertSame('Modified by another user', $detail->notes);
+    }
+
+    public function test_update_with_current_updated_at_succeeds(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
+
+        // Use current updated_at
+        $currentUpdatedAt = $detail->updated_at->toISOString();
+
+        $this->putJson("/api/v1/payroll-details/{$detail->id}", [
+            'final_salary' => 8500000,
+            'updated_at' => $currentUpdatedAt,
+        ])
+            ->assertOk();
+
+        $detail->refresh();
+        $this->assertEquals(8500000, $detail->final_salary);
+    }
+
+    public function test_update_without_updated_at_skips_lock_check(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
+
+        // Simulate another user updating the record
+        $detail->update(['notes' => 'Modified by another user']);
+
+        // Update without providing updated_at (backward compatible)
+        $this->putJson("/api/v1/payroll-details/{$detail->id}", [
+            'final_salary' => 7000000,
+        ])
+            ->assertOk();
+
+        $detail->refresh();
+        $this->assertEquals(7000000, $detail->final_salary);
+    }
 }

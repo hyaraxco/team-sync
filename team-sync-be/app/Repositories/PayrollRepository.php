@@ -710,6 +710,10 @@ class PayrollRepository implements PayrollRepositoryInterface
         return DB::transaction(function () use ($id, $data, $actorId) {
             $payrollDetail = PayrollDetail::findOrFail($id);
 
+            if (isset($data['updated_at']) && $data['updated_at'] !== $payrollDetail->updated_at->toISOString()) {
+                throw new \Exception('Record was modified by another user. Please refresh and try again.');
+            }
+
             if (in_array($payrollDetail->payroll->status, [PayrollStatus::APPROVED, PayrollStatus::PAID], true)) {
                 throw new PayrollStateException('Cannot update payroll details for a payroll that has already been approved or paid.');
             }
@@ -757,138 +761,138 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ->lock('for update nowait')
                     ->firstOrFail();
 
-            if ($payroll->status === PayrollStatus::PAID) {
-                throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be approved.');
-            }
-
-            if ($payroll->status === PayrollStatus::APPROVED) {
-                throw new PayrollStateException('Payroll has already been approved.');
-            }
-
-            if ($payroll->status !== PayrollStatus::PENDING) {
-                throw new PayrollStateException(sprintf(
-                    'Payroll must be in "pending" status to be approved. Current status: "%s".',
-                    $payroll->status->value
-                ));
-            }
-
-            // Check if multi-step approval policies apply
-            $totalAmount = PayrollDetail::where('payroll_id', $payroll->id)->sum('final_salary');
-            $applicablePolicies = PayrollApprovalPolicy::getApplicablePolicies((float) $totalAmount);
-
-            if ($applicablePolicies->isNotEmpty()) {
-                // Check if multi-step approval is active for this payroll
-                $existingApprovals = PayrollApproval::where('payroll_id', $payroll->id)->count();
-                $isFirstCall = ($existingApprovals === 0);
-
-                if ($isFirstCall) {
-                    // Create approval records for the first time
-                    foreach ($applicablePolicies as $policy) {
-                        PayrollApproval::create([
-                            'payroll_id' => $payroll->id,
-                            'policy_id' => $policy->id,
-                            'status' => PayrollApproval::STATUS_PENDING,
-                        ]);
-                    }
+                if ($payroll->status === PayrollStatus::PAID) {
+                    throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be approved.');
                 }
 
-                // Multi-step is active — check if all steps are complete
-                $pendingCount = PayrollApproval::where('payroll_id', $payroll->id)
-                    ->where('status', PayrollApproval::STATUS_PENDING)
-                    ->count();
+                if ($payroll->status === PayrollStatus::APPROVED) {
+                    throw new PayrollStateException('Payroll has already been approved.');
+                }
 
-                if ($pendingCount > 0) {
-                    // Find if this actor has a pending approval
-                    $actorApproval = PayrollApproval::where('payroll_id', $payroll->id)
+                if ($payroll->status !== PayrollStatus::PENDING) {
+                    throw new PayrollStateException(sprintf(
+                        'Payroll must be in "pending" status to be approved. Current status: "%s".',
+                        $payroll->status->value
+                    ));
+                }
+
+                // Check if multi-step approval policies apply
+                $totalAmount = PayrollDetail::where('payroll_id', $payroll->id)->sum('final_salary');
+                $applicablePolicies = PayrollApprovalPolicy::getApplicablePolicies((float) $totalAmount);
+
+                if ($applicablePolicies->isNotEmpty()) {
+                    // Check if multi-step approval is active for this payroll
+                    $existingApprovals = PayrollApproval::where('payroll_id', $payroll->id)->count();
+                    $isFirstCall = ($existingApprovals === 0);
+
+                    if ($isFirstCall) {
+                        // Create approval records for the first time
+                        foreach ($applicablePolicies as $policy) {
+                            PayrollApproval::create([
+                                'payroll_id' => $payroll->id,
+                                'policy_id' => $policy->id,
+                                'status' => PayrollApproval::STATUS_PENDING,
+                            ]);
+                        }
+                    }
+
+                    // Multi-step is active — check if all steps are complete
+                    $pendingCount = PayrollApproval::where('payroll_id', $payroll->id)
                         ->where('status', PayrollApproval::STATUS_PENDING)
-                        ->whereHas('policy', function ($q) use ($actorId) {
-                            $user = User::find($actorId);
-                            if ($user) {
-                                $q->whereIn('required_role', $user->getRoleNames()->toArray());
-                            }
-                        })
-                        ->first();
+                        ->count();
 
-                    if ($actorApproval) {
-                        $actorApproval->update([
-                            'status' => PayrollApproval::STATUS_APPROVED,
-                            'approver_id' => $actorId,
-                            'approved_at' => now(),
-                        ]);
-
-                        // Re-check if all are now complete
-                        $stillPending = PayrollApproval::where('payroll_id', $payroll->id)
+                    if ($pendingCount > 0) {
+                        // Find if this actor has a pending approval
+                        $actorApproval = PayrollApproval::where('payroll_id', $payroll->id)
                             ->where('status', PayrollApproval::STATUS_PENDING)
-                            ->count();
+                            ->whereHas('policy', function ($q) use ($actorId) {
+                                $user = User::find($actorId);
+                                if ($user) {
+                                    $q->whereIn('required_role', $user->getRoleNames()->toArray());
+                                }
+                            })
+                            ->first();
 
-                        if ($stillPending > 0) {
-                            $this->activityLogger->log(
-                                $payroll->id,
-                                'approval_initiated',
-                                'Multi-step approval initiated',
-                                sprintf(
-                                    'Payroll requires %d approval step(s). %d still pending.',
-                                    $isFirstCall ? $applicablePolicies->count() : $existingApprovals,
-                                    $stillPending
-                                ),
-                                $actorId,
-                                [
-                                    'total_steps' => $isFirstCall ? $applicablePolicies->count() : $existingApprovals,
-                                    'pending_steps' => $stillPending,
-                                ]
-                            );
+                        if ($actorApproval) {
+                            $actorApproval->update([
+                                'status' => PayrollApproval::STATUS_APPROVED,
+                                'approver_id' => $actorId,
+                                'approved_at' => now(),
+                            ]);
 
-                            return $payroll->loadCount('payrollDetails');
+                            // Re-check if all are now complete
+                            $stillPending = PayrollApproval::where('payroll_id', $payroll->id)
+                                ->where('status', PayrollApproval::STATUS_PENDING)
+                                ->count();
+
+                            if ($stillPending > 0) {
+                                $this->activityLogger->log(
+                                    $payroll->id,
+                                    'approval_initiated',
+                                    'Multi-step approval initiated',
+                                    sprintf(
+                                        'Payroll requires %d approval step(s). %d still pending.',
+                                        $isFirstCall ? $applicablePolicies->count() : $existingApprovals,
+                                        $stillPending
+                                    ),
+                                    $actorId,
+                                    [
+                                        'total_steps' => $isFirstCall ? $applicablePolicies->count() : $existingApprovals,
+                                        'pending_steps' => $stillPending,
+                                    ]
+                                );
+
+                                return $payroll->loadCount('payrollDetails');
+                            }
+                            // Fall through to approve below
+                        } else {
+                            if ($isFirstCall) {
+                                // First call initiating multi-step — actor doesn't have a matching role
+                                // but they triggered the process. Log and return pending.
+                                $this->activityLogger->log(
+                                    $payroll->id,
+                                    'approval_initiated',
+                                    'Multi-step approval initiated',
+                                    sprintf(
+                                        'Payroll requires %d approval step(s). %d still pending.',
+                                        $applicablePolicies->count(),
+                                        $pendingCount
+                                    ),
+                                    $actorId,
+                                    [
+                                        'total_steps' => $applicablePolicies->count(),
+                                        'pending_steps' => $pendingCount,
+                                    ]
+                                );
+
+                                return $payroll->loadCount('payrollDetails');
+                            }
+
+                            throw new PayrollStateException('You do not have the required role to approve this payroll step.');
                         }
-                        // Fall through to approve below
-                    } else {
-                        if ($isFirstCall) {
-                            // First call initiating multi-step — actor doesn't have a matching role
-                            // but they triggered the process. Log and return pending.
-                            $this->activityLogger->log(
-                                $payroll->id,
-                                'approval_initiated',
-                                'Multi-step approval initiated',
-                                sprintf(
-                                    'Payroll requires %d approval step(s). %d still pending.',
-                                    $applicablePolicies->count(),
-                                    $pendingCount
-                                ),
-                                $actorId,
-                                [
-                                    'total_steps' => $applicablePolicies->count(),
-                                    'pending_steps' => $pendingCount,
-                                ]
-                            );
-
-                            return $payroll->loadCount('payrollDetails');
-                        }
-
-                        throw new PayrollStateException('You do not have the required role to approve this payroll step.');
                     }
+                    // All approvals complete — fall through to set status = approved
                 }
-                // All approvals complete — fall through to set status = approved
-            }
 
-            $payroll->update([
-                'status' => PayrollStatus::APPROVED,
-            ]);
+                $payroll->update([
+                    'status' => PayrollStatus::APPROVED,
+                ]);
 
-            $this->activityLogger->log(
-                $payroll->id,
-                'approved',
-                'Payroll approved for payment',
-                'Payroll review was completed and the payroll is ready to be marked as paid.',
-                $actorId
-            );
+                $this->activityLogger->log(
+                    $payroll->id,
+                    'approved',
+                    'Payroll approved for payment',
+                    'Payroll review was completed and the payroll is ready to be marked as paid.',
+                    $actorId
+                );
 
-            DB::afterCommit(function () use ($payroll, $actorId) {
-                $actorName = $actorId ? User::find($actorId)?->name : null;
-                $this->emailService->sendPayrollApprovedNotification($payroll, $actorName);
+                DB::afterCommit(function () use ($payroll, $actorId) {
+                    $actorName = $actorId ? User::find($actorId)?->name : null;
+                    $this->emailService->sendPayrollApprovedNotification($payroll, $actorName);
+                });
+
+                return $payroll->loadCount('payrollDetails');
             });
-
-            return $payroll->loadCount('payrollDetails');
-        });
         } catch (QueryException $e) {
             if ($this->isLockContentionError($e)) {
                 throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
@@ -907,102 +911,102 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ->lock('for update nowait')
                     ->firstOrFail();
 
-            if ($payroll->status === PayrollStatus::PAID) {
-                throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be modified.');
-            }
+                if ($payroll->status === PayrollStatus::PAID) {
+                    throw new PayrollAlreadyPaidException('Payroll has already been paid and cannot be modified.');
+                }
 
-            if ($payroll->status !== PayrollStatus::APPROVED) {
-                throw new PayrollStateException(sprintf(
-                    'Payroll must be in "approved" status to be marked as paid. Current status: "%s".',
-                    $payroll->status->value
-                ));
-            }
+                if ($payroll->status !== PayrollStatus::APPROVED) {
+                    throw new PayrollStateException(sprintf(
+                        'Payroll must be in "approved" status to be marked as paid. Current status: "%s".',
+                        $payroll->status->value
+                    ));
+                }
 
-            // Check multi-step approval completion
-            $pendingApprovals = PayrollApproval::where('payroll_id', $payroll->id)
-                ->where('status', PayrollApproval::STATUS_PENDING)
-                ->count();
+                // Check multi-step approval completion
+                $pendingApprovals = PayrollApproval::where('payroll_id', $payroll->id)
+                    ->where('status', PayrollApproval::STATUS_PENDING)
+                    ->count();
 
-            if ($pendingApprovals > 0) {
-                throw new PayrollStateException(sprintf(
-                    'Payroll cannot be marked as paid because %d approval step(s) are still pending.',
-                    $pendingApprovals
-                ));
-            }
+                if ($pendingApprovals > 0) {
+                    throw new PayrollStateException(sprintf(
+                        'Payroll cannot be marked as paid because %d approval step(s) are still pending.',
+                        $pendingApprovals
+                    ));
+                }
 
-            $reconciliation = $this->buildPayrollReconciliationPayload($payroll);
-            $criticalCount = (int) ($reconciliation['summary']['unresolved_critical_count'] ?? 0);
+                $reconciliation = $this->buildPayrollReconciliationPayload($payroll);
+                $criticalCount = (int) ($reconciliation['summary']['unresolved_critical_count'] ?? 0);
 
-            if ($criticalCount > 0) {
+                if ($criticalCount > 0) {
+                    $this->activityLogger->log(
+                        $payroll->id,
+                        'payment_blocked_reconciliation',
+                        'Payroll payment blocked by reconciliation',
+                        'Mark as paid was blocked because critical reconciliation issues remain unresolved.',
+                        $actorId,
+                        [
+                            'critical_count' => $criticalCount,
+                            'critical_staff_member_ids' => $reconciliation['summary']['critical_staff_member_ids'] ?? [],
+                        ]
+                    );
+
+                    return [
+                        'blocked' => true,
+                        'message' => sprintf(
+                            'Payroll cannot be marked as paid because %d critical reconciliation issue(s) remain. Complete employee bank information and regenerate payroll before retrying.',
+                            $criticalCount
+                        ),
+                        'details' => [
+                            'critical_count' => $criticalCount,
+                            'critical_staff_member_ids' => $reconciliation['summary']['critical_staff_member_ids'] ?? [],
+                        ],
+                    ];
+                }
+
+                $payroll->update([
+                    'status' => PayrollStatus::PAID,
+                    'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
+                ]);
+
                 $this->activityLogger->log(
                     $payroll->id,
-                    'payment_blocked_reconciliation',
-                    'Payroll payment blocked by reconciliation',
-                    'Mark as paid was blocked because critical reconciliation issues remain unresolved.',
+                    'marked_paid',
+                    'Payroll marked as paid',
+                    'Payroll was finalized and employee notifications were queued automatically.',
                     $actorId,
                     [
-                        'critical_count' => $criticalCount,
-                        'critical_staff_member_ids' => $reconciliation['summary']['critical_staff_member_ids'] ?? [],
+                        'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
                     ]
                 );
 
+                $correctionCount = (int) $payroll->correction_count;
+
+                DB::afterCommit(function () use ($payroll, $correctionCount) {
+                    if ($correctionCount > 0) {
+                        $this->sendCorrectionNotifications($payroll, $correctionCount);
+                    } else {
+                        $this->emailService->sendPayrollPaidNotifications(
+                            $payroll->id,
+                            PayrollNotificationDelivery::TRIGGER_AUTO_PAID
+                        );
+                    }
+                });
+
                 return [
-                    'blocked' => true,
-                    'message' => sprintf(
-                        'Payroll cannot be marked as paid because %d critical reconciliation issue(s) remain. Complete employee bank information and regenerate payroll before retrying.',
-                        $criticalCount
-                    ),
-                    'details' => [
-                        'critical_count' => $criticalCount,
-                        'critical_staff_member_ids' => $reconciliation['summary']['critical_staff_member_ids'] ?? [],
-                    ],
+                    'blocked' => false,
+                    'payroll' => $payroll->loadCount('payrollDetails'),
                 ];
-            }
-
-            $payroll->update([
-                'status' => PayrollStatus::PAID,
-                'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
-            ]);
-
-            $this->activityLogger->log(
-                $payroll->id,
-                'marked_paid',
-                'Payroll marked as paid',
-                'Payroll was finalized and employee notifications were queued automatically.',
-                $actorId,
-                [
-                    'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
-                ]
-            );
-
-            $correctionCount = (int) $payroll->correction_count;
-
-            DB::afterCommit(function () use ($payroll, $correctionCount) {
-                if ($correctionCount > 0) {
-                    $this->sendCorrectionNotifications($payroll, $correctionCount);
-                } else {
-                    $this->emailService->sendPayrollPaidNotifications(
-                        $payroll->id,
-                        PayrollNotificationDelivery::TRIGGER_AUTO_PAID
-                    );
-                }
             });
 
-            return [
-                'blocked' => false,
-                'payroll' => $payroll->loadCount('payrollDetails'),
-            ];
-        });
+            // Throw after transaction commits so activity log is persisted
+            if (($result['blocked'] ?? false) === true) {
+                throw new PayrollReconciliationBlockedException(
+                    (string) ($result['message'] ?? 'Payroll payment was blocked by reconciliation issues.'),
+                    (array) ($result['details'] ?? [])
+                );
+            }
 
-        // Throw after transaction commits so activity log is persisted
-        if (($result['blocked'] ?? false) === true) {
-            throw new PayrollReconciliationBlockedException(
-                (string) ($result['message'] ?? 'Payroll payment was blocked by reconciliation issues.'),
-                (array) ($result['details'] ?? [])
-            );
-        }
-
-        return $result['payroll'];
+            return $result['payroll'];
         } catch (QueryException $e) {
             if ($this->isLockContentionError($e)) {
                 throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
@@ -1021,56 +1025,56 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ->lock('for update nowait')
                     ->firstOrFail();
 
-            if ($payroll->status === PayrollStatus::PENDING) {
-                throw new \Exception('Payroll is already in pending status');
-            }
+                if ($payroll->status === PayrollStatus::PENDING) {
+                    throw new \Exception('Payroll is already in pending status');
+                }
 
-            if ($payroll->status === PayrollStatus::PROCESSING) {
-                throw new \Exception('Processing payroll cannot be reopened for correction');
-            }
+                if ($payroll->status === PayrollStatus::PROCESSING) {
+                    throw new \Exception('Processing payroll cannot be reopened for correction');
+                }
 
-            if ($payroll->status === PayrollStatus::PAID) {
-                throw new \Exception('Payroll must be unapproved before it can be reopened. Please unapprove the payroll first to move it from paid to approved status.');
-            }
+                if ($payroll->status === PayrollStatus::PAID) {
+                    throw new \Exception('Payroll must be unapproved before it can be reopened. Please unapprove the payroll first to move it from paid to approved status.');
+                }
 
-            if ($payroll->status !== PayrollStatus::APPROVED) {
-                throw new \Exception('Only approved payroll can be reopened for correction');
-            }
+                if ($payroll->status !== PayrollStatus::APPROVED) {
+                    throw new \Exception('Only approved payroll can be reopened for correction');
+                }
 
-            // Check correction count limit
-            if ($payroll->correction_count >= self::MAX_CORRECTION_COUNT) {
-                throw new PayrollStateException(sprintf(
-                    'Payroll has reached maximum correction limit (%d). Cannot reopen further.',
-                    self::MAX_CORRECTION_COUNT
-                ));
-            }
+                // Check correction count limit
+                if ($payroll->correction_count >= self::MAX_CORRECTION_COUNT) {
+                    throw new PayrollStateException(sprintf(
+                        'Payroll has reached maximum correction limit (%d). Cannot reopen further.',
+                        self::MAX_CORRECTION_COUNT
+                    ));
+                }
 
-            $previousStatus = $payroll->status;
-            $previousPaymentDate = optional($payroll->payment_date)?->format('Y-m-d');
-            $newCorrectionCount = ((int) $payroll->correction_count) + 1;
+                $previousStatus = $payroll->status;
+                $previousPaymentDate = optional($payroll->payment_date)?->format('Y-m-d');
+                $newCorrectionCount = ((int) $payroll->correction_count) + 1;
 
-            $payroll->update([
-                'status' => PayrollStatus::PENDING,
-                'payment_date' => null,
-                'correction_count' => $newCorrectionCount,
-            ]);
-
-            $this->activityLogger->log(
-                $payroll->id,
-                'reopened_for_correction',
-                'Payroll reopened for correction',
-                'Payroll was reopened to pending status so corrections can be applied before approval/payment.',
-                $actorId,
-                [
-                    'reason' => trim($reason),
-                    'previous_status' => $previousStatus,
-                    'previous_payment_date' => $previousPaymentDate,
+                $payroll->update([
+                    'status' => PayrollStatus::PENDING,
+                    'payment_date' => null,
                     'correction_count' => $newCorrectionCount,
-                ]
-            );
+                ]);
 
-            return $payroll->loadCount('payrollDetails');
-        });
+                $this->activityLogger->log(
+                    $payroll->id,
+                    'reopened_for_correction',
+                    'Payroll reopened for correction',
+                    'Payroll was reopened to pending status so corrections can be applied before approval/payment.',
+                    $actorId,
+                    [
+                        'reason' => trim($reason),
+                        'previous_status' => $previousStatus,
+                        'previous_payment_date' => $previousPaymentDate,
+                        'correction_count' => $newCorrectionCount,
+                    ]
+                );
+
+                return $payroll->loadCount('payrollDetails');
+            });
         } catch (QueryException $e) {
             if ($this->isLockContentionError($e)) {
                 throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
@@ -1810,85 +1814,85 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ->lock('for update nowait')
                     ->firstOrFail();
 
-            if (! in_array($payroll->status, [PayrollStatus::PENDING, PayrollStatus::APPROVED], true)) {
-                throw new \Exception('Payroll must be pending or approved to submit approval decisions');
-            }
-
-            $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
-
-            if ($approvals->isEmpty()) {
-                throw new \Exception('No approval steps found for this payroll');
-            }
-
-            // Find the next pending approval for the actor's role
-            $actor = $actorId ? User::find($actorId) : null;
-            $targetApproval = null;
-
-            foreach ($approvals as $approval) {
-                if ($approval->status !== PayrollApproval::STATUS_PENDING) {
-                    continue;
+                if (! in_array($payroll->status, [PayrollStatus::PENDING, PayrollStatus::APPROVED], true)) {
+                    throw new \Exception('Payroll must be pending or approved to submit approval decisions');
                 }
 
-                $requiredRole = $approval->policy?->required_role;
-                if ($actor && $requiredRole && $actor->hasRole($requiredRole)) {
-                    $targetApproval = $approval;
-                    break;
+                $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
+
+                if ($approvals->isEmpty()) {
+                    throw new \Exception('No approval steps found for this payroll');
                 }
-            }
 
-            if (! $targetApproval) {
-                throw new \Exception('No pending approval step found for your role');
-            }
+                // Find the next pending approval for the actor's role
+                $actor = $actorId ? User::find($actorId) : null;
+                $targetApproval = null;
 
-            $status = $data['status']; // 'approved' or 'rejected'
-            $targetApproval->update([
-                'status' => $status,
-                'approver_id' => $actorId,
-                'notes' => $data['notes'] ?? null,
-                'approved_at' => $status === PayrollApproval::STATUS_APPROVED ? now() : null,
-            ]);
+                foreach ($approvals as $approval) {
+                    if ($approval->status !== PayrollApproval::STATUS_PENDING) {
+                        continue;
+                    }
 
-            $this->activityLogger->log(
-                $payroll->id,
-                'approval_decision',
-                'Approval decision submitted',
-                sprintf(
-                    'Approval step "%s" was %s.',
-                    $targetApproval->policy?->name ?? 'Unknown',
-                    $status
-                ),
-                $actorId,
-                [
-                    'approval_id' => $targetApproval->id,
-                    'policy_name' => $targetApproval->policy?->name,
-                    'decision' => $status,
-                ]
-            );
+                    $requiredRole = $approval->policy?->required_role;
+                    if ($actor && $requiredRole && $actor->hasRole($requiredRole)) {
+                        $targetApproval = $approval;
+                        break;
+                    }
+                }
 
-            // Check if all approvals are now approved
-            $allApproved = PayrollApproval::where('payroll_id', $payroll->id)
-                ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
-                ->doesntExist();
+                if (! $targetApproval) {
+                    throw new \Exception('No pending approval step found for your role');
+                }
 
-            if ($allApproved && $payroll->status === PayrollStatus::PENDING) {
-                $payroll->update(['status' => PayrollStatus::APPROVED]);
+                $status = $data['status']; // 'approved' or 'rejected'
+                $targetApproval->update([
+                    'status' => $status,
+                    'approver_id' => $actorId,
+                    'notes' => $data['notes'] ?? null,
+                    'approved_at' => $status === PayrollApproval::STATUS_APPROVED ? now() : null,
+                ]);
 
                 $this->activityLogger->log(
                     $payroll->id,
-                    'approved',
-                    'Payroll approved via multi-step approval',
-                    'All required approval steps have been completed.',
-                    $actorId
+                    'approval_decision',
+                    'Approval decision submitted',
+                    sprintf(
+                        'Approval step "%s" was %s.',
+                        $targetApproval->policy?->name ?? 'Unknown',
+                        $status
+                    ),
+                    $actorId,
+                    [
+                        'approval_id' => $targetApproval->id,
+                        'policy_name' => $targetApproval->policy?->name,
+                        'decision' => $status,
+                    ]
                 );
 
-                DB::afterCommit(function () use ($payroll, $actorId) {
-                    $actorName = $actorId ? User::find($actorId)?->name : null;
-                    $this->emailService->sendPayrollApprovedNotification($payroll, $actorName);
-                });
-            }
+                // Check if all approvals are now approved
+                $allApproved = PayrollApproval::where('payroll_id', $payroll->id)
+                    ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
+                    ->doesntExist();
 
-            return $this->getApprovalStatus($payrollId);
-        });
+                if ($allApproved && $payroll->status === PayrollStatus::PENDING) {
+                    $payroll->update(['status' => PayrollStatus::APPROVED]);
+
+                    $this->activityLogger->log(
+                        $payroll->id,
+                        'approved',
+                        'Payroll approved via multi-step approval',
+                        'All required approval steps have been completed.',
+                        $actorId
+                    );
+
+                    DB::afterCommit(function () use ($payroll, $actorId) {
+                        $actorName = $actorId ? User::find($actorId)?->name : null;
+                        $this->emailService->sendPayrollApprovedNotification($payroll, $actorName);
+                    });
+                }
+
+                return $this->getApprovalStatus($payrollId);
+            });
         } catch (QueryException $e) {
             if ($this->isLockContentionError($e)) {
                 throw new \Exception('This payroll is currently being processed by another user. Please try again in a few moments.');
@@ -3058,6 +3062,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         if ($code === 'HY000' && str_contains($e->getMessage(), 'database is locked')) {
             return true;
         }
+
         return false;
     }
 

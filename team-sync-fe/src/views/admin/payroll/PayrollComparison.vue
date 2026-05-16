@@ -5,6 +5,7 @@ import { storeToRefs } from "pinia";
 import { formatRupiah } from "@/utils/formatUtils";
 import { ArrowLeft, TrendingUp, TrendingDown, Minus, AlertCircle } from "lucide-vue-next";
 import MainCard from "@/components/common/MainCard.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 
 const payrollStore = usePayrollStore();
 const { payrollComparison, loadingAnalytics, error } = storeToRefs(payrollStore);
@@ -119,12 +120,7 @@ const metrics = [
             </div>
 
             <div v-else-if="payrollComparison && !loadingAnalytics" class="overflow-x-auto">
-                <div
-                    v-if="!payrollComparison.month1.found && !payrollComparison.month2.found"
-                    class="text-center py-8 text-gray-500"
-                >
-                    No payroll data found for the selected periods.
-                </div>
+                <EmptyState v-if="!payrollComparison.month1.found && !payrollComparison.month2.found" icon="Inbox" title="No payroll data found for the selected periods" />
                 <div
                     v-else-if="!payrollComparison.month1.found"
                     class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4"

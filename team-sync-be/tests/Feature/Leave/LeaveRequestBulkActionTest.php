@@ -71,7 +71,7 @@ class LeaveRequestBulkActionTest extends TestCase
         ])
             ->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.0.status', 'approved');
+            ->assertJsonPath('data.succeeded.0.status', 'approved');
 
         $this->assertDatabaseHas('leave_requests', [
             'id' => $firstRequest->id,
@@ -117,7 +117,7 @@ class LeaveRequestBulkActionTest extends TestCase
         ])
             ->assertOk()
             ->assertJsonPath('success', true)
-            ->assertJsonPath('data.0.status', 'rejected');
+            ->assertJsonPath('data.succeeded.0.status', 'rejected');
 
         $this->assertDatabaseHas('leave_requests', [
             'id' => $firstRequest->id,
@@ -175,8 +175,10 @@ class LeaveRequestBulkActionTest extends TestCase
             'ids' => [$leaveRequest->id],
             'action' => 'reject',
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('success', false);
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(1, 'data.failed')
+            ->assertJsonCount(0, 'data.succeeded');
     }
 
     public function test_bulk_approve_validates_leave_entitlement(): void
@@ -198,8 +200,10 @@ class LeaveRequestBulkActionTest extends TestCase
             'ids' => [$leaveRequest->id],
             'action' => 'approve',
         ])
-            ->assertStatus(400)
-            ->assertJsonPath('success', false);
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonCount(1, 'data.failed')
+            ->assertJsonCount(0, 'data.succeeded');
     }
 
     public function test_bulk_action_validates_payload(): void

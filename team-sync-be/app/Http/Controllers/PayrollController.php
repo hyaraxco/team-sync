@@ -300,6 +300,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validate([
             'notes' => 'nullable|string',
             'final_salary' => 'nullable|integer|min:0',
+            'updated_at' => 'nullable|string',
         ]);
 
         try {

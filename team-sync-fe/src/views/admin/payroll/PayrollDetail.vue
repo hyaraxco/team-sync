@@ -21,6 +21,7 @@ import {
     XCircle,
     Minus,
     Bell,
+    Clock,
 } from "lucide-vue-next";
 import { debounce } from "lodash";
 import Pagination from "@/components/admin/payroll/Pagination.vue";
@@ -344,6 +345,9 @@ const fetchPayrollDetails = async (page = 1) => {
                 adjustment_total_amount: parseFloat(detail.adjustment_total_amount) || 0,
                 net_salary: parseFloat(detail.final_salary) || 0,
                 status: payroll.value?.status === "paid" ? "paid" : "pending",
+                overtime_hours: parseFloat(detail.overtime_hours) || 0,
+                overtime_amount: parseFloat(detail.overtime_amount) || 0,
+                overtime_records_count: parseInt(detail.overtime_records_count) || 0,
                 notes: detail.notes,
                 bank_name: detail.staff_member?.bank_information?.bank_name || "N/A",
                 account_number: detail.staff_member?.bank_information?.account_number || "N/A",
@@ -1075,22 +1079,33 @@ const handleApprovePayroll = () => {
                                 </div>
                             </td>
                             <td class="py-4 px-4 text-center">
-                                <div class="flex items-center justify-center gap-2">
-                                    <span
-                                        :class="[
-                                            'text-sm font-semibold',
-                                            getAttendancePercentage(emp.attended_days, emp.total_work_days) >= 90
-                                                ? 'text-green-600'
-                                                : getAttendancePercentage(emp.attended_days, emp.total_work_days) >= 80
-                                                  ? 'text-yellow-600'
-                                                  : 'text-red-600',
-                                        ]"
+                                <div class="flex flex-col items-center gap-1">
+                                    <div class="flex items-center justify-center gap-2">
+                                        <span
+                                            :class="[
+                                                'text-sm font-semibold',
+                                                getAttendancePercentage(emp.attended_days, emp.total_work_days) >= 90
+                                                    ? 'text-green-600'
+                                                    : getAttendancePercentage(emp.attended_days, emp.total_work_days) >= 80
+                                                      ? 'text-yellow-600'
+                                                      : 'text-red-600',
+                                            ]"
+                                        >
+                                            {{ getAttendancePercentage(emp.attended_days, emp.total_work_days) }}%
+                                        </span>
+                                        <span class="text-xs text-brand-light">
+                                            ({{ emp.attended_days }}/{{ emp.total_work_days }})
+                                        </span>
+                                    </div>
+                                    <div
+                                        v-if="emp.overtime_hours > 0"
+                                        class="flex items-center justify-center gap-1 px-2 py-0.5 bg-orange-50 rounded-full border border-orange-200"
                                     >
-                                        {{ getAttendancePercentage(emp.attended_days, emp.total_work_days) }}%
-                                    </span>
-                                    <span class="text-xs text-brand-light">
-                                        ({{ emp.attended_days }}/{{ emp.total_work_days }})
-                                    </span>
+                                        <Clock class="w-3 h-3 text-orange-600" />
+                                        <span class="text-xs font-medium text-orange-700">
+                                            OT {{ emp.overtime_hours }}h
+                                        </span>
+                                    </div>
                                 </div>
                             </td>
                             <td class="py-4 px-4 text-right">

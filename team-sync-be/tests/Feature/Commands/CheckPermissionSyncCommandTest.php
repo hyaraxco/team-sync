@@ -4,6 +4,7 @@ namespace Tests\Feature\Commands;
 
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\TestCase;
 
 class CheckPermissionSyncCommandTest extends TestCase
@@ -13,7 +14,7 @@ class CheckPermissionSyncCommandTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
+        app()[PermissionRegistrar::class]->forgetCachedPermissions();
     }
 
     public function test_exits_successfully_when_all_route_permissions_exist_in_database(): void
