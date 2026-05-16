@@ -133,5 +133,19 @@ export const useThrStore = defineStore("thr", {
                 this.loading = false;
             }
         },
+
+        async reopenThr(id) {
+            this.loading = true;
+            this.error = null;
+            try {
+                const response = await axiosInstance.post(`/thr/${id}/reopen`);
+                return response.data;
+            } catch (error) {
+                this.error = error.response?.data?.message || "Failed to reopen THR";
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
     },
 });

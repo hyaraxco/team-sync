@@ -183,12 +183,20 @@ class LeaveRequestController extends Controller implements HasMiddleware
         $data = $request->validated();
 
         try {
-            $leaveRequests = $this->leaveRequestRepository->bulkAction($data['ids'], $data['action']);
+            $result = $this->leaveRequestRepository->bulkAction($data['ids'], $data['action']);
+
+            $message = count($result['succeeded']).' '.($data['action'] === 'approve' ? 'Approved' : 'Rejected');
+            if (count($result['failed']) > 0) {
+                $message .= ', '.count($result['failed']).' failed';
+            }
 
             return ResponseHelper::jsonResponse(
                 true,
-                'Leave Requests '.($data['action'] === 'approve' ? 'Approved' : 'Rejected').' Successfully',
-                LeaveRequestResource::collection($leaveRequests),
+                $message,
+                [
+                    'succeeded' => LeaveRequestResource::collection($result['succeeded']),
+                    'failed' => $result['failed'],
+                ],
                 200
             );
         } catch (AuthorizationException $e) {

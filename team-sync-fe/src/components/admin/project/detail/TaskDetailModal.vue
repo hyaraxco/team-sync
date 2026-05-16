@@ -401,6 +401,11 @@ const handleAttachmentSelected = async (event) => {
         return;
     }
 
+    if (file.size > 5 * 1024 * 1024) {
+        toast.warning("File Too Large", "Attachment must be under 5MB");
+        return;
+    }
+
     isUploadingAttachment.value = true;
     try {
         await uploadTaskAttachment(props.task.id, file);
