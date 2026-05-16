@@ -83,6 +83,8 @@ vi.mock("vue-router", () => ({
         params: {},
         query: {},
     }),
+    createRouter: vi.fn(() => ({ push: vi.fn(), beforeEach: vi.fn() })),
+    createWebHistory: vi.fn(),
 }));
 
 vi.mock("luxon", async (importOriginal) => {

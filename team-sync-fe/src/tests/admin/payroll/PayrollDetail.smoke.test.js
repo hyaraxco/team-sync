@@ -97,6 +97,8 @@ vi.mock("vue-router", () => ({
     useRouter: () => ({
         back: routerBack,
     }),
+    createRouter: vi.fn(() => ({ push: vi.fn(), beforeEach: vi.fn() })),
+    createWebHistory: vi.fn(),
 }));
 
 vi.mock("@/composables/useToast", () => ({
