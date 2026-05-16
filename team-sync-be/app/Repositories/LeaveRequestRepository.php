@@ -250,47 +250,53 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
                 ->get()
                 ->keyBy('id');
 
-            $updatedLeaveRequests = [];
+            $succeeded = [];
+            $failed = [];
 
             foreach ($ids as $id) {
-                $leaveRequest = $leaveRequestsById->get($id);
+                try {
+                    $leaveRequest = $leaveRequestsById->get($id);
 
-                if (! $leaveRequest) {
-                    throw new ModelNotFoundException('Leave Request Not Found');
-                }
-
-                $this->authorizeManagerScope($leaveRequest);
-                $this->ensurePending($leaveRequest);
-
-                $isApproveAction = $action === 'approve';
-
-                if ($isApproveAction) {
-                    $this->ensureEntitlementIsValid($leaveRequest);
-                }
-
-                $data = [
-                    'status' => $isApproveAction ? 'approved' : 'rejected',
-                    'approved_by' => $approverProfileId,
-                ];
-
-                $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
-                $leaveRequest->update($leaveRequestDto->toArray());
-
-                $updatedLeaveRequest = $leaveRequest->fresh(['staffMember.user', 'approver.user']);
-                $updatedLeaveRequests[] = $updatedLeaveRequest;
-
-                DB::afterCommit(function () use ($updatedLeaveRequest, $action) {
-                    if ($action === 'approve') {
-                        $this->emailService->sendLeaveRequestApprovedNotification($updatedLeaveRequest);
-
-                        return;
+                    if (! $leaveRequest) {
+                        $failed[] = ['id' => $id, 'reason' => 'Leave Request Not Found'];
+                        continue;
                     }
 
-                    $this->emailService->sendLeaveRequestRejectedNotification($updatedLeaveRequest);
-                });
+                    $this->authorizeManagerScope($leaveRequest);
+                    $this->ensurePending($leaveRequest);
+
+                    $isApproveAction = $action === 'approve';
+
+                    if ($isApproveAction) {
+                        $this->ensureEntitlementIsValid($leaveRequest);
+                    }
+
+                    $data = [
+                        'status' => $isApproveAction ? 'approved' : 'rejected',
+                        'approved_by' => $approverProfileId,
+                    ];
+
+                    $leaveRequestDto = LeaveRequestDto::fromArrayForUpdate($data, $leaveRequest);
+                    $leaveRequest->update($leaveRequestDto->toArray());
+
+                    $updatedLeaveRequest = $leaveRequest->fresh(['staffMember.user', 'approver.user']);
+                    $succeeded[] = $updatedLeaveRequest;
+
+                    DB::afterCommit(function () use ($updatedLeaveRequest, $action) {
+                        if ($action === 'approve') {
+                            $this->emailService->sendLeaveRequestApprovedNotification($updatedLeaveRequest);
+
+                            return;
+                        }
+
+                        $this->emailService->sendLeaveRequestRejectedNotification($updatedLeaveRequest);
+                    });
+                } catch (\Exception $e) {
+                    $failed[] = ['id' => $id, 'reason' => $e->getMessage()];
+                }
             }
 
-            return collect($updatedLeaveRequests);
+            return ['succeeded' => collect($succeeded), 'failed' => $failed];
         });
     }
 

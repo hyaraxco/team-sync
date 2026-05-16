@@ -84,6 +84,22 @@ export const useAttendancePeriodStore = defineStore("attendancePeriod", {
             }
         },
 
+        async lockPeriod(id) {
+            this.loading = true;
+            this.error = null;
+            this.success = null;
+            try {
+                const response = await axiosInstance.put(`attendance-periods/${id}`, { status: 'locked' });
+                this.success = response.data.message;
+                return response.data.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.loading = false;
+            }
+        },
+
         async updatePeriod(id, data) {
             this.loading = true;
             this.error = null;

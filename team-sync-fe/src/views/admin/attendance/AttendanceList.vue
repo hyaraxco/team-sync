@@ -9,6 +9,7 @@ import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils.js";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { can } from "@/helpers/permissionHelper";
@@ -377,10 +378,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div v-if="!loadingLeaveRequests && leaveRequests.length === 0" class="text-center py-12">
-                        <CalendarClock class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p class="text-gray-500 text-lg font-medium">No leave requests found</p>
-                    </div>
+                    <EmptyState v-if="!loadingLeaveRequests && leaveRequests.length === 0" icon="CalendarClock" title="No leave requests found" />
                 </div>
             </div>
 
@@ -437,13 +435,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div
-                        v-if="!loadingCorrections && pendingCorrections.length === 0"
-                        class="text-center py-12 flex flex-col items-center"
-                    >
-                        <Clock class="w-12 h-12 text-gray-400 mb-4" />
-                        <p class="text-gray-500 text-lg font-medium">No pending corrections</p>
-                    </div>
+                    <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="Clock" title="No pending corrections" />
                 </div>
             </div>
         </div>
