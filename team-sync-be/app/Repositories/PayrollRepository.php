@@ -711,7 +711,7 @@ class PayrollRepository implements PayrollRepositoryInterface
             $payrollDetail = PayrollDetail::findOrFail($id);
 
             if (isset($data['updated_at']) && $data['updated_at'] !== $payrollDetail->updated_at->toISOString()) {
-                throw new \Exception('Record was modified by another user. Please refresh and try again.');
+                throw new \App\Exceptions\ConcurrentModificationException();
             }
 
             if (in_array($payrollDetail->payroll->status, [PayrollStatus::APPROVED, PayrollStatus::PAID], true)) {

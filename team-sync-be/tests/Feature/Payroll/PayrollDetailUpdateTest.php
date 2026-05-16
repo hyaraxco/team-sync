@@ -206,7 +206,7 @@ class PayrollDetailUpdateTest extends TestCase
         return [$payroll, $detail];
     }
 
-    public function test_update_with_stale_updated_at_returns_400(): void
+    public function test_update_with_stale_updated_at_returns_409(): void
     {
         $this->actingAsRole('finance');
         [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
@@ -225,7 +225,7 @@ class PayrollDetailUpdateTest extends TestCase
             'final_salary' => 8000000,
             'updated_at' => $originalUpdatedAt,
         ])
-            ->assertStatus(400)
+            ->assertStatus(409)
             ->assertJsonPath('message', 'Record was modified by another user. Please refresh and try again.');
 
         // Verify detail was NOT updated with the stale request
