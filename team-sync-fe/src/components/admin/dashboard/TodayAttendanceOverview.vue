@@ -40,7 +40,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
         <div class="flex items-center justify-between mb-4">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
+                    class="w-10 h-10 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
                 >
                     <Clock class="w-5 h-5 text-white" />
                 </div>
@@ -78,7 +78,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
                 </div>
                 <div class="w-full h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                        class="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-500"
+                        class="h-full bg-gradient-to-r from-brand-primary to-brand-primary rounded-full transition-all duration-500"
                         :style="{ width: checkedInPercentage + '%' }"
                     ></div>
                 </div>

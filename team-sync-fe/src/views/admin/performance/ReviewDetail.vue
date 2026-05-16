@@ -475,7 +475,7 @@ watch(
                         :class="
                             activeTab === tab.id
                                 ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                         "
                     >
                         <component
@@ -1530,7 +1530,7 @@ watch(
                                     :class="
                                         isCalibrationValid && !submitting
                                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                                     "
                                 >
                                     <ScaleIcon class="w-4 h-4" />

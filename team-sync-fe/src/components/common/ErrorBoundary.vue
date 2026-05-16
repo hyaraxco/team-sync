@@ -47,7 +47,7 @@ const retry = () => {
         <button
             v-if="showRetry"
             @click="retry"
-            class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 active:scale-[0.97] transition-all duration-150"
+            class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-primary hover:bg-brand-primary active:scale-[0.97] transition-all duration-150"
         >
             <RefreshCw class="w-4 h-4" />
             Try Again

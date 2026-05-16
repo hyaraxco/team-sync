@@ -313,7 +313,7 @@ describe("EmployeeStatistics - Notification category icon/color resolution", () 
     it("resolves unknown category icon class to default blue text", () => {
         const wrapper = factory();
         const cls = wrapper.vm.getActivityIconClass({ category: "unknown-type" });
-        expect(cls).toContain("primary-500");
+        expect(cls).toContain("brand-primary");
     });
 
     it("resolves category from data.category fallback", () => {

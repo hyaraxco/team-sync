@@ -3,13 +3,13 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
 </script>
 
 <template>
-    <div class="auth-shell min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+    <div class="auth-shell min-h-[100dvh] bg-gradient-to-br from-slate-50 via-white to-blue-50">
         <a
             href="#auth-main"
             class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-[#0C51D9] focus:shadow-lg"
         >Skip to main content</a>
 
-        <div class="flex min-h-screen w-full">
+        <div class="flex min-h-[100dvh] w-full">
             <!-- Left Side - Visual (35%) -->
             <aside
                 class="relative hidden w-1/2 overflow-hidden bg-gray-900 text-white lg:flex flex-col items-start justify-between"

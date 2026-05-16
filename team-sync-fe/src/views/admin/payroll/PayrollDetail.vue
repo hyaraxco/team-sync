@@ -774,7 +774,7 @@ const handleApprovePayroll = () => {
     <div class="space-y-6">
         <button
             @click="router.back()"
-            class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-2"
+            class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-2"
         >
             <ArrowLeft class="w-4 h-4 text-gray-600" />
             <span class="text-brand-dark text-base font-semibold">Back</span>
@@ -783,7 +783,7 @@ const handleApprovePayroll = () => {
         <template v-if="hasPayrollStatistics">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div
-                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
                     <div class="flex items-center justify-between">
                         <div>
@@ -801,7 +801,7 @@ const handleApprovePayroll = () => {
                 </div>
 
                 <div
-                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
                     <div class="flex items-center justify-between">
                         <div>
@@ -822,7 +822,7 @@ const handleApprovePayroll = () => {
                 </div>
 
                 <div
-                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
                     <div class="flex items-center justify-between">
                         <div>
@@ -843,7 +843,7 @@ const handleApprovePayroll = () => {
                 </div>
 
                 <div
-                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                    class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
                     <div class="flex items-center justify-between">
                         <div>
@@ -922,7 +922,7 @@ const handleApprovePayroll = () => {
                     :class="
                         activeTab === 'employees'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-employees"
                 >
@@ -935,7 +935,7 @@ const handleApprovePayroll = () => {
                     :class="
                         activeTab === 'reconciliation'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-reconciliation"
                 >
@@ -951,7 +951,7 @@ const handleApprovePayroll = () => {
                     :class="
                         activeTab === 'settings'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-settings"
                 >
@@ -964,7 +964,7 @@ const handleApprovePayroll = () => {
                     :class="
                         activeTab === 'activity'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-activity"
                 >
@@ -977,7 +977,7 @@ const handleApprovePayroll = () => {
                     :class="
                         activeTab === 'approvals'
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-approvals"
                 >
@@ -1012,14 +1012,14 @@ const handleApprovePayroll = () => {
                             v-model="searchQuery"
                             placeholder="Search employees..."
                             aria-label="Search employees"
-                            class="pl-10 pr-4 py-2 border border-brand-border rounded-[#12px] hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm"
+                            class="pl-10 pr-4 py-2 border border-brand-border rounded-[#12px] hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm"
                         />
                     </div>
 
                     <select
                         v-model="departmentFilter"
                         aria-label="Filter by position"
-                        class="px-3 py-2 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm"
+                        class="px-3 py-2 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm"
                     >
                         <option value="">All Positions</option>
                         <option value="Software Engineer">Software Engineer</option>
@@ -1508,7 +1508,7 @@ const handleApprovePayroll = () => {
                             <select
                                 v-model="reconciliationSeverityFilter"
                                 data-testid="payroll-reconciliation-filter-severity"
-                                class="px-3 py-2 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm font-normal text-brand-dark"
+                                class="px-3 py-2 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm font-normal text-brand-dark"
                             >
                                 <option value="all">All severities</option>
                                 <option value="critical">Critical</option>
@@ -1521,7 +1521,7 @@ const handleApprovePayroll = () => {
                             <select
                                 v-model="reconciliationTypeFilter"
                                 data-testid="payroll-reconciliation-filter-type"
-                                class="px-3 py-2 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm font-normal text-brand-dark"
+                                class="px-3 py-2 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300 text-sm font-normal text-brand-dark"
                             >
                                 <option value="all">All issue types</option>
                                 <option
@@ -1601,7 +1601,7 @@ const handleApprovePayroll = () => {
                                         type="button"
                                         @click="openResolveExceptionModal(issue)"
                                         data-testid="reconciliation-resolve-btn"
-                                        class="inline-flex items-center gap-1 rounded-lg border border-brand-border px-2.5 py-1.5 text-xs font-semibold text-brand-dark hover:border-primary-500 hover:bg-gray-50 transition-all duration-300"
+                                        class="inline-flex items-center gap-1 rounded-lg border border-brand-border px-2.5 py-1.5 text-xs font-semibold text-brand-dark hover:border-brand-primary hover:bg-gray-50 transition-all duration-300"
                                     >
                                         <ShieldCheck class="w-3.5 h-3.5" />
                                         Resolve
@@ -1627,7 +1627,7 @@ const handleApprovePayroll = () => {
                         @click="exportPdf"
                         :disabled="exportingPdf"
                         data-testid="payroll-export-pdf"
-                        class="border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <Download class="w-4 h-4 text-gray-600" />
                         <span class="text-brand-dark text-sm font-semibold">
@@ -1639,7 +1639,7 @@ const handleApprovePayroll = () => {
                         v-if="hasPayrollList"
                         @click="exportExcel"
                         data-testid="payroll-export-excel"
-                        class="border border-brand-border rounded-xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                        class="border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                     >
                         <Download class="w-4 h-4 text-gray-600" />
                         <span class="text-brand-dark text-sm font-semibold">Export Excel</span>
@@ -1949,7 +1949,7 @@ const handleApprovePayroll = () => {
                     type="button"
                     @click="openResendNotificationsModal"
                     data-testid="payroll-resend-notifications"
-                    class="border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                    class="border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                 >
                     <CheckCircle class="w-4 h-4 text-gray-600" />
                     <span class="text-brand-dark text-sm font-semibold">Resend Notifications</span>
@@ -2043,7 +2043,7 @@ const handleApprovePayroll = () => {
                     <button
                         type="button"
                         @click="closeAdjustmentDetailsModal"
-                        class="border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-2"
+                        class="border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-2"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Close</span>
                     </button>
@@ -2070,7 +2070,7 @@ const handleApprovePayroll = () => {
                         @click="handleApprovePayroll"
                         :disabled="approvingPayroll"
                         data-testid="payroll-confirm-approve"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <CheckCircle class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2080,7 +2080,7 @@ const handleApprovePayroll = () => {
                     <button
                         @click="closeApprovePayrollModal"
                         :disabled="approvingPayroll"
-                        class="flex-1 border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Cancel</span>
                     </button>
@@ -2117,7 +2117,7 @@ const handleApprovePayroll = () => {
                         v-model="paymentDate"
                         required
                         data-testid="payroll-payment-date"
-                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     />
                 </div>
             </div>
@@ -2128,7 +2128,7 @@ const handleApprovePayroll = () => {
                         @click="handleMarkAsPaid"
                         :disabled="markingAsPaid"
                         data-testid="payroll-confirm-mark-as-paid"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <CheckCircle class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2138,7 +2138,7 @@ const handleApprovePayroll = () => {
                     <button
                         @click="closeMarkAsPaidModal"
                         :disabled="markingAsPaid"
-                        class="flex-1 border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Cancel</span>
                     </button>
@@ -2165,7 +2165,7 @@ const handleApprovePayroll = () => {
                         @click="handleResendNotifications"
                         :disabled="resendingNotifications"
                         data-testid="payroll-confirm-resend-notifications"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <CheckCircle class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2175,7 +2175,7 @@ const handleApprovePayroll = () => {
                     <button
                         @click="closeResendNotificationsModal"
                         :disabled="resendingNotifications"
-                        class="flex-1 border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Cancel</span>
                     </button>
@@ -2213,7 +2213,7 @@ const handleApprovePayroll = () => {
                         rows="4"
                         maxlength="500"
                         data-testid="payroll-reopen-reason"
-                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 resize-none"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300 resize-none"
                         placeholder="Explain why this payroll needs to be reopened for correction."
                     />
                     <p class="text-brand-light text-xs mt-2">
@@ -2228,7 +2228,7 @@ const handleApprovePayroll = () => {
                         @click="handleReopenPayroll"
                         :disabled="reopeningPayroll || reopenReason.trim().length < 10"
                         data-testid="payroll-confirm-reopen"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <RotateCcw class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2238,7 +2238,7 @@ const handleApprovePayroll = () => {
                     <button
                         @click="closeReopenPayrollModal"
                         :disabled="reopeningPayroll"
-                        class="flex-1 border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Cancel</span>
                     </button>
@@ -2265,7 +2265,7 @@ const handleApprovePayroll = () => {
                     <select
                         v-model="resolveExceptionForm.resolution_action"
                         data-testid="reconciliation-resolve-action"
-                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300"
                     >
                         <option value="acknowledged">Acknowledged</option>
                         <option value="resolved">Resolved</option>
@@ -2280,7 +2280,7 @@ const handleApprovePayroll = () => {
                         rows="4"
                         maxlength="500"
                         data-testid="reconciliation-resolve-reason"
-                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-primary-500 focus:border-primary-500 focus:ring-2 focus:ring-blue-100 transition-all duration-300 resize-none"
+                        class="w-full px-4 py-3 border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary focus:ring-2 focus:ring-blue-100 transition-all duration-300 resize-none"
                         placeholder="Explain why this exception is being resolved (minimum 10 characters)."
                     />
                     <p class="text-brand-light text-xs mt-2">
@@ -2295,7 +2295,7 @@ const handleApprovePayroll = () => {
                         @click="handleResolveException"
                         :disabled="resolvingException || resolveExceptionForm.reason.trim().length < 10"
                         data-testid="reconciliation-resolve-confirm"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ShieldCheck class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2305,7 +2305,7 @@ const handleApprovePayroll = () => {
                     <button
                         @click="closeResolveExceptionModal"
                         :disabled="resolvingException"
-                        class="flex-1 border border-brand-border rounded-xl hover:border-primary-500 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 border border-brand-border rounded-xl hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <span class="text-brand-dark text-sm font-semibold">Cancel</span>
                     </button>

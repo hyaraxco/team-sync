@@ -8,7 +8,7 @@
             <!-- slot icon -->
             <div
                 v-if="hasIcon"
-                class="absolute left-4 flex h-full items-center pointer-events-none text-gray-400 transition-colors peer-focus:text-primary-500 z-10"
+                class="absolute left-4 flex h-full items-center pointer-events-none text-gray-400 transition-colors peer-focus:text-brand-primary z-10"
             >
                 <slot name="icon" />
             </div>
@@ -31,7 +31,7 @@
                     hasSuffix ? 'pr-12' : 'pr-4',
                     error
                         ? 'border-red-300 ring-4 ring-red-500/10 focus:border-red-500 focus:ring-red-500/20'
-                        : 'border-gray-200 hover:border-gray-300 focus:border-primary-500 focus:ring-4 focus:ring-primary-500/10',
+                        : 'border-gray-200 hover:border-gray-300 focus:border-brand-primary focus:ring-4 focus:ring-brand-primary/10',
                 ]"
                 @input="modelValue = $event.target.value"
                 @blur="emit('blur', $event)"

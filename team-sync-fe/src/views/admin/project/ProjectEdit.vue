@@ -234,21 +234,21 @@ watch(
                                     />
                                     <button
                                         type="button"
-                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <ImagePlus class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Select Photo</span>
                                     </button>
                                     <button
                                         type="button"
-                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <Eye class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Preview Photo</span>
                                     </button>
                                     <button
                                         type="button"
-                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <X class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Remove Photo</span>
@@ -282,7 +282,7 @@ watch(
                             <div class="grid grid-cols-3 gap-4">
                                 <!-- Low Priority -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -305,7 +305,7 @@ watch(
                                             v-model="form.priority"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -315,7 +315,7 @@ watch(
 
                                 <!-- Medium Priority -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -338,7 +338,7 @@ watch(
                                             v-model="form.priority"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -348,7 +348,7 @@ watch(
 
                                 <!-- High Priority -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -371,7 +371,7 @@ watch(
                                             v-model="form.priority"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -482,7 +482,7 @@ watch(
                             <button
                                 type="button"
                                 @click="leaderModal = true"
-                                class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+                                class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                             >
                                 <UserCheck class="w-5 h-5 text-gray-400" />
                                 <span class="text-[#0D2929] font-normal flex-1">
@@ -550,7 +550,7 @@ watch(
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Product Development Team -->
                                 <label
-                                    class="group team-card flex items-center justify-between w-full min-h-[70px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer hover:ring-2 hover:ring-primary-500/20"
+                                    class="group team-card flex items-center justify-between w-full min-h-[70px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer hover:ring-2 hover:ring-brand-primary/20"
                                     v-for="(team, index) in teams"
                                     :key="index"
                                 >
@@ -560,7 +560,7 @@ watch(
                                         >
                                             <!-- Main blue background -->
                                             <div
-                                                class="w-full h-full absolute bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl"
+                                                class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
                                             ></div>
                                             <!-- Lucide icon -->
                                             <Code class="w-5 h-5 text-white relative z-10" />
@@ -585,7 +585,7 @@ watch(
                                             v-model="form.teams"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded border border-brand-border group-has-[:checked]:bg-primary-500 group-has-[:checked]:border-primary-500 transition-all duration-300 items-center justify-center"
+                                            class="flex size-[18px] rounded border border-brand-border group-has-[:checked]:bg-brand-primary group-has-[:checked]:border-brand-primary transition-all duration-300 items-center justify-center"
                                         >
                                             <Check
                                                 class="w-3 h-3 text-white opacity-0 group-has-[:checked]:opacity-100 transition-opacity duration-300"
@@ -652,7 +652,7 @@ watch(
                             <div class="grid grid-cols-2 gap-4">
                                 <!-- Active Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -675,7 +675,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -685,7 +685,7 @@ watch(
 
                                 <!-- Planning Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -708,7 +708,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -718,7 +718,7 @@ watch(
 
                                 <!-- On Hold Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -741,7 +741,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -751,7 +751,7 @@ watch(
 
                                 <!-- Draft Option -->
                                 <label
-                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-primary-500 has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
+                                    class="group card flex items-center justify-between w-full min-h-[60px] rounded-2xl border border-brand-border p-4 has-[:checked]:ring-2 has-[:checked]:ring-brand-primary has-[:checked]:ring-offset-2 transition-all duration-300 cursor-pointer"
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
@@ -774,7 +774,7 @@ watch(
                                             v-model="form.status"
                                         />
                                         <div
-                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-primary-500 transition-all duration-300"
+                                            class="flex size-[18px] rounded-full shadow-sm border border-brand-border group-has-[:checked]:border-[5px] group-has-[:checked]:border-brand-primary transition-all duration-300"
                                         ></div>
                                         <p
                                             class="text-xs font-semibold after:content-['Select'] group-has-[:checked]:after:content-['Selected']"
@@ -791,7 +791,7 @@ watch(
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Update Project</span>
                         <Plus class="w-4 h-4 text-white" />
@@ -799,7 +799,7 @@ watch(
                     <button
                         type="button"
                         onclick="window.history.back()"
-                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-dark text-base font-semibold">Cancel</span>
                     </button>
@@ -828,7 +828,7 @@ watch(
                     <button
                         type="button"
                         @click="leaderModal = false"
-                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     >
                         <X class="w-5 h-5 text-gray-600" />
                     </button>
@@ -843,7 +843,7 @@ watch(
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                         placeholder="Search staffMembers..."
                         v-model="searchLeader"
                     />
@@ -854,7 +854,7 @@ watch(
             <div class="p-6 overflow-y-auto max-h-96">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
-                        class="leader-card border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="leader-card border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
                         v-for="employee in staffMembers"
                         :key="employee.id"
                         @click="handleSelectLeader(employee)"

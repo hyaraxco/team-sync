@@ -187,7 +187,7 @@ const teamProductivitySeries = computed(() => [
     <div v-else-if="projects" class="space-y-6">
         <!-- Period Label -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
-            <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-brand-primary"></span>
             {{ projects.period?.label }}
             <span class="text-gray-300">|</span>
             {{ projects.period?.start }} - {{ projects.period?.end }}

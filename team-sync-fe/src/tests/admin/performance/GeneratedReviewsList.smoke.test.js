@@ -67,7 +67,7 @@ describe("GeneratedReviewsList.vue Smoke Test", () => {
                     status: "pending_self",
                     staff_member: {
                         id: 1,
-                        user: { name: "John Doe" },
+                        user: { name: "Ahmad Fauzi" },
                         job_information: { job_title: "Developer" },
                     },
                     reviewer: {
@@ -88,7 +88,7 @@ describe("GeneratedReviewsList.vue Smoke Test", () => {
             props: { cycle: cycleWithReviews },
         });
 
-        expect(wrapper.text()).toContain("John Doe");
+        expect(wrapper.text()).toContain("Ahmad Fauzi");
         expect(wrapper.text()).toContain("Developer");
         expect(wrapper.text()).toContain("Jane Smith");
         expect(wrapper.text()).toContain("manager");
@@ -106,7 +106,7 @@ describe("GeneratedReviewsList.vue Smoke Test", () => {
                     status: "pending_self",
                     staff_member: {
                         id: 1,
-                        user: { name: "John Doe" },
+                        user: { name: "Ahmad Fauzi" },
                         job_information: { job_title: "Developer" },
                     },
                     reviewer: null,

@@ -30,7 +30,7 @@ const { routeState, routerPushMock, performanceGoalStoreMock, performanceGoalRef
                 __v_isRef: true,
                 value: {
                     id: 1,
-                    name: "John Doe",
+                    name: "Ahmad Fauzi",
                     email: "john@example.com",
                     roles: ["staff"],
                 },

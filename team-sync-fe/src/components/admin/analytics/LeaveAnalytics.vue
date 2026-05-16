@@ -187,7 +187,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
     <div v-else-if="leave" class="space-y-6">
         <!-- Period Label -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
-            <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-brand-primary"></span>
             {{ leave.period?.label }}
             <span class="text-gray-300">|</span>
             {{ leave.period?.start }} - {{ leave.period?.end }}

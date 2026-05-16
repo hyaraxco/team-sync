@@ -530,7 +530,7 @@ onUnmounted(() => {
             <div class="absolute bottom-4 right-6 flex items-center gap-[10px] z-10">
                 <div
                     v-if="isRemote"
-                    class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2 shadow-lg"
+                    class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2 shadow-md"
                 >
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     <span class="text-green-700 text-sm font-semibold">Auto-present · Remote</span>
@@ -538,7 +538,7 @@ onUnmounted(() => {
 
                 <div
                     v-if="canUseClockActions && !isCheckedIn && isHybrid"
-                    class="bg-white/95 backdrop-blur-sm text-brand-dark rounded-lg border border-brand-border px-3 py-2 shadow-lg"
+                    class="bg-white/95 backdrop-blur-sm text-brand-dark rounded-lg border border-brand-border px-3 py-2 shadow-md"
                 >
                     <label for="actual-work-mode" class="sr-only">Actual work mode</label>
                     <select
@@ -557,9 +557,9 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckIn"
                     :disabled="attendanceLoading"
-                    class="bg-white text-brand-dark rounded-lg border border-brand-border hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-white text-brand-dark rounded-lg border border-brand-border hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <Clock class="w-4 h-4 text-primary-500" />
+                    <Clock class="w-4 h-4 text-brand-primary" />
                     <span data-testid="clock-in-button-label" class="text-brand-dark text-sm font-semibold">
                         Clock In
                     </span>
@@ -569,7 +569,7 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckOut"
                     :disabled="isClockOutDisabled"
-                    class="bg-white text-brand-dark rounded-lg border border-[#EE2A3B] hover:ring-2 hover:ring-red-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-white text-brand-dark rounded-lg border border-[#EE2A3B] hover:ring-2 hover:ring-red-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Clock class="w-4 h-4 text-[#EE2A3B]" />
                     <span class="text-brand-dark text-sm font-semibold">Clock Out</span>
@@ -578,7 +578,7 @@ onUnmounted(() => {
                 <button
                     v-if="canCreateLeaveRequest"
                     @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 shadow-lg"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 shadow-md"
                 >
                     <Plus class="w-4 h-4 text-white" />
                     <span class="text-white text-sm font-semibold">Request Leave</span>
@@ -604,7 +604,7 @@ onUnmounted(() => {
                     :class="
                         activeSection === section.id
                             ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-primary-500/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                 >
                     <component
@@ -620,7 +620,7 @@ onUnmounted(() => {
         <div v-if="activeSection === 'overview'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div
                 v-if="canViewMyLeaveRequests"
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
             >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
@@ -670,12 +670,12 @@ onUnmounted(() => {
                     <div
                         v-for="record in recentAttendances"
                         :key="record.id"
-                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4"
+                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-4"
                     >
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
+                                    class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
                                 >
                                     <User class="w-5 h-5 text-white" />
                                 </div>
@@ -745,7 +745,7 @@ onUnmounted(() => {
                             type="button"
                             @click="goToPreviousMonth"
                             aria-label="Previous month"
-                            class="w-9 h-9 border border-brand-border rounded-lg flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                            class="w-9 h-9 border border-brand-border rounded-lg flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                         >
                             <ChevronLeft class="w-4 h-4 text-brand-dark" aria-hidden="true" />
                         </button>
@@ -754,7 +754,7 @@ onUnmounted(() => {
                             type="button"
                             @click="goToNextMonth"
                             aria-label="Next month"
-                            class="w-9 h-9 border border-brand-border rounded-lg flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                            class="w-9 h-9 border border-brand-border rounded-lg flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                         >
                             <ChevronRight class="w-4 h-4 text-brand-dark" aria-hidden="true" />
                         </button>
@@ -784,7 +784,7 @@ onUnmounted(() => {
                                 class="text-xs font-semibold mb-1 w-6 h-6 flex items-center justify-center rounded-full"
                                 :class="[
                                     day.inCurrentMonth ? 'text-brand-dark' : 'text-gray-400',
-                                    day.isToday ? 'bg-primary-500 text-white' : '',
+                                    day.isToday ? 'bg-brand-primary text-white' : '',
                                 ]"
                             >
                                 {{ day.day }}
@@ -813,7 +813,7 @@ onUnmounted(() => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
             >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
@@ -835,13 +835,13 @@ onUnmounted(() => {
                     <div
                         v-for="request in myLeaveRequests"
                         :key="request.id"
-                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-4 cursor-pointer"
                         @click="openLeaveDetailsModal(request.id)"
                     >
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
+                                    class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
                                 >
                                     <CalendarPlus class="w-5 h-5 text-white" />
                                 </div>
@@ -918,7 +918,7 @@ onUnmounted(() => {
                 <button
                     v-if="canCreateLeaveRequest"
                     @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                 >
                     <Plus class="w-4 h-4 text-white" />
                     <span class="text-white text-sm font-semibold">Request Leave</span>
@@ -927,7 +927,7 @@ onUnmounted(() => {
 
             <div
                 v-if="canViewMyLeaveRequests"
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-300 p-6"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
             >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
@@ -949,13 +949,13 @@ onUnmounted(() => {
                     <div
                         v-for="request in myLeaveRequests"
                         :key="request.id"
-                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-4 cursor-pointer"
                         @click="openLeaveDetailsModal(request.id)"
                     >
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-primary-500 to-primary-600 rounded-xl flex items-center justify-center"
+                                    class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
                                 >
                                     <CalendarPlus class="w-5 h-5 text-white" />
                                 </div>
@@ -1035,7 +1035,7 @@ onUnmounted(() => {
                             <button
                                 type="button"
                                 @click="closeLeaveRequestModal"
-                                class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                                class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                             >
                                 <span class="text-gray-600 text-xl">×</span>
                             </button>
@@ -1053,7 +1053,7 @@ onUnmounted(() => {
                                         <select
                                             v-model="leaveForm.leave_type"
                                             required
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                                         >
                                             <option value="">Select leave type</option>
                                             <option v-for="type in leaveTypes" :key="type.value" :value="type.value">
@@ -1072,7 +1072,7 @@ onUnmounted(() => {
                                             @change="updateEndDateMin"
                                             required
                                             data-testid="leave-start-date"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                                         />
                                     </div>
 
@@ -1084,7 +1084,7 @@ onUnmounted(() => {
                                             :min="leaveForm.start_date"
                                             required
                                             data-testid="leave-end-date"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                                         />
                                     </div>
 
@@ -1121,7 +1121,7 @@ onUnmounted(() => {
                                             required
                                             rows="4"
                                             data-testid="leave-reason"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold resize-none"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold resize-none"
                                             placeholder="Please provide a detailed reason for your leave request..."
                                         ></textarea>
                                     </div>
@@ -1133,7 +1133,7 @@ onUnmounted(() => {
                                         <input
                                             type="tel"
                                             v-model="leaveForm.emergency_contact"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
                                             placeholder="Phone number for emergency contact"
                                         />
                                     </div>
@@ -1147,7 +1147,7 @@ onUnmounted(() => {
                                             @change="handleProofFileChange"
                                             accept=".pdf,.jpg,.jpeg,.png"
                                             required
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-primary-500/20 focus:border-primary-500 focus:border-2 focus:bg-white transition-all duration-300 text-sm font-medium text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 text-sm font-medium text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         />
                                         <p class="text-xs text-brand-light mt-1.5">
                                             Max size: 5MB. Formats: PDF, JPG, PNG.
@@ -1160,13 +1160,13 @@ onUnmounted(() => {
                                 <button
                                     type="button"
                                     @click="closeLeaveRequestModal"
-                                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
                                 >
                                     <span class="text-brand-dark text-base font-semibold">Cancel</span>
                                 </button>
                                 <button
                                     type="submit"
-                                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                                 >
                                     <span class="text-brand-white text-base font-semibold">Submit Request</span>
                                 </button>
@@ -1202,7 +1202,7 @@ onUnmounted(() => {
                             <button
                                 type="button"
                                 @click="closeLeaveDetailsModal"
-                                class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-primary-500/20 transition-all duration-200"
+                                class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                             >
                                 <span class="text-gray-600 text-xl">×</span>
                             </button>
@@ -1406,7 +1406,7 @@ onUnmounted(() => {
                                 <button
                                     type="button"
                                     @click="closeLeaveDetailsModal"
-                                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
                                 >
                                     <span class="text-brand-dark text-base font-semibold">Close</span>
                                 </button>

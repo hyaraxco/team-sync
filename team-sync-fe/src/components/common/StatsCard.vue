@@ -93,7 +93,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 <template>
     <div
         :class="borderClass"
-        class="stats-card bg-white border border-brand-border border-l-4 rounded-2xl hover:ring-2 hover:ring-primary-500/20 transition-all duration-200 p-4 sm:p-5"
+        class="stats-card bg-white border border-brand-border border-l-4 rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200 p-4 sm:p-5"
     >
         <div class="flex items-center justify-between">
             <div>

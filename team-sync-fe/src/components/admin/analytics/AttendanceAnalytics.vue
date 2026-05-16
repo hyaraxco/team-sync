@@ -195,7 +195,7 @@ const correctionSeries = computed(() => {
     <div v-else-if="attendance" class="space-y-6">
         <!-- Period Label -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
-            <span class="inline-block w-2 h-2 rounded-full bg-primary-500"></span>
+            <span class="inline-block w-2 h-2 rounded-full bg-brand-primary"></span>
             {{ attendance.period?.label }}
             <span class="text-gray-300">|</span>
             {{ attendance.period?.start }} - {{ attendance.period?.end }}

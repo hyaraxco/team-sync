@@ -235,7 +235,7 @@ onMounted(() => {
             v-if="showModal"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
         >
-            <div class="bg-white rounded-xl shadow-xl w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-white rounded-xl shadow-md w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
                 <div class="flex items-center justify-between p-4 border-b">
                     <h3 class="text-lg font-bold text-brand-dark">
                         {{ editingTemplate ? "Edit Template" : "New Template" }}

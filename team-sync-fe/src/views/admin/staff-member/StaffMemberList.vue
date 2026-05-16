@@ -70,14 +70,14 @@ onMounted(async () => {
             <div class="flex items-center gap-[10px]">
                 <button
                     v-if="can('staff-member-create')"
-                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-primary-500/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-2"
                 >
                     <Upload class="w-4 h-4 text-gray-600" />
                     <span class="text-brand-dark text-sm font-semibold">Import CSV</span>
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.staffMembers.create' }"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-primary-500 transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
                     v-if="can('staff-member-create')"
                 >
                     <UserPlus class="w-4 h-4 text-white" />
