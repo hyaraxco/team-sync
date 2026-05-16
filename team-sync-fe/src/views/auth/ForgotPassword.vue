@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, shallowRef } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
@@ -11,10 +11,8 @@ const authStore = useAuthStore();
 const { loading, error, success } = storeToRefs(authStore);
 const email = shallowRef("");
 
-type ForgotPasswordFieldErrors = Partial<Record<"email", string[]>>;
-
-const fieldErrors = computed<ForgotPasswordFieldErrors>(() =>
-    error.value && typeof error.value === "object" ? (error.value as ForgotPasswordFieldErrors) : {},
+const fieldErrors = computed(() =>
+    error.value && typeof error.value === "object" ? error.value : {},
 );
 
 const handleSubmit = async () => {
@@ -151,30 +149,4 @@ const handleSubmit = async () => {
     </div>
 </template>
 
-<style>
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-.animate-fadeIn {
-    animation: fadeIn 0.5s ease-out forwards;
-}
-
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-    opacity: 0;
-    transform: translateY(-10px);
-}
-</style>
