@@ -347,3 +347,20 @@ html {
         transition: none;
     }
 }
+
+/* Payslip print styles */
+@media print {
+    .payslip-print * {
+        visibility: hidden;
+    }
+    .payslip-print .bg-white,
+    .payslip-print .bg-white * {
+        visibility: visible;
+    }
+    .payslip-print .bg-white {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+    }
+}

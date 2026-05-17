@@ -788,7 +788,7 @@ const handleApprovePayroll = () => {
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-brand-dark text-sm font-medium">Total Staff Members</p>
-                            <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
+                            <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2 tabular-nums">
                                 <template v-if="loadingStatistics">...</template>
                                 <AnimatedValue v-else :value="payrollStatistics?.total_employees || 0" />
                             </p>
@@ -806,7 +806,7 @@ const handleApprovePayroll = () => {
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-brand-dark text-sm font-medium">Total Payroll</p>
-                            <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
+                            <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2 tabular-nums">
                                 {{
                                     loadingStatistics
                                         ? "..."
@@ -827,7 +827,7 @@ const handleApprovePayroll = () => {
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-brand-dark text-sm font-medium">Average Salary</p>
-                            <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
+                            <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2 tabular-nums">
                                 {{
                                     loadingStatistics
                                         ? "..."
@@ -921,7 +921,7 @@ const handleApprovePayroll = () => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'employees'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-employees"
@@ -934,7 +934,7 @@ const handleApprovePayroll = () => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'reconciliation'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-reconciliation"
@@ -950,7 +950,7 @@ const handleApprovePayroll = () => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'settings'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-settings"
@@ -963,7 +963,7 @@ const handleApprovePayroll = () => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'activity'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-activity"
@@ -976,7 +976,7 @@ const handleApprovePayroll = () => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'approvals'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-approvals"
@@ -1109,12 +1109,12 @@ const handleApprovePayroll = () => {
                                 </div>
                             </td>
                             <td class="py-4 px-4 text-right">
-                                <span class="text-brand-dark text-sm font-semibold">
+                                <span class="text-brand-dark text-sm font-semibold tabular-nums">
                                     {{ formatRupiah(emp.basic_salary) }}
                                 </span>
                             </td>
                             <td class="py-4 px-4 text-right">
-                                <span class="text-red-600 text-sm font-semibold">
+                                <span class="text-red-600 text-sm font-semibold tabular-nums">
                                     {{ formatRupiah(emp.deductions) }}
                                 </span>
                             </td>
@@ -1141,7 +1141,7 @@ const handleApprovePayroll = () => {
                                 <span v-else class="text-brand-light text-sm">-</span>
                             </td>
                             <td class="py-4 px-4 text-right">
-                                <span class="text-green-600 text-sm font-bold">{{ formatRupiah(emp.net_salary) }}</span>
+                                <span class="text-green-600 text-sm font-bold tabular-nums">{{ formatRupiah(emp.net_salary) }}</span>
                             </td>
                             <td class="py-4 px-4 text-center">
                                 <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
@@ -2070,7 +2070,7 @@ const handleApprovePayroll = () => {
                         @click="handleApprovePayroll"
                         :disabled="approvingPayroll"
                         data-testid="payroll-confirm-approve"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <CheckCircle class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2128,7 +2128,7 @@ const handleApprovePayroll = () => {
                         @click="handleMarkAsPaid"
                         :disabled="markingAsPaid"
                         data-testid="payroll-confirm-mark-as-paid"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <CheckCircle class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2165,7 +2165,7 @@ const handleApprovePayroll = () => {
                         @click="handleResendNotifications"
                         :disabled="resendingNotifications"
                         data-testid="payroll-confirm-resend-notifications"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <CheckCircle class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2228,7 +2228,7 @@ const handleApprovePayroll = () => {
                         @click="handleReopenPayroll"
                         :disabled="reopeningPayroll || reopenReason.trim().length < 10"
                         data-testid="payroll-confirm-reopen"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <RotateCcw class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -2295,7 +2295,7 @@ const handleApprovePayroll = () => {
                         @click="handleResolveException"
                         :disabled="resolvingException || resolveExceptionForm.reason.trim().length < 10"
                         data-testid="reconciliation-resolve-confirm"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ShieldCheck class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
