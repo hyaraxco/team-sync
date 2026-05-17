@@ -6,17 +6,10 @@ import Login from "@/views/auth/Login.vue";
 import ForgotPassword from "@/views/auth/ForgotPassword.vue";
 import ResetPassword from "@/views/auth/ResetPassword.vue";
 import VerifyEmailResult from "@/views/auth/VerifyEmailResult.vue";
-import AdminDashboard from "@/views/admin/Dashboard.vue";
-import AdminSettings from "@/views/admin/Settings.vue";
+import StaffMemberCreateLayout from "@/layouts/StaffMemberCreateLayout.vue";
 import teamRoutes from "./team";
 import meetingRoutes from "./meeting";
 import staffMemberRoutes from "./staffMember";
-import StaffMemberCreate from "@/views/admin/staff-member/StaffMemberCreate.vue";
-import StaffMemberEdit from "@/views/admin/staff-member/StaffMemberEdit.vue";
-import StaffMemberDetail from "@/views/admin/staff-member/StaffMemberDetail.vue";
-import StaffMemberProfile from "@/views/staff-member/StaffMemberProfile.vue";
-import StaffMemberTeam from "@/views/staff-member/StaffMemberTeam.vue";
-import StaffMemberCreateLayout from "@/layouts/StaffMemberCreateLayout.vue";
 import projectRoutes from "./project";
 import attendanceRoutes from "./attendance";
 import payrollRoutes from "./payroll";
@@ -39,7 +32,7 @@ export const appRoutes = [
             {
                 path: "dashboard",
                 name: "admin.dashboard",
-                component: AdminDashboard,
+                component: () => import("@/views/admin/Dashboard.vue"),
                 meta: {
                     requiredPermission: "dashboard-menu",
                 },
@@ -47,7 +40,7 @@ export const appRoutes = [
             {
                 path: "settings",
                 name: "admin.settings",
-                component: AdminSettings,
+                component: () => import("@/views/admin/Settings.vue"),
                 meta: {
                     requiredAnyPermissions: ["settings-hr-manage", "settings-finance-manage", "settings-system-manage"],
                 },
@@ -71,7 +64,7 @@ export const appRoutes = [
             {
                 path: "my-profile",
                 name: "staffMember.profile",
-                component: StaffMemberProfile,
+                component: () => import("@/views/staff-member/StaffMemberProfile.vue"),
                 meta: {
                     requiredPermission: "profile-menu",
                 },
@@ -87,7 +80,7 @@ export const appRoutes = [
             {
                 path: "my-team",
                 name: "staffMember.team",
-                component: StaffMemberTeam,
+                component: () => import("@/views/staff-member/StaffMemberTeam.vue"),
                 meta: {
                     requiredPermission: "team-view",
                 },
@@ -113,7 +106,7 @@ export const appRoutes = [
             {
                 path: "",
                 name: "admin.staffMembers.create",
-                component: StaffMemberCreate,
+                component: () => import("@/views/admin/staff-member/StaffMemberCreate.vue"),
             },
         ],
     },
@@ -128,7 +121,7 @@ export const appRoutes = [
             {
                 path: "",
                 name: "admin.staffMembers.edit",
-                component: StaffMemberEdit,
+                component: () => import("@/views/admin/staff-member/StaffMemberEdit.vue"),
             },
         ],
     },
@@ -143,7 +136,7 @@ export const appRoutes = [
             {
                 path: "",
                 name: "admin.staffMembers.detail",
-                component: StaffMemberDetail,
+                component: () => import("@/views/admin/staff-member/StaffMemberDetail.vue"),
             },
         ],
     },
