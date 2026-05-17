@@ -53,7 +53,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
     </div>
 
     <!-- Stat card mode: when no default slot, render the metric card -->
-    <div v-else class="main-card rounded-2xl border border-[#0B1042] relative overflow-hidden p-4 sm:p-5">
+    <div v-else class="main-card rounded-2xl border border-brand-dark relative overflow-hidden p-4 sm:p-5">
         <div class="flex flex-col justify-center h-full relative z-10">
             <!-- Trending Badge -->
             <div v-if="trendLabel" class="flex items-center gap-2 mb-3">

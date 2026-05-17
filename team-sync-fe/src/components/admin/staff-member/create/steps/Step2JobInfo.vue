@@ -289,7 +289,7 @@ watch(
                                     class="w-10 h-10 relative flex items-center justify-center rounded-lg overflow-hidden"
                                 >
                                     <div
-                                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-lg"
+                                        class="w-full h-full absolute bg-brand-primary rounded-lg"
                                     ></div>
                                     <Building2 class="w-5 h-5 text-white relative z-10" />
                                 </div>
@@ -700,7 +700,7 @@ watch(
                                 class="w-14 h-14 relative flex items-center justify-center rounded-xl overflow-hidden"
                             >
                                 <div
-                                    class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
+                                    class="w-full h-full absolute bg-brand-primary rounded-xl"
                                 ></div>
                                 <Building2 class="w-6 h-6 text-white relative z-10" />
                             </div>

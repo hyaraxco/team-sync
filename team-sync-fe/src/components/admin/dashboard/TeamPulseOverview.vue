@@ -104,7 +104,7 @@ const formatTime = (value) => {
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex items-center gap-3">
                 <div
-                    class="w-10 h-10 rounded-xl bg-gradient-to-br from-brand-primary to-brand-primary flex items-center justify-center"
+                    class="w-10 h-10 rounded-xl bg-brand-primary flex items-center justify-center"
                 >
                     <MessageCircleHeart class="w-5 h-5 text-white" />
                 </div>

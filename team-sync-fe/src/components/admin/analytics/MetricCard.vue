@@ -56,7 +56,7 @@
                                 v-if="!highlight && trend !== null"
                                 :class="[
                                     trendClass,
-                                    'flex items-center text-xs font-bold px-2 py-1 rounded-[6px] bg-opacity-10 ',
+                                    'flex items-center text-xs font-bold px-2 py-1 rounded-md bg-opacity-10 ',
                                 ]"
                                 :style="
                                     trend >= 0
@@ -83,7 +83,7 @@
 
                     <!-- Highlight Icon Block -->
                     <div v-if="highlight && icon" class="absolute right-0 top-1/2 -translate-y-1/2 -mr-1">
-                        <div class="p-5 bg-slate-500/20 rounded-[26px] backdrop-blur-xl shrink-0">
+                        <div class="p-5 bg-slate-500/20 rounded-3xl backdrop-blur-xl shrink-0">
                             <component :is="icon" class="w-10 h-10 text-white opacity-95" />
                         </div>
                     </div>

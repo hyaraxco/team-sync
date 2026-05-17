@@ -140,7 +140,7 @@ const goToNext = () => {
                     :class="[
                         'px-4 py-2 border rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
                         page === currentPage
-                            ? 'border-[#2151A0] blue-gradient blue-btn-shadow text-white'
+                            ? 'border-primary-700 blue-gradient blue-btn-shadow text-white'
                             : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50',
                     ]"
                 >

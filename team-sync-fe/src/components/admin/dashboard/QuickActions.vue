@@ -112,7 +112,7 @@ const isPrimaryAction = (action) => action.id === primaryActionId.value;
 
 const getActionClasses = (action) => {
     if (isPrimaryAction(action)) {
-        return "btn-secondary w-full text-left rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2";
+        return "btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2";
     }
 
     return "btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2";
