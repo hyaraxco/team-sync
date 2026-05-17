@@ -30,7 +30,7 @@ const handleSubmit = async () => {
                 <CheckCircle2 class="h-8 w-8 text-green-500" aria-hidden="true" stroke-width="1.5" />
             </div>
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Check your email</h1>
-            <p class="mt-3 text-[15px] text-gray-600 max-w-[280px] mx-auto leading-relaxed">
+            <p class="mt-3 text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
                 We've sent a password reset link to
                 <br />
                 <strong class="text-gray-900 font-semibold">{{ email }}</strong>
@@ -40,7 +40,7 @@ const handleSubmit = async () => {
             </div>
             <RouterLink
                 :to="{ name: 'login' }"
-                class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20"
+                class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 active:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20"
             >
                 <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
                 Return to sign in
@@ -51,7 +51,7 @@ const handleSubmit = async () => {
         <template v-else>
             <div class="text-center mb-8">
                 <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Reset password</h1>
-                <p class="mt-2 text-[15px] text-gray-500 leading-relaxed max-w-[280px] mx-auto">
+                <p class="mt-2 text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
                     Enter your email and we'll send you a link to reset your password.
                 </p>
             </div>
@@ -92,10 +92,10 @@ const handleSubmit = async () => {
                     <!-- Submit Button -->
                     <button
                         type="submit"
-                        class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70 overflow-hidden"
+                        class="group w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 active:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70"
                         :disabled="loading"
                     >
-                        <span class="relative z-10 flex items-center gap-2">
+                        <span class="flex items-center gap-2">
                             {{ loading ? "Sending…" : "Send reset link" }}
                             <Send
                                 v-if="!loading"
@@ -124,10 +124,6 @@ const handleSubmit = async () => {
                                 ></path>
                             </svg>
                         </span>
-                        <div
-                            v-if="!loading"
-                            class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
-                        ></div>
                     </button>
                 </form>
             </div>
@@ -136,7 +132,7 @@ const handleSubmit = async () => {
             <div class="mt-6">
                 <RouterLink
                     :to="{ name: 'login' }"
-                    class="group mx-auto flex w-full max-w-[260px] items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-600 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200/70"
+                    class="group mx-auto flex w-full max-w-xs items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-semibold text-gray-600 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-200/70"
                 >
                     <ArrowLeft
                         class="h-4 w-4 shrink-0 transition-transform group-hover:-translate-x-0.5"

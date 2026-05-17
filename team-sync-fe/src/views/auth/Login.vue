@@ -43,7 +43,7 @@ const handleSubmit = async () => {
     <div class="w-full max-w-md mx-auto animate-fadeIn px-4">
         <div class="text-center mb-8">
             <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Welcome back</h1>
-            <p class="mt-2 text-[15px] text-gray-500">Sign in to access your Team Sync dashboard</p>
+            <p class="mt-2 text-sm text-gray-500">Sign in to access your Team Sync dashboard</p>
         </div>
 
         <!-- Error Alert -->
@@ -132,10 +132,10 @@ const handleSubmit = async () => {
                 <button
                     type="submit"
                     data-testid="login-submit"
-                    class="group relative w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70 overflow-hidden mt-2"
+                    class="group w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 active:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70 mt-2"
                     :disabled="loading"
                 >
-                    <span class="relative z-10 flex items-center gap-2 text-white">
+                    <span class="flex items-center gap-2 text-white">
                         {{ loading ? "Signing in…" : "Sign in" }}
                         <ArrowRight
                             v-if="!loading"
@@ -164,10 +164,6 @@ const handleSubmit = async () => {
                             ></path>
                         </svg>
                     </span>
-                    <div
-                        v-if="!loading"
-                        class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"
-                    ></div>
                 </button>
             </form>
         </div>
