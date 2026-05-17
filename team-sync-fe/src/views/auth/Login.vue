@@ -132,10 +132,10 @@ const handleSubmit = async () => {
                 <button
                     type="submit"
                     data-testid="login-submit"
-                    class="group w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 active:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70 mt-2"
+                    class="group w-full flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 active:bg-primary-800 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-600/20 disabled:cursor-not-allowed disabled:opacity-80 mt-2"
                     :disabled="loading"
                 >
-                    <span class="flex items-center gap-2 text-white">
+                    <span class="flex items-center gap-2">
                         {{ loading ? "Signing in…" : "Sign in" }}
                         <ArrowRight
                             v-if="!loading"
@@ -171,7 +171,7 @@ const handleSubmit = async () => {
         <!-- Help Section -->
         <div class="mt-8 text-center text-sm font-medium text-gray-500">
             Need help? Contact your
-            <span class="text-gray-900 cursor-pointer hover:underline underline-offset-4 decoration-gray-300">
+            <span class="text-gray-900 font-semibold">
                 HR administrator
             </span>
         </div>

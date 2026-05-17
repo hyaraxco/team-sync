@@ -2,7 +2,7 @@
 import { ref, onMounted } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { RouterLink } from "vue-router";
-import { TrendingUp, CheckCircle, Star, Clock, CalendarClock, CalendarDays, Check, X } from "lucide-vue-next";
+import { TrendingUp, CheckCircle, Clock, CalendarClock, CalendarDays, Check, X } from "lucide-vue-next";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
@@ -140,7 +140,6 @@ onMounted(async () => {
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
                 <h1 class="text-2xl font-semibold text-brand-dark">Attendance Overview</h1>
-                <p class="text-sm text-brand-light mt-1">Monitor real-time presence and manage requests.</p>
             </div>
         </div>
 
@@ -159,7 +158,6 @@ onMounted(async () => {
                     <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
                         Attendance Logs
                     </h3>
-                    <p class="text-brand-light text-xs mt-0.5">View historical records</p>
                 </div>
             </RouterLink>
 
@@ -177,7 +175,6 @@ onMounted(async () => {
                     <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
                         Leave Requests
                     </h3>
-                    <p class="text-brand-light text-xs mt-0.5">Manage employee time off</p>
                 </div>
             </RouterLink>
 
@@ -195,7 +192,6 @@ onMounted(async () => {
                     <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
                         Corrections
                     </h3>
-                    <p class="text-brand-light text-xs mt-0.5">Manage clock-in disputes</p>
                 </div>
             </RouterLink>
         </div>
@@ -229,10 +225,6 @@ onMounted(async () => {
                         <div class="flex items-center gap-1">
                             <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
                             <span class="text-brand-white-70 text-xs font-normal">Real-time</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <Star class="w-3 h-3 text-white opacity-70" />
-                            <span class="text-brand-white-70 text-xs font-normal">High Attendance</span>
                         </div>
                     </div>
                 </div>
@@ -319,7 +311,6 @@ onMounted(async () => {
                         </div>
                         <div>
                             <h2 class="text-lg font-semibold text-brand-dark">Latest Leave Requests</h2>
-                            <p class="text-brand-light text-sm">Recent 5 leave applications</p>
                         </div>
                     </div>
                 </div>
@@ -390,7 +381,6 @@ onMounted(async () => {
                         </div>
                         <div>
                             <h2 class="text-lg font-semibold text-brand-dark">Pending Corrections</h2>
-                            <p class="text-brand-light text-sm">Attendance sync requests</p>
                         </div>
                     </div>
                 </div>

@@ -158,10 +158,7 @@ onMounted(async () => {
                     <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Briefcase class="w-6 h-6 text-blue-600" />
                     </div>
-                    <div>
-                        <h2 class="text-lg font-semibold text-brand-dark">Project Information</h2>
-                        <p class="text-brand-light text-sm font-normal">Complete project overview</p>
-                    </div>
+                    <h2 class="text-lg font-semibold text-brand-dark">Project Information</h2>
                 </div>
                 <div class="flex items-center gap-2">
                     <div
@@ -187,12 +184,6 @@ onMounted(async () => {
 
             <!-- Project Basic Info -->
             <div class="space-y-4">
-                <div>
-                    <p class="text-2xl font-semibold text-brand-dark mb-2">
-                        {{ project.name }}
-                    </p>
-                </div>
-
                 <div>
                     <h3 class="text-base font-semibold text-brand-dark mb-3">About Project</h3>
                     <div class="text-brand-light text-base leading-relaxed space-y-3">
@@ -268,10 +259,7 @@ onMounted(async () => {
                     <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                         <Crown class="w-6 h-6 text-green-600" />
                     </div>
-                    <div>
-                        <h2 class="text-lg font-semibold text-brand-dark">Project Leader</h2>
-                        <p class="text-brand-light text-sm font-normal">Team leader information</p>
-                    </div>
+                    <h2 class="text-lg font-semibold text-brand-dark">Project Leader</h2>
                 </div>
 
                 <div v-if="project.leader" class="flex items-center gap-4">
@@ -310,7 +298,6 @@ onMounted(async () => {
                         <p class="text-brand-dark text-xl font-extrabold leading-none my-2">
                             <AnimatedValue :value="projectProgress" suffix="%" />
                         </p>
-                        <p class="text-purple-600 text-sm font-medium">Project completion</p>
                     </div>
                     <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center">
                         <Target class="w-6 h-6 text-purple-600" />
@@ -329,10 +316,7 @@ onMounted(async () => {
                 class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-4">
-                    <div>
-                        <p class="text-brand-dark text-sm font-medium">Squad Snapshot</p>
-                        <p class="text-brand-light text-xs font-normal">Team and task distribution for this project</p>
-                    </div>
+                    <p class="text-brand-dark text-sm font-medium">Squad Snapshot</p>
                     <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Users class="w-5 h-5 text-blue-600" />
                     </div>
@@ -403,7 +387,6 @@ onMounted(async () => {
                         <p class="text-brand-dark text-xl font-extrabold leading-none my-2">
                             {{ formatRupiah(project.budget) }}
                         </p>
-                        <p class="text-success text-sm font-medium">Project budget</p>
                     </div>
                     <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center">
                         <DollarSign class="w-6 h-6 text-green-600" />
@@ -420,7 +403,6 @@ onMounted(async () => {
                         <p class="text-brand-dark text-xl font-extrabold leading-none my-2">
                             {{ formatDate(project.start_date) || "N/A" }}
                         </p>
-                        <p class="text-indigo-600 text-sm font-medium">Project kickoff</p>
                     </div>
                     <div class="w-14 h-14 bg-indigo-50 rounded-2xl flex items-center justify-center">
                         <Calendar class="w-6 h-6 text-indigo-600" />
@@ -437,7 +419,6 @@ onMounted(async () => {
                         <p class="text-brand-dark text-xl font-extrabold leading-none my-2">
                             {{ formatDate(project.end_date) || "N/A" }}
                         </p>
-                        <p class="text-orange-600 text-sm font-medium">Project deadline</p>
                     </div>
                     <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center">
                         <CalendarCheck class="w-6 h-6 text-orange-600" />
@@ -454,7 +435,6 @@ onMounted(async () => {
                         <p class="text-brand-dark text-xl font-extrabold leading-none my-2">
                             {{ calculateDuration(project.start_date, project.end_date) }}
                         </p>
-                        <p class="text-blue-600 text-sm font-medium">Project timeline</p>
                     </div>
                     <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
                         <Clock class="w-6 h-6 text-blue-600" />
@@ -470,10 +450,7 @@ onMounted(async () => {
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
-            <div>
-                <h2 class="text-lg font-semibold text-brand-dark">Danger Zone</h2>
-                <p class="text-brand-light text-sm font-normal">Irreversible and destructive actions</p>
-            </div>
+            <h2 class="text-lg font-semibold text-brand-dark">Danger Zone</h2>
         </div>
         <div
             class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-2xl"
