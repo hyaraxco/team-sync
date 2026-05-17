@@ -624,7 +624,7 @@ watch(
                     <input
                         type="text"
                         id="leadSearch"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
                         placeholder="Search staffMembers..."
                         v-model="searchLead"
                     />

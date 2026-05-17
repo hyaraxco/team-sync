@@ -144,7 +144,7 @@ onUnmounted(() => {
                     v-model="searchQuery"
                     type="text"
                     aria-label="Search"
-                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
                     :placeholder="placeholder"
                 />
             </div>
@@ -159,7 +159,7 @@ onUnmounted(() => {
                     <select
                         v-model="filterValues[filter.key]"
                         :aria-label="filter.label"
-                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 transition-all duration-300 bg-white appearance-none font-semibold"
+                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 bg-white appearance-none font-semibold"
                     >
                         <option value="">{{ filter.label }}</option>
                         <option v-for="opt in filter.options" :key="opt.value" :value="opt.value">

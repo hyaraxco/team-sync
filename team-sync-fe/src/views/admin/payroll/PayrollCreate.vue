@@ -395,7 +395,7 @@ watch(
                                 :class="
                                     readiness && !readiness.can_generate
                                         ? 'border-red-300 ring-2 ring-red-500/20 focus:border-red-500'
-                                        : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2'
+                                        : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20'
                                 "
                             />
                         </div>
