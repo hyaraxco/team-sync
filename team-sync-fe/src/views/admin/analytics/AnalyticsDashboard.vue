@@ -281,7 +281,7 @@ onUnmounted(() => {
                     <button
                         @click="showExportMenu = !showExportMenu"
                         :disabled="exportLoading"
-                        class="flex items-center gap-2 px-3 py-2 bg-brand-primary text-white text-sm font-medium rounded-xl hover:bg-[#0a44b8] transition-colors disabled:opacity-50"
+                        class="flex items-center gap-2 px-3 py-2 bg-brand-primary text-white text-sm font-medium rounded-xl hover:bg-brand-primary/90 transition-colors disabled:opacity-50"
                     >
                         <DownloadIcon class="w-4 h-4" />
                         <span v-if="exportLoading">Exporting...</span>
@@ -324,7 +324,7 @@ onUnmounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === tab.id
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                 >
