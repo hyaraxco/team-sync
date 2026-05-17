@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, onMounted, ref } from "vue";
 import { RouterLink } from "vue-router";
 import { UserPlusIcon, UsersIcon, BanknoteIcon, CalendarPlusIcon, VideoIcon, Clock3Icon } from "lucide-vue-next";
@@ -11,24 +11,7 @@ import MeetingCreateModal from "@/components/admin/meeting/MeetingCreateModal.vu
 
 const showMeetingModal = ref(false);
 
-type QuickActionLink = {
-    name: string;
-    query?: Record<string, string>;
-};
-
-type ActionableQuickAction = {
-    id: string;
-    label: string | (() => string);
-    icon: unknown;
-    to?: QuickActionLink;
-    action?: () => void;
-    isVisible: () => boolean;
-    isDisabled?: () => boolean;
-};
-
-type QuickAction = ActionableQuickAction;
-
-const actionConfigs: ActionableQuickAction[] = [
+const actionConfigs = [
     {
         id: "add-employee",
         label: "Add Staff Member",
@@ -73,7 +56,7 @@ const actionConfigs: ActionableQuickAction[] = [
                     toast.success("Clocked Out", "You have successfully clocked out.");
                 }
                 await attendanceStore.fetchTodayAttendance();
-            } catch (e: any) {
+            } catch (e) {
                 toast.error("Action Failed", e?.response?.data?.message || "Failed to process attendance action.");
             }
         },
@@ -125,9 +108,9 @@ const visibleActions = computed(() => actionableActions.value);
 
 const primaryActionId = computed(() => actionableActions.value[0]?.id ?? null);
 
-const isPrimaryAction = (action: QuickAction) => action.id === primaryActionId.value;
+const isPrimaryAction = (action) => action.id === primaryActionId.value;
 
-const getActionClasses = (action: QuickAction) => {
+const getActionClasses = (action) => {
     if (isPrimaryAction(action)) {
         return "btn-secondary w-full text-left rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2";
     }
@@ -135,15 +118,15 @@ const getActionClasses = (action: QuickAction) => {
     return "btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2";
 };
 
-const getIconClasses = (action: QuickAction) => {
+const getIconClasses = (action) => {
     return isPrimaryAction(action) ? "w-4 h-4 text-white" : "w-4 h-4 text-gray-600";
 };
 
-const getLabelClasses = (action: QuickAction) => {
+const getLabelClasses = (action) => {
     return isPrimaryAction(action) ? "text-brand-white text-sm font-semibold" : "text-brand-dark text-sm font-medium";
 };
 
-const resolveLabel = (action: QuickAction) => {
+const resolveLabel = (action) => {
     if (typeof action.label === "function") {
         return action.label();
     }

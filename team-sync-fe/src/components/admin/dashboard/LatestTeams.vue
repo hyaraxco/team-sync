@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, watch } from "vue";
 import { useTeamStore } from "@/stores/team";
 import { useRouter } from "vue-router";
@@ -35,7 +35,7 @@ watch(
     { deep: true },
 );
 
-const goToTeamDetail = (id: number) => {
+const goToTeamDetail = (id) => {
     router.push({ name: "admin.team.detail", params: { id } });
 };
 </script>

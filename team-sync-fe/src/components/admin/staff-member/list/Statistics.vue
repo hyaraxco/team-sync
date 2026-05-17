@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, computed } from "vue";
 import { TrendingUp, Users, UserPlus, Star, UserCheck, CalendarX, Trophy } from "lucide-vue-next";
 import { useStaffMemberStore } from "@/stores/staffMember";

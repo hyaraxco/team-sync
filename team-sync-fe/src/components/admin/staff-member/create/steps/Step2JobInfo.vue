@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Input, Select } from "@/components/common/form";
 import {
     User,
@@ -28,18 +28,16 @@ import RightSidebarStep2 from "@/components/admin/staff-member/create/RightSideb
 import EmptyState from "@/components/common/EmptyState.vue";
 import { parseSalaryNumber } from "@/utils/salaryUtils";
 
-interface Props {
-    modelValue: any;
-    errors?: any;
-}
-
-interface TeamOption {
-    id: number | string;
-    name: string;
-    members_count?: number;
-}
-
-const props = defineProps<Props>();
+const props = defineProps({
+    modelValue: {
+        type: Object,
+        required: true,
+    },
+    errors: {
+        type: Object,
+        default: undefined,
+    },
+});
 const emit = defineEmits(["update:modelValue"]);
 
 const form = computed({
@@ -63,7 +61,7 @@ const loadingPayrollSettings = ref(true);
 // Performance Templates — optional picker per employee
 const performanceStore = usePerformanceReviewStore();
 const templateOptions = computed(() =>
-    (performanceStore.templates ?? []).map((t: any) => ({
+    (performanceStore.templates ?? []).map((t) => ({
         value: t.id,
         label: t.name + (t.is_default ? " (Default)" : ""),
     })),
@@ -83,21 +81,21 @@ watch(
     { immediate: true },
 );
 
-const teamOptions = computed<TeamOption[]>(() => {
-    return Array.isArray(teams.value) ? (teams.value as TeamOption[]) : [];
+const teamOptions = computed(() => {
+    return Array.isArray(teams.value) ? teams.value : [];
 });
 
 // Team modal
 const teamModal = ref(false);
 const searchTeam = ref("");
-const selectedTeam = ref<TeamOption | null>(null);
+const selectedTeam = ref(null);
 
 const filteredTeams = computed(() => {
     if (!searchTeam.value) return teamOptions.value;
     return teamOptions.value.filter((team) => team.name.toLowerCase().includes(searchTeam.value.toLowerCase()));
 });
 
-const normalizeId = (value: any) => String(value ?? "");
+const normalizeId = (value) => String(value ?? "");
 
 const syncSelectedTeam = () => {
     const currentTeamId = normalizeId(form.value.team_id);
@@ -110,7 +108,7 @@ const syncSelectedTeam = () => {
     selectedTeam.value = teamOptions.value.find((team) => normalizeId(team.id) === currentTeamId) || null;
 };
 
-const handleSelectTeam = (team: TeamOption) => {
+const handleSelectTeam = (team) => {
     selectedTeam.value = team;
     form.value.team_id = normalizeId(team.id);
     teamModal.value = false;
@@ -150,7 +148,7 @@ onMounted(async () => {
     }
 });
 
-const formatRupiah = (value: any) => {
+const formatRupiah = (value) => {
     const parsed = parseSalaryNumber(value);
     if (parsed === null) return "";
 

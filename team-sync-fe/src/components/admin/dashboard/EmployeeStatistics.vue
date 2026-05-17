@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed, onMounted } from "vue";
 import { StarIcon, BellIcon, CheckCircle2, Clock3, Wallet, Calendar, Users, MessageSquare } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";
@@ -43,7 +43,7 @@ const currentEmployeeId = computed(
 );
 const upcomingTaskStatuses = new Set(["todo", "in_progress", "review", "rejected"]);
 
-const normalizeTaskStatus = (status: unknown) => {
+const normalizeTaskStatus = (status) => {
     const normalized = String(status ?? "")
         .trim()
         .toLowerCase();
@@ -55,7 +55,7 @@ const normalizeTaskStatus = (status: unknown) => {
     return normalized;
 };
 
-const toDueDateTimestamp = (dueDate: string) => {
+const toDueDateTimestamp = (dueDate) => {
     const parsed = Date.parse(dueDate);
 
     if (Number.isNaN(parsed)) {
@@ -71,7 +71,7 @@ const upcomingTasks = computed(() => {
     }
 
     return taskStore.tasks
-        .filter((task: any) => {
+        .filter((task) => {
             const status = normalizeTaskStatus(task?.status);
             if (!upcomingTaskStatuses.has(status)) {
                 return false;
@@ -84,7 +84,7 @@ const upcomingTasks = computed(() => {
 
             return String(taskAssigneeId) === String(currentEmployeeId.value);
         })
-        .map((task: any) => ({
+        .map((task) => ({
             id: task.id,
             title: task.title || task.name || "Task",
             project: task.project?.name || task.project_name || "-",
@@ -112,7 +112,7 @@ const onTimePercentage = computed(() => {
     return Math.round((ontime / present) * 100 * 10) / 10;
 });
 
-const getPriorityClass = (priority: string) => {
+const getPriorityClass = (priority) => {
     switch (priority) {
         case "high":
             return "bg-red-100 text-red-600";
@@ -125,7 +125,7 @@ const getPriorityClass = (priority: string) => {
     }
 };
 
-const getStatusClass = (status: string) => {
+const getStatusClass = (status) => {
     switch (status) {
         case "todo":
             return "bg-gray-100 text-gray-600";
@@ -142,7 +142,7 @@ const getStatusClass = (status: string) => {
     }
 };
 
-const getTaskStatusLabel = (status: string) => {
+const getTaskStatusLabel = (status) => {
     switch (status) {
         case "todo":
             return "To Do";
@@ -159,7 +159,7 @@ const getTaskStatusLabel = (status: string) => {
     }
 };
 
-const formatDate = (dateString: string) => {
+const formatDate = (dateString) => {
     const date = new Date(dateString);
     const today = new Date();
     const tomorrow = new Date(today);
@@ -171,12 +171,12 @@ const formatDate = (dateString: string) => {
     return date.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 };
 
-const resolveNotificationCategory = (notification: any) =>
+const resolveNotificationCategory = (notification) =>
     String(notification?.category ?? notification?.data?.category ?? notification?.type ?? "")
         .trim()
         .toLowerCase();
 
-const getActivityIcon = (notification: any) => {
+const getActivityIcon = (notification) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
@@ -202,7 +202,7 @@ const getActivityIcon = (notification: any) => {
     return BellIcon;
 };
 
-const getActivityIconBgClass = (notification: any) => {
+const getActivityIconBgClass = (notification) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
@@ -228,7 +228,7 @@ const getActivityIconBgClass = (notification: any) => {
     return "bg-primary-50";
 };
 
-const getActivityIconClass = (notification: any) => {
+const getActivityIconClass = (notification) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
@@ -254,7 +254,7 @@ const getActivityIconClass = (notification: any) => {
     return "text-brand-primary";
 };
 
-const getActivityTime = (notification: any) => {
+const getActivityTime = (notification) => {
     if (!notification?.created_at) {
         return "Recently";
     }
@@ -262,7 +262,7 @@ const getActivityTime = (notification: any) => {
     return getTimeAgo(notification.created_at);
 };
 
-const handleActivitySelect = async (notification: any) => {
+const handleActivitySelect = async (notification) => {
     const actionUrl = typeof notification?.action_url === "string" ? notification.action_url.trim() : "";
 
     if (!actionUrl) {
@@ -318,7 +318,7 @@ onMounted(() => {
     fetchRecentActivities();
     staffMemberStore
         .fetchMyTeamProjects()
-        .then((projects: any[]) => {
+        .then((projects) => {
             const firstProjectId = Array.isArray(projects) && projects.length ? projects[0].id : null;
             if (firstProjectId) {
                 return taskStore.fetchProjectTasks(firstProjectId);

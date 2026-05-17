@@ -1,14 +1,15 @@
-<script setup lang="ts">
+<script setup>
 import { Building, User, Briefcase, Phone, Check, Eye } from "lucide-vue-next";
 
-interface Props {
-    currentStep?: number;
-    isEditing?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-    currentStep: 1,
-    isEditing: false,
+const props = defineProps({
+    currentStep: {
+        type: Number,
+        default: 1,
+    },
+    isEditing: {
+        type: Boolean,
+        default: false,
+    },
 });
 </script>
 
