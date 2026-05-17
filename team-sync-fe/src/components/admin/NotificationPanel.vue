@@ -141,49 +141,49 @@ const getIconContainerClass = (notification) => {
     const category = resolveCategory(notification);
 
     if (category.includes("task")) {
-        return "bg-[#EAF8EE]";
+        return "bg-success-50";
     }
 
     if (category.includes("attendance") || category.includes("check")) {
-        return "bg-[#F0ECFF]";
+        return "bg-purple-50";
     }
 
     if (category.includes("payroll") || category.includes("salary")) {
-        return "bg-[#FFF4E8]";
+        return "bg-warning-50";
     }
 
     if (category.includes("comment") || category.includes("message")) {
-        return "bg-[#EAF0FF]";
+        return "bg-primary-50";
     }
 
     if (category.includes("meeting") || category.includes("team")) {
-        return "bg-[#FFF1E8]";
+        return "bg-warning-50";
     }
 
-    return "bg-[#EEF4FF]";
+    return "bg-primary-50";
 };
 
 const getIconTextClass = (notification) => {
     const category = resolveCategory(notification);
 
     if (category.includes("task")) {
-        return "text-[#16A34A]";
+        return "text-success-600";
     }
 
     if (category.includes("attendance") || category.includes("check")) {
-        return "text-[#7C3AED]";
+        return "text-purple-600";
     }
 
     if (category.includes("payroll") || category.includes("salary")) {
-        return "text-[#EA580C]";
+        return "text-warning-700";
     }
 
     if (category.includes("comment") || category.includes("message")) {
-        return "text-[#2563EB]";
+        return "text-primary-600";
     }
 
     if (category.includes("meeting") || category.includes("team")) {
-        return "text-[#F97316]";
+        return "text-orange-500";
     }
 
     return "text-brand-primary";
@@ -199,17 +199,17 @@ const getIconTextClass = (notification) => {
         class="notification-panel absolute right-0 top-full mt-3 z-[9999] overflow-hidden rounded-2xl"
         :class="{ hidden: !open, 'notification-panel--open': open }"
     >
-        <div class="notification-panel__header border-b border-[#E4EBF9] px-4 py-3">
+        <div class="notification-panel__header border-b border-primary-100 px-4 py-3">
             <div class="relative z-10 flex items-center justify-between">
                 <div>
                     <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-primary">Notifications</p>
-                    <p class="text-xs text-[#5D6882]">Latest updates</p>
+                    <p class="text-xs text-slate-500">Latest updates</p>
                 </div>
                 <button
                     v-if="visibleNotifications.length > 0"
                     type="button"
                     data-testid="mark-all-read-btn"
-                    class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-2.5 py-1 text-[10px] font-semibold text-brand-primary transition-colors hover:bg-[#E1ECFF] disabled:opacity-50"
+                    class="rounded-full border border-primary-200 bg-primary-50 px-2.5 py-1 text-[10px] font-semibold text-brand-primary transition-colors hover:bg-primary-100 disabled:opacity-50"
                     :disabled="markingAllRead"
                     @click="emit('mark-all-read')"
                 >
@@ -219,11 +219,11 @@ const getIconTextClass = (notification) => {
         </div>
 
         <div v-if="loading" data-testid="notification-loading" class="px-4 py-4">
-            <p class="text-sm font-medium text-[#334155]">Loading notifications...</p>
+            <p class="text-sm font-medium text-slate-700">Loading notifications...</p>
             <div class="mt-3 space-y-2.5">
-                <div class="h-2 w-20 animate-pulse rounded-full bg-[#D6E3FD]"></div>
-                <div class="h-2 w-full animate-pulse rounded-full bg-[#E3ECFF]"></div>
-                <div class="h-2 w-5/6 animate-pulse rounded-full bg-[#E3ECFF]"></div>
+                <div class="h-2 w-20 animate-pulse rounded-full bg-primary-100"></div>
+                <div class="h-2 w-full animate-pulse rounded-full bg-primary-100"></div>
+                <div class="h-2 w-5/6 animate-pulse rounded-full bg-primary-100"></div>
             </div>
         </div>
 
@@ -234,7 +234,7 @@ const getIconTextClass = (notification) => {
             <button
                 type="button"
                 data-testid="notification-retry"
-                class="rounded-full border border-[#C9DAFF] bg-[#EEF4FF] px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-[#E1ECFF]"
+                class="rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-primary-100"
                 @click="emit('retry')"
             >
                 Retry
@@ -246,11 +246,11 @@ const getIconTextClass = (notification) => {
             data-testid="notification-empty"
             class="px-4 py-8 text-center"
         >
-            <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#EEF4FF] text-lg">
+            <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-lg">
                 <BellIcon class="h-5 w-5 text-brand-primary" />
             </div>
             <p class="text-sm font-semibold text-brand-dark">You are all caught up</p>
-            <p class="mt-1 text-xs text-[#64748B]">No notifications yet.</p>
+            <p class="mt-1 text-xs text-slate-500">No notifications yet.</p>
         </div>
 
         <ul v-else class="notification-panel__list max-h-96 overflow-auto px-2 py-2">
@@ -258,11 +258,11 @@ const getIconTextClass = (notification) => {
                 v-for="notification in visibleNotifications"
                 :key="notification.id"
                 :data-testid="`notification-item-${notification.id}`"
-                class="border-b border-[#EEF2F8] py-1.5 last:border-b-0"
+                class="border-b border-slate-100 py-1.5 last:border-b-0"
             >
                 <button
                     type="button"
-                    class="notification-item group flex w-full items-start gap-3 rounded-xl px-2.5 py-2 text-left transition-colors duration-200 hover:bg-[#F7FAFF]"
+                    class="notification-item group flex w-full items-start gap-3 rounded-xl px-2.5 py-2 text-left transition-colors duration-200 hover:bg-primary-50/40"
                     :data-testid="`notification-select-${notification.id}`"
                     @click="emit('select', notification)"
                 >
@@ -281,10 +281,10 @@ const getIconTextClass = (notification) => {
                         <p class="text-sm font-semibold leading-5 text-brand-dark">
                             {{ notification.title }}
                         </p>
-                        <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-[#4B5563]">
+                        <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-gray-600">
                             {{ notification.body }}
                         </p>
-                        <p class="mt-1 text-xs text-[#667085]" :title="formatCreatedAt(notification.created_at)">
+                        <p class="mt-1 text-xs text-slate-500" :title="formatCreatedAt(notification.created_at)">
                             {{ formatRelativeTime(notification.created_at) }}
                         </p>
                     </div>
