@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from "vue";
 import { useRoute, RouterLink } from "vue-router";
 import { ArrowLeft, CheckCircle2, MailWarning } from "lucide-vue-next";
