@@ -309,7 +309,7 @@ const clearSearch = () => {
                         <button
                             :data-testid="`my-payroll-download-${payslip.id}`"
                             @click.stop="handleDownload(payslip.id)"
-                            class="flex-1 px-3 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-lg hover:brightness-110 transition-all duration-300 flex items-center justify-center gap-2 text-sm font-semibold"
+                            class="btn-primary flex-1 px-3 py-2 text-sm font-semibold"
                         >
                             <Download class="w-4 h-4" />
                             PDF
