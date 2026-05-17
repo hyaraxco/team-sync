@@ -1,6 +1,6 @@
 # Phase 6 — Test Coverage Gap Closure (BE + FE)
 
-**Status:** IN PROGRESS
+**Status:** COMPLETED — PR #35 (BE, 1481→1504) + PR #36 (FE, 991→1010) merged 2026-05-17
 **Date:** 2026-05-17
 **Predecessor:** Phase 5 — `2026-05-17-fe-audit-phase-5-focus-states.md` (PR #34)
 **Follows workflow:** root [`AGENTS.md`](../../AGENTS.md), [`team-sync-be/AGENTS.md`](../../team-sync-be/AGENTS.md), [`team-sync-fe/AGENTS.md`](../../team-sync-fe/AGENTS.md)
