@@ -259,13 +259,8 @@ onMounted(() => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-indigo-50 rounded-xl flex items-center justify-center">
-                        <Users class="w-6 h-6 text-indigo-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Team Information</h2>
-                        <p class="text-brand-light text-sm">Current team and reporting structure</p>
-                    </div>
+                    <Users class="w-6 h-6 text-indigo-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Team Information</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -280,24 +275,13 @@ onMounted(() => {
                             {{ staffMember.job_information?.team?.members_count || 0 }} members
                         </span>
                     </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-brand-light text-base">Team Status</span>
-                        <span class="text-brand-dark text-base font-medium">
-                            {{ capitalize(staffMember.job_information?.team?.status) }}
-                        </span>
-                    </div>
                 </div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-teal-50 rounded-xl flex items-center justify-center">
-                        <Contact class="w-6 h-6 text-teal-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Contact Details</h2>
-                        <p class="text-brand-light text-sm">How to reach this staff member</p>
-                    </div>
+                    <Contact class="w-6 h-6 text-teal-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Contact Details</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -325,13 +309,8 @@ onMounted(() => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <Calendar class="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Personal Information</h2>
-                        <p class="text-brand-light text-sm">Birth and personal details</p>
-                    </div>
+                    <Calendar class="w-6 h-6 text-blue-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Personal Information</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -375,13 +354,8 @@ onMounted(() => {
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                        <Phone class="w-6 h-6 text-red-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Emergency Contact</h2>
-                        <p class="text-brand-light text-sm">Person to contact in emergency</p>
-                    </div>
+                    <Phone class="w-6 h-6 text-red-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Emergency Contact</h2>
                 </div>
                 <div
                     class="space-y-4"
@@ -421,13 +395,8 @@ onMounted(() => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                        <MapPin class="w-6 h-6 text-purple-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Address Information</h2>
-                        <p class="text-brand-light text-sm">Location and postal details</p>
-                    </div>
+                    <MapPin class="w-6 h-6 text-purple-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Address Information</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-start">
@@ -453,13 +422,8 @@ onMounted(() => {
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                        <Briefcase class="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Employment Details</h2>
-                        <p class="text-brand-light text-sm">Work arrangement and compensation</p>
-                    </div>
+                    <Briefcase class="w-6 h-6 text-green-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Employment Details</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -517,17 +481,12 @@ onMounted(() => {
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                        <FileText class="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Administrative Information</h2>
-                        <p class="text-brand-light text-sm">System details and preferences</p>
-                    </div>
+                    <FileText class="w-6 h-6 text-orange-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Administrative Information</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
-                        <span class="text-brand-light text-base">Staff Member ID</span>
+                        <span class="text-brand-light text-base">Employee Code</span>
                         <span class="text-brand-dark text-base font-medium">
                             {{ staffMember.code }}
                         </span>
@@ -537,13 +496,8 @@ onMounted(() => {
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-cyan-50 rounded-xl flex items-center justify-center">
-                        <Briefcase class="w-6 h-6 text-cyan-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Bank Information</h2>
-                        <p class="text-brand-light text-sm">Banking details for payroll</p>
-                    </div>
+                    <Briefcase class="w-6 h-6 text-cyan-600" />
+                    <h2 class="text-brand-dark text-lg font-semibold">Bank Information</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -570,13 +524,8 @@ onMounted(() => {
 
         <div v-if="can('staff-member-delete')" class="bg-white border border-danger-100 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                    <AlertTriangle class="w-6 h-6 text-red-600" />
-                </div>
-                <div>
-                    <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
-                    <p class="text-brand-light text-sm">Irreversible and destructive actions</p>
-                </div>
+                <AlertTriangle class="w-6 h-6 text-red-600" />
+                <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
             </div>
             <div
                 class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
