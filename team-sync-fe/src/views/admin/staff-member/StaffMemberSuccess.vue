@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Users, UserPlus, Plus, Mail } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 
@@ -52,7 +52,7 @@ const addAnotherEmployee = () => {
                         @click="goToEmployees"
                         class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
                     >
-                        <span class="text-brand-white text-base font-semibold">View All Staff Members</span>
+                        <span class="text-white text-base font-semibold">View All Staff Members</span>
                         <Users class="w-4 h-4 text-white" />
                     </button>
 
