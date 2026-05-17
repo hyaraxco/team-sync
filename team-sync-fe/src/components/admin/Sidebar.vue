@@ -62,7 +62,7 @@ const onNavigate = () => closeMobile();
                         :class="isCollapsed ? 'w-10 h-10' : 'w-14 h-14'"
                     ></div>
                     <div
-                        class="absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full opacity-90 transition-all duration-300"
+                        class="absolute bg-brand-primary rounded-full opacity-90 transition-all duration-300"
                         :class="isCollapsed ? 'w-7 h-7' : 'w-10 h-10'"
                     ></div>
                     <BuildingIcon
@@ -824,7 +824,7 @@ const onNavigate = () => closeMobile();
                 <div class="relative z-10">
                     <!-- Icon -->
                     <div
-                        class="w-10 h-10 bg-gradient-to-r from-brand-primary to-brand-primary rounded-xl flex items-center justify-center mb-3"
+                        class="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center mb-3"
                     >
                         <CrownIcon class="w-5 h-5 text-white" />
                     </div>
@@ -839,7 +839,7 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         :to="{ name: 'admin.upgrade-plan' }"
                         @click="onNavigate"
-                        class="flex items-center justify-center w-full rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                        class="flex items-center justify-center w-full rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
                     >
                         <span class="text-brand-white text-sm font-semibold mr-2">Upgrade Now</span>
                         <ArrowRightIcon class="w-4 h-4 text-white" aria-hidden="true" />

@@ -237,7 +237,7 @@ const handleSubmit = async () => {
                     type="button"
                     @click="handleSubmit"
                     :disabled="isSubmitting || !isValid"
-                    class="px-6 py-3 bg-brand-primary hover:bg-[#0a42b3] text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-6 py-3 bg-brand-primary hover:bg-primary-800 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     :class="{ 'blue-gradient': isValid && !isSubmitting }"
                 >
                     {{ isSubmitting ? "Scheduling..." : "Schedule Meeting" }}

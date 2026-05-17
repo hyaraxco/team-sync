@@ -19,7 +19,7 @@ defineProps({
                 <div class="w-14 h-14 relative flex items-center justify-center rounded-xl overflow-hidden">
                     <!-- Main blue background -->
                     <div
-                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
+                        class="w-full h-full absolute bg-brand-primary rounded-xl"
                     ></div>
                     <!-- Lucide icon -->
                     <img loading="lazy" :src="data.icon" alt="Team Icon" class="w-6 h-6 text-white relative z-10" />

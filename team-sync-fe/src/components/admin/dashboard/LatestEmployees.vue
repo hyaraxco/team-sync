@@ -85,7 +85,7 @@ const goToEmployeeDetail = (id) => {
                         </p>
                         <span
                             v-if="employee.job_information?.employment_type"
-                            class="px-2 py-1 rounded-md text-xs font-semibold capitalize bg-[#EBF8FF] text-[#1E40AF]"
+                            class="px-2 py-1 rounded-md text-xs font-semibold capitalize bg-primary-100 text-primary-800"
                         >
                             {{ employee.job_information.employment_type }}
                         </span>
