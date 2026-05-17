@@ -25,7 +25,7 @@ const loading = computed(() => teamStore.loadingStatistics);
 <template>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <!-- Total Teams Card (spans 2 rows on the left) -->
-        <div class="lg:row-span-2 rounded-2xl border border-[#0B1042] relative overflow-hidden main-card p-5">
+        <div class="lg:row-span-2 rounded-2xl border border-brand-dark relative overflow-hidden main-card p-5">
             <div class="flex flex-col justify-center h-full relative z-10">
                 <!-- Trending Badge -->
                 <div class="flex items-center gap-2 mb-3">

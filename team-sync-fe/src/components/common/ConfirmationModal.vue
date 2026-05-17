@@ -159,11 +159,11 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                     :disabled="loading"
                     class="rounded-lg border hover:brightness-110 focus:ring-2 transition-all duration-300 px-6 py-3 flex items-center gap-2"
                     :class="{
-                        'border-[#A02121] bg-gradient-to-r from-red-500 to-red-600 shadow-lg focus:ring-red-500':
+                        'bg-gradient-to-r from-red-500 to-red-600 shadow-lg focus:ring-red-500':
                             type === 'danger',
-                        'border-[#A07621] bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-lg focus:ring-yellow-500':
+                        'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-lg focus:ring-yellow-500':
                             type === 'warning',
-                        'border-[#2151A0] blue-gradient blue-btn-shadow focus:ring-brand-primary': type === 'info',
+                        'blue-gradient blue-btn-shadow focus:ring-brand-primary': type === 'info',
                     }"
                 >
                     <span class="text-brand-white text-base font-semibold">

@@ -478,8 +478,8 @@ onMounted(() => {
                 >
                     <div class="h-10 w-10 rounded-xl bg-primary-50"></div>
                     <div class="flex-1 space-y-2">
-                        <div class="h-2.5 w-3/4 rounded-full bg-[#E8EEF8]"></div>
-                        <div class="h-2 w-1/3 rounded-full bg-[#EFF3FA]"></div>
+                        <div class="h-2.5 w-3/4 rounded-full bg-gray-200"></div>
+                        <div class="h-2 w-1/3 rounded-full bg-gray-100"></div>
                     </div>
                 </div>
             </div>
@@ -497,9 +497,9 @@ onMounted(() => {
 
             <div
                 v-else-if="recentActivities.length === 0"
-                class="rounded-xl border border-[#E7ECF4] bg-[#F8FAFC] px-3 py-4 text-center"
+                class="rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
             >
-                <p class="text-sm font-medium text-[#334155]">No activities yet.</p>
+                <p class="text-sm font-medium text-slate-700">No activities yet.</p>
             </div>
 
             <div v-else class="space-y-1">
@@ -507,7 +507,7 @@ onMounted(() => {
                     v-for="activity in recentActivities"
                     :key="activity.id"
                     type="button"
-                    class="flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-[#F7FAFF]"
+                    class="flex w-full items-start gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-primary-50/40"
                     :disabled="!activity.action_url"
                     @click="handleActivitySelect(activity)"
                 >

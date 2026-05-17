@@ -185,7 +185,7 @@ onUnmounted(() => {
                 <button
                     v-if="showSearchButton"
                     @click="handleSearchClick"
-                    class="btn-primary w-full sm:w-auto rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
+                    class="btn-primary w-full sm:w-auto rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
                 >
                     <SearchIcon class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-base font-semibold">Search</span>
