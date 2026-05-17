@@ -138,7 +138,7 @@ const handleSubmit = async () => {
                             <div class="w-32 h-32">
                                 <div class="relative w-32 h-32">
                                     <div
-                                        class="w-32 h-32 absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full"
+                                        class="w-32 h-32 absolute bg-brand-primary rounded-full"
                                     ></div>
                                     <div class="w-32 h-32 relative z-10 flex items-center justify-center">
                                         <img loading="lazy"
@@ -175,7 +175,7 @@ const handleSubmit = async () => {
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3"
                     >
                         <span class="text-brand-white text-base font-semibold">
                             {{ loading ? "Saving..." : "Save Changes" }}

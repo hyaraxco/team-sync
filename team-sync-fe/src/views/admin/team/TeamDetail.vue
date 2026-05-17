@@ -217,7 +217,7 @@ watch(
                         <p class="text-brand-light text-sm">Team leadership and management</p>
                     </div>
                 </div>
-                <span class="px-2 py-1 rounded-md text-xs font-semibold bg-[#F0FDF4] text-[#166534]">Active</span>
+                <span class="px-2 py-1 rounded-md text-xs font-semibold bg-success-50 text-success-700">Active</span>
             </div>
 
             <div class="flex flex-col gap-4" v-if="team.leader">
@@ -250,7 +250,7 @@ watch(
                                 </p>
                             </div>
                         </div>
-                        <span class="px-2 py-1 rounded-md text-xs font-semibold bg-[#EBF8FF] text-[#1E40AF]">
+                        <span class="px-2 py-1 rounded-md text-xs font-semibold bg-primary-100 text-primary-800">
                             Team Lead
                         </span>
                     </div>
@@ -401,7 +401,7 @@ watch(
                 </button>
                 <button
                     @click="openAddMemberModal"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                 >
                     <UserPlus class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Add Member</span>
@@ -587,7 +587,7 @@ watch(
         </div>
     </div>
 
-    <div class="bg-white border border-[#FEE2E2] rounded-2xl p-6">
+    <div class="bg-white border border-danger-100 rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-6">
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
@@ -608,7 +608,7 @@ watch(
             </div>
             <button
                 @click="showDeleteModal = true"
-                class="btn-primary rounded-lg border border-[#A02121] hover:brightness-110 focus:ring-2 focus:ring-[#D90C0C] transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-danger-600 transition-all duration-300 bg-danger-600 shadow-lg px-6 py-3 flex items-center gap-2"
             >
                 <Trash2 class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Disband Team</span>
