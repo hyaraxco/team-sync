@@ -519,7 +519,7 @@ onUnmounted(() => {
                         <CalendarCheck class="w-8 h-8 text-white" />
                     </div>
                     <div>
-                        <h3 class="text-white text-2xl font-bold">Attendance Overview</h3>
+                        <h1 class="text-2xl font-semibold text-white">Attendance Overview</h1>
                         <p class="text-white/90 text-base font-normal">
                             Track your daily presence and manage leave requests efficiently
                         </p>
@@ -628,7 +628,7 @@ onUnmounted(() => {
                             <CalendarCheck class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-lg font-bold">Recent Attendance</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Recent Attendance</h2>
                             <p class="text-brand-light text-sm">Last 7 days</p>
                         </div>
                     </div>
@@ -680,9 +680,9 @@ onUnmounted(() => {
                                     <User class="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <h4 class="text-brand-dark text-sm font-semibold">
+                                    <p class="text-sm font-semibold text-brand-dark">
                                         {{ getDayName(record.date) }}
-                                    </h4>
+                                    </p>
                                     <p class="text-brand-light text-sm">
                                         {{ formatDateShort(record.date) }}
                                     </p>
@@ -791,7 +791,7 @@ onUnmounted(() => {
                             </span>
                             <span
                                 v-if="day.status && day.inCurrentMonth"
-                                class="text-[10px] font-medium px-1.5 py-0.5 rounded truncate leading-tight"
+                                class="text-xs font-medium px-1.5 py-0.5 rounded truncate leading-tight"
                                 :class="getAttendanceStatusLabelClass(day.status)"
                             >
                                 {{ getAttendanceStatusLabel(day.status) }}
@@ -821,7 +821,7 @@ onUnmounted(() => {
                             <CalendarX class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-lg font-bold">My Leave Requests</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">My Leave Requests</h2>
                             <p class="text-brand-light text-sm">Recent requests</p>
                         </div>
                     </div>
@@ -846,9 +846,9 @@ onUnmounted(() => {
                                     <CalendarPlus class="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <h4 class="text-brand-dark text-sm font-semibold">
+                                    <p class="text-sm font-semibold text-brand-dark">
                                         {{ formatLeaveType(request.leave_type) }}
-                                    </h4>
+                                    </p>
                                     <p class="text-brand-light text-sm">
                                         {{ request.total_days }}
                                         {{ request.total_days === 1 ? "day" : "days" }}
@@ -909,7 +909,7 @@ onUnmounted(() => {
                         <CalendarPlus class="w-6 h-6 text-orange-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Manage Leave Requests</h3>
+                        <h2 class="text-lg font-semibold text-brand-dark">Manage Leave Requests</h2>
                         <p class="text-brand-light text-sm">
                             Submit new leave requests and review the status of existing ones.
                         </p>
@@ -935,7 +935,7 @@ onUnmounted(() => {
                             <CalendarX class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-lg font-bold">My Leave Requests</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">My Leave Requests</h2>
                             <p class="text-brand-light text-sm">Recent requests</p>
                         </div>
                     </div>
@@ -960,9 +960,9 @@ onUnmounted(() => {
                                     <CalendarPlus class="w-5 h-5 text-white" />
                                 </div>
                                 <div>
-                                    <h4 class="text-brand-dark text-sm font-semibold">
+                                    <p class="text-sm font-semibold text-brand-dark">
                                         {{ formatLeaveType(request.leave_type) }}
-                                    </h4>
+                                    </p>
                                     <p class="text-brand-light text-sm">
                                         {{ request.total_days }}
                                         {{ request.total_days === 1 ? "day" : "days" }}
@@ -1026,7 +1026,7 @@ onUnmounted(() => {
                                     <CalendarPlus class="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h3 class="text-brand-dark text-xl font-bold">Request New Leave</h3>
+                                    <h2 class="text-xl font-semibold text-brand-dark">Request New Leave</h2>
                                     <p class="text-brand-light text-sm font-normal">
                                         Submit a leave request for approval
                                     </p>
@@ -1193,7 +1193,7 @@ onUnmounted(() => {
                                     <CalendarCheck class="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h3 class="text-brand-dark text-xl font-bold">Leave Request Details</h3>
+                                    <h2 class="text-xl font-semibold text-brand-dark">Leave Request Details</h2>
                                     <p class="text-brand-light text-sm font-normal">
                                         Complete information about this leave request
                                     </p>
@@ -1383,7 +1383,7 @@ onUnmounted(() => {
                             >
                                 <div class="flex items-center justify-between">
                                     <div>
-                                        <h4 class="text-brand-dark text-base font-semibold">Re-upload Proof</h4>
+                                        <h3 class="text-base font-semibold text-brand-dark">Re-upload Proof</h3>
                                         <p class="text-brand-light text-sm mt-1">
                                             Your proof was rejected. You can upload a new document.
                                         </p>
