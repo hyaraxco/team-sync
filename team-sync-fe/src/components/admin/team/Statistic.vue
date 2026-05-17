@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, computed } from "vue";
 import { CheckCircle, PlusCircle, Target, Star, TrendingUp, Users, UserPlus } from "lucide-vue-next";
 import { useTeamStore } from "@/stores/team";

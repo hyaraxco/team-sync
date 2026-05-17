@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Input, TextArea } from "@/components/common/form";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import {
@@ -18,13 +18,20 @@ import {
 } from "lucide-vue-next";
 import { ref, computed } from "vue";
 
-interface Props {
-    modelValue: any;
-    errors?: any;
-    isEditMode?: boolean;
-}
-
-const props = defineProps<Props>();
+const props = defineProps({
+    modelValue: {
+        type: Object,
+        required: true,
+    },
+    errors: {
+        type: Object,
+        default: undefined,
+    },
+    isEditMode: {
+        type: Boolean,
+        default: false,
+    },
+});
 const emit = defineEmits(["update:modelValue", "email-blur", "identity-number-blur"]);
 
 const form = computed({
@@ -33,14 +40,14 @@ const form = computed({
 });
 
 // Profile photo handling
-const profilePhotoInput = ref<HTMLInputElement | null>(null);
+const profilePhotoInput = ref(null);
 const photoError = ref("");
 
 const allowedPhotoTypes = ["image/jpeg", "image/png", "image/gif"];
 const maxPhotoSize = 2 * 1024 * 1024;
 
-const handlePhotoSelect = (e: Event) => {
-    const target = e.target as HTMLInputElement;
+const handlePhotoSelect = (e) => {
+    const target = e.target;
     const file = target.files?.[0];
 
     if (file) {
