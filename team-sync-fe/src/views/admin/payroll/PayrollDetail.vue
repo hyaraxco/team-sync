@@ -780,6 +780,8 @@ const handleApprovePayroll = () => {
             <span class="text-brand-dark text-base font-semibold">Back</span>
         </button>
 
+        <h1 class="text-2xl font-semibold text-brand-dark mb-6">Payroll Detail</h1>
+
         <template v-if="hasPayrollStatistics">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div
@@ -897,7 +899,7 @@ const handleApprovePayroll = () => {
         <div v-else class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <h3 class="text-brand-dark text-xl font-bold">Payroll Draft Review</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Payroll Draft Review</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         This view keeps company-wide salary statistics hidden while still allowing draft payroll review.
                     </p>
@@ -997,7 +999,7 @@ const handleApprovePayroll = () => {
                         <Users class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Staff Member Details</h3>
+                        <h2 class="text-lg font-semibold text-brand-dark">Staff Member Details</h2>
                         <p class="text-brand-light text-sm font-normal">Complete payroll breakdown by employee</p>
                     </div>
                 </div>
@@ -1172,7 +1174,7 @@ const handleApprovePayroll = () => {
                     <ShieldCheck class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark text-xl font-bold">Approval Chain</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Approval Chain</h2>
                     <p class="text-brand-light text-sm font-normal">
                         Review threshold-based payroll approval steps and submit a role-based decision.
                     </p>
@@ -1273,7 +1275,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Payroll Activity</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Payroll Activity</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         Trace important payroll actions for this payroll period.
                     </p>
@@ -1346,7 +1348,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Settings Used</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Settings Used</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         Immutable payroll settings reference used when this payroll draft was generated.
                     </p>
@@ -1443,7 +1445,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Reconciliation Check</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Reconciliation Check</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         Critical issues must be resolved before payroll can be marked as paid.
                     </p>
@@ -1617,7 +1619,7 @@ const handleApprovePayroll = () => {
         <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Export & Actions</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Export & Actions</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">Download reports and manage payroll data</p>
                 </div>
 

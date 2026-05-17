@@ -26,7 +26,7 @@ defineProps({
             </div>
             <div class="flex-1">
                 <div class="flex items-center gap-4 mb-3">
-                    <h1 class="text-brand-dark text-3xl font-extrabold">
+                    <h1 class="text-brand-dark text-2xl font-semibold">
                         {{ team.name }}
                     </h1>
                     <span class="px-3 py-1 rounded-md text-sm font-semibold bg-primary-100 text-primary-800">Verified</span>

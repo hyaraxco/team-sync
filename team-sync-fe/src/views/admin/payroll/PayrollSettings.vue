@@ -365,7 +365,7 @@ onMounted(() => {
                 <span class="text-brand-dark text-sm font-semibold">Back</span>
             </button>
             <div>
-                <h2 class="text-brand-dark text-[32px] font-bold leading-tight">Payroll Settings</h2>
+                <h1 class="text-2xl font-semibold text-brand-dark">Payroll Settings</h1>
                 <p class="text-brand-light text-base font-normal mt-2">
                     Configure how future payroll drafts are calculated and documented.
                 </p>
@@ -459,7 +459,7 @@ onMounted(() => {
                             <Calendar class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Payroll Schedule</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Schedule</h2>
                             <p class="text-brand-light text-sm">Define default payday and attendance cut-off.</p>
                         </div>
                     </div>
@@ -501,7 +501,7 @@ onMounted(() => {
                             <Calculator class="w-6 h-6 text-emerald-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Calculation Rules</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Calculation Rules</h2>
                             <p class="text-brand-light text-sm">
                                 Control working day basis, absence deductions, and rounding.
                             </p>
@@ -590,7 +590,7 @@ onMounted(() => {
                                 <FileText class="w-6 h-6 text-amber-600" />
                             </div>
                             <div>
-                                <h3 class="text-brand-dark text-xl font-bold">Payroll Note Template</h3>
+                                <h2 class="text-lg font-semibold text-brand-dark">Payroll Note Template</h2>
                                 <p class="text-brand-light text-sm">
                                     Use placeholders to keep every generated payroll note consistent.
                                 </p>
@@ -619,7 +619,7 @@ onMounted(() => {
                                 <Landmark class="w-6 h-6 text-green-600" />
                             </div>
                             <div>
-                                <h3 class="text-brand-dark text-xl font-bold">Payroll Bank Partner</h3>
+                                <h2 class="text-lg font-semibold text-brand-dark">Payroll Bank Partner</h2>
                                 <p class="text-brand-light text-sm">
                                     Primary bank for salary disbursement. Employees with a different bank will be
                                     flagged.
@@ -676,7 +676,7 @@ onMounted(() => {
                                 <FileText class="w-6 h-6 text-blue-600" />
                             </div>
                             <div>
-                                <h3 class="text-brand-dark text-xl font-bold">Preview Result</h3>
+                                <h2 class="text-lg font-semibold text-brand-dark">Preview Result</h2>
                                 <p class="text-brand-light text-sm font-normal mt-1">
                                     Review your generated note format along with summary configurations.
                                 </p>
@@ -717,7 +717,7 @@ onMounted(() => {
                             <History class="w-6 h-6 text-violet-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-lg font-bold">Version History</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Version History</h2>
                             <p class="text-brand-light text-sm">
                                 Latest payroll settings snapshots used for future drafts.
                             </p>
@@ -833,7 +833,7 @@ onMounted(() => {
                                 <Calculator class="w-6 h-6 text-emerald-600" />
                             </div>
                             <div>
-                                <h4 class="text-brand-dark text-lg font-bold">BPJS Rate History</h4>
+                                <h3 class="text-base font-semibold text-brand-dark">BPJS Rate History</h3>
                                 <p class="text-brand-light text-sm">
                                     Latest BPJS Kesehatan and Ketenagakerjaan rates with effective dates.
                                 </p>
@@ -917,7 +917,7 @@ onMounted(() => {
                     class="bg-white/80 backdrop-blur-md border border-brand-border rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
                 >
                     <div>
-                        <h3 class="text-brand-dark text-base font-bold">Ready to save your changes?</h3>
+                        <h2 class="text-base font-semibold text-brand-dark">Ready to save your changes?</h2>
                         <p class="text-brand-light text-sm mt-0.5">Please make sure to review your settings.</p>
                     </div>
                     <button
