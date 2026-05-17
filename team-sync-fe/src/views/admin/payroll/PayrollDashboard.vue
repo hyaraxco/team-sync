@@ -295,7 +295,7 @@ const handleExportReport = async () => {
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -422,7 +422,7 @@ const handleExportReport = async () => {
                             data-testid="payroll-analytics-total-amount"
                         >
                             <p class="text-xs uppercase tracking-wide text-brand-light mb-1">Total Amount</p>
-                            <p class="text-brand-dark text-lg font-bold">
+                            <p class="text-brand-dark text-lg font-bold tabular-nums">
                                 {{ formatRupiahCompact(analytics.summary.total_amount) }}
                             </p>
                         </div>
@@ -533,7 +533,7 @@ const handleExportReport = async () => {
                                 <span class="text-brand-dark text-sm">{{ point.label }}</span>
                                 <div class="flex items-center gap-4">
                                     <span class="text-brand-light text-xs">{{ point.employee_count }} staff</span>
-                                    <span class="text-brand-dark text-sm font-semibold">
+                                    <span class="text-brand-dark text-sm font-semibold tabular-nums">
                                         {{ formatRupiahCompact(point.total_amount) }}
                                     </span>
                                 </div>
@@ -583,7 +583,7 @@ const handleExportReport = async () => {
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -626,7 +626,7 @@ const handleExportReport = async () => {
                     <div class="w-16 h-16 relative flex items-center justify-center rounded-xl overflow-hidden">
                         <!-- Background -->
                         <div
-                            class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
+                            class="w-full h-full absolute bg-brand-primary rounded-xl"
                         ></div>
                         <!-- Icon -->
                         <Calendar class="w-8 h-8 text-white relative z-10" />
@@ -674,7 +674,7 @@ const handleExportReport = async () => {
                     </div>
                     <div v-if="hasPayrollStatistics" class="flex-1 flex flex-col justify-center items-center">
                         <div class="text-left">
-                            <p class="text-brand-dark text-lg font-bold">
+                            <p class="text-brand-dark text-lg font-bold tabular-nums">
                                 {{ formatRupiahCompact(payroll.total_amount) }}
                             </p>
                             <p class="text-brand-light text-sm font-normal">Total payroll</p>
@@ -773,7 +773,7 @@ const handleExportReport = async () => {
                         type="button"
                         @click="handleExportReport"
                         data-testid="payroll-report-submit"
-                        class="flex-1 btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <Download class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">

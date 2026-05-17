@@ -88,11 +88,11 @@ const loadProjects = async () => {
 
 const getStatusClass = (status) => {
     const statusMap = {
-        active: "bg-[#F0FDF4] text-[#166534]",
-        inactive: "bg-[#FEE2E2] text-[#991B1B]",
-        archived: "bg-[#F3F4F6] text-[#374151]",
+        active: "bg-success-50 text-success-700",
+        inactive: "bg-danger-50 text-danger-700",
+        archived: "bg-gray-100 text-gray-700",
     };
-    return statusMap[status?.toLowerCase()] || "bg-[#EBF8FF] text-[#1E40AF]";
+    return statusMap[status?.toLowerCase()] || "bg-primary-50 text-primary-700";
 };
 
 const getMemberStatus = (member) => {
@@ -103,10 +103,10 @@ const getMemberStatus = (member) => {
 };
 
 const getMemberStatusClass = (member) => {
-    if (member.left_at) return "bg-[#F3F4F6] text-[#374151]";
+    if (member.left_at) return "bg-gray-100 text-gray-700";
     const sm = member.staff_member;
     const isLeader = sm?.user?.id === team.value?.leader?.id;
-    return isLeader ? "bg-[#FEF3C7] text-[#92400E]" : "bg-[#F0FDF4] text-[#166534]";
+    return isLeader ? "bg-warning-50 text-warning-700" : "bg-success-50 text-success-700";
 };
 
 onMounted(async () => {
@@ -156,7 +156,7 @@ onMounted(async () => {
                                 class="w-32 h-32 relative flex items-center justify-center rounded-full overflow-hidden"
                             >
                                 <div
-                                    class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full"
+                                    class="w-full h-full absolute bg-brand-primary rounded-full"
                                 ></div>
                                 <Users class="w-16 h-16 text-white relative z-10" />
                             </div>
@@ -269,7 +269,7 @@ onMounted(async () => {
                             @click="activeTab = 'members'"
                             :class="
                                 activeTab === 'members'
-                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-brand-primary to-brand-primary text-white font-semibold text-base transition-all duration-300'
+                                    ? 'px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-base transition-all duration-300'
                                     : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
@@ -280,7 +280,7 @@ onMounted(async () => {
                             @click="activeTab = 'projects'"
                             :class="
                                 activeTab === 'projects'
-                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-brand-primary to-brand-primary text-white font-semibold text-base transition-all duration-300'
+                                    ? 'px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-base transition-all duration-300'
                                     : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
@@ -291,7 +291,7 @@ onMounted(async () => {
                             @click="activeTab = 'description'"
                             :class="
                                 activeTab === 'description'
-                                    ? 'px-6 py-3 rounded-xl bg-gradient-to-r from-brand-primary to-brand-primary text-white font-semibold text-base transition-all duration-300'
+                                    ? 'px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-base transition-all duration-300'
                                     : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
@@ -388,7 +388,7 @@ onMounted(async () => {
                             </div>
                         </div>
                         <div class="flex items-center gap-2">
-                            <span class="px-3 py-1 rounded-md text-sm font-semibold bg-[#EBF8FF] text-[#1E40AF]">
+                            <span class="px-3 py-1 rounded-md text-sm font-semibold bg-primary-50 text-primary-700">
                                 {{ projects?.length || 0 }} Projects
                             </span>
                         </div>
