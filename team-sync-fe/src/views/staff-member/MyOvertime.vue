@@ -148,7 +148,7 @@ const statusConfig = (status) => {
             </div>
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-[#D5E2FB] px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-primary-100 px-4 py-2 text-sm font-semibold text-brand-primary transition-colors hover:bg-primary-50 disabled:opacity-50"
                 :disabled="loading"
                 @click="fetchData"
             >
@@ -216,7 +216,7 @@ const statusConfig = (status) => {
                     <button
                         v-if="hasActiveFilter"
                         type="button"
-                        class="rounded-xl px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-[#EFF5FF]"
+                        class="rounded-xl px-3 py-2 text-sm font-semibold text-brand-primary hover:bg-primary-50"
                         @click="clearFilters"
                     >
                         Clear
@@ -239,7 +239,7 @@ const statusConfig = (status) => {
                 <div
                     v-for="index in 4"
                     :key="`my-overtime-skeleton-${index}`"
-                    class="h-24 animate-pulse rounded-2xl bg-[#F1F5F9]"
+                    class="h-24 animate-pulse rounded-2xl bg-slate-100"
                 ></div>
             </div>
 
@@ -259,13 +259,13 @@ const statusConfig = (status) => {
                 <article
                     v-for="record in myRecords"
                     :key="record.id"
-                    class="rounded-2xl border border-[#E7ECF4] p-4 transition-all hover:border-brand-primary hover:shadow-sm"
+                    class="rounded-2xl border border-gray-200 p-4 transition-all hover:border-brand-primary hover:shadow-sm"
                     :data-testid="`my-overtime-record-${record.id}`"
                 >
                     <div class="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                         <div class="flex gap-3">
                             <div
-                                class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-[14px]"
+                                class="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-xl"
                                 :class="statusConfig(record.status).iconClass"
                             >
                                 <component :is="statusConfig(record.status).icon" class="h-5 w-5" />
@@ -303,7 +303,7 @@ const statusConfig = (status) => {
                                 </p>
                             </div>
                         </div>
-                        <div class="rounded-[14px] bg-[#F8FAFC] px-4 py-3 text-left md:text-right">
+                        <div class="rounded-xl bg-gray-50 px-4 py-3 text-left md:text-right">
                             <p class="text-xs font-semibold uppercase tracking-[0.1em] text-gray-500">Hours</p>
                             <p class="text-2xl font-extrabold text-brand-dark">
                                 {{ formatHours(record.hours) }}
@@ -315,7 +315,7 @@ const statusConfig = (status) => {
 
             <Pagination
                 v-if="!error && (myRecords.length > 0 || meta.total > 0)"
-                class="mt-5 border-t border-[#EEF2F8] pt-4"
+                class="mt-5 border-t border-gray-200 pt-4"
                 :meta="meta"
                 :loading="loading"
                 @page-change="handlePageChange"

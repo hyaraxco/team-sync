@@ -104,7 +104,7 @@ onMounted(async () => {
 
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <MainCard class="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <MainCard class="bg-primary-50 border-primary-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-blue-700">Total Pending</p>
@@ -118,7 +118,7 @@ onMounted(async () => {
                 </div>
             </MainCard>
 
-            <MainCard class="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+            <MainCard class="bg-purple-50 border-purple-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-purple-700">Active Cycles</p>

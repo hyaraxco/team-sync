@@ -83,7 +83,7 @@ onMounted(async () => {
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.team.create' }"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
                 >
                     <Users class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Add Team</span>

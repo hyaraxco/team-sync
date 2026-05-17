@@ -398,7 +398,7 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'schedule'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-schedule"
@@ -411,7 +411,7 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'rules'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-rules"
@@ -424,7 +424,7 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'bank_notes'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-bank-notes"
@@ -437,7 +437,7 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'history'
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                     data-testid="tab-history"
@@ -827,7 +827,7 @@ onMounted(() => {
                         </template>
                     </div>
 
-                    <section class="mt-6 border-t border-[#E5E7EB] pt-6">
+                    <section class="mt-6 border-t border-gray-200 pt-6">
                         <div class="flex items-center gap-3 mb-4">
                             <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
                                 <Calculator class="w-6 h-6 text-emerald-600" />
@@ -857,7 +857,7 @@ onMounted(() => {
                             data-testid="payroll-settings-bpjs-history-table"
                             class="overflow-x-auto rounded-xl border border-brand-border"
                         >
-                            <table class="min-w-full divide-y divide-[#E5E7EB] text-sm">
+                            <table class="min-w-full divide-y divide-gray-200 text-sm">
                                 <thead class="bg-gray-50">
                                     <tr>
                                         <th class="px-4 py-3 text-left font-semibold text-brand-dark whitespace-nowrap">
@@ -877,7 +877,7 @@ onMounted(() => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-[#F1F5F9] bg-white">
+                                <tbody class="divide-y divide-gray-100 bg-white">
                                     <tr
                                         v-for="rate in bpjsRateHistory"
                                         :key="rate.id"
@@ -925,7 +925,7 @@ onMounted(() => {
                         data-testid="payroll-settings-save"
                         :disabled="loading"
                         @click="handleSubmit"
-                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
+                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
                     >
                         <Settings class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">

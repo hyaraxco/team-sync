@@ -640,7 +640,7 @@ watch(
                             data-testid="payroll-create-submit"
                             @click="handleSubmit"
                             :disabled="isSubmitDisabled"
-                            class="btn-primary w-full rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="btn-primary w-full rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span class="text-brand-white text-base font-semibold">
                                 {{ loading ? "Generating..." : "Generate Payroll" }}

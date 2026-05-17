@@ -331,11 +331,11 @@
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
                         <label class="block text-sm font-semibold text-brand-dark mb-2">Work Start Time</label>
-                        <input v-model="policyForm.work_start_time" type="time" step="1" required class="form-input" />
+                        <input v-model="policyForm.work_start_time" type="time" step="1" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary" />
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-brand-dark mb-2">Work End Time</label>
-                        <input v-model="policyForm.work_end_time" type="time" step="1" required class="form-input" />
+                        <input v-model="policyForm.work_end_time" type="time" step="1" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary" />
                     </div>
                     <div>
                         <label class="block text-sm font-semibold text-brand-dark mb-2">Work Days Per Week</label>
@@ -345,7 +345,7 @@
                             min="1"
                             max="7"
                             required
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                     <div>
@@ -356,7 +356,7 @@
                             min="0"
                             max="120"
                             required
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                     <div>
@@ -368,7 +368,7 @@
                             max="12"
                             step="0.25"
                             required
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                     <div>
@@ -380,7 +380,7 @@
                             max="100"
                             step="0.01"
                             required
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                 </div>
@@ -408,12 +408,12 @@
                     <button
                         type="button"
                         :disabled="isSubmittingPolicy"
-                        class="modal-secondary-button"
+                        class="flex-1 rounded-xl border border-brand-border px-4 py-3 text-sm font-semibold text-brand-dark transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-brand-primary"
                         @click="closePolicyModal"
                     >
                         Cancel
                     </button>
-                    <button type="submit" :disabled="isSubmittingPolicy" class="modal-primary-button">
+                    <button type="submit" :disabled="isSubmittingPolicy" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
                         {{ isSubmittingPolicy ? "Saving..." : "Save Policy" }}
                     </button>
                 </div>
@@ -469,7 +469,7 @@
                 <div class="grid gap-4 md:grid-cols-2">
                     <div>
                         <label class="block text-sm font-semibold text-brand-dark mb-2">Quota Scope</label>
-                        <select v-model="entitlementForm.quota_scope" class="form-input">
+                        <select v-model="entitlementForm.quota_scope" class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary">
                             <option value="annual">Annual</option>
                             <option value="per_occurrence">Per Occurrence</option>
                             <option value="unlimited">Unlimited</option>
@@ -483,7 +483,7 @@
                             type="number"
                             min="0"
                             step="0.5"
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                     <div>
@@ -492,7 +492,7 @@
                             v-model.number="entitlementForm.carry_over_max_days"
                             type="number"
                             min="0"
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                     <div>
@@ -501,7 +501,7 @@
                             v-model.number="entitlementForm.max_attachment_size_kb"
                             type="number"
                             min="0"
-                            class="form-input"
+                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                         />
                     </div>
                 </div>
@@ -512,7 +512,7 @@
                         v-model="allowedMimeTypesInput"
                         type="text"
                         placeholder="image/jpeg, image/png, application/pdf"
-                        class="form-input"
+                        class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                     />
                     <p class="mt-1 text-xs text-gray-500">
                         Separate MIME types with commas. Leave blank for no restriction.
@@ -523,12 +523,12 @@
                     <button
                         type="button"
                         :disabled="isSubmittingEntitlement"
-                        class="modal-secondary-button"
+                        class="flex-1 rounded-xl border border-brand-border px-4 py-3 text-sm font-semibold text-brand-dark transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-brand-primary"
                         @click="closeEntitlementModal"
                     >
                         Cancel
                     </button>
-                    <button type="submit" :disabled="isSubmittingEntitlement" class="modal-primary-button">
+                    <button type="submit" :disabled="isSubmittingEntitlement" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
                         {{ isSubmittingEntitlement ? "Saving..." : "Save Rules" }}
                     </button>
                 </div>
@@ -544,7 +544,7 @@
             <form class="space-y-4" @submit.prevent="submitHolidayForm">
                 <div>
                     <label class="block text-sm font-semibold text-brand-dark mb-2">Date</label>
-                    <input v-model="holidayForm.date" type="date" required class="form-input" />
+                    <input v-model="holidayForm.date" type="date" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary" />
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-brand-dark mb-2">Name</label>
@@ -553,12 +553,12 @@
                         type="text"
                         required
                         placeholder="e.g., Independence Day"
-                        class="form-input"
+                        class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                     />
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-brand-dark mb-2">Type</label>
-                    <select v-model="holidayForm.type" required class="form-input">
+                    <select v-model="holidayForm.type" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary">
                         <option value="national_holiday">National Holiday</option>
                         <option value="collective_leave">Collective Leave (Cuti Bersama)</option>
                     </select>
@@ -569,7 +569,7 @@
                         v-model="holidayAppliesToInput"
                         type="text"
                         placeholder="Optional, comma separated"
-                        class="form-input"
+                        class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                     />
                     <p class="mt-1 text-xs text-gray-500">Leave blank to apply company-wide.</p>
                 </div>
@@ -578,12 +578,12 @@
                     <button
                         type="button"
                         :disabled="isSubmittingHoliday"
-                        class="modal-secondary-button"
+                        class="flex-1 rounded-xl border border-brand-border px-4 py-3 text-sm font-semibold text-brand-dark transition-colors disabled:cursor-not-allowed disabled:opacity-50 hover:border-brand-primary"
                         @click="closeHolidayModal"
                     >
                         Cancel
                     </button>
-                    <button type="submit" :disabled="isSubmittingHoliday" class="modal-primary-button">
+                    <button type="submit" :disabled="isSubmittingHoliday" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
                         {{ isSubmittingHoliday ? "Saving..." : selectedHoliday ? "Update Holiday" : "Create Holiday" }}
                     </button>
                 </div>
@@ -820,55 +820,6 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.font-display {
-    font-family: "Outfit", sans-serif;
-}
-
-.form-input {
-    width: 100%;
-    border-radius: 8px;
-    border: 1px solid #dcdedd;
-    padding: 0.5rem 1rem;
-    color: #0c1c3c;
-    outline: none;
-}
-
-.form-input:focus {
-    border-color: #0c51d9;
-}
-
-.modal-primary-button {
-    flex: 1;
-    border-radius: 12px;
-    background-color: #0c1c3c;
-    padding: 0.75rem 1rem;
-    color: white;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: opacity 0.3s ease;
-}
-
-.modal-primary-button:disabled,
-.modal-secondary-button:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
-.modal-secondary-button {
-    flex: 1;
-    border-radius: 12px;
-    border: 1px solid #dcdedd;
-    padding: 0.75rem 1rem;
-    color: #0c1c3c;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: border-color 0.3s ease;
-}
-
-.modal-secondary-button:hover:not(:disabled) {
-    border-color: #0c51d9;
-}
-
 .fade-enter-active,
 .fade-leave-active {
     transition:
