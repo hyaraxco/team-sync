@@ -1,8 +1,8 @@
-<script setup lang="ts">
+<script setup>
 import { Lightbulb, Check } from "lucide-vue-next";
 import { ref, onMounted, onUnmounted } from "vue";
 
-const sidebarRef = ref<HTMLElement | null>(null);
+const sidebarRef = ref(null);
 const isSticky = ref(false);
 const sidebarTop = ref(0);
 const sidebarWidth = ref(0);

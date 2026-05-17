@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
 </script>
 

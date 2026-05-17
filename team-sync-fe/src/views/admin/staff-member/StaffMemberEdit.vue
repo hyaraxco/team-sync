@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, inject, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { useStaffMemberStore } from "@/stores/staffMember";
@@ -22,10 +22,10 @@ const { loading, error } = storeToRefs(staffMemberStore);
 const showErrorModal = ref(false);
 
 // Inject step management from layout
-const currentStep = inject<any>("currentStep");
-const totalSteps = inject<any>("totalSteps");
-const nextStep = inject<any>("nextStep");
-const previousStep = inject<any>("previousStep");
+const currentStep = inject("currentStep");
+const totalSteps = inject("totalSteps");
+const nextStep = inject("nextStep");
+const previousStep = inject("previousStep");
 
 // Form data for Step 1
 const step1Data = ref({
@@ -46,7 +46,7 @@ const step1Data = ref({
     postal_code: "",
     last_education: "",
     seniority_level: "",
-    profile_photo: null as File | null,
+    profile_photo: null,
     profile_photo_url: "",
 });
 
@@ -77,7 +77,7 @@ const step3Data = ref({
     emergency_contact_email: "",
 });
 
-const parseSalaryNumber = (value: any): number | null => {
+const parseSalaryNumber = (value) => {
     if (value === null || value === undefined) return null;
 
     const raw = String(value).trim();
@@ -100,17 +100,17 @@ const parseSalaryNumber = (value: any): number | null => {
     return Number.isFinite(parsed) ? parsed : null;
 };
 
-const normalizeRupiah = (value: any) => {
+const normalizeRupiah = (value) => {
     const parsed = parseSalaryNumber(value);
     return parsed === null ? "" : String(parsed);
 };
 
-const formatDateForInput = (value: any) => {
+const formatDateForInput = (value) => {
     if (!value) return "";
     return String(value).slice(0, 10);
 };
 
-const extractRoleValue = (roles: any) => {
+const extractRoleValue = (roles) => {
     if (!Array.isArray(roles) || roles.length === 0) return "";
 
     const firstRole = roles[0];
@@ -122,7 +122,7 @@ const extractRoleValue = (roles: any) => {
 // Load staff member data
 const loadStaffMemberData = async () => {
     try {
-        const staffMemberId = route.params.id as string;
+        const staffMemberId = route.params.id;
         const staffMember = await staffMemberStore.fetchStaffMember(staffMemberId);
 
         if (staffMember) {
@@ -250,7 +250,7 @@ const handleSubmit = async () => {
             formData.append("emergency_contacts[0][email]", step3Data.value.emergency_contact_email);
         }
 
-        const staffMemberId = route.params.id as string;
+        const staffMemberId = route.params.id;
         await staffMemberStore.updateStaffMember(staffMemberId, formData);
 
         // Redirect to staff member list on success

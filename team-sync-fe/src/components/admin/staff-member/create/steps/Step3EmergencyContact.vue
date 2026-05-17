@@ -1,20 +1,19 @@
-<script setup lang="ts">
+<script setup>
 import { computed } from "vue";
 import { User, Phone, Mail } from "lucide-vue-next";
 import { Input } from "@/components/common/form";
 import RightSidebarStep3 from "@/components/admin/staff-member/create/RightSidebarStep3.vue";
 
-interface Props {
+const props = defineProps({
     modelValue: {
-        emergency_contact_name: string;
-        emergency_contact_relationship: string;
-        emergency_contact_phone: string;
-        emergency_contact_email: string;
-    };
-    errors?: any;
-}
-
-const props = defineProps<Props>();
+        type: Object,
+        required: true,
+    },
+    errors: {
+        type: Object,
+        default: undefined,
+    },
+});
 const emit = defineEmits(["update:modelValue"]);
 
 const form = computed({
