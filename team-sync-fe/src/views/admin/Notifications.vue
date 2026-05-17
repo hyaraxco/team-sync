@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { computed, onMounted, ref } from "vue";
 import {
     BellIcon,
@@ -30,12 +30,12 @@ const error = computed(() => notificationStore.error);
 const meta = computed(() => notificationStore.meta);
 const markingAllRead = computed(() => notificationStore.markingAllRead);
 
-const resolveNotificationCategory = (notification: any) =>
+const resolveNotificationCategory = (notification) =>
     String(notification?.category ?? notification?.data?.category ?? notification?.type ?? "")
         .trim()
         .toLowerCase();
 
-const getActivityIcon = (notification: any) => {
+const getActivityIcon = (notification) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
@@ -61,7 +61,7 @@ const getActivityIcon = (notification: any) => {
     return BellIcon;
 };
 
-const getActivityIconBgClass = (notification: any) => {
+const getActivityIconBgClass = (notification) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
@@ -87,7 +87,7 @@ const getActivityIconBgClass = (notification: any) => {
     return "bg-primary-50";
 };
 
-const getActivityIconClass = (notification: any) => {
+const getActivityIconClass = (notification) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
@@ -113,7 +113,7 @@ const getActivityIconClass = (notification: any) => {
     return "text-brand-primary";
 };
 
-const getNotificationTime = (notification: any) => {
+const getNotificationTime = (notification) => {
     if (!notification?.created_at) {
         return "Recently";
     }
@@ -121,7 +121,7 @@ const getNotificationTime = (notification: any) => {
     return getTimeAgo(notification.created_at);
 };
 
-const openNotification = async (notification: any) => {
+const openNotification = async (notification) => {
     const actionUrl = typeof notification?.action_url === "string" ? notification.action_url.trim() : "";
 
     if (!actionUrl) {
@@ -145,7 +145,7 @@ const handleMarkAllRead = async () => {
     await notificationStore.markAllAsRead();
 };
 
-const goToPage = (page: number) => {
+const goToPage = (page) => {
     if (page >= 1 && (!meta.value || page <= meta.value.last_page)) {
         fetchNotifications(page);
     }
