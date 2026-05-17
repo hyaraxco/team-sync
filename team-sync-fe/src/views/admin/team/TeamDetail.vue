@@ -213,7 +213,7 @@ watch(
                         <Crown class="w-6 h-6 text-green-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Team Lead</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Team Lead</h2>
                         <p class="text-brand-light text-sm">Team leadership and management</p>
                     </div>
                 </div>
@@ -242,9 +242,9 @@ watch(
                                 ></div>
                             </div>
                             <div class="flex-1 min-w-0">
-                                <h4 class="text-brand-dark text-base font-bold truncate">
+                                <p class="text-brand-dark text-base font-bold truncate">
                                     {{ team.leader?.name }}
-                                </h4>
+                                </p>
                                 <p class="text-brand-light text-sm">
                                     {{ team.leader?.employee_profile?.job_information?.job_title }}
                                 </p>
@@ -257,7 +257,7 @@ watch(
                 </div>
 
                 <div class="space-y-3">
-                    <h5 class="text-brand-dark text-sm font-semibold mb-3">Contact Information</h5>
+                    <h3 class="text-brand-dark text-sm font-semibold mb-3">Contact Information</h3>
                     <div class="space-y-2">
                         <div
                             class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-all duration-300"
@@ -307,7 +307,7 @@ watch(
             <div class="flex flex-1 items-center justify-center min-h-[250px]" v-else>
                 <div class="flex flex-col items-center justify-center">
                     <Crown class="w-12 h-12 text-gray-300 mb-4" />
-                    <h3 class="text-brand-dark text-lg font-bold mb-2">No Team Lead Assigned</h3>
+                    <h3 class="text-brand-dark text-base font-semibold mb-2">No Team Lead Assigned</h3>
                     <p class="text-brand-light text-sm mb-4 text-center">
                         This team does not currently have a leader assigned.
                     </p>
@@ -321,7 +321,7 @@ watch(
                     <Settings class="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Team Settings</h3>
+                    <h2 class="text-brand-dark text-lg font-semibold">Team Settings</h2>
                     <p class="text-brand-light text-sm">Configuration and status</p>
                 </div>
             </div>
@@ -361,7 +361,7 @@ watch(
                 <ListCheck class="w-6 h-6 text-orange-600" />
             </div>
             <div>
-                <h3 class="text-brand-dark text-lg font-bold">Team Responsibilities</h3>
+                <h2 class="text-brand-dark text-lg font-semibold">Team Responsibilities</h2>
                 <p class="text-brand-light text-sm">Key duties and objectives</p>
             </div>
         </div>
@@ -388,7 +388,7 @@ watch(
                     <Users class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Team Members</h3>
+                    <h2 class="text-brand-dark text-lg font-semibold">Team Members</h2>
                     <p class="text-brand-light text-sm">Current team composition</p>
                 </div>
             </div>
@@ -437,9 +437,9 @@ watch(
                     </div>
                 </div>
                 <div class="text-center mb-3">
-                    <h4 class="text-brand-dark text-lg font-bold">
+                    <p class="text-brand-dark text-lg font-bold">
                         {{ member.staff_member?.user?.name || "-" }}
-                    </h4>
+                    </p>
                     <p class="text-brand-light text-base">
                         {{ member.staff_member?.job_information?.job_title || "-" }}
                     </p>
@@ -491,7 +491,7 @@ watch(
                     <Activity class="w-6 h-6 text-gray-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Recent Activity</h3>
+                    <h2 class="text-brand-dark text-lg font-semibold">Recent Activity</h2>
                     <p class="text-brand-light text-sm">Latest team updates and milestones</p>
                 </div>
             </div>
@@ -542,7 +542,7 @@ watch(
                     <Folder class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Team Resources</h3>
+                    <h2 class="text-brand-dark text-lg font-semibold">Team Resources</h2>
                     <p class="text-brand-light text-sm">Essential tools and documents</p>
                 </div>
             </div>
@@ -593,7 +593,7 @@ watch(
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
             <div>
-                <h3 class="text-brand-dark text-lg font-bold">Danger Zone</h3>
+                <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
                 <p class="text-brand-light text-sm">Irreversible and destructive actions</p>
             </div>
         </div>
@@ -601,7 +601,7 @@ watch(
             class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
         >
             <div class="flex-1">
-                <h4 class="text-brand-dark text-base font-bold mb-1">Disband Team</h4>
+                <h3 class="text-brand-dark text-base font-semibold mb-1">Disband Team</h3>
                 <p class="text-brand-light text-sm">
                     Permanently remove this team and reassign all members. This action cannot be undone.
                 </p>
@@ -649,7 +649,7 @@ watch(
                             <UserPlus class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Add Team Member</h3>
+                            <h3 class="text-brand-dark text-lg font-semibold">Add Team Member</h3>
                             <p class="text-brand-light text-sm font-normal">Choose an employee to add to this team</p>
                         </div>
                     </div>
@@ -704,9 +704,9 @@ watch(
                                 </div>
                             </div>
                             <div class="flex-1">
-                                <h4 class="text-brand-dark text-base font-bold">
+                                <p class="text-brand-dark text-base font-bold">
                                     {{ employee.user?.name }}
-                                </h4>
+                                </p>
                                 <p class="text-brand-light text-sm font-normal">
                                     {{ employee.job_information?.job_title }}
                                 </p>

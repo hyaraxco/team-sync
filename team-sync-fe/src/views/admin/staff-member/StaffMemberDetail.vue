@@ -124,7 +124,7 @@ onMounted(() => {
                 </div>
                 <div class="flex-1">
                     <div class="flex items-center gap-4 mb-2">
-                        <h1 class="text-brand-dark text-3xl font-extrabold">
+                        <h1 class="text-brand-dark text-2xl font-semibold">
                             {{ staffMember.user?.name }}
                         </h1>
                     </div>
@@ -263,7 +263,7 @@ onMounted(() => {
                         <Users class="w-6 h-6 text-indigo-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Team Information</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Team Information</h2>
                         <p class="text-brand-light text-sm">Current team and reporting structure</p>
                     </div>
                 </div>
@@ -295,7 +295,7 @@ onMounted(() => {
                         <Contact class="w-6 h-6 text-teal-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Contact Details</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Contact Details</h2>
                         <p class="text-brand-light text-sm">How to reach this staff member</p>
                     </div>
                 </div>
@@ -329,7 +329,7 @@ onMounted(() => {
                         <Calendar class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Personal Information</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Personal Information</h2>
                         <p class="text-brand-light text-sm">Birth and personal details</p>
                     </div>
                 </div>
@@ -379,7 +379,7 @@ onMounted(() => {
                         <Phone class="w-6 h-6 text-red-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Emergency Contact</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Emergency Contact</h2>
                         <p class="text-brand-light text-sm">Person to contact in emergency</p>
                     </div>
                 </div>
@@ -425,7 +425,7 @@ onMounted(() => {
                         <MapPin class="w-6 h-6 text-purple-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Address Information</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Address Information</h2>
                         <p class="text-brand-light text-sm">Location and postal details</p>
                     </div>
                 </div>
@@ -457,7 +457,7 @@ onMounted(() => {
                         <Briefcase class="w-6 h-6 text-green-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Employment Details</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Employment Details</h2>
                         <p class="text-brand-light text-sm">Work arrangement and compensation</p>
                     </div>
                 </div>
@@ -521,7 +521,7 @@ onMounted(() => {
                         <FileText class="w-6 h-6 text-orange-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Administrative Information</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Administrative Information</h2>
                         <p class="text-brand-light text-sm">System details and preferences</p>
                     </div>
                 </div>
@@ -541,7 +541,7 @@ onMounted(() => {
                         <Briefcase class="w-6 h-6 text-cyan-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Bank Information</h3>
+                        <h2 class="text-brand-dark text-lg font-semibold">Bank Information</h2>
                         <p class="text-brand-light text-sm">Banking details for payroll</p>
                     </div>
                 </div>
@@ -574,7 +574,7 @@ onMounted(() => {
                     <AlertTriangle class="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark text-lg font-bold">Danger Zone</h3>
+                    <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
                     <p class="text-brand-light text-sm">Irreversible and destructive actions</p>
                 </div>
             </div>
@@ -582,7 +582,7 @@ onMounted(() => {
                 class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
             >
                 <div class="flex-1">
-                    <h4 class="text-brand-dark text-base font-bold mb-1">Delete Staff Member Profile</h4>
+                    <h3 class="text-brand-dark text-base font-semibold mb-1">Delete Staff Member Profile</h3>
                     <p class="text-brand-light text-sm">
                         Permanently remove this staff member and all associated data. This action cannot be undone.
                     </p>

@@ -444,7 +444,7 @@ watch(
                 <ArrowLeftIcon class="w-5 h-5 text-brand-dark" />
             </button>
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Review Detail</h1>
+                <h1 class="text-2xl font-semibold text-brand-dark">Review Detail</h1>
                 <p class="text-brand-light mt-1">
                     {{ review?.cycle?.name || "Loading..." }}
                 </p>
@@ -598,7 +598,7 @@ watch(
                                     </p>
                                     <span
                                         v-if="review.reviewer?.user?.roles?.length"
-                                        class="px-2 py-0.5 rounded text-[10px] bg-blue-100 text-blue-700 border border-blue-200"
+                                        class="px-2 py-0.5 rounded text-xs bg-blue-100 text-blue-700 border border-blue-200"
                                     >
                                         {{ review.reviewer?.user?.roles?.[0]?.name }}
                                     </span>
@@ -672,10 +672,10 @@ watch(
                     v-if="review.status === 'completed' && review.outcome_applied_at"
                     class="border-l-4 border-l-emerald-500"
                 >
-                    <h4 class="text-sm font-semibold text-brand-dark mb-4 flex items-center gap-2">
+                    <h3 class="text-base font-semibold text-brand-dark mb-4 flex items-center gap-2">
                         <StarIcon class="w-4 h-4 text-emerald-600" />
                         Performance Outcome
-                    </h4>
+                    </h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                         <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
                             <p class="text-xs text-emerald-600 mb-1">Bonus</p>
@@ -728,7 +728,7 @@ watch(
                     v-if="['pending_calibration', 'completed'].includes(reviewStatus)"
                     class="border-l-4 border-l-brand-primary"
                 >
-                    <h3 class="text-lg font-semibold text-brand-dark mb-4">📊 Performance Data Summary</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">📊 Performance Data Summary</h2>
                     <div v-if="readinessLoading" class="flex justify-center py-4">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-primary"></div>
                     </div>
@@ -843,7 +843,7 @@ watch(
 
                 <!-- Deadlines -->
                 <MainCard>
-                    <h3 class="text-lg font-semibold text-brand-dark mb-4">Deadlines & Timeline</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Deadlines & Timeline</h2>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div
                             class="p-3 rounded-lg"
@@ -939,9 +939,9 @@ watch(
                             <!-- Section Header -->
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-brand-dark">
+                                    <h2 class="text-lg font-semibold text-brand-dark">
                                         {{ section.name }}
-                                    </h3>
+                                    </h2>
                                     <p v-if="section.description" class="text-sm text-brand-light mt-1">
                                         {{ section.description }}
                                     </p>
@@ -1088,9 +1088,9 @@ watch(
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-brand-dark">
+                                    <h2 class="text-lg font-semibold text-brand-dark">
                                         {{ section.name }}
-                                    </h3>
+                                    </h2>
                                     <p v-if="section.description" class="text-sm text-brand-light mt-1">
                                         {{ section.description }}
                                     </p>
@@ -1210,7 +1210,7 @@ watch(
                     <!-- Auto-Calculated Rating Preview (Manager) -->
                     <MainCard v-if="canSubmitManagerAssessment">
                         <div class="space-y-4">
-                            <h3 class="text-lg font-semibold text-brand-dark">Projected Final Rating</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Projected Final Rating</h2>
                             <p class="text-sm text-brand-light">Auto-calculated from your section ratings above.</p>
                             <div class="flex items-center gap-4">
                                 <p
@@ -1261,9 +1261,9 @@ watch(
                         <div class="space-y-4">
                             <div class="flex items-center justify-between">
                                 <div>
-                                    <h3 class="text-lg font-semibold text-brand-dark">
+                                    <h2 class="text-lg font-semibold text-brand-dark">
                                         {{ section.name }}
-                                    </h3>
+                                    </h2>
                                     <p v-if="section.description" class="text-sm text-brand-light mt-1">
                                         {{ section.description }}
                                     </p>
@@ -1407,7 +1407,7 @@ watch(
                         <div class="space-y-6">
                             <!-- Projected Final Rating -->
                             <div>
-                                <h3 class="text-lg font-semibold text-brand-dark">Projected Final Rating</h3>
+                                <h2 class="text-lg font-semibold text-brand-dark">Projected Final Rating</h2>
                                 <p class="text-sm text-brand-light mt-1">
                                     Auto-calculated from weighted section ratings. Adjust section overrides above to see
                                     changes.
@@ -1450,9 +1450,9 @@ watch(
 
                             <!-- Normalization Context -->
                             <div v-if="calibrationContext && !calibrationContextLoading">
-                                <h4 class="text-sm font-semibold text-brand-dark mb-3">
+                                <h3 class="text-sm font-semibold text-brand-dark mb-3">
                                     Cross-Manager Normalization Context
-                                </h4>
+                                </h3>
                                 <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-brand-light">Cycle</span>

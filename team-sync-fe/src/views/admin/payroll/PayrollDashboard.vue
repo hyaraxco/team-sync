@@ -239,6 +239,7 @@ const handleExportReport = async () => {
 
 <template>
     <div>
+        <h1 class="text-2xl font-semibold text-brand-dark mb-6">Payroll Dashboard</h1>
         <template v-if="hasPayrollStatistics">
             <!-- Stats Layout -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -290,7 +291,7 @@ const handleExportReport = async () => {
                 <div
                     class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                 >
-                    <h3 class="text-brand-dark text-lg font-bold mb-4">Payroll Actions</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
@@ -394,7 +395,7 @@ const handleExportReport = async () => {
             >
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <div>
-                        <h3 class="text-brand-dark text-lg font-bold">Payroll Analytics (Last 6 Periods)</h3>
+                        <h2 class="text-lg font-semibold text-brand-dark">Payroll Analytics (Last 6 Periods)</h2>
                         <p class="text-brand-light text-sm font-normal">
                             Finance insight from approved and paid payroll periods.
                         </p>
@@ -458,7 +459,7 @@ const handleExportReport = async () => {
             <!-- Finance Insights Section -->
             <div v-if="hasAnalyticsData" data-testid="payroll-finance-insights" class="space-y-6 mb-6">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-brand-dark text-lg font-bold">Finance Insights</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark">Finance Insights</h2>
                     <span class="text-brand-light text-sm">Deeper payroll analytics</span>
                 </div>
 
@@ -468,7 +469,7 @@ const handleExportReport = async () => {
                         data-testid="payroll-insights-avg-salary"
                         class="bg-white border border-brand-border rounded-2xl p-5"
                     >
-                        <h4 class="text-brand-dark text-base font-bold mb-3">Average Salary Trend</h4>
+                        <h3 class="text-base font-semibold text-brand-dark mb-3">Average Salary Trend</h3>
                         <VueApexCharts
                             type="area"
                             height="200"
@@ -482,7 +483,7 @@ const handleExportReport = async () => {
                         data-testid="payroll-insights-bpjs"
                         class="bg-white border border-brand-border rounded-2xl p-5"
                     >
-                        <h4 class="text-brand-dark text-base font-bold mb-3">BPJS Contribution Trend</h4>
+                        <h3 class="text-base font-semibold text-brand-dark mb-3">BPJS Contribution Trend</h3>
                         <VueApexCharts type="bar" height="200" :options="bpjsChartOptions" :series="bpjsChartSeries" />
                     </div>
 
@@ -491,7 +492,7 @@ const handleExportReport = async () => {
                         data-testid="payroll-insights-deduction-reasons"
                         class="bg-white border border-brand-border rounded-2xl p-5"
                     >
-                        <h4 class="text-brand-dark text-base font-bold mb-3">Top Deduction Reasons</h4>
+                        <h3 class="text-base font-semibold text-brand-dark mb-3">Top Deduction Reasons</h3>
                         <div class="space-y-3">
                             <div
                                 v-for="reason in topDeductionReasons"
@@ -523,7 +524,7 @@ const handleExportReport = async () => {
                         data-testid="payroll-insights-headcount"
                         class="bg-white border border-brand-border rounded-2xl p-5"
                     >
-                        <h4 class="text-brand-dark text-base font-bold mb-3">Headcount vs Payroll</h4>
+                        <h3 class="text-base font-semibold text-brand-dark mb-3">Headcount vs Payroll</h3>
                         <div class="space-y-2">
                             <div
                                 v-for="point in headcountVsPayrollGrowth"
@@ -554,7 +555,7 @@ const handleExportReport = async () => {
                             <FileText class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Payroll Operations</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Operations</h2>
                             <p class="text-brand-light text-sm font-normal">
                                 Prepare payroll drafts from validated attendance and employee data.
                             </p>
@@ -578,7 +579,7 @@ const handleExportReport = async () => {
                 </div>
 
                 <div class="bg-white border border-brand-border rounded-2xl p-5">
-                    <h3 class="text-brand-dark text-lg font-bold mb-4">Payroll Actions</h3>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
@@ -613,7 +614,7 @@ const handleExportReport = async () => {
         <!-- Monthly Payroll Periods -->
         <div class="bg-white border border-brand-border rounded-2xl p-5">
             <div class="flex items-center justify-between mb-4">
-                <h3 class="text-brand-dark text-lg font-bold">Monthly Payroll Periods</h3>
+                <h2 class="text-lg font-semibold text-brand-dark">Monthly Payroll Periods</h2>
             </div>
             <div class="space-y-4">
                 <div
