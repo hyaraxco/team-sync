@@ -17,7 +17,6 @@ use App\Services\Attendance\LeaveEntitlementValidator;
 use App\Services\EmailService;
 use Carbon\Carbon;
 use Illuminate\Auth\Access\AuthorizationException;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -259,6 +258,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
                     if (! $leaveRequest) {
                         $failed[] = ['id' => $id, 'reason' => 'Leave Request Not Found'];
+
                         continue;
                     }
 

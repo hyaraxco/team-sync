@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Enums\PayrollStatus;
+use App\Exceptions\ConcurrentModificationException;
 use App\Exceptions\PayrollAlreadyPaidException;
 use App\Exceptions\PayrollReconciliationBlockedException;
 use App\Exceptions\PayrollStateException;
@@ -313,7 +314,7 @@ class PayrollController extends Controller implements HasMiddleware
             Log::warning('PayrollController domain exception: '.$e->getMessage());
 
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
-        } catch (\App\Exceptions\ConcurrentModificationException $e) {
+        } catch (ConcurrentModificationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 409);
         } catch (\Exception $e) {
             Log::warning('PayrollController domain exception: '.$e->getMessage());

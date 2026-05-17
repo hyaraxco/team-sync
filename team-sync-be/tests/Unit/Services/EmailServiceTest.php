@@ -15,6 +15,8 @@ use App\Models\User;
 use App\Notifications\AttendanceCheckedIn;
 use App\Notifications\AttendanceCheckedOut;
 use App\Notifications\AttendanceCorrectionApproved;
+use App\Notifications\AttendanceCorrectionNeedsApproval;
+use App\Notifications\AttendanceCorrectionRejected;
 use App\Notifications\LeaveRequestApproved;
 use App\Notifications\LeaveRequestCreated;
 use App\Notifications\LeaveRequestNeedsApproval;
@@ -24,6 +26,7 @@ use App\Notifications\ProjectLifecycleUpdated;
 use App\Notifications\ProjectTaskCollaborationUpdated;
 use App\Notifications\ProjectTaskStatusChanged;
 use App\Notifications\TaskAssigned;
+use App\Notifications\TeamLeadChanged;
 use App\Notifications\TeamMemberAdded;
 use App\Notifications\TeamMemberRemoved;
 use App\Notifications\TeamStatusChanged;
@@ -939,4 +942,92 @@ it('does not send task assigned notification when assignee is finance', function
     $this->service->sendTaskAssignedNotification($task);
 
     Notification::assertNotSentTo($financeProfile->user, TaskAssigned::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| sendAttendanceCorrectionCreatedNotification
+|--------------------------------------------------------------------------
+*/
+it('sends attendance correction needs approval notification to team lead', function () {
+    [$staffUser, $staffProfile] = createEmailTestUser('staff', 'Correction Requester');
+    [$managerUser] = createEmailTestUser('manager', 'Correction Approver');
+
+    $team = Team::factory()->create([
+        'team_lead_id' => $managerUser->id,
+    ]);
+
+    TeamMember::create([
+        'team_id' => $team->id,
+        'staff_member_id' => $staffProfile->id,
+        'joined_at' => now(),
+    ]);
+
+    $attendance = Attendance::create([
+        'staff_member_id' => $staffProfile->id,
+        'date' => now()->subDays(3)->toDateString(),
+        'clock_in' => now()->subDays(3)->setTime(9, 0),
+        'status' => 'late',
+    ]);
+
+    $correction = AttendanceCorrection::create([
+        'staff_member_id' => $staffProfile->id,
+        'attendance_id' => $attendance->id,
+        'reason' => 'Traffic jam on the way',
+        'status' => 'pending',
+    ]);
+
+    $this->service->sendAttendanceCorrectionCreatedNotification($correction);
+
+    Notification::assertSentTo($managerUser, AttendanceCorrectionNeedsApproval::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| sendAttendanceCorrectionRejectedNotification
+|--------------------------------------------------------------------------
+*/
+it('sends attendance correction rejected notification to the requester', function () {
+    [$staffUser, $staffProfile] = createEmailTestUser('staff', 'Correction Rejected Employee');
+
+    $attendance = Attendance::create([
+        'staff_member_id' => $staffProfile->id,
+        'date' => now()->subDays(3)->toDateString(),
+        'clock_in' => now()->subDays(3)->setTime(9, 0),
+        'status' => 'late',
+    ]);
+
+    $correction = AttendanceCorrection::create([
+        'staff_member_id' => $staffProfile->id,
+        'attendance_id' => $attendance->id,
+        'reason' => 'Traffic jam on the way',
+        'status' => 'rejected',
+    ]);
+
+    $this->service->sendAttendanceCorrectionRejectedNotification($correction);
+
+    Notification::assertSentTo($staffUser, AttendanceCorrectionRejected::class);
+});
+
+/*
+|--------------------------------------------------------------------------
+| sendTeamLeadChangedNotification
+|--------------------------------------------------------------------------
+*/
+it('sends team lead changed notification to old and new leaders', function () {
+    [$oldLeadUser] = createEmailTestUser('manager', 'Old Team Lead');
+    [$newLeadUser] = createEmailTestUser('manager', 'New Team Lead');
+
+    $team = Team::factory()->create([
+        'team_lead_id' => $newLeadUser->id,
+    ]);
+
+    $this->service->sendTeamLeadChangedNotification(
+        team: $team,
+        oldLeader: $oldLeadUser,
+        newLeader: $newLeadUser,
+    );
+
+    Notification::assertSentTo($oldLeadUser, TeamLeadChanged::class);
+    Notification::assertSentTo($newLeadUser, TeamLeadChanged::class);
 });
