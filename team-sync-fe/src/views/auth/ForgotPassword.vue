@@ -40,7 +40,7 @@ const handleSubmit = async () => {
             </div>
             <RouterLink
                 :to="{ name: 'login' }"
-                class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 active:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20"
+                class="group mt-6 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 active:bg-primary-800 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-600/20"
             >
                 <ArrowLeft class="h-4 w-4 transition-transform group-hover:-translate-x-1" aria-hidden="true" />
                 Return to sign in
@@ -92,7 +92,7 @@ const handleSubmit = async () => {
                     <!-- Submit Button -->
                     <button
                         type="submit"
-                        class="group w-full flex items-center justify-center gap-2 rounded-xl bg-brand-primary px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-800 active:bg-primary-700 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-brand-primary/20 disabled:cursor-not-allowed disabled:opacity-70"
+                        class="group w-full flex items-center justify-center gap-2 rounded-xl bg-primary-600 px-4 py-3 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 active:bg-primary-800 hover:shadow-md focus:outline-none focus:ring-4 focus:ring-primary-600/20 disabled:cursor-not-allowed disabled:opacity-80"
                         :disabled="loading"
                     >
                         <span class="flex items-center gap-2">

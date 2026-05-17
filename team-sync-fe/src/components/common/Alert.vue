@@ -9,6 +9,7 @@
         ]"
         role="alert"
         aria-live="polite"
+        aria-atomic="true"
     >
         <svg
             width="20"

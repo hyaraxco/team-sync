@@ -521,13 +521,13 @@ onUnmounted(() => {
                     <div>
                         <h1 class="text-2xl font-semibold text-white">Attendance Overview</h1>
                         <p class="text-white/90 text-base font-normal">
-                            Track your daily presence and manage leave requests efficiently
+                            Track attendance and manage leave requests
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="absolute bottom-4 right-6 flex items-center gap-[10px] z-10">
+            <div class="absolute bottom-4 right-6 flex items-center gap-2.5 z-10">
                 <div
                     v-if="isRemote"
                     class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2 shadow-md"
@@ -627,10 +627,7 @@ onUnmounted(() => {
                         <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                             <CalendarCheck class="w-6 h-6 text-green-600" />
                         </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Recent Attendance</h2>
-                            <p class="text-brand-light text-sm">Last 7 days</p>
-                        </div>
+                        <h2 class="text-lg font-semibold text-brand-dark">Recent Attendance</h2>
                     </div>
                     <div class="border border-brand-border rounded-lg p-1 flex items-center gap-1">
                         <button
@@ -820,10 +817,7 @@ onUnmounted(() => {
                         <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                             <CalendarX class="w-6 h-6 text-orange-600" />
                         </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">My Leave Requests</h2>
-                            <p class="text-brand-light text-sm">Recent requests</p>
-                        </div>
+                        <h2 class="text-lg font-semibold text-brand-dark">My Leave Requests</h2>
                     </div>
                 </div>
 
@@ -898,116 +892,6 @@ onUnmounted(() => {
 
         <div v-else-if="activeSection === 'corrections'">
             <AttendanceCorrectionsList :corrections="myCorrections" />
-        </div>
-
-        <div v-else class="space-y-6">
-            <div
-                class="bg-white border border-brand-border rounded-2xl p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
-            >
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                        <CalendarPlus class="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold text-brand-dark">Manage Leave Requests</h2>
-                        <p class="text-brand-light text-sm">
-                            Submit new leave requests and review the status of existing ones.
-                        </p>
-                    </div>
-                </div>
-                <button
-                    v-if="canCreateLeaveRequest"
-                    @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
-                >
-                    <Plus class="w-4 h-4 text-white" />
-                    <span class="text-white text-sm font-semibold">Request Leave</span>
-                </button>
-            </div>
-
-            <div
-                v-if="canViewMyLeaveRequests"
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
-            >
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                            <CalendarX class="w-6 h-6 text-orange-600" />
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">My Leave Requests</h2>
-                            <p class="text-brand-light text-sm">Recent requests</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="leaveLoading" class="text-center py-8">
-                    <p class="text-brand-light">Loading...</p>
-                </div>
-
-                <div v-else class="space-y-4">
-                    <div
-                        v-for="request in myLeaveRequests"
-                        :key="request.id"
-                        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-4 cursor-pointer"
-                        @click="openLeaveDetailsModal(request.id)"
-                    >
-                        <div class="flex items-center justify-between mb-3">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center"
-                                >
-                                    <CalendarPlus class="w-5 h-5 text-white" />
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold text-brand-dark">
-                                        {{ formatLeaveType(request.leave_type) }}
-                                    </p>
-                                    <p class="text-brand-light text-sm">
-                                        {{ request.total_days }}
-                                        {{ request.total_days === 1 ? "day" : "days" }}
-                                    </p>
-                                </div>
-                            </div>
-                            <span
-                                :class="getStatusConfig(request.status).class"
-                                class="px-2 py-1 rounded-md text-sm font-semibold"
-                            >
-                                {{ getStatusConfig(request.status).text }}
-                            </span>
-                        </div>
-
-                        <div class="border-b border-brand-border mb-3"></div>
-
-                        <div class="space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="text-brand-dark text-sm font-medium">Start Date</span>
-                                <span class="text-brand-dark text-sm font-semibold">
-                                    {{ formatDateShort(request.start_date) }}
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-brand-dark text-sm font-medium">End Date</span>
-                                <span class="text-brand-dark text-sm font-semibold">
-                                    {{ formatDateShort(request.end_date) }}
-                                </span>
-                            </div>
-                            <div class="flex items-center justify-between">
-                                <span class="text-brand-dark text-sm font-medium">Requested</span>
-                                <span class="text-brand-light text-sm">
-                                    {{ formatRequestDate(request.created_at) }}
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <EmptyState
-                        v-if="!leaveLoading && myLeaveRequests.length === 0"
-                        icon="CalendarX"
-                        title="No leave requests found"
-                    />
-                </div>
-            </div>
         </div>
 
         <Teleport to="body">
