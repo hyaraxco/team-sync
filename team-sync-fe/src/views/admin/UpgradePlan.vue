@@ -1,7 +1,9 @@
 <script setup>
 import { ref, computed } from "vue";
 import { CircleCheck } from "lucide-vue-next";
+import { useToast } from "@/composables/useToast";
 
+const toast = useToast();
 const billingCycle = ref("annual"); // 'monthly' | 'annual'
 
 const plans = computed(() => [
@@ -73,7 +75,7 @@ const plans = computed(() => [
 
 const handleUpgrade = (planId) => {
     if (planId === "free") return;
-    alert("Payment gateway integration coming soon!");
+    toast.info("Coming soon", "Payment gateway integration will be available shortly.");
 };
 </script>
 
