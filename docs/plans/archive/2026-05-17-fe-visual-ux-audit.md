@@ -1,10 +1,12 @@
 # FE Visual + UX Audit Plan
 
-> **Status:** ON_GOING
+> **Status:** COMPLETED
 > **Created:** 2026-05-17
+> **Completed:** 2026-05-17
 > **Owner:** AI agents (Pi/Claude/Codex/OpenCode)
 > **Scope:** All 67 Vue views in `team-sync-fe/src/views/`
 > **Strategy:** Tier-based pass + static code audit + one PR per phase
+> **Outcome:** PR #30 (Tier-1) + #31 (Tier-2) + #32 (Tier-3) — all merged
 
 **Goal:** Bring all 67 frontend views into compliance with `team-sync-fe/docs/design-system.md` and apply UX heuristic / UX-law improvements without changing behavior.
 
