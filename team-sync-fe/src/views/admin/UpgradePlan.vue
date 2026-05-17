@@ -90,7 +90,7 @@ const handleUpgrade = (planId) => {
                     class="px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 flex items-center gap-2"
                     :class="
                         billingCycle === 'annual'
-                            ? 'bg-[#1e1e1e] shadow-sm text-white'
+                            ? 'bg-gray-900 shadow-sm text-white'
                             : 'text-gray-500 hover:text-gray-900'
                     "
                     @click="billingCycle = 'annual'"
@@ -111,7 +111,7 @@ const handleUpgrade = (planId) => {
                     class="px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200"
                     :class="
                         billingCycle === 'monthly'
-                            ? 'bg-[#1e1e1e] shadow-sm text-white'
+                            ? 'bg-gray-900 shadow-sm text-white'
                             : 'text-gray-500 hover:text-gray-900'
                     "
                     @click="billingCycle = 'monthly'"
@@ -192,7 +192,7 @@ const handleUpgrade = (planId) => {
                         <!-- CTA -->
                         <div class="mt-auto text-center">
                             <button
-                                class="w-full rounded-2xl py-4 px-6 text-base font-black bg-brand-primary text-white hover:bg-[#093d9e] transition-all duration-300 shadow-xl shadow-blue-500/25 active:scale-[0.98]"
+                                class="w-full rounded-2xl py-4 px-6 text-base font-black bg-brand-primary text-white hover:bg-primary-800 transition-all duration-300 shadow-xl shadow-blue-500/25 active:scale-[0.98]"
                                 @click="handleUpgrade(plans[0].id)"
                             >
                                 {{ plans[0].cta }}
@@ -265,7 +265,7 @@ const handleUpgrade = (planId) => {
                             :class="[
                                 plan.isCurrent
                                     ? 'bg-gray-50 text-gray-400 cursor-default'
-                                    : 'bg-[#1e1e1e] text-white hover:bg-black',
+                                    : 'bg-gray-900 text-white hover:bg-black',
                             ]"
                             :disabled="plan.isCurrent"
                             @click="handleUpgrade(plan.id)"

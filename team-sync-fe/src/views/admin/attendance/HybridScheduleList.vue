@@ -162,14 +162,14 @@ const confirmReject = () =>
 
         <MainCard>
             <div class="space-y-6">
-                <div class="flex items-center gap-2 border-b border-[#EAECF0] pb-3">
+                <div class="flex items-center gap-2 border-b border-gray-200 pb-3">
                     <button
                         @click="activeTab = 'schedules'"
                         :class="[
                             'px-4 py-2 rounded-lg text-sm font-semibold transition-all',
                             activeTab === 'schedules'
                                 ? 'bg-brand-primary text-white'
-                                : 'bg-white text-[#344054] border border-gray-300 hover:border-brand-primary',
+                                : 'bg-white text-gray-700 border border-gray-300 hover:border-brand-primary',
                         ]"
                     >
                         Schedules
@@ -181,7 +181,7 @@ const confirmReject = () =>
                             'px-4 py-2 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-2',
                             activeTab === 'overrides'
                                 ? 'bg-brand-primary text-white'
-                                : 'bg-white text-[#344054] border border-gray-300 hover:border-brand-primary',
+                                : 'bg-white text-gray-700 border border-gray-300 hover:border-brand-primary',
                         ]"
                     >
                         <Clock class="w-4 h-4" />
@@ -204,19 +204,19 @@ const confirmReject = () =>
                     <div v-if="activeTab === 'schedules'" class="overflow-x-auto">
                         <table class="w-full min-w-[900px]">
                             <thead>
-                                <tr class="border-y border-[#EAECF0]">
+                                <tr class="border-y border-gray-200">
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Employee
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Base Schedule (Mon - Fri)
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Status
                                     </th>
@@ -238,9 +238,9 @@ const confirmReject = () =>
                                     v-for="schedule in scheduleItems"
                                     v-else
                                     :key="schedule.id"
-                                    class="border-b border-[#F2F4F7] align-top"
+                                    class="border-b border-gray-100 align-top"
                                 >
-                                    <td class="py-4 px-3 text-sm font-semibold text-[#101828]">
+                                    <td class="py-4 px-3 text-sm font-semibold text-gray-900">
                                         {{ getEmployeeName(schedule) }}
                                     </td>
 
@@ -277,39 +277,39 @@ const confirmReject = () =>
                     <div v-else class="overflow-x-auto">
                         <table class="w-full min-w-[1100px]">
                             <thead>
-                                <tr class="border-y border-[#EAECF0]">
+                                <tr class="border-y border-gray-200">
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Employee
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Requested Date
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Current Location
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Requested Location
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Reason
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Status
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-[#667085] uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
                                     >
                                         Actions
                                     </th>
@@ -331,12 +331,12 @@ const confirmReject = () =>
                                     v-for="override in overrideItems"
                                     v-else
                                     :key="override.id"
-                                    class="border-b border-[#F2F4F7]"
+                                    class="border-b border-gray-100"
                                 >
-                                    <td class="py-4 px-3 text-sm font-semibold text-[#101828]">
+                                    <td class="py-4 px-3 text-sm font-semibold text-gray-900">
                                         {{ override.employeeName }}
                                     </td>
-                                    <td class="py-4 px-3 text-sm text-[#344054]">
+                                    <td class="py-4 px-3 text-sm text-gray-700">
                                         {{ formatRequestDate(override.date) }}
                                     </td>
                                     <td class="py-4 px-3">
@@ -376,7 +376,7 @@ const confirmReject = () =>
                                         </span>
                                     </td>
                                     <td
-                                        class="py-4 px-3 text-sm text-[#475467] max-w-[280px] truncate"
+                                        class="py-4 px-3 text-sm text-gray-600 max-w-[280px] truncate"
                                         :title="override.reason || '-'"
                                     >
                                         {{ override.reason || "-" }}
@@ -391,7 +391,7 @@ const confirmReject = () =>
                                                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 hover:border-green-500 hover:bg-green-50 transition-all"
                                             >
                                                 <Check class="w-4 h-4 text-green-600" />
-                                                <span class="text-xs font-semibold text-[#344054]">Approve</span>
+                                                <span class="text-xs font-semibold text-gray-700">Approve</span>
                                             </button>
 
                                             <button
@@ -399,7 +399,7 @@ const confirmReject = () =>
                                                 class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 hover:border-red-500 hover:bg-red-50 transition-all"
                                             >
                                                 <X class="w-4 h-4 text-red-600" />
-                                                <span class="text-xs font-semibold text-[#344054]">Reject</span>
+                                                <span class="text-xs font-semibold text-gray-700">Reject</span>
                                             </button>
                                         </div>
                                     </td>
@@ -423,12 +423,12 @@ const confirmReject = () =>
                 <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                     <Check class="w-5 h-5 text-green-600" />
                 </div>
-                <p class="text-sm text-[#1D2939]">Confirm approval for this hybrid schedule override request.</p>
+                <p class="text-sm text-gray-800">Confirm approval for this hybrid schedule override request.</p>
             </div>
 
             <div
                 v-if="selectedApproveOverride"
-                class="rounded-xl border border-[#EAECF0] p-4 text-sm text-[#344054] space-y-1"
+                class="rounded-xl border border-gray-200 p-4 text-sm text-gray-700 space-y-1"
             >
                 <p>
                     <span class="font-semibold">Employee:</span>
@@ -475,12 +475,12 @@ const confirmReject = () =>
                 <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
                     <X class="w-5 h-5 text-red-600" />
                 </div>
-                <p class="text-sm text-[#1D2939]">Provide rejection notes for this override request.</p>
+                <p class="text-sm text-gray-800">Provide rejection notes for this override request.</p>
             </div>
 
             <div
                 v-if="selectedRejectOverride"
-                class="rounded-xl border border-[#EAECF0] p-4 text-sm text-[#344054] space-y-1"
+                class="rounded-xl border border-gray-200 p-4 text-sm text-gray-700 space-y-1"
             >
                 <p>
                     <span class="font-semibold">Employee:</span>
@@ -498,11 +498,11 @@ const confirmReject = () =>
                         ).label
                     }}
                 </p>
-                <p class="italic text-[#667085]">"{{ selectedRejectOverride.reason || "-" }}"</p>
+                <p class="italic text-gray-500">"{{ selectedRejectOverride.reason || "-" }}"</p>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-[#1D2939] mb-2">
+                <label class="block text-sm font-semibold text-gray-800 mb-2">
                     Rejection Notes
                     <span class="text-red-500">*</span>
                 </label>

@@ -150,7 +150,7 @@ onMounted(() => {
                     <button
                         v-if="can('staff-member-edit')"
                         @click="editStaffMember"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
@@ -568,7 +568,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div v-if="can('staff-member-delete')" class="bg-white border border-[#FEE2E2] rounded-2xl p-6">
+        <div v-if="can('staff-member-delete')" class="bg-white border border-danger-100 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                     <AlertTriangle class="w-6 h-6 text-red-600" />

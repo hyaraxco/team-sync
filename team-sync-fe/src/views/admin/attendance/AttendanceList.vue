@@ -201,7 +201,7 @@ onMounted(async () => {
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-            <div class="main-card rounded-2xl border border-[#0B1042] relative overflow-hidden p-5">
+            <div class="main-card rounded-2xl border border-brand-dark relative overflow-hidden p-5">
                 <div class="flex flex-col justify-center h-full relative z-10">
                     <div class="flex items-center gap-2 mb-3">
                         <div class="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">

@@ -219,7 +219,7 @@ onMounted(async () => {
                                     class="w-12 h-12 relative flex items-center justify-center rounded-xl overflow-hidden flex-shrink-0"
                                 >
                                     <div
-                                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
+                                        class="w-full h-full absolute bg-brand-primary rounded-xl"
                                     ></div>
                                     <component :is="Briefcase" class="w-5 h-5 text-white relative z-10" />
                                 </div>
@@ -338,18 +338,18 @@ onMounted(async () => {
                 </div>
 
                 <div v-if="squadSummaryLoading" class="space-y-2 animate-pulse">
-                    <div class="h-3 rounded bg-[#E9EEF7]"></div>
-                    <div class="h-3 rounded bg-[#E9EEF7]"></div>
-                    <div class="h-3 rounded bg-[#E9EEF7]"></div>
+                    <div class="h-3 rounded bg-primary-50"></div>
+                    <div class="h-3 rounded bg-primary-50"></div>
+                    <div class="h-3 rounded bg-primary-50"></div>
                 </div>
 
                 <template v-else>
                     <div class="grid grid-cols-2 gap-3 mb-4">
-                        <div class="rounded-xl border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
+                        <div class="rounded-xl border border-primary-100 bg-primary-50 px-3 py-2">
                             <p class="text-[11px] uppercase tracking-wide text-brand-primary font-semibold">Members</p>
                             <p class="text-brand-dark text-lg font-bold">{{ totalHeadcount }}</p>
                         </div>
-                        <div class="rounded-xl border border-[#E6ECF7] bg-[#F7FAFF] px-3 py-2">
+                        <div class="rounded-xl border border-primary-100 bg-primary-50 px-3 py-2">
                             <p class="text-[11px] uppercase tracking-wide text-brand-primary font-semibold">Tasks</p>
                             <p class="text-brand-dark text-lg font-bold">{{ totalTaskCount }}</p>
                         </div>
@@ -464,7 +464,7 @@ onMounted(async () => {
     </div>
 
     <!-- Danger Zone -->
-    <div class="bg-white border border-[#FEE2E2] rounded-2xl p-6">
+    <div class="bg-white border border-danger-100 rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-6">
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
@@ -485,7 +485,7 @@ onMounted(async () => {
             </div>
             <button
                 @click="showDeleteModal = true"
-                class="btn-primary rounded-lg border border-[#A02121] hover:brightness-110 focus:ring-2 focus:ring-[#D90C0C] transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-danger-600 transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
             >
                 <Trash2 class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Delete Project</span>

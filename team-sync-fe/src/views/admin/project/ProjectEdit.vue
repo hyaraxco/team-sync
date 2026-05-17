@@ -485,7 +485,7 @@ watch(
                                 class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                             >
                                 <UserCheck class="w-5 h-5 text-gray-400" />
-                                <span class="text-[#0D2929] font-normal flex-1">
+                                <span class="text-brand-dark font-normal flex-1">
                                     {{ selectedLeader?.user?.name || "Select project leader" }}
                                 </span>
                                 <ChevronDown class="w-4 h-4 text-gray-400" />
@@ -560,7 +560,7 @@ watch(
                                         >
                                             <!-- Main blue background -->
                                             <div
-                                                class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl"
+                                                class="w-full h-full absolute bg-brand-primary rounded-xl"
                                             ></div>
                                             <!-- Lucide icon -->
                                             <Code class="w-5 h-5 text-white relative z-10" />
@@ -791,7 +791,7 @@ watch(
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Update Project</span>
                         <Plus class="w-4 h-4 text-white" />

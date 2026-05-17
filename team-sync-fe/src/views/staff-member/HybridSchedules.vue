@@ -10,7 +10,7 @@
                 </div>
                 <button
                     @click="showOverrideModal = true"
-                    class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
+                    class="px-4 py-2 rounded-lg blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
                 >
                     Request Override
                 </button>
@@ -153,7 +153,7 @@
                     <button
                         type="submit"
                         :disabled="submittingOverride"
-                        class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
+                        class="px-4 py-2 rounded-lg blue-gradient blue-btn-shadow text-white hover:brightness-110 transition-all disabled:opacity-50 cursor-pointer"
                     >
                         {{ submittingOverride ? "Submitting..." : "Submit" }}
                     </button>
@@ -231,8 +231,3 @@ const submitOverride = async () => {
 };
 </script>
 
-<style scoped>
-.font-display {
-    font-family: "Outfit", sans-serif;
-}
-</style>
