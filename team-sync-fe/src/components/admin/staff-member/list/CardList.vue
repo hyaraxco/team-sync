@@ -40,7 +40,7 @@ const goToDetail = () => {
                 />
                 <!-- Active Badge Overlapped at Bottom -->
                 <span
-                    class="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md text-xs font-semibold bg-[#F0FDF4] text-[#166534]"
+                    class="absolute bottom-2 left-1/2 transform -translate-x-1/2 px-2 py-1 rounded-md text-xs font-semibold bg-success-50 text-success-700"
                 >
                     {{ _.capitalize(data?.job_information?.status) }}
                 </span>
@@ -55,7 +55,7 @@ const goToDetail = () => {
                     {{ _.capitalize(data?.job_information?.job_title) }}
                 </p>
             </div>
-            <span class="px-2 py-1 rounded-md text-xs font-semibold bg-[#EBF8FF] text-[#1E40AF]">
+            <span class="px-2 py-1 rounded-md text-xs font-semibold bg-primary-100 text-primary-800">
                 {{ _.capitalize(data?.job_information?.employment_type) }}
             </span>
         </div>

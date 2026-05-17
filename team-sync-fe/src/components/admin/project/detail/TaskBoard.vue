@@ -264,7 +264,7 @@ onMounted(async () => {
             <button
                 v-if="canCreateTask"
                 @click="openCreateModal"
-                class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
             >
                 <Plus class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Create New Task</span>

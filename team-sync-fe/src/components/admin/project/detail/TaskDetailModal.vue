@@ -693,7 +693,7 @@ watch(
                                             <button
                                                 type="button"
                                                 @click="handleUpdateComment(comment.id)"
-                                                class="px-3 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-[#0a42b3] transition-colors"
+                                                class="px-3 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-primary-800 transition-colors"
                                             >
                                                 Save
                                             </button>
@@ -740,7 +740,7 @@ watch(
                                             type="button"
                                             @click="handleCreateComment"
                                             :disabled="!canCollaborateTask || !newComment.trim() || isSubmittingComment"
-                                            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-brand-primary text-white hover:bg-[#0a42b3] disabled:bg-gray-300 disabled:cursor-not-allowed"
+                                            class="px-4 py-2 rounded-lg text-sm font-medium transition-colors bg-brand-primary text-white hover:bg-primary-800 disabled:bg-gray-300 disabled:cursor-not-allowed"
                                         >
                                             {{ isSubmittingComment ? "Posting..." : "Post Comment" }}
                                         </button>
@@ -953,7 +953,7 @@ watch(
                                 <button
                                     type="button"
                                     @click="handleUpdateDueDate"
-                                    class="flex-1 px-3 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-[#0a42b3] transition-colors flex items-center justify-center gap-1"
+                                    class="flex-1 px-3 py-1.5 bg-brand-primary text-white rounded-lg text-xs font-medium hover:bg-primary-800 transition-colors flex items-center justify-center gap-1"
                                 >
                                     <Check class="w-3 h-3" />
                                     Save
@@ -1041,7 +1041,7 @@ watch(
                             <button
                                 v-if="canStartTask"
                                 @click="handleUpdateStatus('in_progress')"
-                                class="w-full px-4 py-2 bg-brand-primary hover:bg-[#0a42b3] text-white rounded-lg text-sm font-medium transition-colors"
+                                class="w-full px-4 py-2 bg-brand-primary hover:bg-primary-800 text-white rounded-lg text-sm font-medium transition-colors"
                             >
                                 Start Task
                             </button>
