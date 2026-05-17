@@ -615,7 +615,7 @@ watch(
                         <div class="space-y-3">
                             <div class="flex items-center gap-2">
                                 <CalendarIcon class="w-5 h-5 text-brand-light" />
-                                <p class="text-sm text-brand-light">Review Cycle</p>
+                                <p class="text-sm font-medium text-brand-dark">Review Cycle</p>
                             </div>
                             <p class="text-lg font-semibold text-brand-dark">
                                 {{ review.cycle?.name || "-" }}
@@ -640,7 +640,7 @@ watch(
                         <div class="space-y-3">
                             <div class="flex items-center gap-2">
                                 <StarIcon class="w-5 h-5 text-brand-light" />
-                                <p class="text-sm text-brand-light">Status & Rating</p>
+                                <p class="text-sm font-medium text-brand-dark">Status & Rating</p>
                             </div>
                             <div class="flex items-center gap-3">
                                 <span
@@ -728,7 +728,7 @@ watch(
                     v-if="['pending_calibration', 'completed'].includes(reviewStatus)"
                     class="border-l-4 border-l-brand-primary"
                 >
-                    <h2 class="text-lg font-semibold text-brand-dark mb-4">📊 Performance Data Summary</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Performance Data Summary</h2>
                     <div v-if="readinessLoading" class="flex justify-center py-4">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-brand-primary"></div>
                     </div>
@@ -1211,7 +1211,6 @@ watch(
                     <MainCard v-if="canSubmitManagerAssessment">
                         <div class="space-y-4">
                             <h2 class="text-lg font-semibold text-brand-dark">Projected Final Rating</h2>
-                            <p class="text-sm text-brand-light">Auto-calculated from your section ratings above.</p>
                             <div class="flex items-center gap-4">
                                 <p
                                     class="text-3xl font-bold"
@@ -1408,10 +1407,6 @@ watch(
                             <!-- Projected Final Rating -->
                             <div>
                                 <h2 class="text-lg font-semibold text-brand-dark">Projected Final Rating</h2>
-                                <p class="text-sm text-brand-light mt-1">
-                                    Auto-calculated from weighted section ratings. Adjust section overrides above to see
-                                    changes.
-                                </p>
                                 <div class="mt-3 flex items-center gap-4">
                                     <p
                                         class="text-4xl font-bold"

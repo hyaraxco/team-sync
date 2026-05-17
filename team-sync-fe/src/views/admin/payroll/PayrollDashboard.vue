@@ -13,7 +13,6 @@ import {
     Download,
     FileWarning,
     Settings,
-    Star,
     Calendar,
     Users,
 } from "lucide-vue-next";
@@ -239,10 +238,10 @@ const handleExportReport = async () => {
 
 <template>
     <div>
-        <h1 class="text-2xl font-semibold text-brand-dark mb-6">Payroll Dashboard</h1>
+        <h1 class="text-2xl font-semibold text-brand-dark">Payroll Dashboard</h1>
         <template v-if="hasPayrollStatistics">
             <!-- Stats Layout -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <!-- Total Payroll Amount Card (spans 2 rows on the left) -->
                 <MainCard
                     class="lg:row-span-2"
@@ -254,16 +253,7 @@ const handleExportReport = async () => {
                     :isTrendUp="true"
                     :loading="loading"
                 >
-                    <template #footer>
-                        <div class="flex items-center gap-1">
-                            <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                            <span class="text-brand-white-70 text-xs font-normal">All Departments</span>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <Star class="w-3 h-3 text-white opacity-70" />
-                            <span class="text-brand-white-70 text-xs font-normal">On Schedule</span>
-                        </div>
-                    </template>
+
                 </MainCard>
 
                 <!-- Row 1 Stats Cards -->
@@ -289,7 +279,7 @@ const handleExportReport = async () => {
 
                 <!-- Quick Actions Card (spans 2 rows on the right) -->
                 <div
-                    class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                    class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
@@ -340,12 +330,7 @@ const handleExportReport = async () => {
                             class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <FileWarning class="w-4 h-4 text-gray-600" />
-                            <div class="flex flex-col items-start">
-                                <span class="text-brand-dark text-sm font-medium">Adjustment Queue</span>
-                                <span class="text-xs font-normal text-gray-500">
-                                    Approve post-period payroll corrections
-                                </span>
-                            </div>
+                            <span class="text-brand-dark text-sm font-medium">Adjustment Queue</span>
                         </RouterLink>
 
                         <RouterLink
@@ -391,7 +376,7 @@ const handleExportReport = async () => {
 
             <div
                 data-testid="payroll-analytics-section"
-                class="bg-white border border-brand-border rounded-2xl p-5 mb-6"
+                class="bg-white border border-brand-border rounded-2xl p-6"
             >
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <div>
@@ -457,17 +442,16 @@ const handleExportReport = async () => {
             </div>
 
             <!-- Finance Insights Section -->
-            <div v-if="hasAnalyticsData" data-testid="payroll-finance-insights" class="space-y-6 mb-6">
+            <div v-if="hasAnalyticsData" data-testid="payroll-finance-insights" class="space-y-6">
                 <div class="flex items-center gap-3">
                     <h2 class="text-lg font-semibold text-brand-dark">Finance Insights</h2>
-                    <span class="text-brand-light text-sm">Deeper payroll analytics</span>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Average Salary Trend -->
                     <div
                         data-testid="payroll-insights-avg-salary"
-                        class="bg-white border border-brand-border rounded-2xl p-5"
+                        class="bg-white border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">Average Salary Trend</h3>
                         <VueApexCharts
@@ -481,7 +465,7 @@ const handleExportReport = async () => {
                     <!-- BPJS Contribution Trend -->
                     <div
                         data-testid="payroll-insights-bpjs"
-                        class="bg-white border border-brand-border rounded-2xl p-5"
+                        class="bg-white border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">BPJS Contribution Trend</h3>
                         <VueApexCharts type="bar" height="200" :options="bpjsChartOptions" :series="bpjsChartSeries" />
@@ -490,7 +474,7 @@ const handleExportReport = async () => {
                     <!-- Top Deduction Reasons -->
                     <div
                         data-testid="payroll-insights-deduction-reasons"
-                        class="bg-white border border-brand-border rounded-2xl p-5"
+                        class="bg-white border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">Top Deduction Reasons</h3>
                         <div class="space-y-3">
@@ -522,7 +506,7 @@ const handleExportReport = async () => {
                     <!-- Headcount vs Payroll Growth -->
                     <div
                         data-testid="payroll-insights-headcount"
-                        class="bg-white border border-brand-border rounded-2xl p-5"
+                        class="bg-white border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">Headcount vs Payroll</h3>
                         <div class="space-y-2">
@@ -546,7 +530,7 @@ const handleExportReport = async () => {
         </template>
 
         <template v-else>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 mb-6">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div
                     class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6"
                 >
@@ -578,7 +562,7 @@ const handleExportReport = async () => {
                     </div>
                 </div>
 
-                <div class="bg-white border border-brand-border rounded-2xl p-5">
+        <div class="bg-white border border-brand-border rounded-2xl p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
                         <RouterLink
@@ -612,10 +596,28 @@ const handleExportReport = async () => {
         <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
         <!-- Monthly Payroll Periods -->
-        <div class="bg-white border border-brand-border rounded-2xl p-5">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-lg font-semibold text-brand-dark">Monthly Payroll Periods</h2>
-            </div>
+                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
+                    <div class="space-y-3">
+                        <RouterLink
+                            v-if="hasPayrollCreate"
+                            :to="{ name: 'admin.payroll.create' }"
+                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                        >
+                            <Plus class="w-4 h-4 text-white" />
+                            <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
+                        </RouterLink>
+                        <RouterLink
+                            v-if="hasPayrollCreate"
+                            :to="{ name: 'admin.payroll.readiness' }"
+                            data-testid="payroll-readiness-link-alt"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                        >
+                            <UserCheck class="w-4 h-4 text-gray-600" />
+                            <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
+                        </RouterLink>
+                    </div>
+                </div>
             <div class="space-y-4">
                 <div
                     v-for="payroll in payrolls"
@@ -624,13 +626,8 @@ const handleExportReport = async () => {
                     :data-payroll-period="payroll.period"
                     class="flex items-center gap-4 p-4 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
                 >
-                    <div class="w-16 h-16 relative flex items-center justify-center rounded-xl overflow-hidden">
-                        <!-- Background -->
-                        <div
-                            class="w-full h-full absolute bg-brand-primary rounded-xl"
-                        ></div>
-                        <!-- Icon -->
-                        <Calendar class="w-8 h-8 text-white relative z-10" />
+                    <div class="w-16 h-16 flex items-center justify-center bg-brand-primary rounded-xl">
+                        <Calendar class="w-8 h-8 text-white" />
                     </div>
                     <div class="flex-1">
                         <div class="flex items-center gap-2 mb-1">
@@ -711,13 +708,6 @@ const handleExportReport = async () => {
                         <option value="summary">Summary</option>
                         <option value="detail">Detail per Employee</option>
                     </select>
-                    <p class="text-brand-light text-xs mt-2">
-                        {{
-                            exportFilters.report_type === "detail"
-                                ? "Exports employee-level payroll rows for the selected period."
-                                : "Exports payroll totals by period for the selected filters."
-                        }}
-                    </p>
                 </div>
 
                 <div>
@@ -791,5 +781,4 @@ const handleExportReport = async () => {
                 </div>
             </template>
         </ModalWrapper>
-    </div>
 </template>

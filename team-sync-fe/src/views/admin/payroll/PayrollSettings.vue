@@ -8,7 +8,6 @@ import {
     Settings,
     Calendar,
     Calculator,
-    FileText,
     History,
     ArrowLeft,
     Landmark,
@@ -372,7 +371,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="bg-blue-50 border border-blue-200 rounded-2xl px-5 py-4">
+        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
             <div class="flex items-start justify-between gap-3">
                 <p class="text-blue-900 text-sm font-semibold">Applies to future payroll drafts only</p>
                 <span
@@ -389,9 +388,10 @@ onMounted(() => {
                 {{ lastUpdatedLabel }}
             </p>
         </div>
+        </div>
 
         <!-- Tab Navigation -->
-        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6" data-testid="payroll-settings-tabs">
+        <div class="bg-white border border-brand-border rounded-2xl p-3" data-testid="payroll-settings-tabs">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <button
                     @click="activeTab = 'schedule'"
@@ -454,14 +454,9 @@ onMounted(() => {
                     v-show="activeTab === 'schedule'"
                     class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <Calendar class="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Schedule</h2>
-                            <p class="text-brand-light text-sm">Define default payday and attendance cut-off.</p>
-                        </div>
+                    <div class="mb-6">
+                        <h2 class="text-lg font-semibold text-brand-dark">Payroll Schedule</h2>
+                        <p class="text-brand-light text-sm">Define default payday and attendance cut-off.</p>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -496,16 +491,11 @@ onMounted(() => {
                     v-show="activeTab === 'rules'"
                     class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
-                    <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                            <Calculator class="w-6 h-6 text-emerald-600" />
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Calculation Rules</h2>
-                            <p class="text-brand-light text-sm">
-                                Control working day basis, absence deductions, and rounding.
-                            </p>
-                        </div>
+                    <div class="mb-6">
+                        <h2 class="text-lg font-semibold text-brand-dark">Calculation Rules</h2>
+                        <p class="text-brand-light text-sm">
+                            Control working day basis, absence deductions, and rounding.
+                        </p>
                     </div>
 
                     <div class="space-y-4">
@@ -585,16 +575,11 @@ onMounted(() => {
                     <section
                         class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                                <FileText class="w-6 h-6 text-amber-600" />
-                            </div>
-                            <div>
-                                <h2 class="text-lg font-semibold text-brand-dark">Payroll Note Template</h2>
-                                <p class="text-brand-light text-sm">
-                                    Use placeholders to keep every generated payroll note consistent.
-                                </p>
-                            </div>
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Note Template</h2>
+                            <p class="text-brand-light text-sm">
+                                Use placeholders to keep every generated payroll note consistent.
+                            </p>
                         </div>
 
                         <label class="block text-brand-dark text-sm font-semibold mb-2">Template</label>
@@ -614,17 +599,12 @@ onMounted(() => {
                     <section
                         class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                                <Landmark class="w-6 h-6 text-green-600" />
-                            </div>
-                            <div>
-                                <h2 class="text-lg font-semibold text-brand-dark">Payroll Bank Partner</h2>
-                                <p class="text-brand-light text-sm">
-                                    Primary bank for salary disbursement. Employees with a different bank will be
-                                    flagged.
-                                </p>
-                            </div>
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Bank Partner</h2>
+                            <p class="text-brand-light text-sm">
+                                Primary bank for salary disbursement. Employees with a different bank will be
+                                flagged.
+                            </p>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -643,9 +623,6 @@ onMounted(() => {
                                         {{ bank.name }}
                                     </option>
                                 </select>
-                                <p class="text-brand-light text-xs mt-2">
-                                    Choose a popular bank from the dropdown to auto-fill details.
-                                </p>
                             </div>
                             <div>
                                 <label class="block text-brand-dark text-sm font-semibold mb-2">
@@ -671,16 +648,11 @@ onMounted(() => {
                     <section
                         class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
-                        <div class="flex items-center gap-3 mb-6">
-                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center shrink-0">
-                                <FileText class="w-6 h-6 text-blue-600" />
-                            </div>
-                            <div>
-                                <h2 class="text-lg font-semibold text-brand-dark">Preview Result</h2>
-                                <p class="text-brand-light text-sm font-normal mt-1">
-                                    Review your generated note format along with summary configurations.
-                                </p>
-                            </div>
+                        <div class="mb-6">
+                            <h2 class="text-lg font-semibold text-brand-dark">Preview Result</h2>
+                            <p class="text-brand-light text-sm font-normal mt-1">
+                                Review your generated note format along with summary configurations.
+                            </p>
                         </div>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div class="border border-brand-border rounded-2xl px-4 py-3 bg-gray-50/50">
@@ -712,16 +684,11 @@ onMounted(() => {
                     v-show="activeTab === 'history'"
                     class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
-                    <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
-                            <History class="w-6 h-6 text-violet-600" />
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Version History</h2>
-                            <p class="text-brand-light text-sm">
-                                Latest payroll settings snapshots used for future drafts.
-                            </p>
-                        </div>
+                    <div class="mb-4">
+                        <h2 class="text-lg font-semibold text-brand-dark">Version History</h2>
+                        <p class="text-brand-light text-sm">
+                            Latest payroll settings snapshots used for future drafts.
+                        </p>
                     </div>
 
                     <div v-if="loadingHistory" class="text-sm text-brand-light">Loading settings history...</div>
@@ -828,17 +795,14 @@ onMounted(() => {
                     </div>
 
                     <section class="mt-6 border-t border-gray-200 pt-6">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                                <Calculator class="w-6 h-6 text-emerald-600" />
-                            </div>
-                            <div>
-                                <h3 class="text-base font-semibold text-brand-dark">BPJS Rate History</h3>
-                                <p class="text-brand-light text-sm">
-                                    Latest BPJS Kesehatan and Ketenagakerjaan rates with effective dates.
-                                </p>
-                            </div>
+                    <div class="flex items-center gap-3 mb-4">
+                        <div>
+                            <h3 class="text-base font-semibold text-brand-dark">BPJS Rate History</h3>
+                            <p class="text-brand-light text-sm">
+                                Latest BPJS Kesehatan and Ketenagakerjaan rates with effective dates.
+                            </p>
                         </div>
+                    </div>
 
                         <div v-if="loadingBpjsRateHistory" class="text-sm text-brand-light">
                             Loading BPJS rate history...
@@ -914,7 +878,7 @@ onMounted(() => {
             <!-- Save Settings Sticky Footer / Action Bar -->
             <div v-show="activeTab !== 'history'" class="sticky bottom-6 z-20 mt-4 animate-fade-in">
                 <div
-                    class="bg-white/80 backdrop-blur-md border border-brand-border rounded-2xl p-5 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
+                    class="bg-white/80 backdrop-blur-md border border-brand-border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
                 >
                     <div>
                         <h2 class="text-base font-semibold text-brand-dark">Ready to save your changes?</h2>
@@ -935,5 +899,4 @@ onMounted(() => {
                 </div>
             </div>
         </div>
-    </div>
 </template>

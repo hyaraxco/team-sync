@@ -207,17 +207,11 @@ watch(
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <div class="bg-white border border-brand-border rounded-2xl p-6">
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                        <Crown class="w-6 h-6 text-green-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-brand-dark text-lg font-semibold">Team Lead</h2>
-                        <p class="text-brand-light text-sm">Team leadership and management</p>
-                    </div>
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                    <Crown class="w-6 h-6 text-green-600" />
                 </div>
-                <span class="px-2 py-1 rounded-md text-xs font-semibold bg-success-50 text-success-700">Active</span>
+                <h2 class="text-brand-dark text-lg font-semibold">Team Lead</h2>
             </div>
 
             <div class="flex flex-col gap-4" v-if="team.leader">
@@ -257,7 +251,6 @@ watch(
                 </div>
 
                 <div class="space-y-3">
-                    <h3 class="text-brand-dark text-sm font-semibold mb-3">Contact Information</h3>
                     <div class="space-y-2">
                         <div
                             class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-all duration-300"
@@ -316,15 +309,12 @@ watch(
         </div>
 
         <div class="bg-white border border-brand-border rounded-2xl p-6">
-            <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                    <Settings class="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                        <Settings class="w-6 h-6 text-purple-600" />
+                    </div>
                     <h2 class="text-brand-dark text-lg font-semibold">Team Settings</h2>
-                    <p class="text-brand-light text-sm">Configuration and status</p>
                 </div>
-            </div>
             <div class="space-y-3">
                 <div class="flex justify-between items-center">
                     <span class="text-brand-light text-base">Department</span>
@@ -360,10 +350,7 @@ watch(
             <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                 <ListCheck class="w-6 h-6 text-orange-600" />
             </div>
-            <div>
-                <h2 class="text-brand-dark text-lg font-semibold">Team Responsibilities</h2>
-                <p class="text-brand-light text-sm">Key duties and objectives</p>
-            </div>
+            <h2 class="text-brand-dark text-lg font-semibold">Team Responsibilities</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
@@ -387,26 +374,15 @@ watch(
                 <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <Users class="w-6 h-6 text-blue-600" />
                 </div>
-                <div>
-                    <h2 class="text-brand-dark text-lg font-semibold">Team Members</h2>
-                    <p class="text-brand-light text-sm">Current team composition</p>
-                </div>
+                <h2 class="text-brand-dark text-lg font-semibold">Team Members</h2>
             </div>
-            <div class="flex items-center gap-4">
-                <button
-                    class="bg-white border border-brand-border text-brand-dark py-3 px-4 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
-                >
-                    <Eye class="w-4 h-4" />
-                    <span class="text-sm font-semibold">View More</span>
-                </button>
-                <button
-                    @click="openAddMemberModal"
-                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
-                >
-                    <UserPlus class="w-4 h-4 text-white" />
-                    <span class="text-brand-white text-sm font-semibold">Add Member</span>
-                </button>
-            </div>
+            <button
+                @click="openAddMemberModal"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+            >
+                <UserPlus class="w-4 h-4 text-white" />
+                <span class="text-brand-white text-sm font-semibold">Add Member</span>
+            </button>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -490,10 +466,7 @@ watch(
                 <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
                     <Activity class="w-6 h-6 text-gray-600" />
                 </div>
-                <div>
-                    <h2 class="text-brand-dark text-lg font-semibold">Recent Activity</h2>
-                    <p class="text-brand-light text-sm">Latest team updates and milestones</p>
-                </div>
+                <h2 class="text-brand-dark text-lg font-semibold">Recent Activity</h2>
             </div>
             <div class="space-y-4">
                 <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
@@ -541,10 +514,7 @@ watch(
                 <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <Folder class="w-6 h-6 text-blue-600" />
                 </div>
-                <div>
-                    <h2 class="text-brand-dark text-lg font-semibold">Team Resources</h2>
-                    <p class="text-brand-light text-sm">Essential tools and documents</p>
-                </div>
+                <h2 class="text-brand-dark text-lg font-semibold">Team Resources</h2>
             </div>
             <div class="space-y-4">
                 <div
@@ -592,10 +562,7 @@ watch(
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
-            <div>
-                <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
-                <p class="text-brand-light text-sm">Irreversible and destructive actions</p>
-            </div>
+            <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
         </div>
         <div
             class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
@@ -648,10 +615,7 @@ watch(
                         <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <UserPlus class="w-6 h-6 text-blue-600" />
                         </div>
-                        <div>
-                            <h3 class="text-brand-dark text-lg font-semibold">Add Team Member</h3>
-                            <p class="text-brand-light text-sm font-normal">Choose an employee to add to this team</p>
-                        </div>
+                        <h3 class="text-brand-dark text-lg font-semibold">Add Team Member</h3>
                     </div>
                     <button
                         type="button"
