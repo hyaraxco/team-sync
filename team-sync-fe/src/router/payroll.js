@@ -1,16 +1,8 @@
-import PayrollDashboard from "@/views/admin/payroll/PayrollDashboard.vue";
-import PayrollCreate from "@/views/admin/payroll/PayrollCreate.vue";
-import PayrollDetail from "@/views/admin/payroll/PayrollDetail.vue";
-import PayrollSettings from "@/views/admin/payroll/PayrollSettings.vue";
-import ThrManagement from "@/views/admin/payroll/ThrManagement.vue";
-import MyPayslips from "@/views/staff-member/MyPayslips.vue";
-import PayslipDetail from "@/views/staff-member/PayslipDetail.vue";
-
 export default [
     {
         path: "payroll",
         name: "admin.payroll.dashboard",
-        component: PayrollDashboard,
+        component: () => import("@/views/admin/payroll/PayrollDashboard.vue"),
         meta: {
             requiredPermission: "payroll-menu",
             requiresAuth: true,
@@ -28,7 +20,7 @@ export default [
     {
         path: "payroll/create",
         name: "admin.payroll.create",
-        component: PayrollCreate,
+        component: () => import("@/views/admin/payroll/PayrollCreate.vue"),
         meta: {
             requiredPermission: "payroll-create",
             requiresAuth: true,
@@ -37,7 +29,7 @@ export default [
     {
         path: "payroll/settings",
         name: "admin.payroll.settings",
-        component: PayrollSettings,
+        component: () => import("@/views/admin/payroll/PayrollSettings.vue"),
         meta: {
             requiredPermission: "settings-finance-manage",
             requiresAuth: true,
@@ -73,7 +65,7 @@ export default [
     {
         path: "payroll/thr",
         name: "admin.payroll.thr",
-        component: ThrManagement,
+        component: () => import("@/views/admin/payroll/ThrManagement.vue"),
         meta: {
             requiredPermission: "thr-list",
             requiresAuth: true,
@@ -91,7 +83,7 @@ export default [
     {
         path: "payroll/:id",
         name: "admin.payroll.detail",
-        component: PayrollDetail,
+        component: () => import("@/views/admin/payroll/PayrollDetail.vue"),
         meta: {
             requiredPermission: "payroll-list",
             requiresAuth: true,
@@ -100,7 +92,7 @@ export default [
     {
         path: "my-payroll",
         name: "staffMember.payroll",
-        component: MyPayslips,
+        component: () => import("@/views/staff-member/MyPayslips.vue"),
         meta: {
             requiredPermission: "payslip-view",
             requiresAuth: true,
@@ -109,7 +101,7 @@ export default [
     {
         path: "my-payroll/:id",
         name: "staffMember.payroll.detail",
-        component: PayslipDetail,
+        component: () => import("@/views/staff-member/PayslipDetail.vue"),
         meta: {
             requiredPermission: "payslip-view",
             requiresAuth: true,
