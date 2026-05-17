@@ -128,7 +128,7 @@ onMounted(() => {
                             name: 'admin.staffMembers.edit',
                             params: { id: resolvedProfile.id },
                         }"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
@@ -136,7 +136,7 @@ onMounted(() => {
                     <RouterLink
                         v-else
                         :to="{ name: 'staffMember.profile.edit' }"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
@@ -361,7 +361,7 @@ onMounted(() => {
                     </div>
 
                     <div
-                        class="flex items-center gap-4 mb-4 p-4 bg-gradient-to-br from-brand-primary to-brand-primary rounded-2xl"
+                        class="flex items-center gap-4 mb-4 p-4 bg-brand-primary rounded-2xl"
                     >
                         <div class="w-16 h-16 relative flex items-center justify-center rounded-xl overflow-hidden">
                             <div class="w-full h-full absolute bg-white/20 rounded-xl"></div>

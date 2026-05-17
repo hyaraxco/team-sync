@@ -571,14 +571,14 @@ onUnmounted(() => {
                     :disabled="isClockOutDisabled"
                     class="bg-white text-brand-dark rounded-lg border border-[#EE2A3B] hover:ring-2 hover:ring-red-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                    <Clock class="w-4 h-4 text-[#EE2A3B]" />
+                    <Clock class="w-4 h-4 text-danger-600" />
                     <span class="text-brand-dark text-sm font-semibold">Clock Out</span>
                 </button>
 
-                <button
+                    <button
                     v-if="canCreateLeaveRequest"
                     @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 shadow-md"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 shadow-md"
                 >
                     <Plus class="w-4 h-4 text-white" />
                     <span class="text-white text-sm font-semibold">Request Leave</span>
@@ -603,7 +603,7 @@ onUnmounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeSection === section.id
-                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
                 >
@@ -675,7 +675,7 @@ onUnmounted(() => {
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
+                                    class="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center"
                                 >
                                     <User class="w-5 h-5 text-white" />
                                 </div>
@@ -841,7 +841,7 @@ onUnmounted(() => {
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
+                                    class="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center"
                                 >
                                     <CalendarPlus class="w-5 h-5 text-white" />
                                 </div>
@@ -918,7 +918,7 @@ onUnmounted(() => {
                 <button
                     v-if="canCreateLeaveRequest"
                     @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                 >
                     <Plus class="w-4 h-4 text-white" />
                     <span class="text-white text-sm font-semibold">Request Leave</span>
@@ -955,7 +955,7 @@ onUnmounted(() => {
                         <div class="flex items-center justify-between mb-3">
                             <div class="flex items-center gap-3">
                                 <div
-                                    class="w-12 h-12 bg-gradient-to-br from-brand-primary to-brand-primary rounded-xl flex items-center justify-center"
+                                    class="w-12 h-12 bg-brand-primary rounded-xl flex items-center justify-center"
                                 >
                                     <CalendarPlus class="w-5 h-5 text-white" />
                                 </div>
@@ -1166,7 +1166,7 @@ onUnmounted(() => {
                                 </button>
                                 <button
                                     type="submit"
-                                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                                 >
                                     <span class="text-brand-white text-base font-semibold">Submit Request</span>
                                 </button>
@@ -1389,7 +1389,7 @@ onUnmounted(() => {
                                         </p>
                                     </div>
                                     <label
-                                        class="px-4 py-2 rounded-lg border border-[#2151A0] blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
+                                        class="px-4 py-2 rounded-lg blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
                                     >
                                         <input
                                             type="file"

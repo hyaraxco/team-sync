@@ -169,7 +169,7 @@ const getAdjustmentStatusClass = (status) => {
 </script>
 
 <template>
-    <div>
+    <div class="payslip-print">
         <div class="flex items-center justify-between mb-6 print:hidden">
             <button
                 @click="router.back()"
@@ -201,7 +201,7 @@ const getAdjustmentStatusClass = (status) => {
                 <button
                     @click="handleDownload"
                     data-testid="payslip-detail-download"
-                    class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl hover:brightness-110 transition-all duration-300"
+                    class="btn-primary px-4 py-2"
                 >
                     <Download class="w-5 h-5" />
                     <span class="font-semibold">Download PDF</span>
@@ -236,7 +236,7 @@ const getAdjustmentStatusClass = (status) => {
                         </div>
                         <div class="text-right">
                             <div
-                                class="w-16 h-16 bg-gradient-to-br from-brand-primary to-brand-primary rounded-2xl flex items-center justify-center mb-2 ml-auto"
+                                class="w-16 h-16 bg-brand-primary rounded-2xl flex items-center justify-center mb-2 ml-auto"
                             >
                                 <Building class="w-8 h-8 text-white" />
                             </div>
@@ -520,21 +520,3 @@ const getAdjustmentStatusClass = (status) => {
         </div>
     </div>
 </template>
-
-<style scoped>
-@media print {
-    body * {
-        visibility: hidden;
-    }
-    .bg-white,
-    .bg-white * {
-        visibility: visible;
-    }
-    .bg-white {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-    }
-}
-</style>

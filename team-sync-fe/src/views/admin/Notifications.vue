@@ -65,49 +65,49 @@ const getActivityIconBgClass = (notification: any) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
-        return "bg-[#EAF8EE]";
+        return "bg-success-50";
     }
 
     if (category.includes("attendance") || category.includes("check")) {
-        return "bg-[#F0ECFF]";
+        return "bg-purple-50";
     }
 
     if (category.includes("payroll") || category.includes("salary")) {
-        return "bg-[#FFF4E8]";
+        return "bg-orange-50";
     }
 
     if (category.includes("comment") || category.includes("message")) {
-        return "bg-[#EAF0FF]";
+        return "bg-primary-50";
     }
 
     if (category.includes("meeting") || category.includes("team")) {
-        return "bg-[#FFF1E8]";
+        return "bg-orange-50";
     }
 
-    return "bg-[#EEF4FF]";
+    return "bg-primary-50";
 };
 
 const getActivityIconClass = (notification: any) => {
     const category = resolveNotificationCategory(notification);
 
     if (category.includes("task")) {
-        return "text-[#16A34A]";
+        return "text-success-600";
     }
 
     if (category.includes("attendance") || category.includes("check")) {
-        return "text-[#7C3AED]";
+        return "text-purple-600";
     }
 
     if (category.includes("payroll") || category.includes("salary")) {
-        return "text-[#EA580C]";
+        return "text-orange-600";
     }
 
     if (category.includes("comment") || category.includes("message")) {
-        return "text-[#2563EB]";
+        return "text-primary-600";
     }
 
     if (category.includes("meeting") || category.includes("team")) {
-        return "text-[#F97316]";
+        return "text-orange-500";
     }
 
     return "text-brand-primary";
@@ -166,7 +166,7 @@ onMounted(() => {
             <div class="flex items-center gap-2">
                 <button
                     type="button"
-                    class="inline-flex items-center gap-1.5 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-[#EFF5FF] disabled:opacity-50"
+                    class="inline-flex items-center gap-1.5 rounded-full border border-primary-100 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-primary-50 disabled:opacity-50"
                     :disabled="markingAllRead || notifications.length === 0"
                     @click="handleMarkAllRead"
                 >
@@ -175,7 +175,7 @@ onMounted(() => {
                 </button>
                 <button
                     type="button"
-                    class="inline-flex items-center gap-2 rounded-full border border-[#D5E2FB] px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-[#EFF5FF]"
+                    class="inline-flex items-center gap-2 rounded-full border border-primary-100 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-primary-50"
                     @click="fetchNotifications(currentPage)"
                 >
                     <RefreshCw class="h-3.5 w-3.5" />
@@ -190,10 +190,10 @@ onMounted(() => {
                 :key="`notifications-skeleton-${index}`"
                 class="flex items-start gap-3 animate-pulse"
             >
-                <div class="h-11 w-11 rounded-xl bg-[#EEF4FF]"></div>
+                <div class="h-11 w-11 rounded-xl bg-primary-50"></div>
                 <div class="flex-1 space-y-2 pt-1">
-                    <div class="h-2.5 w-3/4 rounded-full bg-[#E8EEF8]"></div>
-                    <div class="h-2 w-1/2 rounded-full bg-[#EFF3FA]"></div>
+                    <div class="h-2.5 w-3/4 rounded-full bg-gray-200"></div>
+                    <div class="h-2 w-1/2 rounded-full bg-gray-100"></div>
                 </div>
             </div>
         </div>
@@ -211,10 +211,10 @@ onMounted(() => {
 
         <div
             v-else-if="notifications.length === 0"
-            class="rounded-xl border border-[#E7ECF4] bg-[#F8FAFC] px-4 py-8 text-center"
+            class="rounded-xl border border-brand-border bg-gray-50 px-4 py-8 text-center"
         >
-            <p class="text-base font-semibold text-[#334155]">No notifications yet.</p>
-            <p class="mt-1 text-sm text-[#64748B]">New updates will appear here.</p>
+            <p class="text-base font-semibold text-brand-dark">No notifications yet.</p>
+            <p class="mt-1 text-sm text-gray-500">New updates will appear here.</p>
         </div>
 
         <div v-else class="space-y-1">
@@ -222,7 +222,7 @@ onMounted(() => {
                 v-for="notification in notifications"
                 :key="notification.id"
                 type="button"
-                class="flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-[#F7FAFF]"
+                class="flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-primary-50/40"
                 :disabled="!notification.action_url"
                 @click="openNotification(notification)"
             >
@@ -241,7 +241,7 @@ onMounted(() => {
                     ></span>
                 </div>
 
-                <div class="min-w-0 flex-1 border-b border-[#EEF2F8] pb-2.5">
+                <div class="min-w-0 flex-1 border-b border-gray-100 pb-2.5">
                     <p class="text-brand-dark text-sm font-semibold leading-5">
                         {{ notification.title }}
                     </p>
@@ -257,7 +257,7 @@ onMounted(() => {
             <!-- Pagination -->
             <div
                 v-if="meta && meta.last_page > 1"
-                class="flex items-center justify-between border-t border-[#EEF2F8] pt-4 mt-3"
+                class="flex items-center justify-between border-t border-gray-100 pt-4 mt-3"
             >
                 <p class="text-xs text-gray-500">
                     Page {{ meta.current_page }} of {{ meta.last_page }}
@@ -266,7 +266,7 @@ onMounted(() => {
                 <div class="flex items-center gap-1">
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-primary-50/40 disabled:opacity-40 disabled:cursor-not-allowed"
                         :disabled="currentPage <= 1"
                         @click="goToPage(currentPage - 1)"
                     >
@@ -274,7 +274,7 @@ onMounted(() => {
                     </button>
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-[#F7FAFF] disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-primary-50/40 disabled:opacity-40 disabled:cursor-not-allowed"
                         :disabled="currentPage >= meta.last_page"
                         @click="goToPage(currentPage + 1)"
                     >
