@@ -780,7 +780,7 @@ const handleApprovePayroll = () => {
             <span class="text-brand-dark text-base font-semibold">Back</span>
         </button>
 
-        <h1 class="text-2xl font-semibold text-brand-dark mb-6">Payroll Detail</h1>
+        <h1 class="text-2xl font-semibold text-brand-dark">Payroll Detail</h1>
 
         <template v-if="hasPayrollStatistics">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -916,7 +916,7 @@ const handleApprovePayroll = () => {
             </div>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-3 mt-2 mb-6" data-testid="payroll-tabs">
+        <div class="bg-white border border-brand-border rounded-2xl p-3" data-testid="payroll-tabs">
             <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
                 <button
                     @click="activeTab = 'employees'"
@@ -993,15 +993,9 @@ const handleApprovePayroll = () => {
             v-show="activeTab === 'employees'"
             class="bg-white border border-brand-border rounded-2xl p-6 animate-fade-in"
         >
-            <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <Users class="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                        <h2 class="text-lg font-semibold text-brand-dark">Staff Member Details</h2>
-                        <p class="text-brand-light text-sm font-normal">Complete payroll breakdown by employee</p>
-                    </div>
+                <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h2 class="text-lg font-semibold text-brand-dark">Staff Member Details</h2>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -1170,14 +1164,8 @@ const handleApprovePayroll = () => {
             class="bg-white border border-brand-border rounded-2xl p-6 animate-fade-in"
         >
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <ShieldCheck class="w-6 h-6 text-blue-600" />
-                </div>
                 <div>
                     <h2 class="text-lg font-semibold text-brand-dark">Approval Chain</h2>
-                    <p class="text-brand-light text-sm font-normal">
-                        Review threshold-based payroll approval steps and submit a role-based decision.
-                    </p>
                 </div>
             </div>
 
@@ -1276,12 +1264,6 @@ const handleApprovePayroll = () => {
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
                     <h2 class="text-lg font-semibold text-brand-dark">Payroll Activity</h2>
-                    <p class="text-brand-light text-sm font-normal mt-1">
-                        Trace important payroll actions for this payroll period.
-                    </p>
-                </div>
-                <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                    <CalendarCheck class="w-6 h-6 text-amber-600" />
                 </div>
             </div>
 
@@ -1370,9 +1352,6 @@ const handleApprovePayroll = () => {
                         </span>
                     </p>
                 </div>
-                <span class="inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
-                    {{ payrollSettingsVersionLabel }}
-                </span>
             </div>
 
             <div
@@ -1449,9 +1428,6 @@ const handleApprovePayroll = () => {
                     <p class="text-brand-light text-sm font-normal mt-1">
                         Critical issues must be resolved before payroll can be marked as paid.
                     </p>
-                </div>
-                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                    <AlertTriangle class="w-6 h-6 text-red-600" />
                 </div>
             </div>
 
@@ -1619,8 +1595,7 @@ const handleApprovePayroll = () => {
         <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Export & Actions</h2>
-                    <p class="text-brand-light text-sm font-normal mt-1">Download reports and manage payroll data</p>
+                    <h2 class="text-lg font-semibold text-brand-dark">Actions</h2>
                 </div>
 
                 <div class="flex items-center gap-3">

@@ -9,7 +9,7 @@ const success = computed(() => status.value === "success");
 </script>
 
 <template>
-    <div class="w-full max-w-sm mx-auto text-center">
+    <div class="w-full max-w-sm mx-auto text-center animate-fadeIn px-4">
         <!-- Icon -->
         <div
             class="mx-auto inline-flex h-14 w-14 items-center justify-center rounded-full mb-5"
@@ -31,10 +31,10 @@ const success = computed(() => status.value === "success");
         </p>
 
         <!-- Action Button -->
-            <RouterLink
-                :to="{ name: 'login' }"
-                class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:brightness-110 hover:shadow focus:outline-none focus:ring-2 focus:ring-brand-primary focus:ring-offset-2"
-            >
+        <RouterLink
+            :to="{ name: 'login' }"
+            class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-primary-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-primary-700 active:bg-primary-800 hover:shadow focus:outline-none focus:ring-2 focus:ring-primary-600 focus:ring-offset-2"
+        >
             <ArrowLeft class="h-4 w-4" aria-hidden="true" />
             Go to sign in
         </RouterLink>
