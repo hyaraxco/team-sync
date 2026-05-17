@@ -1053,7 +1053,7 @@ onUnmounted(() => {
                                         <select
                                             v-model="leaveForm.leave_type"
                                             required
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
                                         >
                                             <option value="">Select leave type</option>
                                             <option v-for="type in leaveTypes" :key="type.value" :value="type.value">
@@ -1072,7 +1072,7 @@ onUnmounted(() => {
                                             @change="updateEndDateMin"
                                             required
                                             data-testid="leave-start-date"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
                                         />
                                     </div>
 
@@ -1084,7 +1084,7 @@ onUnmounted(() => {
                                             :min="leaveForm.start_date"
                                             required
                                             data-testid="leave-end-date"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
                                         />
                                     </div>
 
@@ -1121,7 +1121,7 @@ onUnmounted(() => {
                                             required
                                             rows="4"
                                             data-testid="leave-reason"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold resize-none"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold resize-none"
                                             placeholder="Please provide a detailed reason for your leave request..."
                                         ></textarea>
                                     </div>
@@ -1133,7 +1133,7 @@ onUnmounted(() => {
                                         <input
                                             type="tel"
                                             v-model="leaveForm.emergency_contact"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
                                             placeholder="Phone number for emergency contact"
                                         />
                                     </div>
@@ -1147,7 +1147,7 @@ onUnmounted(() => {
                                             @change="handleProofFileChange"
                                             accept=".pdf,.jpg,.jpeg,.png"
                                             required
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 focus:bg-white transition-all duration-300 text-sm font-medium text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 text-sm font-medium text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                                         />
                                         <p class="text-xs text-brand-light mt-1.5">
                                             Max size: 5MB. Formats: PDF, JPG, PNG.

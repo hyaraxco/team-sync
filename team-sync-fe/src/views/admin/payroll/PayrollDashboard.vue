@@ -305,7 +305,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <UserCheck class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
@@ -316,7 +316,7 @@ const handleExportReport = async () => {
                             type="button"
                             data-testid="payroll-export-report-open"
                             @click="openExportReportModal"
-                            class="btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <Download class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Export Payroll Report</span>
@@ -326,7 +326,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollStatistics"
                             :to="{ name: 'admin.payroll.comparison' }"
                             data-testid="payroll-comparison-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <Banknote class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">MoM Comparison</span>
@@ -336,7 +336,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollList"
                             :to="{ name: 'admin.payroll.adjustments' }"
                             data-testid="payroll-adjustment-queue-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <FileWarning class="w-4 h-4 text-gray-600" />
                             <div class="flex flex-col items-start">
@@ -351,7 +351,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollStatistics"
                             :to="{ name: 'admin.payroll.settings' }"
                             data-testid="payroll-settings-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <Settings class="w-4 h-4 text-gray-400" />
                             <div class="flex items-center justify-between w-full gap-2">
@@ -592,7 +592,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link-alt"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:rounded-xl focus:border-brand-primary focus:border-2 focus:rounded-xl focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <UserCheck class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
