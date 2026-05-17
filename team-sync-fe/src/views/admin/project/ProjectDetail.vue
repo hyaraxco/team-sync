@@ -150,6 +150,7 @@ onMounted(async () => {
 </script>
 
 <template>
+    <h1 class="text-2xl font-semibold text-brand-dark mb-6">{{ project.name || 'Project Detail' }}</h1>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between mb-6">
@@ -158,7 +159,7 @@ onMounted(async () => {
                         <Briefcase class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Project Information</h3>
+                        <h2 class="text-lg font-semibold text-brand-dark">Project Information</h2>
                         <p class="text-brand-light text-sm font-normal">Complete project overview</p>
                     </div>
                 </div>
@@ -187,13 +188,13 @@ onMounted(async () => {
             <!-- Project Basic Info -->
             <div class="space-y-4">
                 <div>
-                    <h4 class="text-brand-dark text-2xl font-bold mb-2">
+                    <p class="text-2xl font-semibold text-brand-dark mb-2">
                         {{ project.name }}
-                    </h4>
+                    </p>
                 </div>
 
                 <div>
-                    <h5 class="text-brand-dark text-base font-semibold mb-3">About Project</h5>
+                    <h3 class="text-base font-semibold text-brand-dark mb-3">About Project</h3>
                     <div class="text-brand-light text-base leading-relaxed space-y-3">
                         <p v-for="(paragraph, index) in aboutParagraphs" :key="index">
                             {{ paragraph }}
@@ -202,7 +203,7 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                    <h5 class="text-brand-dark text-base font-semibold mb-3">Assigned Teams</h5>
+                    <h3 class="text-base font-semibold text-brand-dark mb-3">Assigned Teams</h3>
                     <EmptyState
                         v-if="!project.teams || project.teams.length === 0"
                         icon="Briefcase"
@@ -224,9 +225,9 @@ onMounted(async () => {
                                     <component :is="Briefcase" class="w-5 h-5 text-white relative z-10" />
                                 </div>
                                 <div class="flex-1">
-                                    <h4 class="text-brand-dark text-base font-bold mb-1">
+                                    <p class="text-base font-semibold text-brand-dark mb-1">
                                         {{ team.name }}
-                                    </h4>
+                                    </p>
                                     <div class="flex items-center gap-2">
                                         <User class="w-3.5 h-3.5 text-brand-light" />
                                         <p class="text-brand-light text-sm">{{ team.members_count }} Members</p>
@@ -268,7 +269,7 @@ onMounted(async () => {
                         <Crown class="w-6 h-6 text-green-600" />
                     </div>
                     <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Project Leader</h3>
+                        <h2 class="text-lg font-semibold text-brand-dark">Project Leader</h2>
                         <p class="text-brand-light text-sm font-normal">Team leader information</p>
                     </div>
                 </div>
@@ -280,9 +281,9 @@ onMounted(async () => {
                         class="w-16 h-16 rounded-full object-cover"
                     />
                     <div class="flex-1">
-                        <h4 class="text-brand-dark text-md font-bold mb-1">
+                        <p class="text-base font-semibold text-brand-dark mb-1">
                             {{ project.leader?.user?.name }}
-                        </h4>
+                        </p>
                         <p class="text-brand-light text-sm">
                             {{ project.leader?.job_information?.job_title }}
                         </p>
@@ -470,7 +471,7 @@ onMounted(async () => {
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
             <div>
-                <h3 class="text-brand-dark text-xl font-bold">Danger Zone</h3>
+                <h2 class="text-lg font-semibold text-brand-dark">Danger Zone</h2>
                 <p class="text-brand-light text-sm font-normal">Irreversible and destructive actions</p>
             </div>
         </div>
@@ -478,7 +479,7 @@ onMounted(async () => {
             class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-2xl"
         >
             <div class="flex-1">
-                <h4 class="text-brand-dark text-base font-bold mb-1">Delete Project</h4>
+                <h3 class="text-base font-semibold text-brand-dark mb-1">Delete Project</h3>
                 <p class="text-brand-light text-sm">
                     Permanently delete this project and all associated data. This action cannot be undone.
                 </p>

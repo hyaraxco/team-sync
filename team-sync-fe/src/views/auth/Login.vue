@@ -122,7 +122,7 @@ const handleSubmit = async () => {
 
                     <RouterLink
                         :to="{ name: 'forgot-password' }"
-                        class="text-sm font-semibold text-brand-primary hover:text-brand-primary transition-colors"
+                        class="text-sm font-semibold text-brand-primary hover:text-brand-primary/80 transition-colors"
                     >
                         Forgot password?
                     </RouterLink>
