@@ -1,6 +1,6 @@
 # FE UI/UX Audit — Phase 7: Qualitative Polish (Spacing, Hierarchy, Density)
 
-**Status:** IN PROGRESS
+**Status:** COMPLETED — PR #37 (PR-A) + PR #38 (PR-B) + PR #39 (PR-C) merged
 **Date:** 2026-05-17
 **Predecessors:** P1–P5 (token + visual consistency, PRs #30 #31 #32 #33 #34), P6 (test coverage, PR #35 #36)
 **Authoritative spec:** [`team-sync-fe/docs/design-system.md`](../../team-sync-fe/docs/design-system.md)
