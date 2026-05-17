@@ -84,7 +84,7 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
             <!-- Right Side - Form (65%) -->
             <main
                 id="auth-main"
-                class="flex w-full flex-1 flex-col items-center justify-center gap-8 px-6 py-12 lg:w-[65%] lg:px-12 lg:py-16 xl:w-[60%] xl:px-16"
+                class="flex w-full flex-1 items-center justify-center px-6 py-12 lg:px-12 xl:px-16"
             >
                 <ErrorBoundary>
                     <RouterView />
