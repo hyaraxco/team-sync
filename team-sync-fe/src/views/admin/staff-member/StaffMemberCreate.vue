@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, inject } from "vue";
 import { useRouter } from "vue-router";
 import { useStaffMemberStore } from "@/stores/staffMember";
@@ -19,10 +19,10 @@ const { loading, error } = storeToRefs(staffMemberStore);
 
 const showErrorModal = ref(false);
 
-const currentStep = inject<any>("currentStep");
-const totalSteps = inject<any>("totalSteps");
-const nextStep = inject<any>("nextStep");
-const previousStep = inject<any>("previousStep");
+const currentStep = inject("currentStep");
+const totalSteps = inject("totalSteps");
+const nextStep = inject("nextStep");
+const previousStep = inject("previousStep");
 
 const step1Data = ref({
     name: "",
@@ -42,7 +42,7 @@ const step1Data = ref({
     postal_code: "",
     last_education: "",
     seniority_level: "",
-    profile_photo: null as File | null,
+    profile_photo: null,
     profile_photo_url: "",
 });
 
@@ -71,7 +71,7 @@ const step3Data = ref({
     emergency_contact_email: "",
 });
 
-const parseSalaryNumber = (value: any): number | null => {
+const parseSalaryNumber = (value) => {
     if (value === null || value === undefined) return null;
 
     const raw = String(value).trim();
@@ -94,12 +94,12 @@ const parseSalaryNumber = (value: any): number | null => {
     return Number.isFinite(parsed) ? parsed : null;
 };
 
-const normalizeRupiah = (value: any) => {
+const normalizeRupiah = (value) => {
     const parsed = parseSalaryNumber(value);
     return parsed === null ? "" : String(parsed);
 };
 
-const appendIfNotEmpty = (formData: FormData, key: string, value: any) => {
+const appendIfNotEmpty = (formData, key, value) => {
     if (value !== null && value !== undefined && String(value).trim() !== "") {
         formData.append(key, String(value));
     }
@@ -109,19 +109,19 @@ const requiredFieldError = "This field is required.";
 
 const getErrorMap = () => {
     if (!staffMemberStore.error || typeof staffMemberStore.error !== "object") {
-        return {} as Record<string, string[]>;
+        return {};
     }
 
-    return { ...(staffMemberStore.error as Record<string, string[]>) };
+    return { ...staffMemberStore.error };
 };
 
-const setFieldError = (field: string, message: string) => {
+const setFieldError = (field, message) => {
     const nextErrors = getErrorMap();
     nextErrors[field] = [message];
     staffMemberStore.error = nextErrors;
 };
 
-const clearFieldError = (field: string) => {
+const clearFieldError = (field) => {
     if (!staffMemberStore.error || typeof staffMemberStore.error !== "object") return;
 
     const nextErrors = getErrorMap();
@@ -129,7 +129,7 @@ const clearFieldError = (field: string) => {
     staffMemberStore.error = Object.keys(nextErrors).length ? nextErrors : null;
 };
 
-const applyAvailabilityErrors = (errors: Record<string, string[]>) => {
+const applyAvailabilityErrors = (errors) => {
     const nextErrors = getErrorMap();
 
     if (errors?.email) {
@@ -147,7 +147,7 @@ const applyAvailabilityErrors = (errors: Record<string, string[]>) => {
     staffMemberStore.error = Object.keys(nextErrors).length ? nextErrors : null;
 };
 
-const checkAvailabilityRealtime = async (payload: Record<string, string>, field: "email" | "identity_number") => {
+const checkAvailabilityRealtime = async (payload, field) => {
     const value = String(payload[field] ?? "").trim();
 
     if (!value) {
@@ -168,22 +168,22 @@ const checkAvailabilityRealtime = async (payload: Record<string, string>, field:
     try {
         await staffMemberStore.checkAvailability(payload);
         applyAvailabilityErrors({});
-    } catch (err: any) {
+    } catch (err) {
         const availabilityErrors = err?.response?.data?.errors || {};
         applyAvailabilityErrors(availabilityErrors);
     }
 };
 
-const handleEmailBlur = async (value: string) => {
+const handleEmailBlur = async (value) => {
     await checkAvailabilityRealtime({ email: value }, "email");
 };
 
-const handleIdentityNumberBlur = async (value: string) => {
+const handleIdentityNumberBlur = async (value) => {
     await checkAvailabilityRealtime({ identity_number: value }, "identity_number");
 };
 
 const validateStep1 = async () => {
-    const validationErrors: Record<string, string[]> = {};
+    const validationErrors = {};
 
     const step1RequiredFields = [
         "name",
@@ -198,7 +198,7 @@ const validateStep1 = async () => {
         "address",
         "city",
         "postal_code",
-    ] as const;
+    ];
 
     for (const field of step1RequiredFields) {
         if (!String(step1Data.value[field] ?? "").trim()) {
@@ -225,7 +225,7 @@ const validateStep1 = async () => {
             identity_number: step1Data.value.identity_number,
         });
         applyAvailabilityErrors({});
-    } catch (err: any) {
+    } catch (err) {
         const availabilityErrors = err?.response?.data?.errors || {};
         applyAvailabilityErrors(availabilityErrors);
         return false;
@@ -236,8 +236,8 @@ const validateStep1 = async () => {
 };
 
 const validateStep2 = () => {
-    const validationErrors: Record<string, string[]> = {};
-    const step2RequiredChecks: Array<[string, string]> = [
+    const validationErrors = {};
+    const step2RequiredChecks = [
         ["job_title", step2Data.value.job_title],
         ["status", step2Data.value.status],
         ["employment_type", step2Data.value.employment_type],
@@ -269,7 +269,7 @@ const validateStep2 = () => {
 };
 
 const validateStep3 = () => {
-    const validationErrors: Record<string, string[]> = {};
+    const validationErrors = {};
 
     if (!String(step3Data.value.emergency_contact_name ?? "").trim()) {
         validationErrors["emergency_contacts.0.full_name"] = [requiredFieldError];
@@ -311,7 +311,7 @@ const handleNextStep = async () => {
     nextStep?.();
 };
 
-const goToErrorStep = (validationErrors: Record<string, any>) => {
+const goToErrorStep = (validationErrors) => {
     if (!currentStep || !validationErrors) return;
 
     const keys = Object.keys(validationErrors);

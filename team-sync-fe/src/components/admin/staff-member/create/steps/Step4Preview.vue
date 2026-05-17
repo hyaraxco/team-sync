@@ -1,18 +1,25 @@
-<script setup lang="ts">
+<script setup>
 import { User, Briefcase, Phone, CreditCard, CheckCircle } from "lucide-vue-next";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { parseSalaryNumber } from "@/utils/salaryUtils";
 
-interface Props {
-    step1Data: any;
-    step2Data: any;
-    step3Data: any;
-}
-
-defineProps<Props>();
+defineProps({
+    step1Data: {
+        type: Object,
+        required: true,
+    },
+    step2Data: {
+        type: Object,
+        required: true,
+    },
+    step3Data: {
+        type: Object,
+        required: true,
+    },
+});
 
 // Format date to readable format
-const formatDate = (date: string) => {
+const formatDate = (date) => {
     if (!date) return "-";
     return new Date(date).toLocaleDateString("en-US", {
         year: "numeric",
@@ -21,7 +28,7 @@ const formatDate = (date: string) => {
     });
 };
 
-const formatCurrency = (amount: string) => {
+const formatCurrency = (amount) => {
     const parsed = parseSalaryNumber(amount);
     if (parsed === null) return "-";
 
@@ -33,7 +40,7 @@ const formatCurrency = (amount: string) => {
 };
 
 // Format text with capitalization
-const formatText = (text: string) => {
+const formatText = (text) => {
     if (!text) return "-";
     return text.charAt(0).toUpperCase() + text.slice(1).replace(/-/g, " ");
 };

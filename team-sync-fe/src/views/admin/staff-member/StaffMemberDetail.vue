@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, onMounted, computed } from "vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { formatDateLong as formatDate } from "@/utils/dateUtils.js";
@@ -37,12 +37,12 @@ const router = useRouter();
 const staffMemberStore = useStaffMemberStore();
 const { loading, performanceStatistics, success } = storeToRefs(staffMemberStore);
 
-const staffMember = ref<any>(null);
+const staffMember = ref(null);
 const showDeleteModal = ref(false);
 
 const loadStaffMember = async () => {
     try {
-        const staffMemberId = route.params.id as string;
+        const staffMemberId = route.params.id;
         staffMember.value = await staffMemberStore.fetchStaffMember(staffMemberId);
         // Load performance statistics
         await staffMemberStore.fetchPerformanceStatistics(staffMemberId);
@@ -74,7 +74,7 @@ const shareProfile = () => {
 
 const handleDeleteStaffMember = async () => {
     try {
-        await staffMemberStore.deleteStaffMember(route.params.id as string);
+        await staffMemberStore.deleteStaffMember(route.params.id);
         if (success.value) {
             showDeleteModal.value = false;
             router.push({ name: "admin.staffMembers" });

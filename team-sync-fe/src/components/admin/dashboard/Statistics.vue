@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, computed } from "vue";
 import { StarIcon } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";

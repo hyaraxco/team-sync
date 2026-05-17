@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { ref, computed, onMounted } from "vue";
 import VueApexCharts from "vue3-apexcharts";
 import { TrendingUp, Briefcase, PlayCircle } from "lucide-vue-next";
@@ -94,7 +94,7 @@ const chartOptions = ref({
                 colors: "#6B7280",
                 fontSize: "12px",
             },
-            formatter: (value: number) => `${value}`,
+            formatter: (value) => `${value}`,
         },
     },
     tooltip: {
@@ -103,7 +103,7 @@ const chartOptions = ref({
             fontSize: "12px",
         },
         y: {
-            formatter: (value: number) => `${value}`,
+            formatter: (value) => `${value}`,
         },
         theme: "light",
         fillSeriesColor: false,

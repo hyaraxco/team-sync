@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted } from "vue";
 import SearchFilter from "@/components/common/SearchFilter.vue";
 import { useOptionStore } from "@/stores/option";

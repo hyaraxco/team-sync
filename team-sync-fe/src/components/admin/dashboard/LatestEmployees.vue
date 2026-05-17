@@ -1,4 +1,4 @@
-<script setup lang="ts">
+<script setup>
 import { onMounted, watch } from "vue";
 import { useStaffMemberStore } from "@/stores/staffMember";
 import { useRouter } from "vue-router";
@@ -35,7 +35,7 @@ watch(
     { deep: true },
 );
 
-const goToEmployeeDetail = (id: number) => {
+const goToEmployeeDetail = (id) => {
     router.push({ name: "admin.staffMembers.detail", params: { id } });
 };
 </script>
