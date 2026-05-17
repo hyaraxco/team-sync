@@ -569,7 +569,7 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckOut"
                     :disabled="isClockOutDisabled"
-                    class="bg-white text-brand-dark rounded-lg border border-[#EE2A3B] hover:ring-2 hover:ring-red-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-white text-brand-dark rounded-lg border border-danger-600 hover:ring-2 hover:ring-danger-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Clock class="w-4 h-4 text-danger-600" />
                     <span class="text-brand-dark text-sm font-semibold">Clock Out</span>
