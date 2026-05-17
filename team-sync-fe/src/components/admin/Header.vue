@@ -165,7 +165,7 @@ const unreadBadgeClass = computed(() => {
         return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-brand-primary text-[10px] font-bold leading-none text-white`;
     }
 
-    return "absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-[#EE2A3B] px-1.5 text-[11px] font-bold leading-none tracking-tight text-white";
+    return "absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-danger-500 px-1.5 text-[11px] font-bold leading-none tracking-tight text-white";
 });
 const notificationButtonLabel = computed(() => {
     if (unreadNotificationCount.value > 0) {
@@ -365,7 +365,7 @@ onUnmounted(() => {
                 </div>
 
                 <!-- Divider -->
-                <div class="hidden sm:block w-px h-8 bg-[#DCDEDD] mx-5"></div>
+                <div class="hidden sm:block w-px h-8 bg-brand-border mx-5"></div>
 
                 <!-- User Profile -->
                 <div class="relative z-50" ref="accountDropdownRef">

@@ -92,7 +92,7 @@ const handleDeleteProject = async () => {
                         {{ data.leader?.job_information?.job_title }}
                     </p>
                 </div>
-                <div class="px-2 py-1 bg-green-50 border border-green-200 rounded-[6px] flex items-center gap-1">
+                <div class="px-2 py-1 bg-green-50 border border-green-200 rounded-md flex items-center gap-1">
                     <Crown class="w-3 h-3 text-green-600" />
                     <span class="text-green-700 text-xs font-medium">Leader</span>
                 </div>

@@ -26,7 +26,7 @@ const props = defineProps({
                     ></div>
                     <!-- Overlapping smaller circle -->
                     <div
-                        class="w-8 h-8 absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full opacity-90"
+                        class="w-8 h-8 absolute bg-brand-primary rounded-full opacity-90"
                     ></div>
                     <!-- Lucide icon -->
                     <Building class="w-4 h-4 text-white relative z-10" />

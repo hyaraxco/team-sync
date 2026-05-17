@@ -71,7 +71,7 @@ const goToTeamDetail = (id) => {
                 >
                     <!-- Main blue background -->
                     <div
-                        class="w-full h-full absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-lg"
+                        class="w-full h-full absolute bg-brand-primary rounded-lg"
                     ></div>
                     <!-- Lucide icon -->
                     <img loading="lazy" :src="team.icon" class="w-6 h-6 relative z-10" />

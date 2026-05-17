@@ -92,5 +92,5 @@ const modelValue = computed({
     set: (value) => emit("update:modelValue", value),
 });
 
-const borderColor = computed(() => (props.error ? "border-[#DC2626] border-2" : "border-brand-border"));
+const borderColor = computed(() => (props.error ? "border-danger-600 border-2" : "border-brand-border"));
 </script>
