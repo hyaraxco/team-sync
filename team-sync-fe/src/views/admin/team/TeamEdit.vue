@@ -168,7 +168,7 @@ watch(
                                     <div class="relative w-32 h-32">
                                         <!-- Blue gradient background -->
                                         <div
-                                            class="w-32 h-32 absolute bg-gradient-to-br from-brand-primary to-brand-primary rounded-full"
+                                            class="w-32 h-32 absolute bg-brand-primary rounded-full"
                                         ></div>
 
                                         <!-- Icon Display (uploaded only) -->
@@ -322,7 +322,7 @@ watch(
                                 @click="leadModal = true"
                             >
                                 <UserCheck class="w-5 h-5 text-gray-400" />
-                                <span class="text-[#0D2929] font-normal flex-1">
+                                <span class="text-brand-dark font-normal flex-1">
                                     {{ selectedLead?.user?.name || "Select team lead" }}
                                 </span>
                                 <ChevronDown class="w-4 h-4 text-gray-400" />
@@ -599,7 +599,7 @@ watch(
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Update Team</span>
                         <Plus class="w-4 h-4 text-white" />

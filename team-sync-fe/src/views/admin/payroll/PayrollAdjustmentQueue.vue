@@ -174,28 +174,28 @@ onMounted(loadAdjustments);
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="rounded-[18px] border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <SlidersHorizontal class="w-4 h-4" />
                     Loaded Adjustments
                 </div>
                 <p class="mt-3 text-3xl font-bold text-brand-dark">{{ meta.total || payrollAdjustments.length }}</p>
             </div>
-            <div class="rounded-[18px] border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <Clock3 class="w-4 h-4 text-amber-600" />
                     Pending on This Page
                 </div>
                 <p class="mt-3 text-3xl font-bold text-amber-700">{{ pendingCount }}</p>
             </div>
-            <div class="rounded-[18px] border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <BadgeCheck class="w-4 h-4 text-blue-600" />
                     Approved on This Page
                 </div>
                 <p class="mt-3 text-3xl font-bold text-blue-700">{{ approvedCount }}</p>
             </div>
-            <div class="rounded-[18px] border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-white p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <BadgeCheck class="w-4 h-4 text-green-600" />
                     Page Net Impact
@@ -240,7 +240,7 @@ onMounted(loadAdjustments);
                 subtitle="There are no records for the selected status filter."
             />
             <div v-else class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-[#E5E7EB] text-sm">
+                <table class="min-w-full divide-y divide-gray-200 text-sm">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-4 py-3 text-left font-semibold text-brand-dark">Employee</th>
@@ -253,7 +253,7 @@ onMounted(loadAdjustments);
                             <th class="px-4 py-3 text-right font-semibold text-brand-dark">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-[#F1F5F9] bg-white">
+                    <tbody class="divide-y divide-gray-100 bg-white">
                         <tr v-for="adjustment in payrollAdjustments" :key="adjustment.id">
                             <td class="px-4 py-3">
                                 <p class="font-semibold text-brand-dark">{{ getStaffName(adjustment) }}</p>
@@ -305,7 +305,7 @@ onMounted(loadAdjustments);
 
             <div
                 v-if="meta.last_page > 1"
-                class="mt-5 flex items-center justify-between border-t border-[#F1F5F9] pt-4"
+                class="mt-5 flex items-center justify-between border-t border-gray-100 pt-4"
             >
                 <p class="text-sm text-brand-light">
                     Page {{ meta.current_page }} of {{ meta.last_page }} · {{ meta.total }} adjustments

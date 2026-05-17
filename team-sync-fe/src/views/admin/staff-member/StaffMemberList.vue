@@ -77,7 +77,7 @@ onMounted(async () => {
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.staffMembers.create' }"
-                    class="btn-primary rounded-lg border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
                     v-if="can('staff-member-create')"
                 >
                     <UserPlus class="w-4 h-4 text-white" />

@@ -116,7 +116,7 @@ onMounted(async () => {
 
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <MainCard class="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+            <MainCard class="bg-warning-50 border-warning-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-orange-700">Pending Your Review</p>
@@ -130,7 +130,7 @@ onMounted(async () => {
                 </div>
             </MainCard>
 
-            <MainCard class="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+            <MainCard class="bg-success-50 border-success-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-green-700">Completed Reviews</p>
@@ -144,7 +144,7 @@ onMounted(async () => {
                 </div>
             </MainCard>
 
-            <MainCard class="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+            <MainCard class="bg-primary-50 border-primary-100">
                 <div class="flex items-center justify-between">
                     <div>
                         <p class="text-sm font-medium text-blue-700">Average Team Rating</p>

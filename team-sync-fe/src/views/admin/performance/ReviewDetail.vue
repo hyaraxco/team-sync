@@ -474,7 +474,7 @@ watch(
                         class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                         :class="
                             activeTab === tab.id
-                                ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
+                                ? 'blue-gradient blue-btn-shadow text-white'
                                 : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                         "
                     >
@@ -1529,8 +1529,8 @@ watch(
                                     class="px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all"
                                     :class="
                                         isCalibrationValid && !submitting
-                                            ? 'blue-gradient blue-btn-shadow border-[#2151A0] text-white'
-                                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                                        ? 'blue-gradient blue-btn-shadow text-white'
+                                        : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                                     "
                                 >
                                     <ScaleIcon class="w-4 h-4" />

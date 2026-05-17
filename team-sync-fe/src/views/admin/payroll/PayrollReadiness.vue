@@ -868,7 +868,7 @@ watch(salaryMonth, () => {
                         type="button"
                         data-testid="readiness-go-generate"
                         @click="goToGeneratePayroll"
-                        class="w-full rounded-xl border border-[#2151A0] hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
+                        class="w-full rounded-xl border border-primary-700 hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-white text-sm font-semibold">Go to Generate Payroll</span>
                         <ArrowRight class="w-4 h-4 text-white" />
