@@ -139,7 +139,7 @@ onMounted(async () => {
     <div class="flex-1 flex flex-col overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-brand-dark">Attendance Overview</h1>
+                <h1 class="text-2xl font-semibold text-brand-dark">Attendance Overview</h1>
                 <p class="text-sm text-brand-light mt-1">Monitor real-time presence and manage requests.</p>
             </div>
         </div>
@@ -156,7 +156,7 @@ onMounted(async () => {
                     <CalendarDays class="w-6 h-6 text-blue-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-brand-primary transition-colors">
+                    <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
                         Attendance Logs
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">View historical records</p>
@@ -174,7 +174,7 @@ onMounted(async () => {
                     <CalendarClock class="w-6 h-6 text-purple-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-brand-primary transition-colors">
+                    <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
                         Leave Requests
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">Manage employee time off</p>
@@ -192,7 +192,7 @@ onMounted(async () => {
                     <Clock class="w-6 h-6 text-orange-600" />
                 </div>
                 <div>
-                    <h3 class="text-brand-dark font-bold text-base group-hover:text-brand-primary transition-colors">
+                    <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
                         Corrections
                     </h3>
                     <p class="text-brand-light text-xs mt-0.5">Manage clock-in disputes</p>
@@ -318,7 +318,7 @@ onMounted(async () => {
                             <CalendarClock class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-lg font-bold">Latest Leave Requests</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Latest Leave Requests</h2>
                             <p class="text-brand-light text-sm">Recent 5 leave applications</p>
                         </div>
                     </div>
@@ -340,9 +340,9 @@ onMounted(async () => {
                         />
                         <div class="flex-1">
                             <div class="flex items-center gap-2 mb-2">
-                                <h4 class="text-brand-dark text-sm font-semibold">
+                                <p class="text-sm font-semibold text-brand-dark">
                                     {{ request.staff_member?.user?.name }}
-                                </h4>
+                                </p>
                             </div>
                             <div class="flex items-center gap-2">
                                 <StatusBadge type="leave-type" :value="request.type" />
@@ -389,7 +389,7 @@ onMounted(async () => {
                             <Clock class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-lg font-bold">Pending Corrections</h3>
+                            <h2 class="text-lg font-semibold text-brand-dark">Pending Corrections</h2>
                             <p class="text-brand-light text-sm">Attendance sync requests</p>
                         </div>
                     </div>
@@ -411,9 +411,9 @@ onMounted(async () => {
                         />
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center gap-2 mb-1">
-                                <h4 class="text-brand-dark text-sm font-semibold truncate">
+                                <p class="text-sm font-semibold text-brand-dark truncate">
                                     {{ correction.staff_member?.user?.name }}
-                                </h4>
+                                </p>
                             </div>
                             <p class="text-brand-light text-xs truncate max-w-[200px]">
                                 {{ correction.reason }}
