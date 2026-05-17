@@ -203,7 +203,7 @@ const clearSearch = () => {
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 transition-all duration-300"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300"
                         placeholder="Search payroll periods by month or year..."
                         v-model="filters.search"
                     />
@@ -212,7 +212,7 @@ const clearSearch = () => {
                 <select
                     v-model.number="filters.year"
                     data-testid="my-payroll-year"
-                    class="px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:border-2 transition-all duration-300"
+                    class="px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300"
                 >
                     <option v-for="year in availableYears" :key="year" :value="year">
                         {{ year }}
