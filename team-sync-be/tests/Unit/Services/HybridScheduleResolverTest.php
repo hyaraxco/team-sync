@@ -328,7 +328,7 @@ it('does not match schedule whose effective_until is in the past', function () {
 // 9. Employee not found → throws ModelNotFoundException
 // ─────────────────────────────────────────────────────────────────────────────
 
-it('throws ModelNotFoundException when employee id does not exist', function () {
+it('throws ModelNotFoundException when staff member id does not exist', function () {
     $this->resolver->resolve(99999, '2026-05-11');
 })->throws(ModelNotFoundException::class);
 
