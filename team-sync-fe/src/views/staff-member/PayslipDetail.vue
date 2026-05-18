@@ -285,7 +285,7 @@ const getAdjustmentStatusClass = (status) => {
                                         {{ payslip.employee_name }}
                                     </p>
                                     <p v-if="payslip.employee_code" class="text-xs text-gray-500 mt-1">
-                                        Employee ID: {{ payslip.employee_code }}
+                                        Staff Member ID: {{ payslip.employee_code }}
                                     </p>
                                 </div>
                             </div>
