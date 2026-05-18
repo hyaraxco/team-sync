@@ -207,7 +207,7 @@ class PayrollStatisticsTest extends TestCase
         $payrollJune = Payroll::create([
             'salary_month' => '2026-06-01',
             'status' => 'paid',
-            'payment_date' => '2026-06-30',
+            'payment_date' => '2026-05-15',
         ]);
         $this->seedPayrollDetails($payrollJune, [
             ['original' => 12000000, 'final' => 12000000],

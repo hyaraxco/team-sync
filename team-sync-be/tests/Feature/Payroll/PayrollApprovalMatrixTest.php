@@ -85,7 +85,7 @@ class PayrollApprovalMatrixTest extends TestCase
 
         // Mark as paid should fail
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-01',
+            'payment_date' => '2026-05-15',
         ])->assertStatus(422);
 
         // Now director approves
@@ -101,7 +101,7 @@ class PayrollApprovalMatrixTest extends TestCase
         // Switch back to finance (has payroll-process permission) to mark as paid
         $this->actingAsRole('finance');
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-01',
+            'payment_date' => '2026-05-15',
         ])->assertOk();
 
         $this->assertSame('paid', $payroll->fresh()->status->value);
