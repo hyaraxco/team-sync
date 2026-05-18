@@ -1,6 +1,6 @@
 <template>
     <div>
-        <label :for="fieldId" class="block mb-2" :style="labelStyle">
+        <label :for="fieldId" class="block mb-2 text-sm font-semibold text-gray-600">
             {{ label }}
         </label>
 
@@ -20,18 +20,17 @@
                 :aria-invalid="error ? 'true' : undefined"
                 :aria-describedby="error ? errorId : undefined"
                 :class="[
-                    'w-full pr-4 py-3 border rounded-2xl transition-all duration-300 font-semibold',
+                    'w-full pr-4 py-3 border rounded-2xl transition-all duration-300 font-semibold bg-white',
                     hasIcon ? 'pl-12' : 'pl-4',
                     'hover:ring-2 hover:ring-brand-primary/20',
                     'focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white',
                     borderColor,
                 ]"
-                :style="textareaStyle"
                 @input="modelValue = $event.target.value"
             ></textarea>
         </div>
 
-        <p v-if="error" :id="errorId" role="alert" class="mt-2" :style="errorStyle">
+        <p v-if="error" :id="errorId" role="alert" class="mt-2 text-red-600 text-sm font-normal">
             {{ error }}
         </p>
     </div>
@@ -73,20 +72,4 @@ const modelValue = computed({
 });
 
 const borderColor = computed(() => (props.error ? "border-danger-600 border-2" : "border-brand-border"));
-
-const labelStyle = {
-    color: "#4b5563",
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: "14px",
-    fontWeight: 600,
-};
-const textareaStyle = {
-    background: "#ffffff",
-};
-const errorStyle = {
-    color: "#dc2626",
-    fontFamily: "Plus Jakarta Sans",
-    fontSize: "14px",
-    fontWeight: 400,
-};
 </script>
