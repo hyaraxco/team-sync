@@ -13,6 +13,6 @@ class PayrollReopenRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['reason' => ['required', 'string', 'min:10']];
+        return ['reason' => ['required', 'string', 'min:10', 'max:500']];
     }
 }
