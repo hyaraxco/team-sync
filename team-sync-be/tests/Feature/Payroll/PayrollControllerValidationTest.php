@@ -252,4 +252,40 @@ class PayrollControllerValidationTest extends TestCase
             'status' => 'approved',
         ]);
     }
+
+    public function test_get_analytics_rejects_months_below_1(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/analytics?months=0')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['months']);
+    }
+
+    public function test_get_analytics_rejects_months_above_24(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/analytics?months=25')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['months']);
+    }
+
+    public function test_get_analytics_rejects_non_integer_months(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/analytics?months=six')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['months']);
+    }
+
+    public function test_get_analytics_rejects_float_months(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/analytics?months=3.5')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['months']);
+    }
 }

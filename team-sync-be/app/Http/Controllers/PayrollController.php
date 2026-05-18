@@ -10,6 +10,7 @@ use App\Exceptions\PayrollStateException;
 use App\Exports\PayrollExport;
 use App\Exports\PayrollReportExport;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\Payroll\PayrollAnalyticsRequest;
 use App\Http\Requests\Payroll\PayrollDetailsRequest;
 use App\Http\Requests\Payroll\PayrollGenerateReadinessRequest;
 use App\Http\Requests\Payroll\PayrollGenerateRequest;
@@ -481,11 +482,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Get payroll analytics trends
      */
-    public function getAnalytics(Request $request)
+    public function getAnalytics(PayrollAnalyticsRequest $request)
     {
-        $validated = $request->validate([
-            'months' => 'nullable|integer|min:1|max:24',
-        ]);
+        $validated = $request->validated();
 
         try {
             $analytics = $this->payrollRepository->getAnalytics((int) ($validated['months'] ?? 6));
