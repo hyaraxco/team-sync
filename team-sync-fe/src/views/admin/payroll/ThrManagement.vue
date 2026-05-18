@@ -200,7 +200,7 @@ function handlePageChange(page) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Total Events</p>
-                        <p class="text-lg font-bold">{{ yearSummary.total_events }}</p>
+                        <p class="text-lg font-bold tabular-nums">{{ yearSummary.total_events }}</p>
                     </div>
                 </div>
             </div>
@@ -211,7 +211,7 @@ function handlePageChange(page) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Total Employees</p>
-                        <p class="text-lg font-bold">{{ yearSummary.total_employees }}</p>
+                        <p class="text-lg font-bold tabular-nums">{{ yearSummary.total_employees }}</p>
                     </div>
                 </div>
             </div>
@@ -222,7 +222,7 @@ function handlePageChange(page) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Total THR (Gross)</p>
-                        <p class="text-lg font-bold">{{ formatCurrency(yearSummary.total_thr_amount) }}</p>
+                        <p class="text-lg font-bold tabular-nums">{{ formatCurrency(yearSummary.total_thr_amount) }}</p>
                     </div>
                 </div>
             </div>
@@ -233,7 +233,7 @@ function handlePageChange(page) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Total Net</p>
-                        <p class="text-lg font-bold">{{ formatCurrency(yearSummary.total_net_amount) }}</p>
+                        <p class="text-lg font-bold tabular-nums">{{ formatCurrency(yearSummary.total_net_amount) }}</p>
                     </div>
                 </div>
             </div>
@@ -371,15 +371,15 @@ function handlePageChange(page) {
                 <div class="grid grid-cols-3 gap-4">
                     <div class="text-center p-3 bg-green-50 rounded-lg">
                         <p class="text-xs text-gray-500">Eligible</p>
-                        <p class="text-xl font-bold text-green-700">{{ simulation.eligible_count }}</p>
+                        <p class="text-xl font-bold text-green-700 tabular-nums">{{ simulation.eligible_count }}</p>
                     </div>
                     <div class="text-center p-3 bg-red-50 rounded-lg">
                         <p class="text-xs text-gray-500">Ineligible</p>
-                        <p class="text-xl font-bold text-red-700">{{ simulation.ineligible_count }}</p>
+                        <p class="text-xl font-bold text-red-700 tabular-nums">{{ simulation.ineligible_count }}</p>
                     </div>
                     <div class="text-center p-3 bg-blue-50 rounded-lg">
                         <p class="text-xs text-gray-500">Total Net</p>
-                        <p class="text-lg font-bold text-blue-700">{{ formatCurrency(simulation.total_net_amount) }}</p>
+                        <p class="text-lg font-bold text-blue-700 tabular-nums">{{ formatCurrency(simulation.total_net_amount) }}</p>
                     </div>
                 </div>
 
