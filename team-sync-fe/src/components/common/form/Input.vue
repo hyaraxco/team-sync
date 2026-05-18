@@ -25,7 +25,7 @@
                 :min="min"
                 :step="step"
                 :autocomplete="autocomplete"
-                class="peer w-full h-full bg-white text-gray-950 border text-sm rounded-xl outline-none transition-all duration-200 placeholder:text-gray-600 placeholder:font-normal font-medium"
+                class="peer w-full h-full bg-white text-gray-950 border text-sm rounded-2xl outline-none transition-all duration-200 placeholder:text-gray-600 placeholder:font-normal font-medium"
                 :class="[
                     hasIcon ? 'pl-12' : 'pl-4',
                     hasSuffix ? 'pr-12' : 'pr-4',
