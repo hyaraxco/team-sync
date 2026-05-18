@@ -327,7 +327,7 @@ class PayrollControllerValidationTest extends TestCase
     {
         Sanctum::actingAs($this->finance);
 
-        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+        $payroll = Payroll::factory()->create(['status' => 'approved']);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [])
             ->assertStatus(422)
@@ -338,7 +338,7 @@ class PayrollControllerValidationTest extends TestCase
     {
         Sanctum::actingAs($this->finance);
 
-        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+        $payroll = Payroll::factory()->create(['status' => 'approved']);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
             'reason' => 'short',
@@ -351,7 +351,7 @@ class PayrollControllerValidationTest extends TestCase
     {
         Sanctum::actingAs($this->finance);
 
-        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+        $payroll = Payroll::factory()->create(['status' => 'approved']);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
             'reason' => str_repeat('a', 501),
