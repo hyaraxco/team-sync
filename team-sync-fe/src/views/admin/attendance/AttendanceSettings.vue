@@ -337,52 +337,40 @@
                         <label class="block text-sm font-semibold text-brand-dark mb-2">Work End Time</label>
                         <input v-model="policyForm.work_end_time" type="time" step="1" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary" />
                     </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Work Days Per Week</label>
-                        <input
-                            v-model.number="policyForm.work_days_per_week"
-                            type="number"
-                            min="1"
-                            max="7"
-                            required
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Late Grace Minutes</label>
-                        <input
-                            v-model.number="policyForm.late_grace_minutes"
-                            type="number"
-                            min="0"
-                            max="120"
-                            required
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Half Day Minimum Hours</label>
-                        <input
-                            v-model.number="policyForm.half_day_min_hours"
-                            type="number"
-                            min="0"
-                            max="12"
-                            step="0.25"
-                            required
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Warning Absent %</label>
-                        <input
-                            v-model.number="policyForm.warning_absent_pct"
-                            type="number"
-                            min="0"
-                            max="100"
-                            step="0.01"
-                            required
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
+                    <Input
+                        v-model="policyForm.work_days_per_week"
+                        label="Work Days Per Week"
+                        type="number"
+                        :min="1"
+                        :max="7"
+                        required
+                    />
+                    <Input
+                        v-model="policyForm.late_grace_minutes"
+                        label="Late Grace Minutes"
+                        type="number"
+                        :min="0"
+                        :max="120"
+                        required
+                    />
+                    <Input
+                        v-model="policyForm.half_day_min_hours"
+                        label="Half Day Minimum Hours"
+                        type="number"
+                        :min="0"
+                        :max="12"
+                        :step="0.25"
+                        required
+                    />
+                    <Input
+                        v-model="policyForm.warning_absent_pct"
+                        label="Warning Absent %"
+                        type="number"
+                        :min="0"
+                        :max="100"
+                        :step="0.01"
+                        required
+                    />
                 </div>
 
                 <div>
@@ -467,52 +455,43 @@
                 </div>
 
                 <div class="grid gap-4 md:grid-cols-2">
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Quota Scope</label>
-                        <select v-model="entitlementForm.quota_scope" class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary">
-                            <option value="annual">Annual</option>
-                            <option value="per_occurrence">Per Occurrence</option>
-                            <option value="unlimited">Unlimited</option>
-                            <option value="unpaid">Unpaid</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Quota Days</label>
-                        <input
-                            v-model.number="entitlementForm.quota_days"
-                            type="number"
-                            min="0"
-                            step="0.5"
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Carry Over Max Days</label>
-                        <input
-                            v-model.number="entitlementForm.carry_over_max_days"
-                            type="number"
-                            min="0"
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-brand-dark mb-2">Max Attachment Size (KB)</label>
-                        <input
-                            v-model.number="entitlementForm.max_attachment_size_kb"
-                            type="number"
-                            min="0"
-                            class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                        />
-                    </div>
+                    <Select
+                        v-model="entitlementForm.quota_scope"
+                        label="Quota Scope"
+                        :options="[
+                            { value: 'annual', label: 'Annual' },
+                            { value: 'per_occurrence', label: 'Per Occurrence' },
+                            { value: 'unlimited', label: 'Unlimited' },
+                            { value: 'unpaid', label: 'Unpaid' },
+                        ]"
+                    />
+                    <Input
+                        v-model="entitlementForm.quota_days"
+                        label="Quota Days"
+                        type="number"
+                        :min="0"
+                        :step="0.5"
+                    />
+                    <Input
+                        v-model="entitlementForm.carry_over_max_days"
+                        label="Carry Over Max Days"
+                        type="number"
+                        :min="0"
+                    />
+                    <Input
+                        v-model="entitlementForm.max_attachment_size_kb"
+                        label="Max Attachment Size (KB)"
+                        type="number"
+                        :min="0"
+                    />
                 </div>
 
                 <div>
-                    <label class="block text-sm font-semibold text-brand-dark mb-2">Allowed MIME Types</label>
-                    <input
+                    <Input
                         v-model="allowedMimeTypesInput"
+                        label="Allowed MIME Types"
                         type="text"
                         placeholder="image/jpeg, image/png, application/pdf"
-                        class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
                     />
                     <p class="mt-1 text-xs text-gray-500">
                         Separate MIME types with commas. Leave blank for no restriction.
@@ -542,37 +521,35 @@
             @close="closeHolidayModal"
         >
             <form class="space-y-4" @submit.prevent="submitHolidayForm">
-                <div>
-                    <label class="block text-sm font-semibold text-brand-dark mb-2">Date</label>
-                    <input v-model="holidayForm.date" type="date" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary" />
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-brand-dark mb-2">Name</label>
-                    <input
-                        v-model="holidayForm.name"
-                        type="text"
-                        required
-                        placeholder="e.g., Independence Day"
-                        class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                    />
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-brand-dark mb-2">Type</label>
-                    <select v-model="holidayForm.type" required class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary">
-                        <option value="national_holiday">National Holiday</option>
-                        <option value="collective_leave">Collective Leave (Cuti Bersama)</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-sm font-semibold text-brand-dark mb-2">Applies To</label>
-                    <input
-                        v-model="holidayAppliesToInput"
-                        type="text"
-                        placeholder="Optional, comma separated"
-                        class="w-full rounded-lg border border-brand-border px-4 py-2 text-brand-dark outline-none focus:border-brand-primary"
-                    />
-                    <p class="mt-1 text-xs text-gray-500">Leave blank to apply company-wide.</p>
-                </div>
+                <Input
+                    v-model="holidayForm.date"
+                    label="Date"
+                    type="date"
+                    required
+                />
+                <Input
+                    v-model="holidayForm.name"
+                    label="Name"
+                    type="text"
+                    required
+                    placeholder="e.g., Independence Day"
+                />
+                <Select
+                    v-model="holidayForm.type"
+                    label="Type"
+                    required
+                    :options="[
+                        { value: 'national_holiday', label: 'National Holiday' },
+                        { value: 'collective_leave', label: 'Collective Leave (Cuti Bersama)' },
+                    ]"
+                />
+                <Input
+                    v-model="holidayAppliesToInput"
+                    label="Applies To"
+                    type="text"
+                    placeholder="Optional, comma separated"
+                />
+                <p class="mt-1 text-xs text-gray-500">Leave blank to apply company-wide.</p>
 
                 <div class="flex gap-3 pt-2">
                     <button
@@ -595,6 +572,8 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import Input from "@/components/common/form/Input.vue";
+import Select from "@/components/common/form/Select.vue";
 import { useHolidayCalendarStore } from "@/stores/holidayCalendar";
 import { useAttendancePolicyStore } from "@/stores/attendancePolicy";
 import { useLeaveEntitlementStore } from "@/stores/leaveEntitlement";
