@@ -671,7 +671,14 @@ const submitPolicyForm = async () => {
 
     isSubmittingPolicy.value = true;
     try {
-        await policyStore.updatePolicy(selectedPolicy.value.id, policyForm.value);
+        const payload = {
+            ...policyForm.value,
+            work_days_per_week: Number(policyForm.value.work_days_per_week),
+            late_grace_minutes: Number(policyForm.value.late_grace_minutes),
+            half_day_min_hours: Number(policyForm.value.half_day_min_hours),
+            warning_absent_pct: Number(policyForm.value.warning_absent_pct),
+        };
+        await policyStore.updatePolicy(selectedPolicy.value.id, payload);
         toast.success("Policy updated", "Attendance policy has been updated successfully.");
         closePolicyModal();
     } catch (error) {
@@ -716,6 +723,9 @@ const submitEntitlementForm = async () => {
     try {
         await entitlementStore.updateEntitlement(selectedEntitlement.value.id, {
             ...entitlementForm.value,
+            quota_days: Number(entitlementForm.value.quota_days),
+            carry_over_max_days: Number(entitlementForm.value.carry_over_max_days),
+            max_attachment_size_kb: Number(entitlementForm.value.max_attachment_size_kb),
             allowed_mime_types: commaSeparatedToArray(allowedMimeTypesInput.value),
         });
         toast.success("Entitlement updated", "Leave entitlement rules have been updated successfully.");
