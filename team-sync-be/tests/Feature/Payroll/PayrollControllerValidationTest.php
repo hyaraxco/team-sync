@@ -289,4 +289,37 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['months']);
     }
+
+    public function test_update_detail_rejects_negative_final_salary(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->putJson('/api/v1/payroll-details/1', [
+            'final_salary' => -1,
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['final_salary']);
+    }
+
+    public function test_update_detail_rejects_float_final_salary(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->putJson('/api/v1/payroll-details/1', [
+            'final_salary' => 9200000.50,
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['final_salary']);
+    }
+
+    public function test_update_detail_rejects_non_integer_final_salary(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->putJson('/api/v1/payroll-details/1', [
+            'final_salary' => '10juta',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['final_salary']);
+    }
 }

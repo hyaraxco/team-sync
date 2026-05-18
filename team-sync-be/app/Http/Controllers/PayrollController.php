@@ -18,6 +18,7 @@ use App\Http\Requests\Payroll\PayrollListRequest;
 use App\Http\Requests\Payroll\PayrollMarkAsPaidRequest;
 use App\Http\Requests\Payroll\PayrollReconciliationRequest;
 use App\Http\Requests\Payroll\PayrollSalaryMonthRequest;
+use App\Http\Requests\Payroll\PayrollUpdateDetailRequest;
 use App\Http\Requests\ResolveReconciliationExceptionRequest;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\PayrollActivityLogResource;
@@ -289,13 +290,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Update payroll detail (notes and final_salary)
      */
-    public function updateDetail(Request $request, string $id)
+    public function updateDetail(PayrollUpdateDetailRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'notes' => 'nullable|string',
-            'final_salary' => 'nullable|integer|min:0',
-            'updated_at' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         try {
             $payrollDetail = $this->payrollRepository->updatePayrollDetail($id, $validated, $request->user()?->id);
