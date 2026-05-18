@@ -246,11 +246,9 @@ class PayrollController extends Controller implements HasMiddleware
         }
     }
 
-    public function generate(Request $request)
+    public function generate(PayrollGenerateRequest $request)
     {
-        $validated = $request->validate([
-            'salary_month' => 'required|date_format:Y-m',
-        ]);
+        $validated = $request->validated();
 
         try {
             $month = Carbon::parse($validated['salary_month'])->startOfMonth();
