@@ -16,7 +16,7 @@
                 class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
             >
                 <AlertTriangle class="w-5 h-5 shrink-0" />
-                <p>Failed to load mismatches. The API endpoint might be missing or under construction.</p>
+                <p>Unable to load policy mismatches. Please try again later.</p>
             </div>
 
             <!-- Loading State -->
