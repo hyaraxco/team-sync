@@ -11,6 +11,7 @@ use App\Exports\PayrollExport;
 use App\Exports\PayrollReportExport;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\Payroll\PayrollDetailsRequest;
+use App\Http\Requests\Payroll\PayrollGenerateReadinessRequest;
 use App\Http\Requests\Payroll\PayrollGenerateRequest;
 use App\Http\Requests\Payroll\PayrollListRequest;
 use App\Http\Requests\Payroll\PayrollReconciliationRequest;
@@ -201,11 +202,9 @@ class PayrollController extends Controller implements HasMiddleware
         }
     }
 
-    public function generateReadiness(Request $request)
+    public function generateReadiness(PayrollGenerateReadinessRequest $request)
     {
-        $validated = $request->validate([
-            'salary_month' => 'required|date_format:Y-m|before_or_equal:'.now()->format('Y-m'),
-        ]);
+        $validated = $request->validated();
 
         try {
             $readiness = $this->payrollRepository->getGenerateReadiness($validated['salary_month']);
