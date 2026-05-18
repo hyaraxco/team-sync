@@ -11,4 +11,13 @@ describe("Input.vue", () => {
         const input = wrapper.find("input");
         expect(input.classes()).toContain("rounded-2xl");
     });
+
+    it("forwards max prop to the native input element", () => {
+        const wrapper = mount(Input, {
+            props: { label: "Work Days", type: "number", max: 7 },
+        });
+
+        const input = wrapper.find("input");
+        expect(input.attributes("max")).toBe("7");
+    });
 });
