@@ -164,7 +164,7 @@ const canCalibrate = computed(() => {
     return (
         reviewStatus.value === "pending_calibration" &&
         hasRole("hr") &&
-        currentEmployeeId.value !== review.value?.employee_id
+        currentEmployeeId.value !== review.value?.staff_member_id
     );
 });
 

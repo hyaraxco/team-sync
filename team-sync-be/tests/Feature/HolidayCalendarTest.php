@@ -43,7 +43,12 @@ class HolidayCalendarTest extends TestCase
     {
         Sanctum::actingAs($this->admin);
 
-        HolidayCalendar::factory()->count(3)->create();
+        HolidayCalendar::factory()->create([
+            'date' => '2026-01-01',
+            'name' => 'Tahun Baru',
+            'type' => 'national_holiday',
+            'applies_to' => ['all'],
+        ]);
 
         $response = $this->getJson('/api/v1/holiday-calendars');
 
@@ -54,7 +59,22 @@ class HolidayCalendarTest extends TestCase
                         '*' => ['id', 'date', 'name', 'type'],
                     ],
                 ],
-            ]);
+            ])
+            ->assertJsonPath('data.data.0.date', '2026-01-01')
+            ->assertJsonPath('data.data.0.applies_to', ['all']);
+    }
+
+    public function test_holiday_index_clamps_invalid_per_page_to_safe_default()
+    {
+        Sanctum::actingAs($this->admin);
+
+        HolidayCalendar::factory()->count(2)->create();
+
+        $response = $this->getJson('/api/v1/holiday-calendars?per_page=abc');
+
+        $response->assertSuccessful()
+            ->assertJsonPath('data.per_page', 15)
+            ->assertJsonCount(2, 'data.data');
     }
 
     public function test_forbids_normal_user_from_managing_holidays()
@@ -65,6 +85,7 @@ class HolidayCalendarTest extends TestCase
             'date' => '2026-01-01',
             'name' => 'Tahun Baru',
             'type' => 'national_holiday',
+            'applies_to' => ['all'],
         ]);
 
         $response->assertForbidden();
@@ -78,10 +99,13 @@ class HolidayCalendarTest extends TestCase
             'date' => '2026-01-01',
             'name' => 'Tahun Baru',
             'type' => 'national_holiday',
+            'applies_to' => ['all'],
         ]);
 
         $response->assertCreated()
-            ->assertJsonPath('data.name', 'Tahun Baru');
+            ->assertJsonPath('data.name', 'Tahun Baru')
+            ->assertJsonPath('data.date', '2026-01-01')
+            ->assertJsonPath('data.applies_to', ['all']);
 
         $this->assertDatabaseHas('holiday_calendars', [
             'date' => '2026-01-01 00:00:00',
@@ -114,7 +138,8 @@ class HolidayCalendarTest extends TestCase
         ]);
 
         $response->assertSuccessful()
-            ->assertJsonPath('data.name', 'New Name');
+            ->assertJsonPath('data.name', 'New Name')
+            ->assertJsonPath('data.date', '2026-01-02');
 
         $this->assertDatabaseHas('holiday_calendars', [
             'id' => $holiday->id,

@@ -198,4 +198,54 @@ describe("ReviewDetail smoke", () => {
 
         expect(routerBackMock).toHaveBeenCalled();
     });
+
+    describe("canCalibrate guard", () => {
+        it("does not show calibration action when HR user is the reviewee", async () => {
+            // HR user with employee_profile.id = 10, same as review's staff_member_id
+            authStoreMock.user = {
+                roles: [{ name: "hr" }],
+                employee_profile: { id: 10 },
+            };
+            reviewStoreRefs.currentReview.value = {
+                id: 55,
+                status: "pending_calibration",
+                staff_member_id: 10,
+                reviewer_id: 30,
+                cycle: { name: "Q2 2026", calibration_deadline: "2026-06-30" },
+                staff_member: { full_name: "Nadia Employee", email: "nadia@example.com" },
+                reviewer: { full_name: "Ardi Manager", email: "ardi@example.com" },
+                responses: [],
+            };
+
+            const wrapper = factory();
+            await flushAsync();
+
+            // Should NOT show calibration action banner (HR is the reviewee)
+            expect(wrapper.text()).not.toContain("Action Required: Calibration");
+        });
+
+        it("shows calibration action when HR user is NOT the reviewee", async () => {
+            // HR user with employee_profile.id = 99, different from review's staff_member_id = 10
+            authStoreMock.user = {
+                roles: [{ name: "hr" }],
+                employee_profile: { id: 99 },
+            };
+            reviewStoreRefs.currentReview.value = {
+                id: 55,
+                status: "pending_calibration",
+                staff_member_id: 10,
+                reviewer_id: 30,
+                cycle: { name: "Q2 2026", calibration_deadline: "2026-06-30" },
+                staff_member: { full_name: "Nadia Employee", email: "nadia@example.com" },
+                reviewer: { full_name: "Ardi Manager", email: "ardi@example.com" },
+                responses: [],
+            };
+
+            const wrapper = factory();
+            await flushAsync();
+
+            // Should show calibration action banner
+            expect(wrapper.text()).toContain("Action Required: Calibration");
+        });
+    });
 });

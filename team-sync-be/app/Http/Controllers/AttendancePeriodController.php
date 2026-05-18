@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AttendancePeriod\CreateAttendancePeriodRequest;
+use App\Http\Resources\AttendancePeriodResource;
 use App\Interfaces\AttendanceRepositoryInterface;
 use App\Models\AttendancePeriod;
 use Illuminate\Http\JsonResponse;
@@ -25,6 +26,9 @@ class AttendancePeriodController extends Controller implements HasMiddleware
     public function index(Request $request): JsonResponse
     {
         $periods = $this->repository->getAttendancePeriodsPaginated((int) $request->get('per_page', 15));
+        $periods->setCollection($periods->getCollection()->map(
+            fn (AttendancePeriod $period): array => (new AttendancePeriodResource($period))->resolve($request)
+        ));
 
         return response()->json([
             'success' => true,
@@ -51,7 +55,7 @@ class AttendancePeriodController extends Controller implements HasMiddleware
         return response()->json([
             'success' => true,
             'message' => 'Periode absensi berhasil dibuat.',
-            'data' => $period,
+            'data' => new AttendancePeriodResource($period),
         ], 201);
     }
 
@@ -88,7 +92,7 @@ class AttendancePeriodController extends Controller implements HasMiddleware
         return response()->json([
             'success' => true,
             'message' => 'Attendance period status updated successfully.',
-            'data' => $period,
+            'data' => new AttendancePeriodResource($period),
         ]);
     }
 }
