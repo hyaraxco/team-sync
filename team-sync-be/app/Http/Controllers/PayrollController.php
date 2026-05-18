@@ -17,6 +17,7 @@ use App\Http\Requests\Payroll\PayrollGenerateRequest;
 use App\Http\Requests\Payroll\PayrollListRequest;
 use App\Http\Requests\Payroll\PayrollMarkAsPaidRequest;
 use App\Http\Requests\Payroll\PayrollReconciliationRequest;
+use App\Http\Requests\Payroll\PayrollReopenRequest;
 use App\Http\Requests\Payroll\PayrollSalaryMonthRequest;
 use App\Http\Requests\Payroll\PayrollUpdateDetailRequest;
 use App\Http\Requests\ResolveReconciliationExceptionRequest;
@@ -381,11 +382,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Reopen payroll for correction
      */
-    public function reopenPayroll(Request $request, string $id)
+    public function reopenPayroll(PayrollReopenRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'reason' => 'required|string|min:10|max:500',
-        ]);
+        $validated = $request->validated();
 
         try {
             $payroll = $this->payrollRepository->reopenPayroll(
