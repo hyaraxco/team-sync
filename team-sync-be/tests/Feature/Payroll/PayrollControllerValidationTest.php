@@ -322,4 +322,46 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['final_salary']);
     }
+
+    public function test_reopen_payroll_requires_reason(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['reason']);
+    }
+
+    public function test_reopen_payroll_rejects_reason_under_10_chars(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
+            'reason' => 'short',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['reason']);
+    }
+
+    public function test_reopen_payroll_rejects_reason_over_500_chars(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
+            'reason' => str_repeat('a', 501),
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['reason']);
+
+        $this->assertDatabaseHas('payrolls', [
+            'id' => $payroll->id,
+            'status' => 'approved',
+        ]);
+    }
 }
