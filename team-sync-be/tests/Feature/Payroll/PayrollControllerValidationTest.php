@@ -135,4 +135,31 @@ class PayrollControllerValidationTest extends TestCase
 
         \Queue::assertNothingPushed();
     }
+
+    public function test_resolve_reconciliation_exception_requires_resolution_action(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->postJson('/api/v1/payrolls/1/reconciliation/resolve', [
+            'staff_member_id' => 1,
+            'exception_type' => 'missing_bank',
+            'reason' => 'verified manually',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['resolution_action']);
+    }
+
+    public function test_resolve_reconciliation_exception_rejects_invalid_action(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->postJson('/api/v1/payrolls/1/reconciliation/resolve', [
+            'staff_member_id' => 1,
+            'exception_type' => 'missing_bank',
+            'resolution_action' => 'ignore',
+            'reason' => 'verified manually',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['resolution_action']);
+    }
 }

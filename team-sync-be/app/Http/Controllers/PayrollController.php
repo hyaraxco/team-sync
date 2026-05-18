@@ -801,14 +801,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Resolve a reconciliation exception
      */
-    public function resolveReconciliationException(Request $request, string $id)
+    public function resolveReconciliationException(ResolveReconciliationExceptionRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'staff_member_id' => 'required|integer|exists:staff_member_profiles,id',
-            'exception_type' => 'required|string|max:100',
-            'resolution_action' => 'required|string|in:acknowledged,waived,resolved',
-            'reason' => 'required|string|max:500',
-        ]);
+        $validated = $request->validated();
 
         try {
             $resolution = $this->payrollRepository->resolveReconciliationException(
