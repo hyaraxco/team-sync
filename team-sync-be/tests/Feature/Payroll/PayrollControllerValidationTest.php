@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
@@ -37,6 +38,8 @@ class PayrollControllerValidationTest extends TestCase
 
         $this->finance = User::factory()->create();
         $this->finance->assignRole('Finance');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     public function test_get_all_paginated_rejects_non_integer_row_per_page(): void
