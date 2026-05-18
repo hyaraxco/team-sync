@@ -222,11 +222,9 @@ class PayrollController extends Controller implements HasMiddleware
         }
     }
 
-    public function readinessDashboard(Request $request)
+    public function readinessDashboard(PayrollSalaryMonthRequest $request)
     {
-        $validated = $request->validate([
-            'salary_month' => 'required|date_format:Y-m',
-        ]);
+        $validated = $request->validated();
 
         try {
             $payload = $this->payrollRepository->getReadinessDashboard($validated['salary_month']);
@@ -778,11 +776,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Get payroll readiness team summary
      */
-    public function readinessTeamSummary(Request $request)
+    public function readinessTeamSummary(PayrollSalaryMonthRequest $request)
     {
-        $validated = $request->validate([
-            'salary_month' => 'required|date_format:Y-m',
-        ]);
+        $validated = $request->validated();
 
         try {
             $summary = $this->payrollRepository->getReadinessTeamSummary($validated['salary_month']);

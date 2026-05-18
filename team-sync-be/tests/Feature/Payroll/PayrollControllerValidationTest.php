@@ -84,4 +84,31 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['type']);
     }
+
+    public function test_readiness_dashboard_requires_salary_month(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/readiness-dashboard')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+    }
+
+    public function test_readiness_dashboard_rejects_invalid_format(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/readiness-dashboard?salary_month=2026/04')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+    }
+
+    public function test_readiness_team_summary_requires_salary_month(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/readiness-dashboard/team-summary')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+    }
 }
