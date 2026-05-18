@@ -156,12 +156,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Get payroll details with pagination (OPTIMIZED for large datasets)
      */
-    public function getDetails(Request $request, string $id)
+    public function getDetails(PayrollDetailsRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'per_page' => 'nullable|integer|min:10|max:100',
-            'page' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         try {
             $perPage = $validated['per_page'] ?? 50;

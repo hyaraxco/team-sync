@@ -46,4 +46,23 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['row_per_page']);
     }
+
+    public function test_get_details_rejects_per_page_below_10(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $payrollId = 1; // Validation runs before route lookup; 404 only after pass
+        $this->getJson("/api/v1/payrolls/{$payrollId}/details?per_page=5")
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['per_page']);
+    }
+
+    public function test_get_details_rejects_per_page_above_100(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/1/details?per_page=200')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['per_page']);
+    }
 }
