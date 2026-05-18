@@ -111,4 +111,28 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['salary_month']);
     }
+
+    public function test_generate_requires_salary_month(): void
+    {
+        \Queue::fake();
+        Sanctum::actingAs($this->finance);
+
+        $this->postJson('/api/v1/payrolls/generate', [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+
+        \Queue::assertNothingPushed();
+    }
+
+    public function test_generate_rejects_invalid_date_format(): void
+    {
+        \Queue::fake();
+        Sanctum::actingAs($this->finance);
+
+        $this->postJson('/api/v1/payrolls/generate', ['salary_month' => '04-2026'])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+
+        \Queue::assertNothingPushed();
+    }
 }
