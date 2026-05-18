@@ -13,6 +13,10 @@ class PayrollUpdateDetailRequest extends FormRequest
 
     public function rules(): array
     {
-        return ['notes' => ['nullable', 'string'], 'final_salary' => ['nullable', 'numeric', 'min:0']];
+        return [
+            'notes' => ['nullable', 'string'],
+            'final_salary' => ['nullable', 'integer', 'min:0'],
+            'updated_at' => ['nullable', 'date'],
+        ];
     }
 }
