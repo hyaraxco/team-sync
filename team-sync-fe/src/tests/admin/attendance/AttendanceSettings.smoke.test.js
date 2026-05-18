@@ -27,13 +27,15 @@ vi.mock("@/stores/holidayCalendar", () => ({
     })),
 }));
 
+const mockUpdateEntitlement = vi.fn().mockResolvedValue({});
+
 vi.mock("@/stores/leaveEntitlement", () => ({
     useLeaveEntitlementStore: vi.fn(() => ({
         groupedEntitlements: {},
         loading: false,
         error: null,
         fetchEntitlements: vi.fn().mockResolvedValue(),
-        updateEntitlement: vi.fn().mockResolvedValue({}),
+        updateEntitlement: mockUpdateEntitlement,
     })),
 }));
 
@@ -160,5 +162,66 @@ describe("AttendanceSettings.vue — common primitives migration", () => {
 
         const inputs = wrapper.findAllComponents(Input);
         expect(inputs.length).toBeGreaterThanOrEqual(4);
+    });
+
+    it("preserves null on submit for nullable entitlement numeric fields", async () => {
+        const { useAttendancePolicyStore } = await import("@/stores/attendancePolicy");
+        const { useLeaveEntitlementStore } = await import("@/stores/leaveEntitlement");
+
+        useAttendancePolicyStore.mockReturnValue({
+            policies: [samplePolicy],
+            loading: false,
+            error: null,
+            fetchPolicies: vi.fn().mockResolvedValue(),
+            updatePolicy: vi.fn().mockResolvedValue({}),
+        });
+
+        const nullEntitlement = {
+            ...sampleEntitlement,
+            quota_days: null,
+            carry_over_max_days: null,
+            max_attachment_size_kb: null,
+        };
+
+        useLeaveEntitlementStore.mockReturnValue({
+            groupedEntitlements: {
+                annual_leave: [nullEntitlement],
+            },
+            loading: false,
+            error: null,
+            fetchEntitlements: vi.fn().mockResolvedValue(),
+            updateEntitlement: mockUpdateEntitlement,
+        });
+
+        mockUpdateEntitlement.mockClear();
+
+        wrapper = mount(AttendanceSettings, {
+            global: {
+                stubs: { ModalWrapper: false },
+            },
+        });
+
+        await flushPromises();
+
+        // Switch to Leave Entitlements tab
+        const tabs = wrapper.findAll("nav button");
+        await tabs[1].trigger("click");
+        await flushPromises();
+
+        // Open entitlement modal
+        const editBtn = wrapper.find(".policy-card button");
+        await editBtn.trigger("click");
+        await flushPromises();
+
+        // Submit without editing — call submit method directly on component
+        await wrapper.vm.submitEntitlementForm();
+        await flushPromises();
+
+        // Assert updateEntitlement was called with null, not 0
+        expect(mockUpdateEntitlement).toHaveBeenCalled();
+        const callPayload = mockUpdateEntitlement.mock.calls[0][1];
+        expect(callPayload.quota_days).toBeNull();
+        expect(callPayload.carry_over_max_days).toBeNull();
+        expect(callPayload.max_attachment_size_kb).toBeNull();
     });
 });
