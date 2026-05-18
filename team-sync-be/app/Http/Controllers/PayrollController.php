@@ -11,6 +11,7 @@ use App\Exports\PayrollExport;
 use App\Exports\PayrollReportExport;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\Payroll\PayrollAnalyticsRequest;
+use App\Http\Requests\Payroll\PayrollComparisonRequest;
 use App\Http\Requests\Payroll\PayrollDetailsRequest;
 use App\Http\Requests\Payroll\PayrollGenerateReadinessRequest;
 use App\Http\Requests\Payroll\PayrollGenerateRequest;
@@ -496,12 +497,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Get payroll month-over-month comparison
      */
-    public function getComparison(Request $request)
+    public function getComparison(PayrollComparisonRequest $request)
     {
-        $validated = $request->validate([
-            'month1' => 'required|date_format:Y-m',
-            'month2' => 'required|date_format:Y-m',
-        ]);
+        $validated = $request->validated();
 
         try {
             $comparison = $this->payrollRepository->getComparison($validated['month1'], $validated['month2']);
