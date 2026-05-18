@@ -22,5 +22,5 @@ const { displayValue } = useAnimatedNumber(numericValue, {
 </script>
 
 <template>
-    <span>{{ prefix }}{{ displayValue }}{{ suffix }}</span>
+    <span class="tabular-nums">{{ prefix }}{{ displayValue }}{{ suffix }}</span>
 </template>
