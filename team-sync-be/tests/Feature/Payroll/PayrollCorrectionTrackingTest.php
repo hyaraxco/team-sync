@@ -56,7 +56,7 @@ class PayrollCorrectionTrackingTest extends TestCase
         // Re-approve and re-pay
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-01',
+            'payment_date' => '2026-05-15',
         ])->assertOk();
 
         // Second reopen from paid should be rejected
@@ -100,7 +100,7 @@ class PayrollCorrectionTrackingTest extends TestCase
 
         // Re-pay — should trigger PayrollCorrected notification
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-05',
+            'payment_date' => '2026-05-16',
         ])->assertOk();
 
         Notification::assertSentTo(
@@ -121,7 +121,7 @@ class PayrollCorrectionTrackingTest extends TestCase
 
         // Mark as paid without any reopen (correction_count = 0)
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-01',
+            'payment_date' => '2026-05-15',
         ])->assertOk();
 
         $employeeUser = $payroll->payrollDetails->first()->staffMember->user;

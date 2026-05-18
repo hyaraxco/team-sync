@@ -60,7 +60,7 @@ class PayrollStateTransitionTest extends TestCase
         $payroll = $this->createPayrollWithDetail(status: 'pending');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])
             ->assertStatus(422)
             ->assertJsonPath('message', 'Payroll must be in "approved" status to be marked as paid. Current status: "pending".');
@@ -102,7 +102,7 @@ class PayrollStateTransitionTest extends TestCase
         $payroll = $this->createPayrollWithDetail(status: 'paid', paymentDate: '2026-05-30');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-31',
+            'payment_date' => '2026-05-16',
         ])
             ->assertStatus(409)
             ->assertJsonPath('message', 'Payroll has already been paid and cannot be modified.');
@@ -116,13 +116,13 @@ class PayrollStateTransitionTest extends TestCase
         $payroll = $this->createPayrollWithDetail(status: 'approved');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])
             ->assertOk()
             ->assertJsonPath('data.status', 'paid');
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-31',
+            'payment_date' => '2026-05-16',
         ])
             ->assertStatus(409)
             ->assertJsonPath('message', 'Payroll has already been paid and cannot be modified.');
@@ -130,7 +130,7 @@ class PayrollStateTransitionTest extends TestCase
         $freshPayroll = $payroll->fresh();
 
         $this->assertSame('paid', $freshPayroll->status->value);
-        $this->assertSame('2026-05-30', (string) optional($freshPayroll->payment_date)->format('Y-m-d'));
+        $this->assertSame('2026-05-15', (string) optional($freshPayroll->payment_date)->format('Y-m-d'));
     }
 
     public function test_finance_can_reopen_approved_payroll_for_correction(): void
