@@ -179,12 +179,9 @@ class PayrollController extends Controller implements HasMiddleware
         }
     }
 
-    public function getReconciliation(Request $request, string $id)
+    public function getReconciliation(PayrollReconciliationRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'severity' => 'nullable|string|in:critical,warning',
-            'type' => 'nullable|string|max:100',
-        ]);
+        $validated = $request->validated();
 
         try {
             $reconciliation = $this->payrollRepository->getReconciliation($id, $validated);

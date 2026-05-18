@@ -65,4 +65,23 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['per_page']);
     }
+
+    public function test_get_reconciliation_rejects_invalid_severity(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/1/reconciliation?severity=high')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['severity']);
+    }
+
+    public function test_get_reconciliation_rejects_type_exceeding_100_chars(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $longType = str_repeat('a', 101);
+        $this->getJson("/api/v1/payrolls/1/reconciliation?type={$longType}")
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['type']);
+    }
 }
