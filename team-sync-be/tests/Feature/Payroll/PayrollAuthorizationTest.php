@@ -73,7 +73,7 @@ class PayrollAuthorizationTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/approve")
             ->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/resend-notifications")
             ->assertForbidden();
@@ -123,7 +123,7 @@ class PayrollAuthorizationTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/approve")
             ->assertOk();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])->assertOk();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/resend-notifications")
             ->assertOk();
@@ -171,7 +171,7 @@ class PayrollAuthorizationTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/approve")
             ->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/resend-notifications")
             ->assertForbidden();
@@ -215,7 +215,7 @@ class PayrollAuthorizationTest extends TestCase
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/approve")
             ->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])->assertForbidden();
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/resend-notifications")
             ->assertForbidden();

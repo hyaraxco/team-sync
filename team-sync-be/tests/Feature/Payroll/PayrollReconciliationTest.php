@@ -70,7 +70,7 @@ class PayrollReconciliationTest extends TestCase
         [$payroll, , $employeeUser] = $this->createApprovedPayrollDetail(withBankInformation: false);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])
             ->assertStatus(422)
             ->assertJsonPath(
@@ -110,7 +110,7 @@ class PayrollReconciliationTest extends TestCase
         $this->assertContains('excessive_deduction', $exceptionTypes);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])
             ->assertOk()
             ->assertJsonPath('data.status', 'paid');
@@ -264,7 +264,7 @@ class PayrollReconciliationTest extends TestCase
 
         // Now mark as paid should succeed
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])
             ->assertOk()
             ->assertJsonPath('data.status', 'paid');
@@ -278,7 +278,7 @@ class PayrollReconciliationTest extends TestCase
         [$payroll] = $this->createApprovedPayrollDetail(withBankInformation: false);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-05-30',
+            'payment_date' => '2026-05-15',
         ])
             ->assertStatus(422);
 
