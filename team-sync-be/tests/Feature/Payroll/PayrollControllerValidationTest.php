@@ -364,4 +364,49 @@ class PayrollControllerValidationTest extends TestCase
             'status' => 'approved',
         ]);
     }
+
+    public function test_export_report_requires_status(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/export-report?period_type=monthly&month=2026-04')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['status']);
+    }
+
+    public function test_export_report_rejects_invalid_status(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/export-report?status=draft&period_type=monthly&month=2026-04')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['status']);
+    }
+
+    public function test_export_report_requires_month_when_period_type_monthly(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/export-report?status=paid&period_type=monthly')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['month']);
+    }
+
+    public function test_export_report_requires_year_when_period_type_yearly(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/export-report?status=paid&period_type=yearly')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['year']);
+    }
+
+    public function test_export_report_rejects_non_4_digit_year(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/export-report?status=paid&period_type=yearly&year=26')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['year']);
+    }
 }
