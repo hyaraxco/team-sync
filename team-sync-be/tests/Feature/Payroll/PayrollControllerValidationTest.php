@@ -162,4 +162,45 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['resolution_action']);
     }
+
+    public function test_generate_readiness_requires_salary_month(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/generate-readiness')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+    }
+
+    public function test_generate_readiness_rejects_invalid_format(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls/generate-readiness?salary_month=2026-1')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+    }
+
+    public function test_generate_readiness_rejects_future_month(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $futureMonth = now()->addMonths(2)->format('Y-m');
+        $this->getJson("/api/v1/payrolls/generate-readiness?salary_month={$futureMonth}")
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['salary_month']);
+    }
+
+    public function test_generate_readiness_accepts_current_month(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $currentMonth = now()->format('Y-m');
+        // Validation must pass (closure uses `>`, not `>=`).
+        // Endpoint may still 422 on domain logic — assert validation field NOT in errors.
+        $response = $this->getJson("/api/v1/payrolls/generate-readiness?salary_month={$currentMonth}");
+
+        // Validation passed if we didn't get a validation error for salary_month
+        $response->assertJsonMissingValidationErrors(['salary_month']);
+    }
 }
