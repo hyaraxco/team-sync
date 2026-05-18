@@ -8,6 +8,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
@@ -28,6 +29,8 @@ class PayrollComparisonTest extends TestCase
 
         $this->finance = User::factory()->create();
         $this->finance->assignRole('Finance');
+
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
     public function test_comparison_returns_valid_structure_for_two_months(): void
