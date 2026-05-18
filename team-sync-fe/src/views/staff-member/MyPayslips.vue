@@ -158,7 +158,7 @@ const clearSearch = () => {
                     </div>
                 </div>
                 <p class="text-brand-dark text-sm font-medium mb-2">Gross Earnings</p>
-                <p class="text-brand-dark text-xl font-extrabold">
+                <p class="text-brand-dark text-xl font-extrabold tabular-nums">
                     {{ formatCurrency(totalEarnings) }}
                 </p>
                 <p class="text-success text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
@@ -173,7 +173,7 @@ const clearSearch = () => {
                     </div>
                 </div>
                 <p class="text-brand-dark text-sm font-medium mb-2">Total Deductions</p>
-                <p class="text-brand-dark text-xl font-extrabold">
+                <p class="text-brand-dark text-xl font-extrabold tabular-nums">
                     {{ formatCurrency(totalDeductions) }}
                 </p>
                 <p class="text-danger text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
@@ -188,7 +188,7 @@ const clearSearch = () => {
                     </div>
                 </div>
                 <p class="text-brand-dark text-sm font-medium mb-2">Average Net Salary</p>
-                <p class="text-brand-dark text-xl font-extrabold">
+                <p class="text-brand-dark text-xl font-extrabold tabular-nums">
                     {{ formatCurrency(averageNetSalary) }}
                 </p>
                 <p class="text-brand-light text-sm font-medium mt-1">Across loaded periods</p>
