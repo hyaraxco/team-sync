@@ -164,6 +164,18 @@
 
 **Acceptance:** No broad churn; common form primitives match design-system tokens; touched inline forms have explicit error semantics.
 
+**Implementation status (2026-05-18):**
+- ✅ `Input.vue` radius: `rounded-xl` → `rounded-2xl` (SHA `4ed1ee7`)
+- ✅ `Input.vue` added `max` prop for native forwarding (SHA `6d66158`)
+- ✅ `TextArea.vue` inline color styles → Tailwind tokens (`text-gray-600`, `bg-white`, `text-red-600`, `text-sm`, `font-semibold`, `font-normal`) (SHA `7ac8e7f`)
+- ✅ `AnimatedValue.vue` added `tabular-nums` class (SHA `abede64`)
+- ✅ Financial views (`MyPayslips.vue`, `PayslipDetail.vue`, `ThrManagement.vue`) — `tabular-nums` on all currency/number displays (SHA `8d5e77b`)
+- ✅ `PolicyMismatches.vue` dev copy → user-friendly error message (SHA `a0bf53b`)
+- ✅ `AttendanceSettings.vue` migrated 13 inputs + 2 selects across 3 modals to common Input/Select primitives. Time inputs kept native (picker chrome). Checkboxes deferred. Numeric coercion added at submit time. (SHA `e948a17`, `0ca1270`)
+- ⏭️ Step 8 (manual visual check) skipped — non-interactive worker
+- Tests: 139 files, 1025 tests, 0 failures. Build passes.
+- Branch: `chore/accessibility-micro-pass`
+
 ### Task 6: Staff Member ID Terminology Audit
 
 **Files:**
