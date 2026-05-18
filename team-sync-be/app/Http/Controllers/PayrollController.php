@@ -16,6 +16,7 @@ use App\Http\Requests\Payroll\PayrollDetailsRequest;
 use App\Http\Requests\Payroll\PayrollExportReportRequest;
 use App\Http\Requests\Payroll\PayrollGenerateReadinessRequest;
 use App\Http\Requests\Payroll\PayrollGenerateRequest;
+use App\Http\Requests\Payroll\PayrollIndexRequest;
 use App\Http\Requests\Payroll\PayrollListRequest;
 use App\Http\Requests\Payroll\PayrollMarkAsPaidRequest;
 use App\Http\Requests\Payroll\PayrollReconciliationRequest;
@@ -104,12 +105,13 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index(PayrollIndexRequest $request)
     {
         try {
+            $validated = $request->validated();
             $payrolls = $this->payrollRepository->getAll(
-                $request->search,
-                $request->limit,
+                $validated['search'] ?? null,
+                $validated['limit'] ?? null,
                 true
             );
 
