@@ -723,9 +723,19 @@ const submitEntitlementForm = async () => {
     try {
         await entitlementStore.updateEntitlement(selectedEntitlement.value.id, {
             ...entitlementForm.value,
-            quota_days: Number(entitlementForm.value.quota_days),
-            carry_over_max_days: Number(entitlementForm.value.carry_over_max_days),
-            max_attachment_size_kb: Number(entitlementForm.value.max_attachment_size_kb),
+            quota_days:
+                entitlementForm.value.quota_days === null || entitlementForm.value.quota_days === ""
+                    ? null
+                    : Number(entitlementForm.value.quota_days),
+            carry_over_max_days:
+                entitlementForm.value.carry_over_max_days === null || entitlementForm.value.carry_over_max_days === ""
+                    ? null
+                    : Number(entitlementForm.value.carry_over_max_days),
+            max_attachment_size_kb:
+                entitlementForm.value.max_attachment_size_kb === null ||
+                entitlementForm.value.max_attachment_size_kb === ""
+                    ? null
+                    : Number(entitlementForm.value.max_attachment_size_kb),
             allowed_mime_types: commaSeparatedToArray(allowedMimeTypesInput.value),
         });
         toast.success("Entitlement updated", "Leave entitlement rules have been updated successfully.");
