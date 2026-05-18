@@ -253,19 +253,19 @@ const getAdjustmentStatusClass = (status) => {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Payroll Period</p>
-                        <p class="text-lg font-bold text-brand-dark">
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatPeriod(payslip.period) }}
                         </p>
                     </div>
                     <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Payment Date</p>
-                        <p class="text-lg font-bold text-brand-dark">
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatDate(payslip.payment_date || payslip.created_at) }}
                         </p>
                     </div>
                     <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Take Home Pay</p>
-                        <p class="text-lg font-bold text-brand-dark">
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatCurrency(payslip.net_salary) }}
                         </p>
                     </div>
@@ -341,25 +341,25 @@ const getAdjustmentStatusClass = (status) => {
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
                                 <span class="text-sm text-green-700">Basic Salary</span>
-                                <span class="font-semibold text-green-900">
+                                <span class="font-semibold text-green-900 tabular-nums">
                                     {{ formatCurrency(payslip.basic_salary) }}
                                 </span>
                             </div>
                             <div v-if="payslip.allowances > 0" class="flex items-center justify-between">
                                 <span class="text-sm text-green-700">Allowances</span>
-                                <span class="font-semibold text-green-900">
+                                <span class="font-semibold text-green-900 tabular-nums">
                                     {{ formatCurrency(payslip.allowances) }}
                                 </span>
                             </div>
                             <div v-if="payslip.bonus > 0" class="flex items-center justify-between">
                                 <span class="text-sm text-green-700">Bonus</span>
-                                <span class="font-semibold text-green-900">
+                                <span class="font-semibold text-green-900 tabular-nums">
                                     {{ formatCurrency(payslip.bonus) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between pt-3 border-t-2 border-green-200">
                                 <span class="text-sm font-bold text-green-900">Gross Salary</span>
-                                <span class="text-lg font-extrabold text-green-900">
+                                <span class="text-lg font-extrabold text-green-900 tabular-nums">
                                     {{ formatCurrency(payslip.gross_salary) }}
                                 </span>
                             </div>
@@ -374,25 +374,25 @@ const getAdjustmentStatusClass = (status) => {
                         <div class="space-y-3">
                             <div v-if="payslip.tax > 0" class="flex items-center justify-between">
                                 <span class="text-sm text-red-700">Tax</span>
-                                <span class="font-semibold text-red-900">
+                                <span class="font-semibold text-red-900 tabular-nums">
                                     {{ formatCurrency(payslip.tax) }}
                                 </span>
                             </div>
                             <div v-if="payslip.insurance > 0" class="flex items-center justify-between">
                                 <span class="text-sm text-red-700">Insurance</span>
-                                <span class="font-semibold text-red-900">
+                                <span class="font-semibold text-red-900 tabular-nums">
                                     {{ formatCurrency(payslip.insurance) }}
                                 </span>
                             </div>
                             <div v-if="payslip.other_deductions > 0" class="flex items-center justify-between">
                                 <span class="text-sm text-red-700">Other Deductions</span>
-                                <span class="font-semibold text-red-900">
+                                <span class="font-semibold text-red-900 tabular-nums">
                                     {{ formatCurrency(payslip.other_deductions) }}
                                 </span>
                             </div>
                             <div class="flex items-center justify-between pt-3 border-t-2 border-red-200">
                                 <span class="text-sm font-bold text-red-900">Total Deductions</span>
-                                <span class="text-lg font-extrabold text-red-900">
+                                <span class="text-lg font-extrabold text-red-900 tabular-nums">
                                     {{ formatCurrency(payslip.total_deductions) }}
                                 </span>
                             </div>
@@ -491,7 +491,7 @@ const getAdjustmentStatusClass = (status) => {
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-white/80 text-sm font-medium mb-2">NET SALARY (TAKE HOME)</p>
-                            <p class="text-4xl font-extrabold">
+                            <p class="text-4xl font-extrabold tabular-nums">
                                 {{ formatCurrency(payslip.net_salary) }}
                             </p>
                         </div>
