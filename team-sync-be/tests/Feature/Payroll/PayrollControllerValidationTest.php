@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Payroll;
 
+use App\Models\Payroll;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
@@ -209,7 +210,7 @@ class PayrollControllerValidationTest extends TestCase
         Sanctum::actingAs($this->finance);
 
         // Need an approved payroll for state to matter
-        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+        $payroll = Payroll::factory()->create(['status' => 'approved']);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [])
             ->assertStatus(422)
@@ -225,7 +226,7 @@ class PayrollControllerValidationTest extends TestCase
     {
         Sanctum::actingAs($this->finance);
 
-        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+        $payroll = Payroll::factory()->create(['status' => 'approved']);
 
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
             'payment_date' => 'not-a-date',
@@ -238,7 +239,7 @@ class PayrollControllerValidationTest extends TestCase
     {
         Sanctum::actingAs($this->finance);
 
-        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+        $payroll = Payroll::factory()->create(['status' => 'approved']);
 
         $futureDate = now()->addDays(7)->format('Y-m-d');
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
