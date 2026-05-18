@@ -21,6 +21,12 @@ use App\Services\PayrollActivityLogger;
 use App\Services\PayslipPdfService;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use App\Http\Requests\Payroll\PayrollDetailsRequest;
+use App\Http\Requests\Payroll\PayrollGenerateRequest;
+use App\Http\Requests\Payroll\PayrollListRequest;
+use App\Http\Requests\Payroll\PayrollReconciliationRequest;
+use App\Http\Requests\Payroll\PayrollSalaryMonthRequest;
+use App\Http\Requests\ResolveReconciliationExceptionRequest;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -111,13 +117,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Get all payrolls with pagination
      */
-    public function getAllPaginated(Request $request)
+    public function getAllPaginated(PayrollListRequest $request)
     {
-        $validated = $request->validate([
-            'search' => 'nullable|string',
-            'row_per_page' => 'nullable|integer',
-            'page' => 'nullable|integer',
-        ]);
+        $validated = $request->validated();
 
         try {
             $payrolls = $this->payrollRepository->getAllPaginated(
