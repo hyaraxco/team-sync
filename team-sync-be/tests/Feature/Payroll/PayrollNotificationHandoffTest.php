@@ -227,7 +227,7 @@ class PayrollNotificationHandoffTest extends TestCase
         $payroll = Payroll::create([
             'salary_month' => '2026-06-01',
             'status' => 'paid',
-            'payment_date' => '2026-06-30',
+            'payment_date' => '2026-05-15',
         ]);
 
         $detail = PayrollDetail::create([

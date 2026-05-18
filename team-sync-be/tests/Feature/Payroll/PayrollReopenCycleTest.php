@@ -69,14 +69,14 @@ class PayrollReopenCycleTest extends TestCase
 
         // Step 3: Mark as paid
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-01',
+            'payment_date' => '2026-05-15',
         ])
             ->assertOk()
             ->assertJsonPath('data.status', 'paid');
 
         $freshPayroll = $payroll->fresh();
         $this->assertSame('paid', $freshPayroll->status->value);
-        $this->assertSame('2026-06-01', optional($freshPayroll->payment_date)->format('Y-m-d'));
+        $this->assertSame('2026-05-15', optional($freshPayroll->payment_date)->format('Y-m-d'));
 
         // Verify audit trail has all events in correct order
         $events = PayrollActivityLog::where('payroll_id', $payroll->id)

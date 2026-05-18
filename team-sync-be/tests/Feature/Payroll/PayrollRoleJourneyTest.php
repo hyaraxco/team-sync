@@ -113,7 +113,7 @@ class PayrollRoleJourneyTest extends TestCase
 
         $this
             ->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-                'payment_date' => now()->endOfMonth()->toDateString(),
+                'payment_date' => now()->toDateString(),
             ])
             ->assertOk();
 
