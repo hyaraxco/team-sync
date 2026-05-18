@@ -16,7 +16,7 @@ class PayrollUpdateDetailRequest extends FormRequest
         return [
             'notes' => ['nullable', 'string'],
             'final_salary' => ['nullable', 'integer', 'min:0'],
-            'updated_at' => ['nullable', 'date'],
+            'updated_at' => ['nullable', 'string'],
         ];
     }
 }
