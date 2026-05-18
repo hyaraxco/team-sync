@@ -13,6 +13,7 @@ use App\Helpers\ResponseHelper;
 use App\Http\Requests\Payroll\PayrollAnalyticsRequest;
 use App\Http\Requests\Payroll\PayrollComparisonRequest;
 use App\Http\Requests\Payroll\PayrollDetailsRequest;
+use App\Http\Requests\Payroll\PayrollExportReportRequest;
 use App\Http\Requests\Payroll\PayrollGenerateReadinessRequest;
 use App\Http\Requests\Payroll\PayrollGenerateRequest;
 use App\Http\Requests\Payroll\PayrollListRequest;
@@ -639,15 +640,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Export payroll report to Excel with filters
      */
-    public function exportReport(Request $request)
+    public function exportReport(PayrollExportReportRequest $request)
     {
-        $validated = $request->validate([
-            'status' => 'required|in:pending,paid,all',
-            'period_type' => 'required|in:monthly,yearly',
-            'report_type' => 'nullable|in:summary,detail',
-            'month' => 'required_if:period_type,monthly|nullable|date_format:Y-m',
-            'year' => 'required_if:period_type,yearly|nullable|digits:4',
-        ]);
+        $validated = $request->validated();
 
         try {
             $rows = $this->payrollRepository->getPayrollReportRows($validated);
