@@ -409,4 +409,31 @@ class PayrollControllerValidationTest extends TestCase
             ->assertStatus(422)
             ->assertJsonValidationErrors(['year']);
     }
+
+    public function test_payroll_index_rejects_non_integer_limit(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls?limit=abc')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['limit']);
+    }
+
+    public function test_payroll_index_rejects_limit_above_100(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls?limit=200')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['limit']);
+    }
+
+    public function test_payroll_index_rejects_limit_zero(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $this->getJson('/api/v1/payrolls?limit=0')
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['limit']);
+    }
 }
