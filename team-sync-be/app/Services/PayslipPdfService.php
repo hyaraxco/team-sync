@@ -80,7 +80,7 @@ class PayslipPdfService
             'companyAddress' => 'Indonesia',
             'period' => Carbon::parse($payroll->salary_month)->locale('id')->translatedFormat('F Y'),
             'employeeName' => $employee?->user?->name ?? $employee?->full_name ?? 'N/A',
-            'employeeCode' => $employee?->employee_id ?? 'N/A',
+            'employeeCode' => $employee?->code ?? 'N/A',
             'department' => $jobInformation?->team?->name ?? $jobInformation?->job_title ?? 'N/A',
             'paymentDate' => Carbon::parse($payroll->payment_date ?? $payroll->created_at)->locale('id')->translatedFormat('d F Y'),
 

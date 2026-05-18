@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\HolidayCalendar\CreateHolidayRequest;
 use App\Http\Requests\HolidayCalendar\UpdateHolidayRequest;
+use App\Http\Resources\HolidayCalendarResource;
 use App\Interfaces\HolidayCalendarRepositoryInterface;
+use App\Models\HolidayCalendar;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -26,7 +28,14 @@ class HolidayCalendarController extends Controller implements HasMiddleware
 
     public function index(Request $request): JsonResponse
     {
-        $holidays = $this->holidayCalendarRepository->getAllPaginated($request->get('per_page', 15));
+        $perPage = filter_var($request->get('per_page', 15), FILTER_VALIDATE_INT, [
+            'options' => ['default' => 15, 'min_range' => 1],
+        ]);
+
+        $holidays = $this->holidayCalendarRepository->getAllPaginated($perPage);
+        $holidays->setCollection($holidays->getCollection()->map(
+            fn (HolidayCalendar $holiday): array => (new HolidayCalendarResource($holiday))->resolve($request)
+        ));
 
         return response()->json([
             'success' => true,
@@ -41,7 +50,7 @@ class HolidayCalendarController extends Controller implements HasMiddleware
         return response()->json([
             'success' => true,
             'message' => 'Hari libur berhasil ditambahkan.',
-            'data' => $holiday,
+            'data' => new HolidayCalendarResource($holiday),
         ], 201);
     }
 
@@ -51,7 +60,7 @@ class HolidayCalendarController extends Controller implements HasMiddleware
 
         return response()->json([
             'success' => true,
-            'data' => $holiday,
+            'data' => new HolidayCalendarResource($holiday),
         ]);
     }
 
@@ -62,7 +71,7 @@ class HolidayCalendarController extends Controller implements HasMiddleware
         return response()->json([
             'success' => true,
             'message' => 'Hari libur berhasil diperbarui.',
-            'data' => $holiday,
+            'data' => new HolidayCalendarResource($holiday),
         ]);
     }
 

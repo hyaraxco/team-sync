@@ -177,7 +177,7 @@ onMounted(() => {
                             </span>
                         </div>
                         <div class="flex justify-between items-center">
-                            <span class="text-brand-light text-base">Employee ID</span>
+                            <span class="text-brand-light text-base">Staff Member ID</span>
                             <span class="text-brand-dark text-base font-medium">
                                 {{ resolvedProfile?.code || "-" }}
                             </span>

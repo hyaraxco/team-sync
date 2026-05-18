@@ -16,7 +16,7 @@ class TeamRemoveMemberRequest extends FormRequest
     public function attributes()
     {
         return [
-            'staff_member_id' => 'Employee ID',
+            'staff_member_id' => 'Staff Member ID',
         ];
     }
 }
