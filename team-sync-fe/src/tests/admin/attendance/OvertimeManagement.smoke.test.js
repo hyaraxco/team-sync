@@ -242,7 +242,7 @@ describe("OvertimeManagement.vue", () => {
         await createBtn.trigger("click");
         await nextTick();
 
-        expect(wrapper.text()).toContain("Employee ID");
+        expect(wrapper.text()).toContain("Staff Member ID");
         expect(wrapper.text()).toContain("Date");
         expect(wrapper.text()).toContain("Start Time");
         expect(wrapper.text()).toContain("End Time");

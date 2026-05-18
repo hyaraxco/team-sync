@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\HybridWorkScheduleResource;
 use App\Interfaces\HybridWorkScheduleRepositoryInterface;
+use App\Models\HybridWorkSchedule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -23,6 +25,9 @@ class HybridWorkScheduleController extends Controller implements HasMiddleware
     public function index(Request $request): JsonResponse
     {
         $schedules = $this->repository->getSchedulesPaginated((int) $request->get('per_page', 15));
+        $schedules->setCollection($schedules->getCollection()->map(
+            fn (HybridWorkSchedule $schedule): array => (new HybridWorkScheduleResource($schedule))->resolve($request)
+        ));
 
         return response()->json([
             'success' => true,
@@ -42,7 +47,7 @@ class HybridWorkScheduleController extends Controller implements HasMiddleware
 
         return response()->json([
             'success' => true,
-            'data' => $schedule,
+            'data' => $schedule ? new HybridWorkScheduleResource($schedule) : null,
         ]);
     }
 

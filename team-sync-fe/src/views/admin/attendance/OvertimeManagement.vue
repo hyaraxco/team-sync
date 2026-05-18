@@ -405,7 +405,7 @@ const submitCreate = async () => {
         <ModalWrapper :show="showCreateModal" @close="showCreateModal = false" title="Record Overtime">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Employee ID</label>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Staff Member ID</label>
                     <input
                         v-model="createForm.staff_member_id"
                         type="number"

@@ -106,7 +106,7 @@ class SeedEmployeeIdentityAndGeneratePayrollCommand extends Command
 
         // Display table
         $this->table(
-            ['Employee ID', 'PTKP', 'NPWP', 'BPJS-TK', 'BPJS-Kes'],
+            ['Staff Member ID', 'PTKP', 'NPWP', 'BPJS-TK', 'BPJS-Kes'],
             collect($rows)->map(fn ($r) => [
                 $r['id'], $r['ptkp'], $r['npwp'], $r['bpjs_tk'], $r['bpjs_kes'],
             ])->toArray()

@@ -47,7 +47,10 @@ class HybridWorkScheduleTest extends TestCase
     {
         Sanctum::actingAs($this->admin);
 
-        HybridWorkSchedule::factory()->count(2)->create();
+        HybridWorkSchedule::factory()->create([
+            'effective_from' => '2026-01-01',
+            'effective_until' => '2026-06-30',
+        ]);
 
         $response = $this->getJson('/api/v1/hybrid-schedules');
 
@@ -58,7 +61,9 @@ class HybridWorkScheduleTest extends TestCase
                         '*' => ['id', 'staff_member_id', 'effective_from', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday'],
                     ],
                 ],
-            ]);
+            ])
+            ->assertJsonPath('data.data.0.effective_from', '2026-01-01')
+            ->assertJsonPath('data.data.0.effective_until', '2026-06-30');
     }
 
     public function test_employee_can_fetch_their_own_schedule()
@@ -74,7 +79,8 @@ class HybridWorkScheduleTest extends TestCase
 
         $response->assertSuccessful()
             ->assertJsonPath('data.id', $schedule->id)
-            ->assertJsonPath('data.staff_member_id', $this->employeeProfile->id);
+            ->assertJsonPath('data.staff_member_id', $this->employeeProfile->id)
+            ->assertJsonPath('data.effective_from', '2026-01-01');
     }
 
     public function test_can_request_schedule_override()

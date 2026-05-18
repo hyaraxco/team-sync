@@ -32,7 +32,7 @@ class OvertimeRecordResource extends JsonResource
                 return [
                     'id' => $this->staffMember->id,
                     'full_name' => $this->staffMember->full_name,
-                    'employee_id' => $this->staffMember->employee_id,
+                    'code' => $this->staffMember->code,
                     'user' => $this->staffMember->relationLoaded('user') ? [
                         'id' => $this->staffMember->user?->id,
                         'name' => $this->staffMember->user?->name,
