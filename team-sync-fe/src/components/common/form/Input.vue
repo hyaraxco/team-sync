@@ -23,6 +23,7 @@
                 :aria-invalid="error ? 'true' : undefined"
                 :aria-describedby="error ? errorId : undefined"
                 :min="min"
+                :max="max"
                 :step="step"
                 :autocomplete="autocomplete"
                 class="peer w-full h-full bg-white text-gray-950 border text-sm rounded-2xl outline-none transition-all duration-200 placeholder:text-gray-600 placeholder:font-normal font-medium"
@@ -76,6 +77,7 @@ const props = defineProps({
     modelValue: { type: [String, Number], default: "" },
     error: { type: String, default: "" },
     min: { type: [String, Number], default: undefined },
+    max: { type: [String, Number], default: undefined },
     step: { type: [String, Number], default: undefined },
     autocomplete: { type: String, default: undefined },
 });
