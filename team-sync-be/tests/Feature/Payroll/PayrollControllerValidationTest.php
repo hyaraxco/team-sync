@@ -203,4 +203,53 @@ class PayrollControllerValidationTest extends TestCase
         // Validation passed if we didn't get a validation error for salary_month
         $response->assertJsonMissingValidationErrors(['salary_month']);
     }
+
+    public function test_mark_as_paid_requires_payment_date(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        // Need an approved payroll for state to matter
+        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['payment_date']);
+
+        $this->assertDatabaseHas('payrolls', [
+            'id' => $payroll->id,
+            'status' => 'approved',
+        ]);
+    }
+
+    public function test_mark_as_paid_rejects_invalid_date(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
+            'payment_date' => 'not-a-date',
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['payment_date']);
+    }
+
+    public function test_mark_as_paid_rejects_future_payment_date(): void
+    {
+        Sanctum::actingAs($this->finance);
+
+        $payroll = \App\Models\Payroll::factory()->create(['status' => 'approved']);
+
+        $futureDate = now()->addDays(7)->format('Y-m-d');
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
+            'payment_date' => $futureDate,
+        ])
+            ->assertStatus(422)
+            ->assertJsonValidationErrors(['payment_date']);
+
+        $this->assertDatabaseHas('payrolls', [
+            'id' => $payroll->id,
+            'status' => 'approved',
+        ]);
+    }
 }

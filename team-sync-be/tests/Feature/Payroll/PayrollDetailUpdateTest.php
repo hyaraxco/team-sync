@@ -149,7 +149,7 @@ class PayrollDetailUpdateTest extends TestCase
 
         // Mark paid
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
-            'payment_date' => '2026-06-01',
+            'payment_date' => '2026-05-15',
         ])->assertOk();
 
         // Verify the edited salary persisted through the entire lifecycle

@@ -14,6 +14,7 @@ use App\Http\Requests\Payroll\PayrollDetailsRequest;
 use App\Http\Requests\Payroll\PayrollGenerateReadinessRequest;
 use App\Http\Requests\Payroll\PayrollGenerateRequest;
 use App\Http\Requests\Payroll\PayrollListRequest;
+use App\Http\Requests\Payroll\PayrollMarkAsPaidRequest;
 use App\Http\Requests\Payroll\PayrollReconciliationRequest;
 use App\Http\Requests\Payroll\PayrollSalaryMonthRequest;
 use App\Http\Requests\ResolveReconciliationExceptionRequest;
@@ -352,11 +353,9 @@ class PayrollController extends Controller implements HasMiddleware
     /**
      * Mark payroll as paid
      */
-    public function markAsPaid(Request $request, string $id)
+    public function markAsPaid(PayrollMarkAsPaidRequest $request, string $id)
     {
-        $validated = $request->validate([
-            'payment_date' => 'required|date',
-        ]);
+        $validated = $request->validated();
 
         try {
             $payroll = $this->payrollRepository->markAsPaid($id, $validated['payment_date'], $request->user()?->id);
