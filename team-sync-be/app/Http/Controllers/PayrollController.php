@@ -31,6 +31,7 @@ use App\Http\Resources\PayrollResource;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Payroll;
+use App\Services\Payroll\PayrollAnalyticsService;
 use App\Services\PayrollActivityLogger;
 use App\Services\PayslipPdfService;
 use Carbon\Carbon;
@@ -78,7 +79,8 @@ class PayrollController extends Controller implements HasMiddleware
     public function __construct(
         PayrollRepositoryInterface $payrollRepository,
         PayrollActivityLogger $activityLogger,
-        private readonly PayslipPdfService $payslipPdfService
+        private readonly PayslipPdfService $payslipPdfService,
+        private readonly PayrollAnalyticsService $analyticsService,
     ) {
         $this->payrollRepository = $payrollRepository;
         $this->activityLogger = $activityLogger;
@@ -487,7 +489,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $analytics = $this->payrollRepository->getAnalytics((int) ($validated['months'] ?? 6));
+            $analytics = $this->analyticsService->getAnalytics((int) ($validated['months'] ?? 6));
 
             return ResponseHelper::jsonResponse(true, 'Payroll Analytics Retrieved Successfully', $analytics, 200);
         } catch (\Throwable $e) {
@@ -505,7 +507,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $comparison = $this->payrollRepository->getComparison($validated['month1'], $validated['month2']);
+            $comparison = $this->analyticsService->getComparison($validated['month1'], $validated['month2']);
 
             return ResponseHelper::jsonResponse(true, 'Payroll Comparison Retrieved Successfully', $comparison, 200);
         } catch (\Throwable $e) {
