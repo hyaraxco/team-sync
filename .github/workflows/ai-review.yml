@@ -1,0 +1,147 @@
+name: AI Code Review
+
+on:
+  pull_request:
+    types: [opened, synchronize, ready_for_review]
+
+concurrency:
+  group: ai-review-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    if: github.event.pull_request.draft == false
+
+    permissions:
+      pull-requests: write
+      contents: read
+
+    steps:
+      - name: Fetch PR diff
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+        run: |
+          gh api "repos/$REPO/pulls/$PR_NUMBER/files" \
+            --jq '[.[] | "--- \(.filename)\n+++ \(.filename)\n\(.patch // "(binary)")"] | join("\n\n")' \
+            > /tmp/pr_diff.txt 2>/dev/null || echo "" > /tmp/pr_diff.txt
+
+      - name: Write review script
+        run: |
+          cat > /tmp/enowx_review.py << 'SCRIPT'
+import os, json, urllib.request, sys
+
+diff = open("/tmp/pr_diff.txt").read().strip()
+if not diff:
+    open("/tmp/review_output.txt", "w").write("No diff found.")
+    sys.exit(0)
+
+if len(diff) > 12000:
+    diff = diff[:12000] + "\n\n... (diff truncated)"
+
+pr_title = os.environ.get("PR_TITLE", "")
+pr_body = os.environ.get("PR_BODY", "No description provided")
+base = os.environ.get("BASE_BRANCH", "main")
+head = os.environ.get("HEAD_BRANCH", "")
+api_url = os.environ.get("ENOWX_API_URL", "https://enowxai.hyarax.works/v1")
+api_key = os.environ.get("ENOWX_API_KEY", "")
+
+prompt = (
+    "You are a senior code reviewer for Team Sync, a Laravel 12 + Vue 3 HRIS application.\n\n"
+    "Project rules (non-negotiable):\n"
+    "- Backend: Controller -> Service -> Repository -> Interface layering\n"
+    "- FormRequest for all validation, JsonResource for all API responses\n"
+    "- No business logic in controllers, no Eloquent in controllers\n"
+    "- State machine guards must never be bypassed (payroll reconciliation gate, attendance period locks)\n"
+    "- Frontend: Composition API only, Pinia for all API calls, no Axios in components\n\n"
+    f"PR: {pr_title}\n"
+    f"Base: {base} -> {head}\n\n"
+    f"PR Description:\n{pr_body}\n\n"
+    f"Diff:\n{diff}\n\n"
+    "Review this PR. For each issue found, state:\n"
+    "- Severity: Critical / Important / Minor\n"
+    "- File and line (if applicable)\n"
+    "- What the issue is and how to fix it\n\n"
+    "If no issues found, say so clearly. Be concise and technical."
+)
+
+payload = json.dumps({
+    "model": "kiro/auto",
+    "messages": [{"role": "user", "content": prompt}],
+    "max_tokens": 1500,
+    "temperature": 0.2
+}).encode()
+
+req = urllib.request.Request(
+    f"{api_url}/chat/completions",
+    data=payload,
+    headers={
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json"
+    }
+)
+
+try:
+    with urllib.request.urlopen(req, timeout=60) as resp:
+        data = json.loads(resp.read())
+        review = data["choices"][0]["message"]["content"]
+except Exception as e:
+    review = f"enowX AI review failed: {e}"
+
+open("/tmp/review_output.txt", "w").write(review)
+print(f"Review generated ({len(review)} chars)")
+SCRIPT
+
+      - name: Run enowX AI review
+        env:
+          ENOWX_API_KEY: ${{ secrets.ENOWX_API_KEY }}
+          ENOWX_API_URL: ${{ vars.ENOWX_API_URL }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_BRANCH: ${{ github.event.pull_request.base.ref }}
+          HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: python3 /tmp/enowx_review.py
+
+      - name: Write comment script
+        run: |
+          cat > /tmp/post_comment.py << 'SCRIPT'
+import os, json, urllib.request
+
+review = open("/tmp/review_output.txt").read()
+short_sha = os.environ["COMMIT_SHA"][:7]
+run_url = os.environ["RUN_URL"]
+body = (
+    "## enowX AI Review\n\n"
+    + review
+    + f"\n\n---\n*Reviewed commit `{short_sha}` · [Workflow run]({run_url})*"
+)
+
+payload = json.dumps({"body": body}).encode()
+repo = os.environ["REPO"]
+pr = os.environ["PR_NUMBER"]
+token = os.environ["GH_TOKEN"]
+
+req = urllib.request.Request(
+    f"https://api.github.com/repos/{repo}/issues/{pr}/comments",
+    data=payload,
+    headers={
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+        "Accept": "application/vnd.github+json"
+    }
+)
+with urllib.request.urlopen(req) as r:
+    print("Comment posted, status:", r.status)
+SCRIPT
+
+      - name: Post review comment
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 /tmp/post_comment.py
