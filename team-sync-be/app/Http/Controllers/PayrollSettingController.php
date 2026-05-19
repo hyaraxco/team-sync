@@ -7,6 +7,7 @@ use App\Http\Resources\PayrollSettingResource;
 use App\Http\Resources\PayrollSettingVersionResource;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\PayrollSetting;
+use App\Services\Payroll\PayrollAnalyticsService;
 use App\Services\Payroll\TaxCalculationService;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -19,7 +20,8 @@ class PayrollSettingController extends Controller implements HasMiddleware
 {
     public function __construct(
         private PayrollRepositoryInterface $payrollRepository,
-        private TaxCalculationService $taxCalculationService
+        private TaxCalculationService $taxCalculationService,
+        private PayrollAnalyticsService $analyticsService,
     ) {}
 
     public static function middleware()
@@ -76,7 +78,7 @@ class PayrollSettingController extends Controller implements HasMiddleware
     public function versionDiff(int $id)
     {
         try {
-            $diff = $this->payrollRepository->getSettingVersionDiff($id);
+            $diff = $this->analyticsService->getSettingVersionDiff($id);
 
             return ResponseHelper::jsonResponse(
                 true,
