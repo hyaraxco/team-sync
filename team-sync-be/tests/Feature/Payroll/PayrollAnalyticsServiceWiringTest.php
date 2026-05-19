@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Payroll;
 
+use App\Models\PayrollSetting;
+use App\Models\PayrollSettingVersion;
 use App\Models\User;
 use App\Services\Payroll\PayrollAnalyticsService;
 use Database\Seeders\PermissionSeeder;
@@ -57,5 +59,51 @@ class PayrollAnalyticsServiceWiringTest extends TestCase
             ->assertOk()
             ->assertJsonPath('success', true)
             ->assertJsonStructure(['success', 'message', 'data' => ['month1', 'month2', 'variances']]);
+    }
+
+    public function test_version_diff_endpoint_returns_200_via_service(): void
+    {
+        $finance = User::factory()->create();
+        $finance->assignRole('finance');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        Sanctum::actingAs($finance);
+
+        $setting = PayrollSetting::current();
+
+        $v1 = PayrollSettingVersion::create([
+            'payroll_setting_id' => $setting->id,
+            'version_number' => 1,
+            'payday_day' => 25,
+            'attendance_cutoff_day' => 25,
+            'working_days_mode' => 'auto_business_days',
+            'default_working_days' => 22,
+            'absent_deduction_rate' => 1.00,
+            'rounding_mode' => 'nearest',
+            'rounding_unit' => 1000,
+            'note_template' => 'Template v1',
+            'updated_by' => $finance->id,
+            'effective_at' => now()->subDays(10),
+        ]);
+
+        $v2 = PayrollSettingVersion::create([
+            'payroll_setting_id' => $setting->id,
+            'version_number' => 2,
+            'payday_day' => 28,
+            'attendance_cutoff_day' => 25,
+            'working_days_mode' => 'auto_business_days',
+            'default_working_days' => 22,
+            'absent_deduction_rate' => 1.00,
+            'rounding_mode' => 'nearest',
+            'rounding_unit' => 1000,
+            'note_template' => 'Template v1',
+            'updated_by' => $finance->id,
+            'effective_at' => now()->subDays(5),
+        ]);
+
+        $this->getJson("/api/v1/payroll-settings/versions/{$v2->id}/diff")
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.version_id', $v2->id)
+            ->assertJsonStructure(['data' => ['version_id', 'version_number', 'changes']]);
     }
 }
