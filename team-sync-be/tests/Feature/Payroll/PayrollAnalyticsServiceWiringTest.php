@@ -37,10 +37,7 @@ class PayrollAnalyticsServiceWiringTest extends TestCase
 
     public function test_analytics_endpoint_returns_200_via_service(): void
     {
-        $finance = User::factory()->create();
-        $finance->assignRole('finance');
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-        Sanctum::actingAs($finance);
+        $this->actingAsFinance();
 
         $this->getJson('/api/v1/payrolls/analytics')
             ->assertOk()
@@ -50,10 +47,7 @@ class PayrollAnalyticsServiceWiringTest extends TestCase
 
     public function test_comparison_endpoint_returns_200_via_service(): void
     {
-        $finance = User::factory()->create();
-        $finance->assignRole('finance');
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-        Sanctum::actingAs($finance);
+        $this->actingAsFinance();
 
         $this->getJson('/api/v1/payrolls/compare?month1=2026-01&month2=2026-02')
             ->assertOk()
@@ -63,10 +57,7 @@ class PayrollAnalyticsServiceWiringTest extends TestCase
 
     public function test_version_diff_endpoint_returns_200_via_service(): void
     {
-        $finance = User::factory()->create();
-        $finance->assignRole('finance');
-        app(PermissionRegistrar::class)->forgetCachedPermissions();
-        Sanctum::actingAs($finance);
+        $finance = $this->actingAsFinance();
 
         $setting = PayrollSetting::current();
 
@@ -105,5 +96,15 @@ class PayrollAnalyticsServiceWiringTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.version_id', $v2->id)
             ->assertJsonStructure(['data' => ['version_id', 'version_number', 'changes']]);
+    }
+
+    private function actingAsFinance(): User
+    {
+        $user = User::factory()->create();
+        $user->assignRole('finance');
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        Sanctum::actingAs($user);
+
+        return $user;
     }
 }
