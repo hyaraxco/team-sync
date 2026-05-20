@@ -99,7 +99,7 @@ const fieldId = computed(() => {
 const errorId = computed(() => `${fieldId.value}-error`);
 
 const modelValue = computed({
-    get: () => props.modelValue || "",
+    get: () => props.modelValue ?? "",
     set: (value) => emit("update:modelValue", value),
 });
 </script>
