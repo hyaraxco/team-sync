@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
@@ -12,6 +11,7 @@ use App\Models\Payroll;
 use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Services\Payroll\PayrollGenerationService;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -300,7 +300,7 @@ class PayrollGenerateRulesTest extends TestCase
     {
         Log::spy();
 
-        $repository = $this->createMock(PayrollRepositoryInterface::class);
+        $repository = $this->createMock(PayrollGenerationService::class);
         $repository->expects($this->once())
             ->method('generatePayroll')
             ->with('2026-04', 777)
