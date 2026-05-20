@@ -18,18 +18,35 @@ const samplePolicy = {
     warning_absent_pct: 5.0,
 };
 
+const sampleEntitlement = {
+    id: 10,
+    leave_type: "annual_leave",
+    employment_type: "full_time",
+    is_eligible: true,
+    is_paid: true,
+    quota_scope: "annual",
+    quota_days: 12,
+    carry_over_max_days: 5,
+    requires_attachment: false,
+    requires_reason: false,
+    allowed_mime_types: [],
+    max_attachment_size_kb: null,
+};
+
+const mockUpdateEntitlement = vi.fn().mockResolvedValue({});
+
 vi.mock("@/stores/attendancePolicy", () => ({
-    useAttendancePolicyStore: () => ({
+    useAttendancePolicyStore: vi.fn(() => ({
         fetchPolicies: vi.fn().mockResolvedValue(),
-        updatePolicy: vi.fn().mockResolvedValue(),
+        updatePolicy: vi.fn().mockResolvedValue({}),
         policies: [samplePolicy],
         loading: false,
         error: null,
-    }),
+    })),
 }));
 
 vi.mock("@/stores/holidayCalendar", () => ({
-    useHolidayCalendarStore: () => ({
+    useHolidayCalendarStore: vi.fn(() => ({
         fetchAllPaginated: vi.fn().mockResolvedValue(),
         createHoliday: vi.fn(),
         updateHoliday: vi.fn(),
@@ -37,17 +54,17 @@ vi.mock("@/stores/holidayCalendar", () => ({
         meta: { current_page: 1, per_page: 10 },
         loading: false,
         error: null,
-    }),
+    })),
 }));
 
 vi.mock("@/stores/leaveEntitlement", () => ({
-    useLeaveEntitlementStore: () => ({
+    useLeaveEntitlementStore: vi.fn(() => ({
         fetchEntitlements: vi.fn().mockResolvedValue(),
-        updateEntitlement: vi.fn(),
+        updateEntitlement: mockUpdateEntitlement,
         groupedEntitlements: {},
         loading: false,
         error: null,
-    }),
+    })),
 }));
 
 vi.mock("@/composables/useToast", () => ({
@@ -94,5 +111,55 @@ describe("AttendanceSettings.vue smoke", () => {
 
         const selects = wrapper.findAllComponents(Select);
         expect(selects.length).toBeGreaterThanOrEqual(1);
+    });
+
+    it("preserves null on submit for nullable entitlement numeric fields", async () => {
+        const { useLeaveEntitlementStore } = await import("@/stores/leaveEntitlement");
+
+        const nullEntitlement = {
+            ...sampleEntitlement,
+            quota_days: null,
+            carry_over_max_days: null,
+            max_attachment_size_kb: null,
+        };
+
+        useLeaveEntitlementStore.mockReturnValue({
+            fetchEntitlements: vi.fn().mockResolvedValue(),
+            updateEntitlement: mockUpdateEntitlement,
+            groupedEntitlements: {
+                annual_leave: [nullEntitlement],
+            },
+            loading: false,
+            error: null,
+        });
+
+        mockUpdateEntitlement.mockClear();
+
+        const wrapper = mount(AttendanceSettings, {
+            global: { stubs: { ModalWrapper: false } },
+        });
+        await flushPromises();
+
+        // Switch to Leave Entitlements tab
+        const tabs = wrapper.findAll("nav button");
+        const entitlementTab = tabs.find((btn) => btn.text().includes("Leave Entitlements"));
+        await entitlementTab.trigger("click");
+        await flushPromises();
+
+        // Open entitlement modal
+        const editBtn = wrapper.find(".policy-card button");
+        await editBtn.trigger("click");
+        await flushPromises();
+
+        // Submit
+        await wrapper.vm.submitEntitlementForm();
+        await flushPromises();
+
+        // Assert updateEntitlement was called with null, not 0
+        expect(mockUpdateEntitlement).toHaveBeenCalled();
+        const callPayload = mockUpdateEntitlement.mock.calls[0][1];
+        expect(callPayload.quota_days).toBeNull();
+        expect(callPayload.carry_over_max_days).toBeNull();
+        expect(callPayload.max_attachment_size_kb).toBeNull();
     });
 });

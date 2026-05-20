@@ -371,11 +371,11 @@ function handlePageChange(page) {
                 <div class="grid grid-cols-3 gap-4">
                     <div class="text-center p-3 bg-green-50 rounded-lg">
                         <p class="text-xs text-gray-500">Eligible</p>
-                        <p class="text-xl font-bold text-green-700">{{ simulation.eligible_count }}</p>
+                        <p class="text-xl font-bold text-green-700 tabular-nums">{{ simulation.eligible_count }}</p>
                     </div>
                     <div class="text-center p-3 bg-red-50 rounded-lg">
                         <p class="text-xs text-gray-500">Ineligible</p>
-                        <p class="text-xl font-bold text-red-700">{{ simulation.ineligible_count }}</p>
+                        <p class="text-xl font-bold text-red-700 tabular-nums">{{ simulation.ineligible_count }}</p>
                     </div>
                     <div class="text-center p-3 bg-blue-50 rounded-lg">
                         <p class="text-xs text-gray-500">Total Net</p>
