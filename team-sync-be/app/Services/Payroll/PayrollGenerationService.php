@@ -3,6 +3,7 @@
 namespace App\Services\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
+use App\Models\Payroll;
 
 class PayrollGenerationService
 {
@@ -10,7 +11,7 @@ class PayrollGenerationService
         private readonly PayrollRepositoryInterface $payrollRepository,
     ) {}
 
-    public function generatePayroll(string $salaryMonth, ?int $actorId = null)
+    public function generatePayroll(string $salaryMonth, ?int $actorId = null): Payroll
     {
         return $this->payrollRepository->generatePayroll($salaryMonth, $actorId);
     }
