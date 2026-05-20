@@ -1,23 +1,21 @@
-import { describe, it, expect } from "vitest";
 import { mount } from "@vue/test-utils";
+import { describe, it, expect } from "vitest";
 import Input from "@/components/common/form/Input.vue";
 
-describe("Input.vue", () => {
-    it("uses rounded-2xl border radius on the input element", () => {
+describe("Input.vue smoke", () => {
+    it("uses rounded-2xl to match Select and TextArea", () => {
         const wrapper = mount(Input, {
-            props: { label: "Test Input" },
+            props: { label: "Test" },
         });
-
         const input = wrapper.find("input");
         expect(input.classes()).toContain("rounded-2xl");
+        expect(input.classes()).not.toContain("rounded-xl");
     });
 
-    it("forwards max prop to the native input element", () => {
+    it("forwards max prop to native input", () => {
         const wrapper = mount(Input, {
-            props: { label: "Work Days", type: "number", max: 7 },
+            props: { label: "Score", type: "number", max: 100 },
         });
-
-        const input = wrapper.find("input");
-        expect(input.attributes("max")).toBe("7");
+        expect(wrapper.find("input").attributes("max")).toBe("100");
     });
 });
