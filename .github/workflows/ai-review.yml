@@ -5,7 +5,7 @@ on:
     types: [opened, synchronize, ready_for_review]
 
 concurrency:
-  group: ai-review-${{ github.event.pull_request.number }}
+  group: enowxai-review-${{ github.event.pull_request.number }}
   cancel-in-progress: true
 
 jobs:
@@ -19,6 +19,17 @@ jobs:
       contents: read
 
     steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Read repo review rules
+        run: |
+          if [ ! -f .github/review-rules/enowxai-review.md ]; then
+            echo "Error: review rules file not found" >&2
+            exit 1
+          fi
+          cp .github/review-rules/enowxai-review.md /tmp/enowx_rules.md
+
       - name: Fetch PR diff
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -32,70 +43,103 @@ jobs:
       - name: Write review script
         run: |
           cat > /tmp/enowx_review.py << 'SCRIPT'
-import os, json, urllib.request, sys
+          import os, json, urllib.request, sys
 
-diff = open("/tmp/pr_diff.txt").read().strip()
-if not diff:
-    open("/tmp/review_output.txt", "w").write("No diff found.")
-    sys.exit(0)
+          diff = open("/tmp/pr_diff.txt").read().strip()
+          if not diff:
+              fallback = {
+                  "schema_version": 1,
+                  "overall": "approved",
+                  "summary": "No diff found — nothing to review.",
+                  "findings": [],
+                  "fallback_notes": []
+              }
+              open("/tmp/review_output.json", "w").write(json.dumps(fallback))
+              sys.exit(0)
 
-if len(diff) > 12000:
-    diff = diff[:12000] + "\n\n... (diff truncated)"
+          if len(diff) > 30000:
+              diff = diff[:30000] + "\n\n... (diff truncated)"
 
-pr_title = os.environ.get("PR_TITLE", "")
-pr_body = os.environ.get("PR_BODY", "No description provided")
-base = os.environ.get("BASE_BRANCH", "main")
-head = os.environ.get("HEAD_BRANCH", "")
-api_url = os.environ.get("ENOWX_API_URL", "https://enowxai.hyarax.works/v1")
-api_key = os.environ.get("ENOWX_API_KEY", "")
+          rules_text = open("/tmp/enowx_rules.md").read()
 
-prompt = (
-    "You are a senior code reviewer for Team Sync, a Laravel 12 + Vue 3 HRIS application.\n\n"
-    "Project rules (non-negotiable):\n"
-    "- Backend: Controller -> Service -> Repository -> Interface layering\n"
-    "- FormRequest for all validation, JsonResource for all API responses\n"
-    "- No business logic in controllers, no Eloquent in controllers\n"
-    "- State machine guards must never be bypassed (payroll reconciliation gate, attendance period locks)\n"
-    "- Frontend: Composition API only, Pinia for all API calls, no Axios in components\n\n"
-    f"PR: {pr_title}\n"
-    f"Base: {base} -> {head}\n\n"
-    f"PR Description:\n{pr_body}\n\n"
-    f"Diff:\n{diff}\n\n"
-    "Review this PR. For each issue found, state:\n"
-    "- Severity: Critical / Important / Minor\n"
-    "- File and line (if applicable)\n"
-    "- What the issue is and how to fix it\n\n"
-    "If no issues found, say so clearly. Be concise and technical."
-)
+          pr_title = os.environ.get("PR_TITLE", "")
+          pr_body = os.environ.get("PR_BODY", "No description provided")
+          base = os.environ.get("BASE_BRANCH", "main")
+          head = os.environ.get("HEAD_BRANCH", "")
+          api_url = os.environ.get("ENOWX_API_URL") or "https://enowxai.hyarax.works/v1"
+          api_key = os.environ.get("ENOWX_API_KEY", "")
 
-payload = json.dumps({
-    "model": "kiro/auto",
-    "messages": [{"role": "user", "content": prompt}],
-    "max_tokens": 1500,
-    "temperature": 0.2
-}).encode()
+          prompt = (
+              "You are enowxai, an AI code reviewer.\n\n"
+              "Follow the repository review rules exactly.\n\n"
+              f"Rules:\n{rules_text}\n\n"
+              f"PR: {pr_title}\n"
+              f"Base: {base} -> {head}\n\n"
+              f"PR Description:\n{pr_body}\n\n"
+              f"Diff:\n{diff}\n\n"
+              "Return STRICT JSON ONLY. No markdown fences. No prose outside JSON.\n"
+              "JSON contract:\n"
+              "{\n"
+              '  "schema_version": 1,\n'
+              '  "overall": "approved|commented|changes_requested",\n'
+              '  "summary": "short summary",\n'
+              '  "findings": [{"severity":"critical|important|minor","file":"path","line":1,"title":"short","body":"details"}],\n'
+              '  "fallback_notes": ["note"]\n'
+              "}\n"
+              "Cap findings at 15. Put overflow into fallback_notes."
+          )
 
-req = urllib.request.Request(
-    f"{api_url}/chat/completions",
-    data=payload,
-    headers={
-        "Authorization": f"Bearer {api_key}",
-        "Content-Type": "application/json"
-    }
-)
+          payload = json.dumps({
+              "model": "kiro/auto",
+              "messages": [{"role": "user", "content": prompt}],
+              "max_tokens": 4000,
+              "temperature": 0.2
+          }).encode()
 
-try:
-    with urllib.request.urlopen(req, timeout=60) as resp:
-        data = json.loads(resp.read())
-        review = data["choices"][0]["message"]["content"]
-except Exception as e:
-    review = f"enowX AI review failed: {e}"
+          req = urllib.request.Request(
+              f"{api_url}/chat/completions",
+              data=payload,
+              headers={
+                  "Authorization": f"Bearer {api_key}",
+                  "Content-Type": "application/json"
+              }
+          )
 
-open("/tmp/review_output.txt", "w").write(review)
-print(f"Review generated ({len(review)} chars)")
-SCRIPT
+          try:
+              with urllib.request.urlopen(req, timeout=90) as resp:
+                  data = json.loads(resp.read())
+                  review = data["choices"][0]["message"]["content"]
+          except Exception as e:
+              review = f"enowxai review request failed: {type(e).__name__}"
 
-      - name: Run enowX AI review
+          # Strip markdown fences if model wraps output
+          if review.startswith("```"):
+              lines = review.split("\n")
+              if lines[0].startswith("```"):
+                  lines = lines[1:]
+              if lines and lines[-1].strip() == "```":
+                  lines = lines[:-1]
+              review = "\n".join(lines)
+
+          try:
+              parsed = json.loads(review)
+              if parsed.get("schema_version") != 1:
+                  raise ValueError("Unsupported schema_version")
+              open("/tmp/review_output.json", "w").write(json.dumps(parsed))
+          except Exception:
+              fallback = {
+                  "schema_version": 1,
+                  "overall": "commented",
+                  "summary": "enowxai review output could not be parsed as valid JSON.",
+                  "findings": [],
+                  "fallback_notes": [review[:500]]
+              }
+              open("/tmp/review_output.json", "w").write(json.dumps(fallback))
+
+          print("Review output written to /tmp/review_output.json")
+          SCRIPT
+
+      - name: Run enowxai review
         env:
           ENOWX_API_KEY: ${{ secrets.ENOWX_API_KEY }}
           ENOWX_API_URL: ${{ vars.ENOWX_API_URL }}
@@ -105,39 +149,114 @@ SCRIPT
           HEAD_BRANCH: ${{ github.event.pull_request.head.ref }}
         run: python3 /tmp/enowx_review.py
 
-      - name: Write comment script
+      - name: Write summary comment script
         run: |
           cat > /tmp/post_comment.py << 'SCRIPT'
-import os, json, urllib.request
+          import os, json, urllib.request
 
-review = open("/tmp/review_output.txt").read()
-short_sha = os.environ["COMMIT_SHA"][:7]
-run_url = os.environ["RUN_URL"]
-body = (
-    "## enowX AI Review\n\n"
-    + review
-    + f"\n\n---\n*Reviewed commit `{short_sha}` · [Workflow run]({run_url})*"
-)
+          data = json.loads(open("/tmp/review_output.json").read())
+          short_sha = os.environ["COMMIT_SHA"][:7]
+          run_url = os.environ["RUN_URL"]
 
-payload = json.dumps({"body": body}).encode()
-repo = os.environ["REPO"]
-pr = os.environ["PR_NUMBER"]
-token = os.environ["GH_TOKEN"]
+          overall = data.get("overall", "commented")
+          summary = data.get("summary", "No summary available.")
+          findings = data.get("findings", [])
+          fallback_notes = data.get("fallback_notes", [])
 
-req = urllib.request.Request(
-    f"https://api.github.com/repos/{repo}/issues/{pr}/comments",
-    data=payload,
-    headers={
-        "Authorization": f"Bearer {token}",
-        "Content-Type": "application/json",
-        "Accept": "application/vnd.github+json"
-    }
-)
-with urllib.request.urlopen(req) as r:
-    print("Comment posted, status:", r.status)
-SCRIPT
+          # Build summary comment body
+          lines = ["<!-- enowxai-review-summary -->"]
+          lines.append("## enowxai Review\n")
+          lines.append(f"**Overall:** {overall}\n")
+          lines.append(f"{summary}\n")
 
-      - name: Post review comment
+          # Group findings by severity
+          by_severity = {}
+          for f in findings:
+              sev = f.get("severity", "minor")
+              by_severity.setdefault(sev, []).append(f)
+
+          if findings:
+              lines.append("### Findings\n")
+              for sev in ["critical", "important", "minor"]:
+                  items = by_severity.get(sev, [])
+                  if items:
+                      lines.append(f"**{sev.capitalize()}** ({len(items)})")
+                      for item in items:
+                          file_ref = item.get("file", "")
+                          line_ref = item.get("line", "")
+                          loc = f"`{file_ref}:{line_ref}`" if file_ref and line_ref else ""
+                          lines.append(f"- {item.get('title', 'Untitled')} {loc}")
+                      lines.append("")
+
+          if fallback_notes:
+              lines.append("### Unmapped / Fallback Notes\n")
+              for note in fallback_notes:
+                  lines.append(f"- {note}")
+              lines.append("")
+
+          lines.append("---")
+          lines.append(f"*Reviewed commit `{short_sha}` · [Workflow run]({run_url})*")
+
+          body = "\n".join(lines)
+
+          # Find existing summary comment or create new one
+          repo = os.environ["REPO"]
+          pr = os.environ["PR_NUMBER"]
+          token = os.environ["GH_TOKEN"]
+          marker = "<!-- enowxai-review-summary -->"
+
+          # List existing comments with pagination
+          existing_id = None
+          page = 1
+          max_pages = 10
+          while page <= max_pages:
+              list_url = f"https://api.github.com/repos/{repo}/issues/{pr}/comments?per_page=100&page={page}"
+              list_req = urllib.request.Request(list_url, headers={
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/vnd.github+json"
+              })
+              try:
+                  with urllib.request.urlopen(list_req) as r:
+                      comments = json.loads(r.read())
+                      if not comments:
+                          break
+                      for c in comments:
+                          if marker in (c.get("body") or ""):
+                              existing_id = c["id"]
+                              break
+                      if existing_id:
+                          break
+                      page += 1
+              except Exception:
+                  break
+
+          payload = json.dumps({"body": body}).encode()
+
+          if existing_id:
+              # Update existing comment
+              url = f"https://api.github.com/repos/{repo}/issues/comments/{existing_id}"
+              req = urllib.request.Request(url, data=payload, method="PATCH", headers={
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json",
+                  "Accept": "application/vnd.github+json"
+              })
+          else:
+              # Create new comment
+              url = f"https://api.github.com/repos/{repo}/issues/{pr}/comments"
+              req = urllib.request.Request(url, data=payload, headers={
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json",
+                  "Accept": "application/vnd.github+json"
+              })
+
+          try:
+              with urllib.request.urlopen(req) as r:
+                  print(f"Summary comment {'updated' if existing_id else 'created'}, status: {r.status}")
+          except Exception as e:
+              print(f"Failed to post summary comment: {e}")
+          SCRIPT
+
+      - name: Post summary comment
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PR_NUMBER: ${{ github.event.pull_request.number }}
@@ -145,3 +264,168 @@ SCRIPT
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
         run: python3 /tmp/post_comment.py
+
+      - name: Write inline comments script
+        run: |
+          cat > /tmp/post_inline_comments.py << 'SCRIPT'
+          import os, json, hashlib, urllib.request
+
+          data = json.loads(open("/tmp/review_output.json").read())
+          findings = data.get("findings", [])
+
+          if not findings:
+              print("No findings to post inline.")
+              import sys; sys.exit(0)
+
+          repo = os.environ["REPO"]
+          pr = os.environ["PR_NUMBER"]
+          token = os.environ["GH_TOKEN"]
+          commit_sha = os.environ["COMMIT_SHA"]
+
+          MAX_INLINE = 15
+          failed_inline = []
+
+          def fingerprint(file, line, severity, title=""):
+              raw = f"{file}|{line}|{severity}|{title}"
+              return hashlib.sha256(raw.encode()).hexdigest()[:16]
+
+          # Fetch existing PR review comments to check for duplicates
+          existing_fingerprints = set()
+          page = 1
+          max_pages = 10
+          while page <= max_pages:
+              url = f"https://api.github.com/repos/{repo}/pulls/{pr}/comments?per_page=100&page={page}"
+              req = urllib.request.Request(url, headers={
+                  "Authorization": f"Bearer {token}",
+                  "Accept": "application/vnd.github+json"
+              })
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      comments = json.loads(r.read())
+                      if not comments:
+                          break
+                      for c in comments:
+                          body = c.get("body", "")
+                          if "<!-- enowxai-finding:" in body:
+                              try:
+                                  start = body.index("<!-- enowxai-finding:") + len("<!-- enowxai-finding:")
+                                  end = body.index(" -->", start)
+                                  existing_fingerprints.add(body[start:end])
+                              except ValueError:
+                                  continue
+                      page += 1
+              except Exception:
+                  break
+
+          posted = 0
+          for f in findings:
+              if posted >= MAX_INLINE:
+                  break
+
+              file_path = f.get("file", "")
+              line_num = f.get("line")
+              severity = f.get("severity", "minor")
+              title = f.get("title", "")
+              body_text = f.get("body", "")
+
+              if not file_path or not line_num:
+                  continue
+
+              fp = fingerprint(file_path, line_num, severity, title)
+
+              if fp in existing_fingerprints:
+                  continue
+
+              marker = f"<!-- enowxai-finding:{fp} -->"
+              comment_body = (
+                  f"{marker}\n"
+                  f"**Severity:** {severity.capitalize()}\n\n"
+                  f"**Issue:** {title}\n\n"
+                  f"{body_text}"
+              )
+
+              payload = json.dumps({
+                  "body": comment_body,
+                  "commit_id": commit_sha,
+                  "path": file_path,
+                  "line": int(line_num),
+                  "side": "RIGHT",
+                  "subject_type": "line"
+              }).encode()
+
+              url = f"https://api.github.com/repos/{repo}/pulls/{pr}/comments"
+              req = urllib.request.Request(url, data=payload, headers={
+                  "Authorization": f"Bearer {token}",
+                  "Content-Type": "application/json",
+                  "Accept": "application/vnd.github+json"
+              })
+
+              try:
+                  with urllib.request.urlopen(req) as r:
+                      posted += 1
+                      print(f"Inline comment posted: {file_path}:{line_num} [{severity}]")
+              except Exception as e:
+                  print(f"Failed to post inline for {file_path}:{line_num}: {e}")
+                  failed_inline.append(f"{severity}: {title} (`{file_path}:{line_num}`) — inline post failed")
+
+          print(f"Posted {posted} inline comments, skipped {len(existing_fingerprints)} duplicates.")
+
+          if failed_inline:
+              try:
+                  summary_marker = "<!-- enowxai-review-summary -->"
+                  page = 1
+                  max_pages = 10
+                  summary_comment = None
+                  while page <= max_pages:
+                      list_url = f"https://api.github.com/repos/{repo}/issues/{pr}/comments?per_page=100&page={page}"
+                      list_req = urllib.request.Request(list_url, headers={
+                          "Authorization": f"Bearer {token}",
+                          "Accept": "application/vnd.github+json"
+                      })
+                      with urllib.request.urlopen(list_req) as r:
+                          comments = json.loads(r.read())
+                          if not comments:
+                              break
+                          for c in comments:
+                              if summary_marker in (c.get("body") or ""):
+                                  summary_comment = c
+                                  break
+                          if summary_comment:
+                              break
+                          page += 1
+
+                  if summary_comment:
+                      body = summary_comment.get("body") or ""
+                      insert_header = "### Unmapped / Fallback Notes"
+                      # Filter out notes that already exist in the body
+                      new_notes = [note for note in failed_inline if note not in body]
+                      if new_notes:
+                          extra_lines = [f"- {note}" for note in new_notes]
+                          if insert_header in body:
+                              body = body + "\n" + "\n".join(extra_lines)
+                          else:
+                              body = body + "\n\n### Unmapped / Fallback Notes\n\n" + "\n".join(extra_lines)
+
+                          patch_req = urllib.request.Request(
+                              f"https://api.github.com/repos/{repo}/issues/comments/{summary_comment['id']}",
+                              data=json.dumps({"body": body}).encode(),
+                              method="PATCH",
+                              headers={
+                                  "Authorization": f"Bearer {token}",
+                                  "Content-Type": "application/json",
+                                  "Accept": "application/vnd.github+json"
+                              }
+                          )
+                          with urllib.request.urlopen(patch_req) as r:
+                              print(f"Summary comment patched with {len(new_notes)} inline failures, status: {r.status}")
+              except Exception as e:
+                  print(f"Failed to patch summary comment with inline failures: {e}")
+          SCRIPT
+
+      - name: Post inline review comments
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          REPO: ${{ github.repository }}
+          COMMIT_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python3 /tmp/post_inline_comments.py
