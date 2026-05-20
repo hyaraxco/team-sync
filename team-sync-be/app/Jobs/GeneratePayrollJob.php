@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Interfaces\PayrollRepositoryInterface;
+use App\Services\Payroll\PayrollGenerationService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
@@ -35,7 +35,7 @@ class GeneratePayrollJob implements ShouldBeUnique, ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(PayrollRepositoryInterface $payrollRepository): void
+    public function handle(PayrollGenerationService $generationService): void
     {
         try {
             Log::info('Starting payroll generation', [
@@ -43,7 +43,7 @@ class GeneratePayrollJob implements ShouldBeUnique, ShouldQueue
                 'initiated_by' => $this->initiatedBy,
             ]);
 
-            $payroll = $payrollRepository->generatePayroll($this->salaryMonth, $this->initiatedBy);
+            $payroll = $generationService->generatePayroll($this->salaryMonth, $this->initiatedBy);
 
             Log::info('Payroll generation completed', [
                 'salary_month' => $this->salaryMonth,
