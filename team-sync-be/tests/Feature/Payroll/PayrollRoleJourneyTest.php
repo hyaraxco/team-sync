@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\Payroll;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Notifications\PayrollPaid;
+use App\Services\Payroll\PayrollGenerationService;
 use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -67,7 +67,7 @@ class PayrollRoleJourneyTest extends TestCase
             ->assertOk();
 
         Queue::assertPushed(GeneratePayrollJob::class, function (GeneratePayrollJob $job) use ($salaryMonth) {
-            $job->handle(app(PayrollRepositoryInterface::class));
+            $job->handle(app(PayrollGenerationService::class));
 
             return $job->salaryMonth === $salaryMonth;
         });

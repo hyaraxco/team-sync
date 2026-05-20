@@ -2,9 +2,9 @@
 
 namespace Tests\Unit\Jobs;
 
-use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Payroll;
+use App\Services\Payroll\PayrollGenerationService;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -68,39 +68,39 @@ class GeneratePayrollJobTest extends TestCase
         $this->assertNull($job->initiatedBy);
     }
 
-    public function test_handle_delegates_to_payroll_repository(): void
+    public function test_handle_delegates_to_generation_service(): void
     {
         // Create a real Payroll model in DB
         $payroll = Payroll::factory()->create([
             'salary_month' => '2026-05-01',
         ]);
 
-        $mockRepo = Mockery::mock(PayrollRepositoryInterface::class);
-        $mockRepo->shouldReceive('generatePayroll')
+        $mockService = Mockery::mock(PayrollGenerationService::class);
+        $mockService->shouldReceive('generatePayroll')
             ->once()
             ->with('2026-05', 42)
             ->andReturn($payroll);
 
         $job = new GeneratePayrollJob('2026-05', 42);
-        $job->handle($mockRepo);
+        $job->handle($mockService);
 
         $this->assertTrue(true); // If no exception, delegation worked
     }
 
-    public function test_handle_passes_salary_month_and_initiated_by_to_repository(): void
+    public function test_handle_passes_salary_month_and_initiated_by_to_service(): void
     {
         $payroll = Payroll::factory()->create([
             'salary_month' => '2026-06-01',
         ]);
 
-        $mockRepo = Mockery::mock(PayrollRepositoryInterface::class);
-        $mockRepo->shouldReceive('generatePayroll')
+        $mockService = Mockery::mock(PayrollGenerationService::class);
+        $mockService->shouldReceive('generatePayroll')
             ->once()
             ->with('2026-06', null)
             ->andReturn($payroll);
 
         $job = new GeneratePayrollJob('2026-06');
-        $job->handle($mockRepo);
+        $job->handle($mockService);
 
         // Mockery enforces shouldHaveReceived in tearDown
         $this->assertTrue(true);
@@ -108,8 +108,8 @@ class GeneratePayrollJobTest extends TestCase
 
     public function test_handle_rethrows_exception_on_failure(): void
     {
-        $mockRepo = Mockery::mock(PayrollRepositoryInterface::class);
-        $mockRepo->shouldReceive('generatePayroll')
+        $mockService = Mockery::mock(PayrollGenerationService::class);
+        $mockService->shouldReceive('generatePayroll')
             ->once()
             ->andThrow(new \RuntimeException('Database connection lost'));
 
@@ -118,7 +118,7 @@ class GeneratePayrollJobTest extends TestCase
         $this->expectException(\RuntimeException::class);
         $this->expectExceptionMessage('Database connection lost');
 
-        $job->handle($mockRepo);
+        $job->handle($mockService);
     }
 
     public function test_job_is_queued_on_default_queue(): void
