@@ -28,11 +28,12 @@ use App\Http\Resources\PaginateResource;
 use App\Http\Resources\PayrollActivityLogResource;
 use App\Http\Resources\PayrollDetailResource;
 use App\Http\Resources\PayrollResource;
-use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Payroll;
 use App\Services\Payroll\PayrollAnalyticsService;
 use App\Services\Payroll\PayrollGenerationService;
+use App\Services\Payroll\PayrollLifecycleService;
+use App\Services\Payroll\PayrollQueryService;
 use App\Services\PayrollActivityLogger;
 use App\Services\PayslipPdfService;
 use Carbon\Carbon;
@@ -73,18 +74,16 @@ use ZipArchive;
  */
 class PayrollController extends Controller implements HasMiddleware
 {
-    private PayrollRepositoryInterface $payrollRepository;
-
     private PayrollActivityLogger $activityLogger;
 
     public function __construct(
-        PayrollRepositoryInterface $payrollRepository,
+        private readonly PayrollQueryService $queryService,
         PayrollActivityLogger $activityLogger,
         private readonly PayslipPdfService $payslipPdfService,
         private readonly PayrollAnalyticsService $analyticsService,
         private readonly PayrollGenerationService $generationService,
+        private readonly PayrollLifecycleService $lifecycleService,
     ) {
-        $this->payrollRepository = $payrollRepository;
         $this->activityLogger = $activityLogger;
     }
 
@@ -113,7 +112,7 @@ class PayrollController extends Controller implements HasMiddleware
     {
         try {
             $validated = $request->validated();
-            $payrolls = $this->payrollRepository->getAll(
+            $payrolls = $this->queryService->getAll(
                 $validated['search'] ?? null,
                 $validated['limit'] ?? null,
                 true
@@ -135,7 +134,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $payrolls = $this->payrollRepository->getAllPaginated(
+            $payrolls = $this->queryService->getAllPaginated(
                 $validated['search'] ?? null,
                 $validated['row_per_page'] ?? 10
             );
@@ -154,7 +153,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function show(string $id)
     {
         try {
-            $payroll = $this->payrollRepository->getById($id);
+            $payroll = $this->queryService->getById($id);
 
             return ResponseHelper::jsonResponse(true, 'Payroll Retrieved Successfully', new PayrollResource($payroll), 200);
         } catch (ModelNotFoundException $e) {
@@ -175,7 +174,7 @@ class PayrollController extends Controller implements HasMiddleware
 
         try {
             $perPage = $validated['per_page'] ?? 50;
-            $details = $this->payrollRepository->getPayrollDetailsPaginated($id, $perPage);
+            $details = $this->queryService->getPayrollDetailsPaginated($id, $perPage);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -197,7 +196,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $reconciliation = $this->payrollRepository->getReconciliation($id, $validated);
+            $reconciliation = $this->queryService->getReconciliation($id, $validated);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -304,7 +303,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $payrollDetail = $this->payrollRepository->updatePayrollDetail($id, $validated, $request->user()?->id);
+            $payrollDetail = $this->lifecycleService->updatePayrollDetail($id, $validated, $request->user()?->id);
 
             return ResponseHelper::jsonResponse(true, 'Payroll Detail Updated Successfully', new PayrollDetailResource($payrollDetail), 200);
         } catch (ModelNotFoundException $e) {
@@ -332,7 +331,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function approvePayroll(Request $request, string $id)
     {
         try {
-            $payroll = $this->payrollRepository->approvePayroll($id, $request->user()?->id);
+            $payroll = $this->lifecycleService->approvePayroll($id, $request->user()?->id);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -365,7 +364,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $payroll = $this->payrollRepository->markAsPaid($id, $validated['payment_date'], $request->user()?->id);
+            $payroll = $this->lifecycleService->markAsPaid($id, $validated['payment_date'], $request->user()?->id);
 
             return ResponseHelper::jsonResponse(true, 'Payroll Marked as Paid Successfully', new PayrollResource($payroll), 200);
         } catch (ModelNotFoundException $e) {
@@ -395,7 +394,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $payroll = $this->payrollRepository->reopenPayroll(
+            $payroll = $this->lifecycleService->reopenPayroll(
                 $id,
                 $validated['reason'],
                 $request->user()?->id
@@ -426,7 +425,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function resendNotifications(Request $request, string $id)
     {
         try {
-            $payroll = $this->payrollRepository->resendNotifications($id, $request->user()?->id);
+            $payroll = $this->lifecycleService->resendNotifications($id, $request->user()?->id);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -450,7 +449,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function getNotificationDeliveries(string $id)
     {
         try {
-            $summary = $this->payrollRepository->getNotificationDeliverySummary($id);
+            $summary = $this->lifecycleService->getNotificationDeliverySummary($id);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -473,7 +472,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function getStatistics()
     {
         try {
-            $statistics = $this->payrollRepository->getStatistics();
+            $statistics = $this->queryService->getStatistics();
 
             return ResponseHelper::jsonResponse(true, 'Payroll Statistics Retrieved Successfully', $statistics, 200);
         } catch (\Throwable $e) {
@@ -525,7 +524,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function getPayrollStatistics(string $id)
     {
         try {
-            $statistics = $this->payrollRepository->getPayrollStatistics($id);
+            $statistics = $this->queryService->getPayrollStatistics($id);
 
             return ResponseHelper::jsonResponse(true, 'Payroll Statistics Retrieved Successfully', $statistics, 200);
         } catch (ModelNotFoundException $e) {
@@ -544,7 +543,7 @@ class PayrollController extends Controller implements HasMiddleware
     {
         try {
             // Verify payroll exists
-            $payroll = $this->payrollRepository->findById($id);
+            $payroll = $this->queryService->findById($id);
 
             $this->activityLogger->log(
                 $payroll->id,
@@ -577,7 +576,7 @@ class PayrollController extends Controller implements HasMiddleware
         $zipPath = null;
 
         try {
-            $payroll = $this->payrollRepository->findByIdWithDetails($id);
+            $payroll = $this->queryService->findByIdWithDetails($id);
 
             if ($payroll->payrollDetails->isEmpty()) {
                 return ResponseHelper::jsonResponse(false, 'Payroll Details Not Found', null, 404);
@@ -651,7 +650,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $rows = $this->payrollRepository->getPayrollReportRows($validated);
+            $rows = $this->queryService->getPayrollReportRows($validated);
             $reportType = $validated['report_type'] ?? 'summary';
             foreach ($rows->pluck('payroll_id')->filter()->unique() as $payrollId) {
                 $this->activityLogger->log(
@@ -746,7 +745,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function getActivityLogs(string $id)
     {
         try {
-            $logs = $this->payrollRepository->getActivityLogs($id);
+            $logs = $this->queryService->getActivityLogs($id);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -798,7 +797,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $resolution = $this->payrollRepository->resolveReconciliationException(
+            $resolution = $this->lifecycleService->resolveReconciliationException(
                 $id,
                 $validated,
                 $request->user()?->id
@@ -829,7 +828,7 @@ class PayrollController extends Controller implements HasMiddleware
     public function getReconciliationResolutions(string $id)
     {
         try {
-            $resolutions = $this->payrollRepository->getReconciliationResolutions($id);
+            $resolutions = $this->queryService->getReconciliationResolutions($id);
 
             return ResponseHelper::jsonResponse(
                 true,
