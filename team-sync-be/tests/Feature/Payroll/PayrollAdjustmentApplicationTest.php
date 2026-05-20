@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
@@ -12,6 +11,7 @@ use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Services\Payroll\PayrollGenerationService;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -100,7 +100,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             ->assertJsonPath('data.status', 'processing');
 
         Queue::assertPushed(GeneratePayrollJob::class, function (GeneratePayrollJob $job) {
-            $job->handle(app(PayrollRepositoryInterface::class));
+            $job->handle(app(PayrollGenerationService::class));
 
             return $job->salaryMonth === '2026-05';
         });

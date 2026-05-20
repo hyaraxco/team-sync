@@ -128,6 +128,8 @@
 
 **Acceptance:** Separate reviewed plan exists before implementation; no big-bang payroll refactor.
 
+**Progress update (2026-05-20):** PR 1/4 `PayrollAnalyticsService` merged on `main`. PR 2/4 `PayrollGenerationService` implemented on branch `chore/payroll-generation-service` and opened as PR #47. Scope: thin delegation only — new `PayrollGenerationService`, `GeneratePayrollJob` method-injection swap, and `PayrollController` wiring for `generate`, `generateReadiness`, `readinessDashboard`, `readinessTeamSummary`. `PayrollRepositoryInterface` remains unchanged. Current state: CI green, awaiting external review handling before merge.
+
 ### Task 4: Audit and Strengthen Project View Smoke Tests
 
 **Files:**

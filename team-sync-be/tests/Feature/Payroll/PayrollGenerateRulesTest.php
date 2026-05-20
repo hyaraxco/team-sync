@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Payroll;
 
-use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
@@ -12,6 +11,7 @@ use App\Models\Payroll;
 use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Services\Payroll\PayrollGenerationService;
 use Carbon\Carbon;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -300,8 +300,8 @@ class PayrollGenerateRulesTest extends TestCase
     {
         Log::spy();
 
-        $repository = $this->createMock(PayrollRepositoryInterface::class);
-        $repository->expects($this->once())
+        $generationService = $this->createMock(PayrollGenerationService::class);
+        $generationService->expects($this->once())
             ->method('generatePayroll')
             ->with('2026-04', 777)
             ->willThrowException(new \RuntimeException('queue processing failed'));
@@ -309,7 +309,7 @@ class PayrollGenerateRulesTest extends TestCase
         $job = new GeneratePayrollJob('2026-04', 777);
 
         try {
-            $job->handle($repository);
+            $job->handle($generationService);
             $this->fail('Expected RuntimeException was not thrown.');
         } catch (\RuntimeException $exception) {
             $this->assertSame('queue processing failed', $exception->getMessage());
