@@ -200,7 +200,7 @@ function handlePageChange(page) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Total Events</p>
-                        <p class="text-lg font-bold">{{ yearSummary.total_events }}</p>
+                        <p class="text-lg font-bold tabular-nums">{{ yearSummary.total_events }}</p>
                     </div>
                 </div>
             </div>
@@ -211,7 +211,7 @@ function handlePageChange(page) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500">Total Employees</p>
-                        <p class="text-lg font-bold">{{ yearSummary.total_employees }}</p>
+                        <p class="text-lg font-bold tabular-nums">{{ yearSummary.total_employees }}</p>
                     </div>
                 </div>
             </div>
