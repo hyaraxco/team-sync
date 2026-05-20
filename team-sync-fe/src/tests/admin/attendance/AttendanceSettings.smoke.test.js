@@ -1,50 +1,10 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { mount, flushPromises } from "@vue/test-utils";
-import AttendanceSettings from "@/views/admin/attendance/AttendanceSettings.vue";
 import { createPinia, setActivePinia } from "pinia";
+import { describe, it, expect, beforeEach, vi } from "vitest";
+import { nextTick } from "vue";
+import AttendanceSettings from "@/views/admin/attendance/AttendanceSettings.vue";
 import Input from "@/components/common/form/Input.vue";
 import Select from "@/components/common/form/Select.vue";
-
-vi.mock("@/stores/attendancePolicy", () => ({
-    useAttendancePolicyStore: vi.fn(() => ({
-        policies: [samplePolicy],
-        loading: false,
-        error: null,
-        fetchPolicies: vi.fn().mockResolvedValue(),
-        updatePolicy: vi.fn().mockResolvedValue({}),
-    })),
-}));
-
-vi.mock("@/stores/holidayCalendar", () => ({
-    useHolidayCalendarStore: vi.fn(() => ({
-        paginatedHolidays: [],
-        loading: false,
-        error: null,
-        meta: {},
-        fetchAllPaginated: vi.fn().mockResolvedValue(),
-        createHoliday: vi.fn().mockResolvedValue({}),
-        updateHoliday: vi.fn().mockResolvedValue({}),
-    })),
-}));
-
-const mockUpdateEntitlement = vi.fn().mockResolvedValue({});
-
-vi.mock("@/stores/leaveEntitlement", () => ({
-    useLeaveEntitlementStore: vi.fn(() => ({
-        groupedEntitlements: {},
-        loading: false,
-        error: null,
-        fetchEntitlements: vi.fn().mockResolvedValue(),
-        updateEntitlement: mockUpdateEntitlement,
-    })),
-}));
-
-vi.mock("@/composables/useToast", () => ({
-    useToast: vi.fn(() => ({
-        success: vi.fn(),
-        error: vi.fn(),
-    })),
-}));
 
 const samplePolicy = {
     id: 1,
@@ -52,10 +12,10 @@ const samplePolicy = {
     work_start_time: "09:00:00",
     work_end_time: "17:00:00",
     work_days_per_week: 5,
+    default_working_weekdays: ["monday", "tuesday"],
     late_grace_minutes: 30,
     half_day_min_hours: 4,
-    warning_absent_pct: 50,
-    default_working_weekdays: ["monday", "tuesday", "wednesday", "thursday", "friday"],
+    warning_absent_pct: 5.0,
 };
 
 const sampleEntitlement = {
@@ -73,108 +33,88 @@ const sampleEntitlement = {
     max_attachment_size_kb: null,
 };
 
-describe("AttendanceSettings.vue — common primitives migration", () => {
-    let wrapper;
+const mockUpdateEntitlement = vi.fn().mockResolvedValue({});
 
+vi.mock("@/stores/attendancePolicy", () => ({
+    useAttendancePolicyStore: vi.fn(() => ({
+        fetchPolicies: vi.fn().mockResolvedValue(),
+        updatePolicy: vi.fn().mockResolvedValue({}),
+        policies: [samplePolicy],
+        loading: false,
+        error: null,
+    })),
+}));
+
+vi.mock("@/stores/holidayCalendar", () => ({
+    useHolidayCalendarStore: vi.fn(() => ({
+        fetchAllPaginated: vi.fn().mockResolvedValue(),
+        createHoliday: vi.fn(),
+        updateHoliday: vi.fn(),
+        paginatedHolidays: [],
+        meta: { current_page: 1, per_page: 10 },
+        loading: false,
+        error: null,
+    })),
+}));
+
+vi.mock("@/stores/leaveEntitlement", () => ({
+    useLeaveEntitlementStore: vi.fn(() => ({
+        fetchEntitlements: vi.fn().mockResolvedValue(),
+        updateEntitlement: mockUpdateEntitlement,
+        groupedEntitlements: {},
+        loading: false,
+        error: null,
+    })),
+}));
+
+vi.mock("@/composables/useToast", () => ({
+    useToast: () => ({ error: vi.fn(), success: vi.fn() }),
+}));
+
+describe("AttendanceSettings.vue smoke", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
     });
 
-    it("uses Input and Select components in the Policy modal", async () => {
-        // Re-mock with a policy to open
-        const { useAttendancePolicyStore } = await import("@/stores/attendancePolicy");
-        useAttendancePolicyStore.mockReturnValue({
-            policies: [samplePolicy],
-            loading: false,
-            error: null,
-            fetchPolicies: vi.fn().mockResolvedValue(),
-            updatePolicy: vi.fn().mockResolvedValue({}),
-        });
-
-        wrapper = mount(AttendanceSettings, {
-            global: {
-                stubs: {
-                    ModalWrapper: false,
-                },
-            },
-        });
-
+    it("renders policy edit modal with Input primitives when opened", async () => {
+        const wrapper = mount(AttendanceSettings);
         await flushPromises();
 
-        // Open the policy modal by clicking Edit Policy button
-        const editBtn = wrapper.find(".policy-card button");
-        expect(editBtn.exists()).toBe(true);
-        await editBtn.trigger("click");
-        await flushPromises();
+        // Open policy modal
+        await wrapper.find(".policy-card button").trigger("click");
+        await nextTick();
 
-        // Policy modal has 4 number inputs (work_days, late_grace, half_day, warning_absent)
-        // time inputs stay native (type="time" not supported by Input component)
+        // Modal must contain Input primitives (4 number + 2 time inputs)
         const inputs = wrapper.findAllComponents(Input);
-        expect(inputs.length).toBeGreaterThanOrEqual(4);
+        expect(inputs.length).toBeGreaterThanOrEqual(6);
+
+        // Every Input renders an <input> element with auto-generated id
+        for (const inputComp of inputs) {
+            expect(inputComp.find("input").attributes("id")).toBeTruthy();
+        }
     });
 
-    it("uses Input and Select components in the Entitlement modal", async () => {
-        const { useAttendancePolicyStore } = await import("@/stores/attendancePolicy");
-        const { useLeaveEntitlementStore } = await import("@/stores/leaveEntitlement");
-
-        useAttendancePolicyStore.mockReturnValue({
-            policies: [samplePolicy],
-            loading: false,
-            error: null,
-            fetchPolicies: vi.fn().mockResolvedValue(),
-            updatePolicy: vi.fn().mockResolvedValue({}),
-        });
-
-        useLeaveEntitlementStore.mockReturnValue({
-            groupedEntitlements: {
-                annual_leave: [sampleEntitlement],
-            },
-            loading: false,
-            error: null,
-            fetchEntitlements: vi.fn().mockResolvedValue(),
-            updateEntitlement: vi.fn().mockResolvedValue({}),
-        });
-
-        wrapper = mount(AttendanceSettings, {
-            global: {
-                stubs: {
-                    ModalWrapper: false,
-                },
-            },
-        });
-
+    it("holiday modal uses Select primitive for type field", async () => {
+        const wrapper = mount(AttendanceSettings);
         await flushPromises();
 
-        // Switch to Leave Entitlements tab
+        // Switch to Holiday Calendars tab
         const tabs = wrapper.findAll("nav button");
-        await tabs[1].trigger("click");
-        await flushPromises();
+        const holidayTab = tabs.find((btn) => btn.text().includes("Holiday Calendars"));
+        await holidayTab.trigger("click");
+        await nextTick();
 
-        // Open entitlement modal
-        const editBtn = wrapper.find(".policy-card button");
-        expect(editBtn.exists()).toBe(true);
-        await editBtn.trigger("click");
-        await flushPromises();
+        // Open Add Holiday modal
+        const addBtn = wrapper.findAll("button").find((btn) => btn.text().includes("Add Holiday"));
+        await addBtn.trigger("click");
+        await nextTick();
 
-        // Entitlement modal: 1 Select (quota_scope) + 3 number Inputs (quota_days, carry_over, max_attachment) + 1 text Input (MIME types)
         const selects = wrapper.findAllComponents(Select);
         expect(selects.length).toBeGreaterThanOrEqual(1);
-
-        const inputs = wrapper.findAllComponents(Input);
-        expect(inputs.length).toBeGreaterThanOrEqual(4);
     });
 
     it("preserves null on submit for nullable entitlement numeric fields", async () => {
-        const { useAttendancePolicyStore } = await import("@/stores/attendancePolicy");
         const { useLeaveEntitlementStore } = await import("@/stores/leaveEntitlement");
-
-        useAttendancePolicyStore.mockReturnValue({
-            policies: [samplePolicy],
-            loading: false,
-            error: null,
-            fetchPolicies: vi.fn().mockResolvedValue(),
-            updatePolicy: vi.fn().mockResolvedValue({}),
-        });
 
         const nullEntitlement = {
             ...sampleEntitlement,
@@ -184,28 +124,26 @@ describe("AttendanceSettings.vue — common primitives migration", () => {
         };
 
         useLeaveEntitlementStore.mockReturnValue({
+            fetchEntitlements: vi.fn().mockResolvedValue(),
+            updateEntitlement: mockUpdateEntitlement,
             groupedEntitlements: {
                 annual_leave: [nullEntitlement],
             },
             loading: false,
             error: null,
-            fetchEntitlements: vi.fn().mockResolvedValue(),
-            updateEntitlement: mockUpdateEntitlement,
         });
 
         mockUpdateEntitlement.mockClear();
 
-        wrapper = mount(AttendanceSettings, {
-            global: {
-                stubs: { ModalWrapper: false },
-            },
+        const wrapper = mount(AttendanceSettings, {
+            global: { stubs: { ModalWrapper: false } },
         });
-
         await flushPromises();
 
         // Switch to Leave Entitlements tab
         const tabs = wrapper.findAll("nav button");
-        await tabs[1].trigger("click");
+        const entitlementTab = tabs.find((btn) => btn.text().includes("Leave Entitlements"));
+        await entitlementTab.trigger("click");
         await flushPromises();
 
         // Open entitlement modal
@@ -213,7 +151,7 @@ describe("AttendanceSettings.vue — common primitives migration", () => {
         await editBtn.trigger("click");
         await flushPromises();
 
-        // Submit without editing — call submit method directly on component
+        // Submit
         await wrapper.vm.submitEntitlementForm();
         await flushPromises();
 
