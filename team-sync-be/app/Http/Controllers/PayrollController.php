@@ -32,6 +32,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Payroll;
 use App\Services\Payroll\PayrollAnalyticsService;
+use App\Services\Payroll\PayrollGenerationService;
 use App\Services\PayrollActivityLogger;
 use App\Services\PayslipPdfService;
 use Carbon\Carbon;
@@ -81,6 +82,7 @@ class PayrollController extends Controller implements HasMiddleware
         PayrollActivityLogger $activityLogger,
         private readonly PayslipPdfService $payslipPdfService,
         private readonly PayrollAnalyticsService $analyticsService,
+        private readonly PayrollGenerationService $generationService,
     ) {
         $this->payrollRepository = $payrollRepository;
         $this->activityLogger = $activityLogger;
@@ -217,7 +219,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $readiness = $this->payrollRepository->getGenerateReadiness($validated['salary_month']);
+            $readiness = $this->generationService->getGenerateReadiness($validated['salary_month']);
 
             return ResponseHelper::jsonResponse(true, $readiness['message'], $readiness, 200);
         } catch (\Exception $e) {
@@ -236,7 +238,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $payload = $this->payrollRepository->getReadinessDashboard($validated['salary_month']);
+            $payload = $this->generationService->getReadinessDashboard($validated['salary_month']);
 
             return ResponseHelper::jsonResponse(
                 true,
@@ -261,7 +263,7 @@ class PayrollController extends Controller implements HasMiddleware
 
         try {
             $month = Carbon::parse($validated['salary_month'])->startOfMonth();
-            $readiness = $this->payrollRepository->getGenerateReadiness($validated['salary_month']);
+            $readiness = $this->generationService->getGenerateReadiness($validated['salary_month']);
 
             if (! $readiness['can_generate']) {
                 return ResponseHelper::jsonResponse(
@@ -769,7 +771,7 @@ class PayrollController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $summary = $this->payrollRepository->getReadinessTeamSummary($validated['salary_month']);
+            $summary = $this->generationService->getReadinessTeamSummary($validated['salary_month']);
 
             return ResponseHelper::jsonResponse(
                 true,

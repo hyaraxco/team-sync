@@ -58,6 +58,42 @@ class PayrollGenerationServiceWiringTest extends TestCase
         }
     }
 
+    public function test_generate_readiness_endpoint_returns_200_via_service(): void
+    {
+        $this->actingAsFinance();
+
+        $salaryMonth = now()->subMonth()->format('Y-m');
+
+        $this->getJson("/api/v1/payrolls/generate-readiness?salary_month={$salaryMonth}")
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['success', 'message', 'data' => ['can_generate']]);
+    }
+
+    public function test_readiness_dashboard_endpoint_returns_200_via_service(): void
+    {
+        $this->actingAsFinance();
+
+        $salaryMonth = now()->subMonth()->format('Y-m');
+
+        $this->getJson("/api/v1/payrolls/readiness-dashboard?salary_month={$salaryMonth}")
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['success', 'message', 'data']);
+    }
+
+    public function test_readiness_team_summary_endpoint_returns_200_via_service(): void
+    {
+        $this->actingAsFinance();
+
+        $salaryMonth = now()->subMonth()->format('Y-m');
+
+        $this->getJson("/api/v1/payrolls/readiness-dashboard/team-summary?salary_month={$salaryMonth}")
+            ->assertStatus(200)
+            ->assertJsonPath('success', true)
+            ->assertJsonStructure(['success', 'message', 'data']);
+    }
+
     private function actingAsFinance(): User
     {
         $user = User::factory()->create();
