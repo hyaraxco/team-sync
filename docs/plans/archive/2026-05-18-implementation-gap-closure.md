@@ -110,7 +110,7 @@
 
 **Acceptance:** `PayrollController.php` has no inline `$request->validate()`; behavior unchanged.
 
-### Task 3: Plan PayrollService Extraction Separately
+### Task 3: Plan PayrollService Extraction Separately — COMPLETED 2026-05-20
 
 **Files:**
 - Create follow-up plan in `docs/plans/on_going/` after Task 2 passes.
@@ -120,15 +120,23 @@
   - `team-sync-be/app/Repositories/PayrollRepository.php`
   - `team-sync-be/app/Interfaces/PayrollRepositoryInterface.php`
 
-- [ ] Ask @oracle for architecture review before extraction.
-- [ ] Identify controller methods that are pure orchestration vs business rules.
-- [ ] Move business logic to service in small batches.
-- [ ] Preserve state-machine guards: locked attendance before generation, reconciliation before paid.
-- [ ] Add/adjust tests per moved behavior.
+- [x] Ask @oracle for architecture review before extraction.
+- [x] Identify controller methods that are pure orchestration vs business rules.
+- [x] Move business logic to service in small batches.
+- [x] Preserve state-machine guards: locked attendance before generation, reconciliation before paid.
+- [x] Add/adjust tests per moved behavior.
 
 **Acceptance:** Separate reviewed plan exists before implementation; no big-bang payroll refactor.
 
-**Progress update (2026-05-20):** PR 1/4 `PayrollAnalyticsService` merged on `main`. PR 2/4 `PayrollGenerationService` implemented on branch `chore/payroll-generation-service` and opened as PR #47. Scope: thin delegation only — new `PayrollGenerationService`, `GeneratePayrollJob` method-injection swap, and `PayrollController` wiring for `generate`, `generateReadiness`, `readinessDashboard`, `readinessTeamSummary`. `PayrollRepositoryInterface` remains unchanged. Current state: CI green, awaiting external review handling before merge.
+**Implementation notes (2026-05-20):**
+- Staged extraction completed in 4 PRs:
+  - PR 1/4: `PayrollAnalyticsService` (2 methods) — merged
+  - PR 2/4: `PayrollGenerationService` (4 methods) — merged as PR #47
+  - PR 3/4: `PayrollLifecycleService` (7 methods) — merged as PR #50
+  - PR 4/4: `PayrollQueryService` (12 methods) — merged as PR #50
+- `PayrollRepositoryInterface` fully removed from `PayrollController` constructor.
+- @oracle code review: APPROVE. Fix applied (moved `resolveReconciliationException` from QueryService to LifecycleService).
+- Verification: 1573 tests passed, 389 payroll-specific. Pint clean.
 
 ### Task 4: Audit and Strengthen Project View Smoke Tests
 
