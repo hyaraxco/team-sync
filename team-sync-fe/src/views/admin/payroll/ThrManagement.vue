@@ -262,7 +262,7 @@ function handlePageChange(page) {
                             <td class="px-4 py-3">{{ formatDateShort(thr.religion_holiday_date) }}</td>
                             <td class="px-4 py-3">{{ formatDateShort(thr.payment_deadline) }}</td>
                             <td class="px-4 py-3">{{ thr.total_employees }}</td>
-                            <td class="px-4 py-3 font-medium">{{ formatCurrency(thr.total_net_amount) }}</td>
+                            <td class="px-4 py-3 font-medium tabular-nums">{{ formatCurrency(thr.total_net_amount) }}</td>
                             <td class="px-4 py-3">
                                 <span :class="['px-2 py-1 rounded-full text-xs font-medium', statusColors[thr.status]]">
                                     {{ thr.status }}
@@ -386,9 +386,9 @@ function handlePageChange(page) {
                 <div class="border-t pt-3">
                     <p class="text-sm font-medium mb-2">Payment Deadline: {{ simulation.payment_deadline }}</p>
                     <p class="text-sm text-gray-500">
-                        Total Gross: {{ formatCurrency(simulation.total_gross_amount) }}
+                        Total Gross: <span class="tabular-nums">{{ formatCurrency(simulation.total_gross_amount) }}</span>
                     </p>
-                    <p class="text-sm text-gray-500">Total Tax: {{ formatCurrency(simulation.total_tax_amount) }}</p>
+                    <p class="text-sm text-gray-500">Total Tax: <span class="tabular-nums">{{ formatCurrency(simulation.total_tax_amount) }}</span></p>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">

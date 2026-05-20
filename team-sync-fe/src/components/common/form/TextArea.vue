@@ -20,7 +20,7 @@
                 :aria-invalid="error ? 'true' : undefined"
                 :aria-describedby="error ? errorId : undefined"
                 :class="[
-                    'w-full pr-4 py-3 border rounded-2xl transition-all duration-300 font-semibold bg-white',
+                    'w-full pr-4 py-3 border rounded-2xl bg-white transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
                     'hover:ring-2 hover:ring-brand-primary/20',
                     'focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white',
@@ -30,7 +30,7 @@
             ></textarea>
         </div>
 
-        <p v-if="error" :id="errorId" role="alert" class="mt-2 text-red-600 text-sm font-normal">
+        <p v-if="error" :id="errorId" role="alert" class="mt-2 text-sm text-red-600">
             {{ error }}
         </p>
     </div>
