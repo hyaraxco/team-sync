@@ -543,6 +543,7 @@
                 <Select
                     label="Type"
                     v-model="holidayForm.type"
+                    required
                     :options="[
                         { value: 'national_holiday', label: 'National Holiday' },
                         { value: 'collective_leave', label: 'Collective Leave (Cuti Bersama)' },

@@ -253,13 +253,13 @@ const getAdjustmentStatusClass = (status) => {
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Payroll Period</p>
-                        <p class="text-lg font-bold text-brand-dark">
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatPeriod(payslip.period) }}
                         </p>
                     </div>
                     <div class="rounded-2xl border border-brand-border p-5">
                         <p class="text-sm text-gray-500 mb-1">Payment Date</p>
-                        <p class="text-lg font-bold text-brand-dark">
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatDate(payslip.payment_date || payslip.created_at) }}
                         </p>
                     </div>
