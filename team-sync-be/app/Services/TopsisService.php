@@ -254,7 +254,8 @@ class TopsisService
         }
 
         // Urutkan berdasarkan closeness_coefficient tertinggi
-        usort($ranking, fn ($a, $b) => $b['closeness_coefficient'] <=> $a['closeness_coefficient']);
+        usort($ranking, fn ($a, $b) => $b['closeness_coefficient'] <=> $a['closeness_coefficient']
+            ?: strcmp((string) $a['staff_member_id'], (string) $b['staff_member_id']));
 
         // Tambahkan nomor rank
         foreach ($ranking as $rank => &$item) {
@@ -291,14 +292,21 @@ class TopsisService
 
         $candidate = $candidates[0];
         $rawScores = [];
+        $normalizedScores = [];
+        $weightedScores = [];
+
         foreach (self::CRITERIA as $criterion) {
-            $rawScores[$criterion] = (float) ($candidate[$criterion] ?? 0);
+            $raw = (float) ($candidate[$criterion] ?? 0);
+            $rawScores[$criterion] = $raw;
+            // Single candidate: x / sqrt(x²) = 1.0 for non-zero, 0.0 for zero
+            $normalizedScores[$criterion] = $raw > 0 ? 1.0 : 0.0;
+            $weightedScores[$criterion] = (float) ($weights[$criterion] ?? 0) * $normalizedScores[$criterion];
         }
 
         return [
             'weights' => $weights,
-            'ideal_positive' => $rawScores,
-            'ideal_negative' => array_fill_keys(self::CRITERIA, 0),
+            'ideal_positive' => $weightedScores,
+            'ideal_negative' => $weightedScores,
             'criteria' => self::CRITERIA,
             'criteria_types' => self::CRITERIA_TYPES,
             'ranking' => [[
@@ -307,10 +315,10 @@ class TopsisService
                 'employee_name' => $candidate['employee_name'],
                 'department' => $candidate['department'] ?? null,
                 'raw_scores' => $rawScores,
-                'normalized_scores' => $rawScores,
-                'weighted_scores' => $rawScores,
+                'normalized_scores' => $normalizedScores,
+                'weighted_scores' => $weightedScores,
                 'distance_positive' => 0.0,
-                'distance_negative' => 1.0,
+                'distance_negative' => 0.0,
                 'closeness_coefficient' => 1.0,
                 'label' => $this->getRatingLabel(1.0),
             ]],
