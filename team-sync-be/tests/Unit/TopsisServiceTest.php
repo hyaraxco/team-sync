@@ -343,3 +343,84 @@ it('returns complete output structure with all required keys', function () {
         ]);
     }
 });
+
+// --- Test 10: Manual calculation validation against published journal ---
+// Reference: Arundaa, R., Sopacua, R.I., & Tamonob, A.M. (2024).
+// "Penerapan Metode TOPSIS untuk Menentukan Karyawan Terbaik Berdasarkan
+// Penilaian Kinerja di PT. JRBM". IJIDS, Vol. 03, No. 02, pp. 85-94.
+// E-ISSN: 2988-0416. DOI: https://ejournal.unsrat.ac.id/v3/index.php/IJIDS
+//
+// Data: 5 alternatif × 5 kriteria (semua Benefit), bobot [0.25, 0.20, 0.20, 0.10, 0.25]
+// Mapping R1 → Team Sync criteria keys:
+//   C1 (Komitmen keselamatan, 25%) → performance_score
+//   C2 (Keterampilan & pengetahuan, 20%) → attendance_rate
+//   C3 (Kehadiran, 20%) → goal_completion
+//   C4 (Catatan Kedisiplinan, 10%) → feedback_score
+//   C5 (Sikap & perilaku pribadi, 25%) → tenure_factor
+it('produces CC values matching published journal R1 (Arundaa et al., IJIDS 2024)', function () {
+    $service = new TopsisService;
+
+    // Tabel 2: Matriks Keputusan (5 karyawan sample dari 30 total)
+    $candidates = [
+        makeCandidate('K2', 'Karyawan 2', 4.4, 4.7, 4.5, 5.0, 4.5),
+        makeCandidate('K3', 'Karyawan 3', 4.7, 4.7, 4.5, 5.0, 4.5),
+        makeCandidate('K6', 'Karyawan 6', 4.7, 4.7, 4.5, 5.0, 4.3),
+        makeCandidate('K11', 'Karyawan 11', 4.4, 4.0, 4.5, 5.0, 4.7),
+        makeCandidate('K17', 'Karyawan 17', 4.7, 4.7, 5.0, 4.0, 4.8),
+    ];
+
+    // Bobot R1: C1=25%, C2=20%, C3=20%, C4=10%, C5=25%
+    $weights = [
+        'performance_score' => 0.25,
+        'attendance_rate' => 0.20,
+        'goal_completion' => 0.20,
+        'feedback_score' => 0.10,
+        'tenure_factor' => 0.25,
+    ];
+
+    $result = $service->calculate($candidates, $weights);
+
+    // Verifikasi jumlah kandidat
+    expect($result['total_candidates'])->toBe(5);
+    expect($result['ranking'])->toHaveCount(5);
+
+    // Ambil CC per karyawan (indexed by staff_member_id)
+    $ccByEmployee = [];
+    foreach ($result['ranking'] as $ranked) {
+        $ccByEmployee[$ranked['staff_member_id']] = $ranked['closeness_coefficient'];
+    }
+
+    // Tabel 3 R1: Nilai Preferensi (CC) — toleransi 0.0001 (4 desimal)
+    // K17: 0.7036, K3: 0.6062, K2: 0.5485, K6: 0.5366, K11: 0.4221
+    expect($ccByEmployee['K17'])->toEqualWithDelta(0.7036, 0.0001);
+    expect($ccByEmployee['K3'])->toEqualWithDelta(0.6062, 0.0001);
+    expect($ccByEmployee['K2'])->toEqualWithDelta(0.5485, 0.0001);
+    expect($ccByEmployee['K6'])->toEqualWithDelta(0.5366, 0.0001);
+    expect($ccByEmployee['K11'])->toEqualWithDelta(0.4221, 0.0001);
+
+    // Verifikasi ranking order: K17 > K3 > K2 > K6 > K11
+    $rankByEmployee = [];
+    foreach ($result['ranking'] as $ranked) {
+        $rankByEmployee[$ranked['staff_member_id']] = $ranked['rank'];
+    }
+    expect($rankByEmployee['K17'])->toBe(1);
+    expect($rankByEmployee['K3'])->toBe(2);
+    expect($rankByEmployee['K2'])->toBe(3);
+    expect($rankByEmployee['K6'])->toBe(4);
+    expect($rankByEmployee['K11'])->toBe(5);
+
+    // Verifikasi intermediate: solusi ideal positif & negatif
+    // A+ = (0.1147, 0.0920, 0.0971, 0.0464, 0.1176) — dari R1 halaman 90
+    expect($result['ideal_positive']['performance_score'])->toEqualWithDelta(0.1147, 0.0001);
+    expect($result['ideal_positive']['attendance_rate'])->toEqualWithDelta(0.0920, 0.0001);
+    expect($result['ideal_positive']['goal_completion'])->toEqualWithDelta(0.0971, 0.0001);
+    expect($result['ideal_positive']['feedback_score'])->toEqualWithDelta(0.0464, 0.0001);
+    expect($result['ideal_positive']['tenure_factor'])->toEqualWithDelta(0.1176, 0.0001);
+
+    // A- = (0.1074, 0.0783, 0.0874, 0.0371, 0.1054) — dari R1 halaman 90
+    expect($result['ideal_negative']['performance_score'])->toEqualWithDelta(0.1074, 0.0001);
+    expect($result['ideal_negative']['attendance_rate'])->toEqualWithDelta(0.0783, 0.0001);
+    expect($result['ideal_negative']['goal_completion'])->toEqualWithDelta(0.0874, 0.0001);
+    expect($result['ideal_negative']['feedback_score'])->toEqualWithDelta(0.0371, 0.0001);
+    expect($result['ideal_negative']['tenure_factor'])->toEqualWithDelta(0.1054, 0.0001);
+});
