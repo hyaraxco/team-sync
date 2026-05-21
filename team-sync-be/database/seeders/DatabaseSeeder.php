@@ -46,6 +46,9 @@ class DatabaseSeeder extends Seeder
             // 6. Seed interaction data (attendance, goals, feedback, tasks, leave, payroll settings)
             DemoInteractionSeeder::class,
 
+            // 7. Seed TOPSIS ranking dummy data (10 employees with full criteria data in Q4 2025)
+            TopsisRankingDummySeeder::class,
+
             // Legacy seeders (disabled — replaced by DemoDataSeeder)
             // StaffMemberProfileSeeder::class,
             // TeamSeeder::class,
