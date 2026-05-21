@@ -1,8 +1,8 @@
 # Product Requirements Document (PRD)
 # Team Sync — HRIS Indonesia
 
-> **Version**: 2.0
-> **Last Updated**: 2026-05-10
+> **Version**: 2.1
+> **Last Updated**: 2026-05-21
 > **Status**: Active Development (Thesis Project)
 > **Business Plans**: See `docs/plans/future_plan.md`
 
@@ -272,15 +272,27 @@ GET /api/v1/performance/cycles/{cycleId}/topsis-ranking
 
 ### Completed
 - [x] Core HRIS features (staff, attendance, teams)
-- [x] Payroll system dengan BPJS dan PPh 21
-- [x] Leave management
-- [x] Project management
-- [x] Performance reviews dengan TOPSIS
-- [x] Analytics dashboard
+- [x] Payroll system dengan BPJS dan PPh 21 (TER 2024 + Desember annualized)
+- [x] THR generation, approval, reopen, year summary
+- [x] Leave management (request, approve/reject, bulk action, proof upload + re-upload)
+- [x] Overtime management (request, approve, payroll link)
+- [x] Project management (CRUD, tasks, comments, attachments dengan 5MB limit)
+- [x] Performance reviews + TOPSIS ranking, Goals, Feedback (semua flow wired ke store)
+- [x] Review templates management (create, update, delete)
+- [x] Calibration flow (pending list + submit via ReviewDetail)
+- [x] Analytics dashboard (workforce, attendance, leave, payroll, project, performance) + Excel/PDF export
+- [x] Notifications (real-time toast polling, mark read, paginated list)
+- [x] Meetings (schedule, broadcast, reminders via scheduler)
+- [x] Multi-timezone support (per-company, formatToClientTimezone helper)
+- [x] BPJS rate history + payroll setting versioning (audit trail)
+- [x] Attendance period lock (with confirm modal)
+- [x] EmptyState component adopted across 90+ views
+- [x] Optimistic locking for payroll detail edits (ConcurrentModificationException + HTTP 409)
 - [x] License system (basic)
 
 ### In Progress
-- [ ] Fix 22 missing FE integrations (dari audit)
+- [ ] Sample data seeding UI for onboarding wizard (`docs/plans/future/onboarding-enhancements.md`)
+- [ ] Quick tour component for first-time users (`docs/plans/future/onboarding-enhancements.md`)
 
 ### Future Plans
 See `docs/plans/future_plan.md` for:
