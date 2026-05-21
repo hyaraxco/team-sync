@@ -150,31 +150,25 @@ describe("ReviewCycleDetail smoke", () => {
                     rank: 1,
                     department: "Engineering",
                     raw_scores: {
-                        avg_manager_rating: 4,
-                        final_rating: 4,
-                        avg_goal_completion: 80,
-                        goal_completion_ratio: 0.8,
-                        positive_feedback_count: 5,
-                        attendance_quality: 90,
-                        task_completion_quality: 85,
+                        performance_score: 85,
+                        attendance_rate: 90,
+                        goal_completion: 80,
+                        feedback_score: 75,
+                        tenure_factor: 60,
                     },
                     normalized_scores: {
-                        avg_manager_rating: 0.5,
-                        final_rating: 0.5,
-                        avg_goal_completion: 0.5,
-                        goal_completion_ratio: 0.5,
-                        positive_feedback_count: 0.5,
-                        attendance_quality: 0.5,
-                        task_completion_quality: 0.5,
+                        performance_score: 0.5,
+                        attendance_rate: 0.5,
+                        goal_completion: 0.5,
+                        feedback_score: 0.5,
+                        tenure_factor: 0.5,
                     },
                     weighted_scores: {
-                        avg_manager_rating: 0.175,
-                        final_rating: 0.15,
-                        avg_goal_completion: 0.1,
-                        goal_completion_ratio: 0.025,
-                        positive_feedback_count: 0.025,
-                        attendance_quality: 0.015,
-                        task_completion_quality: 0.01,
+                        performance_score: 0.2,
+                        attendance_rate: 0.2,
+                        goal_completion: 0.2,
+                        feedback_score: 0.2,
+                        tenure_factor: 0.2,
                     },
                     distance_positive: 0,
                     distance_negative: 1,
@@ -187,8 +181,8 @@ describe("ReviewCycleDetail smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.text()).toContain("C6");
-        expect(wrapper.text()).toContain("C7");
+        expect(wrapper.text()).toContain("Perf");
+        expect(wrapper.text()).toContain("Tenure");
     });
 
     it("navigates back when back button is clicked", async () => {
