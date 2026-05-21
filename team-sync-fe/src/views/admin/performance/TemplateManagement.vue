@@ -164,7 +164,7 @@ onMounted(() => {
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
             </div>
 
-            <EmptyState v-else-if="!templates.length" icon="Layout" title="No templates found" subtitle="Create your first performance review template." size="lg" />
+            <EmptyState v-else-if="!templates.length" icon="Layout" title="Template belum tersedia" subtitle="Buat template review performa pertama Anda." size="lg" />
 
             <div v-else class="overflow-x-auto">
                 <table class="w-full">
@@ -319,7 +319,7 @@ onMounted(() => {
                             class="text-center py-12 border-2 border-dashed rounded-xl bg-gray-50"
                         >
                             <p class="text-sm text-brand-light">
-                                No sections added yet. Select from available sections on the left.
+                                Belum ada section ditambahkan. Pilih section dari panel kiri.
                             </p>
                         </div>
 

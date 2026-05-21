@@ -236,8 +236,8 @@ onMounted(loadAdjustments);
             <EmptyState
                 v-else-if="payrollAdjustments.length === 0"
                 icon="FileText"
-                title="No payroll adjustments found"
-                subtitle="There are no records for the selected status filter."
+                title="Data penyesuaian payroll kosong"
+                subtitle="Tidak ada data untuk filter status yang dipilih."
             />
             <div v-else class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 text-sm">
@@ -264,7 +264,7 @@ onMounted(loadAdjustments);
                                     {{ formatAdjustmentKind(adjustment.adjustment_kind) }}
                                 </p>
                                 <p class="mt-1 max-w-xs text-xs text-brand-light">
-                                    {{ adjustment.reason || "No reason provided" }}
+                                    {{ adjustment.reason || "Tanpa alasan" }}
                                 </p>
                             </td>
                             <td class="px-4 py-3 text-brand-light">{{ formatPeriod(adjustment.source_period) }}</td>
@@ -296,7 +296,7 @@ onMounted(loadAdjustments);
                                 >
                                     {{ approvingId === adjustment.id ? "Approving..." : "Approve" }}
                                 </button>
-                                <span v-else class="text-xs text-brand-light">No action</span>
+                                <span v-else class="text-xs text-brand-light">Tidak ada aksi</span>
                             </td>
                         </tr>
                     </tbody>

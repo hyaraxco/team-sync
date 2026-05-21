@@ -283,7 +283,7 @@ const mapReadinessLabel = (value, dictionary) => {
 const exportCsv = () => {
     const rows = sortedEmployees.value;
     if (rows.length === 0) {
-        toast.warning("No data to export");
+        toast.warning("Data kosong to export");
         return;
     }
 

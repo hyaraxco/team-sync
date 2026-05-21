@@ -311,15 +311,15 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="Calendar"
-            title="No Review Cycles"
-            description="Create your first performance review cycle to start evaluating your team's performance."
+            title="Belum ada siklus review"
+            description="Buat siklus review pertama untuk mulai mengevaluasi performa tim."
         >
             <button
                 class="mt-4 flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
                 @click="createCycle"
             >
                 <Plus class="w-5 h-5" />
-                Create First Cycle
+                Buat Siklus Pertama
             </button>
         </EmptyState>
     </div>

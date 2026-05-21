@@ -66,7 +66,7 @@ describe("TeamGoals smoke", () => {
     it("displays empty state when no goals", () => {
         performanceGoalRefs.teamGoals.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no team goals found/i);
+        expect(wrapper.text()).toMatch(/sasaran tim belum tersedia/i);
     });
 
     it("displays goal cards when data available", () => {

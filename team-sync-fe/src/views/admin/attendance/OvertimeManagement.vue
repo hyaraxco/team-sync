@@ -260,8 +260,8 @@ const submitCreate = async () => {
             <div v-if="loading" class="p-8 text-center text-gray-500">Loading...</div>
             <EmptyState
                 v-else-if="!records.length"
-                title="No overtime records"
-                description="No overtime records found for the selected filters."
+                title="Data lembur kosong"
+                description="Data lembur kosong found for the selected filters."
             />
             <table v-else class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">

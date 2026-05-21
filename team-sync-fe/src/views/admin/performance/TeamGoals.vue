@@ -138,7 +138,7 @@ onMounted(async () => {
                             </div>
                         </div>
                         <p class="text-sm text-brand-light line-clamp-2">
-                            {{ goal.description || "No description provided" }}
+                            {{ goal.description || "Deskripsi belum tersedia" }}
                         </p>
                     </div>
 
@@ -193,8 +193,8 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="Target"
-            title="No team goals found"
-            subtitle="Try adjusting your filters or ask team members to create goals."
+            title="Sasaran tim belum tersedia"
+            subtitle="Sesuaikan filter atau minta anggota tim membuat sasaran."
         />
     </div>
 </template>

@@ -45,7 +45,7 @@
 
                     <!-- Empty State -->
                     <div v-else-if="!periods.length" class="bg-white border border-brand-border rounded-2xl p-12">
-                        <EmptyState icon="CalendarClock" title="No attendance periods found" subtitle="Create a period to get started." />
+                        <EmptyState icon="CalendarClock" title="Data periode kosong" subtitle="Buat periode kehadiran baru." />
                     </div>
 
                     <!-- Period List -->

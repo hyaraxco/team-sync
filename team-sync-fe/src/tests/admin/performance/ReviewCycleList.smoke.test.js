@@ -112,7 +112,7 @@ describe("ReviewCycleList smoke", () => {
     it("displays empty state when no cycles", () => {
         performanceReviewRefs.cycles.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no.*cycles/i);
+        expect(wrapper.text()).toMatch(/belum ada siklus review/i);
     });
 
     it("displays review cycles when available", () => {

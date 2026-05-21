@@ -148,8 +148,8 @@ const onRejectAction = (req) => {
                         <td colspan="6" class="py-8">
                             <EmptyState
                                 icon="ClipboardList"
-                                title="No Corrections Found"
-                                description="There are no attendance correction requests currently matching filters."
+                                title="Data koreksi kosong"
+                                description="Tidak ada pengajuan koreksi absensi yang cocok dengan filter."
                             />
                         </td>
                     </tr>

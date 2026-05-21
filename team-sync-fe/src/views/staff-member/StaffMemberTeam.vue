@@ -370,7 +370,7 @@ onMounted(async () => {
                     <!-- Empty State -->
                     <div v-if="!loadingMembers && (!members || members.length === 0)" class="text-center py-12">
                         <Users class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p class="text-gray-500 text-lg font-medium">No team members</p>
+                        <p class="text-gray-500 text-lg font-medium">Belum ada anggota tim</p>
                         <p class="text-gray-400 text-sm">Team members will appear here</p>
                     </div>
                 </div>
@@ -405,7 +405,7 @@ onMounted(async () => {
                     <!-- Empty State -->
                     <div v-if="!loadingProjects && (!projects || projects.length === 0)" class="text-center py-12">
                         <Folder class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p class="text-gray-500 text-lg font-medium">No projects assigned</p>
+                        <p class="text-gray-500 text-lg font-medium">Belum ada proyek ditugaskan</p>
                         <p class="text-gray-400 text-sm">Projects assigned to your team will appear here</p>
                     </div>
                 </div>
@@ -429,7 +429,7 @@ onMounted(async () => {
                         <div>
                             <h4 class="text-brand-dark text-base font-semibold mb-2">Description</h4>
                             <p class="text-gray-600 text-base leading-relaxed">
-                                {{ team?.description || "No description available" }}
+                                {{ team?.description || "Deskripsi belum tersedia" }}
                             </p>
                         </div>
 

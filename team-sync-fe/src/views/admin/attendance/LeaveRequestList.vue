@@ -253,7 +253,7 @@ onMounted(() => {
 <template>
     <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-brand-dark">Leave Requests</h1>
+            <h1 class="text-2xl font-bold text-brand-dark">Pengajuan Cuti</h1>
             <p class="text-sm text-brand-light mt-1">Manage and monitor employee leave requests.</p>
         </div>
 
@@ -360,8 +360,8 @@ onMounted(() => {
                             <td colspan="8" class="py-8">
                                 <EmptyState
                                     icon="ClipboardList"
-                                    title="No Requests Found"
-                                    description="There are no leave requests currently matching filters."
+                                    title="Data pengajuan kosong"
+                                    description="Tidak ada pengajuan cuti yang cocok dengan filter."
                                 />
                             </td>
                         </tr>
@@ -419,7 +419,7 @@ onMounted(() => {
                                         <ExternalLink class="w-3 h-3" />
                                         View Proof
                                     </a>
-                                    <span v-else class="text-xs text-gray-500 italic">No proof</span>
+                                    <span v-else class="text-xs text-gray-500 italic">Tidak ada bukti</span>
 
                                     <div v-if="request.proof_file_path" class="mt-1">
                                         <span

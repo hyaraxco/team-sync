@@ -284,7 +284,7 @@ onMounted(() => {
                             </span>
                         </div>
                     </div>
-                    <EmptyState v-else icon="Users" title="No emergency contact added" size="sm" />
+                    <EmptyState v-else icon="Users" title="Kontak darurat belum ditambahkan" size="sm" />
                 </div>
             </div>
 

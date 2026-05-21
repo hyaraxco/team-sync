@@ -68,7 +68,7 @@
                             v-if="!schedule.overrides?.length"
                             class="bg-white border border-brand-border rounded-2xl p-8 text-center"
                         >
-                            <p class="text-brand-light">No override requests yet.</p>
+                            <p class="text-brand-light">Belum ada pengajuan override.</p>
                         </div>
 
                         <div v-else class="space-y-3">

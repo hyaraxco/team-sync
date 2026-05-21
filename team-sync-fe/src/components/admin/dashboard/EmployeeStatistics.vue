@@ -499,7 +499,7 @@ onMounted(() => {
                 v-else-if="recentActivities.length === 0"
                 class="rounded-xl border border-gray-200 bg-gray-50 px-3 py-4 text-center"
             >
-                <p class="text-sm font-medium text-slate-700">No activities yet.</p>
+                <p class="text-sm font-medium text-slate-700">Belum ada aktivitas.</p>
             </div>
 
             <div v-else class="space-y-1">
