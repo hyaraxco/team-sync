@@ -434,6 +434,22 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         // Pre-load section weights and categories (fallback)
         $sections = PerformanceReviewSection::where('is_active', true)->get()->keyBy('id');
 
+        // Pre-calculate feedback normalization cap for this cycle
+        // Cap = max(10, max positive feedback count among all employees in cycle)
+        $cycle = PerformanceReviewCycle::find($cycleId);
+        $maxFeedbackInCycle = PerformanceFeedback::whereIn('staff_member_id', $reviewScores->pluck('staff_member_id'))
+            ->where('feedback_type', 'positive')
+            ->whereBetween('created_at', [
+                $cycle->start_date.' 00:00:00',
+                $cycle->end_date.' 23:59:59',
+            ])
+            ->selectRaw('staff_member_id, COUNT(*) as cnt')
+            ->groupBy('staff_member_id')
+            ->pluck('cnt')
+            ->max() ?? 10;
+
+        $feedbackNormCap = max(10, (int) $maxFeedbackInCycle);
+
         $candidates = [];
         foreach ($reviewScores as $review) {
             $employeeId = $review->staff_member_id;
@@ -561,7 +577,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 'performance_score' => round((float) $performanceScore, 4),        // Merged C1+C2
                 'attendance_rate' => round((float) $attendanceQuality, 4),          // C6 (renamed)
                 'goal_completion' => round((float) $goalCompletion, 4),             // Merged C3+C4
-                'feedback_score' => (int) $positiveFeedbackCount,                   // C5 (renamed)
+                'feedback_score' => round(min($positiveFeedbackCount / $feedbackNormCap, 1.0) * 100, 4),  // C5: normalized 0-100
                 'tenure_factor' => round((float) $tenureFactor, 4),                // NEW
             ];
         }

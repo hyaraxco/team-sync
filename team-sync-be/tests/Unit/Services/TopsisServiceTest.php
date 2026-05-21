@@ -263,11 +263,11 @@ describe('buildSingleResult() with 1 candidate', function () {
         expect($ranked['staff_member_id'])->toBe('emp-1');
         expect($ranked['closeness_coefficient'])->toBe(1.0);
         expect($ranked['distance_positive'])->toBe(0.0);
-        expect($ranked['distance_negative'])->toBe(1.0);
+        expect($ranked['distance_negative'])->toBe(0.0);
         expect($ranked['label'])->toBe('Outstanding');
     });
 
-    it('uses raw scores for normalized and weighted scores (no division needed)', function () {
+    it('computes correct normalized and weighted scores for single candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
@@ -277,30 +277,26 @@ describe('buildSingleResult() with 1 candidate', function () {
         $result = $service->calculate($candidates, topsisWeights());
         $ranked = $result['ranking'][0];
 
-        // Single candidate: normalized = raw, weighted = raw
-        expect($ranked['normalized_scores'])->toBe($ranked['raw_scores']);
-        expect($ranked['weighted_scores'])->toBe($ranked['raw_scores']);
-    });
+        // Single candidate: x/sqrt(x²) = 1.0 for non-zero values
+        expect($ranked['normalized_scores'])->toBe([
+            'performance_score' => 1.0,
+            'attendance_rate' => 1.0,
+            'goal_completion' => 1.0,
+            'feedback_score' => 1.0,
+            'tenure_factor' => 1.0,
+        ]);
 
-    it('sets ideal_positive to the candidate raw scores', function () {
-        $service = new TopsisService;
-
-        $candidates = [
-            topsisCandidate('emp-1', 'Alice', 90.0, 95.0, 80.0, 5, 90.0),
-        ];
-
-        $result = $service->calculate($candidates, topsisWeights());
-
-        expect($result['ideal_positive'])->toBe([
-            'performance_score' => 90.0,
-            'attendance_rate' => 95.0,
-            'goal_completion' => 80.0,
-            'feedback_score' => 5.0,
-            'tenure_factor' => 90.0,
+        // weighted = weight × normalized (= weight × 1.0)
+        expect($ranked['weighted_scores'])->toBe([
+            'performance_score' => 0.30,
+            'attendance_rate' => 0.20,
+            'goal_completion' => 0.25,
+            'feedback_score' => 0.15,
+            'tenure_factor' => 0.10,
         ]);
     });
 
-    it('sets ideal_negative to all zeros', function () {
+    it('sets ideal_positive and ideal_negative to weighted scores for single candidate', function () {
         $service = new TopsisService;
 
         $candidates = [
@@ -309,12 +305,17 @@ describe('buildSingleResult() with 1 candidate', function () {
 
         $result = $service->calculate($candidates, topsisWeights());
 
-        $expected = array_fill_keys([
-            'performance_score', 'attendance_rate', 'goal_completion',
-            'feedback_score', 'tenure_factor',
-        ], 0);
+        // Single candidate: A+ = A- = weighted scores (candidate is both ideal and anti-ideal)
+        $expectedWeighted = [
+            'performance_score' => 0.30,
+            'attendance_rate' => 0.20,
+            'goal_completion' => 0.25,
+            'feedback_score' => 0.15,
+            'tenure_factor' => 0.10,
+        ];
 
-        expect($result['ideal_negative'])->toBe($expected);
+        expect($result['ideal_positive'])->toBe($expectedWeighted);
+        expect($result['ideal_negative'])->toBe($expectedWeighted);
     });
 
     it('preserves department in ranking output', function () {

@@ -423,4 +423,72 @@ it('produces CC values matching published journal R1 (Arundaa et al., IJIDS 2024
     expect($result['ideal_negative']['goal_completion'])->toEqualWithDelta(0.0874, 0.0001);
     expect($result['ideal_negative']['feedback_score'])->toEqualWithDelta(0.0371, 0.0001);
     expect($result['ideal_negative']['tenure_factor'])->toEqualWithDelta(0.1054, 0.0001);
+
+    // --- Intermediate step verification (academic rigor for Bab 4) ---
+
+    // Index ranking by staff_member_id for easy lookup
+    $rankedByEmployee = [];
+    foreach ($result['ranking'] as $ranked) {
+        $rankedByEmployee[$ranked['staff_member_id']] = $ranked;
+    }
+
+    // 1. Verify normalized scores are in valid range [0, 1] for all candidates
+    foreach ($result['ranking'] as $ranked) {
+        foreach ($ranked['normalized_scores'] as $criterion => $value) {
+            expect($value)->toBeGreaterThanOrEqual(0.0,
+                "normalized {$criterion} for {$ranked['staff_member_id']} must be >= 0");
+            expect($value)->toBeLessThanOrEqual(1.0,
+                "normalized {$criterion} for {$ranked['staff_member_id']} must be <= 1");
+        }
+    }
+
+    // 2. Verify weighted = weight × normalized for all candidates
+    foreach ($result['ranking'] as $ranked) {
+        foreach ($ranked['weighted_scores'] as $criterion => $value) {
+            $expected = $weights[$criterion] * $ranked['normalized_scores'][$criterion];
+            expect($value)->toEqualWithDelta($expected, 0.000001,
+                "weighted {$criterion} for {$ranked['staff_member_id']} should equal weight × normalized");
+        }
+    }
+
+    // 3. Verify CC = D⁻ / (D⁺ + D⁻) for all candidates (fundamental TOPSIS formula)
+    foreach ($result['ranking'] as $ranked) {
+        $dp = $ranked['distance_positive'];
+        $dn = $ranked['distance_negative'];
+        $total = $dp + $dn;
+        if ($total > 0) {
+            $computedCC = $dn / $total;
+            expect($computedCC)->toEqualWithDelta(
+                $ranked['closeness_coefficient'],
+                0.0001,
+                "CC for {$ranked['staff_member_id']} should equal D⁻/(D⁺+D⁻)"
+            );
+        }
+    }
+
+    // 4. Verify distances are non-negative
+    foreach ($result['ranking'] as $ranked) {
+        expect($ranked['distance_positive'])->toBeGreaterThanOrEqual(0.0);
+        expect($ranked['distance_negative'])->toBeGreaterThanOrEqual(0.0);
+    }
+
+    // 5. Verify ideal_positive >= all weighted scores (benefit criteria)
+    foreach ($result['ranking'] as $ranked) {
+        foreach ($result['criteria'] as $criterion) {
+            expect($result['ideal_positive'][$criterion])->toBeGreaterThanOrEqual(
+                $ranked['weighted_scores'][$criterion] - 0.000001,
+                "A+ {$criterion} must be >= weighted score for {$ranked['staff_member_id']}"
+            );
+        }
+    }
+
+    // 6. Verify ideal_negative <= all weighted scores (benefit criteria)
+    foreach ($result['ranking'] as $ranked) {
+        foreach ($result['criteria'] as $criterion) {
+            expect($result['ideal_negative'][$criterion])->toBeLessThanOrEqual(
+                $ranked['weighted_scores'][$criterion] + 0.000001,
+                "A⁻ {$criterion} must be <= weighted score for {$ranked['staff_member_id']}"
+            );
+        }
+    }
 });
