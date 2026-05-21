@@ -102,17 +102,14 @@ const scoreBarWidth = (score) => `${Math.round(score * 100)}%`;
 /** Check if an employee's TOPSIS data is incomplete (goals/feedback = 0) */
 const getIncompleteWarnings = (item) => {
     const warnings = [];
-    if (item.raw_scores.avg_goal_completion === 0 && item.raw_scores.goal_completion_ratio === 0) {
+    if (item.raw_scores.goal_completion === 0) {
         warnings.push("Goals data unavailable");
     }
-    if (item.raw_scores.positive_feedback_count === 0) {
+    if (item.raw_scores.feedback_score === 0) {
         warnings.push("No feedback received");
     }
-    if (item.raw_scores.attendance_quality === 0) {
+    if (item.raw_scores.attendance_rate === 0) {
         warnings.push("Attendance data unavailable");
-    }
-    if (item.raw_scores.task_completion_quality === 0) {
-        warnings.push("Task completion data unavailable");
     }
     return warnings;
 };
@@ -406,37 +403,27 @@ onMounted(async () => {
                                     <th
                                         class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
                                     >
-                                        C1
+                                        Perf
                                     </th>
                                     <th
                                         class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
                                     >
-                                        C2
+                                        Attend
                                     </th>
                                     <th
                                         class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
                                     >
-                                        C3
+                                        Goals
                                     </th>
                                     <th
                                         class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
                                     >
-                                        C4
+                                        Feedback
                                     </th>
                                     <th
                                         class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
                                     >
-                                        C5
-                                    </th>
-                                    <th
-                                        class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
-                                    >
-                                        C6
-                                    </th>
-                                    <th
-                                        class="text-center py-3 px-2 text-xs font-semibold text-brand-light uppercase tracking-wide"
-                                    >
-                                        C7
+                                        Tenure
                                     </th>
                                     <th
                                         class="text-center py-3 px-3 text-xs font-semibold text-brand-light uppercase tracking-wide w-32"
@@ -483,27 +470,25 @@ onMounted(async () => {
                                                 </span>
                                             </div>
                                         </td>
-                                        <!-- C1-C5 raw scores -->
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ (item.raw_scores.avg_manager_rating ?? 0).toFixed(2) }}
+                                        <!-- C1: Performance Score (0-100) -->
+                                        <td class="py-4 px-2 text-center text-sm text-brand-dark tabular-nums">
+                                            {{ (item.raw_scores.performance_score ?? 0).toFixed(1) }}
                                         </td>
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ (item.raw_scores.final_rating ?? 0).toFixed(2) }}
+                                        <!-- C2: Attendance Rate (0-100) -->
+                                        <td class="py-4 px-2 text-center text-sm text-brand-dark tabular-nums">
+                                            {{ (item.raw_scores.attendance_rate ?? 0).toFixed(1) }}
                                         </td>
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ (item.raw_scores.avg_goal_completion ?? 0).toFixed(1) }}%
+                                        <!-- C3: Goal Completion (0-100) -->
+                                        <td class="py-4 px-2 text-center text-sm text-brand-dark tabular-nums">
+                                            {{ (item.raw_scores.goal_completion ?? 0).toFixed(1) }}
                                         </td>
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ ((item.raw_scores.goal_completion_ratio ?? 0) * 100).toFixed(0) }}%
+                                        <!-- C4: Feedback Score (0-100) -->
+                                        <td class="py-4 px-2 text-center text-sm text-brand-dark tabular-nums">
+                                            {{ (item.raw_scores.feedback_score ?? 0).toFixed(1) }}
                                         </td>
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ item.raw_scores.positive_feedback_count }}
-                                        </td>
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ (item.raw_scores.attendance_quality ?? 0).toFixed(1) }}%
-                                        </td>
-                                        <td class="py-4 px-2 text-center text-sm text-brand-dark">
-                                            {{ (item.raw_scores.task_completion_quality ?? 0).toFixed(1) }}%
+                                        <!-- C5: Tenure Factor (0-100) -->
+                                        <td class="py-4 px-2 text-center text-sm text-brand-dark tabular-nums">
+                                            {{ (item.raw_scores.tenure_factor ?? 0).toFixed(1) }}
                                         </td>
                                         <!-- Closeness coefficient + bar -->
                                         <td class="py-4 px-3">
