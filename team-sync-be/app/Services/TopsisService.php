@@ -9,45 +9,19 @@ namespace App\Services;
  * kinerja komprehensif dalam satu review cycle.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * PRD vs Implementation Mapping (PRD Section 3.2 — Kriteria Penilaian)
+ * Kriteria PRD Section 3.2 — 5 kriteria (semua Benefit — semakin besar semakin baik)
  * ─────────────────────────────────────────────────────────────────────────────
  *
- * PRD specifies 5 criteria. The implementation uses 7 criteria for a more
- * granular analysis. The mapping is as follows:
+ *   performance_score (30%) — gabungan kompetensi + KPI (0-100)
+ *   attendance_rate   (20%) — persentase kehadiran (0-100)
+ *   goal_completion   (25%) — penyelesaian tujuan (0-100)
+ *   feedback_score    (15%) — skor umpan balik positif (0-100)
+ *   tenure_factor     (10%) — masa kerja, cap 60 bulan, skala 0-100
  *
- *   PRD Criteria (5)          → Implementation Criteria (7)
- *   ─────────────────────────────────────────────────────────────
- *   Performance Score (30%)   → C1: avg_manager_rating (15%)
- *                                + C2: final_rating (15%)
- *                              The PRD's single "Performance Score" is split into
- *                              competency (C1) and KPI (C2) for finer granularity.
- *
- *   Attendance Rate (20%)     → C6: attendance_quality (20%)
- *                              Direct 1:1 mapping.
- *
- *   Goal Completion (25%)     → C3: avg_goal_completion (15%)
- *                                + C4: goal_completion_ratio (10%)
- *                              Split into completion % and on-time ratio for
- *                              richer goal performance signal.
- *
- *   Feedback Score (15%)      → C5: positive_feedback_count (15%)
- *                              Direct 1:1 mapping.
- *
- *   Tenure Factor (10%)       → C7: task_completion_quality (10%)
- *                              Tenure Factor was not implemented as it requires
- *                              historical employment start_date data. Instead,
- *                              task_completion_quality (ratio of done/review tasks
- *                              relative to total assigned tasks) serves as a proxy
- *                              for work experience and productivity.
+ * Keys di sini HARUS cocok dengan DEFAULT_WEIGHTS di PerformanceTopsisController.
+ * Jika tidak cocok, semua bobot akan resolve ke 0.0 dan ranking akan rusak secara diam-diam.
  *
  * ─────────────────────────────────────────────────────────────────────────────
- *
- * Kriteria (semua Benefit — semakin besar semakin baik):
- *   C1 - performance_score  : Skor kinerja (30%) — gabungan kompetensi + KPI (0-100)
- *   C2 - attendance_rate    : Tingkat kehadiran (20%) — persentase hari masuk (0-100)
- *   C3 - goal_completion    : Penyelesaian tujuan (25%) — persentase selesai + tepat waktu (0-100)
- *   C4 - feedback_score     : Skor umpan balik (15%) — jumlah feedback positif yang diterima (0-100)
- *   C5 - tenure_factor      : Faktor masa kerja (10%) — skala 0-100 berdasarkan durasi kerja
  *
  * Langkah-langkah:
  *   1. Bangun matriks keputusan (decision matrix)
