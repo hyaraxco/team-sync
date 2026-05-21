@@ -49,6 +49,9 @@ class DatabaseSeeder extends Seeder
             // 7. Seed TOPSIS ranking dummy data (10 employees with full criteria data in Q4 2025)
             TopsisRankingDummySeeder::class,
 
+            // 8. Seed comprehensive dummy data (payroll, overtime, meetings, leave, goals, feedback, attendance)
+            ComprehensiveDummyDataSeeder::class,
+
             // Legacy seeders (disabled — replaced by DemoDataSeeder)
             // StaffMemberProfileSeeder::class,
             // TeamSeeder::class,
