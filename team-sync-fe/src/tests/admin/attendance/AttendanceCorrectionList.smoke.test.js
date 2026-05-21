@@ -73,7 +73,7 @@ describe("AttendanceCorrectionList smoke", () => {
 
     it("contains header text", () => {
         const wrapper = createWrapper();
-        expect(wrapper.text()).toContain("Attendance Corrections");
+        expect(wrapper.text()).toContain("Koreksi Absensi");
     });
 
     it("fetches data on mount", () => {

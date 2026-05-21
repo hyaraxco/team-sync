@@ -147,7 +147,7 @@ onMounted(() => {
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Review Templates</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Template Review</h1>
                 <p class="text-brand-light mt-1">Configure role-specific assessment parameters and weights</p>
             </div>
             <button

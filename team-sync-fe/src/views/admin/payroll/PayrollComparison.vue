@@ -75,9 +75,9 @@ const metrics = [
                     <RouterLink :to="{ name: 'admin.payroll.dashboard' }" class="text-gray-500 hover:text-gray-700">
                         <ArrowLeft class="w-5 h-5" />
                     </RouterLink>
-                    <h1 class="text-2xl font-bold text-gray-900">Month-over-Month Comparison</h1>
+                    <h1 class="text-2xl font-bold text-gray-900">Perbandingan Bulanan</h1>
                 </div>
-                <p class="text-sm text-gray-500 ml-7">Compare payroll expenditures between two periods.</p>
+                <p class="text-sm text-gray-500 ml-7">Bandingkan pengeluaran payroll antar periode.</p>
             </div>
         </div>
 
@@ -105,7 +105,7 @@ const metrics = [
                         :disabled="loadingAnalytics"
                         class="btn-primary w-full justify-center"
                     >
-                        <span v-if="loadingAnalytics">Loading...</span>
+                        <span v-if="loadingAnalytics">Memuat...</span>
                         <span v-else>Compare</span>
                     </button>
                 </div>

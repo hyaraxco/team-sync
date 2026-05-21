@@ -34,7 +34,7 @@ describe("StaffMemberSuccess smoke", () => {
     it("displays success content", () => {
         const wrapper = factory();
 
-        expect(wrapper.text()).toContain("Added Successfully!");
+        expect(wrapper.text()).toContain("Berhasil Ditambahkan!");
         expect(wrapper.text()).toContain("View All Staff Members");
         expect(wrapper.text()).toContain("Add Another Employee");
     });

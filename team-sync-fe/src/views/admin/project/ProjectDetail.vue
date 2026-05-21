@@ -158,7 +158,7 @@ onMounted(async () => {
                     <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                         <Briefcase class="w-6 h-6 text-blue-600" />
                     </div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Project Information</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Informasi Proyek</h2>
                 </div>
                 <div class="flex items-center gap-2">
                     <div
@@ -185,7 +185,7 @@ onMounted(async () => {
             <!-- Project Basic Info -->
             <div class="space-y-4">
                 <div>
-                    <h3 class="text-base font-semibold text-brand-dark mb-3">About Project</h3>
+                    <h3 class="text-base font-semibold text-brand-dark mb-3">Tentang Proyek</h3>
                     <div class="text-brand-light text-base leading-relaxed space-y-3">
                         <p v-for="(paragraph, index) in aboutParagraphs" :key="index">
                             {{ paragraph }}
@@ -194,7 +194,7 @@ onMounted(async () => {
                 </div>
 
                 <div>
-                    <h3 class="text-base font-semibold text-brand-dark mb-3">Assigned Teams</h3>
+                    <h3 class="text-base font-semibold text-brand-dark mb-3">Tim Ditugaskan</h3>
                     <EmptyState
                         v-if="!project.teams || project.teams.length === 0"
                         icon="Briefcase"
@@ -259,7 +259,7 @@ onMounted(async () => {
                     <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                         <Crown class="w-6 h-6 text-green-600" />
                     </div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Project Leader</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Pimpinan Proyek</h2>
                 </div>
 
                 <div v-if="project.leader" class="flex items-center gap-4">
@@ -450,13 +450,13 @@ onMounted(async () => {
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
-            <h2 class="text-lg font-semibold text-brand-dark">Danger Zone</h2>
+            <h2 class="text-lg font-semibold text-brand-dark">Zona Berbahaya</h2>
         </div>
         <div
             class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-2xl"
         >
             <div class="flex-1">
-                <h3 class="text-base font-semibold text-brand-dark mb-1">Delete Project</h3>
+                <h3 class="text-base font-semibold text-brand-dark mb-1">Hapus Proyek</h3>
                 <p class="text-brand-light text-sm">
                     Permanently delete this project and all associated data. This action cannot be undone.
                 </p>
@@ -466,7 +466,7 @@ onMounted(async () => {
                 class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-danger-600 transition-all duration-300 bg-gradient-to-r from-red-500 to-red-600 shadow-lg px-6 py-3 flex items-center gap-2"
             >
                 <Trash2 class="w-4 h-4 text-white" />
-                <span class="text-brand-white text-sm font-semibold">Delete Project</span>
+                <span class="text-brand-white text-sm font-semibold">Hapus Proyek</span>
             </button>
         </div>
     </div>

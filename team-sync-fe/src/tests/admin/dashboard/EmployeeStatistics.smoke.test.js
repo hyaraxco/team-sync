@@ -249,7 +249,7 @@ describe("EmployeeStatistics smoke", () => {
         const wrapper = factory();
         await flushUi();
 
-        expect(wrapper.text()).toContain("Failed to load activities.");
+        expect(wrapper.text()).toContain("Gagal memuat aktivitas.");
 
         await wrapper.get("button.text-red-700").trigger("click");
 

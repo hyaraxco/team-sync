@@ -155,11 +155,10 @@ onMounted(loadAdjustments);
             <div>
                 <h1 class="text-brand-dark text-[32px] font-bold leading-tight flex items-center gap-3">
                     <FileWarning class="w-8 h-8 text-amber-600" />
-                    Payroll Adjustment Queue
+                    Antrian Penyesuaian Payroll
                 </h1>
                 <p class="text-brand-light text-base font-normal mt-2 max-w-3xl">
-                    Review correction credits and deductions generated after attendance or leave updates. The current
-                    backend supports listing and approving pending adjustments; reject is not available.
+                    Review kredit dan potongan koreksi yang dihasilkan setelah perubahan absensi atau cuti.
                 </p>
             </div>
             <button
@@ -213,8 +212,8 @@ onMounted(loadAdjustments);
         <div class="rounded-2xl border border-brand-border bg-white p-5">
             <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-brand-dark">Adjustment Records</h2>
-                    <p class="text-sm text-brand-light">Filter by lifecycle status and approve pending records.</p>
+                    <h2 class="text-lg font-bold text-brand-dark">Antrian Penyesuaian</h2>
+                    <p class="text-sm text-brand-light">Filter berdasarkan status siklus dan setujui antrian tertunda.</p>
                 </div>
                 <label class="flex items-center gap-2 text-sm font-semibold text-brand-dark">
                     Status

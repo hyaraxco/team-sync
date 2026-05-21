@@ -158,7 +158,7 @@ describe("ThrManagement smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.get("h1").text()).toBe("THR Management");
+        expect(wrapper.get("h1").text()).toBe("Manajemen THR");
         expect(wrapper.findAll("button").some((button) => button.text() === "Generate THR")).toBe(true);
         expect(wrapper.findAll("button").some((button) => button.attributes("title") === "Approve")).toBe(false);
         expect(wrapper.findAll("button").some((button) => button.text() === "Mark Paid")).toBe(false);

@@ -97,8 +97,8 @@ onMounted(async () => {
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Pending Calibration</h1>
-                <p class="text-brand-light mt-1">Review and calibrate performance evaluations</p>
+                <h1 class="text-3xl font-bold text-brand-dark">Kalibrasi Tertunda</h1>
+                <p class="text-brand-light mt-1">Review dan kalibrasi evaluasi performa</p>
             </div>
         </div>
 

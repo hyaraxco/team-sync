@@ -202,7 +202,7 @@ describe("TeamEdit smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.text()).toContain("Team Information");
+        expect(wrapper.text()).toContain("Informasi Tim");
     });
 
     it("submits update and navigates back when successful", async () => {

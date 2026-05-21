@@ -381,8 +381,8 @@ const fetchPayrollActivityLogs = async () => {
         activityLogs.value = await payrollStore.fetchPayrollActivityLogs(route.params.id);
     } catch (error) {
         toast.error(
-            "Failed to load payroll activity logs",
-            payrollStore.error || error?.response?.data?.message || "Failed to load payroll activity logs.",
+            "Gagal memuat log aktivitas payroll",
+            payrollStore.error || error?.response?.data?.message || "Gagal memuat log aktivitas payroll.",
         );
     } finally {
         loadingActivityLogs.value = false;
@@ -780,7 +780,7 @@ const handleApprovePayroll = () => {
             <span class="text-brand-dark text-base font-semibold">Back</span>
         </button>
 
-        <h1 class="text-2xl font-semibold text-brand-dark">Payroll Detail</h1>
+        <h1 class="text-2xl font-semibold text-brand-dark">Detail Payroll</h1>
 
         <template v-if="hasPayrollStatistics">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -899,7 +899,7 @@ const handleApprovePayroll = () => {
         <div v-else class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-start justify-between gap-4">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Payroll Draft Review</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Review Draft Payroll</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         This view keeps company-wide salary statistics hidden while still allowing draft payroll review.
                     </p>
@@ -929,7 +929,7 @@ const handleApprovePayroll = () => {
                     data-testid="tab-employees"
                 >
                     <Users class="w-4 h-4" :class="activeTab === 'employees' ? 'text-white' : 'text-gray-600'" />
-                    <span class="text-sm font-semibold">Staff Member Details</span>
+                    <span class="text-sm font-semibold">Detail Karyawan</span>
                 </button>
                 <button
                     @click="activeTab = 'reconciliation'"
@@ -945,7 +945,7 @@ const handleApprovePayroll = () => {
                         class="w-4 h-4"
                         :class="activeTab === 'reconciliation' ? 'text-white' : 'text-gray-600'"
                     />
-                    <span class="text-sm font-semibold">Reconciliation Check</span>
+                    <span class="text-sm font-semibold">Cek Rekonsiliasi</span>
                 </button>
                 <button
                     @click="activeTab = 'settings'"
@@ -958,7 +958,7 @@ const handleApprovePayroll = () => {
                     data-testid="tab-settings"
                 >
                     <Settings class="w-4 h-4" :class="activeTab === 'settings' ? 'text-white' : 'text-gray-600'" />
-                    <span class="text-sm font-semibold">Settings Used</span>
+                    <span class="text-sm font-semibold">Pengaturan Digunakan</span>
                 </button>
                 <button
                     @click="activeTab = 'activity'"
@@ -995,7 +995,7 @@ const handleApprovePayroll = () => {
         >
                 <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Staff Member Details</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Detail Karyawan</h2>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -1165,7 +1165,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-center gap-3 mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Approval Chain</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Rantai Persetujuan</h2>
                 </div>
             </div>
 
@@ -1263,7 +1263,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Payroll Activity</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Aktivitas Payroll</h2>
                 </div>
             </div>
 
@@ -1330,7 +1330,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Settings Used</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Pengaturan Digunakan</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         Immutable payroll settings reference used when this payroll draft was generated.
                     </p>
@@ -1424,7 +1424,7 @@ const handleApprovePayroll = () => {
         >
             <div class="flex items-start justify-between gap-4 mb-6">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Reconciliation Check</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Cek Rekonsiliasi</h2>
                     <p class="text-brand-light text-sm font-normal mt-1">
                         Critical issues must be resolved before payroll can be marked as paid.
                     </p>
@@ -1595,7 +1595,7 @@ const handleApprovePayroll = () => {
         <div class="bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between">
                 <div>
-                    <h2 class="text-lg font-semibold text-brand-dark">Actions</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Aksi</h2>
                 </div>
 
                 <div class="flex items-center gap-3">
@@ -1663,7 +1663,7 @@ const handleApprovePayroll = () => {
                 <CheckCircle class="w-5 h-5 text-blue-600 mt-0.5" />
                 <div>
                     <p class="text-blue-700 text-sm font-semibold">Payroll approved</p>
-                    <p class="text-blue-700 text-sm">Review is complete. Finance can now mark this payroll as paid.</p>
+                    <p class="text-blue-700 text-sm">Review selesai. Finance dapat menandai payroll ini sebagai dibayar.</p>
                 </div>
             </div>
 

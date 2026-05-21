@@ -85,7 +85,7 @@ onMounted(async () => {
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">My Performance Reviews</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Review Performa Saya</h1>
                 <p class="text-brand-light mt-1">Track your performance evaluations and growth</p>
             </div>
         </div>

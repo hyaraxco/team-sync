@@ -75,7 +75,7 @@ describe("ForgotPassword smoke", () => {
 
     it("displays reset password heading", () => {
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Reset password");
+        expect(wrapper.text()).toContain("Atur Ulang Password");
     });
 
     it("submits forgot password request", async () => {
@@ -94,7 +94,7 @@ describe("ForgotPassword smoke", () => {
         authStoreRefs.success.value = "Reset link sent";
         const wrapper = factory();
 
-        expect(wrapper.text()).toContain("Check your email");
+        expect(wrapper.text()).toContain("Cek Email Anda");
         expect(wrapper.text()).toContain("Return to sign in");
     });
 

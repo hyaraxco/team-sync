@@ -199,7 +199,7 @@ onMounted(() => {
         </div>
 
         <div v-else-if="error" class="rounded-xl border border-red-100 bg-red-50 px-4 py-3">
-            <p class="text-sm text-red-700">Unable to load notifications.</p>
+            <p class="text-sm text-red-700">Gagal memuat notifikasi.</p>
             <button
                 type="button"
                 class="mt-2 text-sm font-semibold text-red-700 hover:underline"

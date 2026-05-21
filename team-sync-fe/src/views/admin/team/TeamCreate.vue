@@ -130,7 +130,7 @@ watch(
                             <User class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Team Information</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Informasi Tim</h3>
                             <p class="text-brand-light text-sm font-normal">Basic team details and description</p>
                         </div>
                     </div>
@@ -283,7 +283,7 @@ watch(
                             <Crown class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Team Lead</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Pimpinan Tim</h3>
                             <p class="text-brand-light text-sm font-normal">Assign a team leader to manage this team</p>
                         </div>
                     </div>
@@ -291,7 +291,7 @@ watch(
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-5">
                         <!-- Team Lead Selection -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Select Team Lead</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Pimpinan Tim</label>
                             <button
                                 type="button"
                                 class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
@@ -339,7 +339,7 @@ watch(
                             <ListCheck class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Team Responsibilities</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Tanggung Jawab Tim</h3>
                             <p class="text-brand-light text-sm font-normal">
                                 Define the key responsibilities and duties for this team
                             </p>
@@ -424,7 +424,7 @@ watch(
                             <Settings class="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Team Settings</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Pengaturan Tim</h3>
                             <p class="text-brand-light text-sm font-normal">Configure team status</p>
                         </div>
                     </div>
@@ -601,7 +601,7 @@ watch(
                             <Crown class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Select Team Lead</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Pilih Pimpinan Tim</h3>
                             <p class="text-brand-light text-sm font-normal">Choose an employee to lead this team</p>
                         </div>
                     </div>

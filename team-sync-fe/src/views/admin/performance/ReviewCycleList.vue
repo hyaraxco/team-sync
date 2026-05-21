@@ -126,7 +126,7 @@ onMounted(async () => {
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Performance Review Cycles</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Siklus Review Performa</h1>
                 <p class="text-brand-light mt-1">Manage company-wide performance review cycles</p>
             </div>
             <button

@@ -180,7 +180,7 @@ describe("PayrollDashboard smoke", () => {
         expect(fetchPayrollAnalytics).not.toHaveBeenCalled();
         expect(fetchPayrolls).toHaveBeenCalledWith({ page: 1, row_per_page: 10 });
         expect(wrapper.text()).toContain("Payroll Operations");
-        expect(wrapper.text()).toContain("Create New Payroll");
+        expect(wrapper.text()).toContain("Buat Payroll Baru");
         expect(wrapper.text()).not.toContain("Total Payroll Amount");
     });
 
@@ -202,7 +202,7 @@ describe("PayrollDashboard smoke", () => {
         expect(fetchPayrollAnalytics).toHaveBeenCalledWith(6);
         expect(wrapper.text()).toContain("Total Payroll Amount");
         expect(wrapper.text()).toContain("Payroll Analytics (Last 6 Periods)");
-        expect(wrapper.text()).toContain("Create New Payroll");
+        expect(wrapper.text()).toContain("Buat Payroll Baru");
         expect(wrapper.text()).toContain("Readiness Dashboard");
         expect(wrapper.text()).toContain("Export Payroll Report");
         const settingsLink = wrapper.find('[data-testid="payroll-settings-link"]');

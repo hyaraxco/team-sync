@@ -158,6 +158,6 @@ describe("ProjectCreate smoke", () => {
 
         await openButton.trigger("click");
 
-        expect(wrapper.text()).toContain("Select Project Leader");
+        expect(wrapper.text()).toContain("Pilih Pimpinan Proyek");
     });
 });

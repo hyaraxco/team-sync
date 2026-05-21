@@ -114,7 +114,7 @@ onMounted(() => {
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Performance Outcome Rules</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Aturan Outcome Performa</h1>
                 <p class="text-brand-light mt-1">Configure automatic outcomes based on review ratings</p>
             </div>
             <button

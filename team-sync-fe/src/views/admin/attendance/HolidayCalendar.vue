@@ -155,9 +155,9 @@ onMounted(() => {
             <div>
                 <h1 class="text-2xl font-bold text-brand-dark flex items-center gap-2">
                     <Calendar class="w-6 h-6" />
-                    Holiday Calendar
+                    Kalender Libur
                 </h1>
-                <p class="text-sm text-brand-light mt-1">Manage national holidays and collective leave dates.</p>
+                <p class="text-sm text-brand-light mt-1">Kelola hari libur nasional dan cuti bersama.</p>
             </div>
 
             <button

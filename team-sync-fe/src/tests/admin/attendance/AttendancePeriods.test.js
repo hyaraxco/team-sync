@@ -16,7 +16,7 @@ describe("AttendancePeriods.vue", () => {
             },
         });
 
-        expect(wrapper.text()).toContain("Attendance Periods");
+        expect(wrapper.text()).toContain("Periode Absensi");
         expect(wrapper.text()).toContain("Readiness");
     });
 });

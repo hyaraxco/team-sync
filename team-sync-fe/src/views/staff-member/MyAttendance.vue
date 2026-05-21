@@ -519,7 +519,7 @@ onUnmounted(() => {
                         <CalendarCheck class="w-8 h-8 text-white" />
                     </div>
                     <div>
-                        <h1 class="text-2xl font-semibold text-white">Attendance Overview</h1>
+                        <h1 class="text-2xl font-semibold text-white">Ringkasan Absensi</h1>
                         <p class="text-white/90 text-base font-normal">
                             Track attendance and manage leave requests
                         </p>
@@ -660,7 +660,7 @@ onUnmounted(() => {
                 </div>
 
                 <div v-if="attendanceLoading" class="text-center py-8">
-                    <p class="text-brand-light">Loading...</p>
+                    <p class="text-brand-light">Memuat...</p>
                 </div>
 
                 <div v-else-if="attendanceViewMode === 'list'" class="space-y-3">
@@ -822,7 +822,7 @@ onUnmounted(() => {
                 </div>
 
                 <div v-if="leaveLoading" class="text-center py-8">
-                    <p class="text-brand-light">Loading...</p>
+                    <p class="text-brand-light">Memuat...</p>
                 </div>
 
                 <div v-else class="space-y-4">
@@ -910,7 +910,7 @@ onUnmounted(() => {
                                     <CalendarPlus class="w-6 h-6 text-blue-600" />
                                 </div>
                                 <div>
-                                    <h2 class="text-xl font-semibold text-brand-dark">Request New Leave</h2>
+                                    <h2 class="text-xl font-semibold text-brand-dark">Ajukan Cuti Baru</h2>
                                     <p class="text-brand-light text-sm font-normal">
                                         Submit a leave request for approval
                                     </p>

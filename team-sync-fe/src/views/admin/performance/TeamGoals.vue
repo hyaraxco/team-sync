@@ -85,7 +85,7 @@ onMounted(async () => {
 <template>
     <div class="space-y-6">
         <div>
-            <h1 class="text-3xl font-bold text-brand-dark">Team Goals</h1>
+            <h1 class="text-3xl font-bold text-brand-dark">Sasaran Tim</h1>
             <p class="text-brand-light mt-1">Monitor and manage your team's goals</p>
         </div>
 

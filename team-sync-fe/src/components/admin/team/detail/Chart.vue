@@ -169,7 +169,7 @@ watch(
             <!-- Chart Container -->
             <div class="relative">
                 <div v-if="loadingTeamChart" class="flex items-center justify-center" style="height: 250px">
-                    <p class="text-brand-light">Loading...</p>
+                    <p class="text-brand-light">Memuat...</p>
                 </div>
                 <VueApexCharts
                     v-else
@@ -196,7 +196,7 @@ watch(
             <!-- Chart Container -->
             <div class="relative">
                 <div v-if="loadingTeamChart" class="flex items-center justify-center" style="height: 250px">
-                    <p class="text-brand-light">Loading...</p>
+                    <p class="text-brand-light">Memuat...</p>
                 </div>
                 <VueApexCharts
                     v-else

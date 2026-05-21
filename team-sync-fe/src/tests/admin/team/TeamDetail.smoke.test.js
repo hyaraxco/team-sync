@@ -185,6 +185,6 @@ describe("TeamDetail smoke", () => {
         expect(staffMemberStoreMock.fetchStaffMembers).toHaveBeenCalledWith({
             limit: 6,
         });
-        expect(wrapper.text()).toContain("Add Team Member");
+        expect(wrapper.text()).toContain("Tambah Anggota");
     });
 });

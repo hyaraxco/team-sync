@@ -173,7 +173,7 @@ function handlePageChange(page) {
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">THR Management</h1>
+                <h1 class="text-2xl font-bold text-gray-900">Manajemen THR</h1>
                 <p class="text-sm text-gray-500 mt-1">Tunjangan Hari Raya — Religious Holiday Bonus</p>
             </div>
             <div class="flex items-center gap-3">

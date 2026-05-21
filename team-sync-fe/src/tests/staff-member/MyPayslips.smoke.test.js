@@ -130,7 +130,7 @@ describe("MyPayslips smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.text()).toContain("My Payroll");
+        expect(wrapper.text()).toContain("Payroll Saya");
         expect(wrapper.text()).toContain("April 2026");
         expect(wrapper.text()).toContain("Average Net Salary");
 

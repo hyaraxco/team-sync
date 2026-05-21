@@ -139,7 +139,7 @@ onMounted(async () => {
     <div class="flex-1 flex flex-col overflow-hidden">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
-                <h1 class="text-2xl font-semibold text-brand-dark">Attendance Overview</h1>
+                <h1 class="text-2xl font-semibold text-brand-dark">Ringkasan Absensi</h1>
             </div>
         </div>
 
@@ -310,13 +310,13 @@ onMounted(async () => {
                             <CalendarClock class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Latest Leave Requests</h2>
+                            <h2 class="text-lg font-semibold text-brand-dark">Pengajuan Cuti Terbaru</h2>
                         </div>
                     </div>
                 </div>
 
                 <div v-if="loadingLeaveRequests" class="text-center py-12">
-                    <p class="text-gray-500 text-lg font-medium">Loading...</p>
+                    <p class="text-gray-500 text-lg font-medium">Memuat...</p>
                 </div>
                 <div v-else class="space-y-4">
                     <div
@@ -380,13 +380,13 @@ onMounted(async () => {
                             <Clock class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Pending Corrections</h2>
+                            <h2 class="text-lg font-semibold text-brand-dark">Koreksi Tertunda</h2>
                         </div>
                     </div>
                 </div>
 
                 <div v-if="loadingCorrections" class="text-center py-12">
-                    <p class="text-gray-500 text-lg font-medium">Loading...</p>
+                    <p class="text-gray-500 text-lg font-medium">Memuat...</p>
                 </div>
                 <div v-else class="space-y-4">
                     <div
@@ -441,7 +441,7 @@ onMounted(async () => {
                     <Check class="w-6 h-6 text-green-600" />
                 </div>
                 <div>
-                    <p class="text-brand-light text-sm">Confirm approval for this leave request</p>
+                    <p class="text-brand-light text-sm">Konfirmasi persetujuan untuk pengajuan cuti ini</p>
                 </div>
             </div>
 
@@ -490,7 +490,7 @@ onMounted(async () => {
                     <X class="w-6 h-6 text-red-600" />
                 </div>
                 <div>
-                    <p class="text-brand-light text-sm">Confirm rejection for this leave request</p>
+                    <p class="text-brand-light text-sm">Konfirmasi penolakan untuk pengajuan cuti ini</p>
                 </div>
             </div>
 

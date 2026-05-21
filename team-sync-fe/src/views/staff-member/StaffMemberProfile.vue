@@ -65,7 +65,7 @@ onMounted(() => {
 
 <template>
     <div v-if="loading" class="flex items-center justify-center h-64">
-        <p class="text-gray-500">Loading...</p>
+        <p class="text-gray-500">Memuat...</p>
     </div>
 
     <div v-else-if="resolvedProfile">

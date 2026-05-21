@@ -147,7 +147,7 @@ describe("PayrollSettings smoke", () => {
         expect(fetchSettings).toHaveBeenCalledTimes(1);
         expect(fetchSettingsHistory).toHaveBeenCalledTimes(1);
         expect(fetchBpjsRateHistory).toHaveBeenCalledTimes(1);
-        expect(wrapper.text()).toContain("Payroll Settings");
+        expect(wrapper.text()).toContain("Pengaturan Payroll");
         expect(wrapper.text()).toContain("Updated by Dwimeta");
         expect(wrapper.text()).toContain("Active v3");
         expect(wrapper.find('[data-testid="payroll-settings-history-list"]').exists()).toBe(true);

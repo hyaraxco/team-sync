@@ -118,11 +118,11 @@ describe("PayrollAdjustmentQueue smoke", () => {
             page: 1,
             per_page: 15,
         });
-        expect(wrapper.text()).toContain("Payroll Adjustment Queue");
+        expect(wrapper.text()).toContain("Antrian Penyesuaian Payroll");
         expect(wrapper.text()).toContain("Dewi Finance");
         expect(wrapper.text()).toContain("Absence Correction Credit");
         expect(wrapper.text()).toContain("Rafi Payroll");
-        expect(wrapper.text()).toContain("reject is not available");
+        expect(wrapper.text()).toContain("antrian tertunda");
         expect(wrapper.findAll("button").some((button) => button.text() === "Approve")).toBe(true);
     });
 

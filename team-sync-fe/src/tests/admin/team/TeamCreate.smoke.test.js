@@ -162,7 +162,7 @@ describe("TeamCreate smoke", () => {
 
     it("displays core section heading", () => {
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Team Information");
+        expect(wrapper.text()).toContain("Informasi Tim");
     });
 
     it("submits create action and navigates when successful", async () => {

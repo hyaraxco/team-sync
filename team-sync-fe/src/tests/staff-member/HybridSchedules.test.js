@@ -32,7 +32,7 @@ describe("HybridSchedules.vue", () => {
 
         await flushPromises();
 
-        expect(wrapper.text()).toContain("Hybrid Schedule");
+        expect(wrapper.text()).toContain("Jadwal Hybrid");
         expect(wrapper.text()).toContain("Request Override");
     });
 });

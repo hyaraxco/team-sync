@@ -62,7 +62,7 @@ onMounted(async () => {
     <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">All Staff Members</h3>
+                <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Semua Karyawan</h3>
                 <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
                     Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} employees
                 </p>

@@ -238,7 +238,7 @@ const handleExportReport = async () => {
 
 <template>
     <div>
-        <h1 class="text-2xl font-semibold text-brand-dark">Payroll Dashboard</h1>
+        <h1 class="text-2xl font-semibold text-brand-dark">Dashboard Payroll</h1>
         <template v-if="hasPayrollStatistics">
             <!-- Stats Layout -->
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -281,7 +281,7 @@ const handleExportReport = async () => {
                 <div
                     class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
-                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Aksi Payroll</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
@@ -289,7 +289,7 @@ const handleExportReport = async () => {
                             class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
-                            <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
+                            <span class="text-brand-white text-sm font-semibold">Buat Payroll Baru</span>
                         </RouterLink>
 
                         <RouterLink
@@ -563,7 +563,7 @@ const handleExportReport = async () => {
                 </div>
 
         <div class="bg-white border border-brand-border rounded-2xl p-6">
-                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Aksi Payroll</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
@@ -571,7 +571,7 @@ const handleExportReport = async () => {
                             class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
-                            <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
+                            <span class="text-brand-white text-sm font-semibold">Buat Payroll Baru</span>
                         </RouterLink>
                         <RouterLink
                             v-if="hasPayrollCreate"
@@ -597,7 +597,7 @@ const handleExportReport = async () => {
 
         <!-- Monthly Payroll Periods -->
                 <div class="bg-white border border-brand-border rounded-2xl p-6">
-                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark mb-4">Aksi Payroll</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
@@ -605,7 +605,7 @@ const handleExportReport = async () => {
                             class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
-                            <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
+                            <span class="text-brand-white text-sm font-semibold">Buat Payroll Baru</span>
                         </RouterLink>
                         <RouterLink
                             v-if="hasPayrollCreate"

@@ -135,7 +135,7 @@ const clearSearch = () => {
 <template>
     <div>
         <div class="mb-6">
-            <h2 class="text-brand-dark font-bold text-2xl mb-2">My Payroll</h2>
+            <h2 class="text-brand-dark font-bold text-2xl mb-2">Payroll Saya</h2>
             <p class="text-gray-600">View and download your payroll history</p>
         </div>
 
@@ -242,7 +242,7 @@ const clearSearch = () => {
 
         <div class="bg-white border border-brand-border rounded-2xl p-5 mb-6">
             <div class="mb-6">
-                <h3 class="text-brand-dark font-bold text-xl">All Payroll Periods</h3>
+                <h3 class="text-brand-dark font-bold text-xl">Semua Periode Payroll</h3>
                 <p class="text-gray-600 text-sm mt-1">
                     Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} payroll periods
                 </p>

@@ -71,7 +71,7 @@ onMounted(async () => {
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Feedback Received</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Feedback Diterima</h1>
                 <p class="text-brand-light mt-1">View and acknowledge feedback from your colleagues</p>
             </div>
         </div>

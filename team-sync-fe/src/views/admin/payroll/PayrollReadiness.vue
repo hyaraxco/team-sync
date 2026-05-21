@@ -376,7 +376,7 @@ watch(salaryMonth, () => {
                         <Users class="w-6 h-6 text-blue-600" />
                     </div>
                     <div>
-                        <h1 class="text-brand-dark text-xl font-bold">Attendance-to-Payroll Readiness</h1>
+                        <h1 class="text-brand-dark text-xl font-bold">Kesiapan Absensi-ke-Payroll</h1>
                         <p class="text-brand-light text-sm font-normal">
                             Identify and resolve blockers before payroll generation
                         </p>

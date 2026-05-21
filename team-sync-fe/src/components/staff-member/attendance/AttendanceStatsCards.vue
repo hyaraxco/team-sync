@@ -126,7 +126,7 @@ const formatLeaveType = (type) => {
                 <p class="text-brand-dark text-sm font-semibold mb-3">Leave Breakdown</p>
 
                 <div v-if="leaveLoading" class="text-center py-3">
-                    <p class="text-brand-light text-sm">Loading...</p>
+                    <p class="text-brand-light text-sm">Memuat...</p>
                 </div>
 
                 <div v-else-if="leaveBalances.length === 0" class="text-center py-3">

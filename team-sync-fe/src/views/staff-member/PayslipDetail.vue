@@ -218,7 +218,7 @@ const getAdjustmentStatusClass = (status) => {
                 <div class="border-b-2 border-gray-200 pb-6 mb-6">
                     <div class="flex items-start justify-between">
                         <div>
-                            <h1 class="text-3xl font-extrabold text-brand-dark mb-2">My Payroll</h1>
+                            <h1 class="text-3xl font-extrabold text-brand-dark mb-2">Payroll Saya</h1>
                             <p class="text-gray-600">
                                 {{ formatPeriod(payslip.period) }}
                             </p>
@@ -516,7 +516,7 @@ const getAdjustmentStatusClass = (status) => {
                 </div>
             </div>
 
-            <EmptyState v-else icon="FileText" title="Payroll detail not found" size="lg" />
+            <EmptyState v-else icon="FileText" title="Detail payroll tidak ditemukan" size="lg" />
         </div>
     </div>
 </template>

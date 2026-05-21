@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Policy Mismatches</h1>
+                    <h1 class="text-2xl font-bold text-brand-dark">Mismatch Kebijakan</h1>
                     <p class="text-brand-light text-sm mt-1">
                         Review and resolve discrepancies between employee scheduled work locations and actual attendance data.
                     </p>
@@ -16,7 +16,7 @@
                 class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
             >
                 <AlertTriangle class="w-5 h-5 shrink-0" />
-                <p>Unable to load policy mismatches. Please try again later.</p>
+                <p>Gagal memuat mismatch kebijakan. Silakan coba lagi nanti.</p>
             </div>
 
             <!-- Loading State -->
@@ -30,8 +30,8 @@
                 class="bg-white border border-brand-border rounded-2xl p-12 text-center"
             >
                 <CheckCircle class="w-12 h-12 mx-auto mb-3 text-green-500" />
-                <p class="text-brand-dark font-semibold text-lg">No pending policy mismatches</p>
-                <p class="text-brand-light text-sm mt-1">All attendance logs match their scheduled locations.</p>
+                <p class="text-brand-dark font-semibold text-lg">Tidak ada mismatch kebijakan tertunda</p>
+                <p class="text-brand-light text-sm mt-1">Semua log absensi sesuai dengan lokasi terjadwal.</p>
             </div>
 
             <!-- Table -->

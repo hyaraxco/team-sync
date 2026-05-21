@@ -46,7 +46,7 @@ describe("HybridScheduleList smoke", () => {
     it("renders without crashing", () => {
         const wrapper = createWrapper();
         expect(wrapper.exists()).toBe(true);
-        expect(wrapper.text()).toContain("Hybrid Work Schedules");
+        expect(wrapper.text()).toContain("Jadwal Hybrid");
     });
 
     it("calls fetchAllPaginated on mount", () => {

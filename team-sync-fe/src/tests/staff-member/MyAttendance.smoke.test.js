@@ -212,7 +212,7 @@ describe("MyAttendance smoke", () => {
         await flushPromises();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).toContain("Request New Leave");
+        expect(wrapper.text()).toContain("Ajukan Cuti Baru");
         expect(routerReplace).toHaveBeenCalledWith({
             name: "staffMember.attendance.my-attendances",
             params: {},
@@ -233,7 +233,7 @@ describe("MyAttendance smoke", () => {
         await flushPromises();
         await wrapper.vm.$nextTick();
 
-        expect(wrapper.text()).not.toContain("Request New Leave");
+        expect(wrapper.text()).not.toContain("Ajukan Cuti Baru");
         expect(routerReplace).not.toHaveBeenCalled();
     });
 

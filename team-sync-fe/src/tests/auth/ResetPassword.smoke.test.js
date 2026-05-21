@@ -88,7 +88,7 @@ describe("ResetPassword smoke", () => {
         };
 
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Invalid reset link");
+        expect(wrapper.text()).toContain("Tautan Reset Tidak Valid");
         expect(wrapper.text()).toContain("Request new link");
     });
 
@@ -112,7 +112,7 @@ describe("ResetPassword smoke", () => {
         authStoreRefs.success.value = "Password reset success";
         const wrapper = factory();
 
-        expect(wrapper.text()).toContain("Password updated");
+        expect(wrapper.text()).toContain("Password Diperbarui");
         expect(wrapper.text()).toContain("Return to sign in");
     });
 

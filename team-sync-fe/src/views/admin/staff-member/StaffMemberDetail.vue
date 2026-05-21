@@ -98,7 +98,7 @@ onMounted(() => {
             <div
                 class="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"
             ></div>
-            <p class="text-brand-dark text-lg font-medium">Loading staff member data...</p>
+            <p class="text-brand-dark text-lg font-medium">Memuat data karyawan...</p>
         </div>
     </div>
 
@@ -260,7 +260,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <Users class="w-6 h-6 text-indigo-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Team Information</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Informasi Tim</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -281,7 +281,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <Contact class="w-6 h-6 text-teal-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Contact Details</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Detail Kontak</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -310,7 +310,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <Calendar class="w-6 h-6 text-blue-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Personal Information</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Informasi Pribadi</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -355,7 +355,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <Phone class="w-6 h-6 text-red-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Emergency Contact</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Kontak Darurat</h2>
                 </div>
                 <div
                     class="space-y-4"
@@ -396,7 +396,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <MapPin class="w-6 h-6 text-purple-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Address Information</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Informasi Alamat</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-start">
@@ -423,7 +423,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <Briefcase class="w-6 h-6 text-green-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Employment Details</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Detail Pekerjaan</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -482,7 +482,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <FileText class="w-6 h-6 text-orange-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Administrative Information</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Informasi Administrasi</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -497,7 +497,7 @@ onMounted(() => {
             <div class="bg-white border border-brand-border rounded-2xl p-6">
                 <div class="flex items-center gap-3 mb-4">
                     <Briefcase class="w-6 h-6 text-cyan-600" />
-                    <h2 class="text-brand-dark text-lg font-semibold">Bank Information</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Informasi Bank</h2>
                 </div>
                 <div class="space-y-4">
                     <div class="flex justify-between items-center">
@@ -525,13 +525,13 @@ onMounted(() => {
         <div v-if="can('staff-member-delete')" class="bg-white border border-danger-100 rounded-2xl p-6">
             <div class="flex items-center gap-3 mb-6">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
-                <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
+                <h2 class="text-brand-dark text-lg font-semibold">Zona Berbahaya</h2>
             </div>
             <div
                 class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
             >
                 <div class="flex-1">
-                    <h3 class="text-brand-dark text-base font-semibold mb-1">Delete Staff Member Profile</h3>
+                    <h3 class="text-brand-dark text-base font-semibold mb-1">Hapus Profil Karyawan</h3>
                     <p class="text-brand-light text-sm">
                         Permanently remove this staff member and all associated data. This action cannot be undone.
                     </p>

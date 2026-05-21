@@ -41,7 +41,7 @@
         <!-- Rating Distribution Chart -->
         <MainCard title="Rating Distribution" class="p-6">
             <div v-if="enhancedMetricsLoading" class="h-64 flex items-center justify-center">
-                <div class="animate-pulse text-gray-400">Loading...</div>
+                <div class="animate-pulse text-gray-400">Memuat...</div>
             </div>
             <div v-else-if="normalizedRatingDistribution.length" class="h-64">
                 <VueApexCharts type="bar" height="100%" :options="ratingChartOptions" :series="ratingChartSeries" />
@@ -52,7 +52,7 @@
         <!-- Team Performance Table -->
         <MainCard title="Team Performance Summary" class="p-6">
             <div v-if="enhancedMetricsLoading" class="h-48 flex items-center justify-center">
-                <div class="animate-pulse text-gray-400">Loading...</div>
+                <div class="animate-pulse text-gray-400">Memuat...</div>
             </div>
             <div v-else-if="teamReviewRows.length" class="overflow-x-auto">
                 <table class="w-full text-sm">

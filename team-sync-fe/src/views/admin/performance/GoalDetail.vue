@@ -140,7 +140,7 @@ onMounted(async () => {
                 <ArrowLeft class="w-5 h-5" />
             </button>
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Goal Details</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Detail Sasaran</h1>
                 <p class="text-brand-light mt-1">Track goal progress, metrics, and update timeline</p>
             </div>
         </div>

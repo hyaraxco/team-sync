@@ -117,7 +117,7 @@ const onRejectAction = (req) => {
     <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</h1>
+                <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Koreksi Absensi</h1>
                 <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
                     Showing {{ meta.from || 0 }} - {{ meta.to || 0 }} of {{ meta.total || 0 }} requests
                 </p>
@@ -139,7 +139,7 @@ const onRejectAction = (req) => {
                 </thead>
                 <tbody>
                     <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                        <td colspan="6" class="py-8 text-center text-gray-500">Loading...</td>
+                        <td colspan="6" class="py-8 text-center text-gray-500">Memuat...</td>
                     </tr>
                     <tr
                         v-else-if="!paginatedCorrections || paginatedCorrections.length === 0"
@@ -255,7 +255,7 @@ const onRejectAction = (req) => {
                 <Check class="w-6 h-6 text-green-600" />
             </div>
             <div>
-                <p class="text-brand-light text-sm">Confirm approval for this attendance correction.</p>
+                <p class="text-brand-light text-sm">Konfirmasi persetujuan untuk koreksi absensi ini.</p>
             </div>
         </div>
         <div v-if="selectedApproveCorrection" class="mb-6 space-y-3">
@@ -307,7 +307,7 @@ const onRejectAction = (req) => {
                 <X class="w-6 h-6 text-red-600" />
             </div>
             <div>
-                <p class="text-brand-light text-sm">Confirm rejection for this attendance correction.</p>
+                <p class="text-brand-light text-sm">Konfirmasi penolakan untuk koreksi absensi ini.</p>
             </div>
         </div>
         <div v-if="selectedRejectCorrection" class="mb-4">

@@ -72,7 +72,7 @@ onMounted(async () => {
 <template>
     <div class="space-y-6">
         <div>
-            <h1 class="text-3xl font-bold text-brand-dark">Give Feedback</h1>
+            <h1 class="text-3xl font-bold text-brand-dark">Beri Feedback</h1>
             <p class="text-brand-light mt-1">
                 Provide meaningful feedback to your team members
                 <span v-if="authStore.user?.name">as {{ authStore.user.name }}</span>

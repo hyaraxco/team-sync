@@ -99,7 +99,7 @@ describe("PayrollApprovalMatrix smoke", () => {
         await nextTick();
         await Promise.resolve();
 
-        expect(wrapper.text()).toContain("Payroll Approval Matrix");
+        expect(wrapper.text()).toContain("Matriks Persetujuan Payroll");
         expect(wrapper.text()).toContain("Add Policy");
         expect(wrapper.text()).toContain(
             "Configure threshold-based approval steps for payroll batches before payment",

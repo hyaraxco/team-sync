@@ -175,7 +175,7 @@ describe("PayrollDetail smoke", () => {
         expect(fetchPayrollDetails).toHaveBeenCalled();
         expect(fetchPayrollStatistics).not.toHaveBeenCalled();
         expect(fetchPayrollNotificationDeliveries).not.toHaveBeenCalled();
-        expect(wrapper.text()).toContain("Payroll Draft Review");
+        expect(wrapper.text()).toContain("Review Draft Payroll");
         expect(wrapper.text()).not.toContain("Mark as Paid");
         expect(wrapper.text()).not.toContain("Total Staff Members");
         expect(wrapper.text()).toContain("Export Excel");
@@ -192,7 +192,7 @@ describe("PayrollDetail smoke", () => {
         expect(wrapper.text()).toContain("Total Staff Members");
         expect(wrapper.text()).toContain("Approve Payroll");
         expect(wrapper.text()).not.toContain("Mark as Paid");
-        expect(wrapper.text()).not.toContain("Payroll Draft Review");
+        expect(wrapper.text()).not.toContain("Review Draft Payroll");
     });
 
     it("shows mark as paid only after payroll has been approved", async () => {
@@ -473,7 +473,7 @@ describe("PayrollDetail smoke", () => {
         await flushView();
 
         expect(wrapper.find('[data-testid="payroll-settings-used-grid"]').exists()).toBe(true);
-        expect(wrapper.text()).toContain("Settings Used");
+        expect(wrapper.text()).toContain("Pengaturan Digunakan");
         expect(wrapper.text()).toContain("Auto business days");
     });
 

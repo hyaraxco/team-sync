@@ -97,7 +97,7 @@ onMounted(async () => {
                 <ArrowLeft class="w-5 h-5 text-brand-dark" />
             </button>
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Create Review Cycle</h1>
+                <h1 class="text-3xl font-bold text-brand-dark">Buat Siklus Review</h1>
                 <p class="text-brand-light mt-1">Set up a new performance review cycle</p>
             </div>
         </div>
@@ -174,7 +174,7 @@ onMounted(async () => {
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
-                        <label class="block text-sm font-medium text-brand-dark mb-2">Cycle Start Date *</label>
+                        <label class="block text-sm font-medium text-brand-dark mb-2">Tanggal Mulai Siklus *</label>
                         <input
                             v-model="formData.start_date"
                             type="date"

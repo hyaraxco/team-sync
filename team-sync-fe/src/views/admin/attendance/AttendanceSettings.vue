@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">System Configuration</h1>
+                    <h1 class="text-2xl font-bold text-brand-dark">Konfigurasi Sistem</h1>
                     <p class="text-brand-light text-sm mt-1">
                         Configure global attendance rules, grace periods, and manage holiday schedules across the organization.
                     </p>
@@ -121,7 +121,7 @@
                     class="relative z-10 space-y-6"
                 >
                     <div class="flex justify-between items-center">
-                        <h2 class="text-lg font-bold text-brand-dark">Leave Quotas & Rules</h2>
+                        <h2 class="text-lg font-bold text-brand-dark">Kuota & Aturan Cuti</h2>
                     </div>
 
                     <div v-if="entitlementStore.loading" class="text-brand-light p-8 flex justify-center w-full">
@@ -217,7 +217,7 @@
 
                 <section v-else-if="activeTab === 'Holiday Calendars'" key="holidays" class="relative z-10 space-y-6">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-light">Upcoming Holidays</h2>
+                        <h2 class="text-2xl font-light">Libur Mendatang</h2>
                         <button
                             class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300"
                             type="button"

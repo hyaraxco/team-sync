@@ -94,8 +94,8 @@ describe("PayrollComparison smoke", () => {
         const wrapper = factory();
         await nextTick();
 
-        expect(wrapper.text()).toContain("Month-over-Month Comparison");
-        expect(wrapper.text()).toContain("Compare payroll expenditures between two periods");
+        expect(wrapper.text()).toContain("Perbandingan Bulanan");
+        expect(wrapper.text()).toContain("Bandingkan pengeluaran payroll antar periode.");
         expect(wrapper.find("input[type='month']").exists()).toBe(true);
     });
 
@@ -117,7 +117,7 @@ describe("PayrollComparison smoke", () => {
         await nextTick();
 
         expect(wrapper.find(".animate-spin").exists()).toBe(true);
-        expect(wrapper.text()).toContain("Loading...");
+        expect(wrapper.text()).toContain("Memuat...");
     });
 
     it("shows error message when error exists", async () => {

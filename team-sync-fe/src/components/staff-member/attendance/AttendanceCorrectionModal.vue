@@ -62,7 +62,7 @@ const handleSubmit = () => {
     <div v-if="show" class="fixed inset-0 z-50 flex items-center justify-center bg-brand-dark/50 p-4">
         <div class="bg-white rounded-3xl w-full max-w-lg overflow-hidden shadow-2xl">
             <div class="px-6 py-4 flex items-center justify-between border-b">
-                <h3 class="text-lg font-bold text-brand-dark">Request Correction</h3>
+                <h3 class="text-lg font-bold text-brand-dark">Ajukan Koreksi</h3>
                 <button @click="$emit('close')" class="text-brand-light hover:text-brand-dark transition-colors">
                     <X class="w-5 h-5" />
                 </button>

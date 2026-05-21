@@ -159,7 +159,7 @@ watch(
                             <Briefcase class="w-6 h-6 text-blue-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Project Information</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Informasi Proyek</h3>
                             <p class="text-brand-light text-sm font-normal">Basic project details and description</p>
                         </div>
                     </div>
@@ -464,7 +464,7 @@ watch(
                             <Crown class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Project Leader</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Pimpinan Proyek</h3>
                             <p class="text-brand-light text-sm font-normal">
                                 Assign a project leader to manage this project
                             </p>
@@ -474,7 +474,7 @@ watch(
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                         <!-- Project Leader Selection -->
                         <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Select Project Leader</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1.5">Pilih Pimpinan Proyek</label>
                             <button
                                 type="button"
                                 @click="leaderModal = true"
@@ -532,7 +532,7 @@ watch(
                             <Users class="w-6 h-6 text-purple-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Team Assignment</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Penugasan Tim</h3>
                             <p class="text-brand-light text-sm font-normal">
                                 Select teams that will work on this project
                             </p>
@@ -621,7 +621,7 @@ watch(
                             <Settings class="w-6 h-6 text-orange-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Project Settings</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Pengaturan Proyek</h3>
                             <p class="text-brand-light text-sm font-normal">Configure project status, budget</p>
                         </div>
                     </div>
@@ -815,7 +815,7 @@ watch(
                             <Crown class="w-6 h-6 text-green-600" />
                         </div>
                         <div>
-                            <h3 class="text-brand-dark text-xl font-bold">Select Project Leader</h3>
+                            <h3 class="text-brand-dark text-xl font-bold">Pilih Pimpinan Proyek</h3>
                             <p class="text-brand-light text-sm font-normal">Choose an employee to lead this project</p>
                         </div>
                     </div>

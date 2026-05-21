@@ -187,7 +187,7 @@ describe("OvertimeManagement.vue", () => {
     });
 
     it("renders the page title", () => {
-        expect(wrapper.text()).toContain("Overtime Management");
+        expect(wrapper.text()).toContain("Manajemen Lembur");
     });
 
     it("renders summary cards with correct data", () => {

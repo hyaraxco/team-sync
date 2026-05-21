@@ -490,7 +490,7 @@ watch(
                                 <ShieldCheck class="h-5 w-5 text-gray-400" />
                             </template>
                         </Input>
-                        <p class="text-brand-light text-xs mt-1">No. BPJS Jamsostek (JHT, JKK, JKM, JP)</p>
+                        <p class="text-brand-light text-xs mt-1">No. BPJS Ketenagakerjaan (JHT, JKK, JKM, JP)</p>
                     </div>
 
                     <!-- BPJS Kesehatan -->
@@ -535,7 +535,7 @@ watch(
                             <div
                                 class="w-full h-[50px] bg-gray-100 border border-brand-border rounded-2xl animate-pulse"
                             ></div>
-                            <p class="text-brand-light text-xs mt-1">Loading bank configuration...</p>
+                            <p class="text-brand-light text-xs mt-1">Memuat konfigurasi bank...</p>
                         </template>
 
                         <!-- Bank locked by company payroll settings -->

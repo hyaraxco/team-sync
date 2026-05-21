@@ -151,7 +151,7 @@ onMounted(loadPolicies);
             <div>
                 <h1 class="text-brand-dark text-[32px] font-bold leading-tight flex items-center gap-3">
                     <ShieldCheck class="w-8 h-8 text-blue-600" />
-                    Payroll Approval Matrix
+                    Matriks Persetujuan Payroll
                 </h1>
                 <p class="text-brand-light text-base font-normal mt-2">
                     Configure threshold-based approval steps for payroll batches before payment.

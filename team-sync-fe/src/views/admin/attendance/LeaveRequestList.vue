@@ -253,8 +253,8 @@ onMounted(() => {
 <template>
     <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-brand-dark">Leave Requests</h1>
-            <p class="text-sm text-brand-light mt-1">Manage and monitor employee leave requests.</p>
+            <h1 class="text-2xl font-bold text-brand-dark">Pengajuan Cuti</h1>
+            <p class="text-sm text-brand-light mt-1">Kelola dan pantau pengajuan cuti karyawan.</p>
         </div>
 
         <!-- Tab Switcher -->
@@ -354,14 +354,14 @@ onMounted(() => {
                     </thead>
                     <tbody>
                         <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                            <td colspan="8" class="py-8 text-center text-gray-500">Loading...</td>
+                            <td colspan="8" class="py-8 text-center text-gray-500">Memuat...</td>
                         </tr>
                         <tr v-else-if="!leaveRequests || leaveRequests.length === 0" class="border-b border-brand-border">
                             <td colspan="8" class="py-8">
                                 <EmptyState
                                     icon="ClipboardList"
-                                    title="No Requests Found"
-                                    description="There are no leave requests currently matching filters."
+                                    title="Data pengajuan kosong"
+                                    description="Tidak ada pengajuan cuti yang cocok dengan filter."
                                 />
                             </td>
                         </tr>
@@ -419,7 +419,7 @@ onMounted(() => {
                                         <ExternalLink class="w-3 h-3" />
                                         View Proof
                                     </a>
-                                    <span v-else class="text-xs text-gray-500 italic">No proof</span>
+                                    <span v-else class="text-xs text-gray-500 italic">Tidak ada bukti</span>
 
                                     <div v-if="request.proof_file_path" class="mt-1">
                                         <span
@@ -578,7 +578,7 @@ onMounted(() => {
             <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shrink-0">
                 <Check class="w-6 h-6 text-green-600" />
             </div>
-            <p class="text-brand-light text-sm">Confirm approval for this leave request.</p>
+            <p class="text-brand-light text-sm">Konfirmasi persetujuan untuk pengajuan cuti ini.</p>
         </div>
         <template #footer>
             <div class="flex gap-3">
@@ -606,7 +606,7 @@ onMounted(() => {
             <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
                 <X class="w-6 h-6 text-red-600" />
             </div>
-            <p class="text-brand-light text-sm">Confirm rejection for this leave request.</p>
+            <p class="text-brand-light text-sm">Konfirmasi penolakan untuk pengajuan cuti ini.</p>
         </div>
         <template #footer>
             <div class="flex gap-3">

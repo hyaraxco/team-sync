@@ -146,7 +146,7 @@ const submitCreate = async () => {
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Overtime Management</h1>
+                <h1 class="text-2xl font-bold text-gray-900">Manajemen Lembur</h1>
                 <p class="text-sm text-gray-500 mt-1">Manage employee overtime records and approvals</p>
             </div>
             <button
@@ -257,7 +257,7 @@ const submitCreate = async () => {
 
         <!-- Table -->
         <div class="bg-white rounded-lg border overflow-hidden">
-            <div v-if="loading" class="p-8 text-center text-gray-500">Loading...</div>
+            <div v-if="loading" class="p-8 text-center text-gray-500">Memuat...</div>
             <EmptyState
                 v-else-if="!records.length"
                 title="No overtime records"

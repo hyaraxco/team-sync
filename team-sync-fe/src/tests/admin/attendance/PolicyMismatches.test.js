@@ -31,7 +31,7 @@ describe("PolicyMismatches.vue", () => {
 
         await flushPromises();
 
-        expect(wrapper.text()).toContain("Policy Mismatches");
+        expect(wrapper.text()).toContain("Mismatch Kebijakan");
         expect(wrapper.text()).toContain("Acknowledge");
         expect(wrapper.text()).toContain("Resolve");
         expect(wrapper.text()).toContain("Ahmad Fauzi");

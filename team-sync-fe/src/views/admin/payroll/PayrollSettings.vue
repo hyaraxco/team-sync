@@ -364,7 +364,7 @@ onMounted(() => {
                 <span class="text-brand-dark text-sm font-semibold">Back</span>
             </button>
             <div>
-                <h1 class="text-2xl font-semibold text-brand-dark">Payroll Settings</h1>
+                <h1 class="text-2xl font-semibold text-brand-dark">Pengaturan Payroll</h1>
                 <p class="text-brand-light text-base font-normal mt-2">
                     Configure how future payroll drafts are calculated and documented.
                 </p>
@@ -417,7 +417,7 @@ onMounted(() => {
                     data-testid="tab-rules"
                 >
                     <Calculator class="w-4 h-4" :class="activeTab === 'rules' ? 'text-white' : 'text-gray-600'" />
-                    <span class="text-sm font-semibold">Calculation Rules</span>
+                    <span class="text-sm font-semibold">Aturan Kalkulasi</span>
                 </button>
                 <button
                     @click="activeTab = 'bank_notes'"
@@ -455,7 +455,7 @@ onMounted(() => {
                     class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="mb-6">
-                        <h2 class="text-lg font-semibold text-brand-dark">Payroll Schedule</h2>
+                        <h2 class="text-lg font-semibold text-brand-dark">Jadwal Payroll</h2>
                         <p class="text-brand-light text-sm">Define default payday and attendance cut-off.</p>
                     </div>
 
@@ -492,7 +492,7 @@ onMounted(() => {
                     class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="mb-6">
-                        <h2 class="text-lg font-semibold text-brand-dark">Calculation Rules</h2>
+                        <h2 class="text-lg font-semibold text-brand-dark">Aturan Kalkulasi</h2>
                         <p class="text-brand-light text-sm">
                             Control working day basis, absence deductions, and rounding.
                         </p>
@@ -576,7 +576,7 @@ onMounted(() => {
                         class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Note Template</h2>
+                            <h2 class="text-lg font-semibold text-brand-dark">Template Catatan Payroll</h2>
                             <p class="text-brand-light text-sm">
                                 Use placeholders to keep every generated payroll note consistent.
                             </p>
@@ -600,7 +600,7 @@ onMounted(() => {
                         class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-brand-dark">Payroll Bank Partner</h2>
+                            <h2 class="text-lg font-semibold text-brand-dark">Mitra Bank Payroll</h2>
                             <p class="text-brand-light text-sm">
                                 Primary bank for salary disbursement. Employees with a different bank will be
                                 flagged.
@@ -649,7 +649,7 @@ onMounted(() => {
                         class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="mb-6">
-                            <h2 class="text-lg font-semibold text-brand-dark">Preview Result</h2>
+                            <h2 class="text-lg font-semibold text-brand-dark">Pratinjau Hasil</h2>
                             <p class="text-brand-light text-sm font-normal mt-1">
                                 Review your generated note format along with summary configurations.
                             </p>
@@ -685,7 +685,7 @@ onMounted(() => {
                     class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="mb-4">
-                        <h2 class="text-lg font-semibold text-brand-dark">Version History</h2>
+                        <h2 class="text-lg font-semibold text-brand-dark">Riwayat Versi</h2>
                         <p class="text-brand-light text-sm">
                             Latest payroll settings snapshots used for future drafts.
                         </p>
@@ -797,15 +797,15 @@ onMounted(() => {
                     <section class="mt-6 border-t border-gray-200 pt-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div>
-                            <h3 class="text-base font-semibold text-brand-dark">BPJS Rate History</h3>
+                            <h3 class="text-base font-semibold text-brand-dark">Riwayat Tarif BPJS</h3>
                             <p class="text-brand-light text-sm">
-                                Latest BPJS Kesehatan and Ketenagakerjaan rates with effective dates.
+                                Latest BPJS Kesehatan dan Ketenagakerjaan terbaru dengan tanggal efektif.
                             </p>
                         </div>
                     </div>
 
                         <div v-if="loadingBpjsRateHistory" class="text-sm text-brand-light">
-                            Loading BPJS rate history...
+                            Memuat riwayat tarif BPJS...
                         </div>
 
                         <div
@@ -881,8 +881,8 @@ onMounted(() => {
                     class="bg-white/80 backdrop-blur-md border border-brand-border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
                 >
                     <div>
-                        <h2 class="text-base font-semibold text-brand-dark">Ready to save your changes?</h2>
-                        <p class="text-brand-light text-sm mt-0.5">Please make sure to review your settings.</p>
+                        <h2 class="text-base font-semibold text-brand-dark">Siap menyimpan perubahan?</h2>
+                        <p class="text-brand-light text-sm mt-0.5">Pastikan untuk meninjau pengaturan Anda.</p>
                     </div>
                     <button
                         type="button"

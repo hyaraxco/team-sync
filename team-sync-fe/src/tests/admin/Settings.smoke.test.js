@@ -31,7 +31,7 @@ describe("Settings.vue smoke test", () => {
 
     it("renders 'Settings' heading", () => {
         const wrapper = factory();
-        expect(wrapper.find("h1").text()).toBe("Settings");
+        expect(wrapper.find("h1").text()).toBe("Pengaturan");
         expect(wrapper.text()).toContain("Manage your organization's configuration and policies.");
     });
 

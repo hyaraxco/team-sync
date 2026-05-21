@@ -29,7 +29,7 @@ const handleSubmit = async () => {
             >
                 <CheckCircle2 class="h-8 w-8 text-green-500" aria-hidden="true" stroke-width="1.5" />
             </div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Check your email</h1>
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Cek Email Anda</h1>
             <p class="mt-3 text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
                 We've sent a password reset link to
                 <br />
@@ -50,7 +50,7 @@ const handleSubmit = async () => {
         <!-- Form State -->
         <template v-else>
             <div class="text-center mb-8">
-                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Reset password</h1>
+                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Atur Ulang Password</h1>
                 <p class="mt-2 text-sm text-gray-500 leading-relaxed max-w-xs mx-auto">
                     Enter your email and we'll send you a link to reset your password.
                 </p>

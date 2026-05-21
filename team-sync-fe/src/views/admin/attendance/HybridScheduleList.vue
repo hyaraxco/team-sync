@@ -156,8 +156,8 @@ const confirmReject = () =>
 <template>
     <div class="space-y-6">
         <div>
-            <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[28px] font-bold">Hybrid Work Schedules</h1>
-            <p class="text-brand-light text-sm mt-1">Manage employee hybrid schedules and approve override requests.</p>
+            <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[28px] font-bold">Jadwal Hybrid</h1>
+            <p class="text-brand-light text-sm mt-1">Kelola jadwal hybrid dan pengajuan override.</p>
         </div>
 
         <MainCard>
@@ -423,7 +423,7 @@ const confirmReject = () =>
                 <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                     <Check class="w-5 h-5 text-green-600" />
                 </div>
-                <p class="text-sm text-gray-800">Confirm approval for this hybrid schedule override request.</p>
+                <p class="text-sm text-gray-800">Konfirmasi persetujuan untuk pengajuan override jadwal hybrid ini.</p>
             </div>
 
             <div
@@ -475,7 +475,7 @@ const confirmReject = () =>
                 <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
                     <X class="w-5 h-5 text-red-600" />
                 </div>
-                <p class="text-sm text-gray-800">Provide rejection notes for this override request.</p>
+                <p class="text-sm text-gray-800">Berikan catatan penolakan untuk pengajuan override ini.</p>
             </div>
 
             <div

@@ -72,7 +72,7 @@ describe("Login smoke", () => {
 
     it("displays login heading", () => {
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Welcome back");
+        expect(wrapper.text()).toContain("Selamat Datang");
         expect(wrapper.text()).toContain("Sign in");
     });
 

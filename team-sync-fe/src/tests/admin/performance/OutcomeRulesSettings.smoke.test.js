@@ -108,7 +108,7 @@ describe("OutcomeRulesSettings smoke", () => {
 
     it("displays page header", () => {
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Performance Outcome Rules");
+        expect(wrapper.text()).toContain("Aturan Outcome Performa");
     });
 
     it("displays loading state", () => {

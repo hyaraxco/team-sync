@@ -91,7 +91,7 @@ const hasVisibleItems = (section) => {
     <div class="space-y-8 pb-10">
         <!-- Page Header -->
         <div>
-            <h1 class="text-brand-dark text-2xl font-bold">Settings</h1>
+            <h1 class="text-brand-dark text-2xl font-bold">Pengaturan</h1>
             <p class="text-brand-light text-base font-normal">Manage your organization's configuration and policies.</p>
         </div>
 

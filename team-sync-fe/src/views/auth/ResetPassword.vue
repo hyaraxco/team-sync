@@ -35,7 +35,7 @@ const handleSubmit = async () => {
             >
                 <CheckCircle2 class="h-8 w-8 text-green-500" aria-hidden="true" stroke-width="1.5" />
             </div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Password updated</h1>
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Password Diperbarui</h1>
             <p class="mt-3 text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
                 Your password has been reset successfully. You can now use it to log in to your account.
             </p>
@@ -55,7 +55,7 @@ const handleSubmit = async () => {
             >
                 <KeyRound class="h-8 w-8 text-red-500" aria-hidden="true" stroke-width="1.5" />
             </div>
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Invalid reset link</h1>
+            <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Tautan Reset Tidak Valid</h1>
             <p class="mt-3 text-sm text-gray-600 max-w-xs mx-auto leading-relaxed">
                 This password reset link is missing a token or has expired. Please request a new one.
             </p>
@@ -85,7 +85,7 @@ const handleSubmit = async () => {
                 >
                     <KeyRound class="h-6 w-6 text-brand-primary" aria-hidden="true" stroke-width="1.5" />
                 </div>
-                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">New password</h1>
+                <h1 class="text-3xl font-bold text-gray-900 tracking-tight">Password Baru</h1>
                 <p class="mt-2 text-sm text-gray-500">Create a strong password for your account</p>
             </div>
 

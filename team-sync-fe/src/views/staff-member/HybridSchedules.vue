@@ -3,7 +3,7 @@
         <div class="max-w-6xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Hybrid Schedule</h1>
+                    <h1 class="text-2xl font-bold text-brand-dark">Jadwal Hybrid</h1>
                     <p class="text-brand-light text-sm mt-1">
                         View your default weekly schedule and request day-specific overrides.
                     </p>
@@ -23,7 +23,7 @@
                     class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
                 >
                     <AlertTriangle class="w-5 h-5 shrink-0" />
-                    <p>Failed to load schedule. The service might be temporarily unavailable.</p>
+                    <p>Gagal memuat jadwal. Layanan mungkin tidak tersedia sementara.</p>
                 </div>
 
                 <!-- Loading State -->
@@ -108,7 +108,7 @@
     <!-- Override Modal -->
     <div v-if="showOverrideModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
         <div class="w-full max-w-md bg-white rounded-2xl p-6 space-y-4">
-            <h2 class="text-xl font-bold text-brand-dark">Request Schedule Override</h2>
+            <h2 class="text-xl font-bold text-brand-dark">Ajukan Override Jadwal</h2>
             <form @submit.prevent="submitOverride" class="space-y-4">
                 <div>
                     <label for="override-date" class="block text-sm font-medium text-brand-dark mb-1">Date</label>
@@ -203,8 +203,8 @@ onMounted(async () => {
         await loadSchedule();
     } catch (err) {
         toast.error(
-            "Failed to load schedule",
-            scheduleStore.error || err?.response?.data?.message || "Failed to load schedule.",
+            "Gagal memuat jadwal",
+            scheduleStore.error || err?.response?.data?.message || "Gagal memuat jadwal.",
         );
         error.value = true;
     } finally {

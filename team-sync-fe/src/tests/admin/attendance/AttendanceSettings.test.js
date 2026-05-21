@@ -16,7 +16,7 @@ describe("AttendanceSettings.vue", () => {
             },
         });
 
-        expect(wrapper.text()).toContain("System Configuration");
+        expect(wrapper.text()).toContain("Konfigurasi Sistem");
         expect(wrapper.text()).toContain("Attendance Policies");
         expect(wrapper.text()).toContain("Holiday Calendars");
     });

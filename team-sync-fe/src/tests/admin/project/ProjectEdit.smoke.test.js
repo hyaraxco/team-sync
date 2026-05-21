@@ -170,6 +170,6 @@ describe("ProjectEdit smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.text()).toContain("Project Information");
+        expect(wrapper.text()).toContain("Informasi Proyek");
     });
 });

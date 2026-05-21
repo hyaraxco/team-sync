@@ -95,7 +95,7 @@ describe("ReviewCycleCreate smoke", () => {
 
     it("displays form heading", () => {
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Create Review Cycle");
+        expect(wrapper.text()).toContain("Buat Siklus Review");
     });
 
     it("renders template select with options", () => {

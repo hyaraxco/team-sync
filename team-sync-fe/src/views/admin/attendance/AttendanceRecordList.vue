@@ -32,8 +32,8 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
     <div class="mb-6">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-brand-dark">Attendance Logs</h1>
-                <p class="text-sm text-brand-light mt-1">Review historical attendance logs across the organization.</p>
+                <h1 class="text-2xl font-bold text-brand-dark">Log Absensi</h1>
+                <p class="text-sm text-brand-light mt-1">Lihat riwayat log absensi seluruh organisasi.</p>
             </div>
         </div>
 

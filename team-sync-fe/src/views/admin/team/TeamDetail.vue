@@ -211,7 +211,7 @@ watch(
                 <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
                     <Crown class="w-6 h-6 text-green-600" />
                 </div>
-                <h2 class="text-brand-dark text-lg font-semibold">Team Lead</h2>
+                <h2 class="text-brand-dark text-lg font-semibold">Pimpinan Tim</h2>
             </div>
 
             <div class="flex flex-col gap-4" v-if="team.leader">
@@ -313,7 +313,7 @@ watch(
                     <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
                         <Settings class="w-6 h-6 text-purple-600" />
                     </div>
-                    <h2 class="text-brand-dark text-lg font-semibold">Team Settings</h2>
+                    <h2 class="text-brand-dark text-lg font-semibold">Pengaturan Tim</h2>
                 </div>
             <div class="space-y-3">
                 <div class="flex justify-between items-center">
@@ -350,7 +350,7 @@ watch(
             <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
                 <ListCheck class="w-6 h-6 text-orange-600" />
             </div>
-            <h2 class="text-brand-dark text-lg font-semibold">Team Responsibilities</h2>
+            <h2 class="text-brand-dark text-lg font-semibold">Tanggung Jawab Tim</h2>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div
@@ -374,7 +374,7 @@ watch(
                 <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <Users class="w-6 h-6 text-blue-600" />
                 </div>
-                <h2 class="text-brand-dark text-lg font-semibold">Team Members</h2>
+                <h2 class="text-brand-dark text-lg font-semibold">Anggota Tim</h2>
             </div>
             <button
                 @click="openAddMemberModal"
@@ -466,7 +466,7 @@ watch(
                 <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
                     <Activity class="w-6 h-6 text-gray-600" />
                 </div>
-                <h2 class="text-brand-dark text-lg font-semibold">Recent Activity</h2>
+                <h2 class="text-brand-dark text-lg font-semibold">Aktivitas Terkini</h2>
             </div>
             <div class="space-y-4">
                 <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
@@ -514,7 +514,7 @@ watch(
                 <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                     <Folder class="w-6 h-6 text-blue-600" />
                 </div>
-                <h2 class="text-brand-dark text-lg font-semibold">Team Resources</h2>
+                <h2 class="text-brand-dark text-lg font-semibold">Sumber Daya Tim</h2>
             </div>
             <div class="space-y-4">
                 <div
@@ -562,13 +562,13 @@ watch(
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
-            <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
+            <h2 class="text-brand-dark text-lg font-semibold">Zona Berbahaya</h2>
         </div>
         <div
             class="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center p-4 bg-red-50 rounded-xl"
         >
             <div class="flex-1">
-                <h3 class="text-brand-dark text-base font-semibold mb-1">Disband Team</h3>
+                <h3 class="text-brand-dark text-base font-semibold mb-1">Bubarkan Tim</h3>
                 <p class="text-brand-light text-sm">
                     Permanently remove this team and reassign all members. This action cannot be undone.
                 </p>
@@ -578,7 +578,7 @@ watch(
                 class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-danger-600 transition-all duration-300 bg-danger-600 shadow-lg px-6 py-3 flex items-center gap-2"
             >
                 <Trash2 class="w-4 h-4 text-white" />
-                <span class="text-brand-white text-sm font-semibold">Disband Team</span>
+                <span class="text-brand-white text-sm font-semibold">Bubarkan Tim</span>
             </button>
         </div>
     </div>
@@ -615,7 +615,7 @@ watch(
                         <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
                             <UserPlus class="w-6 h-6 text-blue-600" />
                         </div>
-                        <h3 class="text-brand-dark text-lg font-semibold">Add Team Member</h3>
+                        <h3 class="text-brand-dark text-lg font-semibold">Tambah Anggota</h3>
                     </div>
                     <button
                         type="button"

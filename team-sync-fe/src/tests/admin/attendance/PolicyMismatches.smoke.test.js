@@ -28,6 +28,6 @@ describe("PolicyMismatches.vue smoke", () => {
         const text = wrapper.text();
         expect(text).not.toContain("under construction");
         expect(text).not.toContain("API endpoint");
-        expect(text).toContain("Unable to load policy mismatches");
+        expect(text).toContain("Gagal memuat mismatch kebijakan. Silakan coba lagi nanti.");
     });
 });

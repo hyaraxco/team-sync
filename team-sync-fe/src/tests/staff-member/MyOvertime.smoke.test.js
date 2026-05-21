@@ -182,7 +182,7 @@ describe("MyOvertime smoke", () => {
         const wrapper = factory();
         await nextTick();
 
-        expect(wrapper.text()).toContain("Unable to load overtime records");
+        expect(wrapper.text()).toContain("Gagal memuat data lembur.");
         expect(wrapper.text()).toContain("Server error");
     });
 });

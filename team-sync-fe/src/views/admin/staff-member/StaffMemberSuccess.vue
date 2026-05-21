@@ -39,7 +39,7 @@ const addAnotherEmployee = () => {
 
                 <!-- Success Message -->
                 <div class="mb-8">
-                    <h1 class="text-brand-dark text-2xl font-extrabold mb-3">Added Successfully!</h1>
+                    <h1 class="text-brand-dark text-2xl font-extrabold mb-3">Berhasil Ditambahkan!</h1>
                     <p class="text-brand-light text-base font-normal leading-relaxed">
                         The new employee has been successfully added to your system, let's help them onboarding.
                     </p>

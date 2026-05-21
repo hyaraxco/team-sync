@@ -230,7 +230,7 @@ const statusConfig = (status) => {
             >
                 <AlertCircle class="mt-0.5 h-5 w-5 flex-shrink-0" />
                 <div>
-                    <p class="font-semibold">Unable to load overtime records.</p>
+                    <p class="font-semibold">Gagal memuat data lembur.</p>
                     <p class="text-sm">{{ error }}</p>
                 </div>
             </div>

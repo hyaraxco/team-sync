@@ -444,9 +444,9 @@ watch(
                 <ArrowLeftIcon class="w-5 h-5 text-brand-dark" />
             </button>
             <div>
-                <h1 class="text-2xl font-semibold text-brand-dark">Review Detail</h1>
+                <h1 class="text-2xl font-semibold text-brand-dark">Detail Review</h1>
                 <p class="text-brand-light mt-1">
-                    {{ review?.cycle?.name || "Loading..." }}
+                    {{ review?.cycle?.name || "Memuat..." }}
                 </p>
             </div>
         </div>

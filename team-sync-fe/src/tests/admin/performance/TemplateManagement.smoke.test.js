@@ -114,7 +114,7 @@ describe("TemplateManagement smoke", () => {
 
     it("displays page header", () => {
         const wrapper = factory();
-        expect(wrapper.text()).toContain("Review Templates");
+        expect(wrapper.text()).toContain("Template Review");
     });
 
     it("displays loading spinner when loading", () => {

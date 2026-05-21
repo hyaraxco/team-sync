@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Attendance Periods</h1>
+                    <h1 class="text-2xl font-bold text-brand-dark">Periode Absensi</h1>
                     <p class="text-brand-light text-sm mt-1">
                         Monitor period statuses, review timesheets, and access the payroll readiness workspace before cutoff.
                     </p>
@@ -27,7 +27,7 @@
 
             <div class="grid gap-6 lg:grid-cols-3">
                 <div class="lg:col-span-2 space-y-4">
-                    <h2 class="text-lg font-bold text-brand-dark">Period History</h2>
+                    <h2 class="text-lg font-bold text-brand-dark">Riwayat Periode</h2>
 
                     <!-- Error State -->
                     <div
@@ -35,7 +35,7 @@
                         class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
                     >
                         <AlertTriangle class="w-5 h-5 shrink-0" />
-                        <p>Failed to load attendance periods. Please try again later.</p>
+                        <p>Gagal memuat periode absensi. Silakan coba lagi nanti.</p>
                     </div>
 
                     <!-- Loading State -->
@@ -106,7 +106,7 @@
 
                         <div v-if="!selectedPeriod" class="text-center py-12 px-4">
                             <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-300" />
-                            <p class="text-brand-light text-sm">Select an attendance period to view payroll readiness.</p>
+                            <p class="text-brand-light text-sm">Pilih periode absensi untuk melihat kesiapan payroll.</p>
                         </div>
 
                         <div v-else class="space-y-4">

@@ -91,7 +91,7 @@ describe("PayslipDetail smoke", () => {
         await flushAsync();
 
         expect(fetchMyPayslip).toHaveBeenCalledWith("21");
-        expect(wrapper.text()).toContain("My Payroll");
+        expect(wrapper.text()).toContain("Payroll Saya");
         expect(wrapper.text()).toContain("Agung Ramadhan");
         expect(wrapper.text()).toContain("EMP001");
         expect(wrapper.text()).toContain("Engineering");

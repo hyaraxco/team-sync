@@ -34,7 +34,7 @@ const activeMembersStatus = computed(() => {
     return "Growing";
 });
 
-const extractErrorMessage = (error) => error?.response?.data?.message || error?.message || "Unable to load your team.";
+const extractErrorMessage = (error) => error?.response?.data?.message || error?.message || "Gagal memuat tim Anda.";
 
 const loadTeam = async () => {
     loadingTeam.value = true;
@@ -132,7 +132,7 @@ onMounted(async () => {
                 data-testid="my-team-loading"
             >
                 <Users class="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                <p class="text-brand-dark text-lg font-semibold">Loading your team workspace...</p>
+                <p class="text-brand-dark text-lg font-semibold">Memuat workspace tim...</p>
             </div>
 
             <div
@@ -164,7 +164,7 @@ onMounted(async () => {
                         <div class="flex-1">
                             <div class="flex items-center gap-4 mb-3">
                                 <h1 class="text-brand-dark text-3xl font-extrabold">
-                                    {{ team?.name || "Loading..." }}
+                                    {{ team?.name || "Memuat..." }}
                                 </h1>
                                 <span
                                     v-if="team?.status"
