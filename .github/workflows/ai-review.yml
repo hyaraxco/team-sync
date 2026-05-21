@@ -66,17 +66,17 @@ jobs:
           pr_body = os.environ.get("PR_BODY", "No description provided")
           base = os.environ.get("BASE_BRANCH", "main")
           head = os.environ.get("HEAD_BRANCH", "")
-           api_url = os.environ.get("ENOWX_API_URL")
-           if not api_url:
-               fallback = {
-                   "schema_version": 1,
-                   "overall": "commented",
-                   "summary": "enowxai review skipped: ENOWX_API_URL not configured.",
-                   "findings": [],
-                   "fallback_notes": ["Set ENOWX_API_URL in GitHub Actions variables to enable AI review."]
-               }
-               open("/tmp/review_output.json", "w").write(json.dumps(fallback))
-               sys.exit(0)
+          api_url = os.environ.get("ENOWX_API_URL")
+          if not api_url:
+              fallback = {
+                  "schema_version": 1,
+                  "overall": "commented",
+                  "summary": "enowxai review skipped: ENOWX_API_URL not configured.",
+                  "findings": [],
+                  "fallback_notes": ["Set ENOWX_API_URL in GitHub Actions variables to enable AI review."]
+              }
+              open("/tmp/review_output.json", "w").write(json.dumps(fallback))
+              sys.exit(0)
           api_key = os.environ.get("ENOWX_API_KEY", "")
 
           prompt = (
