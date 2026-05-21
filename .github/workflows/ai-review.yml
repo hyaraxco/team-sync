@@ -43,7 +43,7 @@ jobs:
       - name: Write review script
         run: |
           cat > /tmp/enowx_review.py << 'SCRIPT'
-          import os, json, urllib.request, sys
+          import os, json, urllib.request, urllib.error, sys
 
           diff = open("/tmp/pr_diff.txt").read().strip()
           if not diff:
@@ -109,8 +109,17 @@ jobs:
               with urllib.request.urlopen(req, timeout=90) as resp:
                   data = json.loads(resp.read())
                   review = data["choices"][0]["message"]["content"]
+          except urllib.error.HTTPError as e:
+              body = ""
+              try:
+                  body = e.read().decode()[:300]
+              except Exception:
+                  pass
+              review = f"enowxai review request failed: HTTP {e.code} — {body or e.reason}"
+              print(f"::warning::enowxai API error: HTTP {e.code} — {body or e.reason}")
           except Exception as e:
-              review = f"enowxai review request failed: {type(e).__name__}"
+              review = f"enowxai review request failed: {type(e).__name__} — {str(e)[:200]}"
+              print(f"::warning::enowxai API error: {type(e).__name__} — {str(e)[:200]}")
 
           # Strip markdown fences if model wraps output
           if review.startswith("```"):
