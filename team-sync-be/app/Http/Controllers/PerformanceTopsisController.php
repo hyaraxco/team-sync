@@ -25,21 +25,22 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
     /**
      * Bobot default jika HR tidak menentukan bobot sendiri.
      *
-     * Disesuaikan dengan PRD Section 3.2 (Kriteria Penilaian):
-     *   PRD Performance Score (30%) → C1 (15%) + C2 (15%)
-     *   PRD Attendance Rate (20%)   → C6 (20%)
-     *   PRD Goal Completion (25%)   → C3 (15%) + C4 (10%)
-     *   PRD Feedback Score (15%)    → C5 (15%)
-     *   PRD Tenure Factor (10%)     → C7 (10%) [task_completion_quality as proxy]
+     * Sesuai PRD Section 3.2 (Kriteria Penilaian) — 5 kriteria, total = 1.0:
+     *   Performance Score (30%) — gabungan kompetensi + KPI (0-100)
+     *   Attendance Rate (20%)   — persentase kehadiran (0-100)
+     *   Goal Completion (25%)   — penyelesaian tujuan (0-100)
+     *   Feedback Score (15%)    — skor umpan balik positif (0-100)
+     *   Tenure Factor (10%)     — masa kerja (0-100, cap 60 bulan)
+     *
+     * Keys MUST match TopsisService::CRITERIA exactly.
+     * Originally implemented as 7 criteria; consolidated to 5 per PRD §3.2 alignment (2026-05-20).
      */
     private const DEFAULT_WEIGHTS = [
-        'avg_manager_rating' => 0.15,      // C1: Competency Score (part of PRD Performance Score)
-        'final_rating' => 0.15,            // C2: KPI Score (part of PRD Performance Score)
-        'avg_goal_completion' => 0.15,     // C3: Goal Completion % (part of PRD Goal Completion)
-        'goal_completion_ratio' => 0.10,   // C4: On-Time Goal Ratio (part of PRD Goal Completion)
-        'positive_feedback_count' => 0.15, // C5: Positive Feedback Count (PRD Feedback Score)
-        'attendance_quality' => 0.20,      // C6: Attendance Quality (PRD Attendance Rate)
-        'task_completion_quality' => 0.10, // C7: Task Completion Quality (PRD Tenure Factor proxy)
+        'performance_score' => 0.30, // PRD Performance Score (30%)
+        'attendance_rate' => 0.20,   // PRD Attendance Rate (20%)
+        'goal_completion' => 0.25,   // PRD Goal Completion (25%)
+        'feedback_score' => 0.15,    // PRD Feedback Score (15%)
+        'tenure_factor' => 0.10,     // PRD Tenure Factor (10%)
     ];
 
     public function __construct(
@@ -52,16 +53,15 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
      *
      * GET /api/v1/performance/cycles/{id}/topsis-ranking
      *
-     * Query params (optional) — Bobot PRD (total = 1.0):
-     *   - w_avg_manager_rating      : float (0-1) — C1: Competency Score (default: 0.15)
-     *   - w_final_rating            : float (0-1) — C2: KPI Score (default: 0.15)
-     *   - w_avg_goal_completion     : float (0-1) — C3: Goal Completion % (default: 0.15)
-     *   - w_goal_completion_ratio   : float (0-1) — C4: On-Time Goal Ratio (default: 0.10)
-     *   - w_positive_feedback_count : float (0-1) — C5: Positive Feedback (default: 0.15)
-     *   - w_attendance_quality      : float (0-1) — C6: Attendance Quality (default: 0.20)
-     *   - w_task_completion_quality : float (0-1) — C7: Task Completion Quality (default: 0.10)
+     * Query params (optional) — Bobot PRD Section 3.2 (total = 1.0):
+     *   - w_performance_score : float (0-1) — Performance Score (default: 0.30)
+     *   - w_attendance_rate   : float (0-1) — Attendance Rate (default: 0.20)
+     *   - w_goal_completion   : float (0-1) — Goal Completion (default: 0.25)
+     *   - w_feedback_score    : float (0-1) — Feedback Score (default: 0.15)
+     *   - w_tenure_factor     : float (0-1) — Tenure Factor (default: 0.10)
      *
      * Total bobot harus = 1.0 (jika tidak, akan dinormalisasi otomatis).
+     * Nilai negatif akan di-clamp ke 0.0 sebelum normalisasi.
      */
     public function ranking(Request $request, int $id): JsonResponse
     {
@@ -117,17 +117,16 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
     /**
      * Ambil bobot dari query params, fallback ke default.
      * Normalisasi otomatis jika total != 1.
+     * Nilai negatif di-clamp ke 0.0 (mencegah inversi kontribusi kriteria).
      */
     private function resolveWeights(Request $request): array
     {
         $keys = [
-            'avg_manager_rating' => 'w_avg_manager_rating',
-            'final_rating' => 'w_final_rating',
-            'avg_goal_completion' => 'w_avg_goal_completion',
-            'goal_completion_ratio' => 'w_goal_completion_ratio',
-            'positive_feedback_count' => 'w_positive_feedback_count',
-            'attendance_quality' => 'w_attendance_quality',
-            'task_completion_quality' => 'w_task_completion_quality',
+            'performance_score' => 'w_performance_score',
+            'attendance_rate' => 'w_attendance_rate',
+            'goal_completion' => 'w_goal_completion',
+            'feedback_score' => 'w_feedback_score',
+            'tenure_factor' => 'w_tenure_factor',
         ];
 
         $hasCustomWeights = collect($keys)->some(fn ($param) => $request->has($param));
@@ -138,7 +137,17 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
 
         $weights = [];
         foreach ($keys as $criterion => $param) {
-            $weights[$criterion] = (float) $request->get($param, self::DEFAULT_WEIGHTS[$criterion]);
+            $raw = (float) $request->get($param, self::DEFAULT_WEIGHTS[$criterion]);
+            $weights[$criterion] = max(0.0, $raw);
+
+            if ($raw < 0) {
+                Log::warning('TOPSIS weight clamped to zero', [
+                    'criterion' => $criterion,
+                    'raw_value' => $raw,
+                    'user_id' => auth()->id(),
+                    'cycle_id' => $request->route('id'),
+                ]);
+            }
         }
 
         // Normalisasi agar total = 1.0
