@@ -53,25 +53,25 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
                             Internal HR Workspace
                         </p>
                         <h1 class="text-2xl font-bold leading-tight text-white xl:text-3xl">
-                            Streamline your workforce operations
+                            Kelola SDM lebih efisien
                         </h1>
                         <p class="text-sm leading-relaxed text-white/90 max-w-xs">
-                            Payroll, attendance, and employee management in one secure platform.
+                            Penggajian, kehadiran, dan manajemen karyawan dalam satu platform.
                         </p>
 
                         <!-- Stats Row -->
                         <div class="flex gap-6 pt-4">
                             <div>
                                 <p class="text-2xl font-bold text-white">6</p>
-                                <p class="text-xs text-white/90">HR Modules</p>
+                                <p class="text-xs text-white/90">Modul HR</p>
                             </div>
                             <div>
                                 <p class="text-2xl font-bold text-white">4</p>
-                                <p class="text-xs text-white/90">User Roles</p>
+                                <p class="text-xs text-white/90">Role Pengguna</p>
                             </div>
                             <div>
-                                <p class="text-2xl font-bold text-white">99%</p>
-                                <p class="text-xs text-white/90">Uptime</p>
+                                <p class="text-2xl font-bold text-white">PPh 21</p>
+                                <p class="text-xs text-white/90">TER 2024</p>
                             </div>
                         </div>
                     </div>
