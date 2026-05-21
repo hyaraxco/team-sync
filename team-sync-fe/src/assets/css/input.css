@@ -267,7 +267,7 @@ html {
     font-size: 12px;
     font-weight: 500;
     white-space: nowrap;
-    z-index: 100;
+    z-index: 9999;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s ease;
@@ -283,7 +283,7 @@ html {
     transform: translateY(-50%);
     border: 5px solid transparent;
     border-right-color: #0C1C3C;
-    z-index: 100;
+    z-index: 9999;
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s ease;

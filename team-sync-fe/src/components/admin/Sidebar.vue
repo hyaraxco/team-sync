@@ -104,8 +104,8 @@ const onNavigate = () => closeMobile();
         <!-- Navigation Menu -->
         <nav
             aria-label="Main navigation"
-            class="py-4 flex-1 overflow-y-auto scrollbar-hide transition-all duration-300"
-            :class="isCollapsed ? 'px-2 space-y-2' : 'px-6 space-y-6'"
+            class="py-4 flex-1 transition-all duration-300"
+            :class="isCollapsed ? 'px-2 space-y-2 overflow-visible' : 'px-6 space-y-6 overflow-y-auto scrollbar-hide'"
         >
             <!-- GENERAL Section -->
             <div data-testid="sidebar-section-general">
