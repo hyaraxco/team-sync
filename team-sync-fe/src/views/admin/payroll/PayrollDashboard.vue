@@ -382,7 +382,7 @@ const handleExportReport = async () => {
                     <div>
                         <h2 class="text-lg font-semibold text-brand-dark">Payroll Analytics (Last 6 Periods)</h2>
                         <p class="text-brand-light text-sm font-normal">
-                            Finance insight from approved and paid payroll periods.
+                            Ringkasan finansial dari periode penggajian yang disetujui.
                         </p>
                     </div>
                     <div class="text-right">
@@ -438,13 +438,13 @@ const handleExportReport = async () => {
                     />
                 </template>
 
-                <EmptyState v-else data-testid="payroll-analytics-empty" icon="FileText" title="No analytics data yet" subtitle="Generate your first payroll to see analytics here." size="lg" />
+                <EmptyState v-else data-testid="payroll-analytics-empty" icon="FileText" title="Data analitik belum tersedia" subtitle="Generate payroll pertama untuk melihat analitik." size="lg" />
             </div>
 
             <!-- Finance Insights Section -->
             <div v-if="hasAnalyticsData" data-testid="payroll-finance-insights" class="space-y-6">
                 <div class="flex items-center gap-3">
-                    <h2 class="text-lg font-semibold text-brand-dark">Finance Insights</h2>
+                    <h2 class="text-lg font-semibold text-brand-dark">Ringkasan Finansial</h2>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -687,7 +687,7 @@ const handleExportReport = async () => {
                     </button>
                 </div>
 
-                <EmptyState v-if="!loading && payrolls.length === 0" icon="Inbox" title="No payroll data found" subtitle="Create your first payroll to get started" />
+                <EmptyState v-if="!loading && payrolls.length === 0" icon="Inbox" title="Data penggajian kosong" subtitle="Generate penggajian baru untuk bulan ini" />
             </div>
         </div>
 

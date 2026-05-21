@@ -372,7 +372,7 @@ onMounted(async () => {
                             </h3>
                         </div>
                         <p class="text-sm text-brand-light line-clamp-2">
-                            {{ goal.description || "No description provided" }}
+                            {{ goal.description || "Deskripsi belum tersedia" }}
                         </p>
                     </div>
 
@@ -427,8 +427,8 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="Target"
-            title="No Goals Yet"
-            subtitle="Start setting goals to track your progress and achievements. Click 'Create Goal' to get started."
+            title="Belum ada sasaran"
+            subtitle="Tetapkan sasaran untuk melacak progres dan pencapaian Anda."
         >
             <button
                 v-if="canCreateGoal"
@@ -436,7 +436,7 @@ onMounted(async () => {
                 @click="createGoal"
             >
                 <Plus class="w-5 h-5" />
-                Create Your First Goal
+                Buat Sasaran Pertama
             </button>
         </EmptyState>
 

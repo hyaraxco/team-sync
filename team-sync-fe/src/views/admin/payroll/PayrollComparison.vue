@@ -120,7 +120,7 @@ const metrics = [
             </div>
 
             <div v-else-if="payrollComparison && !loadingAnalytics" class="overflow-x-auto">
-                <EmptyState v-if="!payrollComparison.month1.found && !payrollComparison.month2.found" icon="Inbox" title="No payroll data found for the selected periods" />
+                <EmptyState v-if="!payrollComparison.month1.found && !payrollComparison.month2.found" icon="Inbox" title="Data penggajian tidak ditemukan untuk periode terpilih" />
                 <div
                     v-else-if="!payrollComparison.month1.found"
                     class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4"

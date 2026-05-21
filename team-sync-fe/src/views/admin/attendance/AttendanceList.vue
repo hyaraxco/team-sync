@@ -369,7 +369,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <EmptyState v-if="!loadingLeaveRequests && leaveRequests.length === 0" icon="CalendarClock" title="No leave requests found" />
+                    <EmptyState v-if="!loadingLeaveRequests && leaveRequests.length === 0" icon="CalendarClock" title="Data pengajuan cuti kosong" />
                 </div>
             </div>
 
@@ -425,7 +425,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="Clock" title="No pending corrections" />
+                    <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="Clock" title="Tidak ada koreksi tertunda" />
                 </div>
             </div>
         </div>

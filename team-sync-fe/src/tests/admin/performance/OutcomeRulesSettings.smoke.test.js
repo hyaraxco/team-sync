@@ -120,7 +120,7 @@ describe("OutcomeRulesSettings smoke", () => {
     it("displays empty state when no rules", () => {
         performanceReviewRefs.outcomeRules.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no outcome rules/i);
+        expect(wrapper.text()).toMatch(/aturan outcome belum dikonfigurasi/i);
     });
 
     it("displays rules table when rules exist", () => {

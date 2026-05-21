@@ -126,7 +126,7 @@ const getAvatarUrl = (user) => {
             class="text-center py-10 border-2 border-dashed border-gray-200 rounded-xl"
         >
             <UserCheck class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-            <h3 class="text-lg font-medium text-brand-dark">No reviews generated yet</h3>
+            <h3 class="text-lg font-medium text-brand-dark">Belum ada ulasan yang digenerate</h3>
             <p class="text-sm text-brand-light mt-1 max-w-sm mx-auto">
                 Click the "Generate Reviews" button to automatically create review records and assign reviewers based on
                 the system rules.
@@ -171,7 +171,7 @@ const getAvatarUrl = (user) => {
                                         {{ review.staff_member?.user?.name || `Staff #${review.staff_member?.id}` }}
                                     </p>
                                     <p class="text-xs text-brand-light">
-                                        {{ review.staff_member?.job_information?.job_title || "No Title" }}
+                                        {{ review.staff_member?.job_information?.job_title || "Tanpa Jabatan" }}
                                     </p>
                                 </div>
                             </div>
@@ -263,7 +263,7 @@ const getAvatarUrl = (user) => {
                                 :value="staff.id"
                             >
                                 {{ staff.user?.name || `Staff #${staff.id}` }} ({{
-                                    staff.job_information?.job_title || "No Title"
+                                    staff.job_information?.job_title || "Tanpa Jabatan"
                                 }})
                             </option>
                         </select>

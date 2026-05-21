@@ -141,7 +141,7 @@ const statusConfig = (status) => {
         <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-primary">Self Service</p>
-                <h1 class="text-2xl font-bold text-brand-dark">My Overtime</h1>
+                <h1 class="text-2xl font-bold text-brand-dark">Lembur Saya</h1>
                 <p class="mt-1 text-sm text-gray-500">
                     Track submitted overtime hours, approvals, and rejection notes.
                 </p>
@@ -198,7 +198,7 @@ const statusConfig = (status) => {
         <div class="rounded-2xl border border-brand-border bg-white p-4 sm:p-5">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                    <h2 class="text-lg font-bold text-brand-dark">Overtime history</h2>
+                    <h2 class="text-lg font-bold text-brand-dark">Riwayat lembur</h2>
                     <p class="text-sm text-gray-500">
                         Showing {{ meta.from || 0 }} - {{ meta.to || myRecords.length }} of
                         {{ meta.total || 0 }} records
@@ -246,11 +246,11 @@ const statusConfig = (status) => {
             <div v-else-if="!error && myRecords.length === 0" class="mt-5">
                 <EmptyState
                     icon="CalendarClock"
-                    title="No overtime records found"
+                    title="Data lembur kosong"
                     :subtitle="
                         hasActiveFilter
-                            ? 'No records match the selected status.'
-                            : 'Your approved or pending overtime history will appear here.'
+                            ? 'Tidak ada data yang cocok dengan filter status.'
+                            : 'Riwayat lembur yang disetujui atau menunggu akan muncul di sini.'
                     "
                 />
             </div>

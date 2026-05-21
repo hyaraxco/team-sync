@@ -213,8 +213,8 @@ onMounted(() => {
             v-else-if="notifications.length === 0"
             class="rounded-xl border border-brand-border bg-gray-50 px-4 py-8 text-center"
         >
-            <p class="text-base font-semibold text-brand-dark">No notifications yet.</p>
-            <p class="mt-1 text-sm text-gray-500">New updates will appear here.</p>
+            <p class="text-base font-semibold text-brand-dark">Belum ada notifikasi.</p>
+            <p class="mt-1 text-sm text-gray-500">Pembaruan baru akan muncul di sini.</p>
         </div>
 
         <div v-else class="space-y-1">

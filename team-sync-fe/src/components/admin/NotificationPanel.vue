@@ -250,7 +250,7 @@ const getIconTextClass = (notification) => {
                 <BellIcon class="h-5 w-5 text-brand-primary" />
             </div>
             <p class="text-sm font-semibold text-brand-dark">You are all caught up</p>
-            <p class="mt-1 text-xs text-slate-500">No notifications yet.</p>
+            <p class="mt-1 text-xs text-slate-500">Belum ada notifikasi.</p>
         </div>
 
         <ul v-else class="notification-panel__list max-h-96 overflow-auto px-2 py-2">

@@ -205,7 +205,7 @@ const formatPercentage = (value) => {
 
 const formatCurrency = (value) => {
     if (value === null || value === undefined) {
-        return "No cap";
+        return "Tanpa batas";
     }
 
     return new Intl.NumberFormat("id-ID", {
@@ -698,7 +698,7 @@ onMounted(() => {
                         data-testid="payroll-settings-history-empty"
                         class="rounded-xl border border-dashed border-brand-border px-4 py-4 text-sm text-brand-light"
                     >
-                        No settings history is available yet.
+                        Riwayat pengaturan belum tersedia.
                     </div>
 
                     <div v-else data-testid="payroll-settings-history-list" class="space-y-2">
@@ -769,7 +769,7 @@ onMounted(() => {
                                     data-testid="payroll-settings-history-compare-no-change"
                                     class="mt-3 text-xs text-brand-light"
                                 >
-                                    No tracked settings changed between these two versions.
+                                    Tidak ada perubahan pengaturan antara dua versi ini.
                                 </div>
 
                                 <div v-else class="mt-3 space-y-2">
@@ -813,7 +813,7 @@ onMounted(() => {
                             data-testid="payroll-settings-bpjs-history-empty"
                             class="rounded-xl border border-dashed border-brand-border px-4 py-4 text-sm text-brand-light"
                         >
-                            No BPJS rate history is available yet.
+                            Riwayat tarif BPJS belum tersedia.
                         </div>
 
                         <div

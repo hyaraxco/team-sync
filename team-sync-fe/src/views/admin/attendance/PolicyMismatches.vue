@@ -30,7 +30,7 @@
                 class="bg-white border border-brand-border rounded-2xl p-12 text-center"
             >
                 <CheckCircle class="w-12 h-12 mx-auto mb-3 text-green-500" />
-                <p class="text-brand-dark font-semibold text-lg">No pending policy mismatches</p>
+                <p class="text-brand-dark font-semibold text-lg">Tidak ada mismatch kebijakan tertunda</p>
                 <p class="text-brand-light text-sm mt-1">All attendance logs match their scheduled locations.</p>
             </div>
 

@@ -205,7 +205,7 @@ const teamProductivitySeries = computed(() => [
                     :options="taskVelocityOptions"
                     :series="taskVelocitySeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -218,7 +218,7 @@ const teamProductivitySeries = computed(() => [
                     :options="taskStatusDonutOptions"
                     :series="taskStatusDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
 
@@ -234,7 +234,7 @@ const teamProductivitySeries = computed(() => [
                     :options="taskPriorityOptions"
                     :series="taskPrioritySeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -268,7 +268,7 @@ const teamProductivitySeries = computed(() => [
                     :options="projectStatusDonutOptions"
                     :series="projectStatusDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -281,7 +281,7 @@ const teamProductivitySeries = computed(() => [
                     :options="projectTypeOptions"
                     :series="projectTypeSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
 
@@ -297,7 +297,7 @@ const teamProductivitySeries = computed(() => [
                     :options="teamProductivityOptions"
                     :series="teamProductivitySeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
     </div>
@@ -305,7 +305,7 @@ const teamProductivitySeries = computed(() => [
     <!-- Empty State -->
     <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
         <FolderKanbanIcon class="w-16 h-16 mb-4 opacity-50" />
-        <p class="text-lg font-medium">No project analytics available</p>
+        <p class="text-lg font-medium">Analitik proyek belum tersedia</p>
         <p class="text-sm mt-1">Try adjusting the period or filters</p>
     </div>
 </template>
