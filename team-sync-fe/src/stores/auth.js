@@ -1,8 +1,26 @@
 import { handleError } from "@/helpers/errorHelper";
 import { axiosInstance } from "@/plugins/axios";
 import Cookies from "js-cookie";
-import { defineStore } from "pinia";
+import { defineStore, getActivePinia } from "pinia";
 import router from "@/router";
+
+/**
+ * Reset all non-auth Pinia stores to their initial state.
+ * Called on logout to prevent stale data leaking into the next session.
+ */
+const resetAllStores = () => {
+    const pinia = getActivePinia();
+    if (!pinia) return;
+    Object.values(pinia.state.value).forEach((storeState, index) => {
+        const storeId = Object.keys(pinia.state.value)[index];
+        if (storeId === "auth") return; // auth store resets itself
+        try {
+            pinia._s.get(storeId)?.$reset();
+        } catch {
+            // Some stores may not implement $reset — ignore silently
+        }
+    });
+};
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
@@ -34,6 +52,10 @@ export const useAuthStore = defineStore("auth", {
                 }
 
                 this.success = response.data.message;
+
+                // Populate user immediately so the sidebar renders the correct
+                // role/permissions before the router guard fires.
+                await this.checkAuth();
 
                 router.push({ name: "admin.dashboard" });
             } catch (error) {
@@ -70,6 +92,12 @@ export const useAuthStore = defineStore("auth", {
                 delete axiosInstance.defaults.headers.common.Authorization;
             }
 
+            // Reset all stores before navigation so the next login starts clean.
+            this.user = null;
+            this.error = null;
+            this.loading = false;
+            resetAllStores();
+
             const loginRoute = { name: "login" };
             const loginPath = "/auth/login";
 
@@ -86,10 +114,6 @@ export const useAuthStore = defineStore("auth", {
                     // Ignore jsdom navigation errors in tests.
                 }
             }
-
-            this.user = null;
-            this.error = null;
-            this.loading = false;
 
             if (!token) {
                 return;
