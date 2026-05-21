@@ -25,7 +25,8 @@ const { isOpen, toggleMobile, closeMobile } = provideSidebar();
         <!-- Main Content -->
         <div
             id="main-content"
-            class="flex-1 flex flex-col overflow-hidden bg-gray-50 transition-colors duration-300"
+            class="flex-1 flex flex-col overflow-hidden transition-colors duration-200"
+            style="background-color: var(--main-bg)"
         >
             <!-- Top Navbar -->
             <Header @toggle-sidebar="toggleMobile" />
