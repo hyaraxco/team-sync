@@ -44,7 +44,7 @@ onMounted(() => {
         </div>
 
         <div v-else-if="!upcomingMeetings || upcomingMeetings.length === 0" class="text-center py-6">
-            <p class="text-gray-400 text-sm">No upcoming meetings</p>
+            <p class="text-gray-400 text-sm">Belum ada meeting mendatang</p>
         </div>
 
         <div v-else class="space-y-3">

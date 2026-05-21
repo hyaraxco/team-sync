@@ -97,7 +97,7 @@ onMounted(async () => {
         </div>
 
         <!-- Empty State -->
-        <EmptyState v-else icon="Users" title="No teams found" />
+        <EmptyState v-else icon="Users" title="Belum ada tim" />
 
         <!-- Pagination -->
         <Pagination

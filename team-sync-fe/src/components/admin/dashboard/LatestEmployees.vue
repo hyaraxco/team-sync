@@ -63,7 +63,7 @@ const goToEmployeeDetail = (id) => {
         <EmptyState
             v-else-if="!latestEmployees || latestEmployees.length === 0"
             icon="Users"
-            title="No employees found"
+            title="Karyawan tidak ditemukan"
         />
 
         <!-- Staff Member List -->

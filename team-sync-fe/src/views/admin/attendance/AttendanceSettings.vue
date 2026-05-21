@@ -283,7 +283,7 @@
                                      v-else-if="!holidayStore.paginatedHolidays?.length"
                                      class="text-center"
                                  >
-                                     <td colspan="4" class="p-8 font-light italic text-brand-light">No holidays configured yet.</td>
+                                     <td colspan="4" class="p-8 font-light italic text-brand-light">Belum ada hari libur yang dikonfigurasi.</td>
                                  </tr>
                                  <tr
                                      v-else

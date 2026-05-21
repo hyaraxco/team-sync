@@ -303,7 +303,7 @@ onMounted(async () => {
                         <div>
                             <h2 class="text-xl font-bold text-brand-dark">TOPSIS Performance Ranking</h2>
                             <p class="text-sm text-brand-light">
-                                Employee rankings based on 5 comprehensive performance criteria
+                                Peringkat karyawan berdasarkan 5 kriteria performa
                             </p>
                         </div>
                     </div>

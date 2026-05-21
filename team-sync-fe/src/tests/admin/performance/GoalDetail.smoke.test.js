@@ -131,6 +131,6 @@ describe("GoalDetail smoke", () => {
         performanceGoalRefs.goalUpdates.value = [];
 
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no progress updates yet/i);
+        expect(wrapper.text()).toMatch(/belum ada pembaruan progres/i);
     });
 });
