@@ -1,9 +1,10 @@
 <script setup>
-import { BellIcon, ChevronDownIcon, MessageCircleIcon, UserIcon, LogOutIcon, MenuIcon } from "lucide-vue-next";
+import { BellIcon, ChevronDownIcon, MessageCircleIcon, UserIcon, LogOutIcon, MenuIcon, SunIcon, MoonIcon } from "lucide-vue-next";
 import NotificationPanel from "@/components/admin/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notifications";
 import { useToast } from "@/composables/useToast";
+import { useDarkMode } from "@/composables/useDarkMode";
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
@@ -15,6 +16,7 @@ const { user } = storeToRefs(authStore);
 const { logout } = authStore;
 const router = useRouter();
 const { info: toastInfo } = useToast();
+const { isDark, toggle: toggleDark } = useDarkMode();
 
 const isAccountMenuOpen = ref(false);
 const isNotificationPanelOpen = ref(false);
@@ -29,92 +31,92 @@ const route = useRoute();
 const titles = {
     "admin.dashboard": {
         title: "Dashboard",
-        subtitle: "Track your team's performance and key metrics at a glance.",
+        subtitle: "Overview ringkas aktivitas tim dan perusahaan.",
     },
     "admin.notifications": {
-        title: "Notifications",
-        subtitle: "Stay up to date with your latest activity.",
+        title: "Notifikasi",
+        subtitle: "Aktivitas terbaru yang membutuhkan perhatian.",
     },
     "admin.teams": {
-        title: "Teams",
-        subtitle: "Organize teams and keep everyone aligned.",
+        title: "Tim",
+        subtitle: "Kelola struktur tim dan anggotanya.",
     },
     "admin.team.detail": {
-        title: "Team Details",
-        subtitle: "View team information",
+        title: "Detail Tim",
+        subtitle: "Informasi dan anggota tim.",
     },
-    "admin.team.create": { title: "Create Team", subtitle: "Set up a new team" },
+    "admin.team.create": { title: "Buat Tim", subtitle: "Tambah tim baru ke organisasi." },
     "admin.team.edit": {
-        title: "Edit Team",
-        subtitle: "Update team information",
+        title: "Edit Tim",
+        subtitle: "Perbarui informasi tim.",
     },
     "admin.staffMembers": {
-        title: "Employees",
-        subtitle: "Manage employee records",
+        title: "Karyawan",
+        subtitle: "Data dan profil seluruh karyawan.",
     },
     "admin.staffMembers.create": {
-        title: "Create Staff Member",
-        subtitle: "Add new employee",
+        title: "Tambah Karyawan",
+        subtitle: "Daftarkan karyawan baru.",
     },
     "admin.staffMembers.edit": {
-        title: "Edit Staff Member",
-        subtitle: "Update employee information",
+        title: "Edit Karyawan",
+        subtitle: "Perbarui data karyawan.",
     },
     "admin.staffMembers.detail": {
-        title: "Staff Member Details",
-        subtitle: "View employee profile",
+        title: "Profil Karyawan",
+        subtitle: "Detail lengkap karyawan.",
     },
     "admin.staffMembers.success": {
-        title: "Employee Created",
-        subtitle: "Employee has been added",
+        title: "Karyawan Ditambahkan",
+        subtitle: "Data karyawan berhasil disimpan.",
     },
     "admin.attendances": {
-        title: "Attendance",
-        subtitle: "Review clock-in and clock-out records quickly.",
+        title: "Kehadiran",
+        subtitle: "Rekap absensi, clock-in, dan clock-out.",
     },
     "admin.projects": {
-        title: "Projects",
-        subtitle: "Plan projects and keep tasks on track.",
+        title: "Proyek",
+        subtitle: "Daftar proyek aktif dan arsip.",
     },
     "admin.projects.create": {
-        title: "Create Project",
-        subtitle: "Set up a new project",
+        title: "Buat Proyek",
+        subtitle: "Inisiasi proyek baru.",
     },
     "admin.projects.edit": {
-        title: "Edit Project",
-        subtitle: "Update project information",
+        title: "Edit Proyek",
+        subtitle: "Perbarui detail proyek.",
     },
     "admin.projects.detail": {
-        title: "Project Details",
-        subtitle: "View project information",
+        title: "Detail Proyek",
+        subtitle: "Progres, tugas, dan anggota tim.",
     },
     "admin.payroll.dashboard": {
-        title: "Payroll",
-        subtitle: "Manage payroll with clear payment insights.",
+        title: "Penggajian",
+        subtitle: "Proses dan riwayat penggajian karyawan.",
     },
     "admin.payroll.create": {
-        title: "Create Payroll",
-        subtitle: "Generate payroll for employees",
+        title: "Buat Penggajian",
+        subtitle: "Generate slip gaji periode ini.",
     },
     "admin.payroll.detail": {
-        title: "Payroll Details",
-        subtitle: "View payroll summary",
+        title: "Detail Penggajian",
+        subtitle: "Rincian komponen gaji dan potongan.",
     },
     "staffMember.profile": {
-        title: "My Profile",
-        subtitle: "Manage your personal information",
+        title: "Profil Saya",
+        subtitle: "Data pribadi dan informasi pekerjaan.",
     },
     "staffMember.profile.edit": {
-        title: "Edit Profile",
-        subtitle: "Update your personal information",
+        title: "Edit Profil",
+        subtitle: "Perbarui informasi pribadi.",
     },
-    "staffMember.team": { title: "My Team", subtitle: "See your team members" },
+    "staffMember.team": { title: "Tim Saya", subtitle: "Anggota tim dan kontak." },
     "staffMember.attendance.my-attendances": {
-        title: "My Attendance",
-        subtitle: "Check your attendance, clock logs, and leave status.",
+        title: "Kehadiran Saya",
+        subtitle: "Rekap absensi, izin, dan cuti.",
     },
     "staffMember.attendance.clock": {
-        title: "My Attendance",
+        title: "Kehadiran Saya",
         subtitle: "Check your attendance, clock logs, and leave status.",
     },
     "staffMember.payroll": {
@@ -297,7 +299,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <header class="page-header bg-white border-b border-brand-border px-4 sm:px-6 py-3.5 sm:py-4">
+    <header class="page-header border-b border-brand-border px-4 sm:px-6 py-3.5 sm:py-4 transition-colors duration-200" style="background-color: var(--header-bg)">
         <div class="flex items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div class="min-w-0 flex items-start sm:items-center gap-3 sm:gap-4">
                 <button
@@ -322,6 +324,17 @@ onUnmounted(() => {
             <div class="flex shrink-0 items-center gap-2 sm:gap-4">
                 <!-- Action Buttons -->
                 <div class="flex items-center gap-2 sm:gap-3">
+                    <!-- Dark Mode Toggle -->
+                    <button
+                        type="button"
+                        :aria-label="isDark ? 'Switch to light mode' : 'Switch to dark mode'"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                        @click="toggleDark"
+                    >
+                        <SunIcon v-if="isDark" class="w-5 h-5 text-brand-light" />
+                        <MoonIcon v-else class="w-5 h-5 text-brand-light" />
+                    </button>
+
                     <div class="relative z-50" ref="notificationDropdownRef">
                         <button
                             type="button"
@@ -410,7 +423,8 @@ onUnmounted(() => {
                         id="header-account-menu"
                         data-testid="header-account-menu"
                         role="menu"
-                        class="absolute right-0 top-full mt-2 w-56 bg-white border border-brand-border rounded-lg shadow-md py-2 z-[9999]"
+                        class="absolute right-0 top-full mt-2 w-56 border border-brand-border rounded-lg shadow-md py-2 z-[9999] transition-colors duration-200"
+                        style="background-color: var(--color-surface)"
                         :class="{ hidden: !isAccountMenuOpen }"
                     >
                         <div class="px-4 py-3 border-b border-brand-border">
@@ -428,7 +442,7 @@ onUnmounted(() => {
                                 :to="{ name: 'staffMember.profile' }"
                                 role="menuitem"
                                 data-testid="header-profile-menu-item"
-                                class="flex items-center gap-3 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer"
+                                class="flex items-center gap-3 px-4 py-2 text-sm text-brand-dark hover:bg-surface-overlay transition-colors cursor-pointer"
                                 @click="isAccountMenuOpen = false"
                             >
                                 <UserIcon class="w-4 h-4" />
