@@ -179,8 +179,8 @@ onMounted(() => {
         <div v-else-if="!paginatedHolidays || paginatedHolidays.length === 0" class="py-8">
             <EmptyState
                 icon="CalendarClock"
-                title="No holidays found"
-                subtitle="Add a holiday to start building your company holiday calendar."
+                title="Data hari libur kosong"
+                subtitle="Tambahkan hari libur untuk memulai kalender perusahaan."
             />
         </div>
 

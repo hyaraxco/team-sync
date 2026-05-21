@@ -725,14 +725,14 @@ onUnmounted(() => {
                             </div>
                         </div>
                         <div v-else class="flex items-center justify-center py-2">
-                            <span class="text-brand-light text-sm italic">No attendance data</span>
+                            <span class="text-brand-light text-sm italic">Data kehadiran kosong</span>
                         </div>
                     </div>
 
                     <EmptyState
                         v-if="!attendanceLoading && recentAttendances.length === 0"
                         icon="CalendarClock"
-                        title="No attendance records found"
+                        title="Data kehadiran tidak ditemukan"
                     />
                 </div>
 
@@ -884,7 +884,7 @@ onUnmounted(() => {
                     <EmptyState
                         v-if="!leaveLoading && myLeaveRequests.length === 0"
                         icon="CalendarX"
-                        title="No leave requests found"
+                        title="Data pengajuan cuti kosong"
                     />
                 </div>
             </div>

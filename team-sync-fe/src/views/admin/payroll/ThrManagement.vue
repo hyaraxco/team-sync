@@ -307,8 +307,8 @@ function handlePageChange(page) {
 
             <EmptyState
                 v-if="!loading && thrPayrolls.length === 0"
-                title="No THR Payrolls"
-                description="Generate THR for a religious holiday event to get started."
+                title="Data THR kosong"
+                description="Generate THR untuk hari raya keagamaan."
             />
         </div>
 

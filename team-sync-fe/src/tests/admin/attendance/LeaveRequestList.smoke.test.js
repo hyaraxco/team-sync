@@ -78,7 +78,7 @@ describe("LeaveRequestList smoke", () => {
 
     it("contains header text", () => {
         const wrapper = createWrapper();
-        expect(wrapper.text()).toContain("Leave Requests");
+        expect(wrapper.text()).toContain("Pengajuan Cuti");
     });
 
     it("fetches paginated data on mount (list view is default)", () => {

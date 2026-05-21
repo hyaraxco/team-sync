@@ -116,7 +116,7 @@ describe("MyReviews smoke", () => {
     it("displays empty state when no reviews", () => {
         performanceReviewRefs.myReviews.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no.*reviews/i);
+        expect(wrapper.text()).toMatch(/belum ada review/i);
     });
 
     it("displays reviews when available", () => {

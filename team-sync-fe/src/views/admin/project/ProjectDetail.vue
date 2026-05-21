@@ -198,7 +198,7 @@ onMounted(async () => {
                     <EmptyState
                         v-if="!project.teams || project.teams.length === 0"
                         icon="Briefcase"
-                        title="No teams assigned"
+                        title="Belum ada tim"
                     />
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div
@@ -342,7 +342,7 @@ onMounted(async () => {
 
                     <div class="mb-4">
                         <p class="text-brand-dark text-xs font-semibold mb-2">By Stream</p>
-                        <div v-if="summaryByStream.length === 0" class="text-xs text-gray-400">No stream data</div>
+                        <div v-if="summaryByStream.length === 0" class="text-xs text-gray-400">Data stream kosong</div>
                         <div v-else class="space-y-1.5">
                             <div
                                 v-for="item in summaryByStream"
@@ -361,7 +361,7 @@ onMounted(async () => {
                             <p class="text-brand-dark text-xs font-semibold">Task Status</p>
                         </div>
                         <div v-if="summaryTaskByStatus.length === 0" class="text-xs text-gray-400">
-                            No task status data
+                            Data status tugas kosong
                         </div>
                         <div v-else class="space-y-1.5">
                             <div

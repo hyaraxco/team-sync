@@ -885,8 +885,8 @@ watch(
                 <EmptyState
                     v-if="staffMembers.length === 0"
                     icon="SearchX"
-                    title="No staffMembers found"
-                    subtitle="Try adjusting your search terms"
+                    title="Karyawan tidak ditemukan"
+                    subtitle="Coba ubah kata kunci pencarian"
                 />
             </div>
         </div>

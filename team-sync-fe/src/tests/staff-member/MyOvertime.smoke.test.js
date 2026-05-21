@@ -104,7 +104,7 @@ describe("MyOvertime smoke", () => {
         const wrapper = factory();
         await nextTick();
 
-        expect(wrapper.text()).toContain("My Overtime");
+        expect(wrapper.text()).toContain("Lembur Saya");
         expect(wrapper.text()).toContain("Track submitted overtime hours, approvals, and rejection notes");
         expect(wrapper.text()).toContain("Loaded Hours");
         expect(wrapper.text()).toContain("Approved Hours");
@@ -130,7 +130,7 @@ describe("MyOvertime smoke", () => {
         await nextTick();
         await Promise.resolve();
 
-        expect(wrapper.text()).toContain("No overtime records found");
+        expect(wrapper.text()).toContain("Data lembur kosong");
     });
 
     it("renders overtime records when data is loaded", async () => {

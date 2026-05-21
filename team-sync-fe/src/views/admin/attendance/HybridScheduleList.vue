@@ -228,8 +228,8 @@ const confirmReject = () =>
                                     <td colspan="3" class="py-10">
                                         <EmptyState
                                             icon="FileText"
-                                            title="No Hybrid Schedules"
-                                            subtitle="No employee schedules are available right now."
+                                            title="Jadwal hybrid belum tersedia"
+                                            subtitle="Jadwal karyawan belum tersedia saat ini."
                                         />
                                     </td>
                                 </tr>
@@ -321,8 +321,8 @@ const confirmReject = () =>
                                     <td colspan="7" class="py-10">
                                         <EmptyState
                                             icon="CalendarClock"
-                                            title="No Pending Override Requests"
-                                            subtitle="Pending override requests will appear here for review."
+                                            title="Tidak ada override tertunda"
+                                            subtitle="Pengajuan override tertunda akan muncul di sini."
                                         />
                                     </td>
                                 </tr>

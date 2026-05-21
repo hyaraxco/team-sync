@@ -14,7 +14,7 @@ const props = defineProps({
      */
     title: {
         type: String,
-        default: "No data found",
+        default: "Data kosong found",
     },
     /**
      * Subtitle / hint text

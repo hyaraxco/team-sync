@@ -245,7 +245,7 @@ onUnmounted(() => {
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-brand-dark">Analytics</h1>
-                <p class="text-sm text-gray-500 mt-1">Comprehensive HR metrics and insights</p>
+                <p class="text-sm text-gray-500 mt-1">Data dan performa SDM perusahaan.</p>
             </div>
 
             <!-- Global Filters + Export -->
@@ -453,7 +453,7 @@ onUnmounted(() => {
                             :series="attendanceDeductionSeries"
                         />
                         <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
-                            No data available for this period
+                            Data kosong available for this period
                         </div>
                     </div>
 
@@ -469,7 +469,7 @@ onUnmounted(() => {
                             :series="hrCostSeries"
                         />
                         <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
-                            No data available for this period
+                            Data kosong available for this period
                         </div>
                     </div>
                 </div>
@@ -486,7 +486,7 @@ onUnmounted(() => {
                         :series="teamPerformanceSeries"
                     />
                     <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
-                        No team data available for this period
+                        Data tim belum tersedia untuk periode ini
                     </div>
                 </div>
             </div>
@@ -494,7 +494,7 @@ onUnmounted(() => {
             <!-- Empty State -->
             <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
                 <BarChart3Icon class="w-16 h-16 mb-4 opacity-50" />
-                <p class="text-lg font-medium">No analytics data available</p>
+                <p class="text-lg font-medium">Data analitik belum tersedia</p>
                 <p class="text-sm mt-1">Try adjusting the period or filters</p>
             </div>
         </div>
