@@ -20,10 +20,25 @@ export default {
                     800: '#1e40af',
                     900: '#1e3a8a',
                 },
-                'brand-dark': '#0C1C3C',
-                'brand-light': '#6B7280',
-                'brand-border': '#DCDEDD',
-                'brand-primary': '#0C51D9',
+                // Semantic tokens — reference CSS custom properties for dark mode support
+                'brand-dark': 'var(--color-brand-dark)',
+                'brand-light': 'var(--color-brand-light)',
+                'brand-border': 'var(--color-brand-border)',
+                'brand-primary': 'var(--color-brand-primary)',
+                // Surface tokens — bg-white, bg-gray-50, bg-gray-100 etc. via CSS vars
+                'surface': 'var(--color-surface)',
+                'surface-raised': 'var(--color-surface-raised)',
+                'surface-overlay': 'var(--color-surface-overlay)',
+                'surface-muted': 'var(--color-surface-muted)',
+                'surface-subtle': 'var(--color-surface-subtle)',
+                // Border tokens
+                'border-default': 'var(--color-border-default)',
+                'border-muted': 'var(--color-border-muted)',
+                // Text tokens
+                'text-primary': 'var(--color-text-primary)',
+                'text-secondary': 'var(--color-text-secondary)',
+                'text-muted': 'var(--color-text-muted)',
+                'text-disabled': 'var(--color-text-disabled)',
                 success: {
                     50: '#ecfdf5',
                     100: '#d1fae5',

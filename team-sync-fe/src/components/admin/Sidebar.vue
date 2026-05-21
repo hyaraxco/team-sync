@@ -39,7 +39,8 @@ const onNavigate = () => closeMobile();
     <!-- Sidebar -->
     <aside
         id="sidebar"
-        class="fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out"
+        class="fixed lg:relative inset-y-0 left-0 z-50 border-r flex flex-col transform transition-all duration-200 ease-in-out"
+        style="background-color: var(--sidebar-bg); border-color: var(--sidebar-border)"
         :style="{ width: isCollapsed ? '68px' : '256px', minWidth: isCollapsed ? '68px' : '256px' }"
         :class="[
             isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -830,9 +831,9 @@ const onNavigate = () => closeMobile();
                     </div>
 
                     <!-- Content -->
-                    <h4 class="text-brand-dark text-base font-bold mb-1">Upgrade to Pro</h4>
+                    <h4 class="text-brand-dark text-base font-bold mb-1">Team Sync Pro</h4>
                     <p class="text-brand-dark text-sm font-normal leading-5 mb-4">
-                        Unlock advanced features and insights
+                        Multi-tenancy, SSO, dan laporan lanjutan.
                     </p>
 
                     <!-- CTA Button -->
