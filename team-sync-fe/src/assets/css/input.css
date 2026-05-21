@@ -640,3 +640,32 @@ html {
 .dark td {
     border-color: var(--color-border-muted);
 }
+
+/* Slate color overrides */
+.dark .bg-slate-50 {
+    background-color: var(--color-surface-raised) !important;
+}
+
+.dark .bg-slate-100 {
+    background-color: var(--color-surface-overlay) !important;
+}
+
+.dark .bg-slate-200 {
+    background-color: var(--color-surface-muted) !important;
+}
+
+.dark .text-slate-400 {
+    color: var(--color-text-muted) !important;
+}
+
+.dark .text-slate-600 {
+    color: var(--color-text-secondary) !important;
+}
+
+.dark .text-slate-800 {
+    color: #E2E8F0 !important;
+}
+
+.dark .border-slate-100 {
+    border-color: var(--color-border-muted) !important;
+}
