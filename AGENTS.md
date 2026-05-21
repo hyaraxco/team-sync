@@ -256,7 +256,7 @@ docker compose up -d queue scheduler
 
 - **Multi-tenancy**: Currently single-tenant. Future: multi-tenant SaaS — design with tenant isolation in mind.
 - **TOPSIS ranking**: `TopsisService.php` — multi-criteria decision analysis for performance reviews
-- **Performance module partially stubbed**: FE views GiveFeedback, TeamGoals, ReviewCycleCreate, GoalDetail have TODO placeholders
+- **Performance module fully wired**: All FE views (GiveFeedback, TeamGoals, ReviewCycleCreate, GoalDetail, FeedbackGiven, MyGoals, PendingCalibration, TemplateManagement) now call real Pinia store actions
 - **ApexCharts**: Registered globally as `VueApexCharts`
 - **Schedule Meeting**: HR broadcasts meeting links to divisions/teams via queued notifications
 - **Constants** (`app/Constants/CacheConstants.php`): `PAYROLL_BULK_INSERT_CHUNK_SIZE = 500`, `DEFAULT_PAGINATION_SIZE = 50`
