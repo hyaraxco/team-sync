@@ -1637,3 +1637,19 @@ After Plan 1 complete, proceed to domain-specific redesign plans:
 
 Each plan will use the migrated shared components from Plan 1.
 
+
+---
+
+## Task 1 Audit Results
+
+**Token mapping for migration:**
+- `bg-white` → `background: var(--color-surface)`
+- `bg-gray-50` → `background: var(--color-surface-raised)`
+- `bg-gray-100` → `background: var(--color-surface-overlay)`
+- `text-gray-900` → `color: var(--color-text-primary)`
+- `text-gray-500` → `color: var(--color-text-secondary)`
+- `text-gray-400` → `color: var(--color-text-muted)`
+- `border-gray-200` → `border-color: var(--color-border-default)`
+
+All required tokens present in `input.css` lines 10-86. No additions needed.
+
