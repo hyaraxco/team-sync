@@ -92,29 +92,31 @@ const onRejectAction = (req) => {
 </script>
 
 <template>
-    <div class="mb-6">
-        <SearchFilter
-            placeholder="Search by Employee or ID..."
-            :filters="[
-                {
-                    key: 'status',
-                    label: 'All Statuses',
-                    icon: 'CheckCircle',
-                    options: [
-                        { value: 'pending', label: 'Pending' },
-                        { value: 'approved', label: 'Approved' },
-                        { value: 'rejected', label: 'Rejected' },
-                    ],
-                },
-            ]"
-            @search="handleSearch"
-            @reset="handleReset"
-        />
-    </div>
+    <div class="p-3 sm:p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <span class="sr-only" role="heading" aria-level="1">Attendance Corrections</span>
 
-    <Alert type="error" title="Error" :message="error || ''" :show="Boolean(error)" />
+            <SearchFilter
+                placeholder="Search by Employee or ID..."
+                :filters="[
+                    {
+                        key: 'status',
+                        label: 'All Statuses',
+                        icon: 'CheckCircle',
+                        options: [
+                            { value: 'pending', label: 'Pending' },
+                            { value: 'approved', label: 'Approved' },
+                            { value: 'rejected', label: 'Rejected' },
+                        ],
+                    },
+                ]"
+                @search="handleSearch"
+                @reset="handleReset"
+            />
 
-    <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
+            <Alert type="error" title="Error" :message="error || ''" :show="Boolean(error)" />
+
+            <div class="bg-white border border-brand-border rounded-2xl p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <p class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</p>
@@ -246,6 +248,8 @@ const onRejectAction = (req) => {
             @page-change="handlePageChange"
             @per-page-change="handlePerPageChange"
         />
+            </div>
+        </div>
     </div>
 
     <!-- Approve Modal -->
