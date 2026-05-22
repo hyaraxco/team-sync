@@ -11,6 +11,13 @@ import EmptyState from "@/components/common/EmptyState.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const store = useHybridScheduleStore();
 const { paginatedSchedules, loading, error } = storeToRefs(store);
 const toast = useToast();
@@ -154,8 +161,8 @@ const confirmReject = () =>
 </script>
 
 <template>
-    <div class="space-y-6">
-        <MainCard>
+    <div :class="embedded ? '' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
+        <component :is="embedded ? 'div' : MainCard" :class="embedded ? 'space-y-6' : ''">
             <div class="space-y-6">
                 <!-- Tabs -->
                 <div class="bg-white border border-brand-border rounded-2xl p-3">
@@ -410,7 +417,7 @@ const confirmReject = () =>
                     </div>
                 </template>
             </div>
-        </MainCard>
+        </component>
     </div>
 
     <ModalWrapper
