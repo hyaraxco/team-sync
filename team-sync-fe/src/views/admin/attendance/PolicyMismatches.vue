@@ -3,7 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Policy Mismatches</h1>
+                    <p class="text-2xl font-bold text-brand-dark">Policy Mismatches</p>
                     <p class="text-brand-light text-sm mt-1">
                         Review and resolve discrepancies between employee scheduled work locations and actual attendance data.
                     </p>
@@ -20,18 +20,18 @@
             </div>
 
             <!-- Loading State -->
-            <div v-else-if="loading" class="space-y-4">
-                <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-2xl animate-pulse" />
+            <div v-else-if="loading" class="rounded-2xl border border-brand-border bg-white p-4 space-y-4">
+                <div v-for="i in 5" :key="i" class="h-16 bg-brand-border/40 rounded-2xl animate-pulse" />
             </div>
 
             <!-- Empty State -->
-            <div
-                v-else-if="!mismatches.length"
-                class="bg-white border border-brand-border rounded-2xl p-12 text-center"
-            >
-                <CheckCircle class="w-12 h-12 mx-auto mb-3 text-green-500" />
-                <p class="text-brand-dark font-semibold text-lg">Tidak ada mismatch kebijakan tertunda</p>
-                <p class="text-brand-light text-sm mt-1">All attendance logs match their scheduled locations.</p>
+            <div v-else-if="!mismatches.length" class="bg-white border border-brand-border rounded-2xl p-6">
+                <EmptyState
+                    icon="Inbox"
+                    title="No policy mismatches found"
+                    subtitle="All attendance logs match scheduled work locations."
+                    size="lg"
+                />
             </div>
 
             <!-- Table -->
@@ -39,19 +39,19 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
-<tr class="border-b border-brand-border">
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Employee</th>
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled</th>
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Actual</th>
-                                 <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                            <tr class="border-b border-brand-border">
+                                 <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Employee</th>
+                                 <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Date</th>
+                                 <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Scheduled</th>
+                                 <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Actual</th>
+                                 <th class="p-4 text-right text-xs font-semibold text-brand-light uppercase tracking-wide">Actions</th>
                              </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-brand-border">
                             <tr
                                 v-for="item in mismatches"
                                 :key="item.id"
-                                class="hover:bg-gray-50 transition-colors"
+                                class="hover:bg-brand-border/20 transition-colors"
                             >
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
@@ -75,7 +75,7 @@
                                 <td class="px-4 py-3 text-right space-x-2">
                                     <button
                                         @click="acknowledge(item.id)"
-                                        class="text-xs px-3 py-1.5 rounded-lg border border-brand-border text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
+                                        class="text-xs px-3 py-1.5 rounded-lg border border-brand-border text-brand-dark hover:bg-brand-border/20 transition-colors cursor-pointer"
                                     >
                                         Acknowledge
                                     </button>
@@ -99,7 +99,8 @@
 import { ref, onMounted } from "vue";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useToast } from "@/composables/useToast";
-import { AlertTriangle, CheckCircle } from "lucide-vue-next";
+import { AlertTriangle } from "lucide-vue-next";
+import EmptyState from "@/components/common/EmptyState.vue";
 
 const attendanceStore = useAttendanceStore();
 const toast = useToast();

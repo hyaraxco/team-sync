@@ -111,4 +111,12 @@ describe("AttendanceRecordList smoke", () => {
 
         expect(searchFilterState.handleSearch).toHaveBeenCalled();
     });
+
+    it("keeps standardized list helpers without local h1", () => {
+        const wrapper = factory();
+
+        expect(wrapper.find(".search-trigger").exists()).toBe(true);
+        expect(wrapper.find(".empty-state-stub").exists()).toBe(true);
+        expect(wrapper.find("h1").exists()).toBe(false);
+    });
 });

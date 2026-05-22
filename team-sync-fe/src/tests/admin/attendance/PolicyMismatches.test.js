@@ -35,5 +35,27 @@ describe("PolicyMismatches.vue", () => {
         expect(wrapper.text()).toContain("Acknowledge");
         expect(wrapper.text()).toContain("Resolve");
         expect(wrapper.text()).toContain("Ahmad Fauzi");
+        expect(wrapper.find("h1").exists()).toBe(false);
+    });
+
+    it("uses shared EmptyState instead of inline empty markup", async () => {
+        setActivePinia(createPinia());
+        const store = useAttendanceStore();
+        store.fetchPolicyMismatches = vi.fn().mockResolvedValue({ data: [] });
+
+        const wrapper = mount(PolicyMismatches, {
+            global: {
+                stubs: {
+                    EmptyState: { template: '<div data-test="empty-state">EmptyState</div>' },
+                },
+            },
+        });
+
+        await flushPromises();
+
+        expect(wrapper.find("h1").exists()).toBe(false);
+        expect(wrapper.find('[data-test="empty-state"]').exists()).toBe(true);
+        expect(wrapper.find(".text-center > svg").exists()).toBe(false);
+        expect(wrapper.text()).toContain("EmptyState");
     });
 });
