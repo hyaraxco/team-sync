@@ -23,11 +23,6 @@ vi.mock("@/stores/attendanceCorrection", () => ({
     }),
 }));
 
-vi.mock("pinia", async () => ({
-    ...(await vi.importActual("pinia")),
-    storeToRefs: (store) => store,
-}));
-
 vi.mock("@/helpers/permissionHelper", () => ({
     can: () => true,
     canOneOf: () => true,
