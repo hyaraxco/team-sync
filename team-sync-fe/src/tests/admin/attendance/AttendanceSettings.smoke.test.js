@@ -99,9 +99,9 @@ describe("AttendanceSettings.vue smoke", () => {
         await flushPromises();
 
         expect(wrapper.find("h1").exists()).toBe(false);
-        const shell = wrapper.find(".rounded-2xl.border.border-brand-border.p-6.shadow-sm");
+        const shell = wrapper.find("section.rounded-2xl.border.border-brand-border.p-6.shadow-sm");
         expect(shell.exists()).toBe(true);
-        expect(shell.attributes("style")).toContain("var(--color-surface)");
+        expect(shell.classes()).toContain("bg-[var(--color-surface)]");
     });
 
     it("holiday modal uses Select primitive for type field", async () => {

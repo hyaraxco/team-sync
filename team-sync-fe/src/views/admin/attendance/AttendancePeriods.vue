@@ -25,7 +25,7 @@
             </header>
 
             <div class="grid gap-6 lg:grid-cols-3">
-                <div class="lg:col-span-2 space-y-4 rounded-2xl border border-brand-border p-6 shadow-sm" style="background-color: var(--color-surface);">
+                <div class="lg:col-span-2 space-y-4 rounded-2xl border border-brand-border bg-[var(--color-surface)] p-6 shadow-sm">
                     <h2 class="text-lg font-bold text-brand-dark">Period History</h2>
 
                     <!-- Error State -->
@@ -67,9 +67,9 @@
                                 <div
                                     class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm"
                                     :class="{
-                                        'bg-green-50 text-green-700': period.status === 'open',
-                                        'bg-yellow-50 text-yellow-700': period.status === 'review',
-                                        'bg-gray-100 text-gray-600': period.status === 'locked',
+                                        'bg-success-50 text-success-700': period.status === 'open',
+                                        'bg-warning-50 text-warning-700': period.status === 'review',
+                                        'bg-[var(--color-surface-muted)] text-brand-light': period.status === 'locked',
                                     }"
                                 >
                                     {{ new Date(period.start_date).toLocaleString("default", { month: "short" }) }}
@@ -84,14 +84,14 @@
                                 <span
                                     class="px-2 py-1 text-xs font-semibold uppercase rounded-full border"
                                     :class="{
-                                        'bg-green-50 border-green-200 text-green-700': period.status === 'open',
-                                        'bg-yellow-50 border-yellow-200 text-yellow-700': period.status === 'review',
-                                        'bg-gray-100 border-gray-200 text-gray-600': period.status === 'locked',
+                                        'bg-success-50 border-success-200 text-success-700': period.status === 'open',
+                                        'bg-warning-50 border-warning-200 text-warning-700': period.status === 'review',
+                                        'bg-[var(--color-surface-muted)] border-brand-border text-brand-light': period.status === 'locked',
                                     }"
                                 >
                                     {{ period.status }}
                                 </span>
-                                <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-brand-dark transition-colors" />
+                                <ChevronRight class="w-4 h-4 text-brand-light group-hover:text-brand-dark transition-colors" />
                             </div>
                         </button>
                     </div>
@@ -106,31 +106,31 @@
                         </h2>
 
                         <div v-if="!selectedPeriod" class="text-center py-12 px-4">
-                            <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                            <Calendar class="w-12 h-12 mx-auto mb-3 text-brand-light opacity-60" />
                             <p class="text-brand-light text-sm">Select an attendance period to view payroll readiness.</p>
                         </div>
 
                         <div v-else class="space-y-4">
-                            <div class="p-4 rounded-xl bg-gray-50 border border-brand-border">
+                            <div class="p-4 rounded-xl bg-[var(--color-surface-muted)] border border-brand-border">
                                 <p class="text-sm text-brand-light mb-1">Selected Period</p>
                                 <p class="text-lg font-semibold text-brand-dark">{{ selectedPeriod.month }}</p>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="p-3 rounded-xl bg-green-50 border border-green-200">
-                                    <p class="text-2xl font-bold text-green-700">{{ readinessCounts.ready }}</p>
-                                    <p class="text-xs text-green-600 font-semibold">Ready</p>
+                                <div class="p-3 rounded-xl bg-success-50 border border-success-200">
+                                    <p class="text-2xl font-bold text-success-700">{{ readinessCounts.ready }}</p>
+                                    <p class="text-xs text-success-700 font-semibold">Ready</p>
                                 </div>
-                                <div class="p-3 rounded-xl bg-yellow-50 border border-yellow-200">
-                                    <p class="text-2xl font-bold text-yellow-700">{{ readinessCounts.warnings }}</p>
-                                    <p class="text-xs text-yellow-600 font-semibold">Warnings</p>
+                                <div class="p-3 rounded-xl bg-warning-50 border border-warning-200">
+                                    <p class="text-2xl font-bold text-warning-700">{{ readinessCounts.warnings }}</p>
+                                    <p class="text-xs text-warning-700 font-semibold">Warnings</p>
                                 </div>
-                                <div class="p-3 rounded-xl bg-red-50 border border-red-200 col-span-2 flex justify-between items-center">
+                                <div class="p-3 rounded-xl bg-danger-50 border border-danger-200 col-span-2 flex justify-between items-center">
                                     <div>
-                                        <p class="text-2xl font-bold text-red-700">{{ readinessCounts.blocked }}</p>
-                                        <p class="text-xs text-red-600 font-semibold">Blocked</p>
+                                        <p class="text-2xl font-bold text-danger-700">{{ readinessCounts.blocked }}</p>
+                                        <p class="text-xs text-danger-700 font-semibold">Blocked</p>
                                     </div>
-                                    <button class="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition-colors cursor-pointer">
+                                    <button class="px-3 py-1.5 rounded-lg bg-danger-100 text-danger-700 text-sm font-medium hover:bg-danger-200 transition-colors cursor-pointer">
                                         Review
                                     </button>
                                 </div>
@@ -150,7 +150,7 @@
                                     :class="
                                         selectedPeriod.status === 'review'
                                             ? 'border border-primary-700 blue-gradient blue-btn-shadow text-white hover:brightness-110'
-                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-[var(--color-surface-muted)] text-brand-light cursor-not-allowed'
                                     "
                                     :disabled="selectedPeriod.status !== 'review'"
                                     @click="handleGeneratePayroll"
@@ -209,7 +209,7 @@
                     <button
                         type="button"
                         :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="flex-1 px-4 py-2.5 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
                         @click="closeCreateModal"
                     >
                         Cancel

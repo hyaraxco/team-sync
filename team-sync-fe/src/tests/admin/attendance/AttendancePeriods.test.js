@@ -1,7 +1,14 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import AttendancePeriods from "@/views/admin/attendance/AttendancePeriods.vue";
 import { createPinia, setActivePinia } from "pinia";
+
+const source = readFileSync(
+    join(process.cwd(), "src/views/admin/attendance/AttendancePeriods.vue"),
+    "utf8",
+);
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({ push: vi.fn() }),
@@ -44,6 +51,12 @@ describe("AttendancePeriods.vue", () => {
         const shells = wrapper.findAll(".rounded-2xl.border.border-brand-border.p-6.shadow-sm");
 
         expect(shells.length).toBeGreaterThan(0);
-        expect(shells.some((shell) => shell.attributes("style")?.includes("var(--color-surface)"))).toBe(true);
+        expect(shells.some((shell) => shell.classes().includes("bg-[var(--color-surface)]"))).toBe(true);
+    });
+
+    it("keeps readiness workspace cards tokenized for dark mode", () => {
+        expect(source).toContain("Readiness Workspace");
+        expect(source).toContain("bg-[var(--color-surface)]");
+        expect(source).not.toMatch(/\b(bg-gray-50|bg-green-50|bg-yellow-50|bg-red-50|text-gray-300|text-gray-400)\b/);
     });
 });

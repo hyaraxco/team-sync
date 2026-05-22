@@ -1,7 +1,14 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import AttendanceSettings from "@/views/admin/attendance/AttendanceSettings.vue";
 import { createPinia, setActivePinia } from "pinia";
+
+const source = readFileSync(
+    join(process.cwd(), "src/views/admin/attendance/AttendanceSettings.vue"),
+    "utf8",
+);
 
 vi.mock("@/stores/attendancePolicy", () => ({
     useAttendancePolicyStore: vi.fn(() => ({
@@ -72,6 +79,11 @@ describe("AttendanceSettings.vue", () => {
         const shells = wrapper.findAll(".rounded-2xl.border.border-brand-border.p-6.shadow-sm");
 
         expect(shells.length).toBeGreaterThan(0);
-        expect(shells.some((shell) => shell.attributes("style")?.includes("var(--color-surface)"))).toBe(true);
+        expect(shells.some((shell) => shell.classes().includes("bg-[var(--color-surface)]"))).toBe(true);
+    });
+
+    it("keeps touched attendance settings surfaces tokenized for dark mode", () => {
+        expect(source).toContain("bg-[var(--color-surface)]");
+        expect(source).not.toMatch(/\b(bg-gray-50|border-gray-300|text-gray-500|divide-gray-100|hover:bg-gray-50|bg-red-50)\b/);
     });
 });
