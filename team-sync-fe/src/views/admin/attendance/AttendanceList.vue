@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
-import { RouterLink } from "vue-router";
-import { TrendingUp, CheckCircle, Clock, CalendarClock, CalendarDays, Check, X } from "lucide-vue-next";
+import { RouterLink, useRouter } from "vue-router";
+import { TrendingUp, CheckCircle, Clock, CalendarClock, CalendarDays, Check, X, Timer, MapPin, AlertTriangle, Settings, FileText } from "lucide-vue-next";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
@@ -20,6 +20,7 @@ const attendanceStore = useAttendanceStore();
 const leaveRequestStore = useLeaveRequestStore();
 const attendanceCorrectionStore = useAttendanceCorrectionStore();
 const toast = useToast();
+const router = useRouter();
 
 const statistics = ref({
     present_today: 0,
@@ -72,16 +73,27 @@ const activeTab = ref("leave-requests");
 const sections = computed(() => {
     const items = [];
     if (can("leave-request-list")) {
-        items.push({ id: "leave-requests", label: "Leave Requests", icon: CalendarClock });
+        items.push({ id: "leave-requests", label: "Leave Requests", icon: CalendarClock, route: null });
     }
     if (can("attendance-correction-list")) {
-        items.push({ id: "corrections", label: "Corrections", icon: Clock });
+        items.push({ id: "corrections", label: "Corrections", icon: Clock, route: null });
     }
+    if (can("attendance-list")) {
+        items.push({ id: "records", label: "Attendance Logs", icon: CalendarDays, route: "admin.attendance.records" });
+    }
+    if (can("overtime-list")) {
+        items.push({ id: "overtime", label: "Overtime", icon: Timer, route: "admin.attendance.overtime" });
+    }
+    items.push({ id: "hybrid", label: "Hybrid Schedules", icon: MapPin, route: "admin.attendance.hybrid-schedules" });
     return items;
 });
 
-const setActiveTab = (id) => {
-    activeTab.value = id;
+const setActiveTab = (section) => {
+    if (section.route) {
+        router.push({ name: section.route });
+    } else {
+        activeTab.value = section.id;
+    }
 };
 
 const loadStatistics = async () => {
@@ -155,60 +167,7 @@ onMounted(async () => {
 
 <template>
     <div class="flex-1 flex flex-col overflow-hidden">
-        <span class="sr-only" role="heading" aria-level="1">Kehadiran</span>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-            <RouterLink
-                :to="{ name: 'admin.attendance.records' }"
-                v-if="can('attendance-list')"
-                class="bg-white rounded-2xl border border-brand-border p-5 transition-all duration-300 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
-            >
-                <div
-                    class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
-                >
-                    <CalendarDays class="w-6 h-6 text-blue-600" />
-                </div>
-                <div>
-                    <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
-                        Attendance Logs
-                    </h3>
-                </div>
-            </RouterLink>
-
-            <RouterLink
-                :to="{ name: 'admin.attendance.leave-requests' }"
-                v-if="can('leave-request-list')"
-                class="bg-white rounded-2xl border border-brand-border p-5 transition-all duration-300 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
-            >
-                <div
-                    class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors"
-                >
-                    <CalendarClock class="w-6 h-6 text-purple-600" />
-                </div>
-                <div>
-                    <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
-                        Leave Requests
-                    </h3>
-                </div>
-            </RouterLink>
-
-            <RouterLink
-                :to="{ name: 'admin.attendance.corrections' }"
-                v-if="can('attendance-correction-list')"
-                class="bg-white rounded-2xl border border-brand-border p-5 transition-all duration-300 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
-            >
-                <div
-                    class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition-colors"
-                >
-                    <Clock class="w-6 h-6 text-orange-600" />
-                </div>
-                <div>
-                    <h3 class="text-brand-dark text-base font-semibold group-hover:text-brand-primary transition-colors">
-                        Corrections
-                    </h3>
-                </div>
-            </RouterLink>
-        </div>
+        <span class="sr-only" role="heading" aria-level="1">Attendance</span>
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div class="main-card rounded-2xl border border-brand-dark relative overflow-hidden p-5">
@@ -312,16 +271,16 @@ onMounted(async () => {
         </div>
 
         <!-- Tabs -->
-        <div v-if="sections.length > 0" class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
+            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <button
                     v-for="section in sections"
                     :key="section.id"
                     type="button"
-                    @click="setActiveTab(section.id)"
+                    @click="setActiveTab(section)"
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
-                        activeTab === section.id
+                        activeTab === section.id && !section.route
                             ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
@@ -329,7 +288,7 @@ onMounted(async () => {
                     <component
                         :is="section.icon"
                         class="w-4 h-4"
-                        :class="activeTab === section.id ? 'text-white' : 'text-gray-600'"
+                        :class="activeTab === section.id && !section.route ? 'text-white' : 'text-gray-600'"
                     />
                     <span class="text-sm font-semibold">{{ section.label }}</span>
                 </button>
