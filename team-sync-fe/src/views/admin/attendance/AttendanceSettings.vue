@@ -3,8 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">System Configuration</h1>
-                    <p class="text-brand-light text-sm mt-1">
+                    <p class="text-brand-light text-sm">
                         Configure global attendance rules, grace periods, and manage holiday schedules across the organization.
                     </p>
                 </div>
@@ -31,7 +30,8 @@
                 <section
                     v-if="activeTab === 'Attendance Policies'"
                     key="policies"
-                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 rounded-2xl border border-brand-border p-6 shadow-sm"
+                    style="background-color: var(--color-surface);"
                 >
                     <div
                         v-if="policyStore.loading"
@@ -50,34 +50,35 @@
                         <div
                             v-for="policy in policyStore.policies"
                             :key="policy.id"
-                            class="policy-card group p-5 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                            class="policy-card group p-5 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                            style="background-color: var(--color-surface);"
                         >
                             <div class="flex justify-between items-start mb-4">
                                 <h3 class="text-lg font-semibold text-brand-dark capitalize">
                                     {{ policy.employment_type.replace("_", " ") }}
                                 </h3>
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-brand-light">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full text-brand-light" style="background-color: var(--color-surface-muted);">
                                     Policy
                                 </span>
                             </div>
 
                             <div class="space-y-3 text-sm">
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Work Hours</span>
                                     <span class="font-medium text-brand-dark">
                                         {{ policy.work_start_time.substring(0, 5) }} -
                                         {{ policy.work_end_time.substring(0, 5) }}
                                     </span>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Late Grace Period</span>
                                     <span class="font-medium text-brand-dark">{{ policy.late_grace_minutes }} mins</span>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Half Day Min</span>
                                     <span class="font-medium text-brand-dark">{{ policy.half_day_min_hours }} hours</span>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Required Work Days</span>
                                     <span class="font-medium text-brand-dark">
                                         {{ policy.work_days_per_week }} days/week
@@ -86,7 +87,8 @@
                             </div>
 
                             <button
-                                class="w-full mt-8 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                class="w-full mt-8 py-3 rounded-xl border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                style="background-color: var(--color-surface-muted);"
                                 type="button"
                                 @click="openPolicyModal(policy)"
                             >
@@ -118,7 +120,8 @@
                 <section
                     v-else-if="activeTab === 'Leave Entitlements'"
                     key="entitlements"
-                    class="relative z-10 space-y-6"
+                    class="relative z-10 space-y-6 rounded-2xl border border-brand-border p-6 shadow-sm"
+                    style="background-color: var(--color-surface);"
                 >
                     <div class="flex justify-between items-center">
                         <h2 class="text-lg font-bold text-brand-dark">Leave Quotas & Rules</h2>
@@ -139,7 +142,8 @@
                             <div
                                 v-for="entitlement in group"
                                 :key="entitlement.id"
-                                class="policy-card p-4 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                                class="policy-card p-4 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                                style="background-color: var(--color-surface);"
                             >
                                 <div class="flex justify-between items-start mb-3">
                                     <h4 class="text-base font-semibold text-brand-dark capitalize">
@@ -166,7 +170,7 @@
                                 </div>
 
                                 <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                    <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                         <span class="text-brand-light">Quota</span>
                                         <span
                                             class="font-medium text-brand-dark"
@@ -182,7 +186,7 @@
                                         </span>
                                     </div>
                                     <div
-                                        class="flex justify-between items-center border-b border-gray-100 pb-2"
+                                        class="flex justify-between items-center border-b border-brand-border pb-2"
                                         v-if="entitlement.carry_over_max_days > 0"
                                     >
                                         <span class="text-brand-light">Max Carry Over</span>
@@ -190,7 +194,7 @@
                                             {{ entitlement.carry_over_max_days }} days
                                         </span>
                                     </div>
-                                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                    <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                         <span class="text-brand-light">Requires Proof</span>
                                         <span
                                             class="font-medium"
@@ -204,7 +208,8 @@
                                 </div>
 
                                 <button
-                                    class="w-full mt-6 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-brand-border text-xs tracking-wide font-medium text-brand-dark transition-all"
+                                    class="w-full mt-6 py-2 rounded-lg border border-brand-border text-xs tracking-wide font-medium text-brand-dark transition-all"
+                                    style="background-color: var(--color-surface-muted);"
                                      type="button"
                                      @click="openEntitlementModal(entitlement)"
                                  >
@@ -215,11 +220,12 @@
                     </div>
                 </section>
 
-                <section v-else-if="activeTab === 'Holiday Calendars'" key="holidays" class="relative z-10 space-y-6">
+                <section v-else-if="activeTab === 'Holiday Calendars'" key="holidays" class="relative z-10 space-y-6 rounded-2xl border border-brand-border p-6 shadow-sm" style="background-color: var(--color-surface);">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-light">Upcoming Holidays</h2>
                         <button
-                            class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300"
+                            class="px-6 py-2.5 rounded-full border border-brand-border text-brand-dark font-medium text-sm hover:scale-105 transition-transform duration-300"
+                            style="background-color: var(--color-surface);"
                             type="button"
                             @click="openHolidayModal()"
                         >
