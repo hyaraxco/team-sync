@@ -46,7 +46,16 @@ describe("HybridScheduleList smoke", () => {
     it("renders without crashing", () => {
         const wrapper = createWrapper();
         expect(wrapper.exists()).toBe(true);
-        expect(wrapper.text()).toContain("Hybrid Work Schedules");
+    });
+
+    it("does not render duplicate local h1 title", () => {
+        const wrapper = createWrapper();
+        expect(wrapper.find("h1").exists()).toBe(false);
+    });
+
+    it("uses CSS variable for surface background", () => {
+        const wrapper = createWrapper();
+        expect(wrapper.html()).toContain("var(--color-surface)");
     });
 
     it("calls fetchAllPaginated on mount", () => {
