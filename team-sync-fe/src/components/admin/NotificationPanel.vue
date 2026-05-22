@@ -1,6 +1,9 @@
 <script setup>
 import { BellIcon, CheckCircle2, Clock3, MessageSquare, Users, Wallet } from "lucide-vue-next";
 import { computed } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const props = defineProps({
     open: {
@@ -188,6 +191,10 @@ const getIconTextClass = (notification) => {
 
     return "text-brand-primary";
 };
+
+const handleSeeAll = () => {
+    router.push({ name: 'admin.notifications' });
+};
 </script>
 
 <template>
@@ -196,14 +203,32 @@ const getIconTextClass = (notification) => {
         data-testid="header-notification-panel"
         role="dialog"
         aria-label="Latest notifications"
-        class="notification-panel absolute right-0 top-full mt-3 z-[9999] overflow-hidden rounded-2xl"
+        class="notification-panel absolute right-0 top-full mt-3 z-[9999] overflow-hidden rounded-2xl border shadow-lg"
         :class="{ hidden: !open, 'notification-panel--open': open }"
+        :style="{
+            background: 'var(--color-surface)',
+            borderColor: 'var(--color-border-default)',
+            width: '20rem',
+            maxWidth: 'calc(100vw - 2rem)'
+        }"
     >
-        <div class="notification-panel__header border-b border-primary-100 px-4 py-3">
+        <div 
+            class="notification-panel__header border-b px-4 py-3"
+            :style="{ borderColor: 'var(--color-border-default)' }"
+        >
             <div class="relative z-10 flex items-center justify-between">
                 <div>
-                    <p class="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-primary">Notifications</p>
-                    <p class="text-xs text-slate-500">Latest updates</p>
+                    <p 
+                        class="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-primary"
+                    >
+                        Notifications
+                    </p>
+                    <p 
+                        class="text-xs"
+                        :style="{ color: 'var(--color-text-secondary)' }"
+                    >
+                        Latest updates
+                    </p>
                 </div>
                 <button
                     v-if="visibleNotifications.length > 0"
@@ -219,7 +244,12 @@ const getIconTextClass = (notification) => {
         </div>
 
         <div v-if="loading" data-testid="notification-loading" class="px-4 py-4">
-            <p class="text-sm font-medium text-slate-700">Loading notifications...</p>
+            <p 
+                class="text-sm font-medium"
+                :style="{ color: 'var(--color-text-primary)' }"
+            >
+                Loading notifications...
+            </p>
             <div class="mt-3 space-y-2.5">
                 <div class="h-2 w-20 animate-pulse rounded-full bg-primary-100"></div>
                 <div class="h-2 w-full animate-pulse rounded-full bg-primary-100"></div>
@@ -249,8 +279,18 @@ const getIconTextClass = (notification) => {
             <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-lg">
                 <BellIcon class="h-5 w-5 text-brand-primary" />
             </div>
-            <p class="text-sm font-semibold text-brand-dark">You are all caught up</p>
-            <p class="mt-1 text-xs text-slate-500">Belum ada notifikasi.</p>
+            <p 
+                class="text-sm font-semibold"
+                :style="{ color: 'var(--color-text-primary)' }"
+            >
+                No notifications
+            </p>
+            <p 
+                class="mt-1 text-xs"
+                :style="{ color: 'var(--color-text-secondary)' }"
+            >
+                You are all caught up
+            </p>
         </div>
 
         <ul v-else class="notification-panel__list max-h-96 overflow-auto px-2 py-2">
@@ -258,11 +298,12 @@ const getIconTextClass = (notification) => {
                 v-for="notification in visibleNotifications"
                 :key="notification.id"
                 :data-testid="`notification-item-${notification.id}`"
-                class="border-b border-slate-100 py-1.5 last:border-b-0"
+                class="notification-item border-b py-1.5 last:border-b-0"
+                :style="{ borderColor: 'var(--color-border-muted)' }"
             >
                 <button
                     type="button"
-                    class="notification-item group flex w-full items-start gap-3 rounded-xl px-2.5 py-2 text-left transition-colors duration-200 hover:bg-primary-50/40"
+                    class="group flex w-full items-start gap-3 rounded-xl px-2.5 py-2 text-left transition-colors duration-200 hover:bg-primary-50/40"
                     :data-testid="`notification-select-${notification.id}`"
                     @click="emit('select', notification)"
                 >
@@ -278,71 +319,51 @@ const getIconTextClass = (notification) => {
                     </div>
 
                     <div class="min-w-0 flex-1">
-                        <p class="text-sm font-semibold leading-5 text-brand-dark">
+                        <p 
+                            class="text-sm font-semibold leading-5"
+                            :style="{ color: 'var(--color-text-primary)' }"
+                        >
                             {{ notification.title }}
                         </p>
-                        <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-gray-600">
+                        <p 
+                            v-if="notification.body" 
+                            class="mt-0.5 text-xs leading-5"
+                            :style="{ color: 'var(--color-text-secondary)' }"
+                        >
                             {{ notification.body }}
                         </p>
-                        <p class="mt-1 text-xs text-slate-500" :title="formatCreatedAt(notification.created_at)">
+                        <p 
+                            class="mt-1 text-xs"
+                            :style="{ color: 'var(--color-text-muted)' }"
+                            :title="formatCreatedAt(notification.created_at)"
+                        >
                             {{ formatRelativeTime(notification.created_at) }}
                         </p>
                     </div>
                 </button>
             </li>
         </ul>
+
+        <!-- See all notifications link -->
+        <div 
+            class="border-t px-4 py-3 text-center"
+            :style="{ borderColor: 'var(--color-border-default)' }"
+        >
+            <button
+                data-testid="see-all-link"
+                type="button"
+                class="text-sm font-medium text-brand-primary hover:text-brand-primary-dark transition-colors"
+                @click="handleSeeAll"
+            >
+                See all notifications →
+            </button>
+        </div>
     </div>
 </template>
 
 <style scoped>
-.notification-panel {
-    width: 20rem;
-    max-width: calc(100vw - 2rem);
-    border: 1px solid #c9dbff;
-    background: linear-gradient(180deg, #ffffff 0%, #fcfdff 100%);
-    box-shadow: 0 24px 60px -30px rgba(12, 81, 217, 0.85);
-}
-
-.notification-panel::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background:
-        radial-gradient(circle at 92% -8%, rgba(12, 81, 217, 0.28), transparent 46%),
-        radial-gradient(circle at 8% -14%, rgba(111, 150, 227, 0.2), transparent 40%);
-}
-
-.notification-panel__header {
-    position: relative;
-    background: linear-gradient(132deg, #f7faff 0%, #edf4ff 100%);
-}
-
-.notification-panel__list {
-    position: relative;
-    z-index: 1;
-}
-
-.notification-panel__list::-webkit-scrollbar {
-    width: 7px;
-}
-
-.notification-panel__list::-webkit-scrollbar-thumb {
-    border-radius: 999px;
-    background: #d5e3ff;
-}
-
-.notification-panel__list::-webkit-scrollbar-track {
-    background: transparent;
-}
-
 .notification-panel--open {
     animation: panel-enter 220ms ease-out;
-}
-
-.notification-item {
-    position: relative;
-    z-index: 1;
 }
 
 @keyframes panel-enter {
@@ -359,7 +380,7 @@ const getIconTextClass = (notification) => {
 @media (max-width: 640px) {
     .notification-panel {
         right: -0.5rem;
-        width: min(20rem, calc(100vw - 1rem));
+        width: min(20rem, calc(100vw - 1rem)) !important;
     }
 }
 </style>
