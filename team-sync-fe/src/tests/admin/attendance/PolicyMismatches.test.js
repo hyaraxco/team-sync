@@ -35,6 +35,10 @@ describe("PolicyMismatches.vue", () => {
         expect(wrapper.text()).toContain("Acknowledge");
         expect(wrapper.text()).toContain("Resolve");
         expect(wrapper.text()).toContain("Ahmad Fauzi");
+        const pageHeading = wrapper.find('[role="heading"][aria-level="1"]');
+        expect(pageHeading.exists()).toBe(true);
+        expect(pageHeading.text()).toBe("Policy Mismatches");
+        expect(pageHeading.classes()).toContain("sr-only");
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 
@@ -53,6 +57,8 @@ describe("PolicyMismatches.vue", () => {
 
         await flushPromises();
 
+        expect(wrapper.find('[role="heading"][aria-level="1"]').text()).toBe("Policy Mismatches");
+        expect(wrapper.find('[role="heading"][aria-level="1"]').classes()).toContain("sr-only");
         expect(wrapper.find("h1").exists()).toBe(false);
         expect(wrapper.find('[data-test="empty-state"]').exists()).toBe(true);
         expect(wrapper.find(".text-center > svg").exists()).toBe(false);

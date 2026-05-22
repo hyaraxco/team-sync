@@ -29,29 +29,32 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
 </script>
 
 <template>
-    <div class="mb-6">
-        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+    <div class="p-3 sm:p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
             <div>
-                <p class="text-2xl font-bold text-brand-dark">Attendance Logs</p>
-                <p class="text-sm text-brand-light mt-1">Review historical attendance logs across the organization.</p>
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                    <div>
+                        <span class="sr-only" role="heading" aria-level="1">Attendance Logs</span>
+                        <p class="text-2xl font-bold text-brand-dark">Attendance Logs</p>
+                        <p class="text-sm text-brand-light mt-1">Review historical attendance logs across the organization.</p>
+                    </div>
+                </div>
+
+                <!-- Search Filters -->
+                <SearchFilter
+                    placeholder="Search by Employee..."
+                    :search="filters.search"
+                    @update:search="filters.search = $event"
+                    @search="handleSearch"
+                    @reset="handleReset"
+                    @change="handleSearch"
+                />
             </div>
-        </div>
 
-        <!-- Search Filters -->
-        <SearchFilter
-            placeholder="Search by Employee..."
-            :search="filters.search"
-            @update:search="filters.search = $event"
-            @search="handleSearch"
-            @reset="handleReset"
-            @change="handleSearch"
-        />
-    </div>
+            <Alert v-if="error" type="error" :message="error" dismissible @close="error = null" />
 
-    <Alert v-if="error" type="error" :message="error" class="mb-6" dismissible @close="error = null" />
-
-    <!-- Main Content Card -->
-    <div class="bg-white rounded-2xl theme-card-shadow border border-brand-border overflow-hidden">
+            <!-- Main Content Card -->
+            <div class="bg-white rounded-2xl theme-card-shadow border border-brand-border overflow-hidden">
         <!-- Desktop Table View -->
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -82,7 +85,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                         </th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-[#DCDEDD]">
+                <tbody class="divide-y divide-brand-border">
                     <tr v-if="loading">
                         <td colspan="5" class="py-12 text-center text-brand-light">Loading attendance logs...</td>
                     </tr>
@@ -158,7 +161,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
         </div>
 
         <!-- Mobile View -->
-        <div class="md:hidden divide-y divide-[#DCDEDD]">
+        <div class="md:hidden divide-y divide-brand-border">
             <div v-if="loading" class="py-12 text-center text-brand-light">Loading attendance logs...</div>
             <div v-else-if="paginatedAttendances?.length === 0" class="py-12">
                 <EmptyState icon="CalendarDays" title="Data tidak ditemukan" message="Tidak ada data yang cocok dengan filter." />
@@ -211,6 +214,8 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                 @page-change="handlePageChange"
                 @per-page-change="handlePerPageChange"
             />
+        </div>
+            </div>
         </div>
     </div>
 </template>
