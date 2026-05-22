@@ -133,18 +133,29 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <div class="bg-white border border-brand-border rounded-2xl p-4">
+    <div 
+        data-testid="search-filter-container"
+        class="border border-brand-border rounded-2xl p-4"
+        :style="{ background: 'var(--color-surface)' }"
+    >
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <!-- Search Bar -->
             <div class="flex-1 relative">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <SearchIcon class="h-5 w-5 text-gray-500" />
+                    <SearchIcon 
+                        class="h-5 w-5" 
+                        :style="{ color: 'var(--color-text-muted)' }"
+                    />
                 </div>
                 <input
                     v-model="searchQuery"
                     type="text"
                     aria-label="Search"
-                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 font-semibold"
+                    :style="{ 
+                        background: 'var(--color-surface)',
+                        color: 'var(--color-text-primary)'
+                    }"
                     :placeholder="placeholder"
                 />
             </div>
@@ -154,12 +165,20 @@ onUnmounted(() => {
                 <!-- Dynamic Filter Dropdowns -->
                 <div v-for="filter in filters" :key="filter.key" class="relative w-full sm:w-auto">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <component :is="getIcon(filter.icon)" class="h-4 w-4 text-gray-500" />
+                        <component 
+                            :is="getIcon(filter.icon)" 
+                            class="h-4 w-4" 
+                            :style="{ color: 'var(--color-text-muted)' }"
+                        />
                     </div>
                     <select
                         v-model="filterValues[filter.key]"
                         :aria-label="filter.label"
-                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 bg-white appearance-none font-semibold"
+                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 appearance-none font-semibold"
+                        :style="{ 
+                            background: 'var(--color-surface)',
+                            color: 'var(--color-text-primary)'
+                        }"
                     >
                         <option value="">{{ filter.label }}</option>
                         <option v-for="opt in filter.options" :key="opt.value" :value="opt.value">
@@ -167,7 +186,10 @@ onUnmounted(() => {
                         </option>
                     </select>
                     <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                        <ChevronDownIcon class="h-4 w-4 text-gray-500" />
+                        <ChevronDownIcon 
+                            class="h-4 w-4" 
+                            :style="{ color: 'var(--color-text-muted)' }"
+                        />
                     </div>
                 </div>
 
