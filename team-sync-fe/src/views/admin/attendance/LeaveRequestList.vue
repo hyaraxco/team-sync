@@ -251,19 +251,23 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div class="p-3 sm:p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <span class="sr-only" role="heading" aria-level="1">Leave Requests</span>
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-brand-dark">Pengajuan Cuti</h1>
+            <p class="text-2xl font-bold text-brand-dark">Leave Requests</p>
             <p class="text-sm text-brand-light mt-1">Manage and monitor employee leave requests.</p>
         </div>
 
         <!-- Tab Switcher -->
-        <div class="bg-gray-100 p-1 flex rounded-lg">
+        <div class="bg-brand-border/20 p-1 flex rounded-lg">
             <button
                 @click="activeTab = 'list'"
                 :class="[
                     'px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-all duration-200',
-                    activeTab === 'list' ? 'bg-white shadow text-brand-dark' : 'text-gray-500 hover:text-brand-dark',
+                    activeTab === 'list' ? 'bg-white shadow text-brand-dark' : 'text-brand-light hover:text-brand-dark',
                 ]"
             >
                 <List class="w-4 h-4" />
@@ -275,7 +279,7 @@ onMounted(() => {
                     'px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-all duration-200',
                     activeTab === 'calendar'
                         ? 'bg-white shadow text-brand-dark'
-                        : 'text-gray-500 hover:text-brand-dark',
+                        : 'text-brand-light hover:text-brand-dark',
                 ]"
             >
                 <CalendarDays class="w-4 h-4" />
@@ -340,7 +344,7 @@ onMounted(() => {
                                     :checked="allSelectableSelected"
                                     :disabled="loading || !selectableRequests.length || processingBulkAction"
                                     @change="toggleSelectAll"
-                                    class="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                                    class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
                                     title="Select all pending requests"
                                 />
                             </th>
@@ -354,14 +358,14 @@ onMounted(() => {
                     </thead>
                     <tbody>
                         <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                            <td colspan="8" class="py-8 text-center text-gray-500">Loading...</td>
+                            <td colspan="8" class="py-8 text-center text-brand-light">Loading...</td>
                         </tr>
                         <tr v-else-if="!leaveRequests || leaveRequests.length === 0" class="border-b border-brand-border">
                             <td colspan="8" class="py-8">
                                 <EmptyState
                                     icon="ClipboardList"
-                                    title="Data pengajuan kosong"
-                                    description="Tidak ada pengajuan cuti yang cocok dengan filter."
+                                    title="No leave requests found"
+                                    description="Adjust filters or wait for employees to submit leave requests."
                                 />
                             </td>
                         </tr>
@@ -369,7 +373,7 @@ onMounted(() => {
                             v-else
                             v-for="request in leaveRequests"
                             :key="request.id"
-                            class="border-b border-brand-border hover:bg-gray-50 transition-colors"
+                            class="border-b border-brand-border hover:bg-brand-border/20 transition-colors"
                         >
                             <td class="py-4 px-4">
                                 <input
@@ -378,7 +382,7 @@ onMounted(() => {
                                     type="checkbox"
                                     :value="request.id"
                                     :disabled="loading || processingBulkAction"
-                                    class="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                                    class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
                                     :aria-label="`Select leave request ${request.id}`"
                                 />
                             </td>
@@ -419,7 +423,7 @@ onMounted(() => {
                                         <ExternalLink class="w-3 h-3" />
                                         View Proof
                                     </a>
-                                    <span v-else class="text-xs text-gray-500 italic">Tidak ada bukti</span>
+                                    <span v-else class="text-xs text-brand-light italic">No proof</span>
 
                                     <div v-if="request.proof_file_path" class="mt-1">
                                         <span
@@ -436,7 +440,7 @@ onMounted(() => {
                                         </span>
                                     </div>
                                 </div>
-                                <span v-else class="text-xs text-gray-400">-</span>
+                                <span v-else class="text-xs text-brand-light">-</span>
                             </td>
                             <td class="py-4 px-4">
                                 <StatusBadge type="leave-status" :value="request.status" />
@@ -501,31 +505,31 @@ onMounted(() => {
         <div class="flex items-center justify-between mb-6">
             <h3 class="text-brand-dark text-[20px] font-bold">{{ currentMonth.toFormat("MMMM yyyy") }}</h3>
             <div class="flex gap-2">
-                <button @click="prevMonth" aria-label="Previous month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
-                    <ChevronLeft class="w-5 h-5 text-gray-600" aria-hidden="true" />
+                <button @click="prevMonth" aria-label="Previous month" class="p-2 border border-brand-border rounded-md hover:bg-brand-border/20" :disabled="loading">
+                    <ChevronLeft class="w-5 h-5 text-brand-light" aria-hidden="true" />
                 </button>
                 <button
                     @click="
                         currentMonth = DateTime.now().startOf('month');
                         fetchMonthData();
                     "
-                    class="px-4 py-2 text-sm font-semibold border rounded-md hover:bg-gray-50"
+                    class="px-4 py-2 text-sm font-semibold border border-brand-border rounded-md hover:bg-brand-border/20"
                     :disabled="loading"
                 >
                     Today
                 </button>
-                <button @click="nextMonth" aria-label="Next month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
-                    <ChevronRight class="w-5 h-5 text-gray-600" aria-hidden="true" />
+                <button @click="nextMonth" aria-label="Next month" class="p-2 border border-brand-border rounded-md hover:bg-brand-border/20" :disabled="loading">
+                    <ChevronRight class="w-5 h-5 text-brand-light" aria-hidden="true" />
                 </button>
             </div>
         </div>
 
-        <div class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+        <div class="grid grid-cols-7 gap-px bg-brand-border border border-brand-border rounded-lg overflow-hidden">
             <!-- Calendar Header -->
             <div
                 v-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
                 :key="day"
-                class="bg-gray-50 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                class="bg-brand-border/20 py-2 text-center text-xs font-semibold text-brand-light uppercase tracking-wider"
             >
                 {{ day }}
             </div>
@@ -535,8 +539,8 @@ onMounted(() => {
                 v-for="date in calendarGrid"
                 :key="date.toISODate()"
                 :class="[
-                    'bg-white min-h-[120px] p-2 hover:bg-gray-50 transition-colors',
-                    { 'opacity-50 bg-gray-50': date.month !== currentMonth.month },
+                    'bg-white min-h-[120px] p-2 hover:bg-brand-border/20 transition-colors',
+                    { 'opacity-50 bg-brand-border/20': date.month !== currentMonth.month },
                 ]"
             >
                 <div class="flex justify-between items-start mb-2">
@@ -545,7 +549,7 @@ onMounted(() => {
                             'text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full',
                             date.toISODate() === DateTime.now().toISODate()
                                 ? 'bg-brand-dark text-white'
-                                : 'text-gray-700',
+                                : 'text-brand-dark',
                         ]"
                     >
                         {{ date.toFormat("d") }}
@@ -642,9 +646,9 @@ onMounted(() => {
 
             <div
                 v-if="selectedProofRequest?.proof_file_path"
-                class="mb-4 p-3 bg-gray-50 border rounded flex justify-between items-center"
+                class="mb-4 p-3 bg-brand-border/20 border border-brand-border rounded flex justify-between items-center"
             >
-                <span class="text-sm font-medium text-gray-700">{{ selectedProofRequest.proof_file_name }}</span>
+                <span class="text-sm font-medium text-brand-dark">{{ selectedProofRequest.proof_file_name }}</span>
                 <a
                     :href="getProofUrl(selectedProofRequest.proof_file_path)"
                     target="_blank"
@@ -657,7 +661,7 @@ onMounted(() => {
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Decision *</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1.5">Review Decision *</label>
                     <select
                         v-model="proofReviewForm.status"
                         class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary"
@@ -667,7 +671,7 @@ onMounted(() => {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Notes</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1.5">Review Notes</label>
                     <textarea
                         v-model="proofReviewForm.notes"
                         rows="3"
@@ -696,4 +700,6 @@ onMounted(() => {
             </div>
         </template>
     </ModalWrapper>
+        </div>
+    </div>
 </template>
