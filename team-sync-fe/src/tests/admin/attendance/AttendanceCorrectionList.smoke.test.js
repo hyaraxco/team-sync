@@ -6,9 +6,22 @@ const RouterLinkStub = defineComponent({ name: "RouterLink", template: "<a><slot
 const SearchFilterStub = defineComponent({ name: "SearchFilter", template: "<div />" });
 const PaginationStub = defineComponent({ name: "Pagination", template: "<div />" });
 const AlertStub = defineComponent({ name: "Alert", template: "<div />" });
-const ModalWrapperStub = defineComponent({ name: "ModalWrapper", template: "<div><slot /></div>" });
+const ModalWrapperStub = defineComponent({
+    name: "ModalWrapper",
+    props: ["show", "title"],
+    template: `
+        <section v-if="show" data-test="modal-wrapper">
+            <p data-test="modal-title">{{ title }}</p>
+            <slot />
+            <footer data-test="modal-footer"><slot name="footer" /></footer>
+        </section>
+    `,
+});
 const EmptyStateStub = defineComponent({ name: "EmptyState", template: "<div />" });
-const StatusBadgeStub = defineComponent({ name: "StatusBadge", template: '<span data-test="status-badge"><slot /></span>' });
+const StatusBadgeStub = defineComponent({
+    name: "StatusBadge",
+    template: '<span data-test="status-badge"><slot /></span>',
+});
 
 const paginatedCorrections = ref([]);
 const loading = ref(false);
@@ -86,8 +99,8 @@ describe("AttendanceCorrectionList smoke", () => {
             {
                 id: "1",
                 status: "approved",
-                requested_check_in: "09:00",
-                requested_check_out: "18:00",
+                requested_check_in: "2026-04-20T09:00:00Z",
+                requested_check_out: "2026-04-20T18:00:00Z",
                 reason: "forgot",
             },
         ];
@@ -122,8 +135,8 @@ describe("AttendanceCorrectionList smoke", () => {
                 {
                     id: "1",
                     status: "pending",
-                    requested_check_in: "09:00",
-                    requested_check_out: "18:00",
+                    requested_check_in: "2026-04-20T09:00:00Z",
+                    requested_check_out: "2026-04-20T18:00:00Z",
                     reason: "forgot",
                 },
             ];
@@ -143,14 +156,20 @@ describe("AttendanceCorrectionList smoke", () => {
                 },
             });
 
-            // Find approve button
             const buttons = wrapper.findAll("button");
             const approveBtn = buttons.find((b) => b.text().includes("Approve"));
 
             expect(approveBtn.exists()).toBe(true);
             await approveBtn.trigger("click");
 
-            // In this smoke test we just verify it doesn't crash on trigger
+            expect(wrapper.find('[data-test="modal-wrapper"]').exists()).toBe(true);
+            expect(wrapper.find('[data-test="modal-title"]').text()).toBe("Approve Correction");
+            expect(wrapper.text()).toContain("Confirm approval for this attendance correction.");
+            expect(wrapper.text()).toContain("Requested In:");
+            expect(wrapper.text()).toContain("16:00");
+            expect(wrapper.text()).toContain('"forgot"');
+            expect(wrapper.find('[data-test="modal-footer"]').text()).toContain("Cancel");
+            expect(wrapper.find('[data-test="modal-footer"]').text()).toContain("Approve");
         });
 
         it("shows reject modal when reject button is clicked", async () => {
@@ -158,8 +177,8 @@ describe("AttendanceCorrectionList smoke", () => {
                 {
                     id: "1",
                     status: "pending",
-                    requested_check_in: "09:00",
-                    requested_check_out: "18:00",
+                    requested_check_in: "2026-04-20T09:00:00Z",
+                    requested_check_out: "2026-04-20T18:00:00Z",
                     reason: "forgot",
                 },
             ];
@@ -179,12 +198,22 @@ describe("AttendanceCorrectionList smoke", () => {
                 },
             });
 
-            // Find reject button
             const buttons = wrapper.findAll("button");
             const rejectBtn = buttons.find((b) => b.text().includes("Reject"));
 
             expect(rejectBtn.exists()).toBe(true);
             await rejectBtn.trigger("click");
+
+            expect(wrapper.find('[data-test="modal-wrapper"]').exists()).toBe(true);
+            expect(wrapper.find('[data-test="modal-title"]').text()).toBe("Reject Correction");
+            expect(wrapper.text()).toContain("Confirm rejection for this attendance correction.");
+            expect(wrapper.text()).toContain("Requested In");
+            expect(wrapper.text()).toContain("16:00");
+            expect(wrapper.find("textarea").exists()).toBe(true);
+            const modalFooter = wrapper.find('[data-test="modal-footer"]');
+            expect(modalFooter.text()).toContain("Cancel");
+            expect(modalFooter.text()).toContain("Reject");
+            expect(modalFooter.findAll("button").at(1).attributes("disabled")).toBeDefined();
         });
     });
 });
