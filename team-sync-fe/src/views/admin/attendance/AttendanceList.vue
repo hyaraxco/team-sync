@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, computed } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
-import { RouterLink, useRouter } from "vue-router";
-import { TrendingUp, CheckCircle, Clock, CalendarClock, CalendarDays, Check, X, Timer, MapPin, AlertTriangle, Settings, FileText } from "lucide-vue-next";
+import { RouterLink } from "vue-router";
+import { TrendingUp, CheckCircle, Clock, CalendarClock, CalendarDays, Check, X, Timer, MapPin } from "lucide-vue-next";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
@@ -10,17 +10,20 @@ import StatusBadge from "@/components/common/StatusBadge.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
+import SearchFilter from "@/components/common/SearchFilter.vue";
 import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils.js";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { can } from "@/helpers/permissionHelper";
 import { useConfirmAction } from "@/composables/useConfirmAction";
 import { useToast } from "@/composables/useToast";
+import AttendanceRecordList from "@/views/admin/attendance/AttendanceRecordList.vue";
+import OvertimeManagement from "@/views/admin/attendance/OvertimeManagement.vue";
+import HybridScheduleList from "@/views/admin/attendance/HybridScheduleList.vue";
 
 const attendanceStore = useAttendanceStore();
 const leaveRequestStore = useLeaveRequestStore();
 const attendanceCorrectionStore = useAttendanceCorrectionStore();
 const toast = useToast();
-const router = useRouter();
 
 const statistics = ref({
     present_today: 0,
@@ -73,27 +76,23 @@ const activeTab = ref("leave-requests");
 const sections = computed(() => {
     const items = [];
     if (can("leave-request-list")) {
-        items.push({ id: "leave-requests", label: "Leave Requests", icon: CalendarClock, route: null });
+        items.push({ id: "leave-requests", label: "Leave Requests", icon: CalendarClock });
     }
     if (can("attendance-correction-list")) {
-        items.push({ id: "corrections", label: "Corrections", icon: Clock, route: null });
+        items.push({ id: "corrections", label: "Corrections", icon: Clock });
     }
     if (can("attendance-list")) {
-        items.push({ id: "records", label: "Attendance Logs", icon: CalendarDays, route: "admin.attendance.records" });
+        items.push({ id: "records", label: "Attendance Logs", icon: CalendarDays });
     }
     if (can("overtime-list")) {
-        items.push({ id: "overtime", label: "Overtime", icon: Timer, route: "admin.attendance.overtime" });
+        items.push({ id: "overtime", label: "Overtime", icon: Timer });
     }
-    items.push({ id: "hybrid", label: "Hybrid Schedules", icon: MapPin, route: "admin.attendance.hybrid-schedules" });
+    items.push({ id: "hybrid", label: "Hybrid Schedules", icon: MapPin });
     return items;
 });
 
-const setActiveTab = (section) => {
-    if (section.route) {
-        router.push({ name: section.route });
-    } else {
-        activeTab.value = section.id;
-    }
+const setActiveTab = (id) => {
+    activeTab.value = id;
 };
 
 const loadStatistics = async () => {
@@ -277,10 +276,10 @@ onMounted(async () => {
                     v-for="section in sections"
                     :key="section.id"
                     type="button"
-                    @click="setActiveTab(section)"
+                    @click="setActiveTab(section.id)"
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
-                        activeTab === section.id && !section.route
+                        activeTab === section.id
                             ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
                     "
@@ -288,7 +287,7 @@ onMounted(async () => {
                     <component
                         :is="section.icon"
                         class="w-4 h-4"
-                        :class="activeTab === section.id && !section.route ? 'text-white' : 'text-gray-600'"
+                        :class="activeTab === section.id ? 'text-white' : 'text-gray-600'"
                     />
                     <span class="text-sm font-semibold">{{ section.label }}</span>
                 </button>
@@ -298,12 +297,17 @@ onMounted(async () => {
         <!-- Leave Requests Tab -->
         <div
             v-if="activeTab === 'leave-requests' && can('leave-request-list')"
-            class="bg-white border border-brand-border rounded-2xl mb-6 p-4 sm:p-5"
+            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-brand-dark text-xl font-bold">Latest Leave Requests</h3>
-                    <p class="text-brand-light text-sm font-normal mt-1">Pending leave requests awaiting approval</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
+                        <CalendarClock class="w-6 h-6 text-purple-600" />
+                    </div>
+                    <div>
+                        <h3 class="text-brand-dark text-xl font-bold">Latest Leave Requests</h3>
+                        <p class="text-brand-light text-sm font-normal">Pending leave requests awaiting approval</p>
+                    </div>
                 </div>
             </div>
 
@@ -368,12 +372,17 @@ onMounted(async () => {
         <!-- Corrections Tab -->
         <div
             v-if="activeTab === 'corrections' && can('attendance-correction-list')"
-            class="bg-white border border-brand-border rounded-2xl mb-6 p-4 sm:p-5"
+            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div>
-                    <h3 class="text-brand-dark text-xl font-bold">Pending Corrections</h3>
-                    <p class="text-brand-light text-sm font-normal mt-1">Attendance corrections awaiting approval</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
+                        <Clock class="w-6 h-6 text-orange-600" />
+                    </div>
+                    <div>
+                        <h3 class="text-brand-dark text-xl font-bold">Pending Corrections</h3>
+                        <p class="text-brand-light text-sm font-normal">Attendance corrections awaiting approval</p>
+                    </div>
                 </div>
             </div>
 
@@ -419,6 +428,63 @@ onMounted(async () => {
 
                 <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="Clock" title="No pending corrections" subtitle="Attendance corrections will appear here once submitted." />
             </div>
+        </div>
+
+        <!-- Attendance Logs Tab -->
+        <div
+            v-if="activeTab === 'records' && can('attendance-list')"
+            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+        >
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
+                        <CalendarDays class="w-6 h-6 text-blue-600" />
+                    </div>
+                    <div>
+                        <h3 class="text-brand-dark text-xl font-bold">Attendance Logs</h3>
+                        <p class="text-brand-light text-sm font-normal">View and manage attendance records</p>
+                    </div>
+                </div>
+            </div>
+            <AttendanceRecordList embedded />
+        </div>
+
+        <!-- Overtime Tab -->
+        <div
+            v-if="activeTab === 'overtime' && can('overtime-list')"
+            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+        >
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
+                        <Timer class="w-6 h-6 text-amber-600" />
+                    </div>
+                    <div>
+                        <h3 class="text-brand-dark text-xl font-bold">Overtime Management</h3>
+                        <p class="text-brand-light text-sm font-normal">Manage employee overtime records and approvals</p>
+                    </div>
+                </div>
+            </div>
+            <OvertimeManagement embedded />
+        </div>
+
+        <!-- Hybrid Schedules Tab -->
+        <div
+            v-if="activeTab === 'hybrid'"
+            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+        >
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
+                        <MapPin class="w-6 h-6 text-violet-600" />
+                    </div>
+                    <div>
+                        <h3 class="text-brand-dark text-xl font-bold">Hybrid Schedules</h3>
+                        <p class="text-brand-light text-sm font-normal">Manage employee hybrid work schedules</p>
+                    </div>
+                </div>
+            </div>
+            <HybridScheduleList embedded />
         </div>
 
         <ModalWrapper
