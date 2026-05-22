@@ -30,8 +30,7 @@
                 <section
                     v-if="activeTab === 'Attendance Policies'"
                     key="policies"
-                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 rounded-2xl border border-brand-border p-6 shadow-sm"
-                    style="background-color: var(--color-surface);"
+                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 rounded-2xl border border-brand-border bg-[var(--color-surface)] p-6 shadow-sm"
                 >
                     <div
                         v-if="policyStore.loading"
@@ -50,8 +49,7 @@
                         <div
                             v-for="policy in policyStore.policies"
                             :key="policy.id"
-                            class="policy-card group p-5 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
-                            style="background-color: var(--color-surface);"
+                            class="policy-card group p-5 border border-brand-border rounded-2xl bg-[var(--color-surface)] hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                         >
                             <div class="flex justify-between items-start mb-4">
                                 <h3 class="text-lg font-semibold text-brand-dark capitalize">
@@ -98,7 +96,7 @@
                     </template>
 
                     <div
-                        class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-gray-300 text-gray-500 bg-gray-50 min-h-[300px]"
+                        class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-[var(--border-color)] bg-[var(--color-surface-muted)] text-brand-light min-h-[300px]"
                     >
                         <svg class="w-12 h-12 mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -111,7 +109,7 @@
                         <span class="font-medium tracking-wide text-center text-brand-dark">
                             Custom policy creation is not available from the current API.
                         </span>
-                        <span class="text-xs text-gray-500 mt-2 text-center">
+                        <span class="text-xs text-brand-light mt-2 text-center">
                             Edit existing employment-type policies instead.
                         </span>
                     </div>
@@ -151,19 +149,19 @@
                                     </h4>
                                     <span
                                         v-if="!entitlement.is_eligible"
-                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-red-50 text-red-700 border border-red-200"
+                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full border border-danger-200 bg-danger-50 text-danger-700"
                                     >
                                         Ineligible
                                     </span>
                                     <span
                                         v-else-if="entitlement.is_paid"
-                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-green-50 text-green-700 border border-green-200"
+                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full border border-success-200 bg-success-50 text-success-700"
                                     >
                                         Paid
                                     </span>
                                     <span
                                         v-else
-                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full border border-warning-200 bg-warning-50 text-warning-700"
                                     >
                                         Unpaid
                                     </span>
@@ -199,7 +197,7 @@
                                         <span
                                             class="font-medium"
                                             :class="
-                                                entitlement.requires_attachment ? 'text-red-600' : 'text-gray-500'
+                                                entitlement.requires_attachment ? 'text-danger-700' : 'text-brand-light'
                                             "
                                         >
                                             {{ entitlement.requires_attachment ? "Yes" : "No" }}
@@ -237,14 +235,14 @@
                          <table class="w-full text-left border-collapse">
                              <thead>
                                  <tr class="border-b border-brand-border">
-                                     <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Holiday Name</th>
-                                     <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
-                                     <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</th>
-                                     <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                                     <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Holiday Name</th>
+                                     <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Date</th>
+                                     <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Type</th>
+                                     <th class="p-4 text-right text-xs font-semibold text-brand-light uppercase tracking-wide">Actions</th>
                                  </tr>
                              </thead>
-                             <tbody class="divide-y divide-gray-100">
-                                 <tr v-if="holidayStore.error" class="text-center text-red-600 bg-red-50">
+                             <tbody class="divide-y divide-[var(--border-color)]">
+                                 <tr v-if="holidayStore.error" class="text-center text-danger-700 bg-[var(--color-surface-muted)]">
                                      <td colspan="4" class="p-8 font-light flex items-center justify-center gap-2">
                                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                              <path
@@ -295,7 +293,7 @@
                                      v-else
                                      v-for="holiday in holidayStore.paginatedHolidays"
                                      :key="holiday.id"
-                                     class="hover:bg-gray-50 transition-colors"
+                                     class="hover:bg-[var(--color-surface-muted)] transition-colors"
                                  >
                                      <td class="p-4 font-medium text-brand-dark">{{ holiday.name || holiday.description }}</td>
                                      <td class="p-4 text-sm text-brand-light">{{ holiday.date }}</td>
@@ -505,7 +503,7 @@
                         v-model="allowedMimeTypesInput"
                         placeholder="image/jpeg, image/png, application/pdf"
                     />
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p class="mt-1 text-xs text-brand-light">
                         Separate MIME types with commas. Leave blank for no restriction.
                     </p>
                 </div>
@@ -562,7 +560,7 @@
                         v-model="holidayAppliesToInput"
                         placeholder="Optional, comma separated"
                     />
-                    <p class="mt-1 text-xs text-gray-500">Leave blank to apply company-wide.</p>
+                    <p class="mt-1 text-xs text-brand-light">Leave blank to apply company-wide.</p>
                 </div>
 
                 <div class="flex gap-3 pt-2">
