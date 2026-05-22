@@ -53,9 +53,9 @@ describe("HybridScheduleList smoke", () => {
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 
-    it("uses CSS variable for surface background", () => {
+    it("uses baseline card styling", () => {
         const wrapper = createWrapper();
-        expect(wrapper.html()).toContain("var(--color-surface)");
+        expect(wrapper.html()).toContain("bg-white");
     });
 
     it("calls fetchAllPaginated on mount", () => {

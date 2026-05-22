@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import { RouterLink } from "vue-router";
 import { TrendingUp, CheckCircle, Clock, CalendarClock, CalendarDays, Check, X } from "lucide-vue-next";
@@ -66,6 +66,24 @@ const {
     },
 });
 const loadingStatistics = ref(false);
+
+const activeTab = ref("leave-requests");
+
+const sections = computed(() => {
+    const items = [];
+    if (can("leave-request-list")) {
+        items.push({ id: "leave-requests", label: "Leave Requests", icon: CalendarClock });
+    }
+    if (can("attendance-correction-list")) {
+        items.push({ id: "corrections", label: "Corrections", icon: Clock });
+    }
+    return items;
+});
+
+const setActiveTab = (id) => {
+    activeTab.value = id;
+};
+
 const loadStatistics = async () => {
     loadingStatistics.value = true;
     try {
@@ -143,8 +161,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.records' }"
                 v-if="can('attendance-list')"
-                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
-                style="background: var(--color-surface)"
+                class="bg-white rounded-2xl border border-brand-border p-5 transition-all duration-300 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
             >
                 <div
                     class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
@@ -161,8 +178,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.leave-requests' }"
                 v-if="can('leave-request-list')"
-                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
-                style="background: var(--color-surface)"
+                class="bg-white rounded-2xl border border-brand-border p-5 transition-all duration-300 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
             >
                 <div
                     class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors"
@@ -179,8 +195,7 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.corrections' }"
                 v-if="can('attendance-correction-list')"
-                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
-                style="background: var(--color-surface)"
+                class="bg-white rounded-2xl border border-brand-border p-5 transition-all duration-300 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
             >
                 <div
                     class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition-colors"
@@ -296,144 +311,154 @@ onMounted(async () => {
             </div>
         </div>
 
+        <!-- Tabs -->
+        <div v-if="sections.length > 0" class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <button
+                    v-for="section in sections"
+                    :key="section.id"
+                    type="button"
+                    @click="setActiveTab(section.id)"
+                    class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
+                    :class="
+                        activeTab === section.id
+                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                    "
+                >
+                    <component
+                        :is="section.icon"
+                        class="w-4 h-4"
+                        :class="activeTab === section.id ? 'text-white' : 'text-gray-600'"
+                    />
+                    <span class="text-sm font-semibold">{{ section.label }}</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Leave Requests Tab -->
         <div
-            :class="[
-                'grid grid-cols-1 gap-6',
-                can('leave-request-list') && can('attendance-correction-list') ? 'lg:grid-cols-2' : '',
-            ]"
+            v-if="activeTab === 'leave-requests' && can('leave-request-list')"
+            class="bg-white border border-brand-border rounded-2xl mb-6 p-4 sm:p-5"
         >
-            <div
-                v-if="can('leave-request-list')"
-                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20"
-                style="background: var(--color-surface)"
-            >
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                            <CalendarClock class="w-6 h-6 text-orange-600" />
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Latest Leave Requests</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="loadingLeaveRequests" class="text-center py-12">
-                    <p class="text-gray-500 text-lg font-medium">Loading...</p>
-                </div>
-                <div v-else class="space-y-4">
-                    <div
-                        v-for="request in leaveRequests"
-                        :key="request.id"
-                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                    >
-                        <img loading="lazy"
-                            :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                            :alt="request.staff_member?.user?.name"
-                            class="w-12 h-12 rounded-full object-cover"
-                        />
-                        <div class="flex-1">
-                            <div class="flex items-center gap-2 mb-2">
-                                <p class="text-sm font-semibold text-brand-dark">
-                                    {{ request.staff_member?.user?.name }}
-                                </p>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <StatusBadge type="leave-type" :value="request.type" />
-                                <span class="text-brand-dark text-xs">
-                                    {{ formatDate(request.start_date) }} - {{ formatDate(request.end_date) }} ({{
-                                        request.days
-                                    }}
-                                    days)
-                                </span>
-                            </div>
-                        </div>
-                        <div
-                            v-if="request.status === 'pending' && can('leave-request-approve')"
-                            class="flex flex-col gap-2"
-                        >
-                            <button
-                                @click="showApproveModal(request)"
-                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
-                            >
-                                <Check class="w-4 h-4 text-green-600" />
-                                <span class="text-brand-dark text-xs font-semibold">Approve</span>
-                            </button>
-                            <button
-                                @click="showRejectModal(request)"
-                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
-                            >
-                                <X class="w-4 h-4 text-red-600" />
-                                <span class="text-brand-dark text-xs font-semibold">Reject</span>
-                            </button>
-                        </div>
-                        <div v-else>
-                            <StatusBadge type="leave-status" :value="request.status" />
-                        </div>
-                    </div>
-
-                    <EmptyState v-if="!loadingLeaveRequests && leaveRequests.length === 0" icon="CalendarClock" title="Data pengajuan cuti kosong" />
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-brand-dark text-xl font-bold">Latest Leave Requests</h3>
+                    <p class="text-brand-light text-sm font-normal mt-1">Pending leave requests awaiting approval</p>
                 </div>
             </div>
 
-            <div
-                v-if="can('attendance-correction-list')"
-                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20"
-                style="background: var(--color-surface)"
-            >
-                <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <Clock class="w-6 h-6 text-blue-600" />
-                        </div>
-                        <div>
-                            <h2 class="text-lg font-semibold text-brand-dark">Pending Corrections</h2>
-                        </div>
-                    </div>
-                </div>
-
-                <div v-if="loadingCorrections" class="text-center py-12">
-                    <p class="text-gray-500 text-lg font-medium">Loading...</p>
-                </div>
-                <div v-else class="space-y-4">
-                    <div
-                        v-for="correction in pendingCorrections"
-                        :key="correction.id"
-                        class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                    >
-                        <img loading="lazy"
-                            :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                            :alt="correction.staff_member?.user?.name"
-                            class="w-12 h-12 rounded-full object-cover"
-                        />
-                        <div class="flex-1 min-w-0">
-                            <div class="flex items-center gap-2 mb-1">
-                                <p class="text-sm font-semibold text-brand-dark truncate">
-                                    {{ correction.staff_member?.user?.name }}
-                                </p>
-                            </div>
-                            <p class="text-brand-light text-xs truncate max-w-[200px]">
-                                {{ correction.reason }}
+            <div v-if="loadingLeaveRequests" class="text-center py-12">
+                <p class="text-brand-light text-lg font-medium">Loading...</p>
+            </div>
+            <div v-else class="space-y-4">
+                <div
+                    v-for="request in leaveRequests"
+                    :key="request.id"
+                    class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
+                >
+                    <img loading="lazy"
+                        :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
+                        :alt="request.staff_member?.user?.name"
+                        class="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div class="flex-1">
+                        <div class="flex items-center gap-2 mb-2">
+                            <p class="text-sm font-semibold text-brand-dark">
+                                {{ request.staff_member?.user?.name }}
                             </p>
                         </div>
-                        <div class="flex items-center gap-3 shrink-0">
-                            <div class="text-right border-l pl-3 border-gray-100">
-                                <div class="flex items-center justify-end gap-1 text-brand-dark text-xs font-semibold">
-                                    <span class="text-gray-400 font-normal">In:</span>
-                                    {{ formatTime(correction.requested_check_in) }}
-                                </div>
-                                <div
-                                    class="flex items-center justify-end gap-1 text-brand-dark text-xs font-semibold mt-0.5"
-                                >
-                                    <span class="text-gray-400 font-normal">Out:</span>
-                                    {{ formatTime(correction.requested_check_out) }}
-                                </div>
+                        <div class="flex items-center gap-2">
+                            <StatusBadge type="leave-type" :value="request.type" />
+                            <span class="text-brand-dark text-xs">
+                                {{ formatDate(request.start_date) }} - {{ formatDate(request.end_date) }} ({{
+                                    request.days
+                                }}
+                                days)
+                            </span>
+                        </div>
+                    </div>
+                    <div
+                        v-if="request.status === 'pending' && can('leave-request-approve')"
+                        class="flex flex-col gap-2"
+                    >
+                        <button
+                            @click="showApproveModal(request)"
+                            class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
+                        >
+                            <Check class="w-4 h-4 text-green-600" />
+                            <span class="text-brand-dark text-xs font-semibold">Approve</span>
+                        </button>
+                        <button
+                            @click="showRejectModal(request)"
+                            class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-3 py-2"
+                        >
+                            <X class="w-4 h-4 text-red-600" />
+                            <span class="text-brand-dark text-xs font-semibold">Reject</span>
+                        </button>
+                    </div>
+                    <div v-else>
+                        <StatusBadge type="leave-status" :value="request.status" />
+                    </div>
+                </div>
+
+                <EmptyState v-if="!loadingLeaveRequests && leaveRequests.length === 0" icon="CalendarClock" title="No pending leave requests" subtitle="Leave requests will appear here once submitted." />
+            </div>
+        </div>
+
+        <!-- Corrections Tab -->
+        <div
+            v-if="activeTab === 'corrections' && can('attendance-correction-list')"
+            class="bg-white border border-brand-border rounded-2xl mb-6 p-4 sm:p-5"
+        >
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-brand-dark text-xl font-bold">Pending Corrections</h3>
+                    <p class="text-brand-light text-sm font-normal mt-1">Attendance corrections awaiting approval</p>
+                </div>
+            </div>
+
+            <div v-if="loadingCorrections" class="text-center py-12">
+                <p class="text-brand-light text-lg font-medium">Loading...</p>
+            </div>
+            <div v-else class="space-y-4">
+                <div
+                    v-for="correction in pendingCorrections"
+                    :key="correction.id"
+                    class="flex items-center gap-4 p-4 border border-brand-border rounded-xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
+                >
+                    <img loading="lazy"
+                        :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
+                        :alt="correction.staff_member?.user?.name"
+                        class="w-12 h-12 rounded-full object-cover"
+                    />
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-1">
+                            <p class="text-sm font-semibold text-brand-dark truncate">
+                                {{ correction.staff_member?.user?.name }}
+                            </p>
+                        </div>
+                        <p class="text-brand-light text-xs truncate max-w-[200px]">
+                            {{ correction.reason }}
+                        </p>
+                    </div>
+                    <div class="flex items-center gap-3 shrink-0">
+                        <div class="text-right border-l pl-3 border-gray-100">
+                            <div class="flex items-center justify-end gap-1 text-brand-dark text-xs font-semibold">
+                                <span class="text-gray-400 font-normal">In:</span>
+                                {{ formatTime(correction.requested_check_in) }}
+                            </div>
+                            <div
+                                class="flex items-center justify-end gap-1 text-brand-dark text-xs font-semibold mt-0.5"
+                            >
+                                <span class="text-gray-400 font-normal">Out:</span>
+                                {{ formatTime(correction.requested_check_out) }}
                             </div>
                         </div>
                     </div>
-
-                    <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="CalendarClock" title="Tidak ada koreksi tertunda" />
                 </div>
+
+                <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="Clock" title="No pending corrections" subtitle="Attendance corrections will appear here once submitted." />
             </div>
         </div>
 

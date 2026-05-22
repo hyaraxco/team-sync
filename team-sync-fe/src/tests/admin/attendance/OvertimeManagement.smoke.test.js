@@ -202,8 +202,8 @@ describe("OvertimeManagement.vue", () => {
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 
-    it("uses CSS variable for surface background", () => {
-        expect(wrapper.html()).toContain("var(--color-surface)");
+    it("uses baseline card styling", () => {
+        expect(wrapper.html()).toContain("bg-white");
     });
 
     it("renders StatsCard components for KPI metrics", () => {
