@@ -107,130 +107,145 @@ const onRejectAction = (req) => {
             <Alert type="error" title="Error" :message="error || ''" :show="Boolean(error)" />
 
             <div class="bg-white border border-brand-border rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <p class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</p>
-                <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
-                    Showing {{ meta.from || 0 }} - {{ meta.to || 0 }} of {{ meta.total || 0 }} requests
-                </p>
-            </div>
-        </div>
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <p class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">
+                            Attendance Corrections
+                        </p>
+                        <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
+                            Showing {{ meta.from || 0 }} - {{ meta.to || 0 }} of {{ meta.total || 0 }} requests
+                        </p>
+                    </div>
+                </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto w-full mb-6">
-            <table class="w-full min-w-[800px]">
-                <thead>
-                    <tr class="border-y border-brand-border">
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Employee</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Date</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Requested Times</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Reason</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Status</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                        <td colspan="6" class="py-8 text-center text-brand-light">Loading...</td>
-                    </tr>
-                    <tr
-                        v-else-if="!paginatedCorrections || paginatedCorrections.length === 0"
-                        class="border-b border-brand-border"
-                    >
-                        <td colspan="6" class="py-8">
-                            <EmptyState
-                                icon="ClipboardList"
-                                title="Data koreksi kosong"
-                                subtitle="Tidak ada pengajuan koreksi absensi yang cocok dengan filter."
-                            />
-                        </td>
-                    </tr>
-                    <tr
-                        v-else
-                        v-for="correction in paginatedCorrections"
-                        :key="correction.id"
-                        class="border-b border-brand-border hover:bg-brand-border/20 transition-colors"
-                    >
-                        <td class="py-4 px-4">
-                            <div class="flex items-center gap-3">
-                                <img loading="lazy"
-                                    :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                                    alt="Avatar"
-                                    class="w-10 h-10 rounded-full object-cover"
-                                />
-                                <div>
-                                    <p class="text-sm font-semibold text-brand-dark">
-                                        {{ correction.staff_member?.user?.name }}
-                                    </p>
-                                    <p class="text-xs text-brand-light">
-                                        {{ correction.staff_member?.staff_member_id }}
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-4 px-4 text-sm text-brand-dark font-medium">
-                            {{ correction.attendance ? formatDateShort(correction.attendance.date) : "-" }}
-                        </td>
-                        <td class="py-4 px-4">
-                            <div class="flex flex-col gap-1">
-                                <p class="text-xs text-brand-dark">
-                                    <strong>In:</strong>
-                                    {{ formatTime(correction.requested_check_in) }}
-                                </p>
-                                <p class="text-xs text-brand-dark">
-                                    <strong>Out:</strong>
-                                    {{ formatTime(correction.requested_check_out) }}
-                                </p>
-                            </div>
-                        </td>
-                        <td class="py-4 px-4">
-                            <p class="text-sm text-brand-light max-w-[200px] truncate" :title="correction.reason">
-                                {{ correction.reason }}
-                            </p>
-                        </td>
-                        <td class="py-4 px-4">
-                            <StatusBadge type="leave-status" :value="correction.status" :label="correction.status" />
-                        </td>
-                        <td class="py-4 px-4">
-                            <div
-                                class="flex items-center gap-2"
-                                v-if="correction.status === 'pending' && can('attendance-correction-approve')"
+                <!-- Table -->
+                <div class="overflow-x-auto w-full mb-6">
+                    <table class="w-full min-w-[800px]">
+                        <thead>
+                            <tr class="border-y border-brand-border">
+                                <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Employee</th>
+                                <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Date</th>
+                                <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">
+                                    Requested Times
+                                </th>
+                                <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Reason</th>
+                                <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Status</th>
+                                <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-if="loading" class="border-b border-brand-border animate-pulse">
+                                <td colspan="6" class="py-8 text-center text-brand-light">Loading...</td>
+                            </tr>
+                            <tr
+                                v-else-if="!paginatedCorrections || paginatedCorrections.length === 0"
+                                class="border-b border-brand-border"
                             >
-                                <button
-                                    @click="showApproveModal(correction)"
-                                    class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                <td colspan="6" class="py-8">
+                                    <EmptyState
+                                        icon="ClipboardList"
+                                        title="Data koreksi kosong"
+                                        subtitle="Tidak ada pengajuan koreksi absensi yang cocok dengan filter."
+                                    />
+                                </td>
+                            </tr>
+                            <template v-else>
+                                <tr
+                                    v-for="correction in paginatedCorrections"
+                                    :key="correction.id"
+                                    class="border-b border-brand-border hover:bg-brand-border/20 transition-colors"
                                 >
-                                    <Check class="w-4 h-4 text-green-600" />
-                                    <span class="text-brand-dark text-xs font-semibold">Approve</span>
-                                </button>
-                                <button
-                                    @click="onRejectAction(correction)"
-                                    class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
-                                >
-                                    <X class="w-4 h-4 text-red-600" />
-                                    <span class="text-brand-dark text-xs font-semibold">Reject</span>
-                                </button>
-                            </div>
-                            <div v-else class="text-xs text-brand-light">
-                                {{
-                                    correction.status === "pending"
-                                        ? "Pending Review"
-                                        : `Reviewed by ${correction.reviewer?.name || "Admin"}`
-                                }}
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                                    <td class="py-4 px-4">
+                                        <div class="flex items-center gap-3">
+                                            <img
+                                                loading="lazy"
+                                                :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
+                                                alt="Avatar"
+                                                class="w-10 h-10 rounded-full object-cover"
+                                            />
+                                            <div>
+                                                <p class="text-sm font-semibold text-brand-dark">
+                                                    {{ correction.staff_member?.user?.name }}
+                                                </p>
+                                                <p class="text-xs text-brand-light">
+                                                    {{ correction.staff_member?.staff_member_id }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4 text-sm text-brand-dark font-medium">
+                                        {{ correction.attendance ? formatDateShort(correction.attendance.date) : "-" }}
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <div class="flex flex-col gap-1">
+                                            <p class="text-xs text-brand-dark">
+                                                <strong>In:</strong>
+                                                {{ formatTime(correction.requested_check_in) }}
+                                            </p>
+                                            <p class="text-xs text-brand-dark">
+                                                <strong>Out:</strong>
+                                                {{ formatTime(correction.requested_check_out) }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <p
+                                            class="text-sm text-brand-light max-w-[200px] truncate"
+                                            :title="correction.reason"
+                                        >
+                                            {{ correction.reason }}
+                                        </p>
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <StatusBadge
+                                            type="leave-status"
+                                            :value="correction.status"
+                                            :label="correction.status"
+                                        />
+                                    </td>
+                                    <td class="py-4 px-4">
+                                        <div
+                                            class="flex items-center gap-2"
+                                            v-if="
+                                                correction.status === 'pending' && can('attendance-correction-approve')
+                                            "
+                                        >
+                                            <button
+                                                @click="showApproveModal(correction)"
+                                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                            >
+                                                <Check class="w-4 h-4 text-green-600" />
+                                                <span class="text-brand-dark text-xs font-semibold">Approve</span>
+                                            </button>
+                                            <button
+                                                @click="onRejectAction(correction)"
+                                                class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
+                                            >
+                                                <X class="w-4 h-4 text-red-600" />
+                                                <span class="text-brand-dark text-xs font-semibold">Reject</span>
+                                            </button>
+                                        </div>
+                                        <div v-else class="text-xs text-brand-light">
+                                            {{
+                                                correction.status === "pending"
+                                                    ? "Pending Review"
+                                                    : `Reviewed by ${correction.reviewer?.name || "Admin"}`
+                                            }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+                </div>
 
-        <!-- Pagination -->
-        <Pagination
-            :meta="meta"
-            :loading="loading"
-            @page-change="handlePageChange"
-            @per-page-change="handlePerPageChange"
-        />
+                <!-- Pagination -->
+                <Pagination
+                    :meta="meta"
+                    :loading="loading"
+                    @page-change="handlePageChange"
+                    @per-page-change="handlePerPageChange"
+                />
             </div>
         </div>
     </div>
@@ -301,7 +316,8 @@ const onRejectAction = (req) => {
             <!-- Details Card -->
             <div class="bg-brand-border/20 border border-brand-border rounded-xl p-4 text-sm mb-5 shadow-sm">
                 <div class="flex items-center gap-3 mb-3 border-b border-brand-border pb-3">
-                    <img loading="lazy"
+                    <img
+                        loading="lazy"
                         :src="selectedRejectCorrection.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                         class="w-10 h-10 rounded-full object-cover"
                     />
