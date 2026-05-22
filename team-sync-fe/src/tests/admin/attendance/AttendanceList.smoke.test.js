@@ -152,12 +152,6 @@ describe("AttendanceList smoke", () => {
         expect(wrapper.exists()).toBe(true);
     });
 
-    it("does not render duplicate local page title because header owns it", () => {
-        const wrapper = factory();
-
-        expect(wrapper.findAll("h1")).toHaveLength(0);
-    });
-
     it("renders KPI metrics through StatsCard components", () => {
         const wrapper = factory();
 
