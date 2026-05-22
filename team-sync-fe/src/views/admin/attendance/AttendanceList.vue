@@ -432,7 +432,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="Clock" title="Tidak ada koreksi tertunda" />
+                    <EmptyState v-if="!loadingCorrections && pendingCorrections.length === 0" icon="CalendarClock" title="Tidak ada koreksi tertunda" />
                 </div>
             </div>
         </div>
