@@ -300,14 +300,9 @@ onMounted(async () => {
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                        <CalendarClock class="w-6 h-6 text-purple-600" />
-                    </div>
-                    <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Latest Leave Requests</h3>
-                        <p class="text-brand-light text-sm font-normal">Pending leave requests awaiting approval</p>
-                    </div>
+                <div>
+                    <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Latest Leave Requests</h3>
+                    <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">Pending leave requests awaiting approval</p>
                 </div>
             </div>
 
@@ -375,14 +370,9 @@ onMounted(async () => {
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                        <Clock class="w-6 h-6 text-orange-600" />
-                    </div>
-                    <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Pending Corrections</h3>
-                        <p class="text-brand-light text-sm font-normal">Attendance corrections awaiting approval</p>
-                    </div>
+                <div>
+                    <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Pending Corrections</h3>
+                    <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">Attendance corrections awaiting approval</p>
                 </div>
             </div>
 
@@ -436,14 +426,9 @@ onMounted(async () => {
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <CalendarDays class="w-6 h-6 text-blue-600" />
-                    </div>
-                    <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Attendance Logs</h3>
-                        <p class="text-brand-light text-sm font-normal">View and manage attendance records</p>
-                    </div>
+                <div>
+                    <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Logs</h3>
+                    <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">View and manage attendance records</p>
                 </div>
             </div>
             <AttendanceRecordList embedded />
@@ -455,14 +440,9 @@ onMounted(async () => {
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center">
-                        <Timer class="w-6 h-6 text-amber-600" />
-                    </div>
-                    <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Overtime Management</h3>
-                        <p class="text-brand-light text-sm font-normal">Manage employee overtime records and approvals</p>
-                    </div>
+                <div>
+                    <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Overtime Management</h3>
+                    <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">Manage employee overtime records and approvals</p>
                 </div>
             </div>
             <OvertimeManagement embedded />
@@ -474,14 +454,9 @@ onMounted(async () => {
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
-                <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-violet-50 rounded-xl flex items-center justify-center">
-                        <MapPin class="w-6 h-6 text-violet-600" />
-                    </div>
-                    <div>
-                        <h3 class="text-brand-dark text-xl font-bold">Hybrid Schedules</h3>
-                        <p class="text-brand-light text-sm font-normal">Manage employee hybrid work schedules</p>
-                    </div>
+                <div>
+                    <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Hybrid Schedules</h3>
+                    <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">Manage employee hybrid work schedules</p>
                 </div>
             </div>
             <HybridScheduleList embedded />
