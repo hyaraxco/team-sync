@@ -9,10 +9,18 @@ import Pagination from "@/components/admin/team/Pagination.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
+import SearchFilter from "@/components/common/SearchFilter.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import { useConfirmAction } from "@/composables/useConfirmAction";
 import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
+
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const store = useOvertimeStore();
 const staffMemberStore = useStaffMemberStore();
@@ -143,9 +151,9 @@ const submitCreate = async () => {
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
         <!-- Header -->
-        <div class="flex items-center justify-between">
+        <div v-if="!embedded" class="flex items-center justify-between">
             <div></div>
             <button
                 v-if="can('overtime-create')"

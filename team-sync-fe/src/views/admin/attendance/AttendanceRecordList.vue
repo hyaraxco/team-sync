@@ -12,6 +12,13 @@ import EmptyState from "@/components/common/EmptyState.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
+
 const store = useAttendanceStore();
 const { paginatedAttendances, meta, loading, error } = storeToRefs(store);
 
@@ -29,10 +36,10 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
 </script>
 
 <template>
-    <div class="p-3 sm:p-4 md:p-6 lg:p-8">
-        <div class="max-w-7xl mx-auto space-y-6">
+    <div :class="embedded ? '' : 'p-3 sm:p-4 md:p-6 lg:p-8'">
+        <div :class="embedded ? '' : 'max-w-7xl mx-auto space-y-6'">
             <div>
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div v-if="!embedded" class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
                         <span class="sr-only" role="heading" aria-level="1">Attendance Logs</span>
                         <p class="text-2xl font-bold text-brand-dark">Attendance Logs</p>
