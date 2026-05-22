@@ -3,8 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Attendance Periods</h1>
-                    <p class="text-brand-light text-sm mt-1">
+                    <p class="text-brand-light text-sm">
                         Monitor period statuses, review timesheets, and access the payroll readiness workspace before cutoff.
                     </p>
                 </div>
@@ -17,7 +16,7 @@
                         Create Period
                     </button>
                     <button
-                        class="px-4 py-2 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 rounded-lg border border-brand-border text-brand-dark font-medium text-sm transition-colors cursor-pointer"
                         @click="fetchData"
                     >
                         Sync Latest
@@ -26,13 +25,14 @@
             </header>
 
             <div class="grid gap-6 lg:grid-cols-3">
-                <div class="lg:col-span-2 space-y-4">
+                <div class="lg:col-span-2 space-y-4 rounded-2xl border border-brand-border p-6 shadow-sm" style="background-color: var(--color-surface);">
                     <h2 class="text-lg font-bold text-brand-dark">Period History</h2>
 
                     <!-- Error State -->
                     <div
                         v-if="periodStore.error"
-                        class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
+                        class="border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
+                        style="background-color: var(--color-surface);"
                     >
                         <AlertTriangle class="w-5 h-5 shrink-0" />
                         <p>Failed to load attendance periods. Please try again later.</p>
@@ -40,13 +40,13 @@
 
                     <!-- Loading State -->
                     <div v-else-if="periodStore.loading" class="space-y-3">
-                        <div v-for="i in 4" :key="i" class="h-20 bg-gray-100 rounded-2xl animate-pulse" />
+                        <div v-for="i in 4" :key="i" class="h-20 rounded-2xl animate-pulse" style="background-color: var(--color-surface-muted);" />
                     </div>
 
                     <!-- Empty State -->
-                    <div v-else-if="!periods.length" class="bg-white border border-brand-border rounded-2xl p-12">
+                    <template v-else-if="!periods.length">
                         <EmptyState icon="CalendarClock" title="Data periode kosong" subtitle="Buat periode kehadiran baru." />
-                    </div>
+                    </template>
 
                     <!-- Period List -->
                     <div v-else class="space-y-3">
@@ -55,7 +55,8 @@
                             :key="period.id"
                             type="button"
                             @click="selectPeriod(period)"
-                            class="group flex items-center justify-between p-4 bg-white border rounded-2xl transition-all duration-200 cursor-pointer text-left w-full"
+                            class="group flex items-center justify-between p-4 border rounded-2xl transition-all duration-200 cursor-pointer text-left w-full"
+                            style="background-color: var(--color-surface);"
                             :class="
                                 selectedPeriod?.id === period.id
                                     ? 'border-brand-primary shadow-md'
@@ -98,7 +99,7 @@
 
                 <!-- Readiness Sidebar -->
                 <div class="lg:col-span-1">
-                    <div class="sticky top-8 bg-white border border-brand-border rounded-2xl p-6">
+                    <div class="sticky top-8 rounded-2xl border border-brand-border p-6 shadow-sm" style="background-color: var(--color-surface);">
                         <h2 class="text-lg font-bold text-brand-dark mb-4 flex items-center gap-2">
                             <CheckCircle class="w-5 h-5 text-green-500" />
                             Readiness Workspace
