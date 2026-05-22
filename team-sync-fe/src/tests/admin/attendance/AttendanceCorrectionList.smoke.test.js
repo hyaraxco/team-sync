@@ -74,6 +74,10 @@ describe("AttendanceCorrectionList smoke", () => {
     it("contains header text", () => {
         const wrapper = createWrapper();
         expect(wrapper.text()).toContain("Attendance Corrections");
+        const pageHeading = wrapper.find('[role="heading"][aria-level="1"]');
+        expect(pageHeading.exists()).toBe(true);
+        expect(pageHeading.text()).toBe("Attendance Corrections");
+        expect(pageHeading.classes()).toContain("sr-only");
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 
@@ -82,6 +86,7 @@ describe("AttendanceCorrectionList smoke", () => {
 
         expect(wrapper.findComponent({ name: "SearchFilter" }).exists()).toBe(true);
         expect(wrapper.findComponent({ name: "EmptyState" }).exists()).toBe(true);
+        expect(wrapper.find('[role="heading"][aria-level="1"]').text()).toBe("Attendance Corrections");
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 
