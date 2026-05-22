@@ -137,17 +137,12 @@ onMounted(async () => {
 
 <template>
     <div class="flex-1 flex flex-col overflow-hidden">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-            <div>
-                <h1 class="text-2xl font-semibold text-brand-dark">Attendance Overview</h1>
-            </div>
-        </div>
-
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <RouterLink
                 :to="{ name: 'admin.attendance.records' }"
                 v-if="can('attendance-list')"
-                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-brand-primary hover:shadow-md transition-all duration-300 group"
+                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
+                style="background: var(--color-surface)"
             >
                 <div
                     class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
@@ -164,7 +159,8 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.leave-requests' }"
                 v-if="can('leave-request-list')"
-                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-brand-primary hover:shadow-md transition-all duration-300 group"
+                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
+                style="background: var(--color-surface)"
             >
                 <div
                     class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 transition-colors"
@@ -181,7 +177,8 @@ onMounted(async () => {
             <RouterLink
                 :to="{ name: 'admin.attendance.corrections' }"
                 v-if="can('attendance-correction-list')"
-                class="bg-white border border-brand-border rounded-2xl p-4 flex items-center gap-4 hover:border-brand-primary hover:shadow-md transition-all duration-300 group"
+                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20 flex items-center gap-4 group"
+                style="background: var(--color-surface)"
             >
                 <div
                     class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center group-hover:bg-orange-100 transition-colors"
@@ -303,7 +300,11 @@ onMounted(async () => {
                 can('leave-request-list') && can('attendance-correction-list') ? 'lg:grid-cols-2' : '',
             ]"
         >
-            <div v-if="can('leave-request-list')" class="bg-white border border-brand-border rounded-2xl p-6">
+            <div
+                v-if="can('leave-request-list')"
+                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20"
+                style="background: var(--color-surface)"
+            >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
@@ -373,7 +374,11 @@ onMounted(async () => {
                 </div>
             </div>
 
-            <div v-if="can('attendance-correction-list')" class="bg-white border border-brand-border rounded-2xl p-6">
+            <div
+                v-if="can('attendance-correction-list')"
+                class="rounded-2xl border border-brand-border p-5 shadow-sm transition-all duration-200 hover:ring-2 hover:ring-brand-primary/20"
+                style="background: var(--color-surface)"
+            >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
                         <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">

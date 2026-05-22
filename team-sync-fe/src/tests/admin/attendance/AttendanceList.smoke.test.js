@@ -104,6 +104,7 @@ const factory = () =>
                 },
                 StatusBadge: { template: '<div class="status-badge-stub"><slot /></div>' },
                 StatsCard: { template: '<div class="stats-card-stub"><slot /></div>' },
+                EmptyState: { template: '<div class="empty-state-stub"><slot /></div>' },
                 MainCard: { template: '<div class="main-card-stub"><slot /></div>' },
                 ModalWrapper: {
                     props: ["show"],
@@ -149,6 +150,28 @@ describe("AttendanceList smoke", () => {
     it("renders without crashing", () => {
         const wrapper = factory();
         expect(wrapper.exists()).toBe(true);
+    });
+
+    it("does not render duplicate local page title because header owns it", () => {
+        const wrapper = factory();
+
+        expect(wrapper.findAll("h1")).toHaveLength(0);
+    });
+
+    it("renders KPI metrics through StatsCard components", () => {
+        const wrapper = factory();
+
+        expect(wrapper.findAll(".stats-card-stub").length).toBeGreaterThanOrEqual(6);
+    });
+
+    it("uses EmptyState for empty dashboard sections", async () => {
+        leaveRequestStoreMock.fetchLatestLeaveRequests.mockResolvedValue([]);
+        correctionStoreMock.paginatedCorrections = [];
+
+        const wrapper = factory();
+        await flushAsync();
+
+        expect(wrapper.findAll(".empty-state-stub").length).toBeGreaterThanOrEqual(2);
     });
 
     it("calls fetch methods on mount", async () => {
