@@ -37,6 +37,18 @@ const titles = {
         title: "Notifikasi",
         subtitle: "Aktivitas terbaru yang membutuhkan perhatian.",
     },
+    "admin.settings": {
+        title: "Settings",
+        subtitle: "System configuration and preferences.",
+    },
+    "admin.analytics": {
+        title: "Analytics",
+        subtitle: "Company-wide insights and metrics.",
+    },
+    "admin.meetings": {
+        title: "Meetings",
+        subtitle: "Schedule and manage team meetings.",
+    },
     "admin.teams": {
         title: "Tim",
         subtitle: "Kelola struktur tim dan anggotanya.",
@@ -74,6 +86,42 @@ const titles = {
         title: "Kehadiran",
         subtitle: "Rekap absensi, clock-in, dan clock-out.",
     },
+    "admin.attendance.settings": {
+        title: "Attendance Settings",
+        subtitle: "Configure attendance policies and rules.",
+    },
+    "admin.attendance.periods": {
+        title: "Attendance Periods",
+        subtitle: "Manage attendance tracking periods.",
+    },
+    "admin.attendance.mismatches": {
+        title: "Policy Mismatches",
+        subtitle: "Review attendance policy violations.",
+    },
+    "admin.attendance.corrections": {
+        title: "Attendance Corrections",
+        subtitle: "Review and approve attendance adjustments.",
+    },
+    "admin.attendance.records": {
+        title: "Attendance Records",
+        subtitle: "Detailed attendance logs and history.",
+    },
+    "admin.attendance.leave-requests": {
+        title: "Leave Requests",
+        subtitle: "Approve or reject employee leave requests.",
+    },
+    "admin.attendance.holidays": {
+        title: "Holiday Calendar",
+        subtitle: "Manage company holidays and observances.",
+    },
+    "admin.attendance.hybrid-schedules": {
+        title: "Hybrid Schedules",
+        subtitle: "Configure remote and office work schedules.",
+    },
+    "admin.attendance.overtime": {
+        title: "Overtime Management",
+        subtitle: "Track and approve overtime requests.",
+    },
     "admin.projects": {
         title: "Proyek",
         subtitle: "Daftar proyek aktif dan arsip.",
@@ -89,6 +137,58 @@ const titles = {
     "admin.projects.detail": {
         title: "Detail Proyek",
         subtitle: "Progres, tugas, dan anggota tim.",
+    },
+    "admin.performance.cycles": {
+        title: "Review Cycles",
+        subtitle: "Manage performance review cycles.",
+    },
+    "admin.performance.cycles.create": {
+        title: "Create Review Cycle",
+        subtitle: "Set up a new performance review cycle.",
+    },
+    "admin.performance.cycles.detail": {
+        title: "Review Cycle Details",
+        subtitle: "View cycle progress and participants.",
+    },
+    "admin.performance.outcome-rules": {
+        title: "Outcome Rules",
+        subtitle: "Configure performance rating rules.",
+    },
+    "admin.performance.templates": {
+        title: "Review Templates",
+        subtitle: "Manage performance review templates.",
+    },
+    "admin.performance.my-reviews": {
+        title: "My Reviews",
+        subtitle: "Performance reviews assigned to you.",
+    },
+    "admin.performance.pending-calibration": {
+        title: "Pending Calibration",
+        subtitle: "Reviews awaiting calibration.",
+    },
+    "admin.performance.review.detail": {
+        title: "Review Details",
+        subtitle: "View and complete performance review.",
+    },
+    "admin.performance.my-goals": {
+        title: "My Goals",
+        subtitle: "Track your performance goals.",
+    },
+    "admin.performance.team-goals": {
+        title: "Team Goals",
+        subtitle: "Monitor team performance objectives.",
+    },
+    "admin.performance.feedback.received": {
+        title: "Feedback Received",
+        subtitle: "View feedback from colleagues.",
+    },
+    "admin.performance.feedback.given": {
+        title: "Feedback Given",
+        subtitle: "Feedback you have provided.",
+    },
+    "admin.performance.feedback.give": {
+        title: "Give Feedback",
+        subtitle: "Provide feedback to a colleague.",
     },
     "admin.payroll.dashboard": {
         title: "Penggajian",
