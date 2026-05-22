@@ -104,7 +104,10 @@ const factory = () =>
                 },
                 StatusBadge: { template: '<div class="status-badge-stub"><slot /></div>' },
                 StatsCard: { template: '<div class="stats-card-stub"><slot /></div>' },
-                EmptyState: { template: '<div class="empty-state-stub"><slot /></div>' },
+                EmptyState: {
+                    props: ["icon", "title"],
+                    template: '<div class="empty-state-stub" :data-icon="icon" :data-title="title"><slot /></div>',
+                },
                 MainCard: { template: '<div class="main-card-stub"><slot /></div>' },
                 ModalWrapper: {
                     props: ["show"],
@@ -176,6 +179,20 @@ describe("AttendanceList smoke", () => {
         await flushAsync();
 
         expect(wrapper.findAll(".empty-state-stub").length).toBeGreaterThanOrEqual(2);
+    });
+
+    it("uses a supported EmptyState icon for pending corrections", async () => {
+        leaveRequestStoreMock.fetchLatestLeaveRequests.mockResolvedValue([]);
+        correctionStoreMock.paginatedCorrections = [];
+
+        const wrapper = factory();
+        await flushAsync();
+
+        const correctionEmptyState = wrapper
+            .findAll(".empty-state-stub")
+            .find((emptyState) => emptyState.attributes("data-title") === "Tidak ada koreksi tertunda");
+
+        expect(correctionEmptyState.attributes("data-icon")).toBe("CalendarClock");
     });
 
     it("calls fetch methods on mount", async () => {
