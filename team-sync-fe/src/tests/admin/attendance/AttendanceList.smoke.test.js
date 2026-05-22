@@ -155,14 +155,16 @@ describe("AttendanceList smoke", () => {
         expect(wrapper.exists()).toBe(true);
     });
 
-    it("provides a local semantic page heading without a visible duplicate title", () => {
+    it("exposes page heading semantics without a local h1 tag", () => {
         const wrapper = factory();
 
-        const headings = wrapper.findAll("h1");
+        expect(wrapper.findAll("h1")).toHaveLength(0);
 
-        expect(headings).toHaveLength(1);
-        expect(headings[0].text()).toBe("Kehadiran");
-        expect(headings[0].classes()).toContain("sr-only");
+        const pageHeading = wrapper.find('[role="heading"][aria-level="1"]');
+
+        expect(pageHeading.exists()).toBe(true);
+        expect(pageHeading.text()).toBe("Kehadiran");
+        expect(pageHeading.classes()).toContain("sr-only");
     });
 
     it("renders KPI metrics through StatsCard components", () => {

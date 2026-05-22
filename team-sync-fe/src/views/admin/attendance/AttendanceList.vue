@@ -137,7 +137,7 @@ onMounted(async () => {
 
 <template>
     <div class="flex-1 flex flex-col overflow-hidden">
-        <h1 class="sr-only">Kehadiran</h1>
+        <span class="sr-only" role="heading" aria-level="1">Kehadiran</span>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <RouterLink
