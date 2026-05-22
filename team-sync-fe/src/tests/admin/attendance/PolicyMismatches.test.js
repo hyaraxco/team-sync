@@ -23,8 +23,8 @@ describe("PolicyMismatches.vue", () => {
         const wrapper = mount(PolicyMismatches, {
             global: {
                 stubs: {
-                    RouterLink: true,
-                    Icon: true,
+                    RouterLink: { template: "<a><slot /></a>" },
+                    Icon: { template: "<span />" },
                 },
             },
         });
