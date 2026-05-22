@@ -94,6 +94,16 @@ describe("AttendanceSettings.vue smoke", () => {
         }
     });
 
+    it("renders settings shell with tokenized surface and no local h1", async () => {
+        const wrapper = mount(AttendanceSettings);
+        await flushPromises();
+
+        expect(wrapper.find("h1").exists()).toBe(false);
+        const shell = wrapper.find(".rounded-2xl.border.border-brand-border.p-6.shadow-sm");
+        expect(shell.exists()).toBe(true);
+        expect(shell.attributes("style")).toContain("var(--color-surface)");
+    });
+
     it("holiday modal uses Select primitive for type field", async () => {
         const wrapper = mount(AttendanceSettings);
         await flushPromises();
