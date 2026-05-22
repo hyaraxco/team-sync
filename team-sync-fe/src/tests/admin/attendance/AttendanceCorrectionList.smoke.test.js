@@ -1,6 +1,5 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { createPinia, setActivePinia } from "pinia";
 import { ref } from "vue";
 
 const paginatedCorrections = ref([]);
@@ -24,31 +23,20 @@ vi.mock("@/stores/attendanceCorrection", () => ({
     }),
 }));
 
-vi.mock("pinia", async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-        storeToRefs: (store) => store,
-    };
-});
+vi.mock("pinia", async () => ({
+    ...(await vi.importActual("pinia")),
+    storeToRefs: (store) => store,
+}));
 
 vi.mock("@/helpers/permissionHelper", () => ({
     can: () => true,
     canOneOf: () => true,
 }));
 
-vi.mock("lucide-vue-next", async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-    };
-});
-
 import AttendanceCorrectionList from "@/views/admin/attendance/AttendanceCorrectionList.vue";
 
 describe("AttendanceCorrectionList smoke", () => {
     beforeEach(() => {
-        setActivePinia(createPinia());
         vi.clearAllMocks();
         paginatedCorrections.value = [];
         loading.value = false;
@@ -60,7 +48,7 @@ describe("AttendanceCorrectionList smoke", () => {
         return mount(AttendanceCorrectionList, {
             global: {
                 stubs: {
-                    RouterLink: true,
+                    RouterLink: { template: "<a><slot /></a>" },
                 },
             },
         });
@@ -111,12 +99,12 @@ describe("AttendanceCorrectionList smoke", () => {
             const wrapper = mount(AttendanceCorrectionList, {
                 global: {
                     stubs: {
-                        RouterLink: true,
-                        SearchFilter: true,
-                        Pagination: true,
-                        Alert: true,
-                        ModalWrapper: true,
-                        EmptyState: true,
+                        RouterLink: { template: "<a><slot /></a>" },
+                        SearchFilter: { template: "<div />" },
+                        Pagination: { template: "<div />" },
+                        Alert: { template: "<div />" },
+                        ModalWrapper: { template: "<div><slot /></div>" },
+                        EmptyState: { template: "<div />" },
                     },
                 },
             });
@@ -146,12 +134,12 @@ describe("AttendanceCorrectionList smoke", () => {
             const wrapper = mount(AttendanceCorrectionList, {
                 global: {
                     stubs: {
-                        RouterLink: true,
-                        SearchFilter: true,
-                        Pagination: true,
-                        Alert: true,
-                        ModalWrapper: true,
-                        EmptyState: true,
+                        RouterLink: { template: "<a><slot /></a>" },
+                        SearchFilter: { template: "<div />" },
+                        Pagination: { template: "<div />" },
+                        Alert: { template: "<div />" },
+                        ModalWrapper: { template: "<div><slot /></div>" },
+                        EmptyState: { template: "<div />" },
                     },
                 },
             });

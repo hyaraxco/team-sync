@@ -151,7 +151,7 @@ const onRejectAction = (req) => {
                             <EmptyState
                                 icon="ClipboardList"
                                 title="Data koreksi kosong"
-                                description="Tidak ada pengajuan koreksi absensi yang cocok dengan filter."
+                                subtitle="Tidak ada pengajuan koreksi absensi yang cocok dengan filter."
                             />
                         </td>
                     </tr>
