@@ -94,7 +94,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                             <EmptyState
                                 icon="CalendarDays"
                                 title="Data kehadiran tidak ditemukan"
-                                message="Adjust your search filters or wait for employees to clock in."
+                                subtitle="Adjust your search filters or wait for employees to clock in."
                             />
                         </td>
                     </tr>
@@ -164,7 +164,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
         <div class="md:hidden divide-y divide-brand-border">
             <div v-if="loading" class="py-12 text-center text-brand-light">Loading attendance logs...</div>
             <div v-else-if="paginatedAttendances?.length === 0" class="py-12">
-                <EmptyState icon="CalendarDays" title="Data tidak ditemukan" message="Tidak ada data yang cocok dengan filter." />
+                <EmptyState icon="CalendarDays" title="Data tidak ditemukan" subtitle="Tidak ada data yang cocok dengan filter." />
             </div>
             <div v-for="attendance in paginatedAttendances" :key="attendance.id" class="p-4 space-y-4">
                 <div class="flex items-center justify-between">

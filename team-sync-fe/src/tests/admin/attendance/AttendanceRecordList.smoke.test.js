@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { nextTick } from "vue";
+import { defineComponent, nextTick } from "vue";
 
-const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = vi.hoisted(() => ({
+const testState = {
     attendanceStoreMock: {
         fetchAllPaginated: vi.fn(),
     },
@@ -40,28 +40,28 @@ const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = vi.hoist
         handlePageChange: vi.fn(),
         handlePerPageChange: vi.fn(),
     },
-}));
+};
+
+const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = testState;
+globalThis.__attendanceRecordListTestState = testState;
 
 vi.mock("@/stores/attendance", () => ({
-    useAttendanceStore: () => attendanceStoreMock,
+    useAttendanceStore: () => globalThis.__attendanceRecordListTestState.attendanceStoreMock,
 }));
 
 vi.mock("@/composables/useSearchFilter", () => ({
-    useSearchFilter: () => searchFilterState,
+    useSearchFilter: () => globalThis.__attendanceRecordListTestState.searchFilterState,
 }));
 
-vi.mock("pinia", async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-        storeToRefs: (store) => {
-            if (store === attendanceStoreMock) {
-                return attendanceStoreRefs;
-            }
-            return {};
-        },
-    };
-});
+vi.mock("pinia", async () => ({
+    ...(await vi.importActual("pinia")),
+    storeToRefs: (store) => {
+        if (store === globalThis.__attendanceRecordListTestState.attendanceStoreMock) {
+            return globalThis.__attendanceRecordListTestState.attendanceStoreRefs;
+        }
+        return {};
+    },
+}));
 
 import AttendanceRecordList from "@/views/admin/attendance/AttendanceRecordList.vue";
 
@@ -76,13 +76,14 @@ const factory = () =>
         global: {
             stubs: {
                 SearchFilter: {
+                    name: "SearchFilter",
                     props: ["search"],
                     template: '<button class="search-trigger" @click="$emit(\'search\')">Search</button>',
                 },
-                Pagination: { template: '<div class="pagination-stub"></div>' },
-                Alert: { template: '<div class="alert-stub"></div>' },
-                EmptyState: { template: '<div class="empty-state-stub"></div>' },
-                StatusBadge: { template: '<div class="status-badge-stub"></div>' },
+                Pagination: defineComponent({ name: "Pagination", template: '<div class="pagination-stub"></div>' }),
+                Alert: defineComponent({ name: "Alert", template: '<div class="alert-stub"></div>' }),
+                EmptyState: defineComponent({ name: "EmptyState", template: '<div class="empty-state-stub"></div>' }),
+                StatusBadge: defineComponent({ name: "StatusBadge", template: '<div class="status-badge-stub"></div>' }),
             },
         },
     });
