@@ -32,7 +32,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
     <div class="mb-6">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-brand-dark">Attendance Logs</h1>
+                <p class="text-2xl font-bold text-brand-dark">Attendance Logs</p>
                 <p class="text-sm text-brand-light mt-1">Review historical attendance logs across the organization.</p>
             </div>
         </div>
@@ -56,7 +56,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
         <div class="hidden md:block overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-gray-50/50 border-b border-brand-border">
+                    <tr class="bg-brand-border/20 border-b border-brand-border">
                         <th class="py-4 px-6 text-xs font-semibold text-brand-dark uppercase tracking-wider w-[30%]">
                             Employee
                         </th>
@@ -98,14 +98,14 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                     <tr
                         v-for="attendance in paginatedAttendances"
                         :key="attendance.id"
-                        class="hover:bg-gray-50/50 transition-colors duration-200"
+                        class="hover:bg-brand-border/20 transition-colors duration-200"
                     >
                         <!-- Employee Column -->
                         <td class="py-4 px-6">
                             <div class="flex items-center gap-3">
                                 <img loading="lazy"
                                     :src="attendance.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                                    class="w-10 h-10 rounded-full object-cover border border-gray-200 shadow-sm"
+                                    class="w-10 h-10 rounded-full object-cover border border-brand-border shadow-sm"
                                     alt="Profile"
                                 />
                                 <div>
@@ -127,9 +127,9 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                         <!-- Check In -->
                         <td class="py-4 px-6 text-center">
                             <div
-                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 rounded-lg border border-gray-100"
+                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-border/20 rounded-lg border border-brand-border"
                             >
-                                <Clock class="w-3.5 h-3.5 text-gray-400" />
+                                <Clock class="w-3.5 h-3.5 text-brand-light" />
                                 <span class="text-sm font-medium text-brand-dark">
                                     {{ formatTime(attendance.check_in) }}
                                 </span>
@@ -139,9 +139,9 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                         <!-- Check Out -->
                         <td class="py-4 px-6 text-center">
                             <div
-                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-50 rounded-lg border border-gray-100"
+                                class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-border/20 rounded-lg border border-brand-border"
                             >
-                                <Clock class="w-3.5 h-3.5 text-gray-400" />
+                                <Clock class="w-3.5 h-3.5 text-brand-light" />
                                 <span class="text-sm font-medium text-brand-dark">
                                     {{ formatTime(attendance.check_out) }}
                                 </span>
@@ -181,18 +181,18 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                     <StatusBadge type="leave-type" :value="attendance.status" />
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 bg-gray-50/50 rounded-xl p-3 border border-gray-100">
+                <div class="grid grid-cols-2 gap-4 bg-brand-border/20 rounded-xl p-3 border border-brand-border">
                     <div>
                         <p class="text-xs text-brand-light mb-1 font-medium">Check In</p>
                         <div class="flex items-center gap-1.5 text-brand-dark">
-                            <Clock class="w-3.5 h-3.5 text-gray-400" />
+                            <Clock class="w-3.5 h-3.5 text-brand-light" />
                             <span class="text-sm font-semibold">{{ formatTime(attendance.check_in) }}</span>
                         </div>
                     </div>
                     <div>
                         <p class="text-xs text-brand-light mb-1 font-medium">Check Out</p>
                         <div class="flex items-center gap-1.5 text-brand-dark">
-                            <Clock class="w-3.5 h-3.5 text-gray-400" />
+                            <Clock class="w-3.5 h-3.5 text-brand-light" />
                             <span class="text-sm font-semibold">{{ formatTime(attendance.check_out) }}</span>
                         </div>
                     </div>
@@ -201,7 +201,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
         </div>
 
         <!-- Pagination -->
-        <div class="p-4 border-t border-brand-border bg-gray-50/30">
+        <div class="p-4 border-t border-brand-border bg-brand-border/10">
             <Pagination
                 v-if="meta.total > 0"
                 :current-page="meta.current_page"

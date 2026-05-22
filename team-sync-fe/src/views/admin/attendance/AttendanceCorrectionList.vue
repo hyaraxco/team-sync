@@ -117,7 +117,7 @@ const onRejectAction = (req) => {
     <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</h1>
+                <p class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</p>
                 <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
                     Showing {{ meta.from || 0 }} - {{ meta.to || 0 }} of {{ meta.total || 0 }} requests
                 </p>
@@ -139,7 +139,7 @@ const onRejectAction = (req) => {
                 </thead>
                 <tbody>
                     <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                        <td colspan="6" class="py-8 text-center text-gray-500">Loading...</td>
+                        <td colspan="6" class="py-8 text-center text-brand-light">Loading...</td>
                     </tr>
                     <tr
                         v-else-if="!paginatedCorrections || paginatedCorrections.length === 0"
@@ -157,7 +157,7 @@ const onRejectAction = (req) => {
                         v-else
                         v-for="correction in paginatedCorrections"
                         :key="correction.id"
-                        class="border-b border-brand-border hover:bg-gray-50 transition-colors"
+                        class="border-b border-brand-border hover:bg-brand-border/20 transition-colors"
                     >
                         <td class="py-4 px-4">
                             <div class="flex items-center gap-3">
@@ -312,22 +312,22 @@ const onRejectAction = (req) => {
         </div>
         <div v-if="selectedRejectCorrection" class="mb-4">
             <!-- Details Card -->
-            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm mb-5 shadow-sm">
-                <div class="flex items-center gap-3 mb-3 border-b border-gray-200 pb-3">
+            <div class="bg-brand-border/20 border border-brand-border rounded-xl p-4 text-sm mb-5 shadow-sm">
+                <div class="flex items-center gap-3 mb-3 border-b border-brand-border pb-3">
                     <img loading="lazy"
                         :src="selectedRejectCorrection.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
                         class="w-10 h-10 rounded-full object-cover"
                     />
                     <div>
-                        <p class="font-bold text-gray-900">{{ selectedRejectCorrection.staff_member?.user?.name }}</p>
-                        <p class="text-xs text-gray-500">
+                        <p class="font-bold text-brand-dark">{{ selectedRejectCorrection.staff_member?.user?.name }}</p>
+                        <p class="text-xs text-brand-light">
                             {{ selectedRejectCorrection.staff_member?.staff_member_id }}
                         </p>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-y-2">
-                    <p class="text-gray-500 text-xs">Date</p>
-                    <p class="text-gray-900 font-medium text-right text-xs">
+                    <p class="text-brand-light text-xs">Date</p>
+                    <p class="text-brand-dark font-medium text-right text-xs">
                         {{
                             selectedRejectCorrection.attendance
                                 ? formatDateShort(selectedRejectCorrection.attendance.date)
@@ -335,13 +335,13 @@ const onRejectAction = (req) => {
                         }}
                     </p>
 
-                    <p class="text-gray-500 text-xs">Requested In</p>
-                    <p class="text-gray-900 font-medium text-right text-xs">
+                    <p class="text-brand-light text-xs">Requested In</p>
+                    <p class="text-brand-dark font-medium text-right text-xs">
                         {{ formatTime(selectedRejectCorrection.requested_check_in) }}
                     </p>
 
-                    <p class="text-gray-500 text-xs">Requested Out</p>
-                    <p class="text-gray-900 font-medium text-right text-xs">
+                    <p class="text-brand-light text-xs">Requested Out</p>
+                    <p class="text-brand-dark font-medium text-right text-xs">
                         {{ formatTime(selectedRejectCorrection.requested_check_out) }}
                     </p>
                 </div>
@@ -349,13 +349,13 @@ const onRejectAction = (req) => {
 
             <!-- Form elements -->
             <div class="flex flex-col gap-2">
-                <label class="block text-sm font-bold text-gray-800">
+                <label class="block text-sm font-bold text-brand-dark">
                     Reason for Rejection
                     <span class="text-red-500">*</span>
                 </label>
                 <textarea
                     v-model="rejectReason"
-                    class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white"
+                    class="w-full border border-brand-border rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white"
                     rows="3"
                     placeholder="Please explain why this correction is denied so the employee understands..."
                 ></textarea>
