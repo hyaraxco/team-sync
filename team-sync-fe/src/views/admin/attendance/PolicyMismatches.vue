@@ -11,6 +11,12 @@
                 </div>
             </header>
 
+            <SearchFilter
+                placeholder="Search policy mismatches..."
+                @search="handleSearch"
+                @reset="handleReset"
+            />
+
             <!-- Error State -->
             <div
                 v-if="error"
@@ -28,9 +34,9 @@
             <!-- Empty State -->
             <div v-else-if="!mismatches.length" class="bg-white border border-brand-border rounded-2xl p-6">
                 <EmptyState
-                    icon="Inbox"
-                    title="No policy mismatches found"
-                    subtitle="All attendance logs match scheduled work locations."
+                    icon="AlertTriangle"
+                    title="No policy mismatches"
+                    subtitle="Policy mismatch alerts will appear here when attendance entries need review."
                     size="lg"
                 />
             </div>
@@ -102,6 +108,7 @@ import { useAttendanceStore } from "@/stores/attendance";
 import { useToast } from "@/composables/useToast";
 import { AlertTriangle } from "lucide-vue-next";
 import EmptyState from "@/components/common/EmptyState.vue";
+import SearchFilter from "@/components/common/SearchFilter.vue";
 
 const attendanceStore = useAttendanceStore();
 const toast = useToast();
@@ -128,6 +135,9 @@ const getEmployeeName = (item) =>
     item?.staff_member?.user?.name || item?.staff_member?.name || item?.employee_name || "Unknown";
 
 const formatWorkMode = (value) => String(value || "-").replaceAll("_", " ");
+
+const handleSearch = () => {};
+const handleReset = () => {};
 
 const acknowledge = async (id) => {
     try {

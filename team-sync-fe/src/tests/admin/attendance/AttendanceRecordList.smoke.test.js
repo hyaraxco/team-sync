@@ -1,33 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { defineComponent, nextTick } from "vue";
+import { defineComponent, nextTick, ref } from "vue";
 
 const testState = {
     attendanceStoreMock: {
         fetchAllPaginated: vi.fn(),
-    },
-    attendanceStoreRefs: {
-        paginatedAttendances: {
-            __v_isRef: true,
-            value: [],
-        },
-        meta: {
-            __v_isRef: true,
-            value: {
-                current_page: 1,
-                last_page: 1,
-                per_page: 10,
-                total: 0,
-            },
-        },
-        loading: {
-            __v_isRef: true,
-            value: false,
-        },
-        error: {
-            __v_isRef: true,
-            value: null,
-        },
+        paginatedAttendances: ref([]),
+        meta: ref({
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        }),
+        loading: ref(false),
+        error: ref(null),
     },
     searchFilterState: {
         filters: {
@@ -42,7 +28,7 @@ const testState = {
     },
 };
 
-const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = testState;
+const { attendanceStoreMock, searchFilterState } = testState;
 globalThis.__attendanceRecordListTestState = testState;
 
 vi.mock("@/stores/attendance", () => ({
@@ -51,16 +37,6 @@ vi.mock("@/stores/attendance", () => ({
 
 vi.mock("@/composables/useSearchFilter", () => ({
     useSearchFilter: () => globalThis.__attendanceRecordListTestState.searchFilterState,
-}));
-
-vi.mock("pinia", async () => ({
-    ...(await vi.importActual("pinia")),
-    storeToRefs: (store) => {
-        if (store === globalThis.__attendanceRecordListTestState.attendanceStoreMock) {
-            return globalThis.__attendanceRecordListTestState.attendanceStoreRefs;
-        }
-        return {};
-    },
 }));
 
 import AttendanceRecordList from "@/views/admin/attendance/AttendanceRecordList.vue";
