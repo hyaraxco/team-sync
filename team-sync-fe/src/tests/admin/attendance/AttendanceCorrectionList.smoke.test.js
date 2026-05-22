@@ -1,6 +1,14 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { ref } from "vue";
+import { defineComponent, ref } from "vue";
+
+const RouterLinkStub = defineComponent({ name: "RouterLink", template: "<a><slot /></a>" });
+const SearchFilterStub = defineComponent({ name: "SearchFilter", template: "<div />" });
+const PaginationStub = defineComponent({ name: "Pagination", template: "<div />" });
+const AlertStub = defineComponent({ name: "Alert", template: "<div />" });
+const ModalWrapperStub = defineComponent({ name: "ModalWrapper", template: "<div><slot /></div>" });
+const EmptyStateStub = defineComponent({ name: "EmptyState", template: "<div />" });
+const StatusBadgeStub = defineComponent({ name: "StatusBadge", template: '<span data-test="status-badge"><slot /></span>' });
 
 const paginatedCorrections = ref([]);
 const loading = ref(false);
@@ -43,7 +51,7 @@ describe("AttendanceCorrectionList smoke", () => {
         return mount(AttendanceCorrectionList, {
             global: {
                 stubs: {
-                    RouterLink: { template: "<a><slot /></a>" },
+                    RouterLink: RouterLinkStub,
                 },
             },
         });
@@ -73,6 +81,36 @@ describe("AttendanceCorrectionList smoke", () => {
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 
+    it("uses shared StatusBadge for correction status", () => {
+        paginatedCorrections.value = [
+            {
+                id: "1",
+                status: "approved",
+                requested_check_in: "09:00",
+                requested_check_out: "18:00",
+                reason: "forgot",
+            },
+        ];
+        meta.value = { current_page: 1, last_page: 1, per_page: 10, total: 1 };
+
+        const wrapper = mount(AttendanceCorrectionList, {
+            global: {
+                stubs: {
+                    RouterLink: RouterLinkStub,
+                    SearchFilter: SearchFilterStub,
+                    Pagination: PaginationStub,
+                    Alert: AlertStub,
+                    ModalWrapper: ModalWrapperStub,
+                    EmptyState: EmptyStateStub,
+                    StatusBadge: StatusBadgeStub,
+                },
+            },
+        });
+
+        expect(wrapper.findComponent({ name: "StatusBadge" }).exists()).toBe(true);
+        expect(wrapper.find('[data-test="status-badge"]').exists()).toBe(true);
+    });
+
     it("fetches data on mount", () => {
         createWrapper();
         expect(fetchAllPaginated).toHaveBeenCalled();
@@ -94,12 +132,13 @@ describe("AttendanceCorrectionList smoke", () => {
             const wrapper = mount(AttendanceCorrectionList, {
                 global: {
                     stubs: {
-                        RouterLink: { template: "<a><slot /></a>" },
-                        SearchFilter: { template: "<div />" },
-                        Pagination: { template: "<div />" },
-                        Alert: { template: "<div />" },
-                        ModalWrapper: { template: "<div><slot /></div>" },
-                        EmptyState: { template: "<div />" },
+                        RouterLink: RouterLinkStub,
+                        SearchFilter: SearchFilterStub,
+                        Pagination: PaginationStub,
+                        Alert: AlertStub,
+                        ModalWrapper: ModalWrapperStub,
+                        EmptyState: EmptyStateStub,
+                        StatusBadge: StatusBadgeStub,
                     },
                 },
             });
@@ -129,12 +168,13 @@ describe("AttendanceCorrectionList smoke", () => {
             const wrapper = mount(AttendanceCorrectionList, {
                 global: {
                     stubs: {
-                        RouterLink: { template: "<a><slot /></a>" },
-                        SearchFilter: { template: "<div />" },
-                        Pagination: { template: "<div />" },
-                        Alert: { template: "<div />" },
-                        ModalWrapper: { template: "<div><slot /></div>" },
-                        EmptyState: { template: "<div />" },
+                        RouterLink: RouterLinkStub,
+                        SearchFilter: SearchFilterStub,
+                        Pagination: PaginationStub,
+                        Alert: AlertStub,
+                        ModalWrapper: ModalWrapperStub,
+                        EmptyState: EmptyStateStub,
+                        StatusBadge: StatusBadgeStub,
                     },
                 },
             });
