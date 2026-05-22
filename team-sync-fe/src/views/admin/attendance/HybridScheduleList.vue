@@ -41,8 +41,8 @@ const getLocationMeta = (location) =>
     locationMap[normalizeLocation(location)] || {
         label: location || "-",
         icon: MapPin,
-        iconClass: "text-gray-500",
-        badgeClass: "bg-gray-50 text-gray-700 border-gray-200",
+        iconClass: "text-brand-light",
+        badgeClass: "border-brand-border",
     };
 
 const getBaseSchedule = (schedule) =>
@@ -155,22 +155,18 @@ const confirmReject = () =>
 
 <template>
     <div class="space-y-6">
-        <div>
-            <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[28px] font-bold">Hybrid Work Schedules</h1>
-            <p class="text-brand-light text-sm mt-1">Manage employee hybrid schedules and approve override requests.</p>
-        </div>
-
         <MainCard>
             <div class="space-y-6">
-                <div class="flex items-center gap-2 border-b border-gray-200 pb-3">
+                <div class="flex items-center gap-2 border-b border-brand-border pb-3">
                     <button
                         @click="activeTab = 'schedules'"
                         :class="[
                             'px-4 py-2 rounded-lg text-sm font-semibold transition-all',
                             activeTab === 'schedules'
                                 ? 'bg-brand-primary text-white'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:border-brand-primary',
+                                : 'border border-brand-border hover:border-brand-primary',
                         ]"
+                        :style="activeTab !== 'schedules' ? { background: 'var(--color-surface)', color: 'var(--text-primary)' } : {}"
                     >
                         Schedules
                     </button>
@@ -181,8 +177,9 @@ const confirmReject = () =>
                             'px-4 py-2 rounded-lg text-sm font-semibold transition-all inline-flex items-center gap-2',
                             activeTab === 'overrides'
                                 ? 'bg-brand-primary text-white'
-                                : 'bg-white text-gray-700 border border-gray-300 hover:border-brand-primary',
+                                : 'border border-brand-border hover:border-brand-primary',
                         ]"
+                        :style="activeTab !== 'overrides' ? { background: 'var(--color-surface)', color: 'var(--text-primary)' } : {}"
                     >
                         <Clock class="w-4 h-4" />
                         Override Requests
@@ -190,7 +187,7 @@ const confirmReject = () =>
                 </div>
 
                 <div v-if="loading" class="flex justify-center py-14">
-                    <div class="w-8 h-8 border-4 border-gray-300 border-t-brand-primary rounded-full animate-spin"></div>
+                    <div class="w-8 h-8 border-4 border-brand-border border-t-brand-primary rounded-full animate-spin"></div>
                 </div>
 
                 <div
@@ -204,19 +201,22 @@ const confirmReject = () =>
                     <div v-if="activeTab === 'schedules'" class="overflow-x-auto">
                         <table class="w-full min-w-[900px]">
                             <thead>
-                                <tr class="border-y border-gray-200">
+                                <tr class="border-y border-brand-border">
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Employee
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Base Schedule (Mon - Fri)
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Status
                                     </th>
@@ -228,8 +228,8 @@ const confirmReject = () =>
                                     <td colspan="3" class="py-10">
                                         <EmptyState
                                             icon="FileText"
-                                            title="Jadwal hybrid belum tersedia"
-                                            subtitle="Jadwal karyawan belum tersedia saat ini."
+                                            title="No hybrid schedules"
+                                            subtitle="Employee hybrid schedules will appear here once configured."
                                         />
                                     </td>
                                 </tr>
@@ -238,9 +238,9 @@ const confirmReject = () =>
                                     v-for="schedule in scheduleItems"
                                     v-else
                                     :key="schedule.id"
-                                    class="border-b border-gray-100 align-top"
+                                    class="border-b border-brand-border align-top"
                                 >
-                                    <td class="py-4 px-3 text-sm font-semibold text-gray-900">
+                                    <td class="py-4 px-3 text-sm font-semibold" style="color: var(--text-primary)">
                                         {{ getEmployeeName(schedule) }}
                                     </td>
 
@@ -277,39 +277,46 @@ const confirmReject = () =>
                     <div v-else class="overflow-x-auto">
                         <table class="w-full min-w-[1100px]">
                             <thead>
-                                <tr class="border-y border-gray-200">
+                                <tr class="border-y border-brand-border">
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Employee
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Requested Date
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Current Location
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Requested Location
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Reason
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Status
                                     </th>
                                     <th
-                                        class="py-3 px-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide"
+                                        class="py-3 px-3 text-left text-xs font-semibold uppercase tracking-wide"
+                                        style="color: var(--text-secondary)"
                                     >
                                         Actions
                                     </th>
@@ -321,8 +328,8 @@ const confirmReject = () =>
                                     <td colspan="7" class="py-10">
                                         <EmptyState
                                             icon="CalendarClock"
-                                            title="Tidak ada override tertunda"
-                                            subtitle="Pengajuan override tertunda akan muncul di sini."
+                                            title="No pending overrides"
+                                            subtitle="Pending override requests will appear here."
                                         />
                                     </td>
                                 </tr>
@@ -331,12 +338,12 @@ const confirmReject = () =>
                                     v-for="override in overrideItems"
                                     v-else
                                     :key="override.id"
-                                    class="border-b border-gray-100"
+                                    class="border-b border-brand-border"
                                 >
-                                    <td class="py-4 px-3 text-sm font-semibold text-gray-900">
+                                    <td class="py-4 px-3 text-sm font-semibold" style="color: var(--text-primary)">
                                         {{ override.employeeName }}
                                     </td>
-                                    <td class="py-4 px-3 text-sm text-gray-700">
+                                    <td class="py-4 px-3 text-sm" style="color: var(--text-primary)">
                                         {{ formatRequestDate(override.date) }}
                                     </td>
                                     <td class="py-4 px-3">
@@ -376,7 +383,8 @@ const confirmReject = () =>
                                         </span>
                                     </td>
                                     <td
-                                        class="py-4 px-3 text-sm text-gray-600 max-w-[280px] truncate"
+                                        class="py-4 px-3 text-sm max-w-[280px] truncate"
+                                        style="color: var(--text-secondary)"
                                         :title="override.reason || '-'"
                                     >
                                         {{ override.reason || "-" }}
@@ -388,18 +396,18 @@ const confirmReject = () =>
                                         <div class="flex items-center gap-2">
                                             <button
                                                 @click="showApproveModal(override)"
-                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 hover:border-green-500 hover:bg-green-50 transition-all"
+                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-brand-border hover:border-green-500 hover:bg-green-50 transition-all"
                                             >
                                                 <Check class="w-4 h-4 text-green-600" />
-                                                <span class="text-xs font-semibold text-gray-700">Approve</span>
+                                                <span class="text-xs font-semibold" style="color: var(--text-primary)">Approve</span>
                                             </button>
 
                                             <button
                                                 @click="onRejectAction(override)"
-                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-gray-300 hover:border-red-500 hover:bg-red-50 transition-all"
+                                                class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-brand-border hover:border-red-500 hover:bg-red-50 transition-all"
                                             >
                                                 <X class="w-4 h-4 text-red-600" />
-                                                <span class="text-xs font-semibold text-gray-700">Reject</span>
+                                                <span class="text-xs font-semibold" style="color: var(--text-primary)">Reject</span>
                                             </button>
                                         </div>
                                     </td>
@@ -423,12 +431,13 @@ const confirmReject = () =>
                 <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center shrink-0">
                     <Check class="w-5 h-5 text-green-600" />
                 </div>
-                <p class="text-sm text-gray-800">Confirm approval for this hybrid schedule override request.</p>
+                <p class="text-sm" style="color: var(--text-primary)">Confirm approval for this hybrid schedule override request.</p>
             </div>
 
             <div
                 v-if="selectedApproveOverride"
-                class="rounded-xl border border-gray-200 p-4 text-sm text-gray-700 space-y-1"
+                class="rounded-xl border border-brand-border p-4 text-sm space-y-1"
+                style="color: var(--text-primary)"
             >
                 <p>
                     <span class="font-semibold">Employee:</span>
@@ -475,12 +484,13 @@ const confirmReject = () =>
                 <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center shrink-0">
                     <X class="w-5 h-5 text-red-600" />
                 </div>
-                <p class="text-sm text-gray-800">Provide rejection notes for this override request.</p>
+                <p class="text-sm" style="color: var(--text-primary)">Provide rejection notes for this override request.</p>
             </div>
 
             <div
                 v-if="selectedRejectOverride"
-                class="rounded-xl border border-gray-200 p-4 text-sm text-gray-700 space-y-1"
+                class="rounded-xl border border-brand-border p-4 text-sm space-y-1"
+                style="color: var(--text-primary)"
             >
                 <p>
                     <span class="font-semibold">Employee:</span>
@@ -498,18 +508,19 @@ const confirmReject = () =>
                         ).label
                     }}
                 </p>
-                <p class="italic text-gray-500">"{{ selectedRejectOverride.reason || "-" }}"</p>
+                <p class="italic" style="color: var(--text-secondary)">"{{ selectedRejectOverride.reason || "-" }}"</p>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-800 mb-2">
+                <label class="block text-sm font-semibold mb-2" style="color: var(--text-primary)">
                     Rejection Notes
                     <span class="text-red-500">*</span>
                 </label>
                 <textarea
                     v-model="rejectReason"
                     rows="4"
-                    class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    class="w-full border border-brand-border rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    style="background: var(--color-surface); color: var(--text-primary)"
                     placeholder="Please provide a clear rejection reason..."
                 ></textarea>
             </div>

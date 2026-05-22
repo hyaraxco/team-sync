@@ -156,6 +156,13 @@ vi.mock("@/components/common/EmptyState.vue", () => ({
     default: { template: '<div data-testid="empty-state"></div>', props: ["title", "description"] },
 }));
 
+vi.mock("@/components/common/StatsCard.vue", () => ({
+    default: {
+        template: '<div data-testid="stats-card"><span>{{ value }}</span></div>',
+        props: ["title", "value", "iconName", "colorScheme"],
+    },
+}));
+
 vi.mock("@/components/common/ModalWrapper.vue", () => ({
     default: {
         template: '<div v-if="show" data-testid="modal"><slot /></div>',
@@ -187,7 +194,20 @@ describe("OvertimeManagement.vue", () => {
     });
 
     it("renders the page title", () => {
-        expect(wrapper.text()).toContain("Overtime Management");
+        // Title is now owned by Header.vue, not local h1
+        expect(wrapper.find("h1").exists()).toBe(false);
+    });
+
+    it("does not render duplicate local h1 title", () => {
+        expect(wrapper.find("h1").exists()).toBe(false);
+    });
+
+    it("uses CSS variable for surface background", () => {
+        expect(wrapper.html()).toContain("var(--color-surface)");
+    });
+
+    it("renders StatsCard components for KPI metrics", () => {
+        expect(wrapper.findComponent({ name: "StatsCard" }).exists()).toBe(true);
     });
 
     it("renders summary cards with correct data", () => {
