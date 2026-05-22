@@ -112,11 +112,15 @@ describe("AttendanceRecordList smoke", () => {
         expect(searchFilterState.handleSearch).toHaveBeenCalled();
     });
 
-    it("keeps standardized list helpers without local h1", () => {
+    it("keeps standardized list helpers with accessible page heading", () => {
         const wrapper = factory();
 
         expect(wrapper.find(".search-trigger").exists()).toBe(true);
         expect(wrapper.find(".empty-state-stub").exists()).toBe(true);
+        const pageHeading = wrapper.find('[role="heading"][aria-level="1"]');
+        expect(pageHeading.exists()).toBe(true);
+        expect(pageHeading.text()).toBe("Attendance Logs");
+        expect(pageHeading.classes()).toContain("sr-only");
         expect(wrapper.find("h1").exists()).toBe(false);
     });
 });
