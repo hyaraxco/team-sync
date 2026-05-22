@@ -241,7 +241,7 @@ watch(
                                     </button>
                                     <button
                                         type="button"
-                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2"
                                     >
                                         <Eye class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Preview Photo</span>
