@@ -10,6 +10,7 @@ import Pagination from "@/components/admin/team/Pagination.vue";
 import Alert from "@/components/common/Alert.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import StatusBadge from "@/components/common/StatusBadge.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import { useConfirmAction } from "@/composables/useConfirmAction";
 import { useToast } from "@/composables/useToast";
@@ -29,17 +30,6 @@ onMounted(() => {
 });
 
 const formatTime = (timeStr) => (timeStr ? formatTimeUtil(timeStr) : "-");
-
-const getStatusBadge = (status) => {
-    switch (status) {
-        case "approved":
-            return "bg-green-100 text-green-700";
-        case "rejected":
-            return "bg-red-100 text-red-700";
-        default:
-            return "bg-amber-100 text-amber-700";
-    }
-};
 
 // Approval Workflow
 const {
@@ -199,14 +189,7 @@ const onRejectAction = (req) => {
                             </p>
                         </td>
                         <td class="py-4 px-4">
-                            <span
-                                :class="[
-                                    'px-3 py-1 rounded-full text-xs font-semibold capitalize whitespace-nowrap',
-                                    getStatusBadge(correction.status),
-                                ]"
-                            >
-                                {{ correction.status }}
-                            </span>
+                            <StatusBadge type="leave-status" :value="correction.status" :label="correction.status" />
                         </td>
                         <td class="py-4 px-4">
                             <div
