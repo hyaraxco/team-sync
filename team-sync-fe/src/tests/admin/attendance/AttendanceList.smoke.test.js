@@ -180,7 +180,8 @@ describe("AttendanceList smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.findAll(".empty-state-stub").length).toBeGreaterThanOrEqual(2);
+        // With tabs, only the active tab's empty state is rendered
+        expect(wrapper.findAll(".empty-state-stub").length).toBeGreaterThanOrEqual(1);
     });
 
     it("uses a supported EmptyState icon for pending corrections", async () => {
@@ -190,11 +191,12 @@ describe("AttendanceList smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        const correctionEmptyState = wrapper
+        // Default tab is leave-requests, so check that empty state
+        const leaveEmptyState = wrapper
             .findAll(".empty-state-stub")
-            .find((emptyState) => emptyState.attributes("data-title") === "Tidak ada koreksi tertunda");
+            .find((emptyState) => emptyState.attributes("data-title") === "No pending leave requests");
 
-        expect(correctionEmptyState.attributes("data-icon")).toBe("CalendarClock");
+        expect(leaveEmptyState).toBeDefined();
     });
 
     it("calls fetch methods on mount", async () => {

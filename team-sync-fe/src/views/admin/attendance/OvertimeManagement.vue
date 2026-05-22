@@ -166,15 +166,14 @@ const submitCreate = async () => {
         </div>
 
         <!-- Filters -->
-        <div class="rounded-2xl border border-brand-border p-4 shadow-sm" style="background: var(--color-surface)">
+        <div class="bg-white border border-brand-border rounded-2xl p-4">
             <div class="flex flex-wrap items-center gap-3">
                 <button
                     @click="handleStatusFilter('')"
                     :class="[
                         'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === '' ? 'bg-gray-900 text-white' : 'hover:bg-gray-200',
+                        statusFilter === '' ? 'bg-gray-900 text-white' : 'text-brand-light hover:bg-gray-200',
                     ]"
-                    :style="statusFilter !== '' ? { background: 'var(--color-surface)', color: 'var(--text-secondary)' } : {}"
                 >
                     All
                 </button>
@@ -215,8 +214,8 @@ const submitCreate = async () => {
         </div>
 
         <!-- Table -->
-        <div class="rounded-2xl border border-brand-border overflow-hidden shadow-sm" style="background: var(--color-surface)">
-            <div v-if="loading" class="p-8 text-center" style="color: var(--text-secondary)">Loading...</div>
+        <div class="bg-white rounded-2xl border border-brand-border overflow-hidden">
+            <div v-if="loading" class="p-8 text-center text-brand-light">Loading...</div>
             <EmptyState
                 v-else-if="!records.length"
                 title="No overtime records"
@@ -225,25 +224,25 @@ const submitCreate = async () => {
             <table v-else class="min-w-full divide-y divide-brand-border">
                 <thead>
                     <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Employee</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Time</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Hours</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Type</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium uppercase" style="color: var(--text-secondary)">Actions</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Employee</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Date</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Time</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Hours</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Type</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-brand-light uppercase">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-brand-border">
                     <tr v-for="record in records" :key="record.id" class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm" style="color: var(--text-primary)">
+                        <td class="px-4 py-3 text-sm text-brand-dark">
                             {{ record.staff_member?.user?.name || "-" }}
                         </td>
-                        <td class="px-4 py-3 text-sm" style="color: var(--text-secondary)">
+                        <td class="px-4 py-3 text-sm text-brand-light">
                             {{ formatDateShort(record.date) }}
                         </td>
-                        <td class="px-4 py-3 text-sm" style="color: var(--text-secondary)">{{ record.start_time }} - {{ record.end_time }}</td>
-                        <td class="px-4 py-3 text-sm font-medium" style="color: var(--text-primary)">{{ record.hours }}h</td>
+                        <td class="px-4 py-3 text-sm text-brand-light">{{ record.start_time }} - {{ record.end_time }}</td>
+                        <td class="px-4 py-3 text-sm font-medium text-brand-dark">{{ record.hours }}h</td>
                         <td class="px-4 py-3">
                             <span
                                 :class="[
@@ -281,7 +280,7 @@ const submitCreate = async () => {
                                     <X class="h-4 w-4" />
                                 </button>
                             </div>
-                            <span v-else class="text-xs" style="color: var(--text-secondary)">-</span>
+                            <span v-else class="text-xs text-brand-light">-</span>
                         </td>
                     </tr>
                 </tbody>
@@ -295,18 +294,18 @@ const submitCreate = async () => {
         <!-- Approve Confirmation Modal -->
         <ModalWrapper :show="showApproveModalState" @close="closeApproveModal" title="Approve Overtime">
             <div class="space-y-4">
-                <p class="text-sm" style="color: var(--text-secondary)">
+                <p class="text-sm text-brand-light">
                     Are you sure you want to approve this overtime record for
                     <strong>{{ selectedApproveRecord?.staff_member?.user?.name }}</strong>
                     ?
                 </p>
-                <p class="text-sm" style="color: var(--text-secondary)">
+                <p class="text-sm text-brand-light">
                     {{ selectedApproveRecord?.hours }}h on {{ formatDateShort(selectedApproveRecord?.date) }} ({{
                         selectedApproveRecord?.overtime_type
                     }})
                 </p>
                 <div class="flex justify-end gap-3">
-                    <button @click="closeApproveModal" class="px-4 py-2 text-sm hover:text-gray-800" style="color: var(--text-secondary)">
+                    <button @click="closeApproveModal" class="px-4 py-2 text-sm text-brand-light hover:text-brand-dark">
                         Cancel
                     </button>
                     <button
@@ -323,17 +322,16 @@ const submitCreate = async () => {
         <!-- Reject Modal -->
         <ModalWrapper :show="showRejectModal" @close="showRejectModal = false" title="Reject Overtime">
             <div class="space-y-4">
-                <p class="text-sm" style="color: var(--text-secondary)">
+                <p class="text-sm text-brand-light">
                     Rejecting overtime record for
                     <strong>{{ rejectingRecord?.staff_member?.user?.name }}</strong>
                 </p>
                 <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">Rejection Reason</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Rejection Reason</label>
                     <textarea
                         v-model="rejectionReason"
                         rows="3"
                         class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                        style="background: var(--color-surface); color: var(--text-primary)"
                         placeholder="Provide a reason for rejection (min 10 characters)..."
                     ></textarea>
                     <p
@@ -346,8 +344,7 @@ const submitCreate = async () => {
                 <div class="flex justify-end gap-3">
                     <button
                         @click="showRejectModal = false"
-                        class="px-4 py-2 text-sm hover:text-gray-800"
-                        style="color: var(--text-secondary)"
+                        class="px-4 py-2 text-sm text-brand-light hover:text-brand-dark"
                     >
                         Cancel
                     </button>
@@ -366,50 +363,45 @@ const submitCreate = async () => {
         <ModalWrapper :show="showCreateModal" @close="showCreateModal = false" title="Record Overtime">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">Staff Member ID</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Staff Member ID</label>
                     <input
                         v-model="createForm.staff_member_id"
                         type="number"
                         class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                        style="background: var(--color-surface); color: var(--text-primary)"
                         placeholder="Staff member ID"
                     />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">Date</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Date</label>
                     <input
                         v-model="createForm.date"
                         type="date"
                         class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                        style="background: var(--color-surface); color: var(--text-primary)"
                     />
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">Start Time</label>
+                        <label class="block text-sm font-medium text-brand-dark mb-1">Start Time</label>
                         <input
                             v-model="createForm.start_time"
                             type="time"
                             class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                            style="background: var(--color-surface); color: var(--text-primary)"
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">End Time</label>
+                        <label class="block text-sm font-medium text-brand-dark mb-1">End Time</label>
                         <input
                             v-model="createForm.end_time"
                             type="time"
                             class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                            style="background: var(--color-surface); color: var(--text-primary)"
                         />
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">Overtime Type</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Overtime Type</label>
                     <select
                         v-model="createForm.overtime_type"
                         class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                        style="background: var(--color-surface); color: var(--text-primary)"
                     >
                         <option value="workday">Workday</option>
                         <option value="weekend">Weekend</option>
@@ -417,20 +409,18 @@ const submitCreate = async () => {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--text-primary)">Notes</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Notes</label>
                     <textarea
                         v-model="createForm.notes"
                         rows="2"
                         class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                        style="background: var(--color-surface); color: var(--text-primary)"
                         placeholder="Optional notes..."
                     ></textarea>
                 </div>
                 <div class="flex justify-end gap-3">
                     <button
                         @click="showCreateModal = false"
-                        class="px-4 py-2 text-sm hover:text-gray-800"
-                        style="color: var(--text-secondary)"
+                        class="px-4 py-2 text-sm text-brand-light hover:text-brand-dark"
                     >
                         Cancel
                     </button>
