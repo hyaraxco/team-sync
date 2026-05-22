@@ -163,7 +163,7 @@ describe("AttendanceList smoke", () => {
         const pageHeading = wrapper.find('[role="heading"][aria-level="1"]');
 
         expect(pageHeading.exists()).toBe(true);
-        expect(pageHeading.text()).toBe("Kehadiran");
+        expect(pageHeading.text()).toBe("Attendance");
         expect(pageHeading.classes()).toContain("sr-only");
     });
 
