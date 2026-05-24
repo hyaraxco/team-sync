@@ -24,7 +24,7 @@ const store = useAttendanceStore();
 const { paginatedAttendances, meta, loading, error } = storeToRefs(store);
 
 const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
-    defaultFilters: { search: null },
+    defaultFilters: { search: null, status: "" },
     fetchFn: store.fetchAllPaginated,
 });
 
@@ -44,6 +44,21 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
                 <!-- Search Filters -->
                 <SearchFilter
             placeholder="Search employees by name..."
+            :filters="[
+                {
+                    key: 'status',
+                    label: 'All Statuses',
+                    icon: 'CheckCircle',
+                    options: [
+                        { value: 'present', label: 'Present' },
+                        { value: 'late', label: 'Late' },
+                        { value: 'absent', label: 'Absent' },
+                        { value: 'half_day', label: 'Half Day' },
+                        { value: 'sick_leave', label: 'Sick Leave' },
+                        { value: 'annual_leave', label: 'Annual Leave' },
+                    ],
+                },
+            ]"
             @search="handleSearch"
             @reset="handleReset"
         />

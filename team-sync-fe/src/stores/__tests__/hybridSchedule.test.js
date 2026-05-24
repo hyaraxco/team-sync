@@ -33,7 +33,12 @@ describe("Hybrid Schedule Store", () => {
         const result = await store.fetchAllPaginated(params);
 
         expect(axiosInstance.get).toHaveBeenCalledWith("hybrid-schedules", {
-            params,
+            params: {
+                page: 3,
+                search: "eng",
+                status: "",
+                row_per_page: 20,
+            },
         });
         expect(result).toEqual({ data: paginator, message: "ok" });
         expect(store.paginatedSchedules).toEqual(paginator.data);
