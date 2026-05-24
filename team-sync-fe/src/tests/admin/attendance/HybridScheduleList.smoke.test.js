@@ -4,6 +4,12 @@ import { createPinia, setActivePinia } from "pinia";
 import { ref } from "vue";
 
 const paginatedSchedules = ref([]);
+const meta = ref({
+    current_page: 1,
+    last_page: 1,
+    per_page: 10,
+    total: 0,
+});
 const loading = ref(false);
 const error = ref(null);
 
@@ -14,6 +20,7 @@ const rejectOverride = vi.fn().mockResolvedValue(undefined);
 vi.mock("@/stores/hybridSchedule", () => ({
     useHybridScheduleStore: () => ({
         paginatedSchedules,
+        meta,
         loading,
         error,
         fetchAllPaginated,
@@ -37,6 +44,12 @@ describe("HybridScheduleList smoke", () => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
         paginatedSchedules.value = [];
+        meta.value = {
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        };
         loading.value = false;
         error.value = null;
     });
@@ -66,6 +79,6 @@ describe("HybridScheduleList smoke", () => {
     it("displays tab navigation", () => {
         const wrapper = createWrapper();
         expect(wrapper.text()).toContain("Schedules");
-        expect(wrapper.text()).toContain("Override Requests");
+        expect(wrapper.text()).toContain("Exceptions");
     });
 });
