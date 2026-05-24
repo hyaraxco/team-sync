@@ -4,8 +4,15 @@ import { storeToRefs } from "pinia";
 import { debounce } from "lodash";
 import { AlertCircle, CalendarDays, CheckCircle2, Clock3, Hourglass, RefreshCw, Timer, XCircle } from "lucide-vue-next";
 import { useOvertimeStore } from "@/stores/overtime";
-import Pagination from "@/components/admin/team/Pagination.vue";
+import Pagination from "@/components/common/Pagination.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
+
+defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const overtimeStore = useOvertimeStore();
 const { myRecords, meta, loading, error } = storeToRefs(overtimeStore);
@@ -138,7 +145,7 @@ const statusConfig = (status) => {
 
 <template>
     <div class="space-y-6">
-        <div class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+        <div v-if="!embedded" class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.14em] text-brand-primary">Self Service</p>
                 <h1 class="text-2xl font-bold text-brand-dark">Lembur Saya</h1>

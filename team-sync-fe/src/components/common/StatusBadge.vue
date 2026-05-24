@@ -9,6 +9,7 @@ import {
     getLeaveRequestStatusBadgeClass,
     getTaskStatusBadgeClass,
     getPayrollStatusColor,
+    getAttendanceStatusBadgeClass,
 } from "@/utils/badgeUtils";
 import { capitalize } from "@/utils/formatUtils";
 
@@ -22,7 +23,7 @@ const props = defineProps({
     },
     /**
      * Badge type determines which color mapping to use:
-     * 'status' | 'skill' | 'priority' | 'project' | 'leave-type' | 'leave-status' | 'task' | 'payroll' | 'team'
+     * 'status' | 'skill' | 'priority' | 'project' | 'leave-type' | 'leave-status' | 'task' | 'payroll' | 'team' | 'attendance-status'
      */
     type: {
         type: String,
@@ -47,6 +48,7 @@ const typeMap = {
     task: getTaskStatusBadgeClass,
     payroll: getPayrollStatusColor,
     team: getStatusColor,
+    "attendance-status": getAttendanceStatusBadgeClass,
 };
 
 const getBadgeClass = () => {

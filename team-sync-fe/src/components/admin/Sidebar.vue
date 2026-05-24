@@ -8,7 +8,6 @@ import {
     ArrowRightIcon,
     UserIcon,
     CalendarIcon,
-    Clock3Icon,
     WalletIcon,
     FileWarningIcon,
     BarChart3Icon,
@@ -657,35 +656,7 @@ const onNavigate = () => closeMobile();
                         </span>
                     </RouterLink>
 
-                    <!-- 2. My Overtime (payroll/attendance self service) -->
-                    <RouterLink
-                        :to="{ name: 'staffMember.attendance.my-overtime' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'staffMember.attendance.my-overtime',
-                        }"
-                        v-if="canOneOf(['attendance-my-attendances', 'overtime-list', 'overtime-create'])"
-                        data-tooltip="My Overtime"
-                        @click="onNavigate"
-                    >
-                        <Clock3Icon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'staffMember.attendance.my-overtime',
-                            }"
-                        />
-                        <span
-                            v-show="!isCollapsed"
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'staffMember.attendance.my-overtime',
-                            }"
-                        >
-                            My Overtime
-                        </span>
-                    </RouterLink>
-
-                    <!-- 3. My Team (frequent collaboration) -->
+                    <!-- 2. My Team (frequent collaboration) -->
                     <RouterLink
                         :to="{ name: 'staffMember.team' }"
                         class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"

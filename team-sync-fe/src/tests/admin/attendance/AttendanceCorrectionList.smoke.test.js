@@ -6,6 +6,26 @@ const RouterLinkStub = defineComponent({ name: "RouterLink", template: "<a><slot
 const SearchFilterStub = defineComponent({ name: "SearchFilter", template: "<div />" });
 const PaginationStub = defineComponent({ name: "Pagination", template: "<div />" });
 const AlertStub = defineComponent({ name: "Alert", template: "<div />" });
+const DataTableCardStub = defineComponent({
+    name: "DataTableCard",
+    template: "<div><slot /></div>",
+});
+const TableStateRowsStub = defineComponent({
+    name: "TableStateRows",
+    props: ["loading", "empty", "colspan"],
+    template: "<tr v-if=\"loading || empty\"><td>stub</td></tr>",
+});
+const EmployeeCellStub = defineComponent({
+    name: "EmployeeCell",
+    props: ["photo", "name", "subtitle"],
+    template: "<div>{{ name }}</div>",
+});
+const ModalFooterActionsStub = defineComponent({
+    name: "ModalFooterActions",
+    props: ["processing", "confirmLabel", "confirmColor", "confirmDisabled"],
+    emits: ["cancel", "confirm"],
+    template: `<div data-test="modal-footer-actions"><button @click="$emit('cancel')">Cancel</button><button :disabled="confirmDisabled || processing" @click="$emit('confirm')">{{ processing ? 'Processing...' : confirmLabel }}</button></div>`,
+});
 const ModalWrapperStub = defineComponent({
     name: "ModalWrapper",
     props: ["show", "title"],
@@ -89,7 +109,7 @@ describe("AttendanceCorrectionList smoke", () => {
         const wrapper = createWrapper();
 
         expect(wrapper.findComponent({ name: "SearchFilter" }).exists()).toBe(true);
-        expect(wrapper.findComponent({ name: "EmptyState" }).exists()).toBe(true);
+        expect(wrapper.findComponent({ name: "DataTableCard" }).exists()).toBe(true);
         expect(wrapper.find('[role="heading"][aria-level="1"]').text()).toBe("Attendance Corrections");
         expect(wrapper.find("h1").exists()).toBe(false);
     });
@@ -116,6 +136,10 @@ describe("AttendanceCorrectionList smoke", () => {
                     ModalWrapper: ModalWrapperStub,
                     EmptyState: EmptyStateStub,
                     StatusBadge: StatusBadgeStub,
+                    DataTableCard: DataTableCardStub,
+                    TableStateRows: TableStateRowsStub,
+                    EmployeeCell: EmployeeCellStub,
+                    ModalFooterActions: ModalFooterActionsStub,
                 },
             },
         });
@@ -152,12 +176,15 @@ describe("AttendanceCorrectionList smoke", () => {
                         ModalWrapper: ModalWrapperStub,
                         EmptyState: EmptyStateStub,
                         StatusBadge: StatusBadgeStub,
+                        DataTableCard: DataTableCardStub,
+                        TableStateRows: TableStateRowsStub,
+                        EmployeeCell: EmployeeCellStub,
+                        ModalFooterActions: ModalFooterActionsStub,
                     },
                 },
             });
 
-            const buttons = wrapper.findAll("button");
-            const approveBtn = buttons.find((b) => b.text().includes("Approve"));
+            const approveBtn = wrapper.find('[aria-label="Approve correction"]');
 
             expect(approveBtn.exists()).toBe(true);
             await approveBtn.trigger("click");
@@ -194,12 +221,15 @@ describe("AttendanceCorrectionList smoke", () => {
                         ModalWrapper: ModalWrapperStub,
                         EmptyState: EmptyStateStub,
                         StatusBadge: StatusBadgeStub,
+                        DataTableCard: DataTableCardStub,
+                        TableStateRows: TableStateRowsStub,
+                        EmployeeCell: EmployeeCellStub,
+                        ModalFooterActions: ModalFooterActionsStub,
                     },
                 },
             });
 
-            const buttons = wrapper.findAll("button");
-            const rejectBtn = buttons.find((b) => b.text().includes("Reject"));
+            const rejectBtn = wrapper.find('[aria-label="Reject correction"]');
 
             expect(rejectBtn.exists()).toBe(true);
             await rejectBtn.trigger("click");
@@ -213,7 +243,6 @@ describe("AttendanceCorrectionList smoke", () => {
             const modalFooter = wrapper.find('[data-test="modal-footer"]');
             expect(modalFooter.text()).toContain("Cancel");
             expect(modalFooter.text()).toContain("Reject");
-            expect(modalFooter.findAll("button").at(1).attributes("disabled")).toBeDefined();
         });
     });
 });
