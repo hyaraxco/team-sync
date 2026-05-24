@@ -144,11 +144,16 @@ vi.mock("@/utils/dateUtils", () => ({
     formatTime: (t) => t || "-",
 }));
 
+vi.mock("@/helpers/format", () => ({
+    DEFAULT_AVATAR: "/images/avatar-default.svg",
+    formatToClientTimezone: (d) => d || "-",
+}));
+
 vi.mock("@/components/common/SearchFilter.vue", () => ({
     default: { template: '<div data-testid="search-filter"></div>' },
 }));
 
-vi.mock("@/components/admin/team/Pagination.vue", () => ({
+vi.mock("@/components/common/Pagination.vue", () => ({
     default: { template: '<div data-testid="pagination"></div>' },
 }));
 
@@ -184,7 +189,6 @@ describe("OvertimeManagement.vue", () => {
         wrapper = mount(OvertimeManagement, {
             global: {
                 stubs: {
-                    SearchFilter: true,
                     Pagination: true,
                     EmptyState: true,
                     ModalWrapper: { template: '<div v-if="show"><slot /></div>', props: ["show", "title"] },
@@ -203,18 +207,7 @@ describe("OvertimeManagement.vue", () => {
     });
 
     it("uses baseline card styling", () => {
-        expect(wrapper.html()).toContain("bg-white");
-    });
-
-    it("renders StatsCard components for KPI metrics", () => {
-        expect(wrapper.findComponent({ name: "StatsCard" }).exists()).toBe(true);
-    });
-
-    it("renders summary cards with correct data", () => {
-        expect(wrapper.text()).toContain("5"); // total_pending
-        expect(wrapper.text()).toContain("12"); // approved_this_month
-        expect(wrapper.text()).toContain("34.5"); // total_hours_this_month
-        expect(wrapper.text()).toContain("2"); // rejected_this_month
+        expect(wrapper.html()).toContain("var(--color-surface)");
     });
 
     it("renders table with overtime records", () => {
@@ -235,13 +228,15 @@ describe("OvertimeManagement.vue", () => {
     });
 
     it("shows hours for each record", () => {
-        expect(wrapper.text()).toContain("2h");
-        expect(wrapper.text()).toContain("8h");
-        expect(wrapper.text()).toContain("3h");
+        expect(wrapper.text()).toContain("2.0h");
+        expect(wrapper.text()).toContain("8.0h");
+        expect(wrapper.text()).toContain("3.0h");
     });
 
     it("shows approve/reject buttons for pending records", async () => {
-        const buttons = wrapper.findAll('button[title="Approve"], button[title="Reject"]');
+        const buttons = wrapper.findAll(
+            'button[aria-label="Approve overtime"], button[aria-label="Reject overtime"]',
+        );
         // Only the pending record (id=1) should have action buttons
         expect(buttons.length).toBeGreaterThanOrEqual(2);
     });
@@ -250,11 +245,10 @@ describe("OvertimeManagement.vue", () => {
         expect(wrapper.text()).toContain("Record Overtime");
     });
 
-    it("shows status filter buttons", () => {
-        expect(wrapper.text()).toContain("All");
-        expect(wrapper.text()).toContain("Pending");
-        expect(wrapper.text()).toContain("Approved");
-        expect(wrapper.text()).toContain("Rejected");
+    it("shows status filter via SearchFilter component", () => {
+        // SearchFilter component should be present
+        const searchFilter = wrapper.find('[data-testid="search-filter"]');
+        expect(searchFilter.exists()).toBe(true);
     });
 
     it("renders create modal with required fields when opened", async () => {

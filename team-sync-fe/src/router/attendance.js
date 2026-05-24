@@ -90,18 +90,24 @@ export default [
     {
         path: "attendance/my-hybrid-schedule",
         name: "staffMember.attendance.my-hybrid-schedule",
-        component: () => import("@/views/staff-member/HybridSchedules.vue"),
         meta: {
             requiredAnyPermissions: ["attendance-my-attendances"],
         },
+        beforeEnter: () => ({
+            name: "staffMember.attendance.my-attendances",
+            query: { tab: "hybrid" },
+        }),
     },
     {
         path: "attendance/my-overtime",
         name: "staffMember.attendance.my-overtime",
-        component: () => import("@/views/staff-member/MyOvertime.vue"),
         meta: {
             requiredAnyPermissions: ["attendance-my-attendances", "overtime-list", "overtime-create"],
         },
+        beforeEnter: () => ({
+            name: "staffMember.attendance.my-attendances",
+            query: { tab: "overtime" },
+        }),
     },
     {
         path: "attendance/clock",

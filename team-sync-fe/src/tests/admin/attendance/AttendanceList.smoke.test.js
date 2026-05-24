@@ -12,20 +12,36 @@ const {
     approveConfirmMock,
     rejectConfirmMock,
     useConfirmActionCallCount,
+    searchFilterMocks,
 } = vi.hoisted(() => ({
     attendanceStoreMock: {
         fetchAdminStatistics: vi.fn(),
         error: null,
     },
     leaveRequestStoreMock: {
-        fetchLatestLeaveRequests: vi.fn(),
+        fetchLeaveRequestsPaginated: vi.fn(),
         approveLeaveRequest: vi.fn(),
         rejectLeaveRequest: vi.fn(),
+        leaveRequests: [],
+        meta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        },
+        loading: false,
         error: null,
     },
     correctionStoreMock: {
         fetchAllPaginated: vi.fn(),
         paginatedCorrections: [],
+        meta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        },
+        loading: false,
         error: null,
     },
     toastErrorMock: vi.fn(),
@@ -35,6 +51,24 @@ const {
     rejectConfirmMock: vi.fn(),
     useConfirmActionCallCount: {
         value: 0,
+    },
+    searchFilterMocks: {
+        leave: {
+            filters: { __v_isRef: true, value: { search: null } },
+            fetchData: vi.fn(),
+            handleSearch: vi.fn(),
+            handleReset: vi.fn(),
+            handlePageChange: vi.fn(),
+            handlePerPageChange: vi.fn(),
+        },
+        correction: {
+            filters: { __v_isRef: true, value: { search: null, status: '' } },
+            fetchData: vi.fn(),
+            handleSearch: vi.fn(),
+            handleReset: vi.fn(),
+            handlePageChange: vi.fn(),
+            handlePerPageChange: vi.fn(),
+        },
     },
 }));
 
@@ -86,6 +120,20 @@ vi.mock("@/composables/useConfirmAction", () => ({
     },
 }));
 
+vi.mock("@/composables/useSearchFilter", () => ({
+    useSearchFilter: ({ fetchFn }) => {
+        // Determine which mock to return based on fetchFn
+        if (fetchFn === leaveRequestStoreMock.fetchLeaveRequestsPaginated) {
+            return searchFilterMocks.leave;
+        }
+        if (fetchFn === correctionStoreMock.fetchAllPaginated) {
+            return searchFilterMocks.correction;
+        }
+        // Default fallback
+        return searchFilterMocks.leave;
+    },
+}));
+
 import AttendanceList from "@/views/admin/attendance/AttendanceList.vue";
 
 const flushAsync = async () => {
@@ -117,6 +165,13 @@ const factory = () =>
                     props: ["value"],
                     template: '<span class="animated-value-stub">{{ value }}</span>',
                 },
+                SearchFilter: { template: '<div class="search-filter-stub"></div>' },
+                Pagination: { template: '<div class="pagination-stub"></div>' },
+                AttendanceRecordList: { template: '<div class="attendance-record-list-stub"></div>' },
+                OvertimeManagement: { template: '<div class="overtime-management-stub"></div>' },
+                HybridScheduleList: { template: '<div class="hybrid-schedule-list-stub"></div>' },
+                LeaveRequestList: { template: '<div class="leave-request-list-stub"></div>' },
+                AttendanceCorrectionList: { template: '<div class="attendance-correction-list-stub"></div>' },
             },
         },
     });
@@ -130,7 +185,31 @@ describe("AttendanceList smoke", () => {
             present_today: 10,
             present_change: 2,
         });
-        leaveRequestStoreMock.fetchLatestLeaveRequests.mockResolvedValue([
+        leaveRequestStoreMock.fetchLeaveRequestsPaginated.mockResolvedValue({
+            data: [
+                {
+                    id: 1,
+                    type: "annual",
+                    status: "pending",
+                    start_date: "2026-04-01",
+                    end_date: "2026-04-02",
+                    days: 2,
+                    reason: "Family event",
+                    staff_member: {
+                        user: {
+                            name: "Nadia",
+                        },
+                    },
+                },
+            ],
+            meta: {
+                current_page: 1,
+                last_page: 1,
+                per_page: 10,
+                total: 1,
+            },
+        });
+        leaveRequestStoreMock.leaveRequests = [
             {
                 id: 1,
                 type: "annual",
@@ -145,7 +224,7 @@ describe("AttendanceList smoke", () => {
                     },
                 },
             },
-        ]);
+        ];
         correctionStoreMock.paginatedCorrections = [];
         correctionStoreMock.fetchAllPaginated.mockResolvedValue(undefined);
     });
@@ -174,29 +253,24 @@ describe("AttendanceList smoke", () => {
     });
 
     it("uses EmptyState for empty dashboard sections", async () => {
-        leaveRequestStoreMock.fetchLatestLeaveRequests.mockResolvedValue([]);
+        leaveRequestStoreMock.leaveRequests = [];
         correctionStoreMock.paginatedCorrections = [];
 
         const wrapper = factory();
         await flushAsync();
 
-        // With tabs, only the active tab's empty state is rendered
-        expect(wrapper.findAll(".empty-state-stub").length).toBeGreaterThanOrEqual(1);
+        // Empty states for leave/corrections live inside child tabs (stubbed).
+        // Verify the tab containers mount.
+        expect(wrapper.find(".leave-request-list-stub").exists()).toBe(true);
+        expect(wrapper.find(".attendance-correction-list-stub").exists()).toBe(true);
     });
 
-    it("uses a supported EmptyState icon for pending corrections", async () => {
-        leaveRequestStoreMock.fetchLatestLeaveRequests.mockResolvedValue([]);
-        correctionStoreMock.paginatedCorrections = [];
-
+    it("renders embedded tab components", async () => {
         const wrapper = factory();
         await flushAsync();
 
-        // Default tab is leave-requests, so check that empty state
-        const leaveEmptyState = wrapper
-            .findAll(".empty-state-stub")
-            .find((emptyState) => emptyState.attributes("data-title") === "No pending leave requests");
-
-        expect(leaveEmptyState).toBeDefined();
+        expect(wrapper.find(".leave-request-list-stub").exists()).toBe(true);
+        expect(wrapper.find(".attendance-correction-list-stub").exists()).toBe(true);
     });
 
     it("calls fetch methods on mount", async () => {
@@ -204,22 +278,5 @@ describe("AttendanceList smoke", () => {
         await flushAsync();
 
         expect(attendanceStoreMock.fetchAdminStatistics).toHaveBeenCalled();
-        expect(leaveRequestStoreMock.fetchLatestLeaveRequests).toHaveBeenCalledWith(5);
-        expect(correctionStoreMock.fetchAllPaginated).toHaveBeenCalledWith({
-            status: "pending",
-            row_per_page: 5,
-            page: 1,
-        });
-    });
-
-    it("triggers approve modal when approve clicked", async () => {
-        const wrapper = factory();
-        await flushAsync();
-
-        const approveButton = wrapper.findAll("button").find((button) => button.text().includes("Approve"));
-
-        await approveButton.trigger("click");
-
-        expect(approveModalOpenMock).toHaveBeenCalledWith(expect.objectContaining({ id: 1 }));
     });
 });

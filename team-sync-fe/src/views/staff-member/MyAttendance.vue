@@ -15,6 +15,8 @@ import {
     ChevronLeft,
     ChevronRight,
     FileText,
+    Timer,
+    MapPin,
 } from "lucide-vue-next";
 import { DateTime } from "luxon";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
@@ -41,6 +43,8 @@ import { getStatusConfig, formatLeaveType } from "@/utils/attendanceUtils";
 import AttendanceStatsCards from "@/components/staff-member/attendance/AttendanceStatsCards.vue";
 import LeaveRequestSuccessModal from "@/components/staff-member/attendance/LeaveRequestSuccessModal.vue";
 import EmptyState from "@/components/common/EmptyState.vue";
+import MyOvertime from "@/views/staff-member/MyOvertime.vue";
+import HybridSchedules from "@/views/staff-member/HybridSchedules.vue";
 
 const toast = useToast();
 const route = useRoute();
@@ -236,6 +240,18 @@ const sections = computed(() =>
             label: "Corrections",
             icon: PenSquare,
             isVisible: canCreateCorrection.value,
+        },
+        {
+            id: "overtime",
+            label: "Overtime",
+            icon: Timer,
+            isVisible: true,
+        },
+        {
+            id: "hybrid",
+            label: "Hybrid Schedule",
+            icon: MapPin,
+            isVisible: isHybrid.value,
         },
     ].filter((section) => section.isVisible),
 );
@@ -462,6 +478,15 @@ const handleRouteActionQuery = async () => {
     await clearLeaveRequestActionQuery();
 };
 
+const handleRouteTabQuery = () => {
+    const tab = route.query.tab;
+    if (!tab) return;
+    const valid = sections.value.some((s) => s.id === tab);
+    if (valid) {
+        activeSection.value = tab;
+    }
+};
+
 const setActiveSection = (sectionId) => {
     activeSection.value = sectionId;
 };
@@ -492,6 +517,7 @@ onMounted(async () => {
     await Promise.all(requests);
 
     await handleRouteActionQuery();
+    handleRouteTabQuery();
 });
 
 onUnmounted(() => {
@@ -594,7 +620,15 @@ onUnmounted(() => {
         />
 
         <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div
+                class="grid gap-3"
+                :class="{
+                    'grid-cols-1': sections.length === 1,
+                    'grid-cols-1 md:grid-cols-2': sections.length === 2,
+                    'grid-cols-1 md:grid-cols-3': sections.length === 3,
+                    'grid-cols-2 md:grid-cols-4': sections.length === 4,
+                }"
+            >
                 <button
                     v-for="section in sections"
                     :key="section.id"
@@ -892,6 +926,14 @@ onUnmounted(() => {
 
         <div v-else-if="activeSection === 'corrections'">
             <AttendanceCorrectionsList :corrections="myCorrections" />
+        </div>
+
+        <div v-else-if="activeSection === 'overtime'">
+            <MyOvertime embedded />
+        </div>
+
+        <div v-else-if="activeSection === 'hybrid' && isHybrid">
+            <HybridSchedules embedded />
         </div>
 
         <Teleport to="body">
