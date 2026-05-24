@@ -21,7 +21,7 @@ const emit = defineEmits(["page-change", "per-page-change"]);
             <slot></slot>
         </div>
 
-        <div v-if="meta.total > 0" class="p-4 border-t border-brand-border" style="background-color: var(--color-surface-overlay);">
+        <div class="p-4 border-t border-brand-border" style="background-color: var(--color-surface-overlay);">
             <Pagination
                 :meta="meta"
                 :loading="loading"
