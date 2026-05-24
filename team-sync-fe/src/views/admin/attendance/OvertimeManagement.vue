@@ -34,7 +34,7 @@ const showCreateModal = ref(false);
 
 const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
     defaultFilters: { search: null, status: "" },
-    fetchFn: (params) => store.fetchOvertimeRecords(params),
+    fetchFn: store.fetchOvertimeRecords,
 });
 
 const createForm = ref({

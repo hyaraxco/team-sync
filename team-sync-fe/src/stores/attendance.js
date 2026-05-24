@@ -216,6 +216,7 @@ export const useAttendanceStore = defineStore("attendance", {
                     params: {
                         page: params.page || 1,
                         search: params.search || "",
+                        status: params.status || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
