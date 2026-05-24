@@ -66,7 +66,7 @@ class HybridWorkScheduleController extends Controller implements HasMiddleware
 
         $overrides = $this->repository->getOverridesByStaffMemberIdPaginated(
             (int) $profile->id,
-            (int) $request->get('per_page', 15)
+            (int) $request->input('per_page', 15)
         );
 
         return response()->json([
