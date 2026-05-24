@@ -218,8 +218,7 @@ onMounted(async () => {
 
         <!-- Leave Requests Tab -->
         <div
-            v-if="can('leave-request-list')"
-            v-show="activeTab === 'leave-requests'"
+            v-if="can('leave-request-list') && activeTab === 'leave-requests'"
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
@@ -233,8 +232,7 @@ onMounted(async () => {
 
         <!-- Corrections Tab -->
         <div
-            v-if="can('attendance-correction-list')"
-            v-show="activeTab === 'corrections'"
+            v-if="can('attendance-correction-list') && activeTab === 'corrections'"
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
@@ -248,7 +246,7 @@ onMounted(async () => {
 
         <!-- Attendance Logs Tab -->
         <div
-            v-if="activeTab === 'records' && can('attendance-list')"
+            v-if="can('attendance-list') && activeTab === 'records'"
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
@@ -262,7 +260,7 @@ onMounted(async () => {
 
         <!-- Overtime Tab -->
         <div
-            v-if="activeTab === 'overtime' && can('overtime-list')"
+            v-if="can('overtime-list') && activeTab === 'overtime'"
             class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
         >
             <div class="flex items-center justify-between mb-6">
@@ -275,19 +273,17 @@ onMounted(async () => {
         </div>
 
         <!-- Hybrid Schedules Tab -->
-        <<div class="flex items-center gap-2 flex-wrap">
-                <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">Show</p>
-                <select
-                    :value="perPage"
-                    @change="handlePerPageChange(parseInt($event.target.value))"
-                    :disabled="loading"
-                    class="w-full sm:w-auto px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary transition-all duration-300 bg-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <option v-for="option in perPageOptions" :key="option" :value="option">
-                        {{ option }}
-                    </option>
-                </select>
-                <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">items per page</p>
+        <div
+            v-if="activeTab === 'hybrid'"
+            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+        >
+            <div class="flex items-center justify-between mb-6">
+                <div>
+                    <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Hybrid Schedules</h3>
+                    <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">Manage employee hybrid work schedules and exceptions</p>
+                </div>
+            </div>
+            <HybridScheduleList embedded />
         </div>
     </div>
 </template>
