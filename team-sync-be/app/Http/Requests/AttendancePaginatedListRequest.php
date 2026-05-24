@@ -20,6 +20,7 @@ class AttendancePaginatedListRequest extends FormRequest
         return [
             'search' => 'nullable|string',
             'row_per_page' => 'required|integer|min:1',
+            'status' => 'nullable|string|in:present,late,absent,half_day,sick_leave,annual_leave',
         ];
     }
 }
