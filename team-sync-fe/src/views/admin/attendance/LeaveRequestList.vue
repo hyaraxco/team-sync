@@ -40,14 +40,7 @@ const { filters, serverOptions, fetchData, handleSearch, handleReset, handlePage
     fetchFn: store.fetchLeaveRequestsPaginated,
 });
 
-const leaveStatusFilter = ref("");
 
-const filteredLeaveRequests = computed(() => {
-    if (!leaveStatusFilter.value) {
-        return leaveRequests.value || [];
-    }
-    return (leaveRequests.value || []).filter((request) => request.status === leaveStatusFilter.value);
-});
 
 // ---- DATE NAVIGATION ----
 const now = DateTime.now();
@@ -362,15 +355,14 @@ onMounted(() => {
                         label: 'All Statuses',
                         icon: 'CheckCircle',
                         options: [
-                            { id: 'pending', name: 'Pending' },
-                            { id: 'approved', name: 'Approved' },
-                            { id: 'rejected', name: 'Rejected' },
+                            { value: 'pending', label: 'Pending' },
+                            { value: 'approved', label: 'Approved' },
+                            { value: 'rejected', label: 'Rejected' },
                         ],
                     },
                 ]"
                 @search="handleSearch"
-                @reset="() => { resetWithDateRange(); leaveStatusFilter = ''; }"
-                @update:modelValue="leaveStatusFilter = $event.status || ''"
+                @reset="resetWithDateRange"
             />
         </div>
 
@@ -426,15 +418,15 @@ onMounted(() => {
                     <tbody class="divide-y divide-brand-border">
                         <TableStateRows
                             :loading="loading"
-                            :empty="!filteredLeaveRequests || filteredLeaveRequests.length === 0"
+                            :empty="!leaveRequests || leaveRequests.length === 0"
                             :colspan="7"
                             empty-icon="ClipboardList"
                             empty-title="No leave requests found"
                             empty-subtitle="Adjust filters or wait for employees to submit leave requests."
                         />
-                        <template v-if="filteredLeaveRequests && filteredLeaveRequests.length > 0 && !loading">
+                        <template v-if="leaveRequests && leaveRequests.length > 0 && !loading">
                         <tr
-                            v-for="request in filteredLeaveRequests"
+                            v-for="request in leaveRequests"
                             :key="request.id"
                             class="hover:bg-brand-gray/50"
                         >
