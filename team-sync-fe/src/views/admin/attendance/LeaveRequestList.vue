@@ -1,4 +1,4 @@
-<script setup>
+    <script setup>
 import { ref, onMounted, computed, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
@@ -307,8 +307,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <div :class="embedded ? '' : 'p-3 sm:p-4 md:p-6 lg:p-8'">
-        <div :class="['space-y-6', !embedded && 'max-w-7xl mx-auto']">
+    <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
+        <div class="space-y-6">
             <span v-if="!embedded" class="sr-only" role="heading" aria-level="1">Leave Requests</span>
 
     <div v-if="!embedded" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -394,149 +394,149 @@ onMounted(() => {
         </div>
 
         <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">
-        <table class="min-w-full divide-y divide-brand-border">
-                    <thead>
-                        <tr class="bg-brand-border/20 border-b border-brand-border">
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider w-[48px]">
-                                <input
-                                    type="checkbox"
-                                    :checked="allSelectableSelected"
-                                    :disabled="loading || !selectableRequests.length || processingBulkAction"
-                                    @change="toggleSelectAll"
-                                    class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
-                                    title="Select all pending requests"
-                                />
-                            </th>
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Employee</th>
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Date</th>
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Reason & Type</th>
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Proof</th>
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Status</th>
-                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-brand-border">
-                        <TableStateRows
-                            :loading="loading"
-                            :empty="!leaveRequests || leaveRequests.length === 0"
-                            :colspan="7"
-                            empty-icon="ClipboardList"
-                            empty-title="No leave requests found"
-                            empty-subtitle="Adjust filters or wait for employees to submit leave requests."
-                        />
-                        <template v-if="leaveRequests && leaveRequests.length > 0 && !loading">
-                        <tr
-                            v-for="request in leaveRequests"
-                            :key="request.id"
-                            class="hover:bg-brand-gray/50"
-                        >
-                            <td class="px-6 py-4">
-                                <input
-                                    v-if="request.status === 'pending'"
-                                    v-model="selectedIds"
-                                    type="checkbox"
-                                    :value="request.id"
-                                    :disabled="loading || processingBulkAction"
-                                    class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
-                                    :aria-label="`Select leave request ${request.id}`"
-                                />
-                            </td>
-                            <td class="px-6 py-4">
-                                <EmployeeCell
-                                    :photo="request.staff_member?.user?.profile_photo"
-                                    :name="request.staff_member?.user?.name || ''"
-                                />
-                            </td>
-                            <td class="px-6 py-4">
-                                <div class="text-sm text-brand-dark font-medium">
-                                    {{ formatDateShort(request.start_date) }} - {{ formatDateShort(request.end_date) }}
-                                </div>
-                                <div class="text-xs text-brand-light">{{ request.days }} Days</div>
-                            </td>
-                            <td class="px-6 py-4">
-                                <StatusBadge type="leave-type" :value="request.type" class="mb-1" />
-                                <p class="text-sm text-brand-dark max-w-[200px] truncate" :title="request.reason">
-                                    {{ request.reason }}
-                                </p>
-                            </td>
-                            <td class="px-6 py-4">
-                                <div v-if="request.type === 'sick_leave'" class="flex flex-col gap-1">
-                                    <a
-                                        v-if="request.proof_file_path"
-                                        :href="getProofUrl(request.proof_file_path)"
-                                        target="_blank"
-                                        class="text-xs text-blue-600 hover:underline flex items-center gap-1"
-                                    >
-                                        <ExternalLink class="w-3 h-3" />
-                                        View Proof
-                                    </a>
-                                    <span v-else class="text-xs text-brand-light italic">No proof</span>
-
-                                    <div v-if="request.proof_file_path" class="mt-1">
-                                        <span
-                                            :class="[
-                                                'text-xs px-2 py-0.5 rounded',
-                                                request.proof_review_status === 'approved'
-                                                    ? 'bg-green-100 text-green-700'
-                                                    : request.proof_review_status === 'rejected'
-                                                      ? 'bg-red-100 text-red-700'
-                                                      : 'bg-yellow-100 text-yellow-700',
-                                            ]"
-                                        >
-                                            {{ request.proof_review_status || "pending" }}
-                                        </span>
-                                    </div>
-                                </div>
-                                <span v-else class="text-xs text-brand-light">-</span>
-                            </td>
-                            <td class="px-6 py-4">
-                                <StatusBadge type="leave-status" :value="request.status" />
-                            </td>
-                            <td class="px-6 py-4">
-                                <div
-                                    class="flex items-center gap-2"
-                                    v-if="
-                                        (request.status === 'pending' && can('leave-request-approve')) ||
-                                        (request.type === 'sick_leave' &&
-                                            request.proof_file_path &&
-                                            (!request.proof_review_status || request.proof_review_status === 'pending'))
-                                    "
+            <table class="min-w-full divide-y divide-brand-border">
+                <thead>
+                    <tr class="bg-brand-border/20 border-b border-brand-border">
+                        <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider w-[48px]">
+                            <input
+                                type="checkbox"
+                                :checked="allSelectableSelected"
+                                :disabled="loading || !selectableRequests.length || processingBulkAction"
+                                @change="toggleSelectAll"
+                                class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                                title="Select all pending requests"
+                            />
+                        </th>
+                        <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Employee</th>
+                        <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Date</th>
+                        <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Reason & Type</th>
+                        <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Proof</th>
+                        <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Status</th>
+                        <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-brand-border">
+                    <TableStateRows
+                        :loading="loading"
+                        :empty="!leaveRequests || leaveRequests.length === 0"
+                        :colspan="7"
+                        empty-icon="ClipboardList"
+                        empty-title="No leave requests found"
+                        empty-subtitle="Adjust filters or wait for employees to submit leave requests."
+                    />
+                    <template v-if="leaveRequests && leaveRequests.length > 0 && !loading">
+                    <tr
+                        v-for="request in leaveRequests"
+                        :key="request.id"
+                        class="hover:bg-brand-gray/50"
+                    >
+                        <td class="py-4 px-6">
+                            <input
+                                v-if="request.status === 'pending'"
+                                v-model="selectedIds"
+                                type="checkbox"
+                                :value="request.id"
+                                :disabled="loading || processingBulkAction"
+                                class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                                :aria-label="`Select leave request ${request.id}`"
+                            />
+                        </td>
+                        <td class="py-4 px-6">
+                            <EmployeeCell
+                                :photo="request.staff_member?.user?.profile_photo"
+                                :name="request.staff_member?.user?.name || ''"
+                            />
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <div class="text-sm text-brand-dark font-medium">
+                                {{ formatDateShort(request.start_date) }} - {{ formatDateShort(request.end_date) }}
+                            </div>
+                            <div class="text-xs text-brand-light">{{ request.days }} Days</div>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <StatusBadge type="leave-type" :value="request.type" class="mb-1" />
+                            <p class="text-sm text-brand-dark max-w-[200px] truncate" :title="request.reason">
+                                {{ request.reason }}
+                            </p>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <div v-if="request.type === 'sick_leave'" class="flex flex-col gap-1">
+                                <a
+                                    v-if="request.proof_file_path"
+                                    :href="getProofUrl(request.proof_file_path)"
+                                    target="_blank"
+                                    class="text-xs text-blue-600 hover:underline flex items-center gap-1"
                                 >
-                                    <button
-                                        v-if="request.status === 'pending'"
-                                        @click="showApproveModal(request)"
-                                        title="Approve Leave"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                    <ExternalLink class="w-3 h-3" />
+                                    View Proof
+                                </a>
+                                <span v-else class="text-xs text-brand-light italic">No proof</span>
+
+                                <div v-if="request.proof_file_path" class="mt-1">
+                                    <span
+                                        :class="[
+                                            'text-xs px-2 py-0.5 rounded',
+                                            request.proof_review_status === 'approved'
+                                                ? 'bg-green-100 text-green-700'
+                                                : request.proof_review_status === 'rejected'
+                                                  ? 'bg-red-100 text-red-700'
+                                                  : 'bg-yellow-100 text-yellow-700',
+                                        ]"
                                     >
-                                        <Check class="w-4 h-4 text-green-600" />
-                                    </button>
-                                    <button
-                                        v-if="request.status === 'pending'"
-                                        @click="showRejectModal(request)"
-                                        title="Reject Leave"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
-                                    >
-                                        <X class="w-4 h-4 text-red-600" />
-                                    </button>
-                                    <button
-                                        v-if="
-                                            request.type === 'sick_leave' &&
-                                            request.proof_file_path &&
-                                            (!request.proof_review_status || request.proof_review_status === 'pending')
-                                        "
-                                        @click="openReviewProof(request)"
-                                        title="Review Proof"
-                                        class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-yellow-500 hover:bg-yellow-50 transition-all duration-300 px-3 py-2"
-                                    >
-                                        <FileSearch class="w-4 h-4 text-yellow-600" />
-                                    </button>
+                                        {{ request.proof_review_status || "pending" }}
+                                    </span>
                                 </div>
-                                <div v-else class="text-xs text-brand-light">-</div>
-                            </td>
-                        </tr>
-                        </template>
-                    </tbody>
-                </table>
+                            </div>
+                            <span v-else class="text-xs text-brand-light">-</span>
+                        </td>
+                        <td class="py-4 px-6 text-center">
+                            <StatusBadge type="leave-status" :value="request.status" />
+                        </td>
+                        <td class="py-4 px-6">
+                            <div
+                                v-if="
+                                    (request.status === 'pending' && can('leave-request-approve')) ||
+                                    (request.type === 'sick_leave' &&
+                                        request.proof_file_path &&
+                                        (!request.proof_review_status || request.proof_review_status === 'pending'))
+                                "
+                                class="flex items-center justify-center gap-2"
+                            >
+                                <button
+                                    v-if="request.status === 'pending'"
+                                    @click="showApproveModal(request)"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-300"
+                                    aria-label="Approve leave"
+                                >
+                                    <Check class="w-4 h-4" />
+                                </button>
+                                <button
+                                    v-if="request.status === 'pending'"
+                                    @click="showRejectModal(request)"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300"
+                                    aria-label="Reject leave"
+                                >
+                                    <X class="w-4 h-4" />
+                                </button>
+                                <button
+                                    v-if="
+                                        request.type === 'sick_leave' &&
+                                        request.proof_file_path &&
+                                        (!request.proof_review_status || request.proof_review_status === 'pending')
+                                    "
+                                    @click="openReviewProof(request)"
+                                    class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-yellow-50 text-yellow-600 hover:bg-yellow-100 transition-all duration-300"
+                                    aria-label="Review proof"
+                                >
+                                    <FileSearch class="w-4 h-4" />
+                                </button>
+                            </div>
+                            <span v-else class="text-xs text-brand-light">—</span>
+                        </td>
+                    </tr>
+                    </template>
+                </tbody>
+            </table>
         </DataTableCard>
     </div>
 

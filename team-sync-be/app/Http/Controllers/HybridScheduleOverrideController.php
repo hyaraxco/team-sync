@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\HybridScheduleOverrideListRequest;
 use App\Http\Requests\HybridScheduleOverrideRejectRequest;
 use App\Http\Requests\HybridScheduleOverrideStoreRequest;
+use App\Http\Resources\HybridScheduleOverrideResource;
+use App\Http\Resources\PaginateResource;
+use App\Interfaces\HybridWorkScheduleRepositoryInterface;
 use App\Models\HybridScheduleOverride;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -18,8 +22,26 @@ class HybridScheduleOverrideController extends Controller implements HasMiddlewa
     public static function middleware(): array
     {
         return [
-            new Middleware(PermissionMiddleware::using(['attendance-menu']), only: ['approve', 'reject']),
+            new Middleware(PermissionMiddleware::using(['attendance-menu']), only: ['index', 'approve', 'reject']),
         ];
+    }
+
+    public function __construct(private HybridWorkScheduleRepositoryInterface $repository) {}
+
+    public function index(HybridScheduleOverrideListRequest $request): JsonResponse
+    {
+        $overrides = $this->repository->getOverridesPaginated(
+            (int) ($request->validated('per_page') ?? 15),
+            $request->validated('search'),
+            $request->validated('status'),
+            $request->validated('date_from'),
+            $request->validated('date_to'),
+        );
+
+        return response()->json([
+            'success' => true,
+            'data'    => PaginateResource::make($overrides, HybridScheduleOverrideResource::class),
+        ]);
     }
 
     public function store(HybridScheduleOverrideStoreRequest $request): JsonResponse

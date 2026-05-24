@@ -1,5 +1,5 @@
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { storeToRefs } from "pinia";
 import { MapPin, Home, Building, Clock, Check, X } from "lucide-vue-next";
 import { useHybridScheduleStore } from "@/stores/hybridSchedule";
@@ -26,7 +26,15 @@ const props = defineProps({
 });
 
 const store = useHybridScheduleStore();
-const { paginatedSchedules, meta, loading, error } = storeToRefs(store);
+const {
+    paginatedSchedules,
+    meta,
+    loading,
+    paginatedOverrides,
+    overridesMeta,
+    overridesLoading,
+    error,
+} = storeToRefs(store);
 const toast = useToast();
 
 const activeTab = ref("schedules");
@@ -67,53 +75,55 @@ const getBaseSchedule = (schedule) =>
         friday: schedule?.friday,
     };
 
-const getWeekdayKey = (dateString) => {
-    if (!dateString) {
-        return null;
-    }
-
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) {
-        return null;
-    }
-
-    return date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
-};
-
-const getEmployeeName = (item) => item?.staff_member?.user?.name || item?.staff_member?.name || item?.user?.name || "-";
+const getEmployeeName = (item) =>
+    item?.staff_member?.user?.name || item?.staff_member?.name || item?.user?.name || "-";
 
 const getScheduleStatus = (schedule) => schedule?.status || "active";
 
 const scheduleItems = computed(() => paginatedSchedules.value || []);
 
-const overrideItems = computed(() => {
-    const rows = [];
+// Override items are server-paginated — no more client-side filtering
+const overrideItems = computed(() =>
+    (paginatedOverrides.value || []).map((override) => ({
+        ...override,
+        employeeName: override?.staff_member?.user?.name || "-",
+        currentLocation: override?.current_schedule_mode || "-",
+    })),
+);
 
-    scheduleItems.value.forEach((schedule) => {
-        const overrides = schedule?.overrides || [];
-
-        overrides.forEach((override) => {
-            const weekdayKey = getWeekdayKey(override?.date);
-            const baseSchedule = getBaseSchedule(schedule);
-
-            rows.push({
-                ...override,
-                employeeName: getEmployeeName(override) !== "-" ? getEmployeeName(override) : getEmployeeName(schedule),
-                currentLocation: override?.current_location || (weekdayKey ? baseSchedule[weekdayKey] : null) || "-",
-            });
-        });
-    });
-
-    return rows;
-});
-
-const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
-    defaultFilters: { search: null, status: "" },
+// --- Schedules tab: search only (no status filter) ---
+const {
+    fetchData: schedFetchData,
+    handleSearch: schedHandleSearch,
+    handleReset: schedHandleReset,
+    handlePageChange: schedHandlePageChange,
+    handlePerPageChange: schedHandlePerPageChange,
+} = useSearchFilter({
+    defaultFilters: { search: null },
     fetchFn: store.fetchAllPaginated,
 });
 
+// --- Exceptions tab: search + status, separate pagination ---
+const {
+    fetchData: ovFetchData,
+    handleSearch: ovHandleSearch,
+    handleReset: ovHandleReset,
+    handlePageChange: ovHandlePageChange,
+    handlePerPageChange: ovHandlePerPageChange,
+} = useSearchFilter({
+    defaultFilters: { search: null, status: "" },
+    fetchFn: store.fetchOverridesPaginated,
+});
+
+// Lazy-load overrides on first tab switch
+watch(activeTab, (newTab) => {
+    if (newTab === "overrides" && !store.paginatedOverrides.length) {
+        ovFetchData();
+    }
+});
+
 onMounted(() => {
-    fetchData();
+    schedFetchData();
 });
 
 const {
@@ -126,7 +136,7 @@ const {
 } = useConfirmAction({
     onSuccess: async () => {
         toast.success("Approved", "Schedule exception has been approved.");
-        await fetchData();
+        await ovFetchData();
     },
 });
 
@@ -151,13 +161,13 @@ const {
     },
     onSuccess: async () => {
         toast.success("Rejected", "Schedule exception has been rejected.");
-        await fetchData();
+        await ovFetchData();
     },
 });
 </script>
 
 <template>
-    <div :class="embedded ? '' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
+    <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
         <div class="space-y-6">
             <!-- Tabs -->
             <div class="bg-white border border-brand-border rounded-2xl p-3">
@@ -198,9 +208,19 @@ const {
                 </div>
             </div>
 
-            <!-- Search Section -->
+            <!-- Schedules Search: search only -->
             <SearchFilter
+                v-if="activeTab === 'schedules'"
                 placeholder="Search hybrid schedules..."
+                :filters="[]"
+                @search="schedHandleSearch"
+                @reset="schedHandleReset"
+            />
+
+            <!-- Exceptions Search: search + status filter -->
+            <SearchFilter
+                v-else
+                placeholder="Search by employee name..."
                 :filters="[
                     {
                         key: 'status',
@@ -213,15 +233,21 @@ const {
                         ],
                     },
                 ]"
-                @search="handleSearch"
-                @reset="handleReset"
+                @search="ovHandleSearch"
+                @reset="ovHandleReset"
             />
 
-            <Alert v-if="error" type="error" :message="error" dismissible @close="error = null" />
+            <Alert v-if="error" type="error" :message="error" dismissible @close="store.error = null" />
 
-            <!-- Data Table -->
-            <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">
-                <table v-if="activeTab === 'schedules'" class="min-w-full divide-y divide-brand-border">
+            <!-- Schedules Table -->
+            <DataTableCard
+                v-if="activeTab === 'schedules'"
+                :meta="meta"
+                :loading="loading"
+                @page-change="schedHandlePageChange"
+                @per-page-change="schedHandlePerPageChange"
+            >
+                <table class="min-w-full divide-y divide-brand-border">
                     <thead>
                         <tr class="bg-brand-border/20 border-b border-brand-border">
                             <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">
@@ -257,7 +283,7 @@ const {
                                     :subtitle="schedule?.staff_member?.staff_member_id || ''"
                                 />
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="py-4 px-6">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
                                     <div
                                         v-for="day in dayOrder"
@@ -278,15 +304,24 @@ const {
                                     </div>
                                 </div>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="py-4 px-6">
                                 <StatusBadge :value="getScheduleStatus(schedule)" type="status" />
                             </td>
                         </tr>
                         </template>
                     </tbody>
                 </table>
+            </DataTableCard>
 
-                <table v-else class="min-w-full divide-y divide-brand-border">
+            <!-- Exceptions Table — server-paginated independently -->
+            <DataTableCard
+                v-else
+                :meta="overridesMeta"
+                :loading="overridesLoading"
+                @page-change="ovHandlePageChange"
+                @per-page-change="ovHandlePerPageChange"
+            >
+                <table class="min-w-full divide-y divide-brand-border">
                     <thead>
                         <tr class="bg-brand-border/20 border-b border-brand-border">
                             <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">
@@ -314,14 +349,14 @@ const {
                     </thead>
                     <tbody class="divide-y divide-brand-border">
                         <TableStateRows
-                            :loading="loading"
+                            :loading="overridesLoading"
                             :empty="!overrideItems.length"
                             :colspan="7"
                             empty-icon="CalendarClock"
                             empty-title="No exceptions found"
                             empty-subtitle="When employees request schedule changes, they appear here for approval."
                         />
-                        <template v-if="overrideItems.length && !loading">
+                        <template v-if="overrideItems.length && !overridesLoading">
                         <tr
                             v-for="override in overrideItems"
                             :key="override.id"
@@ -329,14 +364,14 @@ const {
                         >
                             <td class="py-4 px-6">
                                 <EmployeeCell
-                                    :photo="override?.staff_member?.user?.profile_photo || override?.user?.profile_photo"
+                                    :photo="override?.staff_member?.user?.profile_photo"
                                     :name="override.employeeName"
                                 />
                             </td>
-                            <td class="px-6 py-4 text-sm text-brand-light">
+                            <td class="py-4 px-6 text-sm text-brand-light">
                                 {{ formatRequestDate(override.date) }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="py-4 px-6">
                                 <span
                                     class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border"
                                     :class="getPatternMeta(override.currentLocation).badgeClass"
@@ -348,48 +383,46 @@ const {
                                     {{ getPatternMeta(override.currentLocation).label }}
                                 </span>
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="py-4 px-6">
                                 <span
                                     class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full border"
-                                    :class="getPatternMeta(override.planned_work_mode || override.requested_location).badgeClass"
+                                    :class="getPatternMeta(override.planned_work_mode).badgeClass"
                                 >
                                     <component
-                                        :is="getPatternMeta(override.planned_work_mode || override.requested_location).icon"
+                                        :is="getPatternMeta(override.planned_work_mode).icon"
                                         class="w-3.5 h-3.5"
                                     />
-                                    {{ getPatternMeta(override.planned_work_mode || override.requested_location).label }}
+                                    {{ getPatternMeta(override.planned_work_mode).label }}
                                 </span>
                             </td>
                             <td
-                                class="px-6 py-4 text-sm text-brand-light max-w-[280px] truncate"
+                                class="py-4 px-6 text-sm text-brand-light max-w-[280px] truncate"
                                 :title="override.reason || '-'"
                             >
                                 {{ override.reason || "-" }}
                             </td>
-                            <td class="px-6 py-4">
+                            <td class="py-4 px-6">
                                 <StatusBadge :value="override.status || 'pending'" type="leave-status" />
                             </td>
-                            <td class="px-6 py-4">
-                                <div class="flex items-center gap-2">
+                            <td class="py-4 px-6">
+                                <div class="flex items-center justify-center gap-2">
                                     <button
                                         v-if="override.status === 'pending'"
                                         @click="showApproveModal(override)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-brand-border hover:border-green-500 hover:bg-green-50 transition-all"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-300"
+                                        aria-label="Approve schedule exception"
                                     >
-                                        <Check class="w-4 h-4 text-green-600" />
-                                        <span class="text-xs font-semibold text-brand-dark">Approve</span>
+                                        <Check class="w-4 h-4" />
                                     </button>
                                     <button
                                         v-if="override.status === 'pending'"
                                         @click="onRejectAction(override)"
-                                        class="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg border border-brand-border hover:border-red-500 hover:bg-red-50 transition-all"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300"
+                                        aria-label="Reject schedule exception"
                                     >
-                                        <X class="w-4 h-4 text-red-600" />
-                                        <span class="text-xs font-semibold text-brand-dark">Reject</span>
+                                        <X class="w-4 h-4" />
                                     </button>
-                                    <span v-if="override.status !== 'pending'" class="text-xs text-brand-light italic">
-                                        {{ override.status }}
-                                    </span>
+                                    <span v-if="override.status !== 'pending'" class="text-xs text-brand-light">—</span>
                                 </div>
                             </td>
                         </tr>
@@ -398,7 +431,6 @@ const {
                 </table>
             </DataTableCard>
         </div>
-    </div>
 
     <ModalWrapper
         :show="showApproveModalState"
@@ -422,12 +454,12 @@ const {
                     {{ formatRequestDate(selectedApproveOverride.date) }}
                 </p>
                 <p>
+                    <span class="font-semibold">Current schedule:</span>
+                    {{ getPatternMeta(selectedApproveOverride.currentLocation).label }}
+                </p>
+                <p>
                     <span class="font-semibold">Requested:</span>
-                    {{
-                        getPatternMeta(
-                            selectedApproveOverride.planned_work_mode || selectedApproveOverride.requested_location,
-                        ).label
-                    }}
+                    {{ getPatternMeta(selectedApproveOverride.planned_work_mode).label }}
                 </p>
             </div>
         </div>
@@ -461,11 +493,7 @@ const {
                 </p>
                 <p>
                     <span class="font-semibold">Requested:</span>
-                    {{
-                        getPatternMeta(
-                            selectedRejectOverride.planned_work_mode || selectedRejectOverride.requested_location,
-                        ).label
-                    }}
+                    {{ getPatternMeta(selectedRejectOverride.planned_work_mode).label }}
                 </p>
                 <p class="italic text-brand-light">"{{ selectedRejectOverride.reason || "-" }}"</p>
             </div>
@@ -495,4 +523,5 @@ const {
             />
         </template>
     </ModalWrapper>
+    </div>
 </template>
