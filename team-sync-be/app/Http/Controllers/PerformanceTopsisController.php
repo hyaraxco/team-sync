@@ -137,7 +137,7 @@ class PerformanceTopsisController extends Controller implements HasMiddleware
 
         $weights = [];
         foreach ($keys as $criterion => $param) {
-            $raw = (float) $request->get($param, self::DEFAULT_WEIGHTS[$criterion]);
+            $raw = (float) $request->input($param, self::DEFAULT_WEIGHTS[$criterion]);
             $weights[$criterion] = max(0.0, $raw);
 
             if ($raw < 0) {
