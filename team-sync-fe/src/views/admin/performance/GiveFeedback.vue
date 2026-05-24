@@ -89,8 +89,8 @@ onMounted(async () => {
             <EmptyState
                 v-else-if="!staffMembers.length"
                 icon="Users"
-                title="No Employees Available"
-                description="No staff members are available to receive feedback right now."
+                title="Karyawan belum tersedia"
+                description="Belum ada karyawan yang bisa menerima feedback saat ini."
             />
 
             <form v-else class="space-y-6" @submit.prevent="submitFeedback">

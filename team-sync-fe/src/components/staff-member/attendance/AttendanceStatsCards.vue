@@ -130,7 +130,7 @@ const formatLeaveType = (type) => {
                 </div>
 
                 <div v-else-if="leaveBalances.length === 0" class="text-center py-3">
-                    <p class="text-brand-light text-sm">No entitlements found</p>
+                    <p class="text-brand-light text-sm">Data hak cuti tidak ditemukan</p>
                 </div>
 
                 <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

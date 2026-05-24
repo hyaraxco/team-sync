@@ -72,28 +72,12 @@ const iconTextClass = computed(() => {
     return map[props.colorScheme] || "text-gray-600";
 });
 
-const borderClass = computed(() => {
-    const map = {
-        blue: "border-l-blue-500",
-        green: "border-l-green-500",
-        purple: "border-l-purple-500",
-        orange: "border-l-orange-500",
-        red: "border-l-red-500",
-        yellow: "border-l-yellow-500",
-        teal: "border-l-teal-500",
-        cyan: "border-l-cyan-500",
-        gray: "border-l-gray-500",
-    };
-    return map[props.colorScheme] || "border-l-gray-500";
-});
-
 const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 </script>
 
 <template>
     <div
-        :class="borderClass"
-        class="stats-card bg-white border border-brand-border border-l-4 rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200 p-4 sm:p-5"
+        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
     >
         <div class="flex items-center justify-between">
             <div>

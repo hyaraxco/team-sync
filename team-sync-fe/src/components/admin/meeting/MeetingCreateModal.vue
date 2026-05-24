@@ -215,7 +215,7 @@ const handleSubmit = async () => {
                             v-if="teamStore.teams.length === 0 && !teamStore.loading"
                             class="text-sm text-gray-500 italic"
                         >
-                            No teams available
+                            Tim belum tersedia
                         </div>
                         <div v-if="teamStore.loading" class="text-sm text-gray-500">Loading teams...</div>
                     </div>

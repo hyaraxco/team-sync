@@ -61,7 +61,7 @@ const goToTeamDetail = (id) => {
         </div>
 
         <!-- Empty State -->
-        <EmptyState v-else-if="!latestTeams || latestTeams.length === 0" icon="Briefcase" title="No teams found" />
+        <EmptyState v-else-if="!latestTeams || latestTeams.length === 0" icon="Briefcase" title="Belum ada tim" />
 
         <!-- Team List -->
         <div v-else class="space-y-4">

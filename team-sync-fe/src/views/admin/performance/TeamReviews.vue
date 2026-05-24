@@ -294,7 +294,7 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="Users"
-            title="No Team Reviews"
+            title="Belum ada review tim"
             description="You don't have any team members to review yet. Reviews will appear here when HR creates review cycles."
         />
     </div>

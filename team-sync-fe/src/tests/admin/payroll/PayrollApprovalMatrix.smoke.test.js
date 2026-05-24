@@ -102,7 +102,7 @@ describe("PayrollApprovalMatrix smoke", () => {
         expect(wrapper.text()).toContain("Payroll Approval Matrix");
         expect(wrapper.text()).toContain("Add Policy");
         expect(wrapper.text()).toContain(
-            "Configure threshold-based approval steps for payroll batches before payment",
+            "Konfigurasi langkah persetujuan berbasis threshold untuk batch payroll sebelum pembayaran.",
         );
     });
 
@@ -121,7 +121,7 @@ describe("PayrollApprovalMatrix smoke", () => {
         await nextTick();
         await Promise.resolve();
 
-        expect(wrapper.text()).toContain("No approval policies configured");
+        expect(wrapper.text()).toContain("Kebijakan persetujuan belum dikonfigurasi");
     });
 
     it("renders policy table when policies are loaded", async () => {

@@ -184,7 +184,7 @@ const getStatusConfig = (status) => statusConfig[status] || statusConfig["presen
         <!-- No Data -->
         <div v-else class="text-center py-8">
             <AlertCircle class="w-8 h-8 text-gray-300 mx-auto mb-2" />
-            <p class="text-sm text-brand-light">No attendance data available</p>
+            <p class="text-sm text-brand-light">Data kehadiran belum tersedia</p>
         </div>
     </div>
 </template>

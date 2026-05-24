@@ -1,33 +1,19 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { nextTick } from "vue";
+import { defineComponent, nextTick, ref } from "vue";
 
-const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = vi.hoisted(() => ({
+const testState = {
     attendanceStoreMock: {
         fetchAllPaginated: vi.fn(),
-    },
-    attendanceStoreRefs: {
-        paginatedAttendances: {
-            __v_isRef: true,
-            value: [],
-        },
-        meta: {
-            __v_isRef: true,
-            value: {
-                current_page: 1,
-                last_page: 1,
-                per_page: 10,
-                total: 0,
-            },
-        },
-        loading: {
-            __v_isRef: true,
-            value: false,
-        },
-        error: {
-            __v_isRef: true,
-            value: null,
-        },
+        paginatedAttendances: ref([]),
+        meta: ref({
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+        }),
+        loading: ref(false),
+        error: ref(null),
     },
     searchFilterState: {
         filters: {
@@ -40,28 +26,18 @@ const { attendanceStoreMock, attendanceStoreRefs, searchFilterState } = vi.hoist
         handlePageChange: vi.fn(),
         handlePerPageChange: vi.fn(),
     },
-}));
+};
+
+const { attendanceStoreMock, searchFilterState } = testState;
+globalThis.__attendanceRecordListTestState = testState;
 
 vi.mock("@/stores/attendance", () => ({
-    useAttendanceStore: () => attendanceStoreMock,
+    useAttendanceStore: () => globalThis.__attendanceRecordListTestState.attendanceStoreMock,
 }));
 
 vi.mock("@/composables/useSearchFilter", () => ({
-    useSearchFilter: () => searchFilterState,
+    useSearchFilter: () => globalThis.__attendanceRecordListTestState.searchFilterState,
 }));
-
-vi.mock("pinia", async (importOriginal) => {
-    const actual = await importOriginal();
-    return {
-        ...actual,
-        storeToRefs: (store) => {
-            if (store === attendanceStoreMock) {
-                return attendanceStoreRefs;
-            }
-            return {};
-        },
-    };
-});
 
 import AttendanceRecordList from "@/views/admin/attendance/AttendanceRecordList.vue";
 
@@ -76,13 +52,14 @@ const factory = () =>
         global: {
             stubs: {
                 SearchFilter: {
+                    name: "SearchFilter",
                     props: ["search"],
                     template: '<button class="search-trigger" @click="$emit(\'search\')">Search</button>',
                 },
-                Pagination: { template: '<div class="pagination-stub"></div>' },
-                Alert: { template: '<div class="alert-stub"></div>' },
-                EmptyState: { template: '<div class="empty-state-stub"></div>' },
-                StatusBadge: { template: '<div class="status-badge-stub"></div>' },
+                Pagination: defineComponent({ name: "Pagination", template: '<div class="pagination-stub"></div>' }),
+                Alert: defineComponent({ name: "Alert", template: '<div class="alert-stub"></div>' }),
+                EmptyState: defineComponent({ name: "EmptyState", template: '<div class="empty-state-stub"></div>' }),
+                StatusBadge: defineComponent({ name: "StatusBadge", template: '<div class="status-badge-stub"></div>' }),
             },
         },
     });
@@ -110,5 +87,17 @@ describe("AttendanceRecordList smoke", () => {
         await wrapper.find(".search-trigger").trigger("click");
 
         expect(searchFilterState.handleSearch).toHaveBeenCalled();
+    });
+
+    it("keeps standardized list helpers with accessible page heading", () => {
+        const wrapper = factory();
+
+        expect(wrapper.find(".search-trigger").exists()).toBe(true);
+        expect(wrapper.find(".empty-state-stub").exists()).toBe(true);
+        const pageHeading = wrapper.find('[role="heading"][aria-level="1"]');
+        expect(pageHeading.exists()).toBe(true);
+        expect(pageHeading.text()).toBe("Attendance Logs");
+        expect(pageHeading.classes()).toContain("sr-only");
+        expect(wrapper.find("h1").exists()).toBe(false);
     });
 });
