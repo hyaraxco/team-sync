@@ -12,7 +12,10 @@ interface LeaveRequestRepositoryInterface
 
     public function getAllPaginated(
         ?string $search,
-        int $rowPerPage
+        int $rowPerPage,
+        ?string $status = null,
+        ?string $dateFrom = null,
+        ?string $dateTo = null
     );
 
     public function getById(
