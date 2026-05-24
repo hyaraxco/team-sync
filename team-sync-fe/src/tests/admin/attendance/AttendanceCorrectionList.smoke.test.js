@@ -159,8 +159,8 @@ describe("AttendanceCorrectionList smoke", () => {
                 {
                     id: "1",
                     status: "pending",
-                    requested_check_in: "2026-04-20T09:00:00Z",
-                    requested_check_out: "2026-04-20T18:00:00Z",
+                    requested_check_in: "2026-04-20 09:00:00",
+                    requested_check_out: "2026-04-20 16:00:00",
                     reason: "forgot",
                 },
             ];
@@ -204,8 +204,8 @@ describe("AttendanceCorrectionList smoke", () => {
                 {
                     id: "1",
                     status: "pending",
-                    requested_check_in: "2026-04-20T09:00:00Z",
-                    requested_check_out: "2026-04-20T18:00:00Z",
+                    requested_check_in: "2026-04-20 09:00:00",
+                    requested_check_out: "2026-04-20 16:00:00",
                     reason: "forgot",
                 },
             ];
