@@ -166,7 +166,7 @@ class OvertimeController extends Controller implements HasMiddleware
             $records = $this->overtimeService->getByStaffMember(
                 $staffMember->id,
                 $request->query('status'),
-                (int) $request->get('per_page', 15)
+                (int) $request->input('per_page', 15)
             );
 
             return ResponseHelper::jsonResponse(

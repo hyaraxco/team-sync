@@ -39,7 +39,7 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
             $query->where('staff_member_id', $request->staff_member_id);
         }
 
-        $adjustments = $query->paginate($request->get('per_page', 15));
+        $adjustments = $query->paginate($request->input('per_page', 15));
 
         return ResponseHelper::jsonResponse(true, 'Payroll Adjustments Retrieved Successfully', $adjustments, 200);
     }
