@@ -117,8 +117,8 @@ describe("MeetingList smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        expect(wrapper.text()).toContain("No meetings scheduled yet");
-        expect(wrapper.text()).toContain("Create your first meeting to get started");
+        expect(wrapper.text()).toContain("Belum ada jadwal meeting");
+        expect(wrapper.text()).toContain("Jadwalkan meeting baru untuk memulai");
     });
 
     it("shows Schedule Meeting button when user has meeting-create permission", async () => {

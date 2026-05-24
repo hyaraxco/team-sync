@@ -2,6 +2,89 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================
+   CSS Custom Properties — Dark Mode Token System
+   Toggle dark mode by adding/removing .dark on <html>
+   ============================================================ */
+
+:root {
+    /* Brand colors */
+    --color-brand-dark: #0C1C3C;
+    --color-brand-light: #6B7280;
+    --color-brand-border: #DCDEDD;
+    --color-brand-primary: #0C51D9;
+
+    /* Surface layers */
+    --color-surface: #ffffff;           /* bg-white → bg-surface */
+    --color-surface-raised: #f9fafb;    /* bg-gray-50 → bg-surface-raised */
+    --color-surface-overlay: #f3f4f6;   /* bg-gray-100 → bg-surface-overlay */
+    --color-surface-muted: #e5e7eb;     /* bg-gray-200 */
+    --color-surface-subtle: #f0f4ff;    /* bg-blue-50 tinted */
+
+    /* Borders */
+    --color-border-default: #e5e7eb;    /* border-gray-200 */
+    --color-border-muted: #f3f4f6;      /* border-gray-100 */
+
+    /* Text */
+    --color-text-primary: #0C1C3C;      /* text-brand-dark */
+    --color-text-secondary: #6B7280;    /* text-brand-light / text-gray-500 */
+    --color-text-muted: #9CA3AF;        /* text-gray-400 */
+    --color-text-disabled: #D1D5DB;     /* text-gray-300 */
+
+    /* Sidebar */
+    --sidebar-bg: #ffffff;
+    --sidebar-border: #DCDEDD;
+    --sidebar-nav-bg: #ffffff;
+    --sidebar-nav-hover: #f3f4f6;
+    --sidebar-section-title: #6B7280;
+
+    /* Header */
+    --header-bg: #ffffff;
+    --header-border: #DCDEDD;
+
+    /* Main content area */
+    --main-bg: #f9fafb;
+}
+
+.dark {
+    /* Brand colors — dark mode */
+    --color-brand-dark: #F1F5F9;
+    --color-brand-light: #94A3B8;
+    --color-brand-border: #334155;
+    --color-brand-primary: #3B82F6;
+
+    /* Surface layers — dark mode */
+    --color-surface: #1E293B;           /* dark card bg */
+    --color-surface-raised: #0F172A;    /* dark page bg */
+    --color-surface-overlay: #273549;   /* dark elevated surface */
+    --color-surface-muted: #334155;     /* dark divider/muted bg */
+    --color-surface-subtle: #1E3A5F;    /* dark blue-tinted surface */
+
+    /* Borders — dark mode */
+    --color-border-default: #334155;
+    --color-border-muted: #1E293B;
+
+    /* Text — dark mode */
+    --color-text-primary: #F1F5F9;
+    --color-text-secondary: #94A3B8;
+    --color-text-muted: #64748B;
+    --color-text-disabled: #475569;
+
+    /* Sidebar — dark mode */
+    --sidebar-bg: #0F172A;
+    --sidebar-border: #1E293B;
+    --sidebar-nav-bg: #0F172A;
+    --sidebar-nav-hover: #1E293B;
+    --sidebar-section-title: #64748B;
+
+    /* Header — dark mode */
+    --header-bg: #1E293B;
+    --header-border: #334155;
+
+    /* Main content area — dark mode */
+    --main-bg: #0F172A;
+}
+
 @layer utilities {
     .scrollbar-hide {
         -ms-overflow-style: none;
@@ -34,7 +117,9 @@
 
 html {
     font-family: "Plus Jakarta Sans", sans-serif;
-    color: #0C1C3C;
+    color: var(--color-brand-dark);
+    background-color: var(--main-bg);
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .blue-gradient {
@@ -48,12 +133,12 @@ html {
 
 /* Typography styles */
 .text-brand-dark {
-    color: #0C1C3C;
+    color: var(--color-brand-dark);
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
 .text-brand-light {
-    color: #6B7280;
+    color: var(--color-brand-light);
     font-family: 'Plus Jakarta Sans', sans-serif;
 }
 
@@ -118,17 +203,17 @@ html {
     align-items: center;
     gap: 0.5rem;
     padding: 0.625rem 1.25rem;
-    background-color: #fff;
-    color: #374151;
+    background-color: var(--color-surface);
+    color: var(--color-brand-dark);
     font-weight: 500;
     font-size: 0.875rem;
-    border: 1px solid #DCDEDD;
+    border: 1px solid var(--color-brand-border);
     border-radius: 0.5rem;
     transition: background-color 0.15s ease, transform 0.1s ease;
 }
 
 .btn-secondary:hover {
-    background-color: #f9fafb;
+    background-color: var(--color-surface-raised);
 }
 
 .btn-secondary:active {
@@ -160,7 +245,8 @@ html {
     align-items: center;
     gap: 10px;
     align-self: stretch;
-    background: #FFF;
+    background: var(--sidebar-nav-bg);
+    transition: background-color 0.15s ease;
 }
 
 .nav-link-active {
@@ -182,7 +268,7 @@ html {
 
 /* Section headers */
 .section-title {
-    color: #0C1C3C;
+    color: var(--sidebar-section-title);
     font-family: 'Plus Jakarta Sans', sans-serif;
     font-size: 12px;
     font-style: normal;
@@ -260,8 +346,8 @@ html {
     left: calc(100% + 12px);
     top: 50%;
     transform: translateY(-50%);
-    background: #0C1C3C;
-    color: #fff;
+    background: var(--color-brand-dark);
+    color: var(--color-surface);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 12px;
@@ -282,7 +368,7 @@ html {
     top: 50%;
     transform: translateY(-50%);
     border: 5px solid transparent;
-    border-right-color: #0C1C3C;
+    border-right-color: var(--color-brand-dark);
     z-index: 9999;
     pointer-events: none;
     opacity: 0;
@@ -363,4 +449,223 @@ html {
         top: 0;
         width: 100%;
     }
+}
+
+/* ============================================================
+   Dark Mode Overrides — bg-white, bg-gray-*, border-gray-*
+   These override Tailwind's hardcoded values in dark mode
+   ============================================================ */
+
+/* Surface overrides */
+.dark .bg-white {
+    background-color: var(--color-surface) !important;
+}
+
+.dark .bg-gray-50 {
+    background-color: var(--color-surface-raised) !important;
+}
+
+.dark .bg-gray-100 {
+    background-color: var(--color-surface-overlay) !important;
+}
+
+.dark .bg-gray-200 {
+    background-color: var(--color-surface-muted) !important;
+}
+
+.dark .bg-blue-50 {
+    background-color: var(--color-surface-subtle) !important;
+}
+
+.dark .bg-blue-100 {
+    background-color: rgba(30, 58, 95, 0.8) !important;
+}
+
+/* Border overrides */
+.dark .border-gray-100 {
+    border-color: var(--color-border-muted) !important;
+}
+
+.dark .border-gray-200 {
+    border-color: var(--color-border-default) !important;
+}
+
+.dark .border-gray-300 {
+    border-color: #475569 !important;
+}
+
+.dark .border-slate-200 {
+    border-color: var(--color-border-default) !important;
+}
+
+/* Text overrides */
+.dark .text-gray-900 {
+    color: var(--color-text-primary) !important;
+}
+
+.dark .text-gray-800 {
+    color: #E2E8F0 !important;
+}
+
+.dark .text-gray-700 {
+    color: #CBD5E1 !important;
+}
+
+.dark .text-gray-600 {
+    color: var(--color-text-secondary) !important;
+}
+
+.dark .text-gray-500 {
+    color: var(--color-text-secondary) !important;
+}
+
+.dark .text-gray-400 {
+    color: var(--color-text-muted) !important;
+}
+
+.dark .text-gray-300 {
+    color: var(--color-text-disabled) !important;
+}
+
+.dark .text-slate-900 {
+    color: var(--color-text-primary) !important;
+}
+
+.dark .text-slate-700 {
+    color: #CBD5E1 !important;
+}
+
+.dark .text-slate-500 {
+    color: var(--color-text-secondary) !important;
+}
+
+/* Hover state overrides */
+.dark .hover\:bg-gray-50:hover {
+    background-color: var(--color-surface-overlay) !important;
+}
+
+.dark .hover\:bg-gray-100:hover {
+    background-color: var(--color-surface-muted) !important;
+}
+
+/* Divide overrides */
+.dark .divide-gray-100 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--color-border-muted) !important;
+}
+
+.dark .divide-gray-200 > :not([hidden]) ~ :not([hidden]) {
+    border-color: var(--color-border-default) !important;
+}
+
+/* Ring overrides */
+.dark .ring-gray-200 {
+    --tw-ring-color: var(--color-border-default) !important;
+}
+
+/* Shadow overrides — lighten shadows in dark mode */
+.dark .shadow-sm {
+    --tw-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.3) !important;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.dark .shadow {
+    --tw-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+.dark .shadow-md {
+    --tw-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4) !important;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow) !important;
+}
+
+/* Gradient overrides */
+.dark .from-slate-50 {
+    --tw-gradient-from: var(--color-surface-raised) !important;
+}
+
+.dark .to-blue-50 {
+    --tw-gradient-to: var(--color-surface) !important;
+}
+
+.dark .from-blue-50 {
+    --tw-gradient-from: var(--color-surface-subtle) !important;
+}
+
+.dark .to-blue-100 {
+    --tw-gradient-to: rgba(30, 58, 95, 0.8) !important;
+}
+
+/* Auth layout dark mode */
+.dark .auth-shell {
+    background: linear-gradient(to bottom right, var(--color-surface-raised), var(--color-surface), #0a1628) !important;
+}
+
+/* Notification panel dark mode */
+.dark .border-b {
+    border-bottom-color: var(--color-border-default);
+}
+
+/* Input/form elements */
+.dark input:not([type="checkbox"]):not([type="radio"]),
+.dark textarea,
+.dark select {
+    background-color: var(--color-surface-overlay);
+    border-color: var(--color-border-default);
+    color: var(--color-text-primary);
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+/* Table overrides */
+.dark table {
+    background-color: var(--color-surface);
+}
+
+.dark thead {
+    background-color: var(--color-surface-raised);
+}
+
+.dark tbody tr:hover {
+    background-color: var(--color-surface-overlay) !important;
+}
+
+.dark th {
+    color: var(--color-text-secondary);
+    border-color: var(--color-border-default);
+}
+
+.dark td {
+    border-color: var(--color-border-muted);
+}
+
+/* Slate color overrides */
+.dark .bg-slate-50 {
+    background-color: var(--color-surface-raised) !important;
+}
+
+.dark .bg-slate-100 {
+    background-color: var(--color-surface-overlay) !important;
+}
+
+.dark .bg-slate-200 {
+    background-color: var(--color-surface-muted) !important;
+}
+
+.dark .text-slate-400 {
+    color: var(--color-text-muted) !important;
+}
+
+.dark .text-slate-600 {
+    color: var(--color-text-secondary) !important;
+}
+
+.dark .text-slate-800 {
+    color: #E2E8F0 !important;
+}
+
+.dark .border-slate-100 {
+    border-color: var(--color-border-muted) !important;
 }

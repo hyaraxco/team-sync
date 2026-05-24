@@ -265,6 +265,6 @@ describe("PayrollDashboard smoke", () => {
         await Promise.resolve();
 
         expect(wrapper.find('[data-testid="payroll-analytics-empty"]').exists()).toBe(true);
-        expect(wrapper.text()).toContain("No analytics data yet");
+        expect(wrapper.text()).toContain("Data analitik belum tersedia");
     });
 });

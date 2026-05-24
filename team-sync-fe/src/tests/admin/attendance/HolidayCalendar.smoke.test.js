@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import { nextTick, ref } from "vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 
 const paginatedHolidays = ref([]);
 const loading = ref(false);
@@ -87,6 +88,25 @@ describe("HolidayCalendar smoke", () => {
     it("displays Add Holiday button", () => {
         const wrapper = createWrapper();
         expect(wrapper.text()).toContain("Add Holiday");
+    });
+
+    it("preserves semantic heading without visible duplicate local h1", () => {
+        const wrapper = createWrapper();
+        const semanticHeading = wrapper.find('[role="heading"][aria-level="1"]');
+
+        expect(semanticHeading.exists()).toBe(true);
+        expect(semanticHeading.text()).toBe("Holiday Calendar");
+        expect(semanticHeading.classes()).toContain("sr-only");
+        expect(wrapper.findAll("h1")).toHaveLength(0);
+    });
+
+    it("renders English empty state", () => {
+        const wrapper = createWrapper();
+        const emptyState = wrapper.findComponent(EmptyState);
+
+        expect(emptyState.exists()).toBe(true);
+        expect(emptyState.props("title")).toBe("No holidays found");
+        expect(emptyState.props("subtitle")).toBe("Add a holiday to start building the company calendar.");
     });
 
     it("Add Holiday button opens modal", async () => {

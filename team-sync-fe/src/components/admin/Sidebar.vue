@@ -8,7 +8,6 @@ import {
     ArrowRightIcon,
     UserIcon,
     CalendarIcon,
-    Clock3Icon,
     WalletIcon,
     FileWarningIcon,
     BarChart3Icon,
@@ -39,7 +38,8 @@ const onNavigate = () => closeMobile();
     <!-- Sidebar -->
     <aside
         id="sidebar"
-        class="fixed lg:relative inset-y-0 left-0 z-50 bg-white border-r border-gray-200 flex flex-col transform transition-all duration-300 ease-in-out"
+        class="fixed lg:relative inset-y-0 left-0 z-50 border-r flex flex-col transform transition-all duration-200 ease-in-out"
+        style="background-color: var(--sidebar-bg); border-color: var(--sidebar-border)"
         :style="{ width: isCollapsed ? '68px' : '256px', minWidth: isCollapsed ? '68px' : '256px' }"
         :class="[
             isOpen ? 'translate-x-0' : '-translate-x-full',
@@ -656,35 +656,7 @@ const onNavigate = () => closeMobile();
                         </span>
                     </RouterLink>
 
-                    <!-- 2. My Overtime (payroll/attendance self service) -->
-                    <RouterLink
-                        :to="{ name: 'staffMember.attendance.my-overtime' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'staffMember.attendance.my-overtime',
-                        }"
-                        v-if="canOneOf(['attendance-my-attendances', 'overtime-list', 'overtime-create'])"
-                        data-tooltip="My Overtime"
-                        @click="onNavigate"
-                    >
-                        <Clock3Icon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'staffMember.attendance.my-overtime',
-                            }"
-                        />
-                        <span
-                            v-show="!isCollapsed"
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'staffMember.attendance.my-overtime',
-                            }"
-                        >
-                            My Overtime
-                        </span>
-                    </RouterLink>
-
-                    <!-- 3. My Team (frequent collaboration) -->
+                    <!-- 2. My Team (frequent collaboration) -->
                     <RouterLink
                         :to="{ name: 'staffMember.team' }"
                         class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
@@ -830,9 +802,9 @@ const onNavigate = () => closeMobile();
                     </div>
 
                     <!-- Content -->
-                    <h4 class="text-brand-dark text-base font-bold mb-1">Upgrade to Pro</h4>
+                    <h4 class="text-brand-dark text-base font-bold mb-1">Team Sync Pro</h4>
                     <p class="text-brand-dark text-sm font-normal leading-5 mb-4">
-                        Unlock advanced features and insights
+                        Multi-tenancy, SSO, dan laporan lanjutan.
                     </p>
 
                     <!-- CTA Button -->

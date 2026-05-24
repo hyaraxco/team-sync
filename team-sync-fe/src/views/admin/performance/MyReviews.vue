@@ -229,7 +229,7 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="FileText"
-            title="No Performance Reviews"
+            title="Belum ada review performa"
             description="You don't have any performance reviews yet. Reviews will appear here when your manager creates them."
         />
     </div>

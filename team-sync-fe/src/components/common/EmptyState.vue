@@ -1,9 +1,22 @@
 <script setup>
-import { SearchX, Users, Briefcase, CalendarClock, FileText, InboxIcon } from "lucide-vue-next";
+import { 
+    SearchX, 
+    Users, 
+    Briefcase, 
+    CalendarClock, 
+    FileText, 
+    InboxIcon,
+    Video,
+    Bell,
+    Layout,
+    Target,
+    BarChart3,
+    Calendar
+} from "lucide-vue-next";
 
 const props = defineProps({
     /**
-     * Icon name to display: 'SearchX', 'Users', 'Briefcase', 'CalendarClock', 'FileText', 'Inbox'
+     * Icon name to display: 'SearchX', 'Users', 'Briefcase', 'CalendarClock', 'FileText', 'Inbox', 'Video', 'Bell', 'Layout', 'Target', 'BarChart3', 'Calendar'
      */
     icon: {
         type: String,
@@ -39,6 +52,12 @@ const iconMap = {
     CalendarClock,
     FileText,
     Inbox: InboxIcon,
+    Video,
+    Bell,
+    Layout,
+    Target,
+    BarChart3,
+    Calendar
 };
 
 const iconComponent = iconMap[props.icon] || InboxIcon;
@@ -54,9 +73,22 @@ const sizes = sizeClasses[props.size] || sizeClasses.md;
 
 <template>
     <div :class="['text-center', sizes.wrapper]">
-        <component :is="iconComponent" :class="['text-gray-400 mx-auto', sizes.icon]" />
-        <p :class="['text-gray-500 font-medium', sizes.title]">{{ title }}</p>
-        <p v-if="subtitle" :class="['text-gray-400 mt-1', sizes.subtitle]">
+        <component 
+            :is="iconComponent" 
+            :class="['mx-auto', sizes.icon]"
+            :style="{ color: 'var(--color-text-muted)' }"
+        />
+        <p 
+            :class="['font-medium', sizes.title]"
+            :style="{ color: 'var(--color-text-primary)' }"
+        >
+            {{ title }}
+        </p>
+        <p 
+            v-if="subtitle" 
+            :class="['mt-1', sizes.subtitle]"
+            :style="{ color: 'var(--color-text-secondary)' }"
+        >
             {{ subtitle }}
         </p>
         <slot />

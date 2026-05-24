@@ -720,7 +720,7 @@ watch(
                 <EmptyState
                     v-if="filteredTeams.length === 0"
                     icon="SearchX"
-                    title="No teams found"
+                    title="Belum ada tim"
                     subtitle="Try adjusting your search terms"
                 />
             </div>

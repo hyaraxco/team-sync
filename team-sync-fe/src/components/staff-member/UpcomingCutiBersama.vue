@@ -47,6 +47,6 @@ onMounted(() => {
     </div>
     <div v-else-if="!loading" class="bg-gray-50 border border-gray-200 rounded-lg p-4 text-center">
         <Calendar class="w-8 h-8 text-gray-400 mx-auto mb-2" />
-        <p class="text-sm text-gray-600">No upcoming cuti bersama this year</p>
+        <p class="text-sm text-gray-600">Belum ada cuti bersama tahun ini</p>
     </div>
 </template>

@@ -662,7 +662,7 @@ watch(
                                     {{ review.final_rating_label || getRatingLabel(review.final_rating)?.label }}
                                 </span>
                             </div>
-                            <p v-else class="text-sm text-brand-light italic">No final rating yet</p>
+                            <p v-else class="text-sm text-brand-light italic">Belum ada nilai akhir</p>
                         </div>
                     </MainCard>
                 </div>
@@ -1028,7 +1028,7 @@ watch(
                                     </p>
                                 </div>
                                 <div v-else class="text-sm text-brand-light italic">
-                                    No self-assessment submitted yet
+                                    Belum ada self-assessment dikirim
                                 </div>
                             </template>
                         </div>
@@ -1201,7 +1201,7 @@ watch(
                                     </p>
                                 </div>
                                 <div v-else class="text-sm text-brand-light italic">
-                                    No manager assessment submitted yet
+                                    Belum ada penilaian manajer dikirim
                                 </div>
                             </template>
                         </div>
@@ -1564,7 +1564,7 @@ watch(
             v-else-if="!reviewsLoading"
             icon="SearchX"
             title="Review Not Found"
-            subtitle="The review you're looking for doesn't exist or you don't have access to it."
+            subtitle="Review yang Anda cari tidak ada atau Anda tidak memiliki akses."
         />
 
         <!-- Confirmation Modal -->

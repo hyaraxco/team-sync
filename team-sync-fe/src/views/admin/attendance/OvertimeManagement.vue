@@ -1,32 +1,40 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { storeToRefs } from "pinia";
-import { Check, X, Plus, Timer, AlertCircle } from "lucide-vue-next";
+import { Check, X, Plus, Clock } from "lucide-vue-next";
 import { useOvertimeStore } from "@/stores/overtime";
 import { useStaffMemberStore } from "@/stores/staffMember";
-import { formatDateShort } from "@/utils/dateUtils";
-import Pagination from "@/components/admin/team/Pagination.vue";
-import EmptyState from "@/components/common/EmptyState.vue";
+import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils";
+import DataTableCard from "@/components/common/DataTableCard.vue";
+import TableStateRows from "@/components/common/TableStateRows.vue";
+import EmployeeCell from "@/components/common/EmployeeCell.vue";
+import ModalFooterActions from "@/components/common/ModalFooterActions.vue";
+import ModalConfirmBanner from "@/components/common/ModalConfirmBanner.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import SearchFilter from "@/components/common/SearchFilter.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import { useConfirmAction } from "@/composables/useConfirmAction";
+import { useRejectWithReason } from "@/composables/useRejectWithReason";
 import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
+
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const store = useOvertimeStore();
 const staffMemberStore = useStaffMemberStore();
 const { records, meta, loading, error, summary } = storeToRefs(store);
 const toast = useToast();
 
-const statusFilter = ref("");
 const showCreateModal = ref(false);
-const showRejectModal = ref(false);
-const rejectingRecord = ref(null);
-const rejectionReason = ref("");
 
 const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
     defaultFilters: { search: null, status: "" },
-    fetchFn: (params) => store.fetchOvertimeRecords({ ...params, status: statusFilter.value }),
+    fetchFn: (params) => store.fetchOvertimeRecords(params),
 });
 
 const createForm = ref({
@@ -42,11 +50,6 @@ onMounted(async () => {
     fetchData();
     store.fetchOvertimeSummary();
 });
-
-const handleStatusFilter = (status) => {
-    statusFilter.value = status;
-    fetchData();
-};
 
 const getStatusBadge = (status) => {
     switch (status) {
@@ -72,6 +75,9 @@ const getTypeBadge = (type) => {
     }
 };
 
+const formatTime = (timeStr) => (timeStr ? formatTimeUtil(timeStr) : "-");
+const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
+
 // Approve
 const {
     isModalOpen: showApproveModalState,
@@ -94,26 +100,27 @@ const confirmApprove = () =>
     });
 
 // Reject
-const openRejectModal = (record) => {
-    rejectingRecord.value = record;
-    rejectionReason.value = "";
-    showRejectModal.value = true;
-};
-
-const confirmReject = async () => {
-    if (!rejectingRecord.value || rejectionReason.value.length < 10) return;
-    try {
-        await store.rejectOvertime(rejectingRecord.value.id, rejectionReason.value);
+const {
+    showRejectModal,
+    rejectingItem: rejectingRecord,
+    rejectReason: rejectionReason,
+    processingReject,
+    isReasonValid,
+    openRejectModal,
+    closeRejectModal,
+    confirmReject,
+    minLength: rejectMinLength,
+} = useRejectWithReason({
+    rejectFn: async (record, reason) => {
+        await store.rejectOvertime(record.id, reason);
+    },
+    onSuccess: async () => {
         toast.success("Rejected", "Overtime record has been rejected.");
-        showRejectModal.value = false;
-        rejectingRecord.value = null;
-        rejectionReason.value = "";
         await fetchData();
         store.fetchOvertimeSummary();
-    } catch (_e) {
-        toast.error("Error", "Failed to reject overtime record.");
-    }
-};
+    },
+    minLength: 10,
+});
 
 // Create
 const openCreateModal = () => {
@@ -142,308 +149,253 @@ const submitCreate = async () => {
 </script>
 
 <template>
-    <div class="space-y-6">
+    <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
         <!-- Header -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h1 class="text-2xl font-bold text-gray-900">Overtime Management</h1>
-                <p class="text-sm text-gray-500 mt-1">Manage employee overtime records and approvals</p>
-            </div>
+        <div v-if="!embedded" class="flex items-center justify-between">
+            <div></div>
             <button
                 v-if="can('overtime-create')"
                 @click="openCreateModal"
-                class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
             >
-                <Plus class="h-4 w-4" />
-                Record Overtime
+                <Plus class="h-4 w-4 text-white" />
+                <span class="text-brand-white text-sm font-semibold">Record Overtime</span>
             </button>
         </div>
 
-        <!-- Summary Cards -->
-        <div v-if="summary" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-white rounded-lg border p-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-amber-100 rounded-lg">
-                        <AlertCircle class="h-5 w-5 text-amber-600" />
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Pending</p>
-                        <p class="text-xl font-bold text-gray-900">{{ summary.total_pending }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg border p-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-green-100 rounded-lg">
-                        <Check class="h-5 w-5 text-green-600" />
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Approved This Month</p>
-                        <p class="text-xl font-bold text-gray-900">{{ summary.approved_this_month }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg border p-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-blue-100 rounded-lg">
-                        <Timer class="h-5 w-5 text-blue-600" />
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Total Hours This Month</p>
-                        <p class="text-xl font-bold text-gray-900">{{ summary.total_hours_this_month }}h</p>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white rounded-lg border p-4">
-                <div class="flex items-center gap-3">
-                    <div class="p-2 bg-red-100 rounded-lg">
-                        <X class="h-5 w-5 text-red-600" />
-                    </div>
-                    <div>
-                        <p class="text-sm text-gray-500">Rejected This Month</p>
-                        <p class="text-xl font-bold text-gray-900">{{ summary.rejected_this_month }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
         <!-- Filters -->
-        <div class="bg-white rounded-lg border p-4">
-            <div class="flex flex-wrap items-center gap-3">
-                <button
-                    @click="handleStatusFilter('')"
-                    :class="[
-                        'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === '' ? 'bg-gray-900 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200',
-                    ]"
-                >
-                    All
-                </button>
-                <button
-                    @click="handleStatusFilter('pending')"
-                    :class="[
-                        'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === 'pending'
-                            ? 'bg-amber-600 text-white'
-                            : 'bg-amber-50 text-amber-700 hover:bg-amber-100',
-                    ]"
-                >
-                    Pending
-                </button>
-                <button
-                    @click="handleStatusFilter('approved')"
-                    :class="[
-                        'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === 'approved'
-                            ? 'bg-green-600 text-white'
-                            : 'bg-green-50 text-green-700 hover:bg-green-100',
-                    ]"
-                >
-                    Approved
-                </button>
-                <button
-                    @click="handleStatusFilter('rejected')"
-                    :class="[
-                        'px-3 py-1.5 rounded-full text-sm font-medium transition',
-                        statusFilter === 'rejected'
-                            ? 'bg-red-600 text-white'
-                            : 'bg-red-50 text-red-700 hover:bg-red-100',
-                    ]"
-                >
-                    Rejected
-                </button>
-            </div>
+        <div class="mb-6">
+            <SearchFilter
+                placeholder="Search overtime records..."
+                :filters="[
+                    {
+                        key: 'status',
+                        label: 'All Status',
+                        icon: 'CheckCircle',
+                        options: [
+                            { value: 'pending', label: 'Pending' },
+                            { value: 'approved', label: 'Approved' },
+                            { value: 'rejected', label: 'Rejected' },
+                        ],
+                    },
+                ]"
+                @search="handleSearch"
+                @reset="handleReset"
+            />
         </div>
 
         <!-- Table -->
-        <div class="bg-white rounded-lg border overflow-hidden">
-            <div v-if="loading" class="p-8 text-center text-gray-500">Loading...</div>
-            <EmptyState
-                v-else-if="!records.length"
-                title="No overtime records"
-                description="No overtime records found for the selected filters."
-            />
-            <table v-else class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Employee</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Time</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hours</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    <tr v-for="record in records" :key="record.id" class="hover:bg-gray-50">
-                        <td class="px-4 py-3 text-sm text-gray-900">
-                            {{ record.staff_member?.user?.name || "-" }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-600">
-                            {{ formatDateShort(record.date) }}
-                        </td>
-                        <td class="px-4 py-3 text-sm text-gray-600">{{ record.start_time }} - {{ record.end_time }}</td>
-                        <td class="px-4 py-3 text-sm font-medium text-gray-900">{{ record.hours }}h</td>
-                        <td class="px-4 py-3">
-                            <span
-                                :class="[
-                                    'px-2 py-0.5 rounded-full text-xs font-medium',
-                                    getTypeBadge(record.overtime_type),
-                                ]"
-                            >
-                                {{ record.overtime_type }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <span
-                                :class="['px-2 py-0.5 rounded-full text-xs font-medium', getStatusBadge(record.status)]"
-                            >
-                                {{ record.status }}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">
-                            <div
-                                v-if="record.status === 'pending' && can('overtime-approve')"
-                                class="flex items-center gap-2"
-                            >
-                                <button
-                                    @click="showApproveModal(record)"
-                                    class="p-1.5 rounded-md bg-green-50 text-green-600 hover:bg-green-100 transition"
-                                    title="Approve"
-                                >
-                                    <Check class="h-4 w-4" />
-                                </button>
-                                <button
-                                    @click="openRejectModal(record)"
-                                    class="p-1.5 rounded-md bg-red-50 text-red-600 hover:bg-red-100 transition"
-                                    title="Reject"
-                                >
-                                    <X class="h-4 w-4" />
-                                </button>
-                            </div>
-                            <span v-else class="text-xs text-gray-400">-</span>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">
+                <table class="min-w-full divide-y divide-brand-border">
+                    <thead>
+                        <tr class="bg-brand-border/20 border-b border-brand-border">
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Employee
+                            </th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Date
+                            </th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Time
+                            </th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Hours
+                            </th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Type
+                            </th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Status
+                            </th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">
+                                Actions
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-border">
+                        <TableStateRows
+                            :loading="loading"
+                            :empty="!records || records.length === 0"
+                            :colspan="7"
+                            empty-icon="Timer"
+                            empty-title="No overtime records found"
+                            empty-subtitle="Adjust your filters or wait for employees to log overtime."
+                        />
+                        <template v-if="records && records.length > 0 && !loading">
+                        <tr v-for="record in records" :key="record.id" class="hover:bg-brand-gray/50">
+                            <td class="py-4 px-6">
+                                <EmployeeCell
+                                    :photo="record.staff_member?.user?.profile_photo"
+                                    :name="record.staff_member?.user?.name || record.staff_member?.full_name || ''"
+                                    :subtitle="record.staff_member?.code || ''"
+                                />
+                            </td>
 
-            <div v-if="records.length" class="border-t px-4 py-3">
-                <Pagination :meta="meta" @page-change="handlePageChange" />
-            </div>
-        </div>
+                            <td class="py-4 px-6 text-center">
+                                <span class="text-sm text-brand-dark font-medium">{{ formatDate(record.date) }}</span>
+                            </td>
+
+                            <td class="py-4 px-6 text-center">
+                                <div class="inline-flex items-center gap-1.5 px-3 py-1 bg-brand-border/20 rounded-lg border border-brand-border">
+                                    <Clock class="w-3.5 h-3.5 text-brand-light" />
+                                    <span class="text-sm font-medium text-brand-dark tabular-nums">
+                                        {{ formatTime(record.start_time) }} - {{ formatTime(record.end_time) }}
+                                    </span>
+                                </div>
+                            </td>
+
+                            <td class="py-4 px-6 text-center">
+                                <span class="text-sm font-semibold text-brand-dark tabular-nums">
+                                    {{ Number(record.hours || 0).toFixed(1) }}h
+                                </span>
+                            </td>
+
+                            <td class="py-4 px-6 text-center">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize"
+                                    :class="getTypeBadge(record.overtime_type)"
+                                >
+                                    {{ record.overtime_type }}
+                                </span>
+                            </td>
+
+                            <td class="py-4 px-6 text-center">
+                                <span
+                                    class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold capitalize"
+                                    :class="getStatusBadge(record.status)"
+                                >
+                                    {{ record.status }}
+                                </span>
+                            </td>
+
+                            <td class="py-4 px-6">
+                                <div v-if="record.status === 'pending'" class="flex items-center justify-center gap-2">
+                                    <button
+                                        v-if="can('overtime-approve')"
+                                        @click="showApproveModal(record)"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-300"
+                                        aria-label="Approve overtime"
+                                    >
+                                        <Check class="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        v-if="can('overtime-reject')"
+                                        @click="openRejectModal(record)"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300"
+                                        aria-label="Reject overtime"
+                                    >
+                                        <X class="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <span v-else class="text-xs text-brand-light">—</span>
+                            </td>
+                        </tr>
+                        </template>
+                    </tbody>
+                </table>
+        </DataTableCard>
 
         <!-- Approve Confirmation Modal -->
-        <ModalWrapper :show="showApproveModalState" @close="closeApproveModal" title="Approve Overtime">
+        <ModalWrapper :show="showApproveModalState" @close="closeApproveModal" title="Approve Overtime" maxWidth="md">
             <div class="space-y-4">
-                <p class="text-sm text-gray-600">
-                    Are you sure you want to approve this overtime record for
-                    <strong>{{ selectedApproveRecord?.staff_member?.user?.name }}</strong>
-                    ?
-                </p>
-                <p class="text-sm text-gray-500">
-                    {{ selectedApproveRecord?.hours }}h on {{ formatDateShort(selectedApproveRecord?.date) }} ({{
-                        selectedApproveRecord?.overtime_type
-                    }})
-                </p>
-                <div class="flex justify-end gap-3">
-                    <button @click="closeApproveModal" class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800">
-                        Cancel
-                    </button>
-                    <button
-                        @click="confirmApprove"
-                        :disabled="processingApprove"
-                        class="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 disabled:opacity-50"
-                    >
-                        {{ processingApprove ? "Approving..." : "Approve" }}
-                    </button>
+                <ModalConfirmBanner variant="green" message="Confirm approval for this overtime record." />
+                <div v-if="selectedApproveRecord" class="rounded-xl border border-brand-border p-4 text-sm text-brand-dark space-y-1">
+                    <p><span class="font-semibold">Employee:</span> {{ selectedApproveRecord?.staff_member?.user?.name }}</p>
+                    <p><span class="font-semibold">Date:</span> {{ formatDateShort(selectedApproveRecord?.date) }}</p>
+                    <p><span class="font-semibold">Hours:</span> {{ selectedApproveRecord?.hours }}h ({{ selectedApproveRecord?.overtime_type }})</p>
                 </div>
             </div>
+            <template #footer>
+                <ModalFooterActions
+                    :processing="processingApprove"
+                    confirm-label="Approve"
+                    confirm-color="green"
+                    @cancel="closeApproveModal"
+                    @confirm="confirmApprove"
+                />
+            </template>
         </ModalWrapper>
 
         <!-- Reject Modal -->
-        <ModalWrapper :show="showRejectModal" @close="showRejectModal = false" title="Reject Overtime">
+        <ModalWrapper :show="showRejectModal" @close="closeRejectModal" title="Reject Overtime" maxWidth="md">
             <div class="space-y-4">
-                <p class="text-sm text-gray-600">
-                    Rejecting overtime record for
-                    <strong>{{ rejectingRecord?.staff_member?.user?.name }}</strong>
-                </p>
+                <ModalConfirmBanner variant="red" message="Provide rejection reason for this overtime record." />
+                <div v-if="rejectingRecord" class="rounded-xl border border-brand-border p-4 text-sm text-brand-dark space-y-1">
+                    <p><span class="font-semibold">Employee:</span> {{ rejectingRecord?.staff_member?.user?.name }}</p>
+                    <p><span class="font-semibold">Date:</span> {{ formatDateShort(rejectingRecord?.date) }}</p>
+                    <p><span class="font-semibold">Hours:</span> {{ rejectingRecord?.hours }}h ({{ rejectingRecord?.overtime_type }})</p>
+                </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Rejection Reason</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Rejection Reason</label>
                     <textarea
                         v-model="rejectionReason"
                         rows="3"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
-                        placeholder="Provide a reason for rejection (min 10 characters)..."
+                        class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                        :placeholder="`Provide a reason for rejection (min ${rejectMinLength} characters)...`"
                     ></textarea>
                     <p
-                        v-if="rejectionReason.length > 0 && rejectionReason.length < 10"
+                        v-if="rejectionReason.length > 0 && !isReasonValid"
                         class="text-xs text-red-500 mt-1"
                     >
-                        Minimum 10 characters required
+                        Minimum {{ rejectMinLength }} characters required
                     </p>
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button
-                        @click="showRejectModal = false"
-                        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        @click="confirmReject"
-                        :disabled="rejectionReason.length < 10"
-                        class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700 disabled:opacity-50"
-                    >
-                        Reject
-                    </button>
-                </div>
             </div>
+            <template #footer>
+                <ModalFooterActions
+                    :processing="processingReject"
+                    :confirm-disabled="!isReasonValid"
+                    confirm-label="Reject"
+                    confirm-color="red"
+                    @cancel="closeRejectModal"
+                    @confirm="confirmReject"
+                />
+            </template>
         </ModalWrapper>
 
         <!-- Create Modal -->
         <ModalWrapper :show="showCreateModal" @close="showCreateModal = false" title="Record Overtime">
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Staff Member ID</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Staff Member ID</label>
                     <input
                         v-model="createForm.staff_member_id"
                         type="number"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                        class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         placeholder="Staff member ID"
                     />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Date</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Date</label>
                     <input
                         v-model="createForm.date"
                         type="date"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                        class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                     />
                 </div>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+                        <label class="block text-sm font-medium text-brand-dark mb-1">Start Time</label>
                         <input
                             v-model="createForm.start_time"
                             type="time"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                            class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         />
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+                        <label class="block text-sm font-medium text-brand-dark mb-1">End Time</label>
                         <input
                             v-model="createForm.end_time"
                             type="time"
-                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                            class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         />
                     </div>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Overtime Type</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Overtime Type</label>
                     <select
                         v-model="createForm.overtime_type"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                        class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                     >
                         <option value="workday">Workday</option>
                         <option value="weekend">Weekend</option>
@@ -451,30 +403,24 @@ const submitCreate = async () => {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Notes</label>
                     <textarea
                         v-model="createForm.notes"
                         rows="2"
-                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
+                        class="w-full rounded-lg border-brand-border shadow-sm focus:border-brand-primary focus:ring-brand-primary text-sm"
                         placeholder="Optional notes..."
                     ></textarea>
                 </div>
-                <div class="flex justify-end gap-3">
-                    <button
-                        @click="showCreateModal = false"
-                        class="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        @click="submitCreate"
-                        :disabled="loading"
-                        class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 disabled:opacity-50"
-                    >
-                        {{ loading ? "Creating..." : "Create" }}
-                    </button>
-                </div>
             </div>
+            <template #footer>
+                <ModalFooterActions
+                    :processing="loading"
+                    confirm-label="Create"
+                    confirm-color="blue"
+                    @cancel="showCreateModal = false"
+                    @confirm="submitCreate"
+                />
+            </template>
         </ModalWrapper>
     </div>
 </template>

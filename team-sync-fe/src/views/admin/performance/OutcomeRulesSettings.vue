@@ -133,16 +133,15 @@ onMounted(() => {
 
             <div v-else-if="!sortedRules.length" class="text-center py-12">
                 <Settings class="w-12 h-12 text-gray-300 mx-auto mb-3" />
-                <h3 class="text-lg font-medium text-brand-dark">No outcome rules configured</h3>
+                <h3 class="text-lg font-medium text-brand-dark">Aturan outcome belum dikonfigurasi</h3>
                 <p class="text-sm text-brand-light mt-1 max-w-sm mx-auto">
-                    Add rules to automatically assign outcomes (bonus, salary increase, promotion) based on review
-                    ratings.
+                    Tambahkan aturan untuk menetapkan outcome (bonus, kenaikan gaji, promosi) berdasarkan rating review.
                 </p>
                 <button
                     @click="openCreate"
                     class="mt-4 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors text-sm"
                 >
-                    Create First Rule
+                    Buat Aturan Pertama
                 </button>
             </div>
 

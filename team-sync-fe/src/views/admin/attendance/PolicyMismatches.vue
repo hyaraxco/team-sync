@@ -3,12 +3,16 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Policy Mismatches</h1>
+                    <span class="sr-only" role="heading" aria-level="1">Policy Mismatches</span>
+                    <p class="text-2xl font-bold text-brand-dark">Policy Mismatches</p>
                     <p class="text-brand-light text-sm mt-1">
-                        Review and resolve discrepancies between employee scheduled work locations and actual attendance data.
+                        Review and resolve discrepancies between employee scheduled work locations and actual attendance
+                        data.
                     </p>
                 </div>
             </header>
+
+            <SearchFilter placeholder="Search policy mismatches..." @search="handleSearch" @reset="handleReset" />
 
             <!-- Error State -->
             <div
@@ -20,18 +24,18 @@
             </div>
 
             <!-- Loading State -->
-            <div v-else-if="loading" class="space-y-4">
-                <div v-for="i in 5" :key="i" class="h-16 bg-gray-100 rounded-2xl animate-pulse" />
+            <div v-else-if="loading" class="rounded-2xl border border-brand-border bg-white p-4 space-y-4">
+                <div v-for="i in 5" :key="i" class="h-16 bg-brand-border/40 rounded-2xl animate-pulse" />
             </div>
 
             <!-- Empty State -->
-            <div
-                v-else-if="!mismatches.length"
-                class="bg-white border border-brand-border rounded-2xl p-12 text-center"
-            >
-                <CheckCircle class="w-12 h-12 mx-auto mb-3 text-green-500" />
-                <p class="text-brand-dark font-semibold text-lg">No pending policy mismatches</p>
-                <p class="text-brand-light text-sm mt-1">All attendance logs match their scheduled locations.</p>
+            <div v-else-if="!filteredMismatches.length" class="bg-white border border-brand-border rounded-2xl p-6">
+                <EmptyState
+                    icon="AlertTriangle"
+                    title="No policy mismatches"
+                    subtitle="Policy mismatch alerts will appear here when attendance entries need review."
+                    size="lg"
+                />
             </div>
 
             <!-- Table -->
@@ -39,43 +43,71 @@
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>
-<tr class="border-b border-brand-border">
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Employee</th>
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Scheduled</th>
-                                 <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Actual</th>
-                                 <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
-                             </tr>
+                            <tr class="border-b border-brand-border">
+                                <th
+                                    class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide"
+                                >
+                                    Employee
+                                </th>
+                                <th
+                                    class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide"
+                                >
+                                    Date
+                                </th>
+                                <th
+                                    class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide"
+                                >
+                                    Scheduled
+                                </th>
+                                <th
+                                    class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide"
+                                >
+                                    Actual
+                                </th>
+                                <th
+                                    class="p-4 text-right text-xs font-semibold text-brand-light uppercase tracking-wide"
+                                >
+                                    Actions
+                                </th>
+                            </tr>
                         </thead>
-                        <tbody class="divide-y divide-gray-100">
+                        <tbody class="divide-y divide-brand-border">
                             <tr
-                                v-for="item in mismatches"
+                                v-for="item in filteredMismatches"
                                 :key="item.id"
-                                class="hover:bg-gray-50 transition-colors"
+                                class="hover:bg-brand-border/20 transition-colors"
                             >
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
-                                        <div class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs font-bold">
+                                        <div
+                                            class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs font-bold"
+                                        >
                                             {{ getEmployeeName(item).charAt(0) }}
                                         </div>
                                         <span class="font-medium text-brand-dark">{{ getEmployeeName(item) }}</span>
                                     </div>
                                 </td>
-                                <td class="px-4 py-3 text-brand-light text-sm">{{ item.mismatch_date || item.date }}</td>
+                                <td class="px-4 py-3 text-brand-light text-sm">
+                                    {{ item.mismatch_date || item.date }}
+                                </td>
                                 <td class="px-4 py-3">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                    <span
+                                        class="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                                    >
                                         {{ formatWorkMode(item.planned_work_mode || item.scheduled_location) }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3">
-                                    <span class="px-2 py-1 text-xs rounded-full bg-red-50 text-red-700 border border-red-200">
+                                    <span
+                                        class="px-2 py-1 text-xs rounded-full bg-red-50 text-red-700 border border-red-200"
+                                    >
                                         {{ formatWorkMode(item.actual_work_mode || item.actual_location) }}
                                     </span>
                                 </td>
                                 <td class="px-4 py-3 text-right space-x-2">
                                     <button
                                         @click="acknowledge(item.id)"
-                                        class="text-xs px-3 py-1.5 rounded-lg border border-brand-border text-brand-dark hover:bg-gray-50 transition-colors cursor-pointer"
+                                        class="text-xs px-3 py-1.5 rounded-lg border border-brand-border text-brand-dark hover:bg-brand-border/20 transition-colors cursor-pointer"
                                     >
                                         Acknowledge
                                     </button>
@@ -96,14 +128,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { computed, ref, onMounted } from "vue";
 import { useAttendanceStore } from "@/stores/attendance";
 import { useToast } from "@/composables/useToast";
-import { AlertTriangle, CheckCircle } from "lucide-vue-next";
+import { AlertTriangle } from "lucide-vue-next";
+import EmptyState from "@/components/common/EmptyState.vue";
+import SearchFilter from "@/components/common/SearchFilter.vue";
 
 const attendanceStore = useAttendanceStore();
 const toast = useToast();
 const mismatches = ref([]);
+const searchQuery = ref("");
 const loading = ref(true);
 const error = ref(false);
 
@@ -126,6 +161,35 @@ const getEmployeeName = (item) =>
     item?.staff_member?.user?.name || item?.staff_member?.name || item?.employee_name || "Unknown";
 
 const formatWorkMode = (value) => String(value || "-").replaceAll("_", " ");
+
+const filteredMismatches = computed(() => {
+    const query = searchQuery.value.trim().toLowerCase();
+
+    if (!query) return mismatches.value;
+
+    return mismatches.value.filter((item) => {
+        const fields = [
+            getEmployeeName(item),
+            item.mismatch_date || item.date,
+            item.planned_work_mode || item.scheduled_location,
+            item.actual_work_mode || item.actual_location,
+        ];
+
+        return fields.some((field) =>
+            String(field || "")
+                .toLowerCase()
+                .includes(query),
+        );
+    });
+});
+
+const handleSearch = (params = {}) => {
+    searchQuery.value = params.search || "";
+};
+
+const handleReset = () => {
+    searchQuery.value = "";
+};
 
 const acknowledge = async (id) => {
     try {

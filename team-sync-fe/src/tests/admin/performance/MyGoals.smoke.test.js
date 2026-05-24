@@ -113,7 +113,7 @@ describe("MyGoals smoke", () => {
     it("displays empty state when no goals", () => {
         performanceGoalRefs.myGoals.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no.*goals/i);
+        expect(wrapper.text()).toMatch(/belum ada sasaran/i);
     });
 
     it("displays goals when available", () => {
