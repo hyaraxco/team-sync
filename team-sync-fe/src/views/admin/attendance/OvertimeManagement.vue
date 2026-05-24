@@ -75,7 +75,14 @@ const getTypeBadge = (type) => {
     }
 };
 
-const formatTime = (timeStr) => (timeStr ? formatTimeUtil(timeStr) : "-");
+const formatTime = (timeStr) => {
+    if (!timeStr) return "-";
+    // Handle time-only strings (HH:mm:ss or HH:mm) from API
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(timeStr)) {
+        return timeStr.slice(0, 5);
+    }
+    return formatTimeUtil(timeStr);
+};
 const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
 
 // Approve
