@@ -25,7 +25,8 @@ export const useOvertimeStore = defineStore("overtime", {
                 const response = await axiosInstance.get("overtime", {
                     params: {
                         page: params.page || 1,
-                        per_page: params.per_page || 15,
+                        per_page: params.per_page || params.row_per_page || 15,
+                        search: params.search || "",
                         status: params.status || "",
                         staff_member_id: params.staff_member_id || "",
                         overtime_type: params.overtime_type || "",
