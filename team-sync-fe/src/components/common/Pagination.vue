@@ -1,6 +1,6 @@
 <script setup>
 import { ChevronLeft, ChevronRight } from "lucide-vue-next";
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 
 const props = defineProps({
     meta: {
@@ -37,15 +37,21 @@ const emit = defineEmits(["page-change", "per-page-change"]);
 
 const currentPage = computed(() => props.meta.current_page || 1);
 const lastPage = computed(() => props.meta.last_page || 1);
-const perPage = computed(() => {
-    const val = props.meta.per_page;
-    if (val && props.perPageOptions.includes(val)) return val;
-    // If API returns a value not in options list, add it dynamically
-    return val || props.perPageOptions[0];
-});
 const total = computed(() => props.meta.total || 0);
 const from = computed(() => props.meta.from || 0);
 const to = computed(() => props.meta.to || 0);
+
+// Local per-page state: updates immediately on user interaction so the select
+// never reverts to the old value while the API call is in-flight (loading).
+const selectedPerPage = ref(props.meta.per_page || props.perPageOptions[0]);
+
+// Sync with confirmed server value once the API response arrives.
+watch(
+    () => props.meta.per_page,
+    (newVal) => {
+        if (newVal) selectedPerPage.value = newVal;
+    },
+);
 
 const visiblePages = computed(() => {
     const pages = [];
@@ -98,7 +104,8 @@ const handlePageChange = (page) => {
 };
 
 const handlePerPageChange = (newPerPage) => {
-    if (newPerPage !== perPage.value && !props.loading) {
+    if (newPerPage !== selectedPerPage.value && !props.loading) {
+        selectedPerPage.value = newPerPage; // update immediately — no flicker during loading
         emit("per-page-change", newPerPage);
     }
 };
@@ -126,15 +133,15 @@ const goToNext = () => {
             <div class="flex items-center gap-2 flex-wrap">
                 <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">Show</p>
                 <select
-                    :value="perPage"
+                    :value="selectedPerPage"
                     @change="handlePerPageChange(parseInt($event.target.value))"
                     :disabled="loading"
                     class="w-full sm:w-auto px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary transition-all duration-300 appearance-none disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--color-surface); color: var(--color-brand-dark);"
                 >
                     <option
-                        v-if="perPage && !perPageOptions.includes(perPage)"
-                        :value="perPage"
-                    >{{ perPage }}</option>
+                        v-if="selectedPerPage && !perPageOptions.includes(selectedPerPage)"
+                        :value="selectedPerPage"
+                    >{{ selectedPerPage }}</option>
                     <option v-for="option in perPageOptions" :key="option" :value="option">
                         {{ option }}
                     </option>

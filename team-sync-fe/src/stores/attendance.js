@@ -222,14 +222,7 @@ export const useAttendanceStore = defineStore("attendance", {
                 });
                 const paginator = response.data.data;
                 this.paginatedAttendances = paginator.data;
-                this.meta = {
-                    current_page: paginator.current_page,
-                    last_page: paginator.last_page,
-                    per_page: paginator.per_page,
-                    total: paginator.total,
-                    from: paginator.from,
-                    to: paginator.to,
-                };
+                this.meta = paginator.meta;
                 return response.data;
             } catch (error) {
                 this.error = handleError(error);

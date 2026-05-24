@@ -26,13 +26,13 @@ const props = defineProps({
 });
 
 const store = useOvertimeStore();
-const staffMemberStore = useStaffMemberStore();
+
 const { records, meta, loading, error, summary } = storeToRefs(store);
 const toast = useToast();
 
 const showCreateModal = ref(false);
 
-const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
+const {  fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
     defaultFilters: { search: null, status: "" },
     fetchFn: store.fetchOvertimeRecords,
 });

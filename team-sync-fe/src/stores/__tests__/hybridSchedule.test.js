@@ -36,8 +36,7 @@ describe("Hybrid Schedule Store", () => {
             params: {
                 page: 3,
                 search: "eng",
-                status: "",
-                row_per_page: 20,
+                per_page: 20,
             },
         });
         expect(result).toEqual({ data: paginator, message: "ok" });
@@ -215,5 +214,51 @@ describe("Hybrid Schedule Store", () => {
         await expect(store.rejectOverride(999, "note")).rejects.toEqual(mockError);
         expect(store.error).toBe("Override not found");
         expect(store.loading).toBe(false);
+    });
+
+    it("fetchOverridesPaginated populates paginatedOverrides and overridesMeta", async () => {
+        const meta = { current_page: 2, from: 11, last_page: 5, path: "/", per_page: 10, to: 20, total: 50 };
+        const overrides = [{ id: 1, status: "pending" }];
+        const params = { page: 2, search: "ani", row_per_page: 10, status: "pending" };
+
+        axiosInstance.get.mockResolvedValueOnce({
+            data: { data: { data: overrides, meta } },
+        });
+
+        const result = await store.fetchOverridesPaginated(params);
+
+        expect(axiosInstance.get).toHaveBeenCalledWith("hybrid-schedule-overrides", {
+            params: {
+                page: 2,
+                per_page: 10,
+                search: "ani",
+                status: "pending",
+            },
+        });
+        expect(store.paginatedOverrides).toEqual(overrides);
+        expect(store.overridesMeta).toEqual({
+            current_page: 2,
+            last_page: 5,
+            per_page: 10,
+            total: 50,
+            from: 11,
+            to: 20,
+        });
+        expect(store.overridesLoading).toBe(false);
+        expect(store.error).toBe(null);
+    });
+
+    it("fetchOverridesPaginated sets error and rethrows on failure", async () => {
+        const mockError = {
+            response: {
+                status: 403,
+                data: { message: "Forbidden" },
+            },
+        };
+        axiosInstance.get.mockRejectedValueOnce(mockError);
+
+        await expect(store.fetchOverridesPaginated()).rejects.toEqual(mockError);
+        expect(store.error).toBe("Forbidden");
+        expect(store.overridesLoading).toBe(false);
     });
 });
