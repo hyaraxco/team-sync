@@ -644,7 +644,7 @@ watch(
                                 v-else-if="comments.length === 0"
                                 class="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2"
                             >
-                                No comments yet.
+                                Belum ada komentar.
                             </div>
 
                             <div
@@ -778,7 +778,7 @@ watch(
                                 v-else-if="attachments.length === 0"
                                 class="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2"
                             >
-                                No attachments yet.
+                                Belum ada lampiran.
                             </div>
 
                             <div
@@ -910,7 +910,7 @@ watch(
                                 <!-- No Results -->
                                 <div v-if="staffMembers.length === 0" class="p-4 text-center">
                                     <SearchX class="w-8 h-8 text-gray-400 mx-auto mb-2" />
-                                    <p class="text-sm text-gray-500">No employees found</p>
+                                    <p class="text-sm text-gray-500">Karyawan tidak ditemukan</p>
                                 </div>
                             </div>
                         </div>
@@ -1008,7 +1008,7 @@ watch(
                             v-else-if="statusLogs.length === 0"
                             class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
                         >
-                            No status changes recorded yet.
+                            Belum ada perubahan status.
                         </div>
                         <div v-else class="space-y-2 max-h-52 overflow-y-auto pr-1">
                             <div

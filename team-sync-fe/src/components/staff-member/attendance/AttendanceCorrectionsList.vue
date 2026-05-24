@@ -23,10 +23,10 @@ const getStatusBadge = (status) => {
 
 <template>
     <div class="bg-white border flex-1 border-brand-border rounded-2xl p-6 mb-6">
-        <h3 class="text-brand-dark text-lg font-bold mb-6">My Correction Requests</h3>
+        <h3 class="text-brand-dark text-lg font-bold mb-6">Pengajuan Koreksi Saya</h3>
 
         <div v-if="!corrections || corrections.length === 0">
-            <EmptyState title="No corrections" description="You have not made any attendance correction requests." />
+            <EmptyState title="Belum ada koreksi" description="Anda belum membuat pengajuan koreksi absensi." />
         </div>
         <div v-else class="space-y-4">
             <div

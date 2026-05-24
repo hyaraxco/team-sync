@@ -1,19 +1,30 @@
 <script setup>
-import { onMounted, ref } from "vue";
-import { DEFAULT_AVATAR } from "@/helpers/format";
+import { onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { Check, X } from "lucide-vue-next";
 import { useAttendanceCorrectionStore } from "@/stores/attendanceCorrection";
 import { formatDateShort, formatTime as formatTimeUtil } from "@/utils/dateUtils";
 import SearchFilter from "@/components/common/SearchFilter.vue";
-import Pagination from "@/components/admin/team/Pagination.vue";
+import DataTableCard from "@/components/common/DataTableCard.vue";
+import TableStateRows from "@/components/common/TableStateRows.vue";
+import EmployeeCell from "@/components/common/EmployeeCell.vue";
+import ModalFooterActions from "@/components/common/ModalFooterActions.vue";
+import ModalConfirmBanner from "@/components/common/ModalConfirmBanner.vue";
 import Alert from "@/components/common/Alert.vue";
-import EmptyState from "@/components/common/EmptyState.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import StatusBadge from "@/components/common/StatusBadge.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import { useConfirmAction } from "@/composables/useConfirmAction";
+import { useRejectWithReason } from "@/composables/useRejectWithReason";
 import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
+
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const store = useAttendanceCorrectionStore();
 const { paginatedCorrections, meta, loading, error } = storeToRefs(store);
@@ -29,17 +40,6 @@ onMounted(() => {
 });
 
 const formatTime = (timeStr) => (timeStr ? formatTimeUtil(timeStr) : "-");
-
-const getStatusBadge = (status) => {
-    switch (status) {
-        case "approved":
-            return "bg-green-100 text-green-700";
-        case "rejected":
-            return "bg-red-100 text-red-700";
-        default:
-            return "bg-amber-100 text-amber-700";
-    }
-};
 
 // Approval Workflow
 const {
@@ -63,206 +63,161 @@ const confirmApprove = () =>
 
 // Rejection Workflow
 const {
-    isModalOpen: showRejectModalState,
-    selectedItem: selectedRejectCorrection,
-    isProcessing: processingReject,
-    openModal: showRejectModal,
-    closeModal: closeRejectModal,
-    confirmAction: doReject,
-} = useConfirmAction({
+    showRejectModal: showRejectModalState,
+    rejectingItem: selectedRejectCorrection,
+    rejectReason,
+    processingReject,
+    isReasonValid,
+    openRejectModal: onRejectAction,
+    closeRejectModal,
+    confirmReject,
+    minLength: rejectMinLength,
+} = useRejectWithReason({
+    rejectFn: async (correction) => {
+        await store.rejectCorrection(correction.id, { review_notes: rejectReason.value.trim() });
+    },
     onSuccess: async () => {
         toast.success("Rejected", "Attendance correction has been rejected.");
         await fetchData();
     },
 });
-
-const rejectReason = ref("");
-
-const confirmReject = () =>
-    doReject(async (correction) => {
-        if (!rejectReason.value.trim()) throw new Error("Reason is required");
-        await store.rejectCorrection(correction.id, { review_notes: rejectReason.value });
-        rejectReason.value = "";
-    });
-
-const onRejectAction = (req) => {
-    rejectReason.value = "";
-    showRejectModal(req);
-};
 </script>
 
 <template>
-    <div class="mb-6">
-        <SearchFilter
-            placeholder="Search by Employee or ID..."
-            :filters="[
-                {
-                    key: 'status',
-                    label: 'All Statuses',
-                    icon: 'CheckCircle',
-                    options: [
-                        { value: 'pending', label: 'Pending' },
-                        { value: 'approved', label: 'Approved' },
-                        { value: 'rejected', label: 'Rejected' },
-                    ],
-                },
-            ]"
-            @search="handleSearch"
-            @reset="handleReset"
-        />
-    </div>
+    <div :class="embedded ? '' : 'p-3 sm:p-4 md:p-6 lg:p-8'">
+        <div :class="['space-y-6', !embedded && 'max-w-7xl mx-auto']">
+            <span v-if="!embedded" class="sr-only" role="heading" aria-level="1">Attendance Corrections</span>
 
-    <Alert type="error" title="Error" :message="error || ''" :show="Boolean(error)" />
+            <SearchFilter
+                placeholder="Search by Employee or ID..."
+                :filters="[
+                    {
+                        key: 'status',
+                        label: 'All Statuses',
+                        icon: 'CheckCircle',
+                        options: [
+                            { value: 'pending', label: 'Pending' },
+                            { value: 'approved', label: 'Approved' },
+                            { value: 'rejected', label: 'Rejected' },
+                        ],
+                    },
+                ]"
+                @search="handleSearch"
+                @reset="handleReset"
+            />
 
-    <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
-        <div class="flex items-center justify-between mb-6">
-            <div>
-                <h1 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">Attendance Corrections</h1>
-                <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-[14px] font-normal mt-1">
-                    Showing {{ meta.from || 0 }} - {{ meta.to || 0 }} of {{ meta.total || 0 }} requests
-                </p>
-            </div>
-        </div>
+            <Alert type="error" title="Error" :message="error || ''" :show="Boolean(error)" />
 
-        <!-- Table -->
-        <div class="overflow-x-auto w-full mb-6">
-            <table class="w-full min-w-[800px]">
-                <thead>
-                    <tr class="border-y border-brand-border">
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Employee</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Date</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Requested Times</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Reason</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Status</th>
-                        <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                        <td colspan="6" class="py-8 text-center text-gray-500">Loading...</td>
-                    </tr>
-                    <tr
-                        v-else-if="!paginatedCorrections || paginatedCorrections.length === 0"
-                        class="border-b border-brand-border"
-                    >
-                        <td colspan="6" class="py-8">
-                            <EmptyState
-                                icon="ClipboardList"
-                                title="No Corrections Found"
-                                description="There are no attendance correction requests currently matching filters."
+            <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">
+                <table class="min-w-full divide-y divide-brand-border">
+                        <thead>
+                            <tr class="bg-brand-border/20 border-b border-brand-border">
+                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Employee</th>
+                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Date</th>
+                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Requested Times</th>
+                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Reason</th>
+                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Status</th>
+                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-brand-border">
+                            <TableStateRows
+                                :loading="loading"
+                                :empty="!paginatedCorrections || paginatedCorrections.length === 0"
+                                :colspan="6"
+                                empty-icon="ClipboardList"
+                                empty-title="No corrections found"
+                                empty-subtitle="Attendance correction requests will appear here."
                             />
-                        </td>
-                    </tr>
-                    <tr
-                        v-else
-                        v-for="correction in paginatedCorrections"
-                        :key="correction.id"
-                        class="border-b border-brand-border hover:bg-gray-50 transition-colors"
-                    >
-                        <td class="py-4 px-4">
-                            <div class="flex items-center gap-3">
-                                <img loading="lazy"
-                                    :src="correction.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                                    alt="Avatar"
-                                    class="w-10 h-10 rounded-full object-cover"
-                                />
-                                <div>
-                                    <p class="text-sm font-semibold text-brand-dark">
-                                        {{ correction.staff_member?.user?.name }}
-                                    </p>
-                                    <p class="text-xs text-brand-light">
-                                        {{ correction.staff_member?.staff_member_id }}
-                                    </p>
-                                </div>
-                            </div>
-                        </td>
-                        <td class="py-4 px-4 text-sm text-brand-dark font-medium">
-                            {{ correction.attendance ? formatDateShort(correction.attendance.date) : "-" }}
-                        </td>
-                        <td class="py-4 px-4">
-                            <div class="flex flex-col gap-1">
-                                <p class="text-xs text-brand-dark">
-                                    <strong>In:</strong>
-                                    {{ formatTime(correction.requested_check_in) }}
-                                </p>
-                                <p class="text-xs text-brand-dark">
-                                    <strong>Out:</strong>
-                                    {{ formatTime(correction.requested_check_out) }}
-                                </p>
-                            </div>
-                        </td>
-                        <td class="py-4 px-4">
-                            <p class="text-sm text-brand-light max-w-[200px] truncate" :title="correction.reason">
-                                {{ correction.reason }}
-                            </p>
-                        </td>
-                        <td class="py-4 px-4">
-                            <span
-                                :class="[
-                                    'px-3 py-1 rounded-full text-xs font-semibold capitalize whitespace-nowrap',
-                                    getStatusBadge(correction.status),
-                                ]"
-                            >
-                                {{ correction.status }}
-                            </span>
-                        </td>
-                        <td class="py-4 px-4">
-                            <div
-                                class="flex items-center gap-2"
-                                v-if="correction.status === 'pending' && can('attendance-correction-approve')"
-                            >
-                                <button
-                                    @click="showApproveModal(correction)"
-                                    class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                            <template v-if="paginatedCorrections && paginatedCorrections.length > 0 && !loading">
+                                <tr
+                                    v-for="correction in paginatedCorrections"
+                                    :key="correction.id"
+                                    class="hover:bg-brand-gray/50"
                                 >
-                                    <Check class="w-4 h-4 text-green-600" />
-                                    <span class="text-brand-dark text-xs font-semibold">Approve</span>
-                                </button>
-                                <button
-                                    @click="onRejectAction(correction)"
-                                    class="btn-secondary flex items-center justify-center gap-2 border border-brand-border rounded-lg hover:border-red-500 hover:bg-red-50 transition-all duration-300 px-3 py-2"
-                                >
-                                    <X class="w-4 h-4 text-red-600" />
-                                    <span class="text-brand-dark text-xs font-semibold">Reject</span>
-                                </button>
-                            </div>
-                            <div v-else class="text-xs text-brand-light">
-                                {{
-                                    correction.status === "pending"
-                                        ? "Pending Review"
-                                        : `Reviewed by ${correction.reviewer?.name || "Admin"}`
-                                }}
-                            </div>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                                    <td class="px-6 py-4">
+                                        <EmployeeCell
+                                            :photo="correction.staff_member?.user?.profile_photo"
+                                            :name="correction.staff_member?.user?.name || '-'"
+                                            :subtitle="correction.staff_member?.staff_member_id"
+                                        />
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-brand-dark font-medium">
+                                        {{ correction.attendance ? formatDateShort(correction.attendance.date) : "-" }}
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-col gap-1">
+                                            <p class="text-xs text-brand-dark">
+                                                <strong>In:</strong>
+                                                {{ formatTime(correction.requested_check_in) }}
+                                            </p>
+                                            <p class="text-xs text-brand-dark">
+                                                <strong>Out:</strong>
+                                                {{ formatTime(correction.requested_check_out) }}
+                                            </p>
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <p
+                                            class="text-sm text-brand-light max-w-[200px] truncate"
+                                            :title="correction.reason"
+                                        >
+                                            {{ correction.reason }}
+                                        </p>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <StatusBadge
+                                            type="leave-status"
+                                            :value="correction.status"
+                                            :label="correction.status"
+                                        />
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <div
+                                            class="flex items-center gap-2"
+                                            v-if="
+                                                correction.status === 'pending' && can('attendance-correction-approve')
+                                            "
+                                        >
+                                            <button
+                                                @click="showApproveModal(correction)"
+                                                class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-green-50 hover:bg-green-100 transition-all"
+                                                aria-label="Approve correction"
+                                            >
+                                                <Check class="w-4 h-4 text-green-600" />
+                                            </button>
+                                            <button
+                                                @click="onRejectAction(correction)"
+                                                class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 transition-all"
+                                                aria-label="Reject correction"
+                                            >
+                                                <X class="w-4 h-4 text-red-600" />
+                                            </button>
+                                        </div>
+                                        <div v-else class="text-xs text-brand-light">
+                                            {{
+                                                correction.status === "pending"
+                                                    ? "Pending Review"
+                                                    : `Reviewed by ${correction.reviewer?.name || "Admin"}`
+                                            }}
+                                        </div>
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                    </table>
+            </DataTableCard>
         </div>
-
-        <!-- Pagination -->
-        <Pagination
-            :meta="meta"
-            :loading="loading"
-            @page-change="handlePageChange"
-            @per-page-change="handlePerPageChange"
-        />
     </div>
 
     <!-- Approve Modal -->
     <ModalWrapper :show="showApproveModalState" title="Approve Correction" maxWidth="md" @close="closeApproveModal">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-                <Check class="w-6 h-6 text-green-600" />
-            </div>
-            <div>
-                <p class="text-brand-light text-sm">Confirm approval for this attendance correction.</p>
-            </div>
-        </div>
-        <div v-if="selectedApproveCorrection" class="mb-6 space-y-3">
-            <div class="border border-brand-border rounded-xl p-4 text-sm">
-                <p class="font-bold text-brand-dark mb-2">{{ selectedApproveCorrection.staff_member?.user?.name }}</p>
+        <div class="space-y-4">
+            <ModalConfirmBanner variant="green" message="Confirm approval for this attendance correction." />
+            <div v-if="selectedApproveCorrection" class="rounded-xl border border-brand-border p-4 text-sm space-y-1">
+                <p class="font-bold text-brand-dark">{{ selectedApproveCorrection.staff_member?.user?.name }}</p>
                 <p>
-                    <strong>Date:</strong>
+                    <span class="font-semibold">Date:</span>
                     {{
                         selectedApproveCorrection.attendance
                             ? formatDateShort(selectedApproveCorrection.attendance.date)
@@ -270,114 +225,87 @@ const onRejectAction = (req) => {
                     }}
                 </p>
                 <p>
-                    <strong>Requested In:</strong>
+                    <span class="font-semibold">Requested In:</span>
                     {{ formatTime(selectedApproveCorrection.requested_check_in) }}
                 </p>
                 <p>
-                    <strong>Requested Out:</strong>
+                    <span class="font-semibold">Requested Out:</span>
                     {{ formatTime(selectedApproveCorrection.requested_check_out) }}
                 </p>
                 <p class="mt-2 text-brand-light italic">"{{ selectedApproveCorrection.reason }}"</p>
             </div>
         </div>
         <template #footer>
-            <div class="flex gap-3">
-                <button
-                    @click="closeApproveModal"
-                    :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                >
-                    Cancel
-                </button>
-                <button
-                    @click="confirmApprove"
-                    :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {{ processingApprove ? "Approving..." : "Approve" }}
-                </button>
-            </div>
+            <ModalFooterActions
+                :processing="processingApprove"
+                confirm-label="Approve"
+                confirm-color="green"
+                @cancel="closeApproveModal"
+                @confirm="confirmApprove"
+            />
         </template>
     </ModalWrapper>
 
     <!-- Reject Modal -->
     <ModalWrapper :show="showRejectModalState" title="Reject Correction" maxWidth="md" @close="closeRejectModal">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
-                <X class="w-6 h-6 text-red-600" />
-            </div>
-            <div>
-                <p class="text-brand-light text-sm">Confirm rejection for this attendance correction.</p>
-            </div>
-        </div>
-        <div v-if="selectedRejectCorrection" class="mb-4">
-            <!-- Details Card -->
-            <div class="bg-gray-50 border border-gray-200 rounded-xl p-4 text-sm mb-5 shadow-sm">
-                <div class="flex items-center gap-3 mb-3 border-b border-gray-200 pb-3">
-                    <img loading="lazy"
-                        :src="selectedRejectCorrection.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                        class="w-10 h-10 rounded-full object-cover"
-                    />
-                    <div>
-                        <p class="font-bold text-gray-900">{{ selectedRejectCorrection.staff_member?.user?.name }}</p>
-                        <p class="text-xs text-gray-500">
-                            {{ selectedRejectCorrection.staff_member?.staff_member_id }}
+        <div class="space-y-4">
+            <ModalConfirmBanner variant="red" message="Confirm rejection for this attendance correction." />
+            <div v-if="selectedRejectCorrection">
+                <!-- Details Card -->
+                <div class="bg-brand-border/20 border border-brand-border rounded-xl p-4 text-sm shadow-sm">
+                    <div class="flex items-center gap-3 mb-3 border-b border-brand-border pb-3">
+                        <EmployeeCell
+                            :photo="selectedRejectCorrection.staff_member?.user?.profile_photo"
+                            :name="selectedRejectCorrection.staff_member?.user?.name || '-'"
+                            :subtitle="selectedRejectCorrection.staff_member?.staff_member_id"
+                        />
+                    </div>
+                    <div class="grid grid-cols-2 gap-y-2">
+                        <p class="text-brand-light text-xs">Date</p>
+                        <p class="text-brand-dark font-medium text-right text-xs">
+                            {{
+                                selectedRejectCorrection.attendance
+                                    ? formatDateShort(selectedRejectCorrection.attendance.date)
+                                    : "-"
+                            }}
+                        </p>
+
+                        <p class="text-brand-light text-xs">Requested In</p>
+                        <p class="text-brand-dark font-medium text-right text-xs">
+                            {{ formatTime(selectedRejectCorrection.requested_check_in) }}
+                        </p>
+
+                        <p class="text-brand-light text-xs">Requested Out</p>
+                        <p class="text-brand-dark font-medium text-right text-xs">
+                            {{ formatTime(selectedRejectCorrection.requested_check_out) }}
                         </p>
                     </div>
-                </div>
-                <div class="grid grid-cols-2 gap-y-2">
-                    <p class="text-gray-500 text-xs">Date</p>
-                    <p class="text-gray-900 font-medium text-right text-xs">
-                        {{
-                            selectedRejectCorrection.attendance
-                                ? formatDateShort(selectedRejectCorrection.attendance.date)
-                                : "-"
-                        }}
-                    </p>
-
-                    <p class="text-gray-500 text-xs">Requested In</p>
-                    <p class="text-gray-900 font-medium text-right text-xs">
-                        {{ formatTime(selectedRejectCorrection.requested_check_in) }}
-                    </p>
-
-                    <p class="text-gray-500 text-xs">Requested Out</p>
-                    <p class="text-gray-900 font-medium text-right text-xs">
-                        {{ formatTime(selectedRejectCorrection.requested_check_out) }}
-                    </p>
                 </div>
             </div>
 
             <!-- Form elements -->
             <div class="flex flex-col gap-2">
-                <label class="block text-sm font-bold text-gray-800">
+                <label class="block text-sm font-bold text-brand-dark">
                     Reason for Rejection
                     <span class="text-red-500">*</span>
                 </label>
                 <textarea
                     v-model="rejectReason"
-                    class="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white"
+                    class="w-full border border-brand-border rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white"
                     rows="3"
-                    placeholder="Please explain why this correction is denied so the employee understands..."
+                    :placeholder="`Minimum ${rejectMinLength} characters required...`"
                 ></textarea>
             </div>
         </div>
         <template #footer>
-            <div class="flex gap-3">
-                <button
-                    @click="closeRejectModal"
-                    :disabled="processingReject"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                >
-                    Cancel
-                </button>
-                <button
-                    @click="confirmReject"
-                    :disabled="processingReject || !rejectReason.trim()"
-                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    {{ processingReject ? "Rejecting..." : "Reject" }}
-                </button>
-            </div>
+            <ModalFooterActions
+                :processing="processingReject"
+                confirm-label="Reject"
+                confirm-color="red"
+                :confirm-disabled="!isReasonValid"
+                @cancel="closeRejectModal"
+                @confirm="confirmReject"
+            />
         </template>
     </ModalWrapper>
 </template>

@@ -94,7 +94,7 @@ describe("PendingCalibration smoke", () => {
     it("displays empty state when no reviews", () => {
         performanceReviewRefs.pendingCalibrationReviews.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no.*pending/i);
+        expect(wrapper.text()).toMatch(/tidak ada kalibrasi tertunda/i);
     });
 
     it("displays reviews when available", () => {

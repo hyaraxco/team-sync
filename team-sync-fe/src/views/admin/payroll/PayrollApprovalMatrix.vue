@@ -154,7 +154,7 @@ onMounted(loadPolicies);
                     Payroll Approval Matrix
                 </h1>
                 <p class="text-brand-light text-base font-normal mt-2">
-                    Configure threshold-based approval steps for payroll batches before payment.
+                    Konfigurasi langkah persetujuan berbasis threshold untuk batch payroll sebelum pembayaran.
                 </p>
             </div>
             <button
@@ -172,8 +172,8 @@ onMounted(loadPolicies);
             <EmptyState
                 v-else-if="sortedPolicies.length === 0"
                 icon="ShieldCheck"
-                title="No approval policies configured"
-                subtitle="Create a policy to require one or more role-based approvals for matching payroll totals."
+                title="Kebijakan persetujuan belum dikonfigurasi"
+                subtitle="Buat kebijakan untuk memerlukan persetujuan berbasis peran."
             />
             <div v-else class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-[#E5E7EB] text-sm">
@@ -193,7 +193,7 @@ onMounted(loadPolicies);
                             <td class="px-4 py-3 text-brand-dark">{{ policy.name }}</td>
                             <td class="px-4 py-3 text-brand-dark">
                                 {{ formatRupiah(policy.min_amount || 0) }} —
-                                {{ policy.max_amount ? formatRupiah(policy.max_amount) : "No maximum" }}
+                                {{ policy.max_amount ? formatRupiah(policy.max_amount) : "Tanpa batas maksimum" }}
                             </td>
                             <td class="px-4 py-3 text-brand-dark">{{ policy.required_role }}</td>
                             <td class="px-4 py-3">
@@ -263,7 +263,7 @@ onMounted(loadPolicies);
                             v-model="form.max_amount"
                             min="0"
                             type="number"
-                            placeholder="No maximum"
+                            placeholder="Tanpa batas maksimum"
                             class="w-full rounded-lg border border-brand-border px-4 py-3"
                         />
                     </div>

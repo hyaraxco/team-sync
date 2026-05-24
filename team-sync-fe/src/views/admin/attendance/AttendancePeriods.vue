@@ -3,8 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">Attendance Periods</h1>
-                    <p class="text-brand-light text-sm mt-1">
+                    <p class="text-brand-light text-sm">
                         Monitor period statuses, review timesheets, and access the payroll readiness workspace before cutoff.
                     </p>
                 </div>
@@ -17,7 +16,7 @@
                         Create Period
                     </button>
                     <button
-                        class="px-4 py-2 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="px-4 py-2 rounded-lg border border-brand-border text-brand-dark font-medium text-sm transition-colors cursor-pointer"
                         @click="fetchData"
                     >
                         Sync Latest
@@ -26,13 +25,14 @@
             </header>
 
             <div class="grid gap-6 lg:grid-cols-3">
-                <div class="lg:col-span-2 space-y-4">
+                <div class="lg:col-span-2 space-y-4 rounded-2xl border border-brand-border bg-[var(--color-surface)] p-6 shadow-sm">
                     <h2 class="text-lg font-bold text-brand-dark">Period History</h2>
 
                     <!-- Error State -->
                     <div
                         v-if="periodStore.error"
-                        class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
+                        class="border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
+                        style="background-color: var(--color-surface);"
                     >
                         <AlertTriangle class="w-5 h-5 shrink-0" />
                         <p>Failed to load attendance periods. Please try again later.</p>
@@ -40,13 +40,13 @@
 
                     <!-- Loading State -->
                     <div v-else-if="periodStore.loading" class="space-y-3">
-                        <div v-for="i in 4" :key="i" class="h-20 bg-gray-100 rounded-2xl animate-pulse" />
+                        <div v-for="i in 4" :key="i" class="h-20 rounded-2xl animate-pulse" style="background-color: var(--color-surface-muted);" />
                     </div>
 
                     <!-- Empty State -->
-                    <div v-else-if="!periods.length" class="bg-white border border-brand-border rounded-2xl p-12">
-                        <EmptyState icon="CalendarClock" title="No attendance periods found" subtitle="Create a period to get started." />
-                    </div>
+                    <template v-else-if="!periods.length">
+                        <EmptyState icon="CalendarClock" title="Data periode kosong" subtitle="Buat periode kehadiran baru." />
+                    </template>
 
                     <!-- Period List -->
                     <div v-else class="space-y-3">
@@ -55,7 +55,8 @@
                             :key="period.id"
                             type="button"
                             @click="selectPeriod(period)"
-                            class="group flex items-center justify-between p-4 bg-white border rounded-2xl transition-all duration-200 cursor-pointer text-left w-full"
+                            class="group flex items-center justify-between p-4 border rounded-2xl transition-all duration-200 cursor-pointer text-left w-full"
+                            style="background-color: var(--color-surface);"
                             :class="
                                 selectedPeriod?.id === period.id
                                     ? 'border-brand-primary shadow-md'
@@ -66,9 +67,9 @@
                                 <div
                                     class="w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm"
                                     :class="{
-                                        'bg-green-50 text-green-700': period.status === 'open',
-                                        'bg-yellow-50 text-yellow-700': period.status === 'review',
-                                        'bg-gray-100 text-gray-600': period.status === 'locked',
+                                        'bg-success-50 text-success-700': period.status === 'open',
+                                        'bg-warning-50 text-warning-700': period.status === 'review',
+                                        'bg-[var(--color-surface-muted)] text-brand-light': period.status === 'locked',
                                     }"
                                 >
                                     {{ new Date(period.start_date).toLocaleString("default", { month: "short" }) }}
@@ -83,14 +84,14 @@
                                 <span
                                     class="px-2 py-1 text-xs font-semibold uppercase rounded-full border"
                                     :class="{
-                                        'bg-green-50 border-green-200 text-green-700': period.status === 'open',
-                                        'bg-yellow-50 border-yellow-200 text-yellow-700': period.status === 'review',
-                                        'bg-gray-100 border-gray-200 text-gray-600': period.status === 'locked',
+                                        'bg-success-50 border-success-200 text-success-700': period.status === 'open',
+                                        'bg-warning-50 border-warning-200 text-warning-700': period.status === 'review',
+                                        'bg-[var(--color-surface-muted)] border-brand-border text-brand-light': period.status === 'locked',
                                     }"
                                 >
                                     {{ period.status }}
                                 </span>
-                                <ChevronRight class="w-4 h-4 text-gray-400 group-hover:text-brand-dark transition-colors" />
+                                <ChevronRight class="w-4 h-4 text-brand-light group-hover:text-brand-dark transition-colors" />
                             </div>
                         </button>
                     </div>
@@ -98,38 +99,38 @@
 
                 <!-- Readiness Sidebar -->
                 <div class="lg:col-span-1">
-                    <div class="sticky top-8 bg-white border border-brand-border rounded-2xl p-6">
+                    <div class="sticky top-8 rounded-2xl border border-brand-border p-6 shadow-sm" style="background-color: var(--color-surface);">
                         <h2 class="text-lg font-bold text-brand-dark mb-4 flex items-center gap-2">
                             <CheckCircle class="w-5 h-5 text-green-500" />
                             Readiness Workspace
                         </h2>
 
                         <div v-if="!selectedPeriod" class="text-center py-12 px-4">
-                            <Calendar class="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                            <Calendar class="w-12 h-12 mx-auto mb-3 text-brand-light opacity-60" />
                             <p class="text-brand-light text-sm">Select an attendance period to view payroll readiness.</p>
                         </div>
 
                         <div v-else class="space-y-4">
-                            <div class="p-4 rounded-xl bg-gray-50 border border-brand-border">
+                            <div class="p-4 rounded-xl bg-[var(--color-surface-muted)] border border-brand-border">
                                 <p class="text-sm text-brand-light mb-1">Selected Period</p>
                                 <p class="text-lg font-semibold text-brand-dark">{{ selectedPeriod.month }}</p>
                             </div>
 
                             <div class="grid grid-cols-2 gap-3">
-                                <div class="p-3 rounded-xl bg-green-50 border border-green-200">
-                                    <p class="text-2xl font-bold text-green-700">{{ readinessCounts.ready }}</p>
-                                    <p class="text-xs text-green-600 font-semibold">Ready</p>
+                                <div class="p-3 rounded-xl bg-success-50 border border-success-200">
+                                    <p class="text-2xl font-bold text-success-700">{{ readinessCounts.ready }}</p>
+                                    <p class="text-xs text-success-700 font-semibold">Ready</p>
                                 </div>
-                                <div class="p-3 rounded-xl bg-yellow-50 border border-yellow-200">
-                                    <p class="text-2xl font-bold text-yellow-700">{{ readinessCounts.warnings }}</p>
-                                    <p class="text-xs text-yellow-600 font-semibold">Warnings</p>
+                                <div class="p-3 rounded-xl bg-warning-50 border border-warning-200">
+                                    <p class="text-2xl font-bold text-warning-700">{{ readinessCounts.warnings }}</p>
+                                    <p class="text-xs text-warning-700 font-semibold">Warnings</p>
                                 </div>
-                                <div class="p-3 rounded-xl bg-red-50 border border-red-200 col-span-2 flex justify-between items-center">
+                                <div class="p-3 rounded-xl bg-danger-50 border border-danger-200 col-span-2 flex justify-between items-center">
                                     <div>
-                                        <p class="text-2xl font-bold text-red-700">{{ readinessCounts.blocked }}</p>
-                                        <p class="text-xs text-red-600 font-semibold">Blocked</p>
+                                        <p class="text-2xl font-bold text-danger-700">{{ readinessCounts.blocked }}</p>
+                                        <p class="text-xs text-danger-700 font-semibold">Blocked</p>
                                     </div>
-                                    <button class="px-3 py-1.5 rounded-lg bg-red-100 text-red-700 text-sm font-medium hover:bg-red-200 transition-colors cursor-pointer">
+                                    <button class="px-3 py-1.5 rounded-lg bg-danger-100 text-danger-700 text-sm font-medium hover:bg-danger-200 transition-colors cursor-pointer">
                                         Review
                                     </button>
                                 </div>
@@ -149,7 +150,7 @@
                                     :class="
                                         selectedPeriod.status === 'review'
                                             ? 'border border-primary-700 blue-gradient blue-btn-shadow text-white hover:brightness-110'
-                                            : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                            : 'bg-[var(--color-surface-muted)] text-brand-light cursor-not-allowed'
                                     "
                                     :disabled="selectedPeriod.status !== 'review'"
                                     @click="handleGeneratePayroll"
@@ -208,7 +209,7 @@
                     <button
                         type="button"
                         :disabled="isSubmitting"
-                        class="flex-1 px-4 py-2.5 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-gray-50 transition-colors cursor-pointer"
+                        class="flex-1 px-4 py-2.5 rounded-lg border border-brand-border text-brand-dark font-medium text-sm hover:bg-[var(--color-surface-muted)] transition-colors cursor-pointer"
                         @click="closeCreateModal"
                     >
                         Cancel

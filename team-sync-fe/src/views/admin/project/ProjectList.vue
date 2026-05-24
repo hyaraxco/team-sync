@@ -92,8 +92,8 @@ onMounted(async () => {
         <EmptyState
             v-if="projects.length === 0"
             icon="SearchX"
-            title="No projects found"
-            subtitle="Try adjusting your search terms or filters"
+            title="Belum ada proyek"
+            subtitle="Coba ubah kata kunci atau filter pencarian"
             class="py-12"
         />
     </div>

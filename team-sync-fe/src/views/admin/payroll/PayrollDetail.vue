@@ -1174,7 +1174,7 @@ const handleApprovePayroll = () => {
                 v-else-if="!hasApprovalSteps"
                 class="rounded-xl border border-dashed border-brand-border px-4 py-6 text-sm text-brand-light"
             >
-                No multi-step approval chain has been started for this payroll. Use the Approve Payroll action to
+                Alur persetujuan berjenjang belum dimulai untuk payroll ini. Use the Approve Payroll action to
                 initialize matching approval policies.
             </div>
             <div v-else class="space-y-4">
@@ -1274,7 +1274,7 @@ const handleApprovePayroll = () => {
                 data-testid="payroll-activity-empty"
                 class="rounded-2xl border border-dashed border-brand-border px-4 py-6 text-sm text-brand-light"
             >
-                No payroll activity has been recorded yet.
+                Belum ada aktivitas payroll yang tercatat.
             </div>
 
             <div v-else class="space-y-4" data-testid="payroll-activity-list">
@@ -1476,7 +1476,7 @@ const handleApprovePayroll = () => {
                     data-testid="payroll-reconciliation-empty"
                     class="rounded-2xl border border-dashed border-brand-border px-4 py-6 text-sm text-brand-light"
                 >
-                    No reconciliation issues were found for this payroll.
+                    Tidak ada isu rekonsiliasi pada payroll ini.
                 </div>
 
                 <div v-else class="space-y-3">
@@ -1522,7 +1522,7 @@ const handleApprovePayroll = () => {
                         data-testid="payroll-reconciliation-filter-empty"
                         class="rounded-2xl border border-dashed border-brand-border px-4 py-6 text-sm text-brand-light"
                     >
-                        No reconciliation issues match the selected filters.
+                        Tidak ada isu rekonsiliasi yang cocok dengan filter.
                     </div>
 
                     <div v-else class="space-y-3" data-testid="payroll-reconciliation-list">
@@ -1878,7 +1878,7 @@ const handleApprovePayroll = () => {
                                             </span>
                                         </p>
                                         <p class="mt-1 text-xs text-brand-light">
-                                            {{ delivery.recipient_email || "No recipient email" }}
+                                            {{ delivery.recipient_email || "Email penerima kosong" }}
                                         </p>
                                         <p class="mt-2 text-xs text-brand-light">
                                             Trigger {{ formatNotificationTrigger(delivery.trigger_type) }} • Attempts
@@ -1917,7 +1917,7 @@ const handleApprovePayroll = () => {
                     data-testid="payroll-notification-delivery-empty"
                     class="mt-4 rounded-xl border border-dashed border-brand-border px-4 py-4 text-sm text-brand-light"
                 >
-                    No notification delivery logs are available yet for this payroll.
+                    Log pengiriman notifikasi payroll belum tersedia.
                 </div>
             </div>
 
@@ -1951,7 +1951,7 @@ const handleApprovePayroll = () => {
                     v-if="selectedAdjustmentItems.length === 0"
                     class="rounded-xl border border-dashed border-brand-border px-4 py-4 text-sm text-brand-light"
                 >
-                    No adjustments available for this staff member.
+                    Tidak ada penyesuaian untuk karyawan ini.
                 </div>
 
                 <div v-else class="space-y-3 max-h-[360px] overflow-y-auto pr-1">

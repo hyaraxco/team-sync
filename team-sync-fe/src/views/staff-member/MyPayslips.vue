@@ -334,10 +334,10 @@ const clearSearch = () => {
                 </template>
                 <template v-else>
                     <p class="text-lg font-semibold" data-testid="my-payroll-empty-none">
-                        No payslip available for this period
+                        Payslip belum tersedia untuk periode ini
                     </p>
                     <p class="text-sm">
-                        There are no payroll records for {{ filters.year }}. Try selecting a different year.
+                        Tidak ada data payroll untuk tahun {{ filters.year }}. Coba pilih tahun lain.
                     </p>
                 </template>
             </div>

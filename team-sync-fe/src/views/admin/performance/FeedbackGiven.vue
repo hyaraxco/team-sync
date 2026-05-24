@@ -156,7 +156,7 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="MessageSquare"
-            title="No Feedback Given"
+            title="Belum ada feedback diberikan"
             description="You haven't given any feedback yet"
         />
     </div>

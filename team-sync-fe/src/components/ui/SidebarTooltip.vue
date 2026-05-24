@@ -20,8 +20,8 @@ defineProps({
 <style scoped>
 .sidebar-tooltip {
     position: absolute;
-    background: #0c1c3c;
-    color: #fff;
+    background: var(--color-brand-dark);
+    color: var(--color-surface);
     padding: 6px 12px;
     border-radius: 8px;
     font-size: 12px;
@@ -47,7 +47,7 @@ defineProps({
     top: 50%;
     transform: translateY(-50%);
     border: 5px solid transparent;
-    border-right-color: #0c1c3c;
+    border-right-color: var(--color-brand-dark);
 }
 
 .sidebar-tooltip--left {
@@ -63,7 +63,7 @@ defineProps({
     top: 50%;
     transform: translateY(-50%);
     border: 5px solid transparent;
-    border-left-color: #0c1c3c;
+    border-left-color: var(--color-brand-dark);
 }
 
 .sidebar-tooltip--top {
@@ -79,7 +79,7 @@ defineProps({
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-top-color: #0c1c3c;
+    border-top-color: var(--color-brand-dark);
 }
 
 .sidebar-tooltip--bottom {
@@ -95,6 +95,6 @@ defineProps({
     left: 50%;
     transform: translateX(-50%);
     border: 5px solid transparent;
-    border-bottom-color: #0c1c3c;
+    border-bottom-color: var(--color-brand-dark);
 }
 </style>

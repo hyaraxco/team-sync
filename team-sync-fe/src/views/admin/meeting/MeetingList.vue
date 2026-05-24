@@ -121,7 +121,7 @@ onUnmounted(() => {
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
             </div>
 
-            <EmptyState v-else-if="!meetings || meetings.length === 0" icon="Video" title="No meetings scheduled yet" subtitle="Create your first meeting to get started" size="lg" />
+            <EmptyState v-else-if="!meetings || meetings.length === 0" icon="Video" title="Belum ada jadwal meeting" subtitle="Jadwalkan meeting baru untuk memulai" size="lg" />
 
             <div v-else class="overflow-x-auto">
                 <table class="w-full text-sm">

@@ -3,8 +3,7 @@
         <div class="max-w-7xl mx-auto space-y-6">
             <header class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                 <div>
-                    <h1 class="text-2xl font-bold text-brand-dark">System Configuration</h1>
-                    <p class="text-brand-light text-sm mt-1">
+                    <p class="text-brand-light text-sm">
                         Configure global attendance rules, grace periods, and manage holiday schedules across the organization.
                     </p>
                 </div>
@@ -31,7 +30,7 @@
                 <section
                     v-if="activeTab === 'Attendance Policies'"
                     key="policies"
-                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3"
+                    class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 rounded-2xl border border-brand-border bg-[var(--color-surface)] p-6 shadow-sm"
                 >
                     <div
                         v-if="policyStore.loading"
@@ -50,34 +49,34 @@
                         <div
                             v-for="policy in policyStore.policies"
                             :key="policy.id"
-                            class="policy-card group p-5 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                            class="policy-card group p-5 border border-brand-border rounded-2xl bg-[var(--color-surface)] hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                         >
                             <div class="flex justify-between items-start mb-4">
                                 <h3 class="text-lg font-semibold text-brand-dark capitalize">
                                     {{ policy.employment_type.replace("_", " ") }}
                                 </h3>
-                                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-brand-light">
+                                <span class="px-2 py-1 text-xs font-semibold rounded-full text-brand-light" style="background-color: var(--color-surface-muted);">
                                     Policy
                                 </span>
                             </div>
 
                             <div class="space-y-3 text-sm">
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Work Hours</span>
                                     <span class="font-medium text-brand-dark">
                                         {{ policy.work_start_time.substring(0, 5) }} -
                                         {{ policy.work_end_time.substring(0, 5) }}
                                     </span>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Late Grace Period</span>
                                     <span class="font-medium text-brand-dark">{{ policy.late_grace_minutes }} mins</span>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Half Day Min</span>
                                     <span class="font-medium text-brand-dark">{{ policy.half_day_min_hours }} hours</span>
                                 </div>
-                                <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                     <span class="text-brand-light">Required Work Days</span>
                                     <span class="font-medium text-brand-dark">
                                         {{ policy.work_days_per_week }} days/week
@@ -86,7 +85,8 @@
                             </div>
 
                             <button
-                                class="w-full mt-8 py-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                class="w-full mt-8 py-3 rounded-xl border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary"
+                                style="background-color: var(--color-surface-muted);"
                                 type="button"
                                 @click="openPolicyModal(policy)"
                             >
@@ -96,7 +96,7 @@
                     </template>
 
                     <div
-                        class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-gray-300 text-gray-500 bg-gray-50 min-h-[300px]"
+                        class="policy-card flex flex-col items-center justify-center p-6 rounded-2xl border border-dashed border-[var(--border-color)] bg-[var(--color-surface-muted)] text-brand-light min-h-[300px]"
                     >
                         <svg class="w-12 h-12 mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path
@@ -109,7 +109,7 @@
                         <span class="font-medium tracking-wide text-center text-brand-dark">
                             Custom policy creation is not available from the current API.
                         </span>
-                        <span class="text-xs text-gray-500 mt-2 text-center">
+                        <span class="text-xs text-brand-light mt-2 text-center">
                             Edit existing employment-type policies instead.
                         </span>
                     </div>
@@ -118,7 +118,8 @@
                 <section
                     v-else-if="activeTab === 'Leave Entitlements'"
                     key="entitlements"
-                    class="relative z-10 space-y-6"
+                    class="relative z-10 space-y-6 rounded-2xl border border-brand-border p-6 shadow-sm"
+                    style="background-color: var(--color-surface);"
                 >
                     <div class="flex justify-between items-center">
                         <h2 class="text-lg font-bold text-brand-dark">Leave Quotas & Rules</h2>
@@ -139,7 +140,8 @@
                             <div
                                 v-for="entitlement in group"
                                 :key="entitlement.id"
-                                class="policy-card p-4 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                                class="policy-card p-4 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                                style="background-color: var(--color-surface);"
                             >
                                 <div class="flex justify-between items-start mb-3">
                                     <h4 class="text-base font-semibold text-brand-dark capitalize">
@@ -147,26 +149,26 @@
                                     </h4>
                                     <span
                                         v-if="!entitlement.is_eligible"
-                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-red-50 text-red-700 border border-red-200"
+                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full border border-danger-200 bg-danger-50 text-danger-700"
                                     >
                                         Ineligible
                                     </span>
                                     <span
                                         v-else-if="entitlement.is_paid"
-                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-green-50 text-green-700 border border-green-200"
+                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full border border-success-200 bg-success-50 text-success-700"
                                     >
                                         Paid
                                     </span>
                                     <span
                                         v-else
-                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full bg-yellow-50 text-yellow-700 border border-yellow-200"
+                                        class="px-2 py-0.5 text-[10px] font-semibold uppercase rounded-full border border-warning-200 bg-warning-50 text-warning-700"
                                     >
                                         Unpaid
                                     </span>
                                 </div>
 
                                 <div class="space-y-2 text-sm">
-                                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                    <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                         <span class="text-brand-light">Quota</span>
                                         <span
                                             class="font-medium text-brand-dark"
@@ -182,7 +184,7 @@
                                         </span>
                                     </div>
                                     <div
-                                        class="flex justify-between items-center border-b border-gray-100 pb-2"
+                                        class="flex justify-between items-center border-b border-brand-border pb-2"
                                         v-if="entitlement.carry_over_max_days > 0"
                                     >
                                         <span class="text-brand-light">Max Carry Over</span>
@@ -190,12 +192,12 @@
                                             {{ entitlement.carry_over_max_days }} days
                                         </span>
                                     </div>
-                                    <div class="flex justify-between items-center border-b border-gray-100 pb-2">
+                                    <div class="flex justify-between items-center border-b border-brand-border pb-2">
                                         <span class="text-brand-light">Requires Proof</span>
                                         <span
                                             class="font-medium"
                                             :class="
-                                                entitlement.requires_attachment ? 'text-red-600' : 'text-gray-500'
+                                                entitlement.requires_attachment ? 'text-danger-700' : 'text-brand-light'
                                             "
                                         >
                                             {{ entitlement.requires_attachment ? "Yes" : "No" }}
@@ -204,7 +206,8 @@
                                 </div>
 
                                 <button
-                                    class="w-full mt-6 py-2 rounded-lg bg-gray-50 hover:bg-gray-100 border border-brand-border text-xs tracking-wide font-medium text-brand-dark transition-all"
+                                    class="w-full mt-6 py-2 rounded-lg border border-brand-border text-xs tracking-wide font-medium text-brand-dark transition-all"
+                                    style="background-color: var(--color-surface-muted);"
                                      type="button"
                                      @click="openEntitlementModal(entitlement)"
                                  >
@@ -215,11 +218,12 @@
                     </div>
                 </section>
 
-                <section v-else-if="activeTab === 'Holiday Calendars'" key="holidays" class="relative z-10 space-y-6">
+                <section v-else-if="activeTab === 'Holiday Calendars'" key="holidays" class="relative z-10 space-y-6 rounded-2xl border border-brand-border p-6 shadow-sm" style="background-color: var(--color-surface);">
                     <div class="flex justify-between items-center">
                         <h2 class="text-2xl font-light">Upcoming Holidays</h2>
                         <button
-                            class="px-6 py-2.5 rounded-full bg-white text-black font-medium text-sm hover:scale-105 transition-transform duration-300"
+                            class="px-6 py-2.5 rounded-full border border-brand-border text-brand-dark font-medium text-sm hover:scale-105 transition-transform duration-300"
+                            style="background-color: var(--color-surface);"
                             type="button"
                             @click="openHolidayModal()"
                         >
@@ -231,14 +235,14 @@
                          <table class="w-full text-left border-collapse">
                              <thead>
                                  <tr class="border-b border-brand-border">
-                                     <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Holiday Name</th>
-                                     <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Date</th>
-                                     <th class="p-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">Type</th>
-                                     <th class="p-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wide">Actions</th>
+                                     <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Holiday Name</th>
+                                     <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Date</th>
+                                     <th class="p-4 text-left text-xs font-semibold text-brand-light uppercase tracking-wide">Type</th>
+                                     <th class="p-4 text-right text-xs font-semibold text-brand-light uppercase tracking-wide">Actions</th>
                                  </tr>
                              </thead>
-                             <tbody class="divide-y divide-gray-100">
-                                 <tr v-if="holidayStore.error" class="text-center text-red-600 bg-red-50">
+                             <tbody class="divide-y divide-[var(--border-color)]">
+                                 <tr v-if="holidayStore.error" class="text-center text-danger-700 bg-[var(--color-surface-muted)]">
                                      <td colspan="4" class="p-8 font-light flex items-center justify-center gap-2">
                                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                              <path
@@ -283,13 +287,13 @@
                                      v-else-if="!holidayStore.paginatedHolidays?.length"
                                      class="text-center"
                                  >
-                                     <td colspan="4" class="p-8 font-light italic text-brand-light">No holidays configured yet.</td>
+                                     <td colspan="4" class="p-8 font-light italic text-brand-light">Belum ada hari libur yang dikonfigurasi.</td>
                                  </tr>
                                  <tr
                                      v-else
                                      v-for="holiday in holidayStore.paginatedHolidays"
                                      :key="holiday.id"
-                                     class="hover:bg-gray-50 transition-colors"
+                                     class="hover:bg-[var(--color-surface-muted)] transition-colors"
                                  >
                                      <td class="p-4 font-medium text-brand-dark">{{ holiday.name || holiday.description }}</td>
                                      <td class="p-4 text-sm text-brand-light">{{ holiday.date }}</td>
@@ -499,7 +503,7 @@
                         v-model="allowedMimeTypesInput"
                         placeholder="image/jpeg, image/png, application/pdf"
                     />
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p class="mt-1 text-xs text-brand-light">
                         Separate MIME types with commas. Leave blank for no restriction.
                     </p>
                 </div>
@@ -556,7 +560,7 @@
                         v-model="holidayAppliesToInput"
                         placeholder="Optional, comma separated"
                     />
-                    <p class="mt-1 text-xs text-gray-500">Leave blank to apply company-wide.</p>
+                    <p class="mt-1 text-xs text-brand-light">Leave blank to apply company-wide.</p>
                 </div>
 
                 <div class="flex gap-3 pt-2">

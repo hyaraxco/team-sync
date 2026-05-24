@@ -205,7 +205,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                     :options="monthlyLeaveOptions"
                     :series="monthlyLeaveSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -218,7 +218,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                     :options="typeDonutOptions"
                     :series="typeDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
 
@@ -248,7 +248,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                         <p class="text-xs text-gray-400">Pending</p>
                     </div>
                 </div>
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -261,7 +261,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                     :options="avgDurationOptions"
                     :series="avgDurationSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
 
@@ -277,7 +277,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                     :options="deptLeaveOptions"
                     :series="deptLeaveSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -335,7 +335,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
                         <p class="text-xs text-gray-400">Total Sick</p>
                     </div>
                 </div>
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
     </div>
@@ -343,7 +343,7 @@ const complianceSeries = computed(() => [leave.value?.proof_compliance?.complian
     <!-- Empty State -->
     <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
         <PalmtreeIcon class="w-16 h-16 mb-4 opacity-50" />
-        <p class="text-lg font-medium">No leave analytics available</p>
+        <p class="text-lg font-medium">Analitik cuti belum tersedia</p>
         <p class="text-sm mt-1">Try adjusting the period or filters</p>
     </div>
 </template>

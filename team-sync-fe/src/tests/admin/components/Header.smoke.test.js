@@ -155,6 +155,13 @@ describe("Header smoke", () => {
         expect(wrapper.find('a[href="#"]').exists()).toBe(false);
     });
 
+    it("renders the route title without claiming page-level heading semantics", () => {
+        const wrapper = factory();
+
+        expect(wrapper.findAll("h1")).toHaveLength(0);
+        expect(wrapper.text()).toContain("Dashboard");
+    });
+
     it("closes dropdown after profile link click", async () => {
         const wrapper = factory();
 

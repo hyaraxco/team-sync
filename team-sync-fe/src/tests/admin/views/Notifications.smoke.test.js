@@ -117,8 +117,8 @@ describe("Notifications view smoke", () => {
         const wrapper = factory();
         await flushUi();
 
-        expect(wrapper.text()).toContain("No notifications yet.");
-        expect(wrapper.text()).toContain("New updates will appear here.");
+        expect(wrapper.text()).toContain("Belum ada notifikasi.");
+        expect(wrapper.text()).toContain("Pembaruan baru akan muncul di sini.");
     });
 
     it("retries the current page from the error state", async () => {
