@@ -8,9 +8,27 @@ use App\Models\HybridWorkSchedule;
 
 class HybridWorkScheduleRepository implements HybridWorkScheduleRepositoryInterface
 {
-    public function getSchedulesPaginated(int $perPage)
-    {
-        return HybridWorkSchedule::query()->paginate($perPage);
+    public function getSchedulesPaginated(
+        int $perPage,
+        ?string $search = null,
+        ?string $status = null
+    ) {
+        $query = HybridWorkSchedule::with(['staffMember.user'])
+            ->orderBy('created_at', 'desc');
+
+        if ($search !== null && $search !== '') {
+            $query->whereHas('staffMember.user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
+
+        if ($status !== null && $status !== '') {
+            $query->whereHas('overrides', function ($q) use ($status) {
+                $q->where('status', $status);
+            });
+        }
+
+        return $query->paginate($perPage);
     }
 
     public function getScheduleByStaffMemberId(int $staffMemberId)
