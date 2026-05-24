@@ -106,7 +106,7 @@ describe("FeedbackGiven smoke", () => {
     it("displays empty state when no feedback", () => {
         performanceFeedbackRefs.givenFeedback.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/no feedback given/i);
+        expect(wrapper.text()).toMatch(/belum ada feedback diberikan/i);
     });
 
     it("displays feedback data when available", () => {

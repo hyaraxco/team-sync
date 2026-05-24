@@ -1,19 +1,30 @@
 <script setup>
 import { ref, onMounted, computed, watch } from "vue";
-import { DEFAULT_AVATAR } from "@/helpers/format";
 import { storeToRefs } from "pinia";
 import { useLeaveRequestStore } from "@/stores/leaveRequest";
 import { useConfirmAction } from "@/composables/useConfirmAction";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 import { useToast } from "@/composables/useToast";
 import { formatDateShort } from "@/utils/dateUtils";
-import { Check, X, CalendarDays, List, ChevronLeft, ChevronRight, FileSearch, ExternalLink } from "lucide-vue-next";
+import { can } from "@/helpers/permissionHelper";
+import { Check, X, CalendarDays, List, FileSearch, ExternalLink } from "lucide-vue-next";
 import SearchFilter from "@/components/common/SearchFilter.vue";
-import Pagination from "@/components/admin/team/Pagination.vue";
-import EmptyState from "@/components/common/EmptyState.vue";
+import DataTableCard from "@/components/common/DataTableCard.vue";
+import TableStateRows from "@/components/common/TableStateRows.vue";
+import EmployeeCell from "@/components/common/EmployeeCell.vue";
+import ModalFooterActions from "@/components/common/ModalFooterActions.vue";
+import ModalConfirmBanner from "@/components/common/ModalConfirmBanner.vue";
+import DatePagination from "@/components/admin/attendance/DatePagination.vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import { DateTime } from "luxon";
+
+const props = defineProps({
+    embedded: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const store = useLeaveRequestStore();
 const { leaveRequests, meta, loading, calendarData, error } = storeToRefs(store);
@@ -24,13 +35,67 @@ const processingBulkAction = ref(false);
 const activeTab = ref("list"); // 'list' or 'calendar'
 
 // ---- LIST VIEW LOGIC ----
-const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
-    defaultFilters: { search: null, status: "" },
+const { filters, serverOptions, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
+    defaultFilters: { search: null, status: "", date_from: null, date_to: null },
     fetchFn: store.fetchLeaveRequestsPaginated,
 });
 
+const leaveStatusFilter = ref("");
+
+const filteredLeaveRequests = computed(() => {
+    if (!leaveStatusFilter.value) {
+        return leaveRequests.value || [];
+    }
+    return (leaveRequests.value || []).filter((request) => request.status === leaveStatusFilter.value);
+});
+
+// ---- DATE NAVIGATION ----
+const now = DateTime.now();
+const dateRange = ref({
+    from: now.startOf("month").toISODate(),
+    to: now.endOf("month").toISODate(),
+});
+
+const handleDateChange = (range) => {
+    dateRange.value = range;
+    filters.value.date_from = range.from;
+    filters.value.date_to = range.to;
+    serverOptions.value.page = 1;
+    fetchData();
+};
+
+const resetWithDateRange = () => {
+    const today = DateTime.now();
+    dateRange.value = {
+        from: today.startOf("month").toISODate(),
+        to: today.endOf("month").toISODate(),
+    };
+    Object.assign(filters.value, {
+        search: null,
+        status: "",
+        date_from: dateRange.value.from,
+        date_to: dateRange.value.to,
+    });
+    serverOptions.value.page = 1;
+    fetchData();
+};
+
 // ---- CALENDAR VIEW LOGIC ----
 const currentMonth = ref(DateTime.now().startOf("month"));
+const calendarDateRange = computed({
+    get: () => ({
+        from: currentMonth.value.startOf("month").toISODate(),
+        to: currentMonth.value.endOf("month").toISODate(),
+    }),
+    set: (range) => {
+        if (range?.from) {
+            const dt = DateTime.fromISO(range.from);
+            if (dt.isValid) {
+                currentMonth.value = dt.startOf("month");
+            }
+        }
+    },
+});
 const calendarGrid = computed(() => {
     const start = currentMonth.value.startOf("week"); // Monday
     const end = currentMonth.value.endOf("month").endOf("week"); // Sunday
@@ -49,12 +114,8 @@ const fetchMonthData = async () => {
     await store.fetchCalendarData(monthStr);
 };
 
-const nextMonth = () => {
-    currentMonth.value = currentMonth.value.plus({ months: 1 });
-    fetchMonthData();
-};
-const prevMonth = () => {
-    currentMonth.value = currentMonth.value.minus({ months: 1 });
+const handleCalendarDateChange = (range) => {
+    calendarDateRange.value = range;
     fetchMonthData();
 };
 
@@ -246,24 +307,30 @@ const getProofUrl = (path) => {
 };
 
 onMounted(() => {
+    filters.value.date_from = dateRange.value.from;
+    filters.value.date_to = dateRange.value.to;
     fetchData();
 });
 </script>
 
 <template>
-    <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div :class="embedded ? '' : 'p-3 sm:p-4 md:p-6 lg:p-8'">
+        <div :class="['space-y-6', !embedded && 'max-w-7xl mx-auto']">
+            <span v-if="!embedded" class="sr-only" role="heading" aria-level="1">Leave Requests</span>
+
+    <div v-if="!embedded" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
-            <h1 class="text-2xl font-bold text-brand-dark">Leave Requests</h1>
+            <p class="text-2xl font-bold text-brand-dark">Leave Requests</p>
             <p class="text-sm text-brand-light mt-1">Manage and monitor employee leave requests.</p>
         </div>
 
         <!-- Tab Switcher -->
-        <div class="bg-gray-100 p-1 flex rounded-lg">
+        <div class="bg-brand-border/20 p-1 flex rounded-lg">
             <button
                 @click="activeTab = 'list'"
                 :class="[
                     'px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-all duration-200',
-                    activeTab === 'list' ? 'bg-white shadow text-brand-dark' : 'text-gray-500 hover:text-brand-dark',
+                    activeTab === 'list' ? 'bg-white shadow text-brand-dark' : 'text-brand-light hover:text-brand-dark',
                 ]"
             >
                 <List class="w-4 h-4" />
@@ -275,7 +342,7 @@ onMounted(() => {
                     'px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-all duration-200',
                     activeTab === 'calendar'
                         ? 'bg-white shadow text-brand-dark'
-                        : 'text-gray-500 hover:text-brand-dark',
+                        : 'text-brand-light hover:text-brand-dark',
                 ]"
             >
                 <CalendarDays class="w-4 h-4" />
@@ -285,7 +352,7 @@ onMounted(() => {
     </div>
 
     <!-- LIST VIEW -->
-    <div v-if="activeTab === 'list'">
+    <div v-if="activeTab === 'list' || embedded">
         <div class="mb-6">
             <SearchFilter
                 placeholder="Search by Employee..."
@@ -302,11 +369,17 @@ onMounted(() => {
                     },
                 ]"
                 @search="handleSearch"
-                @reset="handleReset"
+                @reset="() => { resetWithDateRange(); leaveStatusFilter = ''; }"
+                @update:modelValue="leaveStatusFilter = $event.status || ''"
             />
         </div>
 
-        <div class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+        <!-- Date Navigation -->
+        <div class="mb-4">
+            <DatePagination v-model="dateRange" :loading="loading" @update:modelValue="handleDateChange" />
+        </div>
+
+        <div v-if="!embedded" class="mb-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <p class="text-sm text-brand-light">
                 {{ selectedPendingCount }} pending request{{ selectedPendingCount > 1 ? "s" : "" }} selected
             </p>
@@ -328,87 +401,73 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
-            <!-- Table -->
-            <div class="overflow-x-auto w-full mb-6">
-                <table class="w-full min-w-[860px]">
+        <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">
+        <table class="min-w-full divide-y divide-brand-border">
                     <thead>
-                        <tr class="border-y border-brand-border">
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm w-[48px]">
+                        <tr class="bg-brand-border/20 border-b border-brand-border">
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider w-[48px]">
                                 <input
                                     type="checkbox"
                                     :checked="allSelectableSelected"
                                     :disabled="loading || !selectableRequests.length || processingBulkAction"
                                     @change="toggleSelectAll"
-                                    class="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                                    class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
                                     title="Select all pending requests"
                                 />
                             </th>
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Employee</th>
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Date</th>
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Reason & Type</th>
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Proof</th>
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Status</th>
-                            <th class="py-4 px-4 text-left text-brand-light font-semibold text-sm">Actions</th>
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Employee</th>
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Date</th>
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Reason & Type</th>
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Proof</th>
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Status</th>
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr v-if="loading" class="border-b border-brand-border animate-pulse">
-                            <td colspan="8" class="py-8 text-center text-gray-500">Loading...</td>
-                        </tr>
-                        <tr v-else-if="!leaveRequests || leaveRequests.length === 0" class="border-b border-brand-border">
-                            <td colspan="8" class="py-8">
-                                <EmptyState
-                                    icon="ClipboardList"
-                                    title="No Requests Found"
-                                    description="There are no leave requests currently matching filters."
-                                />
-                            </td>
-                        </tr>
+                    <tbody class="divide-y divide-brand-border">
+                        <TableStateRows
+                            :loading="loading"
+                            :empty="!filteredLeaveRequests || filteredLeaveRequests.length === 0"
+                            :colspan="7"
+                            empty-icon="ClipboardList"
+                            empty-title="No leave requests found"
+                            empty-subtitle="Adjust filters or wait for employees to submit leave requests."
+                        />
+                        <template v-if="filteredLeaveRequests && filteredLeaveRequests.length > 0 && !loading">
                         <tr
-                            v-else
-                            v-for="request in leaveRequests"
+                            v-for="request in filteredLeaveRequests"
                             :key="request.id"
-                            class="border-b border-brand-border hover:bg-gray-50 transition-colors"
+                            class="hover:bg-brand-gray/50"
                         >
-                            <td class="py-4 px-4">
+                            <td class="px-6 py-4">
                                 <input
                                     v-if="request.status === 'pending'"
                                     v-model="selectedIds"
                                     type="checkbox"
                                     :value="request.id"
                                     :disabled="loading || processingBulkAction"
-                                    class="w-4 h-4 rounded border-gray-300 text-brand-dark focus:ring-brand-dark disabled:opacity-50"
+                                    class="w-4 h-4 rounded border-brand-border text-brand-dark focus:ring-brand-dark disabled:opacity-50"
                                     :aria-label="`Select leave request ${request.id}`"
                                 />
                             </td>
-                            <td class="py-4 px-4">
-                                <div class="flex items-center gap-3">
-                                    <img loading="lazy"
-                                        :src="request.staff_member?.user?.profile_photo || DEFAULT_AVATAR"
-                                        alt="Avatar"
-                                        class="w-10 h-10 rounded-full object-cover"
-                                    />
-                                    <div>
-                                        <p class="text-sm font-semibold text-brand-dark">
-                                            {{ request.staff_member?.user?.name }}
-                                        </p>
-                                    </div>
-                                </div>
+                            <td class="px-6 py-4">
+                                <EmployeeCell
+                                    :photo="request.staff_member?.user?.profile_photo"
+                                    :name="request.staff_member?.user?.name || ''"
+                                />
                             </td>
-                            <td class="py-4 px-4">
+                            <td class="px-6 py-4">
                                 <div class="text-sm text-brand-dark font-medium">
                                     {{ formatDateShort(request.start_date) }} - {{ formatDateShort(request.end_date) }}
                                 </div>
                                 <div class="text-xs text-brand-light">{{ request.days }} Days</div>
                             </td>
-                            <td class="py-4 px-4">
+                            <td class="px-6 py-4">
                                 <StatusBadge type="leave-type" :value="request.type" class="mb-1" />
                                 <p class="text-sm text-brand-dark max-w-[200px] truncate" :title="request.reason">
                                     {{ request.reason }}
                                 </p>
                             </td>
-                            <td class="py-4 px-4">
+                            <td class="px-6 py-4">
                                 <div v-if="request.type === 'sick_leave'" class="flex flex-col gap-1">
                                     <a
                                         v-if="request.proof_file_path"
@@ -419,7 +478,7 @@ onMounted(() => {
                                         <ExternalLink class="w-3 h-3" />
                                         View Proof
                                     </a>
-                                    <span v-else class="text-xs text-gray-500 italic">No proof</span>
+                                    <span v-else class="text-xs text-brand-light italic">No proof</span>
 
                                     <div v-if="request.proof_file_path" class="mt-1">
                                         <span
@@ -436,16 +495,16 @@ onMounted(() => {
                                         </span>
                                     </div>
                                 </div>
-                                <span v-else class="text-xs text-gray-400">-</span>
+                                <span v-else class="text-xs text-brand-light">-</span>
                             </td>
-                            <td class="py-4 px-4">
+                            <td class="px-6 py-4">
                                 <StatusBadge type="leave-status" :value="request.status" />
                             </td>
-                            <td class="py-4 px-4">
+                            <td class="px-6 py-4">
                                 <div
                                     class="flex items-center gap-2"
                                     v-if="
-                                        request.status === 'pending' ||
+                                        (request.status === 'pending' && can('leave-request-approve')) ||
                                         (request.type === 'sick_leave' &&
                                             request.proof_file_path &&
                                             (!request.proof_review_status || request.proof_review_status === 'pending'))
@@ -483,49 +542,24 @@ onMounted(() => {
                                 <div v-else class="text-xs text-brand-light">-</div>
                             </td>
                         </tr>
+                        </template>
                     </tbody>
                 </table>
-            </div>
-
-            <Pagination
-                :meta="meta"
-                :loading="loading"
-                @page-change="handlePageChange"
-                @per-page-change="handlePerPageChange"
-            />
-        </div>
+        </DataTableCard>
     </div>
 
     <!-- CALENDAR VIEW -->
-    <div v-else class="bg-white border border-brand-border rounded-2xl p-5">
-        <div class="flex items-center justify-between mb-6">
-            <h3 class="text-brand-dark text-[20px] font-bold">{{ currentMonth.toFormat("MMMM yyyy") }}</h3>
-            <div class="flex gap-2">
-                <button @click="prevMonth" aria-label="Previous month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
-                    <ChevronLeft class="w-5 h-5 text-gray-600" aria-hidden="true" />
-                </button>
-                <button
-                    @click="
-                        currentMonth = DateTime.now().startOf('month');
-                        fetchMonthData();
-                    "
-                    class="px-4 py-2 text-sm font-semibold border rounded-md hover:bg-gray-50"
-                    :disabled="loading"
-                >
-                    Today
-                </button>
-                <button @click="nextMonth" aria-label="Next month" class="p-2 border rounded-md hover:bg-gray-50" :disabled="loading">
-                    <ChevronRight class="w-5 h-5 text-gray-600" aria-hidden="true" />
-                </button>
-            </div>
+    <div v-else-if="!embedded" class="bg-white border border-brand-border rounded-2xl p-5">
+        <div class="mb-6">
+            <DatePagination v-model="calendarDateRange" :loading="loading" @update:modelValue="handleCalendarDateChange" />
         </div>
 
-        <div class="grid grid-cols-7 gap-px bg-gray-200 border border-gray-200 rounded-lg overflow-hidden">
+        <div class="grid grid-cols-7 gap-px bg-brand-border border border-brand-border rounded-lg overflow-hidden">
             <!-- Calendar Header -->
             <div
                 v-for="day in ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']"
                 :key="day"
-                class="bg-gray-50 py-2 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider"
+                class="bg-brand-border/20 py-2 text-center text-xs font-semibold text-brand-light uppercase tracking-wider"
             >
                 {{ day }}
             </div>
@@ -535,8 +569,8 @@ onMounted(() => {
                 v-for="date in calendarGrid"
                 :key="date.toISODate()"
                 :class="[
-                    'bg-white min-h-[120px] p-2 hover:bg-gray-50 transition-colors',
-                    { 'opacity-50 bg-gray-50': date.month !== currentMonth.month },
+                    'bg-white min-h-[120px] p-2 hover:bg-brand-border/20 transition-colors',
+                    { 'opacity-50 bg-brand-border/20': date.month !== currentMonth.month },
                 ]"
             >
                 <div class="flex justify-between items-start mb-2">
@@ -545,7 +579,7 @@ onMounted(() => {
                             'text-sm font-medium w-6 h-6 flex items-center justify-center rounded-full',
                             date.toISODate() === DateTime.now().toISODate()
                                 ? 'bg-brand-dark text-white'
-                                : 'text-gray-700',
+                                : 'text-brand-dark',
                         ]"
                     >
                         {{ date.toFormat("d") }}
@@ -574,57 +608,29 @@ onMounted(() => {
 
     <!-- Approve Modal -->
     <ModalWrapper :show="showApproveModalState" title="Approve Leave Request" maxWidth="md" @close="closeApproveModal">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-                <Check class="w-6 h-6 text-green-600" />
-            </div>
-            <p class="text-brand-light text-sm">Confirm approval for this leave request.</p>
-        </div>
+        <ModalConfirmBanner variant="green" message="Confirm approval for this leave request." />
         <template #footer>
-            <div class="flex gap-3">
-                <button
-                    @click="closeApproveModal"
-                    :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                >
-                    Cancel
-                </button>
-                <button
-                    @click="confirmApprove"
-                    :disabled="processingApprove"
-                    class="flex-1 px-4 py-3 bg-green-600 text-white rounded-xl text-sm font-semibold hover:bg-green-700 transition-all duration-300"
-                >
-                    {{ processingApprove ? "Approving..." : "Approve" }}
-                </button>
-            </div>
+            <ModalFooterActions
+                :processing="processingApprove"
+                confirm-label="Approve"
+                confirm-color="green"
+                @cancel="closeApproveModal"
+                @confirm="confirmApprove"
+            />
         </template>
     </ModalWrapper>
 
     <!-- Reject Modal -->
     <ModalWrapper :show="showRejectModalState" title="Reject Leave Request" maxWidth="md" @close="closeRejectModal">
-        <div class="flex items-center gap-4 mb-6">
-            <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center shrink-0">
-                <X class="w-6 h-6 text-red-600" />
-            </div>
-            <p class="text-brand-light text-sm">Confirm rejection for this leave request.</p>
-        </div>
+        <ModalConfirmBanner variant="red" message="Confirm rejection for this leave request." />
         <template #footer>
-            <div class="flex gap-3">
-                <button
-                    @click="closeRejectModal"
-                    :disabled="processingReject"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                >
-                    Cancel
-                </button>
-                <button
-                    @click="confirmReject"
-                    :disabled="processingReject"
-                    class="flex-1 px-4 py-3 bg-red-600 text-white rounded-xl text-sm font-semibold hover:bg-red-700 transition-all duration-300"
-                >
-                    {{ processingReject ? "Rejecting..." : "Reject" }}
-                </button>
-            </div>
+            <ModalFooterActions
+                :processing="processingReject"
+                confirm-label="Reject"
+                confirm-color="red"
+                @cancel="closeRejectModal"
+                @confirm="confirmReject"
+            />
         </template>
     </ModalWrapper>
 
@@ -642,9 +648,9 @@ onMounted(() => {
 
             <div
                 v-if="selectedProofRequest?.proof_file_path"
-                class="mb-4 p-3 bg-gray-50 border rounded flex justify-between items-center"
+                class="mb-4 p-3 bg-brand-border/20 border border-brand-border rounded flex justify-between items-center"
             >
-                <span class="text-sm font-medium text-gray-700">{{ selectedProofRequest.proof_file_name }}</span>
+                <span class="text-sm font-medium text-brand-dark">{{ selectedProofRequest.proof_file_name }}</span>
                 <a
                     :href="getProofUrl(selectedProofRequest.proof_file_path)"
                     target="_blank"
@@ -657,7 +663,7 @@ onMounted(() => {
 
             <div class="space-y-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Decision *</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1.5">Review Decision *</label>
                     <select
                         v-model="proofReviewForm.status"
                         class="w-full px-4 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary"
@@ -667,7 +673,7 @@ onMounted(() => {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1.5">Review Notes</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1.5">Review Notes</label>
                     <textarea
                         v-model="proofReviewForm.notes"
                         rows="3"
@@ -678,22 +684,15 @@ onMounted(() => {
             </div>
         </div>
         <template #footer>
-            <div class="flex gap-3">
-                <button
-                    @click="closeReviewProofModal"
-                    :disabled="processingProofReview"
-                    class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300"
-                >
-                    Cancel
-                </button>
-                <button
-                    @click="confirmReviewProof"
-                    :disabled="processingProofReview"
-                    class="flex-1 px-4 py-3 bg-brand-dark text-white rounded-xl text-sm font-semibold hover:bg-opacity-90 transition-all duration-300"
-                >
-                    {{ processingProofReview ? "Submitting..." : "Submit Review" }}
-                </button>
-            </div>
+            <ModalFooterActions
+                :processing="processingProofReview"
+                confirm-label="Submit Review"
+                confirm-color="blue"
+                @cancel="closeReviewProofModal"
+                @confirm="confirmReviewProof"
+            />
         </template>
     </ModalWrapper>
+        </div>
+    </div>
 </template>

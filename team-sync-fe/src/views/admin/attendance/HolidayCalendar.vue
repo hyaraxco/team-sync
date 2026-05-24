@@ -150,13 +150,17 @@ onMounted(() => {
 </script>
 
 <template>
+    <div class="p-3 sm:p-4 md:p-6 lg:p-8">
+        <div class="max-w-7xl mx-auto space-y-6">
+            <span class="sr-only" role="heading" aria-level="1">Holiday Calendar</span>
+
     <MainCard>
         <div class="flex items-center justify-between mb-6">
             <div>
-                <h1 class="text-2xl font-bold text-brand-dark flex items-center gap-2">
+                <p class="text-2xl font-bold text-brand-dark flex items-center gap-2">
                     <Calendar class="w-6 h-6" />
                     Holiday Calendar
-                </h1>
+                </p>
                 <p class="text-sm text-brand-light mt-1">Manage national holidays and collective leave dates.</p>
             </div>
 
@@ -171,7 +175,7 @@ onMounted(() => {
 
         <div v-if="loading" class="py-16 flex items-center justify-center">
             <div class="flex items-center gap-3 text-brand-light">
-                <div class="w-5 h-5 border-2 border-gray-300 border-t-brand-dark rounded-full animate-spin"></div>
+                <div class="w-5 h-5 border-2 border-brand-border border-t-brand-dark rounded-full animate-spin"></div>
                 <span class="text-sm">Loading holidays...</span>
             </div>
         </div>
@@ -180,7 +184,7 @@ onMounted(() => {
             <EmptyState
                 icon="CalendarClock"
                 title="No holidays found"
-                subtitle="Add a holiday to start building your company holiday calendar."
+                subtitle="Add a holiday to start building the company calendar."
             />
         </div>
 
@@ -199,7 +203,7 @@ onMounted(() => {
                         <tr
                             v-for="holiday in paginatedHolidays"
                             :key="holiday.id"
-                            class="border-b border-brand-border hover:bg-gray-50 transition-colors"
+                            class="border-b border-brand-border hover:bg-brand-border/20 transition-colors"
                         >
                             <td class="py-4 px-4 text-sm text-brand-dark font-medium">
                                 {{ holiday.date }}
@@ -286,7 +290,7 @@ onMounted(() => {
                     <option value="national_holiday">National Holiday</option>
                     <option value="collective_leave">Collective Leave (Cuti Bersama)</option>
                 </select>
-                <p class="mt-1 text-xs text-gray-500">
+                <p class="mt-1 text-xs text-brand-light">
                     Cuti bersama does not require leave requests and won't deduct from employee leave balance.
                 </p>
             </div>
@@ -341,4 +345,6 @@ onMounted(() => {
             </div>
         </template>
     </ModalWrapper>
+        </div>
+    </div>
 </template>

@@ -158,7 +158,7 @@ onMounted(async () => {
                                 {{ currentGoal.title }}
                             </h2>
                             <p class="text-brand-light mt-2">
-                                {{ currentGoal.description || "No description provided" }}
+                                {{ currentGoal.description || "Deskripsi belum tersedia" }}
                             </p>
                         </div>
 
@@ -344,13 +344,13 @@ onMounted(async () => {
                 <EmptyState
                     v-else
                     icon="CalendarClock"
-                    title="No progress updates yet"
-                    subtitle="Progress history will appear here once updates are added."
+                    title="Belum ada pembaruan progres"
+                    subtitle="Riwayat progres akan muncul setelah pembaruan ditambahkan."
                     size="sm"
                 />
             </MainCard>
         </template>
 
-        <EmptyState v-else icon="Target" title="Goal not found" subtitle="The requested goal could not be loaded." />
+        <EmptyState v-else icon="Target" title="Sasaran tidak ditemukan" subtitle="Sasaran yang diminta tidak dapat dimuat." />
     </div>
 </template>

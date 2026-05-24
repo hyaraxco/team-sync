@@ -300,7 +300,7 @@ watch(
             <div class="flex flex-1 items-center justify-center min-h-[250px]" v-else>
                 <div class="flex flex-col items-center justify-center">
                     <Crown class="w-12 h-12 text-gray-300 mb-4" />
-                    <h3 class="text-brand-dark text-base font-semibold mb-2">No Team Lead Assigned</h3>
+                    <h3 class="text-brand-dark text-base font-semibold mb-2">Belum ada leader tim</h3>
                     <p class="text-brand-light text-sm mb-4 text-center">
                         This team does not currently have a leader assigned.
                     </p>
@@ -682,8 +682,8 @@ watch(
                 <EmptyState
                     v-if="availableEmployees.length === 0"
                     icon="SearchX"
-                    title="No staffMembers available"
-                    subtitle="All staffMembers are already members of this team or try adjusting your search terms"
+                    title="Tidak ada karyawan tersedia"
+                    subtitle="Semua karyawan sudah menjadi anggota tim ini atau ubah kata kunci pencarian"
                 />
             </div>
         </div>

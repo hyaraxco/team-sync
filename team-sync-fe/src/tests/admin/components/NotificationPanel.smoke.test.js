@@ -35,7 +35,7 @@ describe("NotificationPanel smoke", () => {
     it("shows empty state", () => {
         const wrapper = factory();
 
-        expect(wrapper.get('[data-testid="notification-empty"]').text()).toContain("No notifications yet");
+        expect(wrapper.get('[data-testid="notification-empty"]').text()).toContain("No notifications");
     });
 
     it("renders up to five latest notifications", () => {

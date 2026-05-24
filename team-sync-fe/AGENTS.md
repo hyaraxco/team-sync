@@ -173,7 +173,7 @@ Dashboard and analytics use permission-based branching:
 - **DO NOT** mix npm and bun lockfiles — use bun only
 - **DO NOT** use `h-screen` — use `min-h-[100dvh]` for full-height layouts (iOS Safari bug)
 - **DO NOT** use `hover:border-2` — causes 1px layout shift; use `hover:ring-2` instead
-- **DO NOT** use `dark:` classes — partial dark mode not supported; remove entirely
+- **DO NOT** use `dark:` Tailwind classes — dark mode uses CSS custom properties approach. Use `var(--color-*)` tokens defined in `input.css`. Toggle via `.dark` class on `<html>` (managed by `useDarkMode` composable)
 
 ## COMMANDS
 

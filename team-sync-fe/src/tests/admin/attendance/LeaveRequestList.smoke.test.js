@@ -46,6 +46,9 @@ vi.mock("lucide-vue-next", async (importOriginal) => {
 });
 
 import LeaveRequestList from "@/views/admin/attendance/LeaveRequestList.vue";
+import SearchFilter from "@/components/common/SearchFilter.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
+import StatusBadge from "@/components/common/StatusBadge.vue";
 
 describe("LeaveRequestList smoke", () => {
     beforeEach(() => {
@@ -78,7 +81,37 @@ describe("LeaveRequestList smoke", () => {
 
     it("contains header text", () => {
         const wrapper = createWrapper();
-        expect(wrapper.text()).toContain("Leave Requests");
+        const semanticHeading = wrapper.find('[role="heading"][aria-level="1"]');
+        expect(semanticHeading.exists()).toBe(true);
+        expect(semanticHeading.text()).toBe("Leave Requests");
+        expect(semanticHeading.classes()).toContain("sr-only");
+        expect(wrapper.findAll("h1")).toHaveLength(0);
+        expect(wrapper.text()).not.toContain("Pengajuan Cuti");
+    });
+
+    it("keeps list essentials and empty state", () => {
+        const wrapper = createWrapper();
+
+        expect(wrapper.findComponent(SearchFilter).exists()).toBe(true);
+        expect(wrapper.findComponent(EmptyState).exists()).toBe(true);
+    });
+
+    it("keeps StatusBadge for populated rows", () => {
+        leaveRequests.value = [
+            {
+                id: 1,
+                status: "pending",
+                type: "annual_leave",
+                start_date: "2026-05-01",
+                end_date: "2026-05-01",
+                days: 1,
+                reason: "Vacation",
+                staff_member: { user: { name: "Agung", profile_photo: null } },
+            },
+        ];
+
+        const wrapper = createWrapper();
+        expect(wrapper.findComponent(StatusBadge).exists()).toBe(true);
     });
 
     it("fetches paginated data on mount (list view is default)", () => {

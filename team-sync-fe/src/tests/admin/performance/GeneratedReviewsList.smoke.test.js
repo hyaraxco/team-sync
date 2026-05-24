@@ -52,7 +52,7 @@ describe("GeneratedReviewsList.vue Smoke Test", () => {
         });
 
         expect(wrapper.text()).toContain("Generated Reviews");
-        expect(wrapper.text()).toContain("No reviews generated yet");
+        expect(wrapper.text()).toContain("Belum ada ulasan yang digenerate");
         // Generate reviews button is visible because status is draft
         expect(wrapper.text()).toContain("Generate Reviews");
     });

@@ -256,8 +256,8 @@ onMounted(async () => {
         <EmptyState
             v-else
             icon="CheckCircle2"
-            title="No Pending Calibrations"
-            description="There are currently no performance reviews waiting for HR calibration."
+            title="Tidak ada kalibrasi tertunda"
+            description="Tidak ada review performa yang menunggu kalibrasi HR."
         />
     </div>
 </template>

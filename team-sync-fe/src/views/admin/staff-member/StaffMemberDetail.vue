@@ -387,7 +387,7 @@ onMounted(() => {
                     </div>
                 </div>
                 <div v-else class="text-center py-4">
-                    <p class="text-brand-light text-sm">No emergency contact information</p>
+                    <p class="text-brand-light text-sm">Informasi kontak darurat belum tersedia</p>
                 </div>
             </div>
         </div>

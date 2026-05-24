@@ -213,7 +213,7 @@ const correctionSeries = computed(() => {
                     :options="monthlyRateOptions"
                     :series="monthlyRateSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -226,7 +226,7 @@ const correctionSeries = computed(() => {
                     :options="statusDonutOptions"
                     :series="statusDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
 
@@ -242,7 +242,7 @@ const correctionSeries = computed(() => {
                     :options="latenessOptions"
                     :series="latenessSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -255,7 +255,7 @@ const correctionSeries = computed(() => {
                     :options="avgHoursOptions"
                     :series="avgHoursSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
 
@@ -271,7 +271,7 @@ const correctionSeries = computed(() => {
                     :options="workModeOptions"
                     :series="workModeSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -298,7 +298,7 @@ const correctionSeries = computed(() => {
                         <span class="text-sm font-semibold text-amber-600">{{ emp.late_count }}x</span>
                     </div>
                 </div>
-                <div v-else class="flex items-center justify-center h-48 text-gray-400 text-sm">No late records</div>
+                <div v-else class="flex items-center justify-center h-48 text-gray-400 text-sm">Tidak ada catatan keterlambatan</div>
             </div>
         </div>
 
@@ -314,7 +314,7 @@ const correctionSeries = computed(() => {
                     :options="mismatchOptions"
                     :series="mismatchSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -327,7 +327,7 @@ const correctionSeries = computed(() => {
                     :options="correctionOptions"
                     :series="correctionSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
             </div>
         </div>
     </div>
@@ -335,7 +335,7 @@ const correctionSeries = computed(() => {
     <!-- Empty State -->
     <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
         <CalendarCheckIcon class="w-16 h-16 mb-4 opacity-50" />
-        <p class="text-lg font-medium">No attendance analytics available</p>
+        <p class="text-lg font-medium">Analitik kehadiran belum tersedia</p>
         <p class="text-sm mt-1">Try adjusting the period or filters</p>
     </div>
 </template>

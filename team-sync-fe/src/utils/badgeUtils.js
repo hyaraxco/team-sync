@@ -131,3 +131,16 @@ export const getPayrollStatusColor = (status) => {
     };
     return colors[status?.toLowerCase()] || "bg-gray-100 text-gray-700";
 };
+
+// ─── Attendance Status ───
+export const getAttendanceStatusBadgeClass = (status) => {
+    const map = {
+        present: "bg-green-100 text-green-700",
+        late: "bg-amber-100 text-amber-700",
+        half_day: "bg-amber-100 text-amber-700",
+        absent: "bg-red-100 text-red-700",
+        sick_leave: "bg-gray-100 text-gray-700",
+        annual_leave: "bg-gray-100 text-gray-700",
+    };
+    return map[status?.toLowerCase()] || "bg-gray-100 text-gray-700";
+};
