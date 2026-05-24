@@ -43,7 +43,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
             $thrPayrolls = $this->thrService->getAllPaginated(
                 $request->query('year') ? (int) $request->query('year') : null,
                 $request->query('status'),
-                (int) $request->get('per_page', 15)
+                (int) $request->input('per_page', 15)
             );
 
             return ResponseHelper::jsonResponse(
@@ -90,7 +90,7 @@ class ThrPayrollController extends Controller implements HasMiddleware
         try {
             $details = $this->thrService->getDetails(
                 (int) $id,
-                (int) $request->get('per_page', 15)
+                (int) $request->input('per_page', 15)
             );
 
             return ResponseHelper::jsonResponse(
