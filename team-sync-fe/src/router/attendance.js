@@ -84,7 +84,13 @@ export default [
         name: "staffMember.attendance.my-attendances",
         component: () => import("@/views/staff-member/MyAttendance.vue"),
         meta: {
-            requiredAnyPermissions: ["attendance-my-attendances", "attendance-check-in", "attendance-check-out"],
+            requiredAnyPermissions: [
+                "attendance-my-attendances",
+                "attendance-check-in",
+                "attendance-check-out",
+                "overtime-list",
+                "overtime-create"
+            ],
         },
     },
     {

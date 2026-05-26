@@ -10,8 +10,7 @@ class HybridWorkScheduleRepository implements HybridWorkScheduleRepositoryInterf
 {
     public function getSchedulesPaginated(
         int $perPage,
-        ?string $search = null,
-        ?string $status = null
+        ?string $search = null
     ) {
         $query = HybridWorkSchedule::with(['staffMember.user'])
             ->orderBy('created_at', 'desc');
