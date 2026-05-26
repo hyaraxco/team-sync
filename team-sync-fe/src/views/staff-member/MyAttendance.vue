@@ -233,7 +233,7 @@ const sections = computed(() =>
             id: "overview",
             label: "Overview",
             icon: CalendarDays,
-            isVisible: true,
+            isVisible: canViewMyAttendanceData.value,
         },
         {
             id: "corrections",
@@ -518,6 +518,10 @@ onMounted(async () => {
 
     await handleRouteActionQuery();
     handleRouteTabQuery();
+
+    if (!sections.value.some((s) => s.id === activeSection.value) && sections.value.length > 0) {
+        activeSection.value = sections.value[0].id;
+    }
 });
 
 onUnmounted(() => {

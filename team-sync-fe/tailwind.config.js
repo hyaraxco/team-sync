@@ -1,4 +1,13 @@
 /** @type {import('tailwindcss').Config} */
+function withOpacity(variableName) {
+    return ({ opacityValue }) => {
+        if (opacityValue !== undefined) {
+            return `color-mix(in srgb, var(${variableName}) calc(${opacityValue} * 100%), transparent)`;
+        }
+        return `var(${variableName})`;
+    };
+}
+
 export default {
     darkMode: 'class',
     content: [
@@ -21,24 +30,24 @@ export default {
                     900: '#1e3a8a',
                 },
                 // Semantic tokens — reference CSS custom properties for dark mode support
-                'brand-dark': 'var(--color-brand-dark)',
-                'brand-light': 'var(--color-brand-light)',
-                'brand-border': 'var(--color-brand-border)',
-                'brand-primary': 'var(--color-brand-primary)',
+                'brand-dark': withOpacity('--color-brand-dark'),
+                'brand-light': withOpacity('--color-brand-light'),
+                'brand-border': withOpacity('--color-brand-border'),
+                'brand-primary': withOpacity('--color-brand-primary'),
                 // Surface tokens — bg-white, bg-gray-50, bg-gray-100 etc. via CSS vars
-                'surface': 'var(--color-surface)',
-                'surface-raised': 'var(--color-surface-raised)',
-                'surface-overlay': 'var(--color-surface-overlay)',
-                'surface-muted': 'var(--color-surface-muted)',
-                'surface-subtle': 'var(--color-surface-subtle)',
+                'surface': withOpacity('--color-surface'),
+                'surface-raised': withOpacity('--color-surface-raised'),
+                'surface-overlay': withOpacity('--color-surface-overlay'),
+                'surface-muted': withOpacity('--color-surface-muted'),
+                'surface-subtle': withOpacity('--color-surface-subtle'),
                 // Border tokens
-                'border-default': 'var(--color-border-default)',
-                'border-muted': 'var(--color-border-muted)',
+                'border-default': withOpacity('--color-border-default'),
+                'border-muted': withOpacity('--color-border-muted'),
                 // Text tokens
-                'text-primary': 'var(--color-text-primary)',
-                'text-secondary': 'var(--color-text-secondary)',
-                'text-muted': 'var(--color-text-muted)',
-                'text-disabled': 'var(--color-text-disabled)',
+                'text-primary': withOpacity('--color-text-primary'),
+                'text-secondary': withOpacity('--color-text-secondary'),
+                'text-muted': withOpacity('--color-text-muted'),
+                'text-disabled': withOpacity('--color-text-disabled'),
                 success: {
                     50: '#ecfdf5',
                     100: '#d1fae5',

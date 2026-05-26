@@ -27,8 +27,7 @@ class HybridWorkScheduleController extends Controller implements HasMiddleware
     {
         $schedules = $this->repository->getSchedulesPaginated(
             (int) ($request->validated('per_page') ?? 15),
-            $request->validated('search'),
-            $request->validated('status')
+            $request->validated('search')
         );
         $schedules->setCollection($schedules->getCollection()->map(
             fn (HybridWorkSchedule $schedule): array => (new HybridWorkScheduleResource($schedule))->resolve($request)
