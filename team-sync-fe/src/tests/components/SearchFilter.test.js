@@ -22,6 +22,7 @@ describe('SearchFilter', () => {
     })
 
     it('emits update:modelValue on input', async () => {
+        vi.useFakeTimers()
         wrapper = mount(SearchFilter, {
             props: {
                 modelValue: { search: '' },
@@ -32,10 +33,11 @@ describe('SearchFilter', () => {
         const input = wrapper.find('input')
         await input.setValue('test query')
         
-        // Wait for debounce
-        await new Promise(resolve => setTimeout(resolve, 350))
+        // Wait for debounce deterministically
+        vi.advanceTimersByTime(350)
         
         expect(wrapper.emitted('update:modelValue')).toBeTruthy()
+        vi.useRealTimers()
     })
 
     it('shows reset button when search value is not empty', async () => {

@@ -6,8 +6,7 @@ interface HybridWorkScheduleRepositoryInterface
 {
     public function getSchedulesPaginated(
         int $perPage,
-        ?string $search = null,
-        ?string $status = null
+        ?string $search = null
     );
 
     public function getScheduleByStaffMemberId(int $staffMemberId);

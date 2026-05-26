@@ -15,7 +15,6 @@ class HybridScheduleListRequest extends FormRequest
     {
         return [
             'search' => 'nullable|string',
-            'status' => 'nullable|string|in:pending,approved,rejected',
             'per_page' => 'nullable|integer|min:1|max:100',
         ];
     }
