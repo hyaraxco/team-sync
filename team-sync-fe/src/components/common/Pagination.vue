@@ -154,7 +154,7 @@ const goToNext = () => {
             <button
                 @click="goToPrevious"
                 :disabled="currentPage <= 1 || loading"
-                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Previous page"
             >
                 <ChevronLeft class="w-4 h-4" />
@@ -171,18 +171,18 @@ const goToNext = () => {
                         'px-3 sm:px-4 py-2 border rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
                         page === currentPage
                             ? 'border-primary-700 blue-gradient blue-btn-shadow text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50',
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised',
                     ]"
                 >
                     {{ page }}
                 </button>
-                <span v-else class="px-2 text-gray-500">...</span>
+                <span v-else class="px-2 text-text-secondary">...</span>
             </template>
 
             <button
                 @click="goToNext"
                 :disabled="currentPage >= lastPage || loading"
-                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Next page"
             >
                 <ChevronRight class="w-4 h-4" />

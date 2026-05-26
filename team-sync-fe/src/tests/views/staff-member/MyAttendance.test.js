@@ -160,6 +160,12 @@ const factory = () =>
                 AttendanceCorrectionModal: {
                     template: '<div class="correction-modal-stub" />',
                 },
+                MyOvertime: {
+                    template: '<div class="my-overtime-stub" />',
+                },
+                HybridSchedules: {
+                    template: '<div class="hybrid-schedules-stub" />',
+                },
             },
         },
     });
