@@ -155,11 +155,13 @@ describe("Header smoke", () => {
         expect(wrapper.find('a[href="#"]').exists()).toBe(false);
     });
 
-    it("renders the route title without claiming page-level heading semantics", () => {
+    it("renders the route title as a page-level h1 heading", () => {
         const wrapper = factory();
 
-        expect(wrapper.findAll("h1")).toHaveLength(0);
-        expect(wrapper.text()).toContain("Dashboard");
+        const heading = wrapper.find('[data-testid="page-title"]');
+        expect(heading.exists()).toBe(true);
+        expect(heading.element.tagName).toBe("H1");
+        expect(heading.text()).toContain("Dashboard");
     });
 
     it("closes dropdown after profile link click", async () => {

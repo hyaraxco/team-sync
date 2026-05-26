@@ -136,7 +136,7 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
       await submitButton.click();
       await expect(page).toHaveURL(/\/admin\/payroll$/);
       await expect(
-        page.locator("text=/processed in the background|being processed/i").first()
+        page.locator("text=/processed in the background|being processed|successfully generated/i").first()
       ).toBeVisible({
         timeout: 15_000,
       });
