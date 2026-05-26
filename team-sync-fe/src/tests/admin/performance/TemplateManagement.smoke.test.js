@@ -126,7 +126,7 @@ describe("TemplateManagement smoke", () => {
     it("displays empty state when no templates", () => {
         performanceReviewRefs.templates.value = [];
         const wrapper = factory();
-        expect(wrapper.text()).toMatch(/template belum tersedia/i);
+        expect(wrapper.text()).toMatch(/no templates found/i);
     });
 
     it("displays templates table when templates exist", () => {
