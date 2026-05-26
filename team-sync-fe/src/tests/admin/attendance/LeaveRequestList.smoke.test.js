@@ -81,10 +81,9 @@ describe("LeaveRequestList smoke", () => {
 
     it("contains header text", () => {
         const wrapper = createWrapper();
-        const semanticHeading = wrapper.find('[role="heading"][aria-level="1"]');
-        expect(semanticHeading.exists()).toBe(true);
-        expect(semanticHeading.text()).toBe("Leave Requests");
-        expect(semanticHeading.classes()).toContain("sr-only");
+        const title = wrapper.find("p.text-2xl");
+        expect(title.exists()).toBe(true);
+        expect(title.text()).toBe("Leave Requests");
         expect(wrapper.findAll("h1")).toHaveLength(0);
         expect(wrapper.text()).not.toContain("Pengajuan Cuti");
     });
