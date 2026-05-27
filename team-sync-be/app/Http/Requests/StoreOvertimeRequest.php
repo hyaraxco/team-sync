@@ -22,7 +22,7 @@ class StoreOvertimeRequest extends FormRequest
                     }
 
                     $exists = OvertimeRecord::where('staff_member_id', $this->input('staff_member_id'))
-                        ->whereDate('date', $value)
+                        ->whereRaw('DATE(date) = ?', [$value])
                         ->exists();
 
                     if ($exists) {
@@ -45,7 +45,7 @@ class StoreOvertimeRequest extends FormRequest
                     $matches = Attendance::query()
                         ->whereKey($value)
                         ->where('staff_member_id', $this->input('staff_member_id'))
-                        ->whereDate('date', $this->input('date'))
+                        ->whereRaw('DATE(date) = ?', [$this->input('date')])
                         ->exists();
 
                     if (! $matches) {

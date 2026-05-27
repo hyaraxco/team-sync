@@ -1174,7 +1174,7 @@ const handleApprovePayroll = () => {
                 v-else-if="!hasApprovalSteps"
                 class="rounded-xl border border-dashed border-brand-border px-4 py-6 text-sm text-brand-light"
             >
-                Alur persetujuan berjenjang belum dimulai untuk payroll ini. Use the Approve Payroll action to
+                Tiered approval workflow has not started for this payroll. Use the Approve Payroll action to
                 initialize matching approval policies.
             </div>
             <div v-else class="space-y-4">

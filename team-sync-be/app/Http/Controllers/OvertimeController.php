@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\ApproveOvertimeRequest;
+use App\Http\Requests\OvertimeListRequest;
 use App\Http\Requests\RejectOvertimeRequest;
 use App\Http\Requests\StoreOvertimeRequest;
 use App\Http\Resources\OvertimeRecordResource;
@@ -32,16 +33,17 @@ class OvertimeController extends Controller implements HasMiddleware
         ];
     }
 
-    public function index(Request $request): JsonResponse
+    public function index(OvertimeListRequest $request): JsonResponse
     {
         try {
             $records = $this->overtimeService->getAllPaginated(
-                $request->query('status'),
-                $request->query('staff_member_id') ? (int) $request->query('staff_member_id') : null,
-                $request->query('overtime_type'),
-                $request->query('date_from'),
-                $request->query('date_to'),
-                (int) $request->get('per_page', 15)
+                $request->validated('status'),
+                $request->validated('staff_member_id') ? (int) $request->validated('staff_member_id') : null,
+                $request->validated('overtime_type'),
+                $request->validated('date_from'),
+                $request->validated('date_to'),
+                (int) ($request->validated('per_page') ?? 15),
+                $request->validated('search')
             );
 
             return ResponseHelper::jsonResponse(
@@ -164,7 +166,7 @@ class OvertimeController extends Controller implements HasMiddleware
             $records = $this->overtimeService->getByStaffMember(
                 $staffMember->id,
                 $request->query('status'),
-                (int) $request->get('per_page', 15)
+                (int) $request->input('per_page', 15)
             );
 
             return ResponseHelper::jsonResponse(

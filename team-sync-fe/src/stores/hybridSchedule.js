@@ -7,6 +7,7 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
         schedules: [],
         paginatedSchedules: [],
         overrides: [],
+        paginatedOverrides: [],
         mySchedule: null,
         myOverrides: [],
         meta: {
@@ -14,7 +15,18 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
             last_page: 1,
             per_page: 10,
             total: 0,
+            from: null,
+            to: null,
         },
+        overridesMeta: {
+            current_page: 1,
+            last_page: 1,
+            per_page: 10,
+            total: 0,
+            from: null,
+            to: null,
+        },
+        overridesLoading: false,
         loading: false,
         error: null,
         success: null,
@@ -29,7 +41,7 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
                     params: {
                         page: params.page || 1,
                         search: params.search || "",
-                        row_per_page: params.row_per_page || 10,
+                        per_page: params.row_per_page || 10,
                     },
                 });
                 const paginator = response.data.data;
@@ -39,6 +51,8 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
                     last_page: paginator.last_page,
                     per_page: paginator.per_page,
                     total: paginator.total,
+                    from: paginator.from,
+                    to: paginator.to,
                 };
                 return response.data;
             } catch (error) {
@@ -122,6 +136,37 @@ export const useHybridScheduleStore = defineStore("hybridSchedule", {
                 throw error;
             } finally {
                 this.loading = false;
+            }
+        },
+
+        async fetchOverridesPaginated(params = {}) {
+            this.overridesLoading = true;
+            this.error = null;
+            try {
+                const response = await axiosInstance.get("hybrid-schedule-overrides", {
+                    params: {
+                        page: params.page || 1,
+                        per_page: params.row_per_page || 10,
+                        search: params.search || "",
+                        status: params.status || "",
+                    },
+                });
+                const paginator = response.data.data;
+                this.paginatedOverrides = paginator.data;
+                this.overridesMeta = {
+                    current_page: paginator.meta.current_page,
+                    last_page: paginator.meta.last_page,
+                    per_page: paginator.meta.per_page,
+                    total: paginator.meta.total,
+                    from: paginator.meta.from,
+                    to: paginator.meta.to,
+                };
+                return response.data;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            } finally {
+                this.overridesLoading = false;
             }
         },
     },

@@ -26,15 +26,15 @@ const props = defineProps({
 });
 
 const store = useOvertimeStore();
-const staffMemberStore = useStaffMemberStore();
+
 const { records, meta, loading, error, summary } = storeToRefs(store);
 const toast = useToast();
 
 const showCreateModal = ref(false);
 
-const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
+const {  fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
     defaultFilters: { search: null, status: "" },
-    fetchFn: (params) => store.fetchOvertimeRecords(params),
+    fetchFn: store.fetchOvertimeRecords,
 });
 
 const createForm = ref({
@@ -75,7 +75,14 @@ const getTypeBadge = (type) => {
     }
 };
 
-const formatTime = (timeStr) => (timeStr ? formatTimeUtil(timeStr) : "-");
+const formatTime = (timeStr) => {
+    if (!timeStr) return "-";
+    // Handle time-only strings (HH:mm:ss or HH:mm) from API
+    if (/^\d{2}:\d{2}(:\d{2})?$/.test(timeStr)) {
+        return timeStr.slice(0, 5);
+    }
+    return formatTimeUtil(timeStr);
+};
 const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
 
 // Approve
