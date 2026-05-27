@@ -90,8 +90,8 @@ onUnmounted(() => {
 <template>
     <div class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-                <h2 class="text-2xl font-bold text-gray-900">Meetings</h2>
+                <div>
+                    <div class="text-2xl font-bold text-gray-900">Meetings</div>
                 <p class="text-sm text-gray-500 mt-1">Manage scheduled meetings and broadcasts</p>
             </div>
             <button

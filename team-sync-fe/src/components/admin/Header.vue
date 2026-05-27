@@ -412,9 +412,12 @@ onUnmounted(() => {
                     <MenuIcon class="w-5 h-5 text-gray-600" />
                 </button>
                 <div class="min-w-0">
-                    <div class="text-brand-dark text-xl sm:text-2xl font-extrabold leading-tight truncate">
+                    <h1
+                        data-testid="page-title"
+                        class="text-brand-dark text-xl sm:text-2xl font-extrabold leading-tight truncate"
+                    >
                         {{ pageTitle }}
-                    </div>
+                    </h1>
                     <p class="hidden md:block text-brand-light text-sm font-normal leading-snug mt-1 truncate">
                         {{ pageSubtitle }}
                     </p>
