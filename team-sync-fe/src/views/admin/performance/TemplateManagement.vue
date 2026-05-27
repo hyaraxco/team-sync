@@ -147,7 +147,7 @@ onMounted(() => {
     <div class="space-y-6">
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-3xl font-bold text-brand-dark">Review Templates</h1>
+                <div class="text-3xl font-bold text-brand-dark">Review Templates</div>
                 <p class="text-brand-light mt-1">Configure role-specific assessment parameters and weights</p>
             </div>
             <button
@@ -164,7 +164,7 @@ onMounted(() => {
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
             </div>
 
-            <EmptyState v-else-if="!templates.length" icon="Layout" title="Template belum tersedia" subtitle="Buat template review performa pertama Anda." size="lg" />
+            <EmptyState v-else-if="!templates.length" icon="Layout" title="No templates found" subtitle="Create your first performance review template." size="lg" />
 
             <div v-else class="overflow-x-auto">
                 <table class="w-full">
