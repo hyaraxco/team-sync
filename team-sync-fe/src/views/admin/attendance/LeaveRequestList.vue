@@ -307,9 +307,8 @@ onMounted(() => {
 </script>
 
 <template>
-    <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
-        <div class="space-y-6">
-            <span v-if="!embedded" class="sr-only" role="heading" aria-level="1">Leave Requests</span>
+    <div :class="embedded ? '' : 'p-3 sm:p-4 md:p-6 lg:p-8'">
+        <div :class="['space-y-6', !embedded && 'max-w-7xl mx-auto']">
 
     <div v-if="!embedded" class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>

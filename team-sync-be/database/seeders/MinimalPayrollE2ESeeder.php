@@ -82,6 +82,7 @@ class MinimalPayrollE2ESeeder extends Seeder
             );
 
             $this->resetPayrollMonth($payrollMonth);
+            $this->resetPayrollMonth($payrollMonth->copy()->subMonth());
             $this->clearPayrollBlockers($payrollMonth);
             $this->seedAttendanceForActiveEmployeesForMonth($payrollMonth);
 

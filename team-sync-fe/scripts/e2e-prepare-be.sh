@@ -74,6 +74,7 @@ if ! grep -q '^APP_KEY=base64:' .env; then
 fi
 
 "${compose_cmd[@]}" exec -T web php artisan migrate:fresh
+"${compose_cmd[@]}" exec -T web php artisan cache:clear
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=MinimalPayrollE2ESeeder
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=DemoDataSeeder
 "${compose_cmd[@]}" exec -T web php artisan attendance-periods:sync
@@ -105,4 +106,6 @@ foreach (\$ids as \$id) {
 }
 "
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceReviewSectionSeeder
+"${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceOutcomeRuleSeeder
+"${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceReviewTemplateSeeder
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceDataSeeder
