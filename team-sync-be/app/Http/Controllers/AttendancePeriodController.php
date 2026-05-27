@@ -25,7 +25,7 @@ class AttendancePeriodController extends Controller implements HasMiddleware
 
     public function index(Request $request): JsonResponse
     {
-        $periods = $this->repository->getAttendancePeriodsPaginated((int) $request->get('per_page', 15));
+        $periods = $this->repository->getAttendancePeriodsPaginated((int) $request->input('per_page', 15));
         $periods->setCollection($periods->getCollection()->map(
             fn (AttendancePeriod $period): array => (new AttendancePeriodResource($period))->resolve($request)
         ));

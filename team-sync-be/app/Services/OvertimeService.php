@@ -24,7 +24,8 @@ class OvertimeService
         ?string $overtimeType,
         ?string $dateFrom,
         ?string $dateTo,
-        int $perPage = 15
+        int $perPage = 15,
+        ?string $search = null
     ): LengthAwarePaginator {
         return $this->overtimeRepository->getAllPaginated(
             $status,
@@ -32,7 +33,8 @@ class OvertimeService
             $overtimeType,
             $dateFrom,
             $dateTo,
-            $perPage
+            $perPage,
+            $search
         );
     }
 

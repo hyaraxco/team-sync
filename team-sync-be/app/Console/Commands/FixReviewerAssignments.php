@@ -40,6 +40,7 @@ class FixReviewerAssignments extends Command
         $clearedSelfAssignments = 0;
         $skipped = 0;
 
+        /** @var PerformanceReview $review */
         foreach ($reviews as $review) {
             $processed++;
 
