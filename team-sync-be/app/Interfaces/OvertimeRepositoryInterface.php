@@ -13,7 +13,8 @@ interface OvertimeRepositoryInterface
         ?string $overtimeType,
         ?string $dateFrom,
         ?string $dateTo,
-        int $perPage = 15
+        int $perPage = 15,
+        ?string $search = null
     ): LengthAwarePaginator;
 
     public function getById(int $id): OvertimeRecord;

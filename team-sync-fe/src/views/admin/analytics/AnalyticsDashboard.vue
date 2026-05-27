@@ -453,7 +453,7 @@ onUnmounted(() => {
                             :series="attendanceDeductionSeries"
                         />
                         <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
-                            Data kosong available for this period
+                            No data available for this period
                         </div>
                     </div>
 
@@ -469,7 +469,7 @@ onUnmounted(() => {
                             :series="hrCostSeries"
                         />
                         <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
-                            Data kosong available for this period
+                            No data available for this period
                         </div>
                     </div>
                 </div>

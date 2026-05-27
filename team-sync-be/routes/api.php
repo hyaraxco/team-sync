@@ -250,6 +250,8 @@ Route::prefix('v1')
             Route::get('my-hybrid-schedule', [HybridWorkScheduleController::class, 'mySchedule']);
             Route::get('my-hybrid-overrides', [HybridWorkScheduleController::class, 'myOverrides']);
 
+            Route::get('hybrid-schedule-overrides', [HybridScheduleOverrideController::class, 'index'])
+                ->middleware(PermissionMiddleware::using('attendance-menu'));
             Route::post('hybrid-schedule-overrides', [HybridScheduleOverrideController::class, 'store']);
             Route::post('hybrid-schedule-overrides/{hybridScheduleOverride}/approve', [HybridScheduleOverrideController::class, 'approve'])
                 ->middleware(PermissionMiddleware::using('attendance-menu'));
