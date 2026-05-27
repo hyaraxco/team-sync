@@ -322,7 +322,7 @@ onMounted(() => {
                 @click="activeTab = 'list'"
                 :class="[
                     'px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-all duration-200',
-                    activeTab === 'list' ? 'bg-white shadow text-brand-dark' : 'text-brand-light hover:text-brand-dark',
+                    activeTab === 'list' ? 'bg-[var(--color-surface)] shadow text-brand-dark' : 'text-brand-light hover:text-brand-dark',
                 ]"
             >
                 <List class="w-4 h-4" />
@@ -333,7 +333,7 @@ onMounted(() => {
                 :class="[
                     'px-4 py-2 text-sm font-semibold rounded-md flex items-center gap-2 transition-all duration-200',
                     activeTab === 'calendar'
-                        ? 'bg-white shadow text-brand-dark'
+                        ? 'bg-[var(--color-surface)] shadow text-brand-dark'
                         : 'text-brand-light hover:text-brand-dark',
                 ]"
             >
@@ -540,7 +540,7 @@ onMounted(() => {
     </div>
 
     <!-- CALENDAR VIEW -->
-    <div v-else-if="!embedded" class="bg-white border border-brand-border rounded-2xl p-5">
+    <div v-else-if="!embedded" class="border border-brand-border rounded-2xl p-5" style="background: var(--color-surface)">
         <div class="mb-6">
             <DatePagination v-model="calendarDateRange" :loading="loading" @update:modelValue="handleCalendarDateChange" />
         </div>
@@ -560,7 +560,7 @@ onMounted(() => {
                 v-for="date in calendarGrid"
                 :key="date.toISODate()"
                 :class="[
-                    'bg-white min-h-[120px] p-2 hover:bg-brand-border/20 transition-colors',
+                    'bg-[var(--color-surface)] min-h-[120px] p-2 hover:bg-brand-border/20 transition-colors',
                     { 'opacity-50 bg-brand-border/20': date.month !== currentMonth.month },
                 ]"
             >

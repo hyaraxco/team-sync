@@ -170,7 +170,7 @@ const {
     <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
         <div class="space-y-6">
             <!-- Tabs -->
-            <div class="bg-white border border-brand-border rounded-2xl p-3">
+            <div class="border border-brand-border rounded-2xl p-3" style="background: var(--color-surface)">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <button
                         @click="activeTab = 'schedules'"
@@ -179,7 +179,7 @@ const {
                         :class="
                             activeTab === 'schedules'
                                 ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
-                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20'
                         "
                     >
                         <MapPin
@@ -196,7 +196,7 @@ const {
                         :class="
                             activeTab === 'overrides'
                                 ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
-                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20'
                         "
                     >
                         <Clock

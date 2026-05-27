@@ -77,12 +77,14 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 
 <template>
     <div
-        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+        data-testid="stats-card"
+        class="border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+        style="background: var(--color-surface); border-color: var(--color-border-default)"
     >
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-brand-dark text-sm font-medium">{{ title }}</p>
-                <p class="text-brand-dark text-2xl sm:text-3xl font-extrabold leading-tight my-2 tabular-nums">
+                <p class="text-sm font-medium" style="color: var(--color-text-primary)">{{ title }}</p>
+                <p class="text-2xl sm:text-3xl font-extrabold leading-tight my-2 tabular-nums" style="color: var(--color-text-primary)">
                     {{ animatedDisplay }}
                 </p>
                 <p v-if="subtitle" :class="subtitleColor" class="text-xs sm:text-sm font-medium">

@@ -2,6 +2,8 @@ import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import { ref } from "vue";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const paginatedSchedules = ref([]);
 const meta = ref({
@@ -68,7 +70,13 @@ describe("HybridScheduleList smoke", () => {
 
     it("uses baseline card styling", () => {
         const wrapper = createWrapper();
-        expect(wrapper.html()).toContain("bg-white");
+        expect(wrapper.html()).toContain("var(--color-surface)");
+
+        const source = readFileSync(
+            resolve(process.cwd(), "src/views/admin/attendance/HybridScheduleList.vue"),
+            "utf8",
+        );
+        expect(source).not.toContain("bg-white");
     });
 
     it("calls fetchAllPaginated on mount", () => {

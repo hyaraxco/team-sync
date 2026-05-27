@@ -23,9 +23,11 @@ describe('StatsCard', () => {
     })
 
     it('renders with baseline card styling', () => {
-        const card = wrapper.find('.bg-white')
+        const card = wrapper.find('[data-testid="stats-card"]')
         expect(card.exists()).toBe(true)
-        expect(card.classes()).toContain('border-brand-border')
+        expect(card.classes()).not.toContain('bg-white')
+        expect(card.attributes('style')).toContain('background: var(--color-surface)')
+        expect(card.attributes('style')).toContain('border-color: var(--color-border-default)')
         expect(card.classes()).toContain('rounded-2xl')
     })
 

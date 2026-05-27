@@ -3,6 +3,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import { ref } from "vue";
 import { DateTime } from "luxon";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const leaveRequests = ref([]);
 const calendarData = ref([]);
@@ -132,5 +134,15 @@ describe("LeaveRequestList smoke", () => {
         // Should fetch calendar data for current month
         const currentMonthStr = DateTime.now().startOf("month").toFormat("yyyy-MM");
         expect(fetchCalendarData).toHaveBeenCalledWith(currentMonthStr);
+    });
+
+    it("uses tokenized surface shells instead of bg-white", () => {
+        const source = readFileSync(
+            resolve(process.cwd(), "src/views/admin/attendance/LeaveRequestList.vue"),
+            "utf8",
+        );
+
+        expect(source).toContain("var(--color-surface)");
+        expect(source).not.toContain("bg-white");
     });
 });

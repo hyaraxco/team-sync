@@ -192,7 +192,7 @@ onMounted(async () => {
         </div>
 
         <!-- Tabs -->
-        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
+        <div class="border border-brand-border rounded-2xl p-3 mb-6" style="background: var(--color-surface)">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
                 <button
                     v-for="section in sections"
@@ -203,7 +203,7 @@ onMounted(async () => {
                     :class="
                         activeTab === section.id
                             ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20'
                     "
                 >
                     <component
@@ -219,7 +219,8 @@ onMounted(async () => {
         <!-- Leave Requests Tab -->
         <div
             v-if="can('leave-request-list') && activeTab === 'leave-requests'"
-            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+            class="border border-brand-border rounded-2xl p-6 mb-6"
+            style="background: var(--color-surface)"
         >
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -233,7 +234,8 @@ onMounted(async () => {
         <!-- Corrections Tab -->
         <div
             v-if="can('attendance-correction-list') && activeTab === 'corrections'"
-            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+            class="border border-brand-border rounded-2xl p-6 mb-6"
+            style="background: var(--color-surface)"
         >
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -247,7 +249,8 @@ onMounted(async () => {
         <!-- Attendance Logs Tab -->
         <div
             v-if="can('attendance-list') && activeTab === 'records'"
-            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+            class="border border-brand-border rounded-2xl p-6 mb-6"
+            style="background: var(--color-surface)"
         >
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -261,7 +264,8 @@ onMounted(async () => {
         <!-- Overtime Tab -->
         <div
             v-if="can('overtime-list') && activeTab === 'overtime'"
-            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+            class="border border-brand-border rounded-2xl p-6 mb-6"
+            style="background: var(--color-surface)"
         >
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -275,7 +279,8 @@ onMounted(async () => {
         <!-- Hybrid Schedules Tab -->
         <div
             v-if="activeTab === 'hybrid'"
-            class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+            class="border border-brand-border rounded-2xl p-6 mb-6"
+            style="background: var(--color-surface)"
         >
             <div class="flex items-center justify-between mb-6">
                 <div>
