@@ -28,10 +28,11 @@ class HolidayCalendarController extends Controller implements HasMiddleware
 
     public function index(Request $request): JsonResponse
     {
-        $perPage = filter_var($request->get('per_page', 15), FILTER_VALIDATE_INT, [
+        $perPage = filter_var($request->input('per_page', 15), FILTER_VALIDATE_INT, [
             'options' => ['default' => 15, 'min_range' => 1],
         ]);
 
+        /** @var \Illuminate\Pagination\LengthAwarePaginator $holidays */
         $holidays = $this->holidayCalendarRepository->getAllPaginated($perPage);
         $holidays->setCollection($holidays->getCollection()->map(
             fn (HolidayCalendar $holiday): array => (new HolidayCalendarResource($holiday))->resolve($request)

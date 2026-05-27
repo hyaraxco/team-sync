@@ -84,8 +84,8 @@ const {
 </script>
 
 <template>
-    <div :class="embedded ? '' : 'p-3 sm:p-4 md:p-6 lg:p-8'">
-        <div :class="['space-y-6', !embedded && 'max-w-7xl mx-auto']">
+    <div :class="embedded ? 'space-y-6' : 'space-y-6 p-3 sm:p-4 md:p-6 lg:p-8'">
+        <div class="space-y-6">
             <span v-if="!embedded" class="sr-only" role="heading" aria-level="1">Attendance Corrections</span>
 
             <SearchFilter
@@ -110,105 +110,100 @@ const {
 
             <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">
                 <table class="min-w-full divide-y divide-brand-border">
-                        <thead>
-                            <tr class="bg-brand-border/20 border-b border-brand-border">
-                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Employee</th>
-                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Date</th>
-                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Requested Times</th>
-                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Reason</th>
-                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Status</th>
-                                <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-brand-border">
-                            <TableStateRows
-                                :loading="loading"
-                                :empty="!paginatedCorrections || paginatedCorrections.length === 0"
-                                :colspan="6"
-                                empty-icon="ClipboardList"
-                                empty-title="No corrections found"
-                                empty-subtitle="Attendance correction requests will appear here."
-                            />
-                            <template v-if="paginatedCorrections && paginatedCorrections.length > 0 && !loading">
-                                <tr
-                                    v-for="correction in paginatedCorrections"
-                                    :key="correction.id"
-                                    class="hover:bg-brand-gray/50"
+                    <thead>
+                        <tr class="bg-brand-border/20 border-b border-brand-border">
+                            <th class="py-4 px-6 text-left text-xs font-semibold text-brand-dark uppercase tracking-wider">Employee</th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Date</th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Requested Times</th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Reason</th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Status</th>
+                            <th class="py-4 px-6 text-center text-xs font-semibold text-brand-dark uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-brand-border">
+                        <TableStateRows
+                            :loading="loading"
+                            :empty="!paginatedCorrections || paginatedCorrections.length === 0"
+                            :colspan="6"
+                            empty-icon="ClipboardList"
+                            empty-title="No corrections found"
+                            empty-subtitle="Attendance correction requests will appear here."
+                        />
+                        <template v-if="paginatedCorrections && paginatedCorrections.length > 0 && !loading">
+                        <tr
+                            v-for="correction in paginatedCorrections"
+                            :key="correction.id"
+                            class="hover:bg-brand-gray/50"
+                        >
+                            <td class="py-4 px-6">
+                                <EmployeeCell
+                                    :photo="correction.staff_member?.user?.profile_photo"
+                                    :name="correction.staff_member?.user?.name || '-'"
+                                    :subtitle="correction.staff_member?.staff_member_id"
+                                />
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <span class="text-sm text-brand-dark font-medium">
+                                    {{ correction.attendance ? formatDateShort(correction.attendance.date) : "-" }}
+                                </span>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <div class="flex flex-col gap-1">
+                                    <p class="text-xs text-brand-dark">
+                                        <strong>In:</strong>
+                                        {{ formatTime(correction.requested_check_in) }}
+                                    </p>
+                                    <p class="text-xs text-brand-dark">
+                                        <strong>Out:</strong>
+                                        {{ formatTime(correction.requested_check_out) }}
+                                    </p>
+                                </div>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <p
+                                    class="text-sm text-brand-light max-w-[200px] truncate"
+                                    :title="correction.reason"
                                 >
-                                    <td class="px-6 py-4">
-                                        <EmployeeCell
-                                            :photo="correction.staff_member?.user?.profile_photo"
-                                            :name="correction.staff_member?.user?.name || '-'"
-                                            :subtitle="correction.staff_member?.staff_member_id"
-                                        />
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-brand-dark font-medium">
-                                        {{ correction.attendance ? formatDateShort(correction.attendance.date) : "-" }}
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div class="flex flex-col gap-1">
-                                            <p class="text-xs text-brand-dark">
-                                                <strong>In:</strong>
-                                                {{ formatTime(correction.requested_check_in) }}
-                                            </p>
-                                            <p class="text-xs text-brand-dark">
-                                                <strong>Out:</strong>
-                                                {{ formatTime(correction.requested_check_out) }}
-                                            </p>
-                                        </div>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <p
-                                            class="text-sm text-brand-light max-w-[200px] truncate"
-                                            :title="correction.reason"
-                                        >
-                                            {{ correction.reason }}
-                                        </p>
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <StatusBadge
-                                            type="leave-status"
-                                            :value="correction.status"
-                                            :label="correction.status"
-                                        />
-                                    </td>
-                                    <td class="px-6 py-4">
-                                        <div
-                                            class="flex items-center gap-2"
-                                            v-if="
-                                                correction.status === 'pending' && can('attendance-correction-approve')
-                                            "
-                                        >
-                                            <button
-                                                @click="showApproveModal(correction)"
-                                                class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-green-50 hover:bg-green-100 transition-all"
-                                                aria-label="Approve correction"
-                                            >
-                                                <Check class="w-4 h-4 text-green-600" />
-                                            </button>
-                                            <button
-                                                @click="onRejectAction(correction)"
-                                                class="w-8 h-8 inline-flex items-center justify-center rounded-lg bg-red-50 hover:bg-red-100 transition-all"
-                                                aria-label="Reject correction"
-                                            >
-                                                <X class="w-4 h-4 text-red-600" />
-                                            </button>
-                                        </div>
-                                        <div v-else class="text-xs text-brand-light">
-                                            {{
-                                                correction.status === "pending"
-                                                    ? "Pending Review"
-                                                    : `Reviewed by ${correction.reviewer?.name || "Admin"}`
-                                            }}
-                                        </div>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
+                                    {{ correction.reason }}
+                                </p>
+                            </td>
+                            <td class="py-4 px-6 text-center">
+                                <StatusBadge
+                                    type="leave-status"
+                                    :value="correction.status"
+                                    :label="correction.status"
+                                />
+                            </td>
+                            <td class="py-4 px-6">
+                                <div
+                                    v-if="correction.status === 'pending' && can('attendance-correction-approve')"
+                                    class="flex items-center justify-center gap-2"
+                                >
+                                    <button
+                                        @click="showApproveModal(correction)"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-green-50 text-green-600 hover:bg-green-100 transition-all duration-300"
+                                        aria-label="Approve correction"
+                                    >
+                                        <Check class="w-4 h-4" />
+                                    </button>
+                                    <button
+                                        @click="onRejectAction(correction)"
+                                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300"
+                                        aria-label="Reject correction"
+                                    >
+                                        <X class="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <span v-else class="text-xs text-brand-light">—</span>
+                            </td>
+                        </tr>
+                        </template>
+                    </tbody>
+                </table>
             </DataTableCard>
         </div>
-    </div>
+
+
 
     <!-- Approve Modal -->
     <ModalWrapper :show="showApproveModalState" title="Approve Correction" maxWidth="md" @close="closeApproveModal">
@@ -308,4 +303,5 @@ const {
             />
         </template>
     </ModalWrapper>
+    </div>
 </template>

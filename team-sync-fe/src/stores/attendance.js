@@ -216,19 +216,13 @@ export const useAttendanceStore = defineStore("attendance", {
                     params: {
                         page: params.page || 1,
                         search: params.search || "",
+                        status: params.status || "",
                         row_per_page: params.row_per_page || 10,
                     },
                 });
                 const paginator = response.data.data;
                 this.paginatedAttendances = paginator.data;
-                this.meta = {
-                    current_page: paginator.current_page,
-                    last_page: paginator.last_page,
-                    per_page: paginator.per_page,
-                    total: paginator.total,
-                    from: paginator.from,
-                    to: paginator.to,
-                };
+                this.meta = paginator.meta;
                 return response.data;
             } catch (error) {
                 this.error = handleError(error);

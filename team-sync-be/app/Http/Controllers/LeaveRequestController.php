@@ -68,7 +68,10 @@ class LeaveRequestController extends Controller implements HasMiddleware
         try {
             $leaveRequests = $this->leaveRequestRepository->getAllPaginated(
                 $validated['search'] ?? null,
-                $validated['row_per_page']
+                $validated['row_per_page'],
+                $validated['status'] ?? null,
+                $validated['date_from'] ?? null,
+                $validated['date_to'] ?? null
             );
 
             return ResponseHelper::jsonResponse(true, 'Leave Requests Retrieved Successfully', PaginateResource::make($leaveRequests, LeaveRequestResource::class), 200);

@@ -30,7 +30,7 @@
                     />
                 </svg>
             </div>
-            <p class="text-sm font-medium text-brand-light">Data kosong available</p>
+            <p class="text-sm font-medium text-brand-light">No data available</p>
         </div>
 
         <VueApexCharts v-else :type="chartType" height="300" :options="apexOptions" :series="apexSeries" />

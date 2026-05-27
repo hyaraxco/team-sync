@@ -259,18 +259,30 @@ describe("AttendanceList smoke", () => {
         const wrapper = factory();
         await flushAsync();
 
-        // Empty states for leave/corrections live inside child tabs (stubbed).
-        // Verify the tab containers mount.
+        // With v-if lazy loading, only the active (default) tab renders.
+        // Default active tab is 'leave-requests'.
         expect(wrapper.find(".leave-request-list-stub").exists()).toBe(true);
-        expect(wrapper.find(".attendance-correction-list-stub").exists()).toBe(true);
+        // Other tabs are not rendered until their tab is clicked.
+        expect(wrapper.find(".attendance-correction-list-stub").exists()).toBe(false);
     });
 
-    it("renders embedded tab components", async () => {
+    it("renders embedded tab components on tab switch", async () => {
         const wrapper = factory();
         await flushAsync();
 
+        // Default tab is leave-requests
         expect(wrapper.find(".leave-request-list-stub").exists()).toBe(true);
+        expect(wrapper.find(".attendance-correction-list-stub").exists()).toBe(false);
+
+        // Click the Corrections tab button
+        const tabs = wrapper.findAll("button");
+        const correctionsTab = tabs.find((btn) => btn.text().includes("Corrections"));
+        await correctionsTab.trigger("click");
+        await flushAsync();
+
+        // Now corrections should render, leave-requests should not
         expect(wrapper.find(".attendance-correction-list-stub").exists()).toBe(true);
+        expect(wrapper.find(".leave-request-list-stub").exists()).toBe(false);
     });
 
     it("calls fetch methods on mount", async () => {

@@ -15,10 +15,17 @@ class OvertimeRepository implements OvertimeRepositoryInterface
         ?string $overtimeType,
         ?string $dateFrom,
         ?string $dateTo,
-        int $perPage = 15
+        int $perPage = 15,
+        ?string $search = null
     ): LengthAwarePaginator {
         $query = OvertimeRecord::with(['staffMember.user', 'approvedByUser'])
             ->orderByDesc('date');
+
+        if ($search !== null && $search !== '') {
+            $query->whereHas('staffMember.user', function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%");
+            });
+        }
 
         if ($status !== null && $status !== '') {
             $query->where('status', $status);
