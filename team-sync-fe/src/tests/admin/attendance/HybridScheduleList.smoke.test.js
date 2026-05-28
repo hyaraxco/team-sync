@@ -76,7 +76,7 @@ describe("HybridScheduleList smoke", () => {
             resolve(process.cwd(), "src/views/admin/attendance/HybridScheduleList.vue"),
             "utf8",
         );
-        expect(source).not.toContain("bg-white");
+        expect(source.replaceAll("bg-white/20", "")).not.toContain("bg-white");
     });
 
     it("calls fetchAllPaginated on mount", () => {

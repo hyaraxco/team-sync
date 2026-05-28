@@ -203,8 +203,9 @@ onMounted(async () => {
                     :class="
                         activeTab === section.id
                             ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20'
+                            : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                     "
+                    :style="{ color: activeTab === section.id ? 'white' : 'var(--color-text-primary)' }"
                 >
                     <component
                         :is="section.icon"

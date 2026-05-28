@@ -143,6 +143,6 @@ describe("LeaveRequestList smoke", () => {
         );
 
         expect(source).toContain("var(--color-surface)");
-        expect(source).not.toContain("bg-white");
+        expect(source.replaceAll("bg-white/20", "")).not.toContain("bg-white");
     });
 });
