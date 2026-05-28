@@ -114,8 +114,6 @@
             color: #334155;
         }
         tr:nth-child(even) td { background: #fafbfc; }
-        tr:hover td { background: #f0f4ff; }
-
         /* ── KPI Grid ───────────────────────────────────────── */
         .kpi-grid {
             display: table;
@@ -365,9 +363,12 @@
                                 {{ $row['attendance_rate'] }}%
                             </span>
                         </td>
+                        @php
+                            $taskCompletion = $row['task_completion_rate'] ?? $row['task_completion'] ?? 0;
+                        @endphp
                         <td class="text-right">
-                            <span class="badge {{ (($row['task_completion_rate'] ?? $row['task_completion'] ?? 0) >= 80) ? 'badge-green' : ((($row['task_completion_rate'] ?? $row['task_completion'] ?? 0) >= 50) ? 'badge-amber' : 'badge-red') }}">
-                                {{ $row['task_completion_rate'] ?? $row['task_completion'] ?? 0 }}%
+                            <span class="badge {{ $taskCompletion >= 80 ? 'badge-green' : ($taskCompletion >= 50 ? 'badge-amber' : 'badge-red') }}">
+                                {{ $taskCompletion }}%
                             </span>
                         </td>
                     </tr>
