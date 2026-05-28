@@ -228,7 +228,7 @@ const tenureSeries = computed(() => [
                     :options="headcountOptions"
                     :series="headcountSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
 
@@ -244,7 +244,7 @@ const tenureSeries = computed(() => [
                     :options="genderDonutOptions"
                     :series="genderDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -257,7 +257,7 @@ const tenureSeries = computed(() => [
                     :options="employmentDonutOptions"
                     :series="employmentDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
 
@@ -273,7 +273,7 @@ const tenureSeries = computed(() => [
                     :options="workLocationOptions"
                     :series="workLocationSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -286,7 +286,7 @@ const tenureSeries = computed(() => [
                     :options="departmentOptions"
                     :series="departmentSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
 
@@ -302,7 +302,7 @@ const tenureSeries = computed(() => [
                     :options="skillLevelOptions"
                     :series="skillLevelSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -315,7 +315,7 @@ const tenureSeries = computed(() => [
                     :options="ageOptions"
                     :series="ageSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
 
@@ -331,7 +331,7 @@ const tenureSeries = computed(() => [
                     :options="tenureOptions"
                     :series="tenureSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
     </div>
@@ -339,7 +339,7 @@ const tenureSeries = computed(() => [
     <!-- Empty State -->
     <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
         <UsersIcon class="w-16 h-16 mb-4 opacity-50" />
-        <p class="text-lg font-medium">Analitik SDM belum tersedia</p>
+        <p class="text-lg font-medium">Workforce analytics not yet available</p>
         <p class="text-sm mt-1">Try adjusting the period or filters</p>
     </div>
 </template>
