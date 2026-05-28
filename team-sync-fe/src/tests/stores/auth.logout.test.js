@@ -62,6 +62,7 @@ import { useAuthStore } from "@/stores/auth";
 describe("auth store logout", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
+        window.history.replaceState(null, "", "/auth/login");
 
         cookieState.token = "seed-token";
 

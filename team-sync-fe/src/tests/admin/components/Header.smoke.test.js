@@ -164,6 +164,28 @@ describe("Header smoke", () => {
         expect(heading.text()).toContain("Dashboard");
     });
 
+    it("renders English title for notifications", () => {
+        routeState.name = "admin.notifications";
+        const wrapper = factory();
+
+        expect(wrapper.get('[data-testid="page-title"]').text()).toContain("Notifications");
+        expect(wrapper.text()).not.toContain("Notifikasi");
+    });
+
+    it("renders title for payroll readiness route", () => {
+        routeState.name = "admin.payroll.readiness";
+        const wrapper = factory();
+
+        expect(wrapper.get('[data-testid="page-title"]').text()).toContain("Payroll Readiness");
+    });
+
+    it("renders title for team reviews route", () => {
+        routeState.name = "admin.performance.team-reviews";
+        const wrapper = factory();
+
+        expect(wrapper.get('[data-testid="page-title"]').text()).toContain("Team Reviews");
+    });
+
     it("closes dropdown after profile link click", async () => {
         const wrapper = factory();
 

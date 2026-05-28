@@ -34,8 +34,8 @@ const titles = {
         subtitle: "Overview ringkas aktivitas tim dan perusahaan.",
     },
     "admin.notifications": {
-        title: "Notifikasi",
-        subtitle: "Aktivitas terbaru yang membutuhkan perhatian.",
+        title: "Notifications",
+        subtitle: "Recent activity that needs attention.",
     },
     "admin.settings": {
         title: "Settings",
@@ -50,41 +50,41 @@ const titles = {
         subtitle: "Schedule and manage team meetings.",
     },
     "admin.teams": {
-        title: "Tim",
-        subtitle: "Kelola struktur tim dan anggotanya.",
+        title: "Teams",
+        subtitle: "Manage team structure and members.",
     },
     "admin.team.detail": {
-        title: "Detail Tim",
-        subtitle: "Informasi dan anggota tim.",
+        title: "Team Details",
+        subtitle: "Team information and members.",
     },
-    "admin.team.create": { title: "Buat Tim", subtitle: "Tambah tim baru ke organisasi." },
+    "admin.team.create": { title: "Create Team", subtitle: "Add a new team to the organization." },
     "admin.team.edit": {
-        title: "Edit Tim",
-        subtitle: "Perbarui informasi tim.",
+        title: "Edit Team",
+        subtitle: "Update team information.",
     },
     "admin.staffMembers": {
-        title: "Karyawan",
-        subtitle: "Data dan profil seluruh karyawan.",
+        title: "Staff Members",
+        subtitle: "Data and profiles for all staff members.",
     },
     "admin.staffMembers.create": {
-        title: "Tambah Karyawan",
-        subtitle: "Daftarkan karyawan baru.",
+        title: "Add Staff Member",
+        subtitle: "Register a new staff member.",
     },
     "admin.staffMembers.edit": {
-        title: "Edit Karyawan",
-        subtitle: "Perbarui data karyawan.",
+        title: "Edit Staff Member",
+        subtitle: "Update staff member data.",
     },
     "admin.staffMembers.detail": {
-        title: "Profil Karyawan",
-        subtitle: "Detail lengkap karyawan.",
+        title: "Staff Profile",
+        subtitle: "Complete staff member details.",
     },
     "admin.staffMembers.success": {
-        title: "Karyawan Ditambahkan",
-        subtitle: "Data karyawan berhasil disimpan.",
+        title: "Staff Member Added",
+        subtitle: "Staff member data has been saved.",
     },
     "admin.attendances": {
-        title: "Kehadiran",
-        subtitle: "Rekap absensi, clock-in, dan clock-out.",
+        title: "Attendance",
+        subtitle: "Attendance, clock-in, and clock-out summary.",
     },
     "admin.attendance.settings": {
         title: "Attendance Settings",
@@ -123,20 +123,20 @@ const titles = {
         subtitle: "Track and approve overtime requests.",
     },
     "admin.projects": {
-        title: "Proyek",
-        subtitle: "Daftar proyek aktif dan arsip.",
+        title: "Projects",
+        subtitle: "Active and archived projects.",
     },
     "admin.projects.create": {
-        title: "Buat Proyek",
-        subtitle: "Inisiasi proyek baru.",
+        title: "Create Project",
+        subtitle: "Start a new project.",
     },
     "admin.projects.edit": {
-        title: "Edit Proyek",
-        subtitle: "Perbarui detail proyek.",
+        title: "Edit Project",
+        subtitle: "Update project details.",
     },
     "admin.projects.detail": {
-        title: "Detail Proyek",
-        subtitle: "Progres, tugas, dan anggota tim.",
+        title: "Project Details",
+        subtitle: "Progress, tasks, and team members.",
     },
     "admin.performance.cycles": {
         title: "Review Cycles",
@@ -162,6 +162,10 @@ const titles = {
         title: "My Reviews",
         subtitle: "Performance reviews assigned to you.",
     },
+    "admin.performance.team-reviews": {
+        title: "Team Reviews",
+        subtitle: "Review performance submissions for your team.",
+    },
     "admin.performance.pending-calibration": {
         title: "Pending Calibration",
         subtitle: "Reviews awaiting calibration.",
@@ -178,6 +182,10 @@ const titles = {
         title: "Team Goals",
         subtitle: "Monitor team performance objectives.",
     },
+    "admin.performance.goal.detail": {
+        title: "Goal Details",
+        subtitle: "Track goal progress and updates.",
+    },
     "admin.performance.feedback.received": {
         title: "Feedback Received",
         subtitle: "View feedback from colleagues.",
@@ -191,32 +199,64 @@ const titles = {
         subtitle: "Provide feedback to a colleague.",
     },
     "admin.payroll.dashboard": {
-        title: "Penggajian",
-        subtitle: "Proses dan riwayat penggajian karyawan.",
+        title: "Payroll",
+        subtitle: "Process and review employee payroll history.",
+    },
+    "admin.payroll.readiness": {
+        title: "Payroll Readiness",
+        subtitle: "Check payroll data completeness before generation.",
     },
     "admin.payroll.create": {
-        title: "Buat Penggajian",
-        subtitle: "Generate slip gaji periode ini.",
+        title: "Create Payroll",
+        subtitle: "Generate payroll for the current period.",
+    },
+    "admin.payroll.settings": {
+        title: "Payroll Settings",
+        subtitle: "Configure payroll rules and rates.",
+    },
+    "admin.payroll.approval-matrix": {
+        title: "Approval Matrix",
+        subtitle: "Manage payroll approval rules.",
+    },
+    "admin.payroll.adjustments": {
+        title: "Payroll Adjustments",
+        subtitle: "Review payroll additions and deductions.",
+    },
+    "admin.payroll.comparison": {
+        title: "Payroll Comparison",
+        subtitle: "Compare payroll changes across periods.",
+    },
+    "admin.payroll.thr": {
+        title: "THR Payroll",
+        subtitle: "Manage holiday allowance payroll.",
+    },
+    "admin.payroll.thr.detail": {
+        title: "THR Details",
+        subtitle: "Review holiday allowance payroll details.",
     },
     "admin.payroll.detail": {
-        title: "Detail Penggajian",
-        subtitle: "Rincian komponen gaji dan potongan.",
+        title: "Payroll Details",
+        subtitle: "Salary components and deduction details.",
+    },
+    "admin.upgrade-plan": {
+        title: "Upgrade Plan",
+        subtitle: "Review available plan options.",
     },
     "staffMember.profile": {
-        title: "Profil Saya",
-        subtitle: "Data pribadi dan informasi pekerjaan.",
+        title: "My Profile",
+        subtitle: "Personal data and job information.",
     },
     "staffMember.profile.edit": {
-        title: "Edit Profil",
-        subtitle: "Perbarui informasi pribadi.",
+        title: "Edit Profile",
+        subtitle: "Update personal information.",
     },
-    "staffMember.team": { title: "Tim Saya", subtitle: "Anggota tim dan kontak." },
+    "staffMember.team": { title: "My Team", subtitle: "Team members and contacts." },
     "staffMember.attendance.my-attendances": {
-        title: "Kehadiran Saya",
-        subtitle: "Rekap absensi, izin, dan cuti.",
+        title: "My Attendance",
+        subtitle: "Attendance, permissions, and leave summary.",
     },
     "staffMember.attendance.clock": {
-        title: "Kehadiran Saya",
+        title: "My Attendance",
         subtitle: "Check your attendance, clock logs, and leave status.",
     },
     "staffMember.payroll": {

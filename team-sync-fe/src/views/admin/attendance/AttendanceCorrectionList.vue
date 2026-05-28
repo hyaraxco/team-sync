@@ -286,7 +286,8 @@ const {
                 </label>
                 <textarea
                     v-model="rejectReason"
-                    class="w-full border border-brand-border rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all bg-white"
+                    class="w-full border border-brand-border rounded-xl p-3 text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all"
+                    style="background: var(--color-surface); color: var(--color-text-primary)"
                     rows="3"
                     :placeholder="`Minimum ${rejectMinLength} characters required...`"
                 ></textarea>
