@@ -3,6 +3,8 @@ import { describe, it, expect, vi } from "vitest";
 import PolicyMismatches from "@/views/admin/attendance/PolicyMismatches.vue";
 import { createPinia, setActivePinia } from "pinia";
 import { useAttendanceStore } from "@/stores/attendance";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 describe("PolicyMismatches.vue", () => {
     it("renders the header and mismatches table", async () => {
@@ -67,5 +69,15 @@ describe("PolicyMismatches.vue", () => {
         expect(wrapper.find('[data-test="empty-state"]').exists()).toBe(true);
         expect(wrapper.find(".text-center > svg").exists()).toBe(false);
         expect(wrapper.text()).toContain("EmptyState");
+    });
+
+    it("uses tokenized surface shells instead of bg-white", () => {
+        const source = readFileSync(
+            resolve(process.cwd(), "src/views/admin/attendance/PolicyMismatches.vue"),
+            "utf8",
+        );
+
+        expect(source).toContain("var(--color-surface)");
+        expect(source).not.toMatch(/\bbg-white\b(?!\/)/);
     });
 });

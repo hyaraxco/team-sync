@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { nextTick } from "vue";
+import { readFileSync } from "node:fs";
+import { resolve } from "node:path";
 
 const {
     attendanceStoreMock,
@@ -250,6 +252,16 @@ describe("AttendanceList smoke", () => {
         const wrapper = factory();
 
         expect(wrapper.findAll(".stats-card-stub").length).toBeGreaterThanOrEqual(6);
+    });
+
+    it("uses tokenized surface shells instead of solid white cards", () => {
+        const source = readFileSync(
+            resolve(process.cwd(), "src/views/admin/attendance/AttendanceList.vue"),
+            "utf8",
+        );
+
+        expect(source).toContain("var(--color-surface)");
+        expect(source).not.toMatch(/\bbg-white\b(?!\/)/);
     });
 
     it("uses EmptyState for empty dashboard sections", async () => {
