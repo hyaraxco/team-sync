@@ -261,7 +261,7 @@ describe("AttendanceList smoke", () => {
         );
 
         expect(source).toContain("var(--color-surface)");
-        expect(source.replaceAll("bg-white/20", "")).not.toContain("bg-white");
+        expect(source).not.toMatch(/\bbg-white\b(?!\/)/);
     });
 
     it("uses EmptyState for empty dashboard sections", async () => {

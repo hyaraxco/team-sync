@@ -181,7 +181,7 @@ const {
                                 ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                                 : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                         "
-                        :style="{ color: activeTab === 'schedules' ? 'white' : 'var(--color-text-primary)' }"
+                        :style="{ color: activeTab === 'schedules' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)' }"
                     >
                         <MapPin
                             class="w-4 h-4"
@@ -199,7 +199,7 @@ const {
                                 ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                                 : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                         "
-                        :style="{ color: activeTab === 'overrides' ? 'white' : 'var(--color-text-primary)' }"
+                        :style="{ color: activeTab === 'overrides' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)' }"
                     >
                         <Clock
                             class="w-4 h-4"

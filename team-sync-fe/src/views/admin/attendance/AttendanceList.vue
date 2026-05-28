@@ -205,7 +205,7 @@ onMounted(async () => {
                             ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
                             : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                     "
-                    :style="{ color: activeTab === section.id ? 'white' : 'var(--color-text-primary)' }"
+                    :style="{ color: activeTab === section.id ? 'var(--color-text-inverse)' : 'var(--color-text-primary)' }"
                 >
                     <component
                         :is="section.icon"
