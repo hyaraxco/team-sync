@@ -27,7 +27,7 @@ describe('StatsCard', () => {
         expect(card.exists()).toBe(true)
         expect(card.classes()).not.toContain('bg-white')
         expect(card.attributes('style')).toContain('background: var(--color-surface)')
-        expect(card.attributes('style')).toContain('border-color: var(--color-border-default)')
+        expect(card.classes()).toContain('border-brand-border')
         expect(card.classes()).toContain('rounded-2xl')
     })
 

@@ -78,8 +78,8 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
 <template>
     <div
         data-testid="stats-card"
-        class="border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
-        style="background: var(--color-surface); border-color: var(--color-border-default)"
+        class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+        style="background: var(--color-surface)"
     >
         <div class="flex items-center justify-between">
             <div>
