@@ -30,6 +30,7 @@
     --color-text-secondary: #6B7280;    /* text-brand-light / text-gray-500 */
     --color-text-muted: #9CA3AF;        /* text-gray-400 */
     --color-text-disabled: #D1D5DB;     /* text-gray-300 */
+    --color-text-inverse: #ffffff;      /* white text on dark/brand backgrounds */
 
     /* Sidebar */
     --sidebar-bg: #ffffff;
@@ -69,6 +70,7 @@
     --color-text-secondary: #94A3B8;
     --color-text-muted: #64748B;
     --color-text-disabled: #475569;
+    --color-text-inverse: #ffffff;      /* white text on dark/brand backgrounds */
 
     /* Sidebar — dark mode */
     --sidebar-bg: #0F172A;

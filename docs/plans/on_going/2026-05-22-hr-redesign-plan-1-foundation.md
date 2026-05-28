@@ -1653,3 +1653,92 @@ Each plan will use the migrated shared components from Plan 1.
 
 All required tokens present in `input.css` lines 10-86. No additions needed.
 
+---
+
+## 2026-05-27 Execution Patch — Orchestrator Crosscheck Corrections
+
+> **Status:** Applied before final verification in branch/worktree `hr-redesign-execution`.
+> **Reason:** Direct source crosscheck found stale plan assumptions. Execution followed the corrected scope below, not the stale code examples above.
+
+### Corrected Component Scope
+
+- `StatsCard.vue` actual props are `title`, `value`, `subtitle`, `subtitleColor`, `iconName`, `colorScheme`, `loading`.
+- Do **not** use stale plan props `icon`, `iconColor`, `trend`, `trendLabel`, or `formatter`.
+- Do **not** use `import.meta.glob('lucide-vue-next')`; the component already imports Lucide icons via `import * as Icons from "lucide-vue-next"`.
+- `EmptyState.vue` already includes `Video`, `Bell`, `Layout`, `Target`, `BarChart3`, and `Calendar`; no icon-add task is required.
+- `EmptyState.vue` actual copy prop is `subtitle`, not `description`.
+- `MainCard.vue`, `SearchFilter.vue`, and `EmptyState.vue` were already substantially tokenized. Execution avoided unnecessary rewrites.
+
+### Corrected Header Scope
+
+Add only missing real route names from router files:
+
+```txt
+admin.performance.team-reviews
+admin.performance.goal.detail
+admin.payroll.readiness
+admin.payroll.settings
+admin.payroll.approval-matrix
+admin.payroll.adjustments
+admin.payroll.comparison
+admin.payroll.thr
+admin.payroll.thr.detail
+admin.upgrade-plan
+```
+
+Correct stale route keys:
+
+```txt
+admin.payroll        ❌ use admin.payroll.dashboard
+staffMember.payslip  ❌ use staffMember.payslips.detail
+```
+
+Convert existing Indonesian Header titles/subtitles to English, including notifications, teams, staff members, attendance, projects, payroll, profile, team, and attendance self-service entries.
+
+### Corrected TDD Checks Executed
+
+Update tests before implementation:
+
+- `team-sync-fe/src/tests/components/StatsCard.test.js`
+  - assert root `[data-testid="stats-card"]`
+  - assert no solid `bg-white`
+  - assert `background: var(--color-surface)`
+  - assert `border-color: var(--color-border-default)`
+- `team-sync-fe/src/tests/admin/components/Header.smoke.test.js`
+  - assert `admin.notifications` displays `Notifications`, not `Notifikasi`
+  - assert `admin.payroll.readiness` displays `Payroll Readiness`
+  - assert `admin.performance.team-reviews` displays `Team Reviews`
+
+### Corrected Implementation Files
+
+```txt
+team-sync-fe/src/components/common/StatsCard.vue
+team-sync-fe/src/components/admin/Header.vue
+team-sync-fe/src/tests/components/StatsCard.test.js
+team-sync-fe/src/tests/admin/components/Header.smoke.test.js
+```
+
+### Verification Evidence
+
+```bash
+cd team-sync-fe
+bun run test src/tests/components/StatsCard.test.js src/tests/admin/components/Header.smoke.test.js src/tests/admin/attendance
+bun run test
+```
+
+Observed result after implementation:
+
+```txt
+145 test files passed
+1091 tests passed
+0 failed
+```
+
+### Updated Success Criteria for Executed Scope
+
+- ✅ `StatsCard.vue` root uses CSS variable surface/border tokens.
+- ✅ `StatsCard.vue` no longer depends on solid `bg-white` card surface.
+- ✅ Header title map covers the 10 verified missing routes.
+- ✅ Header stale Indonesian titles in verified map converted to English.
+- ✅ Stale EmptyState icon work explicitly skipped because icons already exist.
+- ✅ Full frontend suite passes.

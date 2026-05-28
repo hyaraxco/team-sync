@@ -71,7 +71,7 @@ const getTypeBadge = (type) => {
         case "holiday":
             return "bg-orange-100 text-orange-700";
         default:
-            return "bg-gray-100 text-gray-700";
+            return "bg-brand-border/30 text-brand-light";
     }
 };
 

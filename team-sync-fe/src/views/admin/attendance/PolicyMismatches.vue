@@ -17,19 +17,20 @@
             <!-- Error State -->
             <div
                 v-if="error"
-                class="bg-white border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
+                class="border border-red-200 rounded-2xl p-6 flex items-center gap-3 text-red-600"
+                style="background: var(--color-surface)"
             >
                 <AlertTriangle class="w-5 h-5 shrink-0" />
                 <p>Unable to load policy mismatches. Please try again later.</p>
             </div>
 
             <!-- Loading State -->
-            <div v-else-if="loading" class="rounded-2xl border border-brand-border bg-white p-4 space-y-4">
+            <div v-else-if="loading" class="rounded-2xl border border-brand-border p-4 space-y-4" style="background: var(--color-surface)">
                 <div v-for="i in 5" :key="i" class="h-16 bg-brand-border/40 rounded-2xl animate-pulse" />
             </div>
 
             <!-- Empty State -->
-            <div v-else-if="!filteredMismatches.length" class="bg-white border border-brand-border rounded-2xl p-6">
+            <div v-else-if="!filteredMismatches.length" class="border border-brand-border rounded-2xl p-6" style="background: var(--color-surface)">
                 <EmptyState
                     icon="AlertTriangle"
                     title="No policy mismatches"
@@ -39,7 +40,7 @@
             </div>
 
             <!-- Table -->
-            <div v-else class="bg-white border border-brand-border rounded-2xl overflow-hidden">
+            <div v-else class="border border-brand-border rounded-2xl overflow-hidden" style="background: var(--color-surface)">
                 <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead>

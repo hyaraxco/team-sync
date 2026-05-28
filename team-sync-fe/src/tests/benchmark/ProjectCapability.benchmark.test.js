@@ -56,6 +56,7 @@ describe("Benchmark: Auth Store", () => {
 
     beforeEach(async () => {
         setActivePinia(createPinia());
+        window.history.replaceState(null, "", "/auth/login");
         const { useAuthStore } = await import("@/stores/auth");
         store = useAuthStore();
         vi.clearAllMocks();

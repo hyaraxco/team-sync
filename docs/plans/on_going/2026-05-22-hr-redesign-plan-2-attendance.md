@@ -559,3 +559,92 @@ After Plan 2 complete:
 - **Plan 4: Core Admin**
 - **Plan 5: Staff/Project/Team**
 
+---
+
+## 2026-05-27 Execution Patch — Orchestrator Crosscheck Corrections
+
+> **Status:** Applied before final verification in branch/worktree `hr-redesign-execution`.
+> **Reason:** Direct source crosscheck found the original plan over-scoped some pages and missed actual token debt counts. Execution followed the corrected surgical cleanup below.
+
+### Corrected Attendance Scope
+
+The following pages were already tokenized enough or inherited tokenized shells and were not rewritten:
+
+- `AttendanceSettings.vue` — already uses `var(--color-surface)`, no solid `bg-white`.
+- `AttendancePeriods.vue` — already uses `var(--color-surface)`, no solid `bg-white`.
+- `AttendanceRecordList.vue` — no direct solid `bg-white`; uses tokenized shared components.
+- `HolidayCalendar.vue` — no direct execution change required for this patch.
+
+Surgical token cleanup was applied to the verified debt files:
+
+```txt
+team-sync-fe/src/views/admin/attendance/AttendanceList.vue
+team-sync-fe/src/views/admin/attendance/HybridScheduleList.vue
+team-sync-fe/src/views/admin/attendance/LeaveRequestList.vue
+team-sync-fe/src/views/admin/attendance/PolicyMismatches.vue
+team-sync-fe/src/views/admin/attendance/AttendanceCorrectionList.vue
+team-sync-fe/src/views/admin/attendance/OvertimeManagement.vue
+team-sync-fe/src/components/common/ModalWrapper.vue
+team-sync-fe/src/components/common/ConfirmationModal.vue
+```
+
+Allowed exception:
+
+- `bg-white/20` remains allowed for translucent overlays on dark hero/gradient surfaces.
+
+### Corrected Tests Executed First
+
+Tests were updated before implementation to fail against the old source:
+
+- `team-sync-fe/src/tests/admin/attendance/AttendanceList.smoke.test.js`
+  - source guard: contains `var(--color-surface)`
+  - source guard: no solid `bg-white` after ignoring `bg-white/20`
+- `team-sync-fe/src/tests/admin/attendance/HybridScheduleList.smoke.test.js`
+  - source guard: no solid `bg-white`
+  - rendered output includes `var(--color-surface)`
+- `team-sync-fe/src/tests/admin/attendance/LeaveRequestList.smoke.test.js`
+  - source guard: contains `var(--color-surface)`
+  - source guard: no solid `bg-white`
+- `team-sync-fe/src/tests/admin/attendance/PolicyMismatches.test.js`
+  - source guard: contains `var(--color-surface)`
+  - source guard: no solid `bg-white`
+
+### Corrected Implementation Notes
+
+- Replaced solid `bg-white` shells with inline `style="background: var(--color-surface)"` or Tailwind arbitrary `bg-[var(--color-surface)]` where class binding required it.
+- Removed solid white tab inactive surfaces in `AttendanceList.vue` and `HybridScheduleList.vue`.
+- Replaced `OvertimeManagement.vue` gray fallback badge from `bg-gray-100 text-gray-700` to token-compatible brand classes.
+- Tokenized modal panel surfaces in `ModalWrapper.vue` and `ConfirmationModal.vue`.
+- Tokenized `AttendanceCorrectionList.vue` reject textarea surface.
+
+### Verification Evidence
+
+```bash
+cd team-sync-fe
+bun run test src/tests/components/StatsCard.test.js src/tests/admin/components/Header.smoke.test.js src/tests/admin/attendance
+bun run test
+```
+
+Observed result after implementation:
+
+```txt
+145 test files passed
+1091 tests passed
+0 failed
+```
+
+Source guard after implementation:
+
+```txt
+No solid bg-white remains in targeted attendance views.
+No bg-gray-100 text-gray-700 remains in OvertimeManagement.vue.
+No bg-white remains in ModalWrapper.vue or ConfirmationModal.vue modal panels.
+```
+
+### Updated Success Criteria for Executed Scope
+
+- ✅ Verified high-debt attendance views no longer use solid `bg-white` surfaces.
+- ✅ `bg-white/20` translucent overlays remain allowed.
+- ✅ Shared modal panels use `var(--color-surface)`.
+- ✅ Attendance-focused tests pass.
+- ✅ Full frontend suite passes.

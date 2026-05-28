@@ -101,7 +101,11 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
         class="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4"
         @click.self="handleCancel"
     >
-        <div ref="modalRef" class="bg-white rounded-2xl border border-brand-border w-full max-w-md overflow-hidden">
+        <div
+            ref="modalRef"
+            class="rounded-2xl border border-brand-border w-full max-w-md overflow-hidden"
+            style="background: var(--color-surface)"
+        >
             <!-- Header -->
             <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">

@@ -114,7 +114,8 @@ watch(
                 >
                     <div
                         v-if="show"
-                        class="bg-white rounded-2xl p-6 w-full mx-4 flex flex-col max-h-[90vh]"
+                        class="rounded-2xl p-6 w-full mx-4 flex flex-col max-h-[90vh]"
+                        style="background: var(--color-surface)"
                         :class="{
                             'max-w-sm': maxWidth === 'sm',
                             'max-w-md': maxWidth === 'md',
