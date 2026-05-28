@@ -93,8 +93,32 @@ class AnalyticsExportController extends Controller implements HasMiddleware
             'leave' => $this->analyticsRepository->getLeaveAnalytics($period, $department),
             'payroll' => $this->analyticsRepository->getPayrollAnalytics($period, $department),
             'projects' => $this->analyticsRepository->getProjectAnalytics($period, null),
+            'performance' => $this->fetchPerformanceData($teamId),
             default => [],
         };
+    }
+
+    /**
+     * Aggregate the 5 performance endpoints into a single payload for export.
+     */
+    private function fetchPerformanceData(?int $teamId): array
+    {
+        $companySummary = $this->analyticsRepository->getCompanyPerformanceSummary();
+        $ratingDistribution = $this->analyticsRepository->getRatingDistribution();
+        $goalCompletion = $this->analyticsRepository->getGoalCompletionRate(null, $teamId);
+        $feedbackMetrics = $this->analyticsRepository->getFeedbackMetrics(null, $teamId);
+
+        $teamSummary = $teamId
+            ? $this->analyticsRepository->getTeamPerformanceSummary($teamId)
+            : null;
+
+        return [
+            'company_summary' => $companySummary,
+            'rating_distribution' => $ratingDistribution,
+            'goal_completion' => $goalCompletion,
+            'feedback_metrics' => $feedbackMetrics,
+            'team_summary' => $teamSummary,
+        ];
     }
 
     /**
@@ -111,6 +135,7 @@ class AnalyticsExportController extends Controller implements HasMiddleware
             'leave' => $this->buildLeaveSheets($data),
             'payroll' => $this->buildPayrollSheets($data),
             'projects' => $this->buildProjectSheets($data),
+            'performance' => $this->buildPerformanceSheets($data),
             default => [],
         };
     }
@@ -161,7 +186,10 @@ class AnalyticsExportController extends Controller implements HasMiddleware
         if (! empty($data['team_performance'])) {
             $sheets[] = new AnalyticsExport(
                 collect($data['team_performance'])->map(fn ($r) => [
-                    $r['team_name'], $r['attendance_rate'], $r['task_completion'], $r['member_count'],
+                    $r['team_name'],
+                    $r['attendance_rate'],
+                    $r['task_completion_rate'] ?? $r['task_completion'] ?? 0,
+                    $r['member_count'],
                 ]),
                 ['Team', 'Attendance Rate (%)', 'Task Completion (%)', 'Members'],
                 'Team Performance'
@@ -345,6 +373,91 @@ class AnalyticsExportController extends Controller implements HasMiddleware
                 'Team Productivity'
             );
         }
+
+        return $sheets;
+    }
+
+    private function buildPerformanceSheets(array $data): array
+    {
+        $sheets = [];
+
+        // Company summary KPIs
+        $company = $data['company_summary'] ?? [];
+        $sheets[] = new AnalyticsExport(
+            collect([
+                ['Total Reviews', $company['total_reviews'] ?? 0],
+                ['Completed Reviews', $company['completed_reviews'] ?? 0],
+                ['Completion Rate (%)', $company['completion_rate'] ?? 0],
+                ['Average Rating', $company['average_rating'] ?? 0],
+            ]),
+            ['Metric', 'Value'],
+            'Company Summary'
+        );
+
+        // Rating distribution
+        $rating = $data['rating_distribution'] ?? [];
+        if (! empty($rating['distribution'])) {
+            $rows = [];
+            foreach ($rating['distribution'] as $score => $count) {
+                $percentage = $rating['percentages'][$score] ?? 0;
+                $rows[] = [$score, $count, $percentage];
+            }
+            $sheets[] = new AnalyticsExport(
+                collect($rows),
+                ['Rating', 'Count', 'Percentage (%)'],
+                'Rating Distribution'
+            );
+        }
+
+        // Goal completion
+        $goals = $data['goal_completion'] ?? [];
+        $sheets[] = new AnalyticsExport(
+            collect([
+                ['Total Goals', $goals['total_goals'] ?? 0],
+                ['Completed Goals', $goals['completed_goals'] ?? 0],
+                ['In Progress Goals', $goals['in_progress_goals'] ?? 0],
+                ['Not Started Goals', $goals['not_started_goals'] ?? 0],
+                ['Completion Rate (%)', $goals['completion_rate'] ?? 0],
+                ['Average Progress (%)', $goals['average_progress'] ?? 0],
+                ['Overdue Goals', $goals['overdue_goals'] ?? 0],
+            ]),
+            ['Metric', 'Value'],
+            'Goal Completion'
+        );
+
+        // Goals by category
+        if (! empty($goals['by_category'])) {
+            $rows = [];
+            foreach ($goals['by_category'] as $category => $stats) {
+                $rows[] = [
+                    $category ?: 'Uncategorized',
+                    $stats['total'] ?? 0,
+                    $stats['completed'] ?? 0,
+                    $stats['completion_rate'] ?? 0,
+                ];
+            }
+            $sheets[] = new AnalyticsExport(
+                collect($rows),
+                ['Category', 'Total', 'Completed', 'Completion Rate (%)'],
+                'Goals by Category'
+            );
+        }
+
+        // Feedback metrics
+        $feedback = $data['feedback_metrics'] ?? [];
+        $feedbackRows = [
+            ['Total Feedback', $feedback['total_feedback'] ?? 0],
+            ['Recent Feedback (30d)', $feedback['recent_feedback_30d'] ?? 0],
+            ['Average per Employee', $feedback['average_per_employee'] ?? 0],
+        ];
+        foreach (($feedback['by_type'] ?? []) as $type => $count) {
+            $feedbackRows[] = ['Type: '.ucfirst((string) $type), $count];
+        }
+        $sheets[] = new AnalyticsExport(
+            collect($feedbackRows),
+            ['Metric', 'Value'],
+            'Feedback Metrics'
+        );
 
         return $sheets;
     }
