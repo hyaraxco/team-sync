@@ -259,29 +259,29 @@
             <div class="kpi-grid">
                 <div class="kpi-row">
                     <div class="kpi-cell">
-                        <div class="kpi-value">{{ number_format($data['kpis']['total_employees']) }}</div>
+                        <div class="kpi-value">{{ number_format($data['kpis']['total_employees'] ?? 0) }}</div>
                         <div class="kpi-label">Total Employees</div>
                     </div>
                     <div class="kpi-cell">
-                        <div class="kpi-value">{{ $data['kpis']['attendance_rate'] }}%</div>
+                        <div class="kpi-value">{{ $data['kpis']['attendance_rate'] ?? 0 }}%</div>
                         <div class="kpi-label">Attendance Rate</div>
                     </div>
                     <div class="kpi-cell">
-                        <div class="kpi-value">Rp {{ number_format($data['kpis']['average_salary'], 0, ',', '.') }}</div>
+                        <div class="kpi-value">Rp {{ number_format($data['kpis']['average_salary'] ?? 0, 0, ',', '.') }}</div>
                         <div class="kpi-label">Average Salary</div>
                     </div>
                 </div>
                 <div class="kpi-row">
                     <div class="kpi-cell">
-                        <div class="kpi-value">{{ $data['kpis']['active_projects'] }}</div>
+                        <div class="kpi-value">{{ $data['kpis']['active_projects'] ?? 0 }}</div>
                         <div class="kpi-label">Active Projects</div>
                     </div>
                     <div class="kpi-cell">
-                        <div class="kpi-value">{{ $data['kpis']['task_completion_rate'] }}%</div>
+                        <div class="kpi-value">{{ $data['kpis']['task_completion_rate'] ?? 0 }}%</div>
                         <div class="kpi-label">Task Completion</div>
                     </div>
                     <div class="kpi-cell">
-                        <div class="kpi-value">{{ $data['kpis']['leave_utilization'] }}%</div>
+                        <div class="kpi-value">{{ $data['kpis']['leave_utilization'] ?? 0 }}%</div>
                         <div class="kpi-label">Leave Utilization</div>
                     </div>
                 </div>
