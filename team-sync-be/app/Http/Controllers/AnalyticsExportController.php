@@ -466,9 +466,8 @@ class AnalyticsExportController extends Controller implements HasMiddleware
                     $review['employee_name'] ?? '-',
                     $review['overall_rating'] ?? null,
                     $review['status'] ?? '-',
-                    $review['id'] ?? null,
                 ]),
-                ['Employee', 'Avg Rating', 'Status', 'Review ID'],
+                ['Employee', 'Avg Rating', 'Status'],
                 'Team Summary'
             );
         }
