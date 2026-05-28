@@ -21,7 +21,7 @@ class AnalyticsExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     private const CURRENCY_COLUMNS = [
         'Salary', 'Tax', 'BPJS', 'Deductions', 'Total Salary', 'Total Deductions',
         'Avg Salary', 'Total Cost', 'PPh21', 'BPJS TK', 'BPJS Kesehatan',
-        'Average Salary', 'Total Deductions',
+        'Average Salary',
     ];
 
     /** @var string[] Column keys that should be formatted as percentages */
@@ -55,7 +55,7 @@ class AnalyticsExport implements FromCollection, ShouldAutoSize, WithHeadings, W
     public function styles(Worksheet $sheet): array
     {
         $lastColumn = \PhpOffice\PhpSpreadsheet\Cell\Coordinate::stringFromColumnIndex(count($this->headings));
-        $headerRange = 'A1:'.$lastColumn.'1';
+        $lastRow = max($this->rows->count() + 1, 2);
 
         return [
             // Header row — brand blue background, white bold text
@@ -81,7 +81,7 @@ class AnalyticsExport implements FromCollection, ShouldAutoSize, WithHeadings, W
                 ],
             ],
             // Data rows — alternating white/light-gray with borders
-            'A2:'.$lastColumn.'1000' => [
+            'A2:'.$lastColumn.$lastRow => [
                 'borders' => [
                     'bottom' => [
                         'borderStyle' => Border::BORDER_THIN,
