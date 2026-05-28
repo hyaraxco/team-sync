@@ -257,6 +257,77 @@ class AnalyticsExportControllerTest extends TestCase
             ->assertHeaderContains('Content-Disposition', 'analytics-executive-');
     }
 
+    public function test_executive_excel_export_supports_task_completion_rate_key(): void
+    {
+        $this->app->bind(AnalyticsRepositoryInterface::class, fn () => new class implements AnalyticsRepositoryInterface
+        {
+            public function getExecutiveSummary(string $period, ?string $department, ?int $teamId): array
+            {
+                return [
+                    'kpis' => [
+                        'total_employees' => 9,
+                        'employee_growth' => 0,
+                        'attendance_rate' => 100,
+                        'average_salary' => 10000000,
+                        'active_projects' => 1,
+                        'task_completion_rate' => 88.5,
+                        'leave_utilization' => 10,
+                    ],
+                    'team_performance' => [
+                        [
+                            'team_name' => 'Engineering',
+                            'attendance_rate' => 100,
+                            'task_completion_rate' => 33.3,
+                            'member_count' => 3,
+                        ],
+                    ],
+                ];
+            }
+
+            public function getWorkforceAnalytics(string $period, ?string $department): array { return []; }
+            public function getAttendanceAnalytics(string $period, ?string $department, ?int $teamId): array { return []; }
+            public function getLeaveAnalytics(string $period, ?string $department): array { return []; }
+            public function getPayrollAnalytics(string $period, ?string $department): array { return []; }
+            public function getProjectAnalytics(string $period, ?int $projectId): array { return []; }
+            public function getTurnoverRate(string $period, ?string $department): array { return []; }
+            public function getAverageTenure(?string $department): array { return []; }
+            public function getNewHireTrends(string $period, ?string $department): array { return []; }
+            public function getAttendanceComplianceRate(string $period, ?string $department): array { return []; }
+            public function getAttendancePatterns(string $period, ?string $department): array { return []; }
+            public function getRemoteOfficeRatio(string $period, ?string $department): array { return []; }
+            public function getLeaveUtilizationRate(string $period, ?string $department): array { return []; }
+            public function getLeaveBalanceTrends(string $period, ?string $department): array { return []; }
+            public function getPeakLeavePeriods(string $period): array { return []; }
+            public function getPayrollCostTrends(string $period, ?string $department): array { return []; }
+            public function getSalaryDistribution(?string $department): array { return []; }
+            public function getDeductionAnalysis(string $period, ?string $department): array { return []; }
+            public function getProjectTimelineAdherence(string $period): array { return []; }
+            public function getTaskVelocity(string $period, ?int $teamId): array { return []; }
+            public function getOverdueTrends(string $period): array { return []; }
+            public function getSnapshotMetric(string $metricType, string $metricName, string $periodType, string $startDate, string $endDate): ?array { return null; }
+            public function getWorkforceDemographicsEndpoint(string $period, ?string $department): array { return []; }
+            public function getAttendanceCorrectionFrequency(string $period, ?string $department): array { return []; }
+            public function getLeaveApprovalTurnaround(string $period, ?string $department): array { return []; }
+            public function getLeaveTypeDistribution(string $period, ?string $department): array { return []; }
+            public function getPayrollCostPerEmployee(string $period, ?string $department): array { return []; }
+            public function getPayrollProcessingTime(string $period): array { return []; }
+            public function getProjectResourceUtilization(string $period, ?int $teamId): array { return []; }
+            public function getTeamPerformanceSummary(int $teamId, ?int $cycleId = null): array { return []; }
+            public function getCompanyPerformanceSummary(?int $cycleId = null): array { return []; }
+            public function getRatingDistribution(?int $cycleId = null): array { return []; }
+            public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array { return []; }
+            public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array { return []; }
+        });
+
+        $user = User::factory()->create();
+        $user->givePermissionTo('analytics-export');
+        Sanctum::actingAs($user);
+
+        $this->getJson('/api/v1/analytics/export/excel?tab=executive')
+            ->assertOk()
+            ->assertHeaderContains('Content-Disposition', 'analytics-executive-');
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // PDF Export
     // ─────────────────────────────────────────────────────────────────────────

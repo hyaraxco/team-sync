@@ -173,7 +173,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                     :options="costTrendOptions"
                     :series="costTrendSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -186,7 +186,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                     :options="salaryDistOptions"
                     :series="salaryDistSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
 
@@ -202,7 +202,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                     :options="taxBpjsOptions"
                     :series="taxBpjsSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
             <div class="bg-white border border-brand-border rounded-2xl p-6">
@@ -215,7 +215,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                     :options="costByDeptOptions"
                     :series="costByDeptSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
 
@@ -231,7 +231,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                     :options="deductionDonutOptions"
                     :series="deductionDonutSeries"
                 />
-                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">Data kosong</div>
+                <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
         </div>
     </div>
@@ -239,7 +239,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
     <!-- Empty State -->
     <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
         <WalletIcon class="w-16 h-16 mb-4 opacity-50" />
-        <p class="text-lg font-medium">Analitik penggajian belum tersedia</p>
+        <p class="text-lg font-medium">Payroll analytics not yet available</p>
         <p class="text-sm mt-1">Try adjusting the period or filters</p>
     </div>
 </template>
