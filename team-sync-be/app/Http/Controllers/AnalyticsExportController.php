@@ -459,6 +459,20 @@ class AnalyticsExportController extends Controller implements HasMiddleware
             'Feedback Metrics'
         );
 
+        $teamSummary = $data['team_summary']['reviews'] ?? [];
+        if (! empty($teamSummary)) {
+            $sheets[] = new AnalyticsExport(
+                collect($teamSummary)->map(fn ($review) => [
+                    $review['employee_name'] ?? '-',
+                    $review['overall_rating'] ?? null,
+                    $review['status'] ?? '-',
+                    $review['id'] ?? null,
+                ]),
+                ['Employee', 'Avg Rating', 'Status', 'Review ID'],
+                'Team Summary'
+            );
+        }
+
         return $sheets;
     }
 }
