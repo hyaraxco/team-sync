@@ -5,12 +5,16 @@ namespace App\Http\Controllers;
 use App\Helpers\ResponseHelper;
 use App\Http\Middleware\EnsureProjectMembership;
 use App\Http\Requests\Project\ProjectListRequest;
+use App\Http\Requests\Project\UpdateProjectLeaderRequest;
 use App\Http\Requests\ProjectStoreRequest;
 use App\Http\Requests\ProjectUpdateRequest;
 use App\Http\Resources\PaginateResource;
 use App\Http\Resources\ProjectResource;
+use App\Http\Resources\StaffMemberProfileResource;
 use App\Interfaces\ProjectRepositoryInterface;
 use App\Models\Project;
+use App\Services\InvalidProjectLeaderException;
+use App\Services\ProjectMembershipService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -25,21 +29,26 @@ class ProjectController extends Controller implements HasMiddleware
 {
     private ProjectRepositoryInterface $projectRepository;
 
-    public function __construct(ProjectRepositoryInterface $projectRepository)
-    {
+    private ProjectMembershipService $membershipService;
+
+    public function __construct(
+        ProjectRepositoryInterface $projectRepository,
+        ProjectMembershipService $membershipService,
+    ) {
         $this->projectRepository = $projectRepository;
+        $this->membershipService = $membershipService;
     }
 
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['project-list|project-create|project-edit|project-delete']), only: ['index', 'getAllPaginated', 'show']),
+            new Middleware(PermissionMiddleware::using(['project-list|project-create|project-edit|project-delete']), only: ['index', 'getAllPaginated', 'show', 'getMembers']),
             new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getStatistics']),
             new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getSquadSummary']),
             new Middleware(PermissionMiddleware::using(['project-create']), only: ['store']),
-            new Middleware(PermissionMiddleware::using(['project-edit']), only: ['update']),
+            new Middleware(PermissionMiddleware::using(['project-edit']), only: ['update', 'updateLeader', 'getEligibleLeaders']),
             new Middleware(PermissionMiddleware::using(['project-delete']), only: ['destroy']),
-            new Middleware(EnsureProjectMembership::class, only: ['show', 'getSquadSummary']),
+            new Middleware(EnsureProjectMembership::class, only: ['show', 'getSquadSummary', 'getMembers']),
         ];
     }
 
@@ -222,6 +231,97 @@ class ProjectController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
         } catch (AuthorizationException $e) {
             return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
+        } catch (\Throwable $e) {
+            Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * List all active project members (used by task assignee picker, etc).
+     */
+    public function getMembers(string $id): JsonResponse
+    {
+        try {
+            $project = $this->projectRepository->findById($id);
+            $project->loadMissing('teams');
+
+            $members = $this->membershipService->getProjectMembers($project);
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Project Members Retrieved Successfully',
+                StaffMemberProfileResource::collection($members),
+                200
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
+        } catch (\Throwable $e) {
+            Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * List eligible project leader candidates with optional seniority filter.
+     * Manager only — guarded by project-edit permission middleware.
+     */
+    public function getEligibleLeaders(Request $request, string $id): JsonResponse
+    {
+        try {
+            $project = $this->projectRepository->findById($id);
+            $project->loadMissing('teams');
+
+            $seniority = $request->query('seniority_level');
+            $result = $this->membershipService->getEligibleLeaders(
+                $project,
+                is_string($seniority) ? $seniority : null,
+            );
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Eligible Project Leaders Retrieved Successfully',
+                [
+                    'members' => StaffMemberProfileResource::collection($result['members'])->toArray($request),
+                    'warning' => $result['warning'],
+                ],
+                200,
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
+        } catch (\Throwable $e) {
+            Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * Reassign the project leader. Manager only — guarded by project-edit middleware.
+     * Business validation is delegated to ProjectMembershipService::reassignLeader.
+     */
+    public function updateLeader(UpdateProjectLeaderRequest $request, string $id): JsonResponse
+    {
+        $data = $request->validated();
+
+        try {
+            $project = $this->membershipService->reassignLeader(
+                (int) $id,
+                (int) $data['project_leader_id'],
+            );
+
+            return ResponseHelper::jsonResponse(
+                true,
+                'Project Leader Updated Successfully',
+                new ProjectResource($project),
+                200
+            );
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Project Not Found', null, 404);
+        } catch (InvalidProjectLeaderException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('ProjectController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
