@@ -211,7 +211,7 @@ class ThrCalculationService
      * - Feb 29 2024 → Feb 27 2025 = 11 (last-of-month leap-day start; Feb 2025 has 28 days, day 27 < 28)
      * - Feb 29 2024 → Feb 28 2025 = 12 (last-of-month leap-day start; reaches Feb 28 anniversary)
      */
-    public function calculateTenureMonths(Carbon $startDate, Carbon $paymentDate): int
+    private function calculateTenureMonths(Carbon $startDate, Carbon $paymentDate): int
     {
         if ($paymentDate->lessThan($startDate)) {
             return 0;
