@@ -452,7 +452,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'due_date' => now()->addDays(8)->toDateString(),
         ])->assertCreated();
 
-        Sanctum::actingAs($hrUser);
+        Sanctum::actingAs($managerUser);
 
         $qaTaskResponse = $this->postJson('/api/v1/project-tasks', [
             'project_id' => $projectId,
@@ -482,7 +482,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'comment' => 'QA process checkpoint from manager.',
         ])->assertCreated();
 
-        Sanctum::actingAs($hrUser);
+        Sanctum::actingAs($managerUser);
 
         $this->post('/api/v1/project-tasks/'.$qaTaskId.'/attachments', [
             'file' => UploadedFile::fake()->create('lp3es-uat-checklist.txt', 12, 'text/plain'),
@@ -518,7 +518,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'status' => 'review',
         ])->assertOk();
 
-        Sanctum::actingAs($hrUser);
+        Sanctum::actingAs($managerUser);
 
         $this->putJson('/api/v1/project-tasks/'.$frontendTaskId, [
             'status' => 'rejected',
@@ -545,7 +545,7 @@ class ProjectTeamAttendanceNotificationsTest extends TestCase
             'status' => 'done',
         ])->assertOk();
 
-        Sanctum::actingAs($hrUser);
+        Sanctum::actingAs($managerUser);
 
         $this->putJson('/api/v1/project-tasks/'.$qaTaskId, [
             'status' => 'done',

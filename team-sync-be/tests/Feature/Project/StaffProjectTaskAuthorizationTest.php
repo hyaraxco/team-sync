@@ -126,7 +126,7 @@ class StaffProjectTaskAuthorizationTest extends TestCase
         $this->projectB->teams()->sync([$this->teamB->id => ['assigned_at' => now()]]);
     }
 
-    // ─── Finding #1: Staff cannot create task on non-member project ─────
+    // ─── Permission overhaul (2026-05-30): staff cannot create tasks ────
 
     public function test_staff_cannot_create_task_on_non_member_project(): void
     {
@@ -142,23 +142,42 @@ class StaffProjectTaskAuthorizationTest extends TestCase
         $response->assertForbidden();
     }
 
-    public function test_staff_can_create_task_on_own_project(): void
+    public function test_staff_cannot_create_task_on_own_project(): void
+    {
+        // After permission overhaul, staff have no task-create permission.
+        // Tasks are assigned to staff by the project leader/manager.
+        Sanctum::actingAs($this->staffUserA);
+
+        $response = $this->postJson('/api/v1/project-tasks', [
+            'project_id' => $this->projectA->id,
+            'name' => 'Self-created task',
+            'priority' => TaskPriority::MEDIUM->value,
+            'status' => TaskStatus::TODO->value,
+        ]);
+
+        $response->assertForbidden();
+    }
+
+    // ─── Finding #1: Staff cannot create tasks at all ───────────────────
+    // (legacy "staff cannot assign to others" / "staff cannot use done status"
+    //  cases collapse into "staff cannot create" — see test_staff_cannot_create_task_on_own_project)
+
+    public function test_staff_cannot_create_task_assigning_to_self(): void
     {
         Sanctum::actingAs($this->staffUserA);
 
         $response = $this->postJson('/api/v1/project-tasks', [
             'project_id' => $this->projectA->id,
-            'name' => 'Legitimate Task',
+            'name' => 'My own task',
+            'assignee_id' => $this->staffProfileA->id,
             'priority' => TaskPriority::MEDIUM->value,
             'status' => TaskStatus::TODO->value,
         ]);
 
-        $response->assertCreated();
+        $response->assertForbidden();
     }
 
-    // ─── Finding #1: Staff cannot assign task to others ─────────────────
-
-    public function test_staff_cannot_assign_task_to_other_employee(): void
+    public function test_staff_cannot_create_task_assigning_to_other_employee(): void
     {
         Sanctum::actingAs($this->staffUserA);
 
@@ -172,23 +191,6 @@ class StaffProjectTaskAuthorizationTest extends TestCase
 
         $response->assertForbidden();
     }
-
-    public function test_staff_can_assign_task_to_self(): void
-    {
-        Sanctum::actingAs($this->staffUserA);
-
-        $response = $this->postJson('/api/v1/project-tasks', [
-            'project_id' => $this->projectA->id,
-            'name' => 'My own task',
-            'assignee_id' => $this->staffProfileA->id,
-            'priority' => TaskPriority::MEDIUM->value,
-            'status' => TaskStatus::TODO->value,
-        ]);
-
-        $response->assertCreated();
-    }
-
-    // ─── Finding #2: Staff cannot create task with status done ──────────
 
     public function test_staff_cannot_create_task_with_done_status(): void
     {

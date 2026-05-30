@@ -665,7 +665,8 @@ class ProjectCapabilityBenchmarkTest extends TestCase
 
     public function test_benchmark_project_crud_operations(): void
     {
-        $this->actAs('hr');
+        // Permission overhaul (2026-05-30): only manager has project CRUD; HR is read-only.
+        $this->actAs('manager');
 
         // Create
         $response = $this->postJson('/api/v1/projects', [
