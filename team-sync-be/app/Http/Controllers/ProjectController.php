@@ -44,7 +44,6 @@ class ProjectController extends Controller implements HasMiddleware
         return [
             new Middleware(PermissionMiddleware::using(['project-list|project-create|project-edit|project-delete']), only: ['index', 'getAllPaginated', 'show', 'getMembers']),
             new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getStatistics']),
-            new Middleware(PermissionMiddleware::using(['project-statistic']), only: ['getSquadSummary']),
             new Middleware(PermissionMiddleware::using(['project-create']), only: ['store']),
             new Middleware(PermissionMiddleware::using(['project-edit']), only: ['update', 'updateLeader', 'getEligibleLeaders']),
             new Middleware(PermissionMiddleware::using(['project-delete']), only: ['destroy']),

@@ -98,10 +98,18 @@ class ProjectPolicy
 
     /**
      * Determine if the user can view squad summary for a project.
-     * Requires project-statistic permission + project membership for staff.
+     * Allowed for: privileged roles (manager/hr) with project-statistic permission,
+     * OR the project leader themselves (regardless of role).
+     * Membership is enforced separately by middleware.
      */
     public function viewSquadSummary(User $user, Project $project): Response
     {
+        // Project leader of THIS project can always see squad summary
+        $profile = $user->staffMemberProfile;
+        if ($profile && (int) $project->project_leader_id === (int) $profile->id) {
+            return Response::allow();
+        }
+
         if (! $user->hasPermissionTo('project-statistic')) {
             return Response::deny('You do not have permission to view squad summary.');
         }
