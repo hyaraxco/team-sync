@@ -3,9 +3,11 @@
 namespace App\Http\Resources;
 
 use App\Models\Project;
+use App\Models\ProjectTask;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Illuminate\Support\Facades\Gate;
 
 /**
  * @mixin Project
@@ -63,18 +65,19 @@ class ProjectResource extends JsonResource
         return (int) $this->project_leader_id === (int) $profileId;
     }
 
+    /**
+     * Delegate to ProjectTaskPolicy::create so authorization stays single-source.
+     * Returning false is safe when the user is unauthenticated.
+     */
     private function resolveCanCreateTask(?User $user): bool
     {
         if (! $user) {
             return false;
         }
 
-        // Manager can create tasks (delegates to project leader by convention)
-        if ($user->hasRole('manager')) {
-            return true;
-        }
-
-        // Project leader can create tasks in their project
-        return $this->resolveIsProjectLeader($user);
+        return Gate::forUser($user)->allows('create', [
+            ProjectTask::class,
+            ['project_id' => $this->id],
+        ]);
     }
 }
