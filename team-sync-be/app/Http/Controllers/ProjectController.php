@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\InvalidProjectLeaderException;
 use App\Helpers\ResponseHelper;
 use App\Http\Middleware\EnsureProjectMembership;
 use App\Http\Requests\Project\ProjectListRequest;
@@ -13,7 +14,6 @@ use App\Http\Resources\ProjectResource;
 use App\Http\Resources\StaffMemberProfileResource;
 use App\Interfaces\ProjectRepositoryInterface;
 use App\Models\Project;
-use App\Services\InvalidProjectLeaderException;
 use App\Services\ProjectMembershipService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;

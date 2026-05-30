@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Enums\JobStatus;
+use App\Exceptions\InvalidProjectLeaderException;
 use App\Interfaces\ProjectRepositoryInterface;
 use App\Models\Project;
 use App\Models\StaffMemberProfile;
@@ -10,10 +11,13 @@ use App\Models\TeamMember;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use RuntimeException;
 
 class ProjectMembershipService
 {
+    public function __construct(
+        private readonly ProjectRepositoryInterface $projectRepository,
+    ) {}
+
     /**
      * Resolve the team IDs a staff member profile belongs to.
      * Combines jobInformation.team_id and active team_members rows.
@@ -162,10 +166,7 @@ class ProjectMembershipService
      */
     public function reassignLeader(int $projectId, int $newLeaderId): Project
     {
-        /** @var ProjectRepositoryInterface $projectRepository */
-        $projectRepository = app(ProjectRepositoryInterface::class);
-
-        $project = $projectRepository->findById((string) $projectId);
+        $project = $this->projectRepository->findById((string) $projectId);
         $project->loadMissing('teams');
 
         $candidate = StaffMemberProfile::with('jobInformation')->find($newLeaderId);
@@ -184,10 +185,8 @@ class ProjectMembershipService
             );
         }
 
-        return $projectRepository->update((string) $projectId, [
+        return $this->projectRepository->update((string) $projectId, [
             'project_leader_id' => $newLeaderId,
         ]);
     }
 }
-
-class InvalidProjectLeaderException extends RuntimeException {}
