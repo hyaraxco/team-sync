@@ -37,11 +37,19 @@ class ProjectTaskController extends Controller implements HasMiddleware
 
     public static function middleware()
     {
+        // Route-level middleware enforces the broad "task" capability gate (task-list).
+        // Fine-grained authorization (who can create/update/delete which task) lives
+        // in ProjectTaskPolicy. Manager has task-list only; project leader auth is
+        // project-scoped (not a Spatie permission), so policy must be the real gate.
         return [
-            new Middleware(PermissionMiddleware::using(['task-list']), only: ['index', 'getAllPaginated', 'getByProject', 'getByProjectPaginated', 'show', 'getComments', 'getAttachments', 'getStatusLogs']),
-            new Middleware(PermissionMiddleware::using(['task-create']), only: ['store']),
-            new Middleware(PermissionMiddleware::using(['task-edit']), only: ['update', 'storeComment', 'updateComment', 'deleteComment', 'storeAttachment', 'deleteAttachment']),
-            new Middleware(PermissionMiddleware::using(['task-delete']), only: ['destroy']),
+            new Middleware(PermissionMiddleware::using(['task-list']), only: [
+                'index', 'getAllPaginated', 'getByProject', 'getByProjectPaginated',
+                'show', 'getComments', 'getAttachments', 'getStatusLogs',
+                'store',
+                'update', 'storeComment', 'updateComment', 'deleteComment',
+                'storeAttachment', 'deleteAttachment',
+                'destroy',
+            ]),
         ];
     }
 
@@ -260,10 +268,10 @@ class ProjectTaskController extends Controller implements HasMiddleware
         try {
             $task = ProjectTask::with('project')->findOrFail($id);
             $user = Auth::user();
-            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+            $isPrivileged = $user->hasRole('manager');
 
             // Task status lock check — only for non-privileged users
-            if (! $isReviewer) {
+            if (! $isPrivileged) {
                 $collaborateResponse = Gate::inspect('collaborate', $task);
                 if ($collaborateResponse->denied()) {
                     return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
@@ -273,7 +281,7 @@ class ProjectTaskController extends Controller implements HasMiddleware
             $comment = $this->projectTaskRepository->findCommentById($task->id, $commentId);
 
             // Ownership check: staff can only edit their own comments
-            if (! $isReviewer) {
+            if (! $isPrivileged) {
                 $profileId = $user->staffMemberProfile?->id;
                 if (! $profileId || $comment->staff_member_id !== $profileId) {
                     return ResponseHelper::jsonResponse(false, 'You can only edit your own comments.', null, 403);
@@ -299,10 +307,10 @@ class ProjectTaskController extends Controller implements HasMiddleware
         try {
             $task = ProjectTask::with('project')->findOrFail($id);
             $user = Auth::user();
-            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
+            $isPrivileged = $user->hasRole('manager');
 
             // Task status lock check — only for non-privileged users
-            if (! $isReviewer) {
+            if (! $isPrivileged) {
                 $collaborateResponse = Gate::inspect('collaborate', $task);
                 if ($collaborateResponse->denied()) {
                     return ResponseHelper::jsonResponse(false, $collaborateResponse->message(), null, 403);
@@ -312,7 +320,7 @@ class ProjectTaskController extends Controller implements HasMiddleware
             $comment = $this->projectTaskRepository->findCommentById($task->id, $commentId);
 
             // Ownership check: staff can only delete their own comments
-            if (! $isReviewer) {
+            if (! $isPrivileged) {
                 $profileId = $user->staffMemberProfile?->id;
                 if (! $profileId || $comment->staff_member_id !== $profileId) {
                     return ResponseHelper::jsonResponse(false, 'You can only delete your own comments.', null, 403);
@@ -401,8 +409,8 @@ class ProjectTaskController extends Controller implements HasMiddleware
 
             // Ownership check: staff can only delete their own attachments
             $user = Auth::user();
-            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
-            if (! $isReviewer) {
+            $isPrivileged = $user->hasRole('manager');
+            if (! $isPrivileged) {
                 $profileId = $user->staffMemberProfile?->id;
                 if (! $profileId || $attachment->staff_member_id !== $profileId) {
                     return ResponseHelper::jsonResponse(false, 'You can only delete your own attachments.', null, 403);

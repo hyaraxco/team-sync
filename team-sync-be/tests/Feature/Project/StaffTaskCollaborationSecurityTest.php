@@ -54,8 +54,8 @@ class StaffTaskCollaborationSecurityTest extends TestCase
         $staffRole = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
         $managerRole = Role::firstOrCreate(['name' => 'manager', 'guard_name' => 'sanctum']);
 
-        $staffRole->syncPermissions(['task-list', 'task-create', 'task-edit']);
-        $managerRole->syncPermissions($permissions);
+        $staffRole->syncPermissions(['task-list', 'task-edit']);
+        $managerRole->syncPermissions(['task-list', 'project-list', 'project-create', 'project-edit', 'project-delete']);
 
         // Create users
         $this->staffUser = User::factory()->create();

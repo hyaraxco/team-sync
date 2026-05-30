@@ -36,7 +36,7 @@ class RolePermissionMatrixTest extends TestCase
             'goal-create-own',
             'meeting-menu', 'meeting-list',
             'team-view', 'project-menu', 'project-list',
-            'task-menu', 'task-list', 'task-create', 'task-edit',
+            'task-menu', 'task-list', 'task-edit',
             'overtime-create',
         ];
 
@@ -53,6 +53,8 @@ class RolePermissionMatrixTest extends TestCase
         $staff = Role::findByName('staff', 'sanctum');
 
         $forbidden = [
+            // Permission overhaul (2026-05-30): staff no longer creates tasks
+            'task-create', 'task-delete',
             'staff-member-menu', 'staff-member-list', 'staff-member-create',
             'staff-member-edit', 'staff-member-delete',
             'analytics-menu', 'analytics-view', 'analytics-hr-view', 'analytics-finance-view',
@@ -83,7 +85,9 @@ class RolePermissionMatrixTest extends TestCase
             'dashboard-menu', 'dashboard-view', 'dashboard-team-view',
             'team-menu', 'team-list', 'team-create', 'team-edit', 'team-delete', 'team-view',
             'project-menu', 'project-list', 'project-create', 'project-edit', 'project-delete',
-            'task-menu', 'task-list', 'task-create', 'task-edit', 'task-delete',
+            // Permission overhaul (2026-05-30): manager has task view only;
+            // task CRUD is delegated to project leader.
+            'task-menu', 'task-list',
             'attendance-menu', 'attendance-list',
             'attendance-correction-list', 'attendance-correction-approve',
             'leave-request-list', 'leave-request-approve',
@@ -105,6 +109,8 @@ class RolePermissionMatrixTest extends TestCase
         $manager = Role::findByName('manager', 'sanctum');
 
         $forbidden = [
+            // Permission overhaul (2026-05-30): manager delegates task CRUD to project leader
+            'task-create', 'task-edit', 'task-delete',
             'staff-member-menu', 'staff-member-list', 'staff-member-create',
             'staff-member-edit', 'staff-member-delete',
             'payroll-menu', 'payroll-list', 'payroll-create', 'payroll-process',
@@ -157,6 +163,9 @@ class RolePermissionMatrixTest extends TestCase
         $hr = Role::findByName('hr', 'sanctum');
 
         $forbidden = [
+            // Permission overhaul (2026-05-30): HR is read-only for projects/tasks
+            'project-create', 'project-edit', 'project-delete',
+            'task-create', 'task-edit', 'task-delete',
             'payroll-menu', 'payroll-list', 'payroll-create', 'payroll-edit',
             'payroll-delete', 'payroll-process', 'payroll-statistics',
             'thr-generate', 'thr-approve', 'thr-process',
@@ -182,6 +191,9 @@ class RolePermissionMatrixTest extends TestCase
 
         $expected = [
             'dashboard-menu', 'dashboard-view', 'dashboard-finance-view',
+            // Permission overhaul (2026-05-30): finance has staff-level project/task access
+            'project-menu', 'project-list',
+            'task-menu', 'task-list', 'task-edit',
             'payroll-menu', 'payroll-list', 'payroll-create', 'payroll-edit',
             'payroll-delete', 'payroll-process', 'payroll-statistics', 'payroll-readiness-view',
             'thr-list', 'thr-generate', 'thr-approve', 'thr-process',
@@ -203,6 +215,9 @@ class RolePermissionMatrixTest extends TestCase
         $finance = Role::findByName('finance', 'sanctum');
 
         $forbidden = [
+            // Permission overhaul (2026-05-30): finance cannot create/delete tasks
+            'task-create', 'task-delete',
+            'project-create', 'project-edit', 'project-delete',
             'staff-member-menu', 'staff-member-list', 'staff-member-create',
             'staff-member-edit', 'staff-member-delete',
             'analytics-hr-view', 'analytics-performance-view', 'analytics-project-view',

@@ -27,9 +27,10 @@ class ProjectTaskAttachmentValidationTest extends TestCase
     {
         parent::setUp();
 
+        Permission::firstOrCreate(['name' => 'task-list', 'guard_name' => 'sanctum']);
         Permission::firstOrCreate(['name' => 'task-edit', 'guard_name' => 'sanctum']);
         $role = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
-        $role->givePermissionTo('task-edit');
+        $role->givePermissionTo(['task-list', 'task-edit']);
 
         $this->user = User::factory()->create();
         $this->user->assignRole('staff');

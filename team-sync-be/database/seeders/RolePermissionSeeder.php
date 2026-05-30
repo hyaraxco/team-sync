@@ -46,6 +46,8 @@ class RolePermissionSeeder extends Seeder
             ];
 
             // ─── Staff: self-service + personal workspace ────────────────────
+            // Staff CANNOT create tasks (manager/project leader assigns them).
+            // Staff CAN edit own tasks (status transitions only — enforced by policy).
             $staff->syncPermissions(
                 Permission::whereIn('name', array_merge($selfServiceBaseline, [
                     'dashboard-menu',
@@ -56,7 +58,7 @@ class RolePermissionSeeder extends Seeder
                     'project-list',
                     'task-menu',
                     'task-list',
-                    'task-create',
+                    // 'task-create' REMOVED — manager/project leader assigns tasks
                     'task-edit',
                     'overtime-create',
                     // Meetings: view list (receive/join)
@@ -79,18 +81,21 @@ class RolePermissionSeeder extends Seeder
                     'team-edit',
                     'team-delete',
                     'team-view',
-                    // Project & task management
+                    // Project management (full CRUD)
                     'project-menu',
                     'project-statistic',
                     'project-list',
                     'project-create',
                     'project-edit',
                     'project-delete',
+                    // Task: view only — manager delegates task management to project leader.
+                    // Manager retains task creation/edit/delete via policy when needed,
+                    // but UI surfaces these actions through project leader workflow.
                     'task-menu',
                     'task-list',
-                    'task-create',
-                    'task-edit',
-                    'task-delete',
+                    // 'task-create' REMOVED — project leader creates tasks
+                    // 'task-edit' REMOVED — project leader/staff edit tasks
+                    // 'task-delete' REMOVED — project leader deletes tasks
                     // Attendance: team approval context
                     'attendance-menu',
                     'attendance-list',
@@ -138,7 +143,13 @@ class RolePermissionSeeder extends Seeder
                 'overtime-',
                 'settings-',
             ], [
-                // Exclude: task-delete (admin-only destructive)
+                // Exclude: project CRUD — HR has read-only oversight
+                'project-create',
+                'project-edit',
+                'project-delete',
+                // Exclude: task CRUD — HR has read-only oversight
+                'task-create',
+                'task-edit',
                 'task-delete',
                 // Exclude: Manager-only team review submission
                 'review-manager-submit',
@@ -161,12 +172,20 @@ class RolePermissionSeeder extends Seeder
 
             // ─── Finance: payroll, THR, payroll analytics ────────────────────
             // Finance does NOT get full staff directory or HR admin.
+            // Finance gets staff-level project/task access (view projects, view/edit own tasks).
             $finance->syncPermissions(
                 Permission::whereIn('name', array_merge($selfServiceBaseline, [
                     // Dashboard
                     'dashboard-menu',
                     'dashboard-view',
                     'dashboard-finance-view',
+                    // Project: view only (staff-level)
+                    'project-menu',
+                    'project-list',
+                    // Task: view list and edit own task (staff-level — no create/delete)
+                    'task-menu',
+                    'task-list',
+                    'task-edit',
                     // Payroll operations (Finance owns all)
                     'payroll-menu',
                     'payroll-list',
