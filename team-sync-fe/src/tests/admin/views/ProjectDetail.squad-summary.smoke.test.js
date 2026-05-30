@@ -42,6 +42,11 @@ vi.mock("@/utils/formatUtils", () => ({
     formatRupiah: formatRupiahMock,
 }));
 
+vi.mock("@/helpers/permissionHelper", () => ({
+    can: () => true,
+    canOneOf: () => true,
+}));
+
 vi.mock("@/utils/badgeUtils", async (importOriginal) => {
     const actual = await importOriginal();
     return {
@@ -66,6 +71,7 @@ const factory = () =>
         global: {
             stubs: {
                 TaskBoard: {
+                    props: ["canCreateTask"],
                     template: '<div class="task-board-stub"></div>',
                 },
                 EmptyState: {
@@ -78,6 +84,15 @@ const factory = () =>
                 RouterLink: {
                     props: ["to"],
                     template: '<a class="router-link-stub"><slot /></a>',
+                },
+                ModalWrapper: {
+                    props: ["show", "title", "maxWidth"],
+                    template:
+                        '<div v-if="show" class="modal-wrapper-stub"><slot name="header" /><slot /><slot name="footer" /></div>',
+                },
+                ConfirmationModal: {
+                    props: ["show", "title", "message", "confirmText", "cancelText", "type", "loading"],
+                    template: '<div v-if="show" class="confirmation-modal-stub"></div>',
                 },
             },
         },
