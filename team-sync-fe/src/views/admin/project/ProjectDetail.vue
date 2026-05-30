@@ -13,6 +13,9 @@ import {
     ListChecks,
     Trash2,
     AlertTriangle,
+    UserCheck,
+    Search,
+    SearchX,
 } from "lucide-vue-next";
 import { useRoute } from "vue-router";
 import router from "@/router";
@@ -33,19 +36,32 @@ import EmptyState from "@/components/common/EmptyState.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useToast } from "@/composables/useToast";
 import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
+import ModalWrapper from "@/components/common/ModalWrapper.vue";
+import { can } from "@/helpers/permissionHelper";
 
 const route = useRoute();
 const id = route.params.id;
 
 const projectStore = useProjectStore();
-const { fetchProject, fetchProjectSquadSummary, deleteProject } = projectStore;
+const { fetchProject, fetchProjectSquadSummary, deleteProject, fetchEligibleLeaders, updateProjectLeader } =
+    projectStore;
 const toast = useToast();
 
 const showDeleteModal = ref(false);
+const showLeaderModal = ref(false);
+const eligibleLeaders = ref([]);
+const eligibleLeadersLoading = ref(false);
+const leaderSearch = ref("");
+const leaderSubmitting = ref(false);
 
 const project = ref({});
 const squadSummary = ref(null);
 const squadSummaryLoading = ref(false);
+
+const canViewProjectStats = computed(() => can("project-statistic") || !!project.value?.is_project_leader);
+const canDeleteProject = computed(() => can("project-delete"));
+const canEditProject = computed(() => can("project-edit"));
+const canViewStaffMemberDetail = computed(() => can("staff-member-list"));
 
 const streamOrder = ["frontend", "backend", "uiux", "qa", "pm", "other"];
 const streamLabelMap = {
@@ -105,6 +121,10 @@ const handleFetchProject = async () => {
 };
 
 const handleFetchSquadSummary = async () => {
+    if (!canViewProjectStats.value) {
+        return;
+    }
+
     squadSummaryLoading.value = true;
 
     try {
@@ -127,6 +147,59 @@ const handleDeleteProject = async () => {
     }
 };
 
+const openLeaderEditModal = async () => {
+    showLeaderModal.value = true;
+    leaderSearch.value = "";
+    eligibleLeadersLoading.value = true;
+
+    try {
+        eligibleLeaders.value = await fetchEligibleLeaders(id);
+    } catch {
+        eligibleLeaders.value = [];
+    } finally {
+        eligibleLeadersLoading.value = false;
+    }
+};
+
+const closeLeaderModal = () => {
+    showLeaderModal.value = false;
+    eligibleLeaders.value = [];
+    leaderSearch.value = "";
+};
+
+const filteredEligibleLeaders = computed(() => {
+    const query = leaderSearch.value.trim().toLowerCase();
+    if (!query) return eligibleLeaders.value;
+
+    return eligibleLeaders.value.filter((leader) => {
+        const name = leader?.user?.name?.toLowerCase() || "";
+        const title = leader?.job_information?.job_title?.toLowerCase() || "";
+
+        return name.includes(query) || title.includes(query);
+    });
+});
+
+const handleSelectLeader = async (leader) => {
+    if (leaderSubmitting.value) return;
+
+    leaderSubmitting.value = true;
+
+    try {
+        await updateProjectLeader(id, leader.id);
+
+        toast.success("Project leader updated");
+        closeLeaderModal();
+        await handleFetchProject();
+    } catch (error) {
+        toast.error(
+            "Failed to update project leader",
+            projectStore.error || error?.response?.data?.message || "Failed to update project leader.",
+        );
+    } finally {
+        leaderSubmitting.value = false;
+    }
+};
+
 const aboutParagraphs = computed(() => {
     if (!project.value.description) return [];
     return project.value.description.split("\n\n").map((p) => p.trim());
@@ -145,7 +218,8 @@ const projectProgress = computed(() => {
 });
 
 onMounted(async () => {
-    await Promise.all([handleFetchProject(), handleFetchSquadSummary()]);
+    await handleFetchProject();
+    await handleFetchSquadSummary();
 });
 </script>
 
@@ -177,9 +251,15 @@ onMounted(async () => {
             </div>
 
             <div
+                v-if="project.photo"
                 class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
-                <img loading="lazy" :src="project.photo" alt="Project Image" class="w-full h-full object-cover rounded-xl" />
+                <img
+                    loading="lazy"
+                    :src="project.photo"
+                    :alt="project.name ? `${project.name} cover` : 'Project cover'"
+                    class="w-full h-full object-cover rounded-xl"
+                />
             </div>
 
             <!-- Project Basic Info -->
@@ -277,6 +357,7 @@ onMounted(async () => {
                         </p>
                     </div>
                     <RouterLink
+                        v-if="canViewStaffMemberDetail"
                         :to="{
                             name: 'admin.staffMembers.detail',
                             params: { id: project.leader.id },
@@ -287,6 +368,16 @@ onMounted(async () => {
                         <span class="text-sm font-semibold">Profile</span>
                     </RouterLink>
                 </div>
+
+                <button
+                    v-if="canEditProject"
+                    type="button"
+                    @click="openLeaderEditModal"
+                    class="mt-4 w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center justify-center gap-2"
+                >
+                    <UserCheck class="w-4 h-4 text-gray-600" />
+                    <span class="text-brand-dark text-sm font-semibold">Change Project Leader</span>
+                </button>
             </div>
 
             <div
@@ -313,6 +404,7 @@ onMounted(async () => {
             </div>
 
             <div
+                v-if="canViewProjectStats"
                 class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-4">
@@ -379,6 +471,7 @@ onMounted(async () => {
 
             <!-- Budget Card -->
             <div
+                v-if="canViewProjectStats"
                 class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
@@ -445,7 +538,7 @@ onMounted(async () => {
     </div>
 
     <!-- Danger Zone -->
-    <div class="bg-white border border-danger-100 rounded-2xl p-6">
+    <div v-if="canDeleteProject" class="bg-white border border-danger-100 rounded-2xl p-6">
         <div class="flex items-center gap-3 mb-6">
             <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
@@ -472,7 +565,7 @@ onMounted(async () => {
     </div>
 
     <!-- Tasks Section -->
-    <TaskBoard />
+    <TaskBoard :can-create-task="!!project.can_create_task" />
 
     <ConfirmationModal
         :show="showDeleteModal"
@@ -485,4 +578,86 @@ onMounted(async () => {
         @confirm="handleDeleteProject"
         @cancel="showDeleteModal = false"
     />
+
+    <!-- Change Project Leader Modal -->
+    <ModalWrapper :show="showLeaderModal" title="Change Project Leader" maxWidth="3xl" @close="closeLeaderModal">
+        <template #header>
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
+                    <Crown class="w-6 h-6 text-green-600" />
+                </div>
+                <div>
+                    <h3 class="text-brand-dark text-xl font-bold">Change Project Leader</h3>
+                    <p class="text-brand-light text-sm font-normal">
+                        Select a new project leader from eligible staff members
+                    </p>
+                </div>
+            </div>
+        </template>
+
+        <div class="py-2">
+            <div class="relative mb-4">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <Search class="h-5 w-5 text-gray-400" />
+                </div>
+                <input
+                    type="text"
+                    v-model="leaderSearch"
+                    aria-label="Search eligible project leaders"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 font-medium"
+                    placeholder="Search by name or job title..."
+                />
+            </div>
+
+            <div v-if="eligibleLeadersLoading" class="space-y-2 animate-pulse">
+                <div class="h-16 rounded-xl bg-gray-100"></div>
+                <div class="h-16 rounded-xl bg-gray-100"></div>
+                <div class="h-16 rounded-xl bg-gray-100"></div>
+            </div>
+
+            <div
+                v-else-if="filteredEligibleLeaders.length === 0"
+                class="py-8 text-center"
+            >
+                <SearchX class="w-10 h-10 text-gray-400 mx-auto mb-2" />
+                <p class="text-sm text-brand-light">No eligible staff members found</p>
+            </div>
+
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-3 max-h-96 overflow-y-auto pr-1">
+                <button
+                    v-for="leader in filteredEligibleLeaders"
+                    :key="leader.id"
+                    type="button"
+                    :disabled="leaderSubmitting"
+                    @click="handleSelectLeader(leader)"
+                    class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 p-3 text-left flex items-center gap-3 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <img
+                        loading="lazy"
+                        :src="leader?.user?.profile_photo || DEFAULT_AVATAR"
+                        :alt="leader?.user?.name"
+                        class="w-12 h-12 rounded-xl object-cover"
+                    />
+                    <div class="flex-1 min-w-0">
+                        <p class="text-brand-dark text-sm font-semibold truncate">
+                            {{ leader?.user?.name }}
+                        </p>
+                        <p class="text-brand-light text-xs truncate">
+                            {{ leader?.job_information?.job_title || "—" }}
+                        </p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <template #footer>
+            <button
+                type="button"
+                @click="closeLeaderModal"
+                class="border border-brand-border rounded-lg hover:bg-gray-50 transition-all duration-300 px-4 py-2"
+            >
+                <span class="text-brand-dark text-sm font-semibold">Cancel</span>
+            </button>
+        </template>
+    </ModalWrapper>
 </template>
