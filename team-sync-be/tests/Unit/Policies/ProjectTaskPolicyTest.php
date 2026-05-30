@@ -43,7 +43,7 @@ class ProjectTaskPolicyTest extends TestCase
     {
         parent::setUp();
 
-        $this->policy = new ProjectTaskPolicy(new ProjectMembershipService);
+        $this->policy = new ProjectTaskPolicy(app(ProjectMembershipService::class));
 
         // Create permissions
         $permissions = [

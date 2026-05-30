@@ -24,7 +24,7 @@ class ProjectMembershipServiceTest extends TestCase
         parent::setUp();
         $this->seed(RoleSeeder::class);
         app(PermissionRegistrar::class)->forgetCachedPermissions();
-        $this->service = new ProjectMembershipService;
+        $this->service = app(ProjectMembershipService::class);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
