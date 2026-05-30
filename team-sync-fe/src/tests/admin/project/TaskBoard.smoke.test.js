@@ -63,8 +63,9 @@ vi.mock("@/components/admin/project/detail/TaskCreateModal.vue", () => ({
 
 import TaskBoard from "@/components/admin/project/detail/TaskBoard.vue";
 
-const factory = () =>
+const factory = (props = {}) =>
     mount(TaskBoard, {
+        props,
         global: {
             stubs: {
                 VueDraggableNext: { template: '<div class="draggable-stub"><slot /></div>' },
@@ -78,32 +79,32 @@ describe("TaskBoard smoke", () => {
         mockUser.value = { roles: [] };
     });
 
-    it("shows create button for manager", () => {
-        mockUser.value = {
-            roles: [{ name: "manager" }],
-            permissions: ["task-create", "task-list", "task-edit", "task-delete"],
-        };
-
-        const wrapper = factory();
-
-        expect(wrapper.text()).toContain("Create New Task");
-    });
-
-    it("shows create button for staff with task-create permission", () => {
+    it("shows create button when canCreateTask prop is true", () => {
         mockUser.value = {
             roles: [{ name: "staff" }],
-            permissions: ["task-create", "task-list", "task-edit"],
+            permissions: [],
         };
 
-        const wrapper = factory();
+        const wrapper = factory({ canCreateTask: true });
 
         expect(wrapper.text()).toContain("Create New Task");
     });
 
-    it("hides create button for user without task-create permission", () => {
+    it("hides create button when canCreateTask prop is false", () => {
+        mockUser.value = {
+            roles: [{ name: "manager" }],
+            permissions: ["task-create"],
+        };
+
+        const wrapper = factory({ canCreateTask: false });
+
+        expect(wrapper.text()).not.toContain("Create New Task");
+    });
+
+    it("hides create button by default (no prop)", () => {
         mockUser.value = {
             roles: [{ name: "finance" }],
-            permissions: ["payroll-list"],
+            permissions: [],
         };
 
         const wrapper = factory();

@@ -4,13 +4,19 @@ import { ListChecks, Plus, Search } from "lucide-vue-next";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useTaskStore } from "@/stores/task";
 import { useAuthStore } from "@/stores/auth";
-import { can } from "@/helpers/permissionHelper";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import { useToast } from "@/composables/useToast";
 import TaskCard from "./TaskCard.vue";
 import TaskDetailModal from "./TaskDetailModal.vue";
 import TaskCreateModal from "./TaskCreateModal.vue";
+
+const props = defineProps({
+    canCreateTask: {
+        type: Boolean,
+        default: false,
+    },
+});
 
 const route = useRoute();
 const toast = useToast();
@@ -51,8 +57,6 @@ const roleNames = computed(() => (authStore.user?.roles || []).map((role) => rol
 const hasRole = (role) => roleNames.value.includes(role);
 
 const currentEmployeeId = computed(() => authStore.user?.employee_profile?.id || authStore.user?.employeeProfile?.id);
-
-const canCreateTask = computed(() => can("task-create"));
 
 const normalizeStatus = (status) => (status === "pending" ? "todo" : status);
 

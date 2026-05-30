@@ -87,4 +87,16 @@ class AuthEdgeCaseTest extends TestCase
         $response->assertUnprocessable(); // 422
         $response->assertJsonValidationErrors(['profile_photo']);
     }
+
+    public function test_unauthenticated_browser_request_to_api_returns_401_not_route_login_error(): void
+    {
+        // Regression: hitting an /api/* route from a browser (Accept: text/html, no Authorization)
+        // must not crash with "Route [login] not defined" — it should return JSON 401.
+        $response = $this->get('/api/v1/attendances/last-attendance', [
+            'Accept' => 'text/html,application/xhtml+xml',
+        ]);
+
+        $response->assertStatus(401);
+        $response->assertJson(['success' => false]);
+    }
 }
