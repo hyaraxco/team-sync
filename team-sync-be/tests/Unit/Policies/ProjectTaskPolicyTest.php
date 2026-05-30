@@ -129,7 +129,7 @@ class ProjectTaskPolicyTest extends TestCase
         $this->assertTrue($response->allowed());
     }
 
-    public function test_staff_can_create_task_self_assign(): void
+    public function test_staff_cannot_create_task(): void
     {
         $response = $this->policy->create($this->staffUser, [
             'project_id' => $this->project->id,
@@ -137,7 +137,8 @@ class ProjectTaskPolicyTest extends TestCase
             'status' => 'todo',
         ]);
 
-        $this->assertTrue($response->allowed());
+        $this->assertTrue($response->denied());
+        $this->assertStringContainsString('project leader or a manager', $response->message());
     }
 
     public function test_staff_cannot_create_task_assign_to_others(): void
@@ -168,6 +169,29 @@ class ProjectTaskPolicyTest extends TestCase
             'project_id' => $this->plStaffProject->id,
             'assignee_id' => $this->staffProfile->id,
             'status' => 'todo',
+        ]);
+
+        $this->assertTrue($response->allowed());
+    }
+
+    public function test_pl_staff_cannot_create_task_in_other_project(): void
+    {
+        $response = $this->policy->create($this->plStaffUser, [
+            'project_id' => $this->project->id,
+            'assignee_id' => $this->staffProfile->id,
+            'status' => 'todo',
+        ]);
+
+        $this->assertTrue($response->denied());
+    }
+
+    public function test_pl_staff_can_create_task_with_any_status(): void
+    {
+        // Project leader has full task CRUD within their project
+        $response = $this->policy->create($this->plStaffUser, [
+            'project_id' => $this->plStaffProject->id,
+            'assignee_id' => $this->staffProfile->id,
+            'status' => 'in_progress',
         ]);
 
         $this->assertTrue($response->allowed());

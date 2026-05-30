@@ -102,6 +102,9 @@ Route::prefix('v1')
             Route::get('projects/statistics', [ProjectController::class, 'getStatistics']);
             Route::get('projects/all/paginated', [ProjectController::class, 'getAllPaginated']);
             Route::get('projects/{id}/squad-summary', [ProjectController::class, 'getSquadSummary']);
+            Route::get('projects/{id}/members', [ProjectController::class, 'getMembers']);
+            Route::get('projects/{id}/eligible-leaders', [ProjectController::class, 'getEligibleLeaders']);
+            Route::put('projects/{id}/leader', [ProjectController::class, 'updateLeader']);
             Route::apiResource('projects', ProjectController::class);
 
             Route::apiResource('project-tasks', ProjectTaskController::class);
