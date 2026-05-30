@@ -47,13 +47,22 @@ class ThrCalculationService
             return $this->ineligibleResult('Monthly salary is zero or not set');
         }
 
-        // Calculate tenure in months from start_date to payment_date.
-        // Uses Carbon's diffInMonths which counts calendar months, not exact
-        // 30-day periods. This is the correct approach for Indonesian THR
-        // calculation — the Ministry of Manpower (Kemenaker) regulation
-        // specifies tenure in whole calendar months from date of hire.
+        // Calculate tenure in whole calendar months from start_date to payment_date.
+        //
+        // Indonesian THR (Permenaker 6/2016, masa kerja Pasal 3): tenure is counted
+        // in completed calendar months from the date of hire. We must NOT use
+        // Carbon::diffInMonths because it strictly compares day-of-month, which
+        // misclassifies end-of-short-month hires (e.g. hired Feb 28, evaluated
+        // May 30 → diffInMonths returns 2 instead of 3 even though three full
+        // calendar months have elapsed).
+        //
+        // Approach: count year/month difference, then decrement only when the
+        // payment day-of-month has not yet reached the start day-of-month, AND
+        // the start date was not the last day of its own month. The
+        // isLastOfMonth() guard handles end-of-Feb hires fairly when later
+        // months have more days.
         $startDate = Carbon::parse($jobInfo->start_date);
-        $tenureMonths = (int) $startDate->diffInMonths($paymentDate);
+        $tenureMonths = $this->calculateTenureMonths($startDate, $paymentDate);
 
         // Minimum 1 month tenure required
         if ($tenureMonths < ThrPayroll::MIN_TENURE_MONTHS) {
@@ -179,5 +188,52 @@ class ThrCalculationService
             'tax_calculation_meta' => null,
             'ineligibility_reason' => $reason,
         ];
+    }
+
+    /**
+     * Calculate tenure in completed calendar months between two dates.
+     *
+     * Algorithm:
+     * 1. Compute raw year/month difference.
+     * 2. Resolve the effective anniversary day in the target month. If the
+     *    start date is the last day of its own month, clamp the anniversary
+     *    day to the last day of the target month — this prevents end-of-Feb
+     *    hires from being penalized when later months have more days, while
+     *    still requiring the employee to reach the equivalent end-of-month
+     *    boundary in months with fewer days (e.g. Feb 29 → Feb 28 next year).
+     * 3. If the payment day-of-month is below the effective anniversary day,
+     *    the in-progress month is not yet complete — decrement.
+     *
+     * Examples:
+     * - Feb 28 2026 → May 30 2026 = 3 (Feb is last-of-month; May has 31 days, day 28 reached)
+     * - Jan 31 2026 → Apr 30 2026 = 3 (Jan is last-of-month; Apr has 30 days, anniversary day clamps to 30)
+     * - Jan 20 2026 → Apr 15 2026 = 2 (mid-month start, day 15 < 20)
+     * - Feb 29 2024 → Feb 27 2025 = 11 (last-of-month leap-day start; Feb 2025 has 28 days, day 27 < 28)
+     * - Feb 29 2024 → Feb 28 2025 = 12 (last-of-month leap-day start; reaches Feb 28 anniversary)
+     */
+    public function calculateTenureMonths(Carbon $startDate, Carbon $paymentDate): int
+    {
+        if ($paymentDate->lessThan($startDate)) {
+            return 0;
+        }
+
+        $months = ($paymentDate->year - $startDate->year) * 12
+            + ($paymentDate->month - $startDate->month);
+
+        if ($startDate->isLastOfMonth()) {
+            // Anniversary day in target month is the last day of target month
+            // (or the original start day, whichever is smaller). Handles
+            // 31st-of-month hires landing in 30-day months and end-of-Feb hires.
+            $targetLastDay = $paymentDate->copy()->endOfMonth()->day;
+            $effectiveAnniversaryDay = min($startDate->day, $targetLastDay);
+        } else {
+            $effectiveAnniversaryDay = $startDate->day;
+        }
+
+        if ($paymentDate->day < $effectiveAnniversaryDay) {
+            $months--;
+        }
+
+        return max(0, $months);
     }
 }
