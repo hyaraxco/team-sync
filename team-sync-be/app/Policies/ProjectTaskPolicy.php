@@ -29,7 +29,7 @@ class ProjectTaskPolicy
      */
     public function view(User $user, ProjectTask $task): Response
     {
-        if ($this->isReviewerRole($user)) {
+        if ($this->isPrivilegedRole($user) || $user->hasRole('hr')) {
             return Response::allow();
         }
 
@@ -45,8 +45,13 @@ class ProjectTaskPolicy
     /**
      * Determine if the user can create a task.
      *
-     * PL/Manager: can create tasks with any field, assign to any project member.
-     * Staff: can only create tasks in own project, self-assign, status=todo.
+     * Permission model:
+     * - Manager: can create tasks (delegates to project leader by convention).
+     * - Project Leader: can create tasks within their led project, with any status/assignee.
+     * - HR: read-only — cannot create.
+     * - Staff/Finance: cannot create tasks. Tasks are assigned to them.
+     *
+     * Assignee, when provided, must be a member of the project for ALL roles.
      */
     public function create(User $user, array $data = []): Response
     {
@@ -73,33 +78,22 @@ class ProjectTaskPolicy
             }
         }
 
-        // Manager/HR can create freely (assignee already validated above)
-        if ($this->isReviewerRole($user)) {
+        // HR has read-only oversight — explicitly deny task creation.
+        if ($user->hasRole('hr')) {
+            return Response::deny('HR role cannot create tasks.');
+        }
+
+        // Manager can create tasks (intended convention: delegates to project leader).
+        if ($user->hasRole('manager')) {
             return Response::allow();
         }
 
-        // PL can create freely in their project
-        if ($project->project_leader_id === $profile->id) {
+        // Project leader can create tasks within their led project.
+        if ((int) $project->project_leader_id === (int) $profile->id) {
             return Response::allow();
         }
 
-        // Pure staff checks
-        if (! $this->membershipService->isMember($user, $project)) {
-            return Response::deny('You can only create tasks in projects you are a member of.');
-        }
-
-        // Staff cannot assign to others
-        if ($assigneeId !== null && (int) $assigneeId !== $profile->id) {
-            return Response::deny('You can only assign tasks to yourself.');
-        }
-
-        // Staff can only create with status 'todo'
-        $status = $data['status'] ?? 'todo';
-        if ($status !== 'todo') {
-            return Response::deny('Tasks must be created with status "todo".');
-        }
-
-        return Response::allow();
+        return Response::deny('Only the project leader or a manager can create tasks for this project.');
     }
 
     /**
@@ -121,9 +115,14 @@ class ProjectTaskPolicy
             return Response::deny('Your account is not linked to an employee profile.');
         }
 
-        $isReviewer = $this->isReviewerRole($user);
+        // HR has read-only oversight: can view but never update tasks.
+        if ($user->hasRole('hr')) {
+            return Response::deny('HR role cannot update tasks.');
+        }
+
+        $isPrivileged = $this->isPrivilegedRole($user);
         $isProjectLeader = $task->project?->project_leader_id === $profile->id;
-        $isPrivileged = $isReviewer || $isProjectLeader;
+        $isPrivileged = $isPrivileged || $isProjectLeader;
         $isAssignee = $task->assignee_id === $profile->id;
 
         $currentStatus = strtolower(trim((string) $task->status));
@@ -217,12 +216,17 @@ class ProjectTaskPolicy
     {
         $task->loadMissing('project');
 
+        // HR has read-only oversight: can view but never delete tasks.
+        if ($user->hasRole('hr')) {
+            return Response::deny('HR role cannot delete tasks.');
+        }
+
         $profile = $user->staffMemberProfile;
-        $isReviewer = $this->isReviewerRole($user);
+        $isPrivileged = $this->isPrivilegedRole($user);
         $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
 
-        if (! $isReviewer && ! $isProjectLeader) {
-            return Response::deny('Only manager/HR/project leader can delete tasks.');
+        if (! $isPrivileged && ! $isProjectLeader) {
+            return Response::deny('Only manager or project leader can delete tasks.');
         }
 
         $currentStatus = strtolower(trim((string) $task->status));
@@ -250,9 +254,8 @@ class ProjectTaskPolicy
             return Response::deny('Unauthorized.');
         }
 
-        $isReviewer = $this->isReviewerRole($user);
         $isProjectLeader = $task->project?->project_leader_id === $profile->id;
-        $isPrivileged = $isReviewer || $isProjectLeader;
+        $isPrivileged = $this->isPrivilegedRole($user) || $isProjectLeader;
         $isAssignee = $task->assignee_id === $profile->id;
 
         $currentStatus = strtolower(trim((string) $task->status));
@@ -303,9 +306,8 @@ class ProjectTaskPolicy
     public function transitionStatus(User $user, ProjectTask $task, string $from, string $to): Response
     {
         $profile = $user->staffMemberProfile;
-        $isReviewer = $this->isReviewerRole($user);
         $isProjectLeader = $profile && $task->project?->project_leader_id === $profile->id;
-        $isPrivileged = $isReviewer || $isProjectLeader;
+        $isPrivileged = $this->isPrivilegedRole($user) || $isProjectLeader;
         $isAssignee = $profile && $task->assignee_id === $profile->id;
 
         if ($from === $to) {
@@ -355,9 +357,11 @@ class ProjectTaskPolicy
 
     // ─── Helpers ────────────────────────────────────────────────────────
 
-    private function isReviewerRole(User $user): bool
+    private function isPrivilegedRole(User $user): bool
     {
-        return $user->hasRole('manager') || $user->hasRole('hr');
+        // Manager and project leader have task CRUD authority. HR is read-only
+        // (oversight role) and is intentionally excluded from privileged actions.
+        return $user->hasRole('manager');
     }
 
     private function hasFieldChanged(string $field, array $data, ProjectTask $task): bool
