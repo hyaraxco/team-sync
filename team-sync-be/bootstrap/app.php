@@ -25,6 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'feature.enabled' => EnsureFeatureEnabled::class,
             'project.member' => EnsureProjectMembership::class,
         ]);
+
+        // This is an API-only Laravel app — there is no 'login' web route.
+        // Override the default Authenticate redirect so it never tries to call
+        // route('login'). Returning null causes Laravel to throw AuthenticationException
+        // and the renderer below converts it to a JSON 401 response.
+        $middleware->redirectGuestsTo(fn (Request $request) => null);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->render(function (AuthenticationException $e, Request $request) {

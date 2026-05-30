@@ -71,6 +71,22 @@ describe('NotificationPanel', () => {
         expect(router.currentRoute.value.path).toBe('/admin/notifications')
     })
 
+    it('emits close event when "See all" link is clicked', async () => {
+        wrapper = mount(NotificationPanel, {
+            props: { 
+                open: true,
+                notifications: [] 
+            },
+            global: { plugins: [router] }
+        })
+        
+        const link = wrapper.find('[data-testid="see-all-link"]')
+        await link.trigger('click')
+        
+        expect(wrapper.emitted('close')).toBeTruthy()
+        expect(wrapper.emitted('close').length).toBe(1)
+    })
+
     it('uses CSS variables for panel background', () => {
         wrapper = mount(NotificationPanel, {
             props: { 

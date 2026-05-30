@@ -2,7 +2,7 @@
 import { formatToClientTimezone, DEFAULT_AVATAR } from "@/helpers/format";
 import { can } from "@/helpers/permissionHelper";
 import _ from "lodash";
-import { Calendar, Crown, Edit, FileText, Trash2 } from "lucide-vue-next";
+import { Briefcase, Calendar, Crown, Edit, FileText, Trash2 } from "lucide-vue-next";
 import StatusBadge from "@/components/common/StatusBadge.vue";
 import AnimatedValue from "@/components/common/AnimatedValue.vue";
 import { useRouter } from "vue-router";
@@ -50,7 +50,16 @@ const handleDeleteProject = async () => {
         <div
             class="w-full h-32 bg-gradient-to-br from-primary-50 to-primary-100 relative overflow-hidden rounded-xl mb-4"
         >
-            <img loading="lazy" class="w-full h-full object-cover rounded-xl" :src="data.photo" />
+            <img
+                v-if="data.photo"
+                loading="lazy"
+                :src="data.photo"
+                :alt="data.name ? `${data.name} cover` : 'Project cover'"
+                class="w-full h-full object-cover rounded-xl"
+            />
+            <div v-else class="w-full h-full flex items-center justify-center" aria-hidden="true">
+                <Briefcase class="w-10 h-10 text-primary-400" />
+            </div>
             <!-- Priority Badge Overlay -->
             <StatusBadge
                 v-if="data.priority"
