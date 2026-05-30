@@ -26,6 +26,7 @@ import { storeToRefs } from "pinia";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 import { useToast } from "@/composables/useToast";
+import { can } from "@/helpers/permissionHelper";
 
 const toast = useToast();
 
@@ -111,17 +112,20 @@ const canManageAssignee = computed(() => {
         return false;
     }
 
-    // Staff users must never see assignee management actions.
-    if (hasRole("staff") && !hasRole("manager") && !hasRole("hr")) {
+    if (!can("task-edit")) {
         return false;
     }
 
-    return hasRole("manager") || hasRole("hr") || isProjectLeader.value;
+    return can("project-edit") || isProjectLeader.value;
 });
 
-const canEditDueDate = computed(() => (hasRole("manager") || hasRole("hr")) && !isReviewPhaseLocked.value);
-const canDeleteTask = computed(() => hasRole("manager") || hasRole("hr"));
+const canEditDueDate = computed(
+    () => can("task-edit") && can("project-edit") && !isReviewPhaseLocked.value,
+);
+const canDeleteTask = computed(() => can("task-delete"));
 const canReviewTask = computed(() => hasRole("manager") || hasRole("hr") || isProjectLeader.value);
+
+const canSearchStaffMembers = computed(() => can("staff-member-list"));
 
 const isTodoLikeStatus = computed(() => props.task?.status === "todo" || props.task?.status === "pending");
 
@@ -509,10 +513,12 @@ const cancelDueDateEdit = () => {
 };
 
 onMounted(async () => {
-    await fetchStaffMembers({
-        limit: 6,
-        project_id: props.projectId,
-    });
+    if (canSearchStaffMembers.value) {
+        await fetchStaffMembers({
+            limit: 6,
+            project_id: props.projectId,
+        });
+    }
 
     await loadTaskCollaborationData();
 
@@ -530,6 +536,10 @@ onMounted(async () => {
 watch(
     searchAssignee,
     debounce(() => {
+        if (!canSearchStaffMembers.value) {
+            return;
+        }
+
         fetchStaffMembers({
             limit: 6,
             search: searchAssignee.value,

@@ -1,7 +1,7 @@
 # Frontend Permissions
 
 > **Phase:** 2 of 4
-> **Status:** Pending
+> **Status:** Implementation Complete (pending PR review)
 > **Dependencies:** Phase 1 (Backend Permissions)
 
 ---
@@ -201,8 +201,9 @@ const canDeleteTask = computed(() => can("task-delete"));
 
 ## Completion Checklist
 
-- [ ] Update ProjectDetail.vue (hide sections, add "Change Project Leader")
-- [ ] Update TaskBoard.vue (show create button for project leader)
-- [ ] Update TaskDetailModal.vue (guard API calls, migrate hasRole to can)
-- [ ] Run frontend tests
-- [ ] All tests pass
+- [x] Update ProjectDetail.vue (hide sections, add "Change Project Leader")
+- [x] Update TaskBoard.vue (show create button via `can_create_task` prop from ProjectDetail)
+- [x] Update TaskDetailModal.vue (guard API calls, migrate hasRole to can)
+- [x] Add `updateProjectLeader` and `fetchEligibleLeaders` actions to project store
+- [x] Run frontend tests (1099 passed)
+- [x] All tests pass

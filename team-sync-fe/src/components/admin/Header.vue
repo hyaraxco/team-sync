@@ -509,6 +509,7 @@ onUnmounted(() => {
                             @retry="fetchLatestNotifications"
                             @select="handleNotificationSelect"
                             @mark-all-read="handleMarkAllRead"
+                            @close="isNotificationPanelOpen = false"
                         />
                     </div>
                     <button

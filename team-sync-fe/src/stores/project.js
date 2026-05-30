@@ -189,5 +189,35 @@ export const useProjectStore = defineStore("project", {
                 this.loading = false;
             }
         },
+
+        async fetchEligibleLeaders(id, params = {}) {
+            try {
+                const response = await axiosInstance.get(`projects/${id}/eligible-leaders`, { params });
+
+                return response.data?.data || [];
+            } catch (error) {
+                this.error = handleError(error);
+
+                return [];
+            }
+        },
+
+        async updateProjectLeader(id, leaderId) {
+            this.error = null;
+            this.success = null;
+
+            try {
+                const response = await axiosInstance.put(`projects/${id}/leader`, {
+                    project_leader_id: leaderId,
+                });
+
+                this.success = response.data.message;
+
+                return response.data?.data || null;
+            } catch (error) {
+                this.error = handleError(error);
+                throw error;
+            }
+        },
     },
 });

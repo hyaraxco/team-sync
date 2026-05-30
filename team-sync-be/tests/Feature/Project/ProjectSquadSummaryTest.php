@@ -224,8 +224,108 @@ class ProjectSquadSummaryTest extends TestCase
 
         Sanctum::actingAs($outsideUser);
 
-        // Staff role does not have 'project-statistic' permission,
-        // so they are blocked at the permission middleware layer (403).
+        // Outside staff: not a member, not the leader, no project-statistic permission.
+        // Blocked by EnsureProjectMembership middleware (403).
+        $this->getJson('/api/v1/projects/'.$project->id.'/squad-summary')
+            ->assertForbidden();
+    }
+
+    public function test_project_leader_staff_can_view_squad_summary_without_project_statistic_permission(): void
+    {
+        // Staff role does NOT have project-statistic permission per RolePermissionSeeder.
+        // But when the staff IS the project leader, policy should bypass the permission requirement.
+        $leaderAccount = $this->createUserWithProfileAndTeam(
+            'staff',
+            'Staff Leader',
+            'staff.leader@teamsync.test',
+            'Tech Lead',
+            null
+        );
+        $leaderUser = $leaderAccount['user'];
+        $leaderProfile = $leaderAccount['profile'];
+
+        $this->assertFalse(
+            $leaderUser->hasPermissionTo('project-statistic'),
+            'Precondition: staff role must not have project-statistic permission.'
+        );
+
+        $assignedTeam = $this->createTeam('Leader Squad');
+        $memberProfile = $this->createUserWithProfileAndTeam(
+            'staff',
+            'Squad Member',
+            'squad.member@teamsync.test',
+            'Frontend Engineer',
+            $assignedTeam
+        )['profile'];
+
+        $project = Project::query()->create([
+            'name' => 'Leader Bypass Project',
+            'type' => ProjectType::MOBILE_APP->value,
+            'priority' => ProjectPriority::MEDIUM->value,
+            'status' => ProjectStatus::ACTIVE->value,
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addMonths(3)->toDateString(),
+            'description' => 'Verifies project leader can view squad summary',
+            'project_leader_id' => $leaderProfile->id,
+        ]);
+
+        $project->teams()->sync([
+            $assignedTeam->id => ['assigned_at' => now()],
+        ]);
+
+        $this->createTask($project, 'Lead task', $memberProfile, TaskStatus::IN_PROGRESS->value);
+
+        Sanctum::actingAs($leaderUser);
+
+        $this->getJson('/api/v1/projects/'.$project->id.'/squad-summary')
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.project.id', $project->id);
+    }
+
+    public function test_project_member_staff_without_leader_or_permission_is_forbidden(): void
+    {
+        // Staff who is a project member but NOT the leader and lacks project-statistic
+        // must remain blocked (defense against accidental over-exposure).
+        $managerAccount = $this->createUserWithProfileAndTeam(
+            'manager',
+            'Tight Manager',
+            'tight.manager@teamsync.test',
+            'Product Manager',
+            null
+        );
+        $managerProfile = $managerAccount['profile'];
+
+        $assignedTeam = $this->createTeam('Tight Squad');
+        $memberAccount = $this->createUserWithProfileAndTeam(
+            'staff',
+            'Plain Member',
+            'plain.member@teamsync.test',
+            'Frontend Engineer',
+            $assignedTeam
+        );
+        $memberUser = $memberAccount['user'];
+        $memberProfile = $memberAccount['profile'];
+
+        $project = Project::query()->create([
+            'name' => 'Tight Project',
+            'type' => ProjectType::MOBILE_APP->value,
+            'priority' => ProjectPriority::MEDIUM->value,
+            'status' => ProjectStatus::ACTIVE->value,
+            'start_date' => now()->toDateString(),
+            'end_date' => now()->addMonths(3)->toDateString(),
+            'description' => 'Verifies non-leader staff stays blocked',
+            'project_leader_id' => $managerProfile->id,
+        ]);
+
+        $project->teams()->sync([
+            $assignedTeam->id => ['assigned_at' => now()],
+        ]);
+
+        $this->createTask($project, 'Member task', $memberProfile, TaskStatus::TODO->value);
+
+        Sanctum::actingAs($memberUser);
+
         $this->getJson('/api/v1/projects/'.$project->id.'/squad-summary')
             ->assertForbidden();
     }

@@ -32,7 +32,7 @@ const props = defineProps({
     },
 });
 
-const emit = defineEmits(["retry", "select", "mark-all-read"]);
+const emit = defineEmits(["retry", "select", "mark-all-read", "close"]);
 
 const visibleNotifications = computed(() => props.notifications.slice(0, 5));
 
@@ -193,6 +193,7 @@ const getIconTextClass = (notification) => {
 };
 
 const handleSeeAll = () => {
+    emit("close");
     router.push({ name: 'admin.notifications' });
 };
 </script>
