@@ -49,6 +49,17 @@ vi.mock("pinia", async (importOriginal) => {
     };
 });
 
+vi.mock("@/helpers/permissionHelper", () => ({
+    can: (permission) => {
+        const permissions = mockAuthUser.value?.permissions || [];
+        return permissions.includes(permission);
+    },
+    canOneOf: (permissions) => {
+        const userPermissions = mockAuthUser.value?.permissions || [];
+        return permissions.some((p) => userPermissions.includes(p));
+    },
+}));
+
 import TaskDetailModal from "@/components/admin/project/detail/TaskDetailModal.vue";
 
 const makeTask = (overrides = {}) => ({
@@ -108,6 +119,7 @@ describe("TaskDetailModal smoke", () => {
             name: "Manager User",
             employee_profile: { id: 300 },
             roles: [{ name: "manager" }],
+            permissions: ["task-edit", "project-edit", "task-list"],
         });
 
         await wrapper.vm.$nextTick();
@@ -127,6 +139,7 @@ describe("TaskDetailModal smoke", () => {
                 name: "Employee User",
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             },
         );
 
@@ -147,6 +160,7 @@ describe("TaskDetailModal smoke", () => {
                 name: "Employee User",
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             },
         );
 
