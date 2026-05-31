@@ -304,7 +304,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $rate = $row->total_records > 0 ? round(($attended / $row->total_records) * 100, 1) : 0;
 
             return [
-                'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                // Append '-01' to avoid Carbon day-overflow when today > days-in-target-month.
+                'month' => Carbon::parse($row->month_key.'-01')->format('M Y'),
                 'attendance_rate' => $rate,
                 'present' => (int) $row->present_count,
                 'late' => (int) $row->late_count,
@@ -368,7 +369,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             ->orderBy('month_key')
             ->get()
             ->map(fn ($row) => [
-                'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                'month' => Carbon::parse($row->month_key.'-01')->format('M Y'),
                 'avg_hours' => (float) $row->avg_hours,
             ])
             ->values()
@@ -405,7 +406,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         // Pivot work mode data by month
         $workModeByMonth = [];
         foreach ($workModeTrend as $row) {
-            $monthLabel = Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y');
+            $monthLabel = Carbon::parse($row->month_key.'-01')->format('M Y');
             if (! isset($workModeByMonth[$monthLabel])) {
                 $workModeByMonth[$monthLabel] = ['month' => $monthLabel, 'office' => 0, 'remote' => 0, 'hybrid' => 0];
             }
@@ -455,7 +456,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             ->orderBy('month_key')
             ->get()
             ->map(fn ($row) => [
-                'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                'month' => Carbon::parse($row->month_key.'-01')->format('M Y'),
                 'total' => (int) $row->total,
                 'resolved' => (int) $row->resolved,
             ])
@@ -482,7 +483,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                     : 0;
 
                 return [
-                    'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                    'month' => Carbon::parse($row->month_key.'-01')->format('M Y'),
                     'total' => (int) $row->total,
                     'approved' => (int) $row->approved,
                     'rejected' => (int) $row->rejected,
@@ -526,7 +527,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'total' => (int) $r->total,
                     'approved' => (int) $r->approved,
                     'rejected' => (int) $r->rejected,
@@ -690,7 +691,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'total_salary' => round((float) $r->total_salary, 2),
                     'total_deductions' => round((float) $r->total_deductions, 2),
                     'employee_count' => (int) $r->employee_count,
@@ -737,7 +738,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'pph21' => round((float) $r->pph21, 2),
                     'bpjs_tk' => round((float) $r->bpjs_tk, 2),
                     'bpjs_kes' => round((float) $r->bpjs_kes, 2),
@@ -825,7 +826,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'completed' => (int) $r->completed_count,
                 ])
                 ->values()->all();
@@ -1879,7 +1880,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                         : 0;
 
                     return [
-                        'month' => Carbon::createFromFormat('Y-m', $row->month_key)->format('M Y'),
+                        'month' => Carbon::parse($row->month_key.'-01')->format('M Y'),
                         'total' => (int) $row->total,
                         'approved' => (int) $row->approved,
                         'rejected' => (int) $row->rejected,
@@ -1942,7 +1943,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'avg_hours' => (float) $r->avg_hours,
                     'min_hours' => (int) $r->min_hours,
                     'max_hours' => (int) $r->max_hours,
@@ -2015,7 +2016,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'total_cost' => round((float) $r->total_cost, 2),
                     'employee_count' => (int) $r->employee_count,
                     'cost_per_employee' => round((float) $r->cost_per_employee, 2),
@@ -2052,7 +2053,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->orderBy('month_key')
                 ->get()
                 ->map(fn ($r) => [
-                    'month' => Carbon::createFromFormat('Y-m', $r->month_key)->format('M Y'),
+                    'month' => Carbon::parse($r->month_key.'-01')->format('M Y'),
                     'avg_hours_to_approve' => (float) $r->avg_hours_to_approve,
                     'total_payrolls' => (int) $r->total_payrolls,
                 ])
