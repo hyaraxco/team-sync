@@ -69,7 +69,8 @@ vi.mock("@/helpers/permissionHelper", () => ({
 
 import TaskDetailModal from "@/components/admin/project/detail/TaskDetailModal.vue";
 
-// Permission presets matching backend RolePermissionSeeder
+// Subset of backend RolePermissionSeeder — only the permissions exercised by
+// TaskDetailModal's permission gates. Not an exhaustive mirror of the seeder.
 const ROLE_PERMISSIONS = {
     manager: ["project-edit", "project-delete", "project-statistic", "task-list"],
     hr: ["task-list", "staff-member-list"],
