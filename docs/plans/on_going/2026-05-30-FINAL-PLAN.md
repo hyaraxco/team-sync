@@ -1,12 +1,12 @@
 # Project & Task Permission Overhaul — MASTER PLAN
 
 > **Date:** 2026-05-30
-> **Status:** Phase 1 COMPLETED, Phases 2-4 PENDING
+> **Status:** Phases 1-2 COMPLETED, Phases 3-4 PENDING
 > **Confidence:** 99%
 >
 > ## Phase Status
 > - **Phase 1 — Backend Permissions:** ✅ COMPLETED — shipped via PR [#62](https://github.com/hyaraxco/team-sync/pull/62) (+ prerequisite [#63](https://github.com/hyaraxco/team-sync/pull/63)). Plan archived at `docs/plans/archive/2026-05-30-backend-permissions.md`.
-> - **Phase 2 — Frontend Permissions:** ⏳ Pending
+> - **Phase 2 — Frontend Permissions:** ✅ COMPLETED — shipped via PR [#65](https://github.com/hyaraxco/team-sync/pull/65) (ProjectDetail, TaskBoard, TaskDetailModal Phase 2 gates) + PR [#67](https://github.com/hyaraxco/team-sync/pull/67) (canReviewTask/canCollaborateTask migration + 29 test cases). Plans archived at `docs/plans/archive/2026-05-30-frontend-permissions.md` and `docs/plans/archive/2026-05-31-task-detail-modal-test-coverage.md`.
 > - **Phase 3 — Task Create Form:** ⏳ Pending
 > - **Phase 4 — UI Fixes:** ⏳ Pending
 
@@ -87,7 +87,8 @@ When manager selects a project leader, the system filters eligible staff:
 | Document | Contents | Phase |
 |----------|----------|-------|
 | [Backend Permissions](../archive/2026-05-30-backend-permissions.md) | RolePermissionSeeder, ProjectResource, new endpoints, ProjectTaskPolicy | Phase 1 ✅ |
-| [Frontend Permissions](./2026-05-30-frontend-permissions.md) | ProjectDetail, TaskBoard, TaskDetailModal permission gates | Phase 2 |
+| [Frontend Permissions](../archive/2026-05-30-frontend-permissions.md) | ProjectDetail, TaskBoard, TaskDetailModal permission gates | Phase 2 ✅ |
+| [Task Detail Modal Tests](../archive/2026-05-31-task-detail-modal-test-coverage.md) | canReviewTask/canCollaborateTask migration + test coverage | Phase 2 ✅ |
 | [Task Create Form](./2026-05-30-task-create-form.md) | TaskCreateModal changes (auto-status, optional assignee, empty states) | Phase 3 |
 | [UI Fixes](./2026-05-30-ui-fixes.md) | Notification badge, ApexCharts, empty states, loading states | Phase 4 |
 
