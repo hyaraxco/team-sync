@@ -482,14 +482,15 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function getGenerateReadiness(string $salaryMonth): array
     {
-        $month = Carbon::createFromFormat('Y-m', $salaryMonth)->startOfMonth();
+        // Append '-01' to avoid Carbon day-overflow when today > days-in-target-month.
+        $month = Carbon::parse($salaryMonth.'-01');
 
         return $this->buildGenerateReadiness($month);
     }
 
     public function getReadinessDashboard(string $salaryMonth): array
     {
-        $month = Carbon::createFromFormat('Y-m', $salaryMonth)->startOfMonth();
+        $month = Carbon::parse($salaryMonth.'-01');
         $readiness = $this->buildGenerateReadiness($month);
 
         $activeEmployeeIds = StaffMemberProfile::query()
@@ -1604,7 +1605,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     }
 
                     if ($periodType === 'monthly') {
-                        $month = Carbon::createFromFormat('Y-m', $filters['month'])->startOfMonth();
+                        $month = Carbon::parse($filters['month'].'-01');
                         $payrollQuery->whereDate('salary_month', $month->toDateString());
                     } else {
                         $payrollQuery->whereYear('salary_month', (int) $filters['year']);
@@ -1653,7 +1654,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         }
 
         if ($periodType === 'monthly') {
-            $month = Carbon::createFromFormat('Y-m', $filters['month'])->startOfMonth();
+            $month = Carbon::parse($filters['month'].'-01');
             $query->whereDate('salary_month', $month->toDateString());
         } else {
             $query->whereYear('salary_month', (int) $filters['year']);
