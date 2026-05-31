@@ -156,6 +156,7 @@ const openLeaderEditModal = async () => {
         eligibleLeaders.value = await fetchEligibleLeaders(id);
     } catch {
         eligibleLeaders.value = [];
+        toast.error("Failed to load leaders", projectStore.error || "Please try again.");
     } finally {
         eligibleLeadersLoading.value = false;
     }
