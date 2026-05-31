@@ -197,8 +197,7 @@ export const useProjectStore = defineStore("project", {
                 return response.data?.data || [];
             } catch (error) {
                 this.error = handleError(error);
-
-                return [];
+                throw error;
             }
         },
 
