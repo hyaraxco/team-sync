@@ -1,8 +1,9 @@
 # Frontend Permissions
 
 > **Phase:** 2 of 4
-> **Status:** Implementation Complete (pending PR review)
+> **Status:** COMPLETED (merged via PR #65 on 2026-05-31)
 > **Dependencies:** Phase 1 (Backend Permissions)
+> **Merge commit:** 536a6b7
 
 ---
 
