@@ -132,7 +132,7 @@ class ThrCalculationServiceTest extends TestCase
 
         JobInformation::factory()->active()->create([
             'staff_member_id' => $employee->id,
-            'start_date' => Carbon::now()->subMonths(6)->toDateString(),
+            'start_date' => Carbon::now()->subMonthsNoOverflow(6)->toDateString(),
             'monthly_salary' => 10_000_000,
         ]);
 
