@@ -19,7 +19,6 @@ export const useProjectStore = defineStore("project", {
         loading: false,
         loadingSummary: false,
         loadingStatistics: false,
-        loadingMembers: false,
         error: null,
         success: null,
     }),
@@ -203,7 +202,6 @@ export const useProjectStore = defineStore("project", {
         },
 
         async fetchProjectMembers(projectId) {
-            this.loadingMembers = true;
             this.error = null;
 
             try {
@@ -216,8 +214,6 @@ export const useProjectStore = defineStore("project", {
                 }
 
                 return [];
-            } finally {
-                this.loadingMembers = false;
             }
         },
 

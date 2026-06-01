@@ -114,4 +114,23 @@ describe("TaskCreateModal", () => {
         const emitted = wrapper.emitted("created");
         expect(emitted[0][0].status).toBe("todo");
     });
+
+    it("disables assignee select and shows loading text while fetching members", () => {
+        mockFetchProjectMembers.mockReturnValue(new Promise(() => {}));
+        const wrapper = factory();
+
+        const select = wrapper.find("#task-assignee");
+        expect(select.attributes("disabled")).toBeDefined();
+        expect(select.text()).toContain("Loading members...");
+    });
+
+    it("shows empty state when fetchProjectMembers rejects", async () => {
+        mockFetchProjectMembers.mockRejectedValue(new Error("Network error"));
+        const wrapper = factory();
+        await flushPromises();
+
+        const select = wrapper.find("#task-assignee");
+        expect(select.attributes("disabled")).toBeUndefined();
+        expect(wrapper.text()).toContain("No team members available");
+    });
 });
