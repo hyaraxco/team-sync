@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted } from "vue";
-import { ListChecks, Plus, Search } from "lucide-vue-next";
+import { ListChecks, Plus, Search, ClipboardList } from "lucide-vue-next";
 import { VueDraggableNext } from "vue-draggable-next";
 import { useTaskStore } from "@/stores/task";
 import { useAuthStore } from "@/stores/auth";
@@ -290,8 +290,28 @@ onMounted(async () => {
             </div>
         </div>
 
+        <!-- Empty State -->
+        <div
+            v-if="tasks.length === 0 && !loading"
+            class="flex flex-col items-center justify-center py-12 text-gray-400"
+        >
+            <ClipboardList class="h-12 w-12 mb-4 opacity-50" />
+            <p class="text-lg font-medium mb-2">No tasks yet</p>
+            <p class="text-sm mb-4">Create your first task to get started.</p>
+            <button
+                v-if="canCreateTask"
+                @click="openCreateModal"
+                class="inline-flex items-center rounded-lg bg-brand-primary px-4 py-2 text-sm font-medium text-white hover:bg-brand-primary/90 transition-colors"
+            >
+                Create Task
+            </button>
+        </div>
+
         <!-- Task Management Columns -->
-        <div class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100">
+        <div
+            v-else
+            class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
+        >
             <!-- To Do Column -->
             <div class="bg-gray-50 rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
