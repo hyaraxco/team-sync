@@ -131,6 +131,6 @@ class ProjectPolicy
 
     private function isPrivilegedRole(User $user): bool
     {
-        return $user->hasRole('manager') || $user->hasRole('hr');
+        return $user->hasRole('manager');
     }
 }
