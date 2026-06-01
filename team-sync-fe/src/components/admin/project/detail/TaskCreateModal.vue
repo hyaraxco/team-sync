@@ -22,6 +22,7 @@ const emit = defineEmits(["close", "created"]);
 
 const projectMembers = ref([]);
 const loadingMembers = ref(false);
+const isSubmitting = ref(false);
 
 const formData = ref({
     name: "",
@@ -65,6 +66,7 @@ watch(
             due_date: "",
             project_id: props.projectId,
         };
+        isSubmitting.value = false;
         loadMembers().catch(() => {});
     },
     { immediate: true },
@@ -79,10 +81,12 @@ const closeModal = () => {
 };
 
 const handleSubmit = () => {
+    if (isSubmitting.value) return;
     if (!formData.value.name) {
         toast.warning("Validation Error", "Please enter task name");
         return;
     }
+    isSubmitting.value = true;
     emit("created", { ...formData.value });
     closeModal();
 };
@@ -200,7 +204,8 @@ const handleSubmit = () => {
                 <button
                     type="button"
                     @click="handleSubmit"
-                    class="px-6 py-3 bg-brand-primary hover:bg-primary-800 text-white rounded-lg transition-colors font-medium"
+                    :disabled="isSubmitting"
+                    class="px-6 py-3 bg-brand-primary hover:bg-primary-800 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     Create Task
                 </button>

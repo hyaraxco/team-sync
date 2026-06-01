@@ -123,19 +123,19 @@ const canEditDueDate = computed(
     () => can("task-edit") && can("project-edit") && !isReviewPhaseLocked.value,
 );
 const canDeleteTask = computed(() => can("task-delete"));
-const canReviewTask = computed(() => can("task-edit") && (can("project-edit") || isProjectLeader.value));
+const canReviewTask = computed(() => can("project-edit") || isProjectLeader.value);
 
 const canSearchStaffMembers = computed(() => can("staff-member-list"));
 
 const isTodoLikeStatus = computed(() => props.task?.status === "todo" || props.task?.status === "pending");
 
-const canStartTask = computed(() => hasRole("staff") && isOwnAssignedTask.value && isTodoLikeStatus.value);
+const canStartTask = computed(() => can("task-edit") && isOwnAssignedTask.value && isTodoLikeStatus.value);
 
 const canSubmitForReview = computed(
-    () => hasRole("staff") && isOwnAssignedTask.value && props.task?.status === "in_progress",
+    () => can("task-edit") && isOwnAssignedTask.value && props.task?.status === "in_progress",
 );
 
-const canStartRework = computed(() => hasRole("staff") && isOwnAssignedTask.value && props.task?.status === "rejected");
+const canStartRework = computed(() => can("task-edit") && isOwnAssignedTask.value && props.task?.status === "rejected");
 
 const canApproveReview = computed(() => canReviewTask.value && props.task?.status === "review");
 
@@ -161,7 +161,7 @@ const canCollaborateTask = computed(() => {
 
     const status = normalizedTaskStatus.value;
 
-    if (can("task-edit") && (can("project-edit") || isProjectLeader.value)) {
+    if (can("project-edit") || isProjectLeader.value) {
         return ["todo", "review"].includes(status);
     }
 

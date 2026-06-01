@@ -45,7 +45,7 @@ class ProjectResource extends JsonResource
             'leader' => new StaffMemberProfileResource($this->projectLeader),
             'teams' => TeamResource::collection($this->whenLoaded('teams')),
             'is_project_leader' => $this->resolveIsProjectLeader($user),
-            'can_create_task' => $this->resolveCanCreateTask($user),
+            'can_create_task' => $this->when(request()->routeIs('projects.show'), fn () => $this->resolveCanCreateTask($user)),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
