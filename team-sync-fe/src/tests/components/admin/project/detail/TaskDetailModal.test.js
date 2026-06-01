@@ -72,7 +72,7 @@ import TaskDetailModal from "@/components/admin/project/detail/TaskDetailModal.v
 // Subset of backend RolePermissionSeeder — only the permissions exercised by
 // TaskDetailModal's permission gates. Not an exhaustive mirror of the seeder.
 const ROLE_PERMISSIONS = {
-    manager: ["project-edit", "project-delete", "project-statistic", "task-list", "task-edit"],
+    manager: ["project-edit", "project-delete", "project-statistic", "task-list"],
     hr: ["task-list", "staff-member-list"],
     staff: ["task-edit", "task-list"],
     "project-leader": ["task-create", "task-edit", "task-delete", "task-list"],
@@ -140,106 +140,79 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canManageAssignee (task-edit + (project-edit OR isProjectLeader) + !locked) ---
     describe("canManageAssignee", () => {
         it("returns true when user has task-edit and project-edit and status is todo", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(true);
         });
 
         it("returns true when user has task-edit and is project leader", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", project: { leader: { id: 500 } } }),
-                {
-                    employee_profile: { id: 500 },
-                    roles: [{ name: "staff" }],
-                    permissions: ["task-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo", project: { leader: { id: 500 } } }), {
+                employee_profile: { id: 500 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(true);
         });
 
         it("returns false when user lacks task-edit even with project-edit", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["project-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(false);
         });
 
         it("returns false when user has task-edit but no project-edit and is not project leader", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", project: { leader: { id: 999 } } }),
-                {
-                    employee_profile: { id: 100 },
-                    roles: [{ name: "staff" }],
-                    permissions: ["task-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo", project: { leader: { id: 999 } } }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(false);
         });
 
         it("returns false for staff with no permissions", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("staff", { permissions: [] }),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("staff", { permissions: [] }));
             expect(wrapper.vm.canManageAssignee).toBe(false);
         });
 
         it("returns false when status is review (review phase locked)", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "review" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(false);
         });
 
         it("returns false when status is done (review phase locked)", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "done" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(false);
         });
 
         it("returns true when status is in_progress with all permissions", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(true);
         });
 
         it("returns true when status is rejected with all permissions", () => {
-            const wrapper = factory(
-                makeTask({ status: "rejected" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "rejected" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canManageAssignee).toBe(true);
         });
     });
@@ -247,74 +220,56 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canEditDueDate (task-edit + project-edit + !locked) ---
     describe("canEditDueDate", () => {
         it("returns true when user has both task-edit and project-edit and task is todo", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canEditDueDate).toBe(true);
         });
 
         it("returns true when user has both permissions and task is in_progress", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canEditDueDate).toBe(true);
         });
 
         it("returns false when user lacks project-edit", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "staff" }],
-                    permissions: ["task-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit"],
+            });
             expect(wrapper.vm.canEditDueDate).toBe(false);
         });
 
         it("returns false when user lacks task-edit", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["project-edit"],
+            });
             expect(wrapper.vm.canEditDueDate).toBe(false);
         });
 
         it("returns false when status is review (locked)", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "review" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canEditDueDate).toBe(false);
         });
 
         it("returns false when status is done (locked)", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "manager" }],
-                    permissions: ["task-edit", "project-edit"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "done" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "project-edit"],
+            });
             expect(wrapper.vm.canEditDueDate).toBe(false);
         });
     });
@@ -322,38 +277,26 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canDeleteTask (task-delete) ---
     describe("canDeleteTask", () => {
         it("returns true when user has task-delete permission", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                {
-                    employee_profile: { id: 300 },
-                    roles: [{ name: "staff" }],
-                    permissions: ["task-delete"],
-                },
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-delete"],
+            });
             expect(wrapper.vm.canDeleteTask).toBe(true);
         });
 
         it("returns false when user lacks task-delete", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("manager"));
             expect(wrapper.vm.canDeleteTask).toBe(false);
         });
 
         it("returns false for staff", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("staff"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("staff"));
             expect(wrapper.vm.canDeleteTask).toBe(false);
         });
 
         it("returns false for HR", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("hr"));
             expect(wrapper.vm.canDeleteTask).toBe(false);
         });
     });
@@ -361,26 +304,17 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canSearchStaffMembers ---
     describe("canSearchStaffMembers", () => {
         it("returns true for HR with staff-member-list", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("hr"));
             expect(wrapper.vm.canSearchStaffMembers).toBe(true);
         });
 
         it("returns false for staff", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("staff"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("staff"));
             expect(wrapper.vm.canSearchStaffMembers).toBe(false);
         });
 
         it("returns false for manager", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("manager"));
             expect(wrapper.vm.canSearchStaffMembers).toBe(false);
         });
     });
@@ -388,18 +322,12 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canReviewTask ---
     describe("canReviewTask", () => {
         it("returns true for manager with task-edit and project-edit", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("manager"));
             expect(wrapper.vm.canReviewTask).toBe(true);
         });
 
         it("returns false for HR (no task-edit permission)", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("hr"));
             expect(wrapper.vm.canReviewTask).toBe(false);
         });
 
@@ -412,42 +340,47 @@ describe("TaskDetailModal - Permission Matrix", () => {
         });
 
         it("returns false for staff (non-leader)", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                { employee_profile: { id: 400 }, roles: [{ name: "staff" }], permissions: ["task-edit", "task-list"] },
-            );
+            const wrapper = factory(makeTask({ status: "review" }), {
+                employee_profile: { id: 400 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canReviewTask).toBe(false);
         });
 
         it("returns true for superadmin (has all permissions)", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                { employee_profile: { id: 300 }, roles: [{ name: "superadmin" }], permissions: ["task-edit", "project-edit", "task-list"] },
-            );
+            const wrapper = factory(makeTask({ status: "review" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "superadmin" }],
+                permissions: ["task-edit", "project-edit", "task-list"],
+            });
             expect(wrapper.vm.canReviewTask).toBe(true);
         });
 
-        it("returns false for project-leader without task-edit", () => {
-            const wrapper = factory(
-                makeTask({ status: "review", project: { leader: { id: 300 } } }),
-                { employee_profile: { id: 300 }, roles: [{ name: "staff" }], permissions: ["task-list"] },
-            );
-            expect(wrapper.vm.canReviewTask).toBe(false);
+        it("returns true for project-leader (inherent review authority)", () => {
+            const wrapper = factory(makeTask({ status: "review", project: { leader: { id: 300 } } }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-list"],
+            });
+            expect(wrapper.vm.canReviewTask).toBe(true);
         });
 
         it("returns false for manager with task-edit but no project-edit", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                { employee_profile: { id: 300 }, roles: [{ name: "manager" }], permissions: ["task-edit", "task-list"] },
-            );
+            const wrapper = factory(makeTask({ status: "review" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canReviewTask).toBe(false);
         });
 
         it("returns false for finance role", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                { employee_profile: { id: 300 }, roles: [{ name: "finance" }], permissions: ["task-edit", "task-list"] },
-            );
+            const wrapper = factory(makeTask({ status: "review" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "finance" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canReviewTask).toBe(false);
         });
     });
@@ -455,42 +388,44 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canStartTask (employee workflow) ---
     describe("canStartTask", () => {
         it("returns true for staff when task is todo and assigned to them", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "todo", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canStartTask).toBe(true);
         });
 
         it("returns false for staff when task is todo but not assigned to them", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", assignee_id: 200 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "todo", assignee_id: 200 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canStartTask).toBe(false);
         });
 
         it("returns false for staff when status is in_progress", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canStartTask).toBe(false);
         });
 
         it("returns false for manager (not staff role)", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", assignee_id: 300 }),
-                { employee_profile: { id: 300 }, roles: [{ name: "manager" }] },
-            );
+            const wrapper = factory(makeTask({ status: "todo", assignee_id: 300 }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+            });
             expect(wrapper.vm.canStartTask).toBe(false);
         });
 
         it("returns true for pending status (normalized to todo-like)", () => {
-            const wrapper = factory(
-                makeTask({ status: "pending", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "pending", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canStartTask).toBe(true);
         });
 
@@ -506,26 +441,27 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canSubmitForReview ---
     describe("canSubmitForReview", () => {
         it("returns true for staff when task is in_progress and assigned to them", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canSubmitForReview).toBe(true);
         });
 
         it("returns false when task is todo", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "todo", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canSubmitForReview).toBe(false);
         });
 
         it("returns false when not own task", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress", assignee_id: 200 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 200 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canSubmitForReview).toBe(false);
         });
 
@@ -541,18 +477,12 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canApproveReview / canRejectReview ---
     describe("canApproveReview", () => {
         it("returns true for manager when status is review", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("manager"));
             expect(wrapper.vm.canApproveReview).toBe(true);
         });
 
         it("returns false when status is not review", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "in_progress" }), buildUser("manager"));
             expect(wrapper.vm.canApproveReview).toBe(false);
         });
 
@@ -573,36 +503,24 @@ describe("TaskDetailModal - Permission Matrix", () => {
         });
 
         it("returns false for HR when status is review", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("hr"));
             expect(wrapper.vm.canApproveReview).toBe(false);
         });
     });
 
     describe("canRejectReview", () => {
         it("returns false for HR (no task-edit permission)", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("hr"));
             expect(wrapper.vm.canRejectReview).toBe(false);
         });
 
         it("returns false when status is done", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "done" }), buildUser("manager"));
             expect(wrapper.vm.canRejectReview).toBe(false);
         });
 
         it("returns true for manager when status is review", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("manager"));
             expect(wrapper.vm.canRejectReview).toBe(true);
         });
 
@@ -618,42 +536,27 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canReopenDoneAsRejected ---
     describe("canReopenDoneAsRejected", () => {
         it("returns true for manager when status is done", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "done" }), buildUser("manager"));
             expect(wrapper.vm.canReopenDoneAsRejected).toBe(true);
         });
 
         it("returns false when status is not done", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("manager"));
             expect(wrapper.vm.canReopenDoneAsRejected).toBe(false);
         });
 
         it("returns true for project leader when status is done", () => {
-            const wrapper = factory(
-                makeTask({ status: "done", project: { leader: { id: 300 } } }),
-                buildUser("staff"),
-            );
+            const wrapper = factory(makeTask({ status: "done", project: { leader: { id: 300 } } }), buildUser("staff"));
             expect(wrapper.vm.canReopenDoneAsRejected).toBe(true);
         });
 
         it("returns false for staff when status is done", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                buildUser("staff"),
-            );
+            const wrapper = factory(makeTask({ status: "done" }), buildUser("staff"));
             expect(wrapper.vm.canReopenDoneAsRejected).toBe(false);
         });
 
         it("returns false for HR when status is done", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "done" }), buildUser("hr"));
             expect(wrapper.vm.canReopenDoneAsRejected).toBe(false);
         });
     });
@@ -661,18 +564,19 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canStartRework ---
     describe("canStartRework", () => {
         it("returns true for staff when status is rejected and assigned to them", () => {
-            const wrapper = factory(
-                makeTask({ status: "rejected", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "rejected", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.vm.canStartRework).toBe(true);
         });
 
         it("returns false when status is review", () => {
-            const wrapper = factory(
-                makeTask({ status: "review", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "review", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canStartRework).toBe(false);
         });
 
@@ -696,34 +600,22 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canCollaborateTask ---
     describe("canCollaborateTask", () => {
         it("returns true for manager when status is todo", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("manager"));
             expect(wrapper.vm.canCollaborateTask).toBe(true);
         });
 
         it("returns true for manager when status is review", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("manager"));
             expect(wrapper.vm.canCollaborateTask).toBe(true);
         });
 
         it("returns false for manager when status is done (terminal)", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "done" }), buildUser("manager"));
             expect(wrapper.vm.canCollaborateTask).toBe(false);
         });
 
         it("returns false for manager when status is cancelled (terminal)", () => {
-            const wrapper = factory(
-                makeTask({ status: "cancelled" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "cancelled" }), buildUser("manager"));
             expect(wrapper.vm.canCollaborateTask).toBe(false);
         });
 
@@ -768,10 +660,7 @@ describe("TaskDetailModal - Permission Matrix", () => {
         });
 
         it("returns true for project leader when status is todo", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", project: { leader: { id: 300 } } }),
-                buildUser("staff"),
-            );
+            const wrapper = factory(makeTask({ status: "todo", project: { leader: { id: 300 } } }), buildUser("staff"));
             expect(wrapper.vm.canCollaborateTask).toBe(true);
         });
 
@@ -792,26 +681,17 @@ describe("TaskDetailModal - Permission Matrix", () => {
         });
 
         it("returns false for manager when status is in_progress", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "in_progress" }), buildUser("manager"));
             expect(wrapper.vm.canCollaborateTask).toBe(false);
         });
 
         it("returns false for manager when status is rejected", () => {
-            const wrapper = factory(
-                makeTask({ status: "rejected" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "rejected" }), buildUser("manager"));
             expect(wrapper.vm.canCollaborateTask).toBe(false);
         });
 
         it("returns false for HR when status is todo", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo" }),
-                buildUser("hr"),
-            );
+            const wrapper = factory(makeTask({ status: "todo" }), buildUser("hr"));
             expect(wrapper.vm.canCollaborateTask).toBe(false);
         });
     });
@@ -819,34 +699,34 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- canMutateEntityOwner ---
     describe("canMutateEntityOwner", () => {
         it("returns true when current user owns entity and task is not terminal", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canMutateEntityOwner(100)).toBe(true);
         });
 
         it("returns false when current user does not own entity", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress", assignee_id: 200 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 200 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canMutateEntityOwner(200)).toBe(false);
         });
 
         it("returns false when task is terminal (done)", () => {
-            const wrapper = factory(
-                makeTask({ status: "done", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "done", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canMutateEntityOwner(100)).toBe(false);
         });
 
         it("returns false when task is terminal (cancelled)", () => {
-            const wrapper = factory(
-                makeTask({ status: "cancelled", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "cancelled", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.vm.canMutateEntityOwner(100)).toBe(false);
         });
 
@@ -878,29 +758,27 @@ describe("TaskDetailModal - Permission Matrix", () => {
     // --- Integration: role + status matrix rendering ---
     describe("UI action rendering", () => {
         it("renders reviewer actions (approve/reject) for manager on review status", () => {
-            const wrapper = factory(
-                makeTask({ status: "review" }),
-                buildUser("manager"),
-            );
+            const wrapper = factory(makeTask({ status: "review" }), buildUser("manager"));
             expect(wrapper.text()).toContain("Approve and Mark Done");
             expect(wrapper.text()).toContain("Reject Task");
             expect(wrapper.text()).not.toContain("Start Task");
         });
 
         it("renders employee submit action for own in_progress task", () => {
-            const wrapper = factory(
-                makeTask({ status: "in_progress", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.text()).toContain("Task Selesai - Submit for Review");
             expect(wrapper.text()).not.toContain("Approve and Mark Done");
         });
 
         it("locks comment textarea on done status", () => {
-            const wrapper = factory(
-                makeTask({ status: "done" }),
-                { employee_profile: { id: 300 }, roles: [{ name: "manager" }] },
-            );
+            const wrapper = factory(makeTask({ status: "done" }), {
+                employee_profile: { id: 300 },
+                roles: [{ name: "manager" }],
+            });
             const commentTextarea = wrapper.find(
                 'textarea[placeholder="Comments are locked on completed/cancelled tasks"]',
             );
@@ -909,18 +787,19 @@ describe("TaskDetailModal - Permission Matrix", () => {
         });
 
         it("shows 'No task actions' for staff with no own tasks on todo status", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", assignee_id: 200 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "todo", assignee_id: 200 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+            });
             expect(wrapper.text()).toContain("No task actions available");
         });
 
         it("shows Start Task button for staff on own todo task", () => {
-            const wrapper = factory(
-                makeTask({ status: "todo", assignee_id: 100 }),
-                { employee_profile: { id: 100 }, roles: [{ name: "staff" }] },
-            );
+            const wrapper = factory(makeTask({ status: "todo", assignee_id: 100 }), {
+                employee_profile: { id: 100 },
+                roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
+            });
             expect(wrapper.text()).toContain("Start Task");
         });
     });
