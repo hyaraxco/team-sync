@@ -105,6 +105,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 300 },
                 roles: [{ name: "manager" }],
+                permissions: ["project-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "review", project: { leader: { id: 999 } } };
@@ -115,20 +116,22 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 300 },
                 roles: [{ name: "manager" }],
+                permissions: ["project-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "review", project: { leader: { id: 999 } } };
             expect(wrapper.vm.canMoveTask(task, "rejected")).toBe(true);
         });
 
-        it("allows HR to move from done to rejected", () => {
+        it("denies HR from moving tasks because HR has task oversight only", () => {
             mockUser.value = {
                 employee_profile: { id: 300 },
                 roles: [{ name: "hr" }],
+                permissions: ["task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "done", project: { leader: { id: 999 } } };
-            expect(wrapper.vm.canMoveTask(task, "rejected")).toBe(true);
+            expect(wrapper.vm.canMoveTask(task, "rejected")).toBe(false);
         });
 
         it("allows project leader to move from review to done", () => {
@@ -145,6 +148,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 300 },
                 roles: [{ name: "manager" }],
+                permissions: ["project-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "review", project: { leader: { id: 999 } } };
@@ -155,6 +159,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 300 },
                 roles: [{ name: "manager" }],
+                permissions: ["project-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "todo", project: { leader: { id: 999 } } };
@@ -165,6 +170,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 300 },
                 roles: [{ name: "hr" }],
+                permissions: ["task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "done", project: { leader: { id: 999 } } };
@@ -178,6 +184,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "todo", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -188,6 +195,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "in_progress", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -198,6 +206,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "rejected", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -208,6 +217,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "review", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -270,6 +280,7 @@ describe("TaskBoard - canMoveTask", () => {
             mockUser.value = {
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             };
             const wrapper = factory();
             const task = { id: 1, status: "pending", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -288,6 +299,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         mockUser.value = {
             employee_profile: { id: 100 },
             roles: [{ name: "staff" }],
+            permissions: ["task-edit", "task-list"],
         };
         const wrapper = factory();
         expect(wrapper.vm.getMoveDeniedReason(null, "done")).toBe("Task cannot be moved.");
@@ -297,6 +309,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         mockUser.value = {
             employee_profile: { id: 100 },
             roles: [{ name: "staff" }],
+            permissions: ["task-edit", "task-list"],
         };
         const wrapper = factory();
         const task = { id: 1, status: "todo", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -307,6 +320,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         mockUser.value = {
             employee_profile: { id: 100 },
             roles: [{ name: "staff" }],
+            permissions: ["task-edit", "task-list"],
         };
         const wrapper = factory();
         const task = { id: 1, status: "todo", assignee_id: 200, project: { leader: { id: 999 } } };
@@ -317,6 +331,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         mockUser.value = {
             employee_profile: { id: 100 },
             roles: [{ name: "staff" }],
+            permissions: ["task-edit", "task-list"],
         };
         const wrapper = factory();
         const task = { id: 1, status: "todo", assignee_id: 100, project: { leader: { id: 999 } } };
@@ -327,6 +342,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         mockUser.value = {
             employee_profile: { id: 300 },
             roles: [{ name: "manager" }],
+            permissions: ["project-edit", "task-list"],
         };
         const wrapper = factory();
         const task = { id: 1, status: "review", project: { leader: { id: 999 } } };
