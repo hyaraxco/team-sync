@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from "vue";
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from "vue";
 import { storeToRefs } from "pinia";
 import { useAnalyticsStore } from "@/stores/analytics";
 import { useTeamStore } from "@/stores/team";
@@ -27,6 +27,7 @@ import {
     FileTextIcon,
 } from "lucide-vue-next";
 
+const chartReady = ref(false);
 const exportLoading = ref(false);
 const showExportMenu = ref(false);
 const exportDropdownRef = ref(null);
@@ -229,9 +230,11 @@ function fetchActiveTab() {
 
 watch(activeTab, () => fetchActiveTab());
 
-onMounted(() => {
+onMounted(async () => {
     document.addEventListener("click", handleClickOutside);
     fetchActiveTab();
+    await nextTick();
+    chartReady.value = true;
 });
 
 onUnmounted(() => {
@@ -446,7 +449,7 @@ onUnmounted(() => {
                             Correlation between attendance rate and payroll deductions
                         </p>
                         <VueApexCharts
-                            v-if="attendanceDeductionSeries[0]?.data?.length"
+                            v-if="chartReady && attendanceDeductionSeries[0]?.data?.length"
                             type="line"
                             height="320"
                             :options="attendanceDeductionOptions"
@@ -462,7 +465,7 @@ onUnmounted(() => {
                         <h3 class="text-base font-semibold text-brand-dark mb-1">Monthly HR Cost Breakdown</h3>
                         <p class="text-xs text-gray-400 mb-4">Salary, tax, BPJS contributions, and deductions</p>
                         <VueApexCharts
-                            v-if="hrCostSeries[0]?.data?.length"
+                            v-if="chartReady && hrCostSeries[0]?.data?.length"
                             type="area"
                             height="320"
                             :options="hrCostOptions"
@@ -479,7 +482,7 @@ onUnmounted(() => {
                     <h3 class="text-base font-semibold text-brand-dark mb-1">Team Performance Comparison</h3>
                     <p class="text-xs text-gray-400 mb-4">Attendance rate and task completion by team</p>
                     <VueApexCharts
-                        v-if="teamPerformanceSeries[0]?.data?.length"
+                        v-if="chartReady && teamPerformanceSeries[0]?.data?.length"
                         type="bar"
                         height="320"
                         :options="teamPerformanceOptions"

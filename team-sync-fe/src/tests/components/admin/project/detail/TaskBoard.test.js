@@ -310,9 +310,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         };
         const wrapper = factory();
         const task = { id: 1, status: "todo", assignee_id: 200, project: { leader: { id: 999 } } };
-        expect(wrapper.vm.getMoveDeniedReason(task, "in_progress")).toBe(
-            "You can only move your own assigned tasks.",
-        );
+        expect(wrapper.vm.getMoveDeniedReason(task, "in_progress")).toBe("You can only move your own assigned tasks.");
     });
 
     it("returns 'Invalid status transition for employee workflow.' for invalid staff transition", () => {
@@ -322,9 +320,7 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         };
         const wrapper = factory();
         const task = { id: 1, status: "todo", assignee_id: 100, project: { leader: { id: 999 } } };
-        expect(wrapper.vm.getMoveDeniedReason(task, "done")).toBe(
-            "Invalid status transition for employee workflow.",
-        );
+        expect(wrapper.vm.getMoveDeniedReason(task, "done")).toBe("Invalid status transition for employee workflow.");
     });
 
     it("returns reviewer transition message for manager with invalid transition", () => {
@@ -346,8 +342,58 @@ describe("TaskBoard - getMoveDeniedReason", () => {
         };
         const wrapper = factory();
         const task = { id: 1, status: "review", project: { leader: { id: 999 } } };
-        expect(wrapper.vm.getMoveDeniedReason(task, "in_progress")).toBe(
-            "You are not allowed to move this task.",
-        );
+        expect(wrapper.vm.getMoveDeniedReason(task, "in_progress")).toBe("You are not allowed to move this task.");
+    });
+});
+
+describe("TaskBoard - Empty State", () => {
+    beforeEach(() => {
+        mockTasks.value = [];
+        mockUser.value = { roles: [{ name: "staff" }] };
+    });
+
+    it("shows empty state when no tasks exist", () => {
+        const wrapper = factory();
+        expect(wrapper.text()).toContain("No tasks yet");
+        expect(wrapper.text()).toContain("Create your first task to get started.");
+    });
+
+    it("shows Create Task button in empty state when canCreateTask is true", () => {
+        const wrapper = mount(TaskBoard, {
+            props: { canCreateTask: true },
+            global: {
+                stubs: {
+                    VueDraggableNext: {
+                        template: '<div class="draggable-stub"><slot /></div>',
+                    },
+                },
+            },
+        });
+        const buttons = wrapper.findAll("button");
+        const emptyCreateBtn = buttons.find((b) => b.text().includes("Create Task"));
+        expect(emptyCreateBtn).toBeTruthy();
+    });
+
+    it("hides Create Task button in empty state when canCreateTask is false", () => {
+        const wrapper = mount(TaskBoard, {
+            props: { canCreateTask: false },
+            global: {
+                stubs: {
+                    VueDraggableNext: {
+                        template: '<div class="draggable-stub"><slot /></div>',
+                    },
+                },
+            },
+        });
+        const emptyState = wrapper.find(".py-12");
+        expect(emptyState.exists()).toBe(true);
+        expect(emptyState.find("button").exists()).toBe(false);
+    });
+
+    it("shows kanban columns when tasks exist", () => {
+        mockTasks.value = [{ id: 1, status: "todo", name: "Test Task", project: { leader: { id: 999 } } }];
+        const wrapper = factory();
+        expect(wrapper.text()).not.toContain("No tasks yet");
+        expect(wrapper.text()).toContain("To Do");
     });
 });

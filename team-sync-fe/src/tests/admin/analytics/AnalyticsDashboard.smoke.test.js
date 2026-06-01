@@ -142,4 +142,11 @@ describe("AnalyticsDashboard smoke", () => {
 
         expect(analyticsStoreMock.fetchAttendanceAnalytics).toHaveBeenCalled();
     });
+
+    it("does not render charts before nextTick (chartReady guard)", () => {
+        const wrapper = factory();
+        // Charts should not be visible immediately on mount — chartReady is false until nextTick
+        const chart = wrapper.find(".apex-chart-stub");
+        expect(chart.exists()).toBe(false);
+    });
 });

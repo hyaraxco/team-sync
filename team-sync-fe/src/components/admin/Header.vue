@@ -1,5 +1,14 @@
 <script setup>
-import { BellIcon, ChevronDownIcon, MessageCircleIcon, UserIcon, LogOutIcon, MenuIcon, SunIcon, MoonIcon } from "lucide-vue-next";
+import {
+    BellIcon,
+    ChevronDownIcon,
+    MessageCircleIcon,
+    UserIcon,
+    LogOutIcon,
+    MenuIcon,
+    SunIcon,
+    MoonIcon,
+} from "lucide-vue-next";
 import NotificationPanel from "@/components/admin/NotificationPanel.vue";
 import { useAuthStore } from "@/stores/auth";
 import { useNotificationStore } from "@/stores/notifications";
@@ -298,16 +307,13 @@ const formatUnreadCount = (count, maxCount = 99) => {
 };
 const unreadBadgeText = computed(() => formatUnreadCount(unreadNotificationCount.value, isEmployeeUser.value ? 9 : 99));
 const unreadBadgeClass = computed(() => {
-    if (isEmployeeUser.value) {
-        const safeCount = Number.isFinite(unreadNotificationCount.value)
-            ? Math.max(0, Math.floor(unreadNotificationCount.value))
-            : 0;
-        const sizeClass = safeCount > 9 ? "w-6 px-1" : "w-5";
+    const safeCount = Number.isFinite(unreadNotificationCount.value)
+        ? Math.max(0, Math.floor(unreadNotificationCount.value))
+        : 0;
+    const sizeClass = safeCount > 9 ? "w-6 px-1" : "w-5";
 
-        return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-brand-primary text-[10px] font-bold leading-none text-white`;
-    }
-
-    return "absolute right-0 top-0 flex h-5 min-w-[1.75rem] -translate-y-1/2 translate-x-1/3 items-center justify-center rounded-full border-2 border-white bg-danger-500 px-1.5 text-[11px] font-bold leading-none tracking-tight text-white";
+    // Standardized red badge for all roles
+    return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-danger-500 text-[10px] font-bold leading-none text-white`;
 });
 const notificationButtonLabel = computed(() => {
     if (unreadNotificationCount.value > 0) {
@@ -439,7 +445,10 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <header class="page-header border-b border-brand-border px-4 sm:px-6 py-3.5 sm:py-4 transition-colors duration-200" style="background-color: var(--header-bg)">
+    <header
+        class="page-header border-b border-brand-border px-4 sm:px-6 py-3.5 sm:py-4 transition-colors duration-200"
+        style="background-color: var(--header-bg)"
+    >
         <div class="flex items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div class="min-w-0 flex items-start sm:items-center gap-3 sm:gap-4">
                 <button
@@ -536,7 +545,8 @@ onUnmounted(() => {
                         class="flex items-center gap-2 sm:gap-3 cursor-pointer"
                         @click="toggleAccountMenu"
                     >
-                        <img loading="eager"
+                        <img
+                            loading="eager"
                             :src="user?.profile_photo"
                             alt="User Avatar"
                             class="w-10 h-10 sm:w-12 sm:h-12 rounded-full object-cover"
