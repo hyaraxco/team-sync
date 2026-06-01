@@ -754,6 +754,14 @@ describe("TaskDetailModal - Permission Matrix", () => {
             );
             expect(wrapper.vm.canMutateEntityOwner(300)).toBe(true);
         });
+
+        it("returns false for HR owner because HR has task oversight only", () => {
+            const wrapper = factory(
+                makeTask({ status: "in_progress" }),
+                buildUser("hr", { employee_profile: { id: 400 } }),
+            );
+            expect(wrapper.vm.canMutateEntityOwner(400)).toBe(false);
+        });
     });
 
     // --- Integration: role + status matrix rendering ---

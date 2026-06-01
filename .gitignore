@@ -109,7 +109,6 @@ storage/tntsearch/
 # ====================
 # Misc
 # ====================
-.gitkeep
 *.tgz
 *.tar.gz
 *.zip
