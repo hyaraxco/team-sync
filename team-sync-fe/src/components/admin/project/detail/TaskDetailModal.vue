@@ -182,7 +182,7 @@ const canMutateEntityOwner = (ownerId) => {
         return false;
     }
 
-    return !hasRole("staff") || isOwnAssignedTask.value;
+    return can("project-edit") || (can("task-edit") && isOwnAssignedTask.value);
 };
 
 const formatDateTime = (value) => {

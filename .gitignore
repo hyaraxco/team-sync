@@ -91,6 +91,8 @@ storage/logs/*.log
 PI_SETUP_GUIDE.md
 benchmarks/
 .github/context-mode/content/
+docs/plans/on_going/
+session-ses_*.md
 
 # ====================
 # Search Indexes
@@ -107,6 +109,7 @@ storage/tntsearch/
 # ====================
 # Misc
 # ====================
+.gitkeep
 *.tgz
 *.tar.gz
 *.zip

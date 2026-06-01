@@ -7,6 +7,7 @@ import { useAuthStore } from "@/stores/auth";
 import { storeToRefs } from "pinia";
 import { useRoute } from "vue-router";
 import { useToast } from "@/composables/useToast";
+import { can } from "@/helpers/permissionHelper";
 import TaskCard from "./TaskCard.vue";
 import TaskDetailModal from "./TaskDetailModal.vue";
 import TaskCreateModal from "./TaskCreateModal.vue";
@@ -52,10 +53,6 @@ const showNotice = (message, type = "error") => {
     }, 2800);
 };
 
-const roleNames = computed(() => (authStore.user?.roles || []).map((role) => role.name || role));
-
-const hasRole = (role) => roleNames.value.includes(role);
-
 const currentEmployeeId = computed(() => authStore.user?.employee_profile?.id || authStore.user?.employeeProfile?.id);
 
 const normalizeStatus = (status) => (status === "pending" ? "todo" : status);
@@ -75,7 +72,7 @@ const canMoveTask = (task, targetStatus) => {
         return true;
     }
 
-    if (hasRole("manager") || hasRole("hr") || isProjectLeader(task)) {
+    if (can("project-edit") || isProjectLeader(task)) {
         const reviewerTransitions = {
             review: ["done", "rejected"],
             done: ["rejected"],
@@ -84,7 +81,7 @@ const canMoveTask = (task, targetStatus) => {
         return (reviewerTransitions[fromStatus] || []).includes(targetStatus);
     }
 
-    if (hasRole("staff") && isOwnAssignedTask(task)) {
+    if (can("task-edit") && isOwnAssignedTask(task)) {
         const employeeTransitions = {
             todo: ["in_progress"],
             in_progress: ["review"],
@@ -114,15 +111,15 @@ const getMoveDeniedReason = (task, targetStatus) => {
         return "Task is already in this status.";
     }
 
-    if (hasRole("staff") && !isOwnAssignedTask(task)) {
+    if (can("task-edit") && !isOwnAssignedTask(task)) {
         return "You can only move your own assigned tasks.";
     }
 
-    if (hasRole("staff")) {
+    if (can("task-edit")) {
         return "Invalid status transition for employee workflow.";
     }
 
-    if (hasRole("manager") || hasRole("hr") || isProjectLeader(task)) {
+    if (can("project-edit") || isProjectLeader(task)) {
         return "Invalid reviewer transition. Allowed: review -> done/rejected and done -> rejected.";
     }
 

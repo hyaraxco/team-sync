@@ -29,7 +29,7 @@ class ProjectTaskPolicy
      */
     public function view(User $user, ProjectTask $task): Response
     {
-        if ($this->isPrivilegedRole($user) || $user->hasRole('hr')) {
+        if ($this->canViewAllTasks($user)) {
             return Response::allow();
         }
 
@@ -362,6 +362,11 @@ class ProjectTaskPolicy
         // Manager and project leader have task CRUD authority. HR is read-only
         // (oversight role) and is intentionally excluded from privileged actions.
         return $user->hasRole('manager');
+    }
+
+    private function canViewAllTasks(User $user): bool
+    {
+        return $this->isPrivilegedRole($user) || $user->hasRole('hr');
     }
 
     private function hasFieldChanged(string $field, array $data, ProjectTask $task): bool
