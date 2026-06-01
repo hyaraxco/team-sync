@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, watch, shallowRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import { storeToRefs } from "pinia";
+import { can } from "@/helpers/permissionHelper";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
 import { useAuthStore } from "@/stores/auth";
 import MainCard from "@/components/common/MainCard.vue";
@@ -63,9 +64,6 @@ const tabs = [
     { id: "calibration", label: "Calibration", icon: ScaleIcon },
 ];
 
-// Role detection (matches existing pattern in TaskDetailModal.vue)
-const roleNames = computed(() => (authStore.user?.roles || []).map((role) => role.name || role));
-const hasRole = (role) => roleNames.value.includes(role);
 const currentEmployeeId = computed(() => authStore.user?.employee_profile?.id || authStore.user?.employeeProfile?.id);
 
 // Review data helpers
@@ -155,7 +153,7 @@ const canSubmitSelfAssessment = computed(() => {
 const canSubmitManagerAssessment = computed(() => {
     return (
         reviewStatus.value === "pending_manager" &&
-        (hasRole("manager") || hasRole("hr")) &&
+        can("review-manager-submit") &&
         currentEmployeeId.value === review.value?.reviewer_id
     );
 });
@@ -163,7 +161,7 @@ const canSubmitManagerAssessment = computed(() => {
 const canCalibrate = computed(() => {
     return (
         reviewStatus.value === "pending_calibration" &&
-        hasRole("hr") &&
+        can("review-calibrate") &&
         currentEmployeeId.value !== review.value?.staff_member_id
     );
 });
@@ -415,7 +413,7 @@ onMounted(async () => {
     }
 
     // Auto-fetch readiness data for Performance Data Summary card (HR/calibrator only)
-    if (["pending_calibration", "completed"].includes(currentReview.value?.status) && hasRole("hr")) {
+    if (["pending_calibration", "completed"].includes(currentReview.value?.status) && can("review-calibrate")) {
         reviewStore.fetchValidateReadiness(reviewId.value).catch(() => {});
     }
 });

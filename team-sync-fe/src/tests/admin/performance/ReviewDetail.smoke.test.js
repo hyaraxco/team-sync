@@ -77,6 +77,13 @@ vi.mock("@/stores/auth", () => ({
     useAuthStore: () => authStoreMock,
 }));
 
+vi.mock("@/helpers/permissionHelper", () => ({
+    can: (permission) => {
+        const permissions = authStoreMock.user?.permissions || [];
+        return permissions.includes(permission);
+    },
+}));
+
 vi.mock("vue-router", () => ({
     useRoute: () => routeState,
     useRouter: () => ({
@@ -173,6 +180,11 @@ describe("ReviewDetail smoke", () => {
         reviewStoreMock.fetchActiveSections.mockResolvedValue(undefined);
         reviewStoreMock.fetchCalibrationContext.mockResolvedValue(undefined);
         reviewStoreMock.fetchValidateReadiness.mockResolvedValue(undefined);
+        authStoreMock.user = {
+            roles: [{ name: "staff" }],
+            employee_profile: { id: 10 },
+            permissions: ["performance-menu"],
+        };
     });
 
     it("renders without crashing", () => {
@@ -205,6 +217,7 @@ describe("ReviewDetail smoke", () => {
             authStoreMock.user = {
                 roles: [{ name: "hr" }],
                 employee_profile: { id: 10 },
+                permissions: ["performance-menu", "review-calibrate"],
             };
             reviewStoreRefs.currentReview.value = {
                 id: 55,
@@ -229,6 +242,7 @@ describe("ReviewDetail smoke", () => {
             authStoreMock.user = {
                 roles: [{ name: "hr" }],
                 employee_profile: { id: 99 },
+                permissions: ["performance-menu", "review-calibrate"],
             };
             reviewStoreRefs.currentReview.value = {
                 id: 55,

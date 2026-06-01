@@ -702,6 +702,7 @@ describe("TaskDetailModal - Permission Matrix", () => {
             const wrapper = factory(makeTask({ status: "in_progress", assignee_id: 100 }), {
                 employee_profile: { id: 100 },
                 roles: [{ name: "staff" }],
+                permissions: ["task-edit", "task-list"],
             });
             expect(wrapper.vm.canMutateEntityOwner(100)).toBe(true);
         });
