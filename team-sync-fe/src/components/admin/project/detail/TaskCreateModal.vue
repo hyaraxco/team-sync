@@ -65,7 +65,7 @@ watch(
             due_date: "",
             project_id: props.projectId,
         };
-        loadMembers();
+        loadMembers().catch(() => {});
     },
     { immediate: true },
 );
