@@ -1,10 +1,24 @@
 import { expect, type Page } from "@playwright/test";
 
+const password = process.env.E2E_PASSWORD || "teamsync";
+
 export const roleCredentials = {
-  manager: { email: "yudhis@teamsync.com", password: "REDACTED" },
-  hr: { email: "tasyia@teamsync.com", password: "REDACTED" },
-  finance: { email: "dwimeta@teamsync.com", password: "REDACTED" },
-  employee: { email: "agung@teamsync.com", password: "REDACTED" },
+  manager: {
+    email: process.env.E2E_MANAGER_EMAIL || "yudhis@teamsync.com",
+    password,
+  },
+  hr: {
+    email: process.env.E2E_HR_EMAIL || "tasyia@teamsync.com",
+    password,
+  },
+  finance: {
+    email: process.env.E2E_FINANCE_EMAIL || "dwimeta@teamsync.com",
+    password,
+  },
+  employee: {
+    email: process.env.E2E_EMPLOYEE_EMAIL || "agung@teamsync.com",
+    password,
+  },
 } as const;
 
 export type RoleName = keyof typeof roleCredentials;

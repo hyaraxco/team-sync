@@ -32,7 +32,7 @@ class StaffMemberProfileEducationSeniorityTest extends TestCase
         $payload = [
             'name' => 'Education Candidate',
             'email' => 'education.candidate@teamsync.com',
-            'password' => 'REDACTED',
+            'password' => env('TEST_STAFF_PASSWORD', 'teamsync123'),
             'roles' => ['staff'],
             'identity_number' => '9988776655443322',
             'phone' => '081299887766',
@@ -148,7 +148,7 @@ class StaffMemberProfileEducationSeniorityTest extends TestCase
         $response = $this->postJson('/api/v1/staff-members', [
             'name' => 'Invalid Candidate',
             'email' => 'invalid.education@teamsync.com',
-            'password' => 'REDACTED',
+            'password' => env('TEST_STAFF_PASSWORD', 'teamsync123'),
             'roles' => ['staff'],
             'identity_number' => '1122334455667788',
             'phone' => '081200000001',
