@@ -225,7 +225,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <h1 class="text-2xl font-semibold text-brand-dark mb-6">{{ project.name || 'Project Detail' }}</h1>
+    <h1 class="text-2xl font-semibold text-brand-dark mb-6">{{ project.name || "Project Detail" }}</h1>
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between mb-6">
@@ -276,11 +276,14 @@ onMounted(async () => {
 
                 <div>
                     <h3 class="text-base font-semibold text-brand-dark mb-3">Assigned Teams</h3>
-                    <EmptyState
+                    <div
                         v-if="!project.teams || project.teams.length === 0"
-                        icon="Briefcase"
-                        title="Belum ada tim"
-                    />
+                        class="flex flex-col items-center justify-center py-12 text-gray-400"
+                    >
+                        <Users class="h-12 w-12 mb-4 opacity-50" />
+                        <p class="text-lg font-medium mb-2">No teams added yet</p>
+                        <p class="text-sm mb-4">Add teams to collaborate on this project.</p>
+                    </div>
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div
                             v-for="team in project.teams"
@@ -291,9 +294,7 @@ onMounted(async () => {
                                 <div
                                     class="w-12 h-12 relative flex items-center justify-center rounded-xl overflow-hidden flex-shrink-0"
                                 >
-                                    <div
-                                        class="w-full h-full absolute bg-brand-primary rounded-xl"
-                                    ></div>
+                                    <div class="w-full h-full absolute bg-brand-primary rounded-xl"></div>
                                     <component :is="Briefcase" class="w-5 h-5 text-white relative z-10" />
                                 </div>
                                 <div class="flex-1">
@@ -309,7 +310,8 @@ onMounted(async () => {
 
                             <div class="mt-4 pt-4 border-t border-brand-border">
                                 <div v-if="team.leader" class="flex items-center gap-3">
-                                    <img loading="lazy"
+                                    <img
+                                        loading="lazy"
                                         :src="team.leader.profile_photo || DEFAULT_AVATAR"
                                         :alt="team.leader.name"
                                         class="w-9 h-9 rounded-full object-cover"
@@ -344,7 +346,8 @@ onMounted(async () => {
                 </div>
 
                 <div v-if="project.leader" class="flex items-center gap-4">
-                    <img loading="lazy"
+                    <img
+                        loading="lazy"
                         :src="project.leader?.user?.profile_photo || DEFAULT_AVATAR"
                         :alt="project.leader?.user?.name"
                         class="w-16 h-16 rounded-full object-cover"
@@ -616,10 +619,7 @@ onMounted(async () => {
                 <div class="h-16 rounded-xl bg-gray-100"></div>
             </div>
 
-            <div
-                v-else-if="filteredEligibleLeaders.length === 0"
-                class="py-8 text-center"
-            >
+            <div v-else-if="filteredEligibleLeaders.length === 0" class="py-8 text-center">
                 <SearchX class="w-10 h-10 text-gray-400 mx-auto mb-2" />
                 <p class="text-sm text-brand-light">No eligible staff members found</p>
             </div>
