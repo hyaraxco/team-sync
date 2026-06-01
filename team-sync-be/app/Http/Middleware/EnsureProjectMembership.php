@@ -25,7 +25,7 @@ class EnsureProjectMembership
             return ResponseHelper::jsonResponse(false, 'Unauthorized', null, 401);
         }
 
-        if (! $user->hasRole('staff')) {
+        if ($user->hasAnyRole(['manager', 'hr', 'superadmin'])) {
             return $next($request);
         }
 

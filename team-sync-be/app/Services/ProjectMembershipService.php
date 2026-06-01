@@ -103,9 +103,21 @@ class ProjectMembershipService
 
         if (! empty($projectTeamIds)) {
             $query->where(function ($q) use ($projectTeamIds, $project) {
+                // Check team_members pivot
                 $q->whereHas('teamMembers', function ($qq) use ($projectTeamIds) {
                     $qq->whereIn('team_id', $projectTeamIds)
                         ->whereNull('left_at');
+                });
+
+                // Also check jobInformation.team_id (for members not in pivot),
+                // but exclude those who explicitly left via team_members.left_at
+                $q->orWhere(function ($subQ) use ($projectTeamIds) {
+                    $subQ->whereHas('jobInformation', function ($qq) use ($projectTeamIds) {
+                        $qq->whereIn('team_id', $projectTeamIds);
+                    })->whereDoesntHave('teamMembers', function ($qq) use ($projectTeamIds) {
+                        $qq->whereIn('team_id', $projectTeamIds)
+                            ->whereNotNull('left_at');
+                    });
                 });
 
                 if ($project->project_leader_id) {
