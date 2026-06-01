@@ -39,13 +39,12 @@ class LeaveBalanceService
      */
     public function getEmployeeBalances(int $employeeId, ?string $asOfDate = null): Collection
     {
-        $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);
+        $employee = $this->loadEmployee($employeeId);
         if (! $employee) {
             return collect();
         }
 
-        $employmentType = $employee->jobInformation?->employment_type ?? '';
-        $employmentType = AttendanceHelper::normalizeEmploymentType($employmentType);
+        $employmentType = $this->resolveEmploymentType($employee);
 
         $entitlements = LeaveEntitlement::where('employment_type', $employmentType)
             ->where('is_eligible', true)
@@ -94,12 +93,12 @@ class LeaveBalanceService
      */
     public function getUpcomingCollectiveLeave(int $employeeId): Collection
     {
-        $employee = StaffMemberProfile::with('jobInformation')->find($employeeId);
+        $employee = $this->loadEmployee($employeeId);
         if (! $employee) {
             return collect();
         }
 
-        $employmentType = AttendanceHelper::normalizeEmploymentType($employee->jobInformation?->employment_type ?? 'full_time');
+        $employmentType = $this->resolveEmploymentType($employee, 'full_time');
 
         return HolidayCalendar::query()
             ->where('type', 'collective_leave')
@@ -112,5 +111,17 @@ class LeaveBalanceService
 
                 return $appliesTo === null || in_array($employmentType, $appliesTo, true);
             });
+    }
+
+    private function loadEmployee(int $employeeId): ?StaffMemberProfile
+    {
+        return StaffMemberProfile::with('jobInformation')->find($employeeId);
+    }
+
+    private function resolveEmploymentType(StaffMemberProfile $employee, string $default = ''): string
+    {
+        return AttendanceHelper::normalizeEmploymentType(
+            $employee->jobInformation?->employment_type ?? $default
+        );
     }
 }
