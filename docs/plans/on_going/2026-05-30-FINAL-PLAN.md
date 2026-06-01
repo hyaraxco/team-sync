@@ -1,13 +1,13 @@
 # Project & Task Permission Overhaul — MASTER PLAN
 
 > **Date:** 2026-05-30
-> **Status:** Phases 1-2 COMPLETED, Phases 3-4 PENDING
+> **Status:** Phases 1-3 COMPLETED, Phase 4 PENDING
 > **Confidence:** 99%
 >
 > ## Phase Status
 > - **Phase 1 — Backend Permissions:** ✅ COMPLETED — shipped via PR [#62](https://github.com/hyaraxco/team-sync/pull/62) (+ prerequisite [#63](https://github.com/hyaraxco/team-sync/pull/63)). Plan archived at `docs/plans/archive/2026-05-30-backend-permissions.md`.
 > - **Phase 2 — Frontend Permissions:** ✅ COMPLETED — shipped via PR [#65](https://github.com/hyaraxco/team-sync/pull/65) (ProjectDetail, TaskBoard, TaskDetailModal Phase 2 gates) + PR [#67](https://github.com/hyaraxco/team-sync/pull/67) (canReviewTask/canCollaborateTask migration + 29 test cases). Plans archived at `docs/plans/archive/2026-05-30-frontend-permissions.md` and `docs/plans/archive/2026-05-31-task-detail-modal-test-coverage.md`.
-> - **Phase 3 — Task Create Form:** ⏳ Pending
+> - **Phase 3 — Task Create Form:** ✅ COMPLETED — shipped via PR [#70](https://github.com/hyaraxco/team-sync/pull/70) (auto-status, assignee dropdown, race-condition fixes, loading/error tests). Plan archived at `docs/plans/archive/2026-05-30-task-create-form.md`.
 > - **Phase 4 — UI Fixes:** ⏳ Pending
 
 ---
