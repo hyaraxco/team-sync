@@ -19,6 +19,7 @@ export const useProjectStore = defineStore("project", {
         loading: false,
         loadingSummary: false,
         loadingStatistics: false,
+        loadingMembers: false,
         error: null,
         success: null,
     }),
@@ -198,6 +199,25 @@ export const useProjectStore = defineStore("project", {
             } catch (error) {
                 this.error = handleError(error);
                 throw error;
+            }
+        },
+
+        async fetchProjectMembers(projectId) {
+            this.loadingMembers = true;
+            this.error = null;
+
+            try {
+                const response = await axiosInstance.get(`projects/${projectId}/members`);
+
+                return response.data?.data || [];
+            } catch (error) {
+                if (error.response?.status !== 403) {
+                    this.error = handleError(error);
+                }
+
+                return [];
+            } finally {
+                this.loadingMembers = false;
             }
         },
 
