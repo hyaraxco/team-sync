@@ -1,10 +1,11 @@
 <script setup>
-import { ref, watch, computed } from "vue";
+import { ref, watch } from "vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 import { useToast } from "@/composables/useToast";
-import { useAuthStore } from "@/stores/auth";
+import { useProjectStore } from "@/stores/project";
 
 const toast = useToast();
+const projectStore = useProjectStore();
 
 const props = defineProps({
     isOpen: {
@@ -19,36 +20,42 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "created"]);
 
-const authStore = useAuthStore();
-
-const roleNames = computed(() => (authStore.user?.roles || []).map((role) => role.name || role));
-
-const isPureStaff = computed(
-    () => roleNames.value.includes("staff") && !roleNames.value.includes("manager") && !roleNames.value.includes("hr"),
-);
-
-const availableStatuses = computed(() => {
-    if (isPureStaff.value) {
-        return [{ value: "todo", label: "To Do" }];
-    }
-    return [
-        { value: "todo", label: "To Do" },
-        { value: "in_progress", label: "In Progress" },
-        { value: "review", label: "Review" },
-        { value: "done", label: "Done" },
-    ];
-});
+const projectMembers = ref([]);
+const loadingMembers = ref(false);
 
 const formData = ref({
     name: "",
     description: "",
     priority: "medium",
     status: "todo",
+    assignee_id: null,
     due_date: "",
     project_id: props.projectId,
 });
 
 const isSubmitting = ref(false);
+
+const loadMembers = async () => {
+    if (!props.projectId) return;
+    loadingMembers.value = true;
+    try {
+        const members = await projectStore.fetchProjectMembers(props.projectId);
+        projectMembers.value = Array.isArray(members) ? members : [];
+    } finally {
+        loadingMembers.value = false;
+    }
+};
+
+// Fetch members when modal opens
+watch(
+    () => props.isOpen,
+    (isOpen) => {
+        if (isOpen) {
+            loadMembers();
+        }
+    },
+    { immediate: true },
+);
 
 // Reset form when modal opens
 watch(
@@ -60,12 +67,17 @@ watch(
                 description: "",
                 priority: "medium",
                 status: "todo",
+                assignee_id: null,
                 due_date: "",
                 project_id: props.projectId,
             };
         }
     },
 );
+
+const memberDisplayName = (member) => {
+    return member?.user?.name || member?.code || `Member #${member?.id}`;
+};
 
 const closeModal = () => {
     emit("close");
@@ -80,7 +92,11 @@ const handleSubmit = async () => {
     isSubmitting.value = true;
 
     try {
-        emit("created", { ...formData.value });
+        const payload = { ...formData.value };
+        if (!payload.assignee_id) {
+            payload.assignee_id = null;
+        }
+        emit("created", payload);
         closeModal();
     } catch (error) {
         toast.error("Failed to create task. Please try again.");
@@ -123,8 +139,11 @@ const handleSubmit = async () => {
             <div class="grid grid-cols-2 gap-4">
                 <!-- Priority -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Priority</label>
+                    <label for="task-priority" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Priority
+                    </label>
                     <select
+                        id="task-priority"
                         v-model="formData.priority"
                         class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
                     >
@@ -135,18 +154,44 @@ const handleSubmit = async () => {
                     </select>
                 </div>
 
-                <!-- Status -->
+                <!-- Status (read-only) -->
                 <div>
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Status</label>
-                    <select
-                        v-model="formData.status"
-                        class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all"
-                    >
-                        <option v-for="status in availableStatuses" :key="status.value" :value="status.value">
-                            {{ status.label }}
-                        </option>
-                    </select>
+                    <span class="block text-sm font-semibold text-gray-700 mb-2">Status</span>
+                    <div class="flex items-center h-[50px] px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                        <span class="px-2 py-1 bg-gray-100 rounded text-sm text-gray-700 font-medium">To Do</span>
+                        <span class="ml-2 text-xs text-gray-500">(set automatically)</span>
+                    </div>
                 </div>
+            </div>
+
+            <!-- Assignee (optional) -->
+            <div>
+                <label for="task-assignee" class="block text-sm font-semibold text-gray-700 mb-2">
+                    Assign To
+                    <span class="text-xs text-gray-500 font-normal">(optional)</span>
+                </label>
+                <select
+                    id="task-assignee"
+                    v-model="formData.assignee_id"
+                    :disabled="loadingMembers"
+                    class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:border-brand-primary focus:ring-2 focus:ring-brand-primary focus:ring-opacity-20 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                    <option :value="null">Unassigned</option>
+                    <option v-if="loadingMembers" disabled value="">Loading members...</option>
+                    <option
+                        v-for="member in projectMembers"
+                        :key="member.id"
+                        :value="member.id"
+                    >
+                        {{ memberDisplayName(member) }}
+                    </option>
+                </select>
+                <p
+                    v-if="!loadingMembers && projectMembers.length === 0"
+                    class="text-sm text-gray-500 mt-2"
+                >
+                    No team members available. Add teams to the project first.
+                </p>
             </div>
 
             <!-- Due Date -->
