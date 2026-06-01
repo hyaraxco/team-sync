@@ -33,46 +33,41 @@ const formData = ref({
     project_id: props.projectId,
 });
 
-const isSubmitting = ref(false);
+// Increments on every open; stale fetch responses are dropped via this id.
+let loadRequestId = 0;
 
 const loadMembers = async () => {
+    const requestId = ++loadRequestId;
     if (!props.projectId) return;
     loadingMembers.value = true;
     try {
         const members = await projectStore.fetchProjectMembers(props.projectId);
+        if (requestId !== loadRequestId) return; // Stale: a newer open superseded us
         projectMembers.value = Array.isArray(members) ? members : [];
     } finally {
-        loadingMembers.value = false;
+        if (requestId === loadRequestId) {
+            loadingMembers.value = false;
+        }
     }
 };
 
-// Fetch members when modal opens
+// Single watcher: on every open, reset the form and refetch members.
 watch(
     () => props.isOpen,
     (isOpen) => {
-        if (isOpen) {
-            loadMembers();
-        }
+        if (!isOpen) return;
+        formData.value = {
+            name: "",
+            description: "",
+            priority: "medium",
+            status: "todo",
+            assignee_id: null,
+            due_date: "",
+            project_id: props.projectId,
+        };
+        loadMembers().catch(() => {});
     },
     { immediate: true },
-);
-
-// Reset form when modal opens
-watch(
-    () => props.isOpen,
-    (isOpen) => {
-        if (isOpen) {
-            formData.value = {
-                name: "",
-                description: "",
-                priority: "medium",
-                status: "todo",
-                assignee_id: null,
-                due_date: "",
-                project_id: props.projectId,
-            };
-        }
-    },
 );
 
 const memberDisplayName = (member) => {
@@ -83,26 +78,13 @@ const closeModal = () => {
     emit("close");
 };
 
-const handleSubmit = async () => {
+const handleSubmit = () => {
     if (!formData.value.name) {
         toast.warning("Validation Error", "Please enter task name");
         return;
     }
-
-    isSubmitting.value = true;
-
-    try {
-        const payload = { ...formData.value };
-        if (!payload.assignee_id) {
-            payload.assignee_id = null;
-        }
-        emit("created", payload);
-        closeModal();
-    } catch (error) {
-        toast.error("Failed to create task. Please try again.");
-    } finally {
-        isSubmitting.value = false;
-    }
+    emit("created", { ...formData.value });
+    closeModal();
 };
 </script>
 
@@ -218,10 +200,9 @@ const handleSubmit = async () => {
                 <button
                     type="button"
                     @click="handleSubmit"
-                    :disabled="isSubmitting"
-                    class="px-6 py-3 bg-brand-primary hover:bg-primary-800 text-white rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-6 py-3 bg-brand-primary hover:bg-primary-800 text-white rounded-lg transition-colors font-medium"
                 >
-                    {{ isSubmitting ? "Creating..." : "Create Task" }}
+                    Create Task
                 </button>
             </div>
         </template>
