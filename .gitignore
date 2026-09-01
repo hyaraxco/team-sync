@@ -114,3 +114,10 @@ storage/tntsearch/
 *.zip
 *.local
 /package-lock.json
+
+# ====================
+# Local Dev Tooling (machine-specific helpers)
+# ====================
+/start-backend.bat
+/run-strix.bat
+/strix_runs/
