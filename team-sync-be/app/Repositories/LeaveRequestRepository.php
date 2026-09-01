@@ -188,6 +188,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             }
 
             $this->ensurePending($leaveRequest);
+            $this->ensureNotSelfApproval($leaveRequest, (int) $approverProfileId);
             $this->ensureEntitlementIsValid($leaveRequest);
 
             $data = [
@@ -225,6 +226,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
             }
 
             $this->ensurePending($leaveRequest);
+            $this->ensureNotSelfApproval($leaveRequest, (int) $approverProfileId);
 
             $data = [
                 'status' => 'rejected',
@@ -279,6 +281,7 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
 
                     $this->authorizeManagerScope($leaveRequest);
                     $this->ensurePending($leaveRequest);
+                    $this->ensureNotSelfApproval($leaveRequest, (int) $approverProfileId);
 
                     $isApproveAction = $action === 'approve';
 
@@ -557,6 +560,17 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
     {
         if ($this->leaveStatusValue($leaveRequest) !== 'pending') {
             throw new \Exception('Only pending leave requests can be approved or rejected.');
+        }
+    }
+
+    /**
+     * Enforce separation of duties: an approver cannot approve/reject their
+     * own leave request, regardless of role (manager, HR, or superadmin).
+     */
+    private function ensureNotSelfApproval(LeaveRequest $leaveRequest, int $approverProfileId): void
+    {
+        if ((int) $leaveRequest->staff_member_id === $approverProfileId) {
+            throw new AuthorizationException('You cannot approve or reject your own leave request.');
         }
     }
 

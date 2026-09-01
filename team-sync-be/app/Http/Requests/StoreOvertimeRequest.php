@@ -5,9 +5,29 @@ namespace App\Http\Requests;
 use App\Models\Attendance;
 use App\Models\OvertimeRecord;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Auth;
 
 class StoreOvertimeRequest extends FormRequest
 {
+    /**
+     * Prevent an IDOR where a self-service (staff) caller could pass an
+     * arbitrary `staff_member_id` and create overtime on behalf of another
+     * employee.
+     *
+     * Privileged roles (manager, HR, superadmin) legitimately create overtime
+     * for other employees, so they keep the ability to supply the id.
+     */
+    public function prepareForValidation(): void
+    {
+        $user = Auth::user();
+
+        if ($user && $user->hasRole('staff')) {
+            $this->merge([
+                'staff_member_id' => $user->staffMemberProfile?->id,
+            ]);
+        }
+    }
+
     public function rules(): array
     {
         return [

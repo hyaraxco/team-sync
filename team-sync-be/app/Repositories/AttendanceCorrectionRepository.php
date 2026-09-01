@@ -140,6 +140,8 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
                 throw new \Exception('This request has already been processed.');
             }
 
+            $this->ensureNotSelfApproval($correction);
+
             $attendance = $correction->attendance;
 
             if ($attendance->attendancePeriod && $attendance->attendancePeriod->status === 'locked') {
@@ -198,6 +200,8 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
                 throw new \Exception('This request has already been processed.');
             }
 
+            $this->ensureNotSelfApproval($correction);
+
             $correction->update([
                 'status' => 'rejected',
                 'reviewed_by' => Auth::id(),
@@ -210,5 +214,18 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
             return $correction;
         });
+    }
+
+    /**
+     * Enforce separation of duties: a reviewer cannot approve/reject their own
+     * correction request, regardless of role (staff, manager, HR, superadmin).
+     */
+    private function ensureNotSelfApproval(AttendanceCorrection $correction): void
+    {
+        $actorProfileId = Auth::user()?->staffMemberProfile?->id;
+
+        if ($actorProfileId && (int) $correction->staff_member_id === (int) $actorProfileId) {
+            throw new AuthorizationException('You cannot approve or reject your own correction request.');
+        }
     }
 }
