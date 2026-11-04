@@ -1,5 +1,10 @@
 # enowxai Review UX Design
 
+> **Status: HISTORICAL / NOT ACTIVE** — Diarsipkan pada 2026-11-04. Workflow
+> `.github/workflows/ai-review.yml` dan ruleset enowxai yang dibahas di sini
+> tidak ada pada checkout saat cleanup. Dokumen ini menyimpan usulan desain,
+> bukan bukti implementasi atau konfigurasi CI yang aktif.
+
 **Goal:** Upgrade the existing `ai-review.yml` workflow so enowxai becomes a practical AI reviewer that posts one durable PR summary comment plus inline PR comments for every mapped finding, using a repo-owned review rules file instead of a hardcoded prompt-only setup.
 
 ## Current State

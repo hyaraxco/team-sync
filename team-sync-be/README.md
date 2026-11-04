@@ -1,87 +1,68 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Team Sync Backend
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Laravel 12 API untuk Team Sync HRIS. PHP 8.2+, Composer, MySQL, Redis,
+dan Meilisearch sesuai konfigurasi `.env`. API aplikasi berada di `/api/v1`.
 
-## Local Queue Worker and Scheduler
+## Setup Lokal
 
-Notification delivery uses queued jobs (`QUEUE_CONNECTION=database`).
-If no queue worker is running, `/api/v1/my-notifications` can appear empty even when notification emitters are called.
-
-Meeting notifications use a dedicated `meetings` queue:
-
-- Creating a meeting dispatches `BroadcastMeetingJob` on `meetings` for scheduled notifications.
-- `meetings:send-reminders` is scheduled every minute and dispatches reminder jobs on `meetings` for meetings starting in 15 minutes.
-- Run the Laravel scheduler (`schedule:work` locally, or a production cron that runs `schedule:run` every minute) so reminder jobs are enqueued.
-
-For Docker local development:
+Jalankan dari `team-sync-be/`:
 
 ```bash
-docker compose up -d queue scheduler
+composer install
+cp .env.example .env
+# Sesuaikan database dan layanan lokal sebelum migrasi.
+php artisan key:generate
+php artisan migrate
+php artisan storage:link
+bun install
+composer dev
 ```
 
-For non-Docker local development:
+`composer dev` memerlukan Node/Bun dan menjalankan API server, queue listener
+`default,meetings`, scheduler, logs, serta Vite **milik backend**. Vue SPA di
+`../team-sync-fe/` tetap dijalankan terpisah; lihat [Frontend README](../team-sync-fe/README.md).
+Seeder hanya dijalankan pada database development/test yang memang disiapkan
+untuk data contoh, bukan pada database produksi.
+
+## Queue dan Scheduler
+
+Notifikasi memakai queued jobs (`QUEUE_CONNECTION=database`). Tanpa worker,
+`/api/v1/my-notifications` dapat terlihat kosong walaupun emitter sudah dipanggil.
+
+- Pembuatan meeting mengantrekan `BroadcastMeetingJob` pada queue `meetings`.
+- `meetings:send-reminders` dijadwalkan setiap menit untuk meeting yang dimulai
+  dalam 15 menit; scheduler diperlukan agar reminder masuk antrean.
+- Di production, jalankan worker di bawah process supervisor dan scheduler
+  melalui cron `schedule:run` setiap menit.
+
+Alternatif manual, masing-masing di terminal terpisah (tidak perlu jika sudah
+memakai `composer dev`):
 
 ```bash
+php artisan serve
 php artisan queue:work --queue=default,meetings --tries=3 --timeout=600
 php artisan schedule:work
 ```
 
-The `composer dev` script starts the API server, `default,meetings` queue listener, scheduler, logs, and Vite together.
+Konfigurasi Docker dapat berbeda menurut checkout lokal. Periksa service yang
+tersedia dengan `docker compose config --services` sebelum menyalakan worker;
+jangan mengasumsikan service `queue` dan `scheduler` selalu tersedia.
 
-## About Laravel
+## Pengujian dan Formatting
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+```bash
+composer test
+./vendor/bin/pint --test
+```
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+`composer test` membersihkan config sebelum menjalankan Pest. Jumlah tes di
+arsip adalah catatan historis, bukan hasil pengujian checkout saat ini.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Dokumentasi Terkait
 
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- [Aturan backend dan struktur layer](AGENTS.md)
+- [Indeks dokumentasi](../docs/README.md)
+- [Integrasi BE–FE](../docs/references/be-fe-integration-patterns.md)
+- [Payroll dan QA](../docs/references/payroll.md)
+- [Panduan attendance](../docs/references/attendance.md)
+- [Security policy proyek](../SECURITY.md)

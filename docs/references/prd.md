@@ -270,6 +270,9 @@ GET /api/v1/performance/cycles/{cycleId}/topsis-ranking
 
 ## 6. Current Status
 
+> Snapshot dari pembaruan PRD terakhir (2026-05-21), bukan release sign-off
+> terbaru. Hasil pengujian dan status merge harus diverifikasi terpisah.
+
 ### Completed
 - [x] Core HRIS features (staff, attendance, teams)
 - [x] Payroll system dengan BPJS dan PPh 21 (TER 2024 + Desember annualized)
@@ -290,12 +293,12 @@ GET /api/v1/performance/cycles/{cycleId}/topsis-ranking
 - [x] Optimistic locking for payroll detail edits (ConcurrentModificationException + HTTP 409)
 - [x] License system (basic)
 
-### In Progress
-- [ ] Sample data seeding UI for onboarding wizard (`docs/plans/future/onboarding-enhancements.md`)
-- [ ] Quick tour component for first-time users (`docs/plans/future/onboarding-enhancements.md`)
+### Future / Not Scheduled
+- [ ] Sample data seeding UI for onboarding wizard ([plan](../plans/future/onboarding-enhancements.md))
+- [ ] Quick tour component for first-time users ([plan](../plans/future/onboarding-enhancements.md))
 
 ### Future Plans
-See `docs/plans/future_plan.md` for:
+See the [future plans index](../plans/future/README.md) for:
 - SaaS pricing & business model
 - Multi-instance hosting architecture
 - Payment gateway integration

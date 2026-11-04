@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { ref } from "vue";
 
@@ -207,7 +207,14 @@ describe("MyAttendance - Leave Request Validation", () => {
         routerReplace.mockClear();
     });
 
-    it("rejects leave request when end date is before start date", async () => {
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it("rejects reversed future dates and accepts the corrected range", async () => {
+        vi.useFakeTimers({ toFake: ["Date"] });
+        vi.setSystemTime(new Date("2026-06-01T12:00:00Z"));
+
         const wrapper = factory();
         await flushPromises();
         await wrapper.vm.$nextTick();
@@ -226,7 +233,15 @@ describe("MyAttendance - Leave Request Validation", () => {
         await flushPromises();
 
         expect(createLeaveRequest).not.toHaveBeenCalled();
-        expect(toastWarningFn).toHaveBeenCalledWith("Invalid Date", "End date must be after start date.");
+
+        wrapper.vm.leaveForm.end_date = "2026-06-11";
+        await wrapper.vm.submitLeaveRequest();
+        await flushPromises();
+
+        expect(createLeaveRequest).toHaveBeenCalledTimes(1);
+        expect(wrapper.vm.showLeaveRequestModal).toBe(false);
+        expect(wrapper.vm.showSuccessModal).toBe(true);
+        wrapper.unmount();
     });
 
     it("rejects sick leave without proof file", async () => {

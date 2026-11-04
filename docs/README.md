@@ -1,72 +1,69 @@
-# Team Sync Docs
+# Team Sync Documentation
 
-Dokumentasi proyek disederhanakan menjadi tiga area: plans, testing, dan references.
-Project context untuk AI agents ada di root `AGENTS.md`.
+Titik masuk dokumentasi FE, BE, domain, pengujian, dan riwayat pengembangan.
+Panduan penggunaan/development dipisahkan dari rencana historis agar arsip
+tidak terbaca sebagai daftar pekerjaan atau kontrak aplikasi terbaru.
 
-## Struktur
+## Mulai di Sini
+
+| Kebutuhan | Dokumen |
+|---|---|
+| Setup proyek | [README root](../README.md) |
+| Backend: setup dan perintah | [Backend README](../team-sync-be/README.md) |
+| Frontend: setup dan perintah | [Frontend README](../team-sync-fe/README.md) |
+| Aturan kontribusi / agent | [Root](../AGENTS.md), [BE](../team-sync-be/AGENTS.md), [FE](../team-sync-fe/AGENTS.md) |
+| Desain antarmuka frontend | [Design system](../team-sync-fe/docs/design-system.md) |
+| Kebutuhan produk | [PRD](references/prd.md) — baseline historis, bukan release sign-off |
+
+## Panduan Domain dan Integrasi
+
+| Area | Dokumen |
+|---|---|
+| Kehadiran | [Attendance](references/attendance.md) |
+| Payroll | [Payroll](references/payroll.md) |
+| Employee self-service | [Employee](references/employee.md) |
+| Integrasi BE–FE | [Patterns](references/be-fe-integration-patterns.md), [quick reference](references/be-fe-integration-summary.md) |
+| Authorization | [Patterns dan anti-patterns](references/authorization-leak-or-grouped-middleware.md) |
+
+## Pengujian
+
+| Dokumen | Penggunaan |
+|---|---|
+| [Frontend E2E](../team-sync-fe/e2e/README.md) | Setup dan eksekusi Playwright |
+| [Manual QA](testing/fe/manual-testing-guide.md) | Checklist per role |
+| [Payroll role QA](testing/be/payroll-role-e2e-qa.md) | Skenario payroll dan permission |
+| [RBAC audit 2026-04-21](testing/be/2026-04-21-rbac-e2e-audit.md) | Bukti audit historis; bukan hasil pengujian terbaru |
+
+## Plans dan Riwayat
+
+- **Aktif / belum ditutup:** `plans/on_going/`. Folder ini saat ini di-ignore
+  oleh Git; isinya lokal dan dapat berbeda antar-checkout.
+  Saat cleanup 2026-11-04 terdapat permission-gate cleanup (implementasi/tes
+  tercatat, penutupan PR/CI belum diverifikasi) dan Strix CI (workflow tidak
+  ada di checkout; perlu rekonsiliasi). Tidak dinyatakan selesai otomatis.
+- **Belum dijadwalkan:** [Future plans](plans/future/README.md).
+- **Historis / superseded:** [Archive](plans/archive/README.md).
+  Keberadaan dokumen di arsip **bukan bukti semua checklist sudah selesai**.
+- **Kolaborasi agent:** [Party mode](party-mode.md).
+
+## Penempatan Dokumen
 
 ```text
 docs/
-├── plans/
-│   ├── on_going/       # Spec/plan/backlog yang masih aktif atau belum ditutup
-│   └── archive/        # Plan/desain historis yang sudah selesai/superseded
-├── testing/
-│   ├── be/             # Backend/RBAC/role QA runbooks
-│   └── fe/             # Frontend/manual QA artifacts
-├── references/         # Domain guides & technical references
-└── README.md           # File ini
+├── references/          # Panduan domain dan integrasi lintas FE/BE
+├── testing/be/          # Runbook dan bukti QA backend
+├── testing/fe/          # Runbook dan bukti QA frontend
+├── deployment/         # Contoh konfigurasi deployment
+└── plans/
+    ├── on_going/       # Plan lokal aktif / belum ditutup
+    ├── future/         # Usulan belum dijadwalkan
+    └── archive/        # Desain, audit, dan plan historis
 ```
 
-## Source of Truth Aktif
-
-| Area | File | Status |
-|---|---|---|
-| Project context for agents | [../AGENTS.md](../AGENTS.md) | Context aktif (root) |
-| Payroll domain guide | [references/payroll.md](references/payroll.md) | Guide aktif |
-| Attendance domain guide | [references/attendance.md](references/attendance.md) | Guide aktif |
-| Employee self-service guide | [references/employee.md](references/employee.md) | Guide aktif |
-
-## Plans
-
-### On-Going
-
-Kosong — semua plan sudah selesai dan di-archive.
-
-### Archive
-
-Folder [plans/archive/](plans/archive/) menyimpan dokumen selesai, superseded, atau historis. Pakai sebagai referensi konteks, bukan kontrak implementasi terbaru.
-
-| File | Completed |
-|---|---|
-| [2026-05-10-security-hardening.md](plans/archive/2026-05-10-security-hardening.md) | 2026-05-10 — 6 security fixes |
-| [2026-05-10-bug-fixes.md](plans/archive/2026-05-10-bug-fixes.md) | 2026-05-10 — 6 bug fixes |
-| [2026-05-10-architecture-cleanup.md](plans/archive/2026-05-10-architecture-cleanup.md) | 2026-05-10 — 4 architecture cleanup tasks |
-| [2026-05-10-testing-gaps.md](plans/archive/2026-05-10-testing-gaps.md) | 2026-05-10 — 5 testing gap tasks |
-| [2026-05-10-unit-testing-gaps.md](plans/archive/2026-05-10-unit-testing-gaps.md) | 2026-05-10 — Service & composable unit tests |
-
-## Testing
-
-| File | Domain |
-|---|---|
-| [testing/be/payroll-role-e2e-qa.md](testing/be/payroll-role-e2e-qa.md) | Payroll role QA runbook |
-| [testing/be/2026-04-21-rbac-e2e-audit.md](testing/be/2026-04-21-rbac-e2e-audit.md) | RBAC E2E audit |
-| [testing/fe/manual-testing-guide.md](testing/fe/manual-testing-guide.md) | Manual testing guide per role |
-
-## References
-
-| File | Description |
-|---|---|
-| [references/attendance.md](references/attendance.md) | Attendance domain guide |
-| [references/employee.md](references/employee.md) | Employee/self-service domain guide |
-| [references/payroll.md](references/payroll.md) | Payroll domain guide and cross-links |
-| [references/authorization-leak-or-grouped-middleware.md](references/authorization-leak-or-grouped-middleware.md) | Authorization patterns & anti-patterns |
-| [references/be-fe-integration-patterns.md](references/be-fe-integration-patterns.md) | **BE-FE integration patterns** (API contract, error handling, auth, state mgmt, file uploads, permissions) |
-| [references/be-fe-integration-summary.md](references/be-fe-integration-summary.md) | Quick reference for BE-FE integration |
-
-## Conventions
-
-- **New active plan/spec** → `docs/plans/on_going/YYYY-MM-DD-<topic>-<type>.md`
-- **Completed/superseded plan** → move to `docs/plans/archive/`
-- **QA runbook/audit** → `docs/testing/be/` or `docs/testing/fe/`
-- **Reference/guide** → `docs/references/`
-- Jangan simpan generated artifacts atau temporary audit report di `docs/` kecuali memang akan jadi source of truth.
+- Setup khusus repo tetap di README FE/BE; aturan agent tetap di AGENTS.md.
+- Design system tetap di `team-sync-fe/docs/`; petunjuk tes dekat suite terkait.
+- Plan baru: `plans/on_going/YYYY-MM-DD-<topic>.md`; setelah penutupan
+  diverifikasi, arsipkan dengan status dan alasan yang jelas.
+- Jangan hapus bukti domain/QA hanya karena lama. Hapus duplikat atau template
+  yang tidak digunakan setelah memeriksa referensinya.
+- Jangan simpan kode pengujian, log, credentials, atau generated artifacts di docs.

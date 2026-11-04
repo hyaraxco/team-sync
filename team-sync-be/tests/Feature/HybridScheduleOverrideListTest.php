@@ -6,6 +6,7 @@ use App\Models\HybridScheduleOverride;
 use App\Models\HybridWorkSchedule;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
@@ -42,9 +43,11 @@ class HybridScheduleOverrideListTest extends TestCase
     {
         Sanctum::actingAs($this->admin);
 
-        HybridScheduleOverride::factory()->count(3)->create([
-            'staff_member_id' => $this->employeeProfile->id,
-        ]);
+        HybridScheduleOverride::factory()->count(3)
+            ->sequence(fn (Sequence $sequence) => ['date' => sprintf('2026-05-%02d', $sequence->index + 1)])
+            ->create([
+                'staff_member_id' => $this->employeeProfile->id,
+            ]);
 
         $response = $this->getJson('/api/v1/hybrid-schedule-overrides');
 
@@ -68,10 +71,12 @@ class HybridScheduleOverrideListTest extends TestCase
         HybridScheduleOverride::factory()->create([
             'staff_member_id' => $this->employeeProfile->id,
             'status'          => 'pending',
+            'date'            => '2026-05-01',
         ]);
         HybridScheduleOverride::factory()->create([
             'staff_member_id' => $this->employeeProfile->id,
             'status'          => 'approved',
+            'date'            => '2026-05-02',
         ]);
 
         $response = $this->getJson('/api/v1/hybrid-schedule-overrides?status=pending');

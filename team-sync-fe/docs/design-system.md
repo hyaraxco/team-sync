@@ -127,7 +127,7 @@ html {
 | Nav link bg | `.nav-link` (white) |
 | Nav link active | `.nav-link-active` (dark navy gradient) |
 
-> **Note:** Dark mode `dark:` classes have been removed. The `useDarkMode` composable and Tailwind `darkMode: 'class'` config remain for future full dark mode implementation.
+> **Note:** Dark mode uses CSS custom properties in `src/assets/css/input.css`, toggled by `useDarkMode()`. Use theme tokens instead of Tailwind `dark:` classes.
 
 ### Status / Semantic Palette
 
@@ -1158,7 +1158,7 @@ getJobStatusText('on_leave') // → "On Leave"
 
 ## 12. Dark Mode
 
-> **Status:** Partially scaffolded but NOT active. All `dark:` utility classes have been removed from components. The infrastructure remains for future full implementation.
+> **Status:** Implemented through CSS custom properties, not Tailwind `dark:` utilities.
 
 ### Infrastructure (in place)
 
@@ -1169,8 +1169,10 @@ getJobStatusText('on_leave') // → "On Leave"
 ### Current State
 
 - **Zero `dark:` classes** in any `.vue` file
-- Dark mode toggle exists but produces no visual change
-- Future: when dark mode is fully implemented, add `dark:` classes systematically using design tokens
+- Theme tokens in `src/assets/css/input.css` define light and `.dark` values.
+- The Header theme toggle uses `useDarkMode()` to switch the class on `<html>`.
+- Use `var(--color-*)` tokens for theme-aware surfaces and text. Do not add
+  Tailwind `dark:` classes; follow the conventions in `team-sync-fe/AGENTS.md`.
 
 ---
 
@@ -1245,7 +1247,7 @@ These patterns **must not** be used in this project:
 | Inline `style=` for colours | Tailwind classes (or CSS custom classes for brand tokens) |
 | `h-screen` for full-height layouts | `min-h-[100dvh]` (iOS Safari viewport bug) |
 | `hover:border-2` for hover states | `hover:ring-2 hover:ring-primary-500/20` (no layout shift) |
-| `dark:` classes on components | Remove — dark mode not yet fully implemented |
+| `dark:` classes on components | Use theme-aware CSS custom properties instead |
 | `rounded-[Npx]` arbitrary radius | `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl` |
 | `shadow-[...]` arbitrary shadows | `shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl` |
 | `border-[#DCDEDD]` hardcoded border | `border-brand-border` (Tailwind config token) |

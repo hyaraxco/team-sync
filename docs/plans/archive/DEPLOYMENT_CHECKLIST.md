@@ -246,5 +246,5 @@ For issues during deployment:
 ## Related Documentation
 
 - [Spatie Laravel-Permission Cache](https://spatie.be/docs/laravel-permission/v7/advanced-usage/cache)
-- [Implementation Summary](../plans/archive/RENAME_IMPLEMENTATION_SUMMARY.md)
-- [Project Config](../../team-sync-be/config/permission.php)
+- [Implementation Summary](RENAME_IMPLEMENTATION_SUMMARY.md)
+- [Project Config](../../../team-sync-be/config/permission.php)

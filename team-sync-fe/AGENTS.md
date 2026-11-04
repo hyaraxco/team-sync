@@ -84,7 +84,7 @@ src/
     │   └── StaffMemberTeam.vue
     └── NotFound.vue      # 404 page
 
-e2e/                      # 15 active Playwright E2E spec files (+ 5 debug)
+e2e/                      # Playwright E2E regression specs (temporary debug specs removed)
 ├── helpers/              # E2E test utilities (auth, api, evidence)
 scripts/
 └── e2e-prepare-be.sh     # Backend seed/reset for E2E

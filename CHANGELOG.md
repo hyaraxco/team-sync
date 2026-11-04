@@ -16,8 +16,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `HolidayCalendarRepository` with full CRUD
 - 20 FormRequest classes for inline validations
 - `be-tests.yml` CI workflow for Pest
+- Document local Strix GPT 6.1 SOL configuration, credential storage, and deferred container verification.
 
 ### Changed
+- Rewrite the root README after audit: correct locked PHP requirements, setup paths, backend asset installation, E2E reset warnings, cache settings, and local Strix guidance.
+- Keep local tooling state, environment variants, credentials, private keys, and database dumps out of version control; retain shareable environment examples.
 - Gate `/setup/doctor` endpoint behind first-boot check
 - Add `mimes:` validation to task attachment upload
 - Set Sanctum token expiration to 30 days (configurable via `SANCTUM_TOKEN_EXPIRATION`)
@@ -33,12 +36,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Consolidate 401 handling (single source in Axios interceptor)
 
 ### Removed
+- Remove the PR screenshot workflow at the owner's request; preserve E2E regression specs and failure-capture support.
 - Dead `formatCurrency` (USD) export from `formatUtils.js`
 - Unused `teamtnt/laravel-scout-tntsearch-driver` dependency
 - Empty `Traits/` directory
 - Redundant `console.error` calls across frontend
 
 ### Fixed
+- Stabilize the leave-date regression test with a scoped clock and verify that a corrected future range can submit without depending on warning text.
+- Use distinct dates in hybrid-override list fixtures so random collisions cannot prevent pagination and status-filter assertions.
 - Attendance clock-in race condition (added `lockForUpdate()`)
 - Duplicate 401 handling in frontend
 
