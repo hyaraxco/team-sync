@@ -6,14 +6,20 @@ End-to-end tests using **Playwright** against the Team Sync fullstack applicatio
 
 Tests run sequentially (1 worker) because they share a seeded backend database.
 
+Only regression specs belong in this suite. Temporary log-only debug specs
+were removed during cleanup; do not commit page/API dumps as passing tests.
+
 ## Prerequisites
 
-- Node.js 22+ (see `.nvmrc`)
+- Node.js `^20.19.0 || >=22.12.0` (see `package.json`; `.nvmrc` selects the local version)
 - Bun package manager
 - Backend running at `http://127.0.0.1:8000`
 - Backend seeded with E2E test data
 
 ## Setup
+
+Run commands from `team-sync-fe/`. Backend preparation resets/seeds database
+state: use a dedicated test database, never a production or working database.
 
 ```bash
 # Install dependencies
@@ -62,7 +68,6 @@ e2e/
 │   │   └── index.ts       # Extended test fixtures (authenticatedPage, userFactory, loginAs)
 │   ├── factories/
 │   │   └── user.factory.ts # User data factory with auto-cleanup
-│   └── page-objects/      # (future) Page object models
 └── README.md              # This file
 ```
 

@@ -19,7 +19,7 @@
 ## Why Future, Not On_Going
 
 - Setup wizard already works end-to-end without these (3 steps complete bootstrap successfully).
-- TOPSIS criteria fix (`docs/plans/on_going/2026-05-20-topsis-criteria-fix.md`) is the only audit finding requiring immediate execution.
+- TOPSIS criteria work is recorded in the [archived criteria fix](../archive/2026-05-20-topsis-criteria-fix.md); its historical priority does not establish today's active backlog.
 - These two share a domain (post-bootstrap UX) and should ship together when prioritized.
 
 ---

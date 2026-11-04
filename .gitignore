@@ -41,10 +41,9 @@ public/storage/
 # Environment Files
 # ====================
 .env
-.env.backup
-.env.production
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example
 
 # ====================
 # Laravel Specific
@@ -121,3 +120,27 @@ storage/tntsearch/
 /start-backend.bat
 /run-strix.bat
 /strix_runs/
+
+# Local tooling state
+.beads/
+.strix/
+.dolt/
+*.db
+.beads-credential-key
+*.gate.lock*
+
+# Credentials, private keys, and database dumps
+auth.json
+.ssh/
+.aws/
+.azure/
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+*.sqlite
+*.sqlite3
+*.sql
+*.dump

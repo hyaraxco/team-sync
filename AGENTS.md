@@ -37,7 +37,7 @@ team-sync/
 ├── team-sync-be/          # Laravel 12 API (PHP 8.2+, Sanctum auth)
 ├── team-sync-fe/          # Vue 3 SPA (Vite, Pinia, Tailwind CSS)
 ├── docs/                  # Plans, references, testing docs (NO executable code)
-├── .github/workflows/     # CI: be-tests, fe-tests, pr-screenshots, auto-tag
+├── .github/workflows/     # CI: be-tests, fe-tests, auto-tag
 └── package.json           # Root workspace (minimal — real deps in subdirs)
 ```
 
@@ -53,7 +53,7 @@ team-sync/
 | Frontend views       | `team-sync-fe/src/views/`                                    | Split: `admin/` vs `staff-member/`               |
 | State management     | `team-sync-fe/src/stores/`                                   | 25 Pinia stores, one per domain                  |
 | Routing              | `team-sync-fe/src/router/`                                   | Split by domain module (10 files)                |
-| CI workflows         | `.github/workflows/`                                         | `be-tests.yml`, `fe-tests.yml`, `pr-screenshots.yml`, `auto-tag.yml` |
+| CI workflows         | `.github/workflows/`                                         | `be-tests.yml`, `fe-tests.yml`, `auto-tag.yml` |
 | E2E prep script      | `team-sync-fe/scripts/e2e-prepare-be.sh`                     | Seeds/resets BE for E2E runs                     |
 
 ---

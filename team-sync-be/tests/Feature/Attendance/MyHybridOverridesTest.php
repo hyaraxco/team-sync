@@ -8,6 +8,7 @@ use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Database\Eloquent\Factories\Sequence;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\PermissionRegistrar;
@@ -52,15 +53,19 @@ class MyHybridOverridesTest extends TestCase
         $profile = StaffMemberProfile::factory()->create(['user_id' => $user->id]);
         Sanctum::actingAs($user);
 
-        HybridScheduleOverride::factory()->count(3)->create([
-            'staff_member_id' => $profile->id,
-        ]);
+        HybridScheduleOverride::factory()->count(3)
+            ->sequence(fn (Sequence $sequence) => ['date' => sprintf('2026-05-%02d', $sequence->index + 1)])
+            ->create([
+                'staff_member_id' => $profile->id,
+            ]);
 
         // Create overrides for another employee (should NOT appear)
         $otherProfile = StaffMemberProfile::factory()->create();
-        HybridScheduleOverride::factory()->count(2)->create([
-            'staff_member_id' => $otherProfile->id,
-        ]);
+        HybridScheduleOverride::factory()->count(2)
+            ->sequence(fn (Sequence $sequence) => ['date' => sprintf('2026-05-%02d', $sequence->index + 1)])
+            ->create([
+                'staff_member_id' => $otherProfile->id,
+            ]);
 
         $this->withoutExceptionHandling();
 
@@ -103,9 +108,11 @@ class MyHybridOverridesTest extends TestCase
         $profile = StaffMemberProfile::factory()->create(['user_id' => $user->id]);
         Sanctum::actingAs($user);
 
-        HybridScheduleOverride::factory()->count(20)->create([
-            'staff_member_id' => $profile->id,
-        ]);
+        HybridScheduleOverride::factory()->count(20)
+            ->sequence(fn (Sequence $sequence) => ['date' => sprintf('2026-05-%02d', $sequence->index + 1)])
+            ->create([
+                'staff_member_id' => $profile->id,
+            ]);
 
         $this->withoutExceptionHandling();
 
