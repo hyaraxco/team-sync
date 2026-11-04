@@ -24,6 +24,11 @@ composer dev
 Seeder hanya dijalankan pada database development/test yang memang disiapkan
 untuk data contoh, bukan pada database produksi.
 
+Aset backend memakai Vite 8 dan Laravel Vite Plugin 3. Gunakan Node.js
+`^20.19.0 || >=22.12.0` dan Bun dengan `bun.lock`; jangan membuat npm lockfile.
+CI memeriksa `bun install --frozen-lockfile --ignore-scripts` dan `bun run build`
+sebelum menjalankan tes PHP.
+
 ## Queue dan Scheduler
 
 Notifikasi memakai queued jobs (`QUEUE_CONNECTION=database`). Tanpa worker,

@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Document local Strix GPT 6.1 SOL configuration, credential storage, and deferred container verification.
 
 ### Changed
+- Upgrade backend assets to Vite 8 and Laravel Vite Plugin 3, retain the current Bun dependency baseline, and verify frozen installation and production builds in backend CI.
 - Rewrite the root README after audit: correct locked PHP requirements, setup paths, backend asset installation, E2E reset warnings, cache settings, and local Strix guidance.
 - Keep local tooling state, environment variants, credentials, private keys, and database dumps out of version control; retain shareable environment examples.
 - Gate `/setup/doctor` endpoint behind first-boot check
@@ -36,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Consolidate 401 handling (single source in Axios interceptor)
 
 ### Removed
+- Remove the obsolete backend npm lockfile; Bun is the canonical package manager and lockfile.
 - Remove the PR screenshot workflow at the owner's request; preserve E2E regression specs and failure-capture support.
 - Dead `formatCurrency` (USD) export from `formatUtils.js`
 - Unused `teamtnt/laravel-scout-tntsearch-driver` dependency
