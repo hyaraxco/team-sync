@@ -1,7 +1,7 @@
 # PROJECT KNOWLEDGE BASE
 
 > Context engineering untuk AI agents. Dibaca otomatis oleh Pi, Claude Code, Codex.
-> Last updated: 2026-05-16
+> Last updated: 2026-11-05
 
 ## Sub-Repo Context
 
@@ -17,12 +17,36 @@ This root file covers cross-cutting concerns: domain rules, role hierarchy, stac
 ## Workflow Kerja Team Sync
 
 1. **Baca Context** — AGENTS.md (root + sub-repo), docs/party-mode.md
-2. **Panggil Agents** — @oracle (strategy), @fixer (implementation), @librarian (docs), @designer (UI/UX), @explorer (codebase). Load skills sesuai kebutuhan.
-3. **Buat Plan** — Tulis di `docs/plans/on_going/`
-4. **Party Mode** (opsional) — Untuk keputusan kompleks: `Party mode: [problem]`. Dispatch 2-3 persona parallel. Lihat `docs/party-mode.md`.
-5. **Execute Plan** — @fixer/subagents, follow architecture rules, write tests, verify semua test suites
-6. **Create PR & Review** — Branch dari `main`, squash jadi 1 commit (`chore: add/fix ...`), push, wait CI, tunggu approval, rebase & merge, hapus branch
-7. **Archive Plan** — Pindah ke `docs/plans/archive/`, update status COMPLETED
+2. **Baca Skills (wajib)** — Pilih dan baca instruksi skills yang relevan dengan tiket/task sebelum membuat plan implementasi atau mulai eksekusi. Jangan hanya menyebut nama skill.
+3. **Panggil Agents sesuai kebutuhan** — @oracle (strategy), @fixer (implementation), @librarian (docs), @designer (UI/UX), @explorer (codebase).
+4. **Buat Plan** — Tulis di `docs/plans/on_going/`
+5. **Party Mode** (opsional) — Untuk keputusan kompleks: `Party mode: [problem]`. Dispatch 2-3 persona parallel. Lihat `docs/party-mode.md`.
+6. **Execute Plan** — Follow architecture rules, verifikasi suite yang terdampak dan jalankan smoke pada jalur yang berubah.
+7. **Integrasi dan Penutupan Tiket** — Ikuti gate CI/CD di bawah; implementasi selesai belum berarti tiket boleh langsung ditutup.
+8. **Archive Plan** — Jika ada plan, pindah ke `docs/plans/archive/` dan beri status COMPLETED setelah acceptance criteria terpenuhi; catat batas verifikasi yang masih ada.
+
+### Gate Skills Sebelum Memulai Tiket/Task
+
+- Baca scope, acceptance criteria, dan bukti pekerjaan yang sudah ada. Jangan mengulang implementasi atau membuka kembali pekerjaan yang sudah selesai tanpa alasan dari tiket.
+- Untuk coding, baca `ponytail` dan `antislop`. Ponytail menjadi prinsip kerja default: YAGNI, reuse pola/solusi yang ada, dan pilih perubahan paling sederhana yang menyelesaikan seluruh scope.
+- Tambahkan skills sesuai pekerjaan: `antislop-copywriting` untuk prose/dokumentasi; `antislop-ui`, `antislop-human`, dan `antislop-layoutmobile` sesuai kebutuhan UI; `ponytail-review` untuk review; `security-audit` untuk pemeriksaan keamanan; `reverse-engineer-anything` untuk analisis artifact/runtime.
+- Sampaikan singkat skills yang dipakai dan kaitannya dengan task sebelum eksekusi. Jika skill tidak tersedia, nyatakan keterbatasannya; jangan mengaku sudah membacanya atau menjalankannya.
+- Tidak perlu menanyakan level Ponytail pada setiap job. Tanya user hanya jika ada keputusan scope, tradeoff, atau risiko yang memang membutuhkan keputusan user.
+- Ponytail bukan alasan untuk mengurangi kebutuhan yang diminta, validasi, keamanan, aksesibilitas, penanganan error, atau verifikasi.
+
+### Gate Penutupan Tiket dan CI/CD
+
+1. **Main dan branch baru:** `main` adalah baseline integrasi yang dijaga stabil, bukan tempat mengerjakan tiket atau checkpoint commit. Fetch `origin`, perbarui baseline dengan fast-forward bila aman, lalu buat branch baru untuk setiap tiket. Gunakan nama deskriptif seperti `fix/<ticket-id>-leave-dates`, `feat/<ticket-id>-team-goals`, `chore/<ticket-id>-dependencies`, atau `docs/ticket-workflow` bila tidak ada ID tiket. Jangan menimpa perubahan lokal user atau memakai kembali branch yang sudah merged. Jangan push langsung atau force-push ke `main`.
+2. **Checkpoint selama pengerjaan:** commit setiap unit kerja kecil yang sudah utuh dan diverifikasi secara proporsional; jangan menunggu seluruh tiket selesai sampai perubahan menumpuk. Gunakan pesan yang menjelaskan hasil kerja. Ini bukan kewajiban commit setiap baris/tool call. Aturan commit aman berikut berlaku pada setiap checkpoint, bukan hanya commit final.
+3. **Verifikasi hasil:** cocokkan implementasi dengan acceptance criteria, periksa caller/kontrak yang terdampak, lakukan self-review, dan jalankan tes serta smoke yang relevan. Update dokumentasi/changelog sesuai perubahan. Untuk docs-only, gunakan pemeriksaan dokumentasi; jangan mengklaim suite aplikasi dijalankan.
+4. **Commit aman dan squash:** stage hanya file dalam scope dan periksa isi staging, termasuk secret pada file yang sudah tracked. Pertahankan `.env`, kredensial, state Beads, dan konfigurasi mesin lokal di luar commit. Verifikasi author/committer sesuai akun GitHub user yang terautentikasi, gunakan noreply bila diperlukan, dan jangan mengubah identitas Git global. Setelah scope tiket selesai dan verifikasi lokal lulus, squash checkpoint menjadi satu commit bermakna sesuai perubahan, misalnya `fix: validate leave dates` atau `chore: update dependencies`.
+5. **Segera buka PR:** push hasil squash dan buka PR untuk review bersama user, dengan ID tiket bila tersedia, scope, bukti verifikasi, dan batasnya. Tentukan checks wajib dari scope perubahan dan tunggu hasilnya pada **SHA head terbaru**, bukan hasil commit lama. Backend memerlukan Pest serta frozen Bun install/build aset; frontend memerlukan Vitest, build dan accessibility sesuai workflow aktif. Periksa juga security checks yang diaktifkan. Gunakan aturan N/A di akhir gate ini untuk checks yang memang di luar scope.
+6. **Review bersama, rebase, lalu merge:** periksa bug/regresi, keamanan dan konflik bersama user. Jika review memerlukan perbaikan, buat checkpoint baru dan rapikan/squash kembali sebelum merge. Rebase terhadap `main` terbaru dan selesaikan konflik tanpa membuang perubahan pihak lain. Merge hanya setelah checks yang diwajibkan untuk scope tersebut lulus pada SHA terbaru dan user menyetujui isi final. Perubahan isi setelah approval, termasuk hasil resolusi konflik, wajib direview ulang; squash/rebase yang hanya mengubah history tanpa perubahan isi tidak memerlukan review ulang seluruh diff, tetapi checks tetap harus cocok dengan SHA terbaru. Jika rewrite branch diizinkan, gunakan `--force-with-lease`, bukan `--force`. Jangan menonaktifkan proteksi atau menelan kegagalan agar terlihat hijau.
+7. **Sinkronisasi setelah merge:** verifikasi status merged dan SHA/author di GitHub, fast-forward `main` lokal ke `origin/main`, lalu hapus branch kerja lokal/remote yang sudah merged. Pastikan perubahan lokal yang dikecualikan tetap utuh. Periksa hasil checks pasca-merge; laporkan kegagalan, jangan menyebut seluruh CI/CD sukses hanya karena PR sudah merged.
+8. **Tutup tiket terkait:** tutup Beads hanya setelah acceptance criteria terpenuhi dan hasil merge terverifikasi. Gunakan ID eksplisit, misalnya `bd close <id> --reason "PR #<nomor>, merge <sha>, verifikasi <hasil/batas>"`. Jangan menutup tiket lain hanya karena menyebut PR yang sama, dan jangan memasukkan secret ke bukti penutupan.
+9. **Release/deploy terpisah:** selesai satu tiket tidak mewajibkan release manual atau deploy production. Repo saat ini memiliki `auto-tag.yml` yang dapat membuat tag/release setelah push ke `main`; periksa hasilnya dan jangan menganggap automasi itu dinonaktifkan oleh aturan ini. Jangan publish draft, menghapus/memaksa tag, atau melakukan deploy manual tanpa otorisasi yang sesuai. Jika release bukan acceptance criteria, pisahkan status tiket implementasi dari kegagalan release dan catat tindak lanjutnya.
+
+Checks yang diwajibkan dan relevan dengan scope harus lulus; `queued`, `pending`, timeout, konflik yang belum selesai, atau checks wajib yang tidak berjalan menghalangi merge. Checks yang benar-benar tidak relevan dicatat N/A dengan alasan dan verifikasi alternatif yang sesuai, bukan diklaim lulus. Jangan menyebut check N/A hanya karena filter workflow gagal memicu tes yang sebenarnya diperlukan. Persetujuan satu PR tidak berlaku otomatis untuk PR lain. Checks mengurangi risiko, bukan menjamin nol bug. Aturan ini tidak mengaktifkan branch protection/ruleset GitHub; penegakan server-side harus dikonfigurasi terpisah.
 
 ---
 
