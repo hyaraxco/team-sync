@@ -19,6 +19,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Document local Strix GPT 6.1 SOL configuration, credential storage, and deferred container verification.
 
 ### Changed
+- Update the backend asset and frontend dependencies to address known npm advisories. Pin frontend `glob` to 14.0.6 and `minimatch` to 11.0.9 until the Vue test tooling accepts the patched majors.
 - Upgrade backend assets to Vite 8 and Laravel Vite Plugin 3, retain the current Bun dependency baseline, and verify frozen installation and production builds in backend CI.
 - Rewrite the root README after audit: correct locked PHP requirements, setup paths, backend asset installation, E2E reset warnings, cache settings, and local Strix guidance.
 - Keep local tooling state, environment variants, credentials, private keys, and database dumps out of version control; retain shareable environment examples.
