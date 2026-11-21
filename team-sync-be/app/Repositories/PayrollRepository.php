@@ -395,11 +395,12 @@ class PayrollRepository implements PayrollRepositoryInterface
 
         // Use TER method for Jan–Nov, annualized progressive for December true-up
         $isDecember = $startOfMonth->month === 12;
+        $contributionPeriod = $startOfMonth->format('Y-m');
         $taxResult = $isDecember
-            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp)
-            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp);
+            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod)
+            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod);
 
-        $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax);
+        $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax, $contributionPeriod);
 
         $pph21Amount = $taxResult['pph21_monthly'];
 
@@ -527,7 +528,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         ];
 
         // BPJS rate validation warnings for readiness dashboard
-        $bpjsValidation = $this->taxCalculationService->validateBpjsRates();
+        $bpjsValidation = $this->taxCalculationService->validateBpjsRates($month->format('Y-m'));
 
         return [
             'salary_month' => (string) ($readiness['meta']['salary_month'] ?? $month->format('Y-m')),
@@ -1193,8 +1194,8 @@ class PayrollRepository implements PayrollRepositoryInterface
     public function getBpjsRateHistory()
     {
         return BpjsRate::query()
-            ->orderByDesc('updated_at')
             ->orderBy('component')
+            ->orderByDesc('effective_date')
             ->get()
             ->map(function (BpjsRate $rate) {
                 return [
@@ -1206,6 +1207,8 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'max_salary_base' => $rate->max_salary_base !== null
                         ? (float) $rate->max_salary_base
                         : null,
+                    'effective_date' => optional($rate->effective_date)->toDateString(),
+                    'valid_until' => optional($rate->valid_until)->toDateString(),
                     'effective_at' => optional($rate->updated_at)->toIso8601String(),
                     'created_at' => optional($rate->created_at)->toIso8601String(),
                     'updated_at' => optional($rate->updated_at)->toIso8601String(),

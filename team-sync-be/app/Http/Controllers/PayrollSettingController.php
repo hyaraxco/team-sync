@@ -168,10 +168,12 @@ class PayrollSettingController extends Controller implements HasMiddleware
         }
     }
 
-    public function bpjsValidation()
+    public function bpjsValidation(Request $request)
     {
         try {
-            $validation = $this->taxCalculationService->validateBpjsRates();
+            $validation = $this->taxCalculationService->validateBpjsRates(
+                $request->query('period')
+            );
 
             return ResponseHelper::jsonResponse(
                 true,

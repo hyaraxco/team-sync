@@ -6,7 +6,6 @@ use App\Models\BpjsRate;
 use App\Models\User;
 use App\Services\Payroll\TaxCalculationService;
 use Carbon\Carbon;
-use Database\Seeders\BpjsRateSeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\PtkpAmountSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -19,9 +18,6 @@ use Spatie\Permission\PermissionRegistrar;
 use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
-/**
- * Tests for BPJS rate validation and cap warnings (#7).
- */
 class BpjsValidationTest extends TestCase
 {
     use ActivatesLicense, RefreshDatabase;
@@ -37,7 +33,6 @@ class BpjsValidationTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
             TaxBracketSeeder::class,
-            BpjsRateSeeder::class,
             PtkpAmountSeeder::class,
         ]);
 
@@ -50,18 +45,26 @@ class BpjsValidationTest extends TestCase
         parent::tearDown();
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // validateBpjsRates()
-    // ─────────────────────────────────────────────────────────────────────────
+    private function seedSinglePeriodRates(array $overrides = []): void
+    {
+        $defaults = [
+            'effective_date' => Carbon::now()->subMonths(3)->toDateString(),
+            'valid_until' => Carbon::now()->addYear()->toDateString(),
+        ];
+
+        $opts = array_merge($defaults, $overrides);
+
+        BpjsRate::create(['component' => 'jht', 'employee_rate' => 2.00, 'employer_rate' => 3.70, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JHT']);
+        BpjsRate::create(['component' => 'jkk', 'employee_rate' => 0.00, 'employer_rate' => 0.24, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JKK']);
+        BpjsRate::create(['component' => 'jkm', 'employee_rate' => 0.00, 'employer_rate' => 0.30, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JKM']);
+        BpjsRate::create(['component' => 'jp', 'employee_rate' => 1.00, 'employer_rate' => 2.00, 'max_salary_base' => 10_042_300, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JP']);
+        BpjsRate::create(['component' => 'bpjs_kesehatan', 'employee_rate' => 1.00, 'employer_rate' => 4.00, 'max_salary_base' => 12_000_000, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'Kesehatan']);
+    }
 
     /** @test */
     public function test_validate_bpjs_rates_returns_valid_when_rates_are_current(): void
     {
-        // Set all rates with recent effective_date
-        BpjsRate::query()->update([
-            'effective_date' => Carbon::now()->subMonths(3)->toDateString(),
-            'valid_until' => Carbon::now()->addYear()->toDateString(),
-        ]);
+        $this->seedSinglePeriodRates();
 
         $service = app(TaxCalculationService::class);
         $result = $service->validateBpjsRates();
@@ -74,16 +77,10 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_validate_bpjs_rates_detects_expired_rates(): void
     {
-        // Set JP rate as expired
-        BpjsRate::where('component', 'jp')->update([
-            'effective_date' => Carbon::now()->subYears(2)->toDateString(),
-            'valid_until' => Carbon::now()->subMonth()->toDateString(),
-        ]);
+        $this->seedSinglePeriodRates();
 
-        // Keep others current
-        BpjsRate::where('component', '!=', 'jp')->update([
-            'effective_date' => Carbon::now()->subMonths(3)->toDateString(),
-            'valid_until' => Carbon::now()->addYear()->toDateString(),
+        BpjsRate::where('component', 'jp')->update([
+            'valid_until' => Carbon::now()->subMonth()->toDateString(),
         ]);
 
         $service = app(TaxCalculationService::class);
@@ -101,8 +98,7 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_validate_bpjs_rates_detects_potentially_outdated_rates(): void
     {
-        // Set all rates with effective_date > 12 months ago, no valid_until
-        BpjsRate::query()->update([
+        $this->seedSinglePeriodRates([
             'effective_date' => Carbon::now()->subMonths(13)->toDateString(),
             'valid_until' => null,
         ]);
@@ -119,11 +115,9 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_validate_bpjs_rates_falls_back_to_updated_at_for_staleness(): void
     {
-        // No effective_date or valid_until, but updated_at is old
-        BpjsRate::query()->update([
-            'effective_date' => null,
+        $this->seedSinglePeriodRates([
+            'effective_date' => Carbon::now()->subMonths(14)->toDateString(),
             'valid_until' => null,
-            'updated_at' => Carbon::now()->subMonths(14),
         ]);
 
         $service = app(TaxCalculationService::class);
@@ -138,7 +132,8 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_validate_bpjs_rates_detects_missing_components(): void
     {
-        // Delete one component
+        $this->seedSinglePeriodRates();
+
         BpjsRate::where('component', 'jkm')->delete();
 
         $service = app(TaxCalculationService::class);
@@ -156,10 +151,7 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_validate_bpjs_rates_returns_rate_details(): void
     {
-        BpjsRate::query()->update([
-            'effective_date' => Carbon::now()->subMonths(3)->toDateString(),
-            'valid_until' => Carbon::now()->addYear()->toDateString(),
-        ]);
+        $this->seedSinglePeriodRates();
 
         $service = app(TaxCalculationService::class);
         $result = $service->validateBpjsRates();
@@ -177,13 +169,11 @@ class BpjsValidationTest extends TestCase
         $this->assertFalse($jpRate['is_potentially_outdated']);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // getBpjsCapWarnings()
-    // ─────────────────────────────────────────────────────────────────────────
-
     /** @test */
     public function test_bpjs_cap_warnings_for_salary_below_all_caps(): void
     {
+        $this->seedSinglePeriodRates();
+
         $service = app(TaxCalculationService::class);
         $result = $service->getBpjsCapWarnings(8_000_000);
 
@@ -199,8 +189,9 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_bpjs_cap_warnings_for_salary_above_jp_cap(): void
     {
+        $this->seedSinglePeriodRates();
+
         $service = app(TaxCalculationService::class);
-        // JP cap is 10_042_300
         $result = $service->getBpjsCapWarnings(15_000_000);
 
         $jpCap = collect($result['caps_applied'])->firstWhere('component', 'jp');
@@ -214,8 +205,9 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_bpjs_cap_warnings_for_salary_above_all_caps(): void
     {
+        $this->seedSinglePeriodRates();
+
         $service = app(TaxCalculationService::class);
-        // Above both JP (10_042_300) and Kesehatan (12_000_000) caps
         $result = $service->getBpjsCapWarnings(20_000_000);
 
         $capsExceeded = collect($result['caps_applied'])->filter(fn ($c) => $c['salary_exceeds_cap']);
@@ -233,10 +225,11 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_bpjs_cap_warnings_only_includes_capped_components(): void
     {
+        $this->seedSinglePeriodRates();
+
         $service = app(TaxCalculationService::class);
         $result = $service->getBpjsCapWarnings(8_000_000);
 
-        // Only JP and bpjs_kesehatan have caps; JHT, JKK, JKM do not
         $components = collect($result['caps_applied'])->pluck('component')->all();
         $this->assertContains('jp', $components);
         $this->assertContains('bpjs_kesehatan', $components);
@@ -245,17 +238,10 @@ class BpjsValidationTest extends TestCase
         $this->assertNotContains('jkm', $components);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // API endpoint: GET /payroll-settings/bpjs-validation
-    // ─────────────────────────────────────────────────────────────────────────
-
     /** @test */
     public function test_bpjs_validation_endpoint_returns_success(): void
     {
-        BpjsRate::query()->update([
-            'effective_date' => Carbon::now()->subMonths(3)->toDateString(),
-            'valid_until' => Carbon::now()->addYear()->toDateString(),
-        ]);
+        $this->seedSinglePeriodRates();
 
         $user = $this->actingAsRole('finance');
 
@@ -270,14 +256,10 @@ class BpjsValidationTest extends TestCase
     /** @test */
     public function test_bpjs_validation_endpoint_returns_warnings_for_expired_rates(): void
     {
-        BpjsRate::where('component', 'jp')->update([
-            'effective_date' => Carbon::now()->subYears(2)->toDateString(),
-            'valid_until' => Carbon::now()->subMonth()->toDateString(),
-        ]);
+        $this->seedSinglePeriodRates();
 
-        BpjsRate::where('component', '!=', 'jp')->update([
-            'effective_date' => Carbon::now()->subMonths(3)->toDateString(),
-            'valid_until' => Carbon::now()->addYear()->toDateString(),
+        BpjsRate::where('component', 'jp')->update([
+            'valid_until' => Carbon::now()->subMonth()->toDateString(),
         ]);
 
         $user = $this->actingAsRole('finance');

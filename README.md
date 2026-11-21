@@ -257,10 +257,20 @@ Rate dibaca dari database. Nilai referensi yang dicatat proyek:
 | JHT | 2% | 3.7% | Tanpa batas |
 | JKK | - | 0.24% | Tanpa batas |
 | JKM | - | 0.30% | Tanpa batas |
-| JP | 1% | 2% | Rp 10.042.300 |
+| JP | 1% | 2% | Per periode kontribusi (lihat bawah) |
 | Kesehatan | 1% | 4% | Rp 12.000.000 |
 
-Angka ini bukan jaminan kepatuhan untuk periode berjalan. Verifikasi rate dan batas yang berlaku sebelum memproses payroll.
+Batas upah JP dipilih berdasarkan periode payroll (kolom `effective_date` /
+`valid_until` pada tabel `bpjs_rates`):
+
+| Periode | Batas upah JP | Berlaku mulai |
+|---|---|---|
+| s/d Feb 2025 | Rp 10.042.300 | historis |
+| Mar 2025 – Feb 2026 | Rp 10.547.400 | 1 Mar 2025 |
+| Mar 2026 – sekarang | Rp 11.086.300 | 1 Mar 2026 |
+
+Angka ini bukan jaminan kepatuhan untuk periode berjalan. Verifikasi rate dan
+batas yang berlaku sebelum memproses payroll.
 
 ### PPh 21
 

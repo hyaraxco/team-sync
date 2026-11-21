@@ -82,7 +82,8 @@ class ThrCalculationService
             $monthlySalary,
             $grossThr,
             $employee->ptkp_status,
-            ! empty($employee->npwp)
+            ! empty($employee->npwp),
+            $paymentDate->format('Y-m')
         );
 
         $pph21Amount = $taxResult['pph21_on_thr'];
@@ -111,15 +112,16 @@ class ThrCalculationService
         float $monthlySalary,
         float $thrAmount,
         ?string $ptkpStatus,
-        bool $hasNpwp
+        bool $hasNpwp,
+        ?string $contributionPeriod = null
     ): array {
         // Step 1: Calculate annual PPh21 on regular salary only
-        $regularTax = $this->taxService->calculateMonthlyPph21($monthlySalary, $ptkpStatus, $hasNpwp);
+        $regularTax = $this->taxService->calculateMonthlyPph21($monthlySalary, $ptkpStatus, $hasNpwp, $contributionPeriod);
         $regularAnnualPph21 = $regularTax['meta']['pph21_annual'];
 
         // Step 2: Calculate annual PPh21 on (regular salary + THR spread over 12 months)
         $salaryWithThr = $monthlySalary + ($thrAmount / 12);
-        $withThrTax = $this->taxService->calculateMonthlyPph21($salaryWithThr, $ptkpStatus, $hasNpwp);
+        $withThrTax = $this->taxService->calculateMonthlyPph21($salaryWithThr, $ptkpStatus, $hasNpwp, $contributionPeriod);
         $withThrAnnualPph21 = $withThrTax['meta']['pph21_annual'];
 
         // Step 3: Difference = tax attributable to THR
