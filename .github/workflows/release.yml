@@ -1,0 +1,70 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Stable version, for example v0.20.0'
+        required: true
+        type: string
+      sha:
+        description: 'Full main commit SHA with successful BE Tests and FE Tests'
+        required: true
+        type: string
+  pull_request:
+    paths:
+      - '.github/workflows/release.yml'
+      - '.github/scripts/release*'
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/release.yml'
+      - '.github/scripts/release*'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && 'publish' || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+      - run: python3 .github/scripts/release-test.py
+
+  publish:
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: main
+          fetch-depth: 0
+      - name: Validate release target
+        id: target
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          TARGET_SHA: ${{ inputs.sha }}
+        run: python3 .github/scripts/release.py >> "$GITHUB_OUTPUT"
+      - name: Publish explicit version
+        if: steps.target.outputs.publish == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ inputs.version }}
+          TARGET_SHA: ${{ inputs.sha }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git tag -a "$VERSION" "$TARGET_SHA" -m "Release $VERSION"
+          git push origin "refs/tags/$VERSION"
+          gh release create "$VERSION" --verify-tag --title "Release $VERSION" --generate-notes
