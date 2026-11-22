@@ -238,12 +238,14 @@ bun run dev
 ## Cross-Role Interaction Tests
 
 ### Payroll Full Cycle
-1. **HR** (Tasyia): Generate payroll for current month
+> Least-privilege saat ini: **Finance** memiliki seluruh operasi payroll/THR; **HR tidak** punya akses payroll. (Revisi 2026-11-22 dari flow lama yang salah menempatkan HR sebagai generator.)
+1. **Finance** (Dwimeta): Generate payroll for current month
 2. **Finance** (Dwimeta): Review payroll detail, edit notes
 3. **Finance** (Dwimeta): Approve payroll
 4. **Finance** (Dwimeta): Mark as paid with today's date
-5. **Staff** (Agung): Check My Payroll → Payslip visible
-6. **Staff** (Agung): Check notifications → "Payroll Paid" notification
+5. **HR** (Tasyia): Verify payroll admin routes are denied (403) — negative check
+6. **Staff** (Agung): Check My Payroll → Payslip visible
+7. **Staff** (Agung): Check notifications → "Payroll Paid" notification
 
 ### Task Assignment Flow
 1. **Manager** (Yudhis): Create task in HRIS project, assign to Agung

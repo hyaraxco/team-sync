@@ -40,14 +40,10 @@
    - Request API payroll utama harus `403`.
 2. `HR`
    - Login berhasil.
-   - Sidebar menampilkan menu `Payroll`.
-   - Dashboard quick action menampilkan `Process Payroll`.
-   - Masuk ke `/admin/payroll`, daftar payroll tampil.
-   - View payroll menggunakan mode operasional tanpa statistik gaji agregat.
-   - Masuk ke `/admin/payroll/create` dan generate payroll bulan berjalan.
-   - Setelah generate selesai diproses, payroll baru muncul dengan status `pending`.
-   - Buka detail payroll dan pastikan tombol `Mark as Paid` tidak tampil.
-   - Akses statistik payroll sensitif harus ditolak.
+   - Sidebar **tidak** menampilkan menu `Payroll`.
+   - Dashboard quick action **tidak** menampilkan `Process Payroll`.
+   - Akses `/admin/payroll`, `/admin/payroll/create`, dan detail payroll diarahkan kembali atau ditolak.
+   - API payroll utama (generate, approve, settings) harus `403`.
 3. `Finance`
    - Login berhasil.
    - Sidebar menampilkan menu `Payroll`.
@@ -72,8 +68,8 @@
 
 ## Expected Result
 - `manager` tidak punya akses payroll admin, tetapi tetap punya self-service personal.
-- `hr` hanya bisa membuat dan memonitor draft payroll.
-- `finance` hanya bisa review, lihat statistik, export report, export detail, dan mark payroll sebagai `paid`.
+- `hr` tidak punya akses payroll admin atau operasi payroll apa pun (least-privilege saat ini: payroll dimiliki `finance`).
+- `finance` hanya bisa review, generate, lihat statistik, export report, export detail, dan mark payroll sebagai `paid`.
 - `employee` tidak punya akses payroll admin.
 - `employee` bisa melihat dan mengunduh payslip miliknya sendiri jika payroll sudah `paid`.
 - Transisi status payroll dari `pending` ke `paid` harus konsisten di UI dan API.
@@ -81,8 +77,8 @@
 ## Stage 1 Done Criteria
 - `manager` tidak melihat payroll admin menu/quick action, tidak bisa direct URL payroll admin, dan API payroll admin tetap `403`.
 - `manager`, `hr`, dan `finance` bisa mengakses self-service personal (`My Profile`, `My Attendance`, `My Payroll`) dari akun yang sama.
-- `hr` bisa generate draft payroll, duplicate month diblok di UI, detail payroll tidak menampilkan statistik sensitif atau `Mark as Paid`.
-- `finance` tidak bisa create payroll, tetapi bisa buka detail payroll, melihat statistik, mengakses payroll settings, export payroll report, export Excel, dan mark payroll menjadi `paid`.
+- `hr` tidak bisa generate atau membuka payroll admin; semua route payroll ditolak.
+- `finance` bisa create/generate payroll, buka detail payroll, melihat statistik, mengakses payroll settings, export payroll report, export Excel, dan mark payroll menjadi `paid`.
 - Setelah payroll `paid`, finance melihat info auto notification, bukan tombol manual send.
 - `employee` bisa buka `My Payroll`, detail, dan download PDF miliknya sendiri, tetapi semua route payroll admin tetap deny.
 - `bun run test:guards` dan `bun run e2e` harus hijau.
@@ -172,8 +168,8 @@
 ## Latest QA Sign-Off (2026-04-08)
 - Full automation `bun run e2e` lulus untuk 4 role (`manager`, `hr`, `finance`, `employee`) dalam satu run.
 - QA role-by-role tambahan lulus:
-  - `HR`: generate draft `pending`, duplicate month guard aktif, tidak bisa approve/mark-as-paid.
-  - `Finance`: tidak bisa generate, bisa review/export/approve/mark-as-paid, status final `paid`.
+  - `HR`: payroll admin tetap deny (`403`); tidak ada operasi payroll (least-privilege saat ini).
+  - `Finance`: generate/review/export/approve/mark-as-paid, status final `paid`.
   - `Manager`: payroll admin tetap deny (`403`), self-service personal tetap usable.
   - `Employee`: my payroll list/detail/download milik sendiri lulus, admin payroll endpoint tetap `403`.
 - Catatan eksekusi:
