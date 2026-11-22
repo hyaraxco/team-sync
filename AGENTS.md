@@ -34,6 +34,10 @@ This root file covers cross-cutting concerns: domain rules, role hierarchy, stac
 - Tidak perlu menanyakan level Ponytail pada setiap job. Tanya user hanya jika ada keputusan scope, tradeoff, atau risiko yang memang membutuhkan keputusan user.
 - Ponytail bukan alasan untuk mengurangi kebutuhan yang diminta, validasi, keamanan, aksesibilitas, penanganan error, atau verifikasi.
 
+### Alur Status Tiket Beads
+
+Status tiket mengikuti alur: `todo` (antrian siap kerja) → `in_progress` (sedang dikerjakan) → `testing` (implementasi selesai, suite yang terdampak lulus di lokal) → `review` (PR terbuka, menunggu checks dan review) → `closed` (merge terverifikasi: SHA, checks pasca-merge, sesuai Gate Penutupan Tiket). `blocked` dan `deferred` tetap dipakai sesuai maknanya. Perbarui status di setiap transisi, terutama saat hand-off antar agent atau sesi: agent berikutnya membaca state dari `bd list`/`bd show`, bukan dari percakapan lama.
+
 ### Gate Penutupan Tiket dan CI/CD
 
 1. **Main dan branch baru:** `main` adalah baseline integrasi yang dijaga stabil, bukan tempat mengerjakan tiket atau checkpoint commit. Fetch `origin`, perbarui baseline dengan fast-forward bila aman, lalu buat branch baru untuk setiap tiket. Gunakan nama deskriptif seperti `fix/<ticket-id>-leave-dates`, `feat/<ticket-id>-team-goals`, `chore/<ticket-id>-dependencies`, atau `docs/ticket-workflow` bila tidak ada ID tiket. Jangan menimpa perubahan lokal user atau memakai kembali branch yang sudah merged. Jangan push langsung atau force-push ke `main`.
