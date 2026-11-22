@@ -48,9 +48,9 @@ class TaxCalculationService
     ];
 
     /**
-     * TER 2024 Category A rates — [max_bruto_monthly, effective_rate].
+     * TER 2024 Category A rates: [inclusive_max_bruto_monthly, effective_rate].
      * Used for PTKP status: TK/0, TK/1, K/0.
-     * Source: Peraturan Pemerintah PP 58/2023, Kep-16/PJ/2024 (revoked & reissued).
+     * Source: PP 58/2023 Annex A-C, https://peraturan.go.id/files/pp-no-58-tahun-2023.pdf
      *
      * The rate represents the effective tax rate already accounting for PTKP deduction,
      * biaya jabatan (5%), and pension contributions (JHT/JP employee share).
@@ -152,7 +152,7 @@ class TaxCalculationService
     ];
 
     /**
-     * TER 2024 Category C rates — [max_bruto_monthly, effective_rate].
+     * TER 2024 Category C rates: [max_bruto_monthly, effective_rate].
      * Used for PTKP status: K/3.
      * Source: PP 58/2023 annex, DJP published tables (PMK 168/2023).
      * 41 rows: band 33% (965.000.001-1.419.000.000) yang awalnya hilang

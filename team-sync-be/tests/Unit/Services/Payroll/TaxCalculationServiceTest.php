@@ -372,6 +372,111 @@ class TaxCalculationServiceTest extends TestCase
         $this->assertEquals(0.34, $aboveExact['ter_rate']);
     }
 
+    public function test_ter_all_annex_bands_have_inclusive_upper_bounds(): void
+    {
+        // Independently transcribed from PP 58/2023 Annex A-C, PDF pages 11-24.
+        // https://peraturan.go.id/files/pp-no-58-tahun-2023.pdf
+        $tables = [
+            'TK/0' => [
+                'category' => 'A',
+                'ceilings' => [
+                    5_400_000, 5_650_000, 5_950_000, 6_300_000, 6_750_000,
+                    7_500_000, 8_550_000, 9_650_000, 10_050_000, 10_350_000,
+                    10_700_000, 11_050_000, 11_600_000, 12_500_000, 13_750_000,
+                    15_100_000, 16_950_000, 19_750_000, 24_150_000, 26_450_000,
+                    28_000_000, 30_050_000, 32_400_000, 35_400_000, 39_100_000,
+                    43_850_000, 47_800_000, 51_400_000, 56_300_000, 62_200_000,
+                    68_600_000, 77_500_000, 89_000_000, 103_000_000, 125_000_000,
+                    157_000_000, 206_000_000, 337_000_000, 454_000_000, 550_000_000,
+                    695_000_000, 910_000_000, 1_400_000_000,
+                ],
+                'percentages' => [
+                    0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 2.25, 2.5,
+                    3, 3.5, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16,
+                    17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                    31, 32, 33, 34,
+                ],
+            ],
+            'K/1' => [
+                'category' => 'B',
+                'ceilings' => [
+                    6_200_000, 6_500_000, 6_850_000, 7_300_000, 9_200_000,
+                    10_750_000, 11_250_000, 11_600_000, 12_600_000, 13_600_000,
+                    14_950_000, 16_400_000, 18_450_000, 21_850_000, 26_000_000,
+                    27_700_000, 29_350_000, 31_450_000, 33_950_000, 37_100_000,
+                    41_100_000, 45_800_000, 49_500_000, 53_800_000, 58_500_000,
+                    64_000_000, 71_000_000, 80_000_000, 93_000_000, 109_000_000,
+                    129_000_000, 163_000_000, 211_000_000, 374_000_000, 459_000_000,
+                    555_000_000, 704_000_000, 957_000_000, 1_405_000_000,
+                ],
+                'percentages' => [
+                    0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9,
+                    10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+                    24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+                ],
+            ],
+            'K/3' => [
+                'category' => 'C',
+                'ceilings' => [
+                    6_600_000, 6_950_000, 7_350_000, 7_800_000, 8_850_000,
+                    9_800_000, 10_950_000, 11_200_000, 12_050_000, 12_950_000,
+                    14_150_000, 15_550_000, 17_050_000, 19_500_000, 22_700_000,
+                    26_600_000, 28_100_000, 30_100_000, 32_600_000, 35_400_000,
+                    38_900_000, 43_000_000, 47_400_000, 51_200_000, 55_800_000,
+                    60_400_000, 66_700_000, 74_500_000, 83_200_000, 95_600_000,
+                    110_000_000, 134_000_000, 169_000_000, 221_000_000, 390_000_000,
+                    463_000_000, 561_000_000, 709_000_000, 965_000_000, 1_419_000_000,
+                ],
+                'percentages' => [
+                    0, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 1.75, 2, 3, 4, 5, 6,
+                    7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34,
+                ],
+            ],
+        ];
+
+        foreach ($tables as $status => $table) {
+            $this->assertCount(count($table['ceilings']) + 1, $table['percentages']);
+
+            foreach ($table['ceilings'] as $index => $ceiling) {
+                foreach ([-1, 0, 1] as $offset) {
+                    $gross = $ceiling + $offset;
+                    $rate = $table['percentages'][$index + ($offset === 1 ? 1 : 0)] / 100;
+                    $result = $this->service->calculateMonthlyTer($gross, $status, true);
+                    $context = "{$status}, gross {$gross}";
+
+                    $this->assertSame($table['category'], $result['ter_category'], $context);
+                    $this->assertEqualsWithDelta($rate, $result['ter_rate'], 1e-12, $context);
+                    $this->assertEquals(round($gross * $rate), $result['pph21_monthly'], $context);
+                }
+            }
+
+            $top = $this->service->calculateMonthlyTer(2_000_000_000, $status, true);
+            $this->assertSame(0.34, $top['ter_rate']);
+            $this->assertEquals(680_000_000, $top['pph21_monthly']);
+        }
+    }
+
+    public function test_ter_category_mapping_matches_article_2(): void
+    {
+        foreach (['TK/0' => 'A', 'TK/1' => 'A', 'K/0' => 'A', 'TK/2' => 'B',
+            'TK/3' => 'B', 'K/1' => 'B', 'K/2' => 'B', 'K/3' => 'C'] as $status => $category) {
+            $result = $this->service->calculateMonthlyTer(21_000_000, $status, true);
+            $this->assertSame($category, $result['ter_category']);
+        }
+    }
+
+    public function test_ter_reported_b_and_c_regressions(): void
+    {
+        $b = $this->service->calculateMonthlyTer(21_000_000, 'K/1', true);
+        $this->assertSame(0.08, $b['ter_rate']);
+        $this->assertEquals(1_680_000, $b['pph21_monthly']);
+
+        $c = $this->service->calculateMonthlyTer(43_050_000, 'K/3', true);
+        $this->assertSame(0.16, $c['ter_rate']);
+        $this->assertEquals(6_888_000, $c['pph21_monthly']);
+    }
+
     /** @test */
     public function test_ter_npwp_surcharge_applied(): void
     {
