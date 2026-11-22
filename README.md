@@ -278,6 +278,15 @@ batas yang berlaku sebelum memproses payroll.
 - Surcharge 20% bila NPWP tidak tersedia, sesuai aturan yang dicatat proyek.
 - Konstanta `JABATAN_RATE = 0.05` dan `JABATAN_MAX_MONTHLY = 500_000`.
 
+Tabel bulanan A/B/C mengikuti [PP 58/2023, Lampiran A-C](https://peraturan.go.id/files/pp-no-58-tahun-2023.pdf)
+dengan batas atas inklusif. Contoh tanpa surcharge: kategori B pada bruto
+Rp 21.000.000 memakai 8% (PPh 21 Rp 1.680.000); kategori C pada bruto
+Rp 43.050.000 memakai 16% (PPh 21 Rp 6.888.000). Band 34% berlaku di atas
+Rp 1.400.000.000 untuk A, Rp 1.405.000.000 untuk B, dan Rp 1.419.000.000 untuk C.
+Koreksi tabel tidak menghitung ulang payroll historis yang sudah dibayar.
+Agregasi penghasilan kena pajak, status NIK/NPWP, dan rekonsiliasi masa pajak
+terakhir masih memiliki tiket terpisah; koreksi ini bukan sertifikasi kepatuhan payroll menyeluruh.
+
 Lihat [referensi payroll](docs/references/payroll.md) dan verifikasi aturan periode berjalan sebelum penggunaan operasional.
 
 ## Deployment

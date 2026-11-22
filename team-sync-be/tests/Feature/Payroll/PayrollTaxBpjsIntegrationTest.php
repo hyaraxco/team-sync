@@ -168,6 +168,34 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $this->assertArrayHasKey('pph21_monthly', $meta);
     }
 
+    public function test_generation_persists_corrected_ter_b_and_c_amounts(): void
+    {
+        Carbon::setTestNow('2026-04-28 09:00:00');
+        PayrollSetting::current()->update(['attendance_cutoff_day' => 25]);
+
+        $b = $this->createEmployeeWithAttendance(21_000_000);
+        $b->update(['ptkp_status' => 'K/1', 'npwp' => '123456789012345']);
+        $c = $this->createEmployeeWithAttendance(43_050_000);
+        $c->update(['ptkp_status' => 'K/3', 'npwp' => '123456789012346']);
+
+        $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
+
+        foreach ([[$b, 'B', 0.08, 1_680_000], [$c, 'C', 0.16, 6_888_000]] as [$employee, $category, $rate, $tax]) {
+            $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
+            $this->assertNotNull($detail);
+            $detail->refresh();
+            $meta = $detail->tax_calculation_meta;
+            $meta = is_string($meta) ? json_decode($meta, true) : $meta;
+
+            $this->assertEquals($tax, (float) $detail->pph21_amount);
+            $this->assertSame('ter_2024', $meta['method']);
+            $this->assertSame($category, $meta['ter_category']);
+            $this->assertSame($rate, $meta['ter_rate']);
+            $this->assertTrue($meta['has_npwp']);
+            $this->assertEquals($tax, $meta['pph21_monthly']);
+        }
+    }
+
     /** @test */
     public function test_bpjs_jp_component_respects_salary_cap_in_detail(): void
     {
