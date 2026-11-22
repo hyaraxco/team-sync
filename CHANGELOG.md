@@ -7,6 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- Select BPJS rates by contribution period instead of a single timeless row per component: payroll, THR, payslip PDF, tax recalc command, and the readiness dashboard now pass the salary month to the calculation service, and JP ceilings are period-qualified (Rp 10.042.300 through Feb 2025, Rp 10.547.400 for Mar 2025-Feb 2026, Rp 11.086.300 from Mar 2026) with provenance recorded in `bpjs_rates` descriptions (PR #85).
+
 ### Added
 - CI workflow for backend Pest tests (`be-tests.yml`)
 - Unit tests for `LicenseService`, `ProjectMembershipService`, `AttendancePeriodService`
