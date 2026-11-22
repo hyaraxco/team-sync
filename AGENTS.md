@@ -165,10 +165,13 @@ team-sync/
 
 ### Payroll System
 - **PPh 21 method**: TER 2024 for monthly (Jan–Nov), annualized in December
-- **BPJS rates are database-driven** — stored in `bpjs_rates` table
+- **BPJS rates are database-driven** — stored in `bpjs_rates` table, selected by
+  contribution period (`effective_date`/`valid_until`, one row per component-period)
   - JHT: employee 2% / employer 3.7% (no cap)
   - JKK: employer 0.24% / JKM: employer 0.30% (no cap)
-  - JP: employee 1% / employer 2% (cap: Rp 10.042.300)
+  - JP: employee 1% / employer 2% — ceiling is period-specific:
+    s/d Feb 2025 = Rp 10.042.300, Mar 2025–Feb 2026 = Rp 10.547.400,
+    Mar 2026+ = Rp 11.086.300 (`BpjsRate::forPeriod()`)
   - Kesehatan: employee 1% / employer 4% (cap: Rp 12.000.000)
 - Tax constants in `TaxCalculationService`: `JABATAN_RATE = 0.05`, `JABATAN_MAX_MONTHLY = 500_000`
 - +20% PPh21 surcharge if no NPWP
