@@ -191,9 +191,11 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         // The only uncapped difference would be JHT (2%) on full salary
         $jhtDiff = abs((float) $highDetail->bpjs_tk_employee - (float) $normalDetail->bpjs_tk_employee);
 
-        // JHT difference: (20jt - 10jt) * 2% = ~200k; JP cap at 10.04jt adds ~4.2 difference
-        // Allow 1000 margin for JP boundary effect
-        $this->assertEqualsWithDelta(200_000, $jhtDiff, 1000, 'Difference should be ~200k (JHT 2% uncapped)');
+        // Due to JP cap at ~11.09jt (Mar 2026+), the BPJS TK should differ by:
+        // JHT: (20jt - 10jt) * 2% = 200k (uncapped)
+        // JP: (min(20jt, 11_086_300) - 10jt) * 1% = 10_863 (cap effect)
+        // Total diff: ~210_863
+        $this->assertEqualsWithDelta(210_863, $jhtDiff, 1000, 'Difference should reflect uncapped JHT + JP cap boundary');
     }
 
     // ─────────────────────────────────────────────────────────────────────────

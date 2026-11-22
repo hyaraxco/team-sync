@@ -14,6 +14,8 @@ class TaxCalculationService
 
     protected ?Collection $bpjsRates = null;
 
+    protected ?string $bpjsLoadedPeriod = null;
+
     protected ?Collection $ptkpAmounts = null;
 
     protected const JABATAN_RATE = 0.05;
@@ -202,11 +204,27 @@ class TaxCalculationService
         $this->loadConfig();
     }
 
-    protected function loadConfig(): void
+    protected function loadConfig(?string $contributionPeriod = null): void
     {
         $this->taxBrackets = TaxBracket::orderBy('order')->get();
-        $this->bpjsRates = BpjsRate::all()->keyBy('component');
         $this->ptkpAmounts = PtkpAmount::all()->keyBy('status');
+
+        $this->loadBpjsRates($contributionPeriod);
+    }
+
+    protected function loadBpjsRates(?string $contributionPeriod = null): void
+    {
+        if ($contributionPeriod && $this->bpjsLoadedPeriod === $contributionPeriod) {
+            return;
+        }
+
+        if ($contributionPeriod) {
+            $this->bpjsRates = BpjsRate::forPeriod($contributionPeriod);
+        } else {
+            $this->bpjsRates = BpjsRate::all()->keyBy('component');
+        }
+
+        $this->bpjsLoadedPeriod = $contributionPeriod;
     }
 
     /**
@@ -221,8 +239,12 @@ class TaxCalculationService
      *     }
      * }
      */
-    public function calculateBpjs(float $grossMonthly): array
+    public function calculateBpjs(float $grossMonthly, ?string $contributionPeriod = null): array
     {
+        if ($contributionPeriod) {
+            $this->loadBpjsRates($contributionPeriod);
+        }
+
         $breakdown = [];
         $employeeShareTotal = 0.0;
         $employerShareTotal = 0.0;
@@ -268,8 +290,12 @@ class TaxCalculationService
      *    }
      * }
      */
-    public function calculateMonthlyPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp): array
+    public function calculateMonthlyPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp, ?string $contributionPeriod = null): array
     {
+        if ($contributionPeriod) {
+            $this->loadBpjsRates($contributionPeriod);
+        }
+
         // 1. Annualize gross
         $grossAnnual = $grossMonthly * 12;
 
@@ -370,7 +396,7 @@ class TaxCalculationService
      *     }
      * }
      */
-    public function calculateMonthlyTer(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp): array
+    public function calculateMonthlyTer(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp, ?string $contributionPeriod = null): array
     {
         $defaultPtkpStatus = 'TK/0';
         $ptkpStatusToUse = $ptkpStatus ?: $defaultPtkpStatus;
@@ -409,9 +435,9 @@ class TaxCalculationService
      *
      * @return array Same structure as calculateMonthlyPph21
      */
-    public function calculateAnnualizedPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp): array
+    public function calculateAnnualizedPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp, ?string $contributionPeriod = null): array
     {
-        return $this->calculateMonthlyPph21($grossMonthly, $ptkpStatus, $hasNpwp);
+        return $this->calculateMonthlyPph21($grossMonthly, $ptkpStatus, $hasNpwp, $contributionPeriod);
     }
 
     /**
@@ -453,15 +479,25 @@ class TaxCalculationService
      *     }>
      * }
      */
-    public function validateBpjsRates(): array
+    public function validateBpjsRates(?string $contributionPeriod = null): array
     {
-        $rates = BpjsRate::all()->keyBy('component');
+        $period = $contributionPeriod ?: now()->format('Y-m');
+        $firstOfMonth = Carbon::parse($period.'-01');
+
+        // Load the latest rate per component with effective_date <= target,
+        // regardless of valid_until, so we can detect expired configurations.
+        $allCandidates = BpjsRate::whereDate('effective_date', '<=', $firstOfMonth->toDateString())
+            ->orderByDesc('effective_date')
+            ->get()
+            ->groupBy('component')
+            ->map->first();
+
         $warnings = [];
         $rateDetails = [];
         $now = Carbon::now();
 
         $expectedComponents = ['jht', 'jkk', 'jkm', 'jp', 'bpjs_kesehatan'];
-        $missingComponents = array_diff($expectedComponents, $rates->keys()->all());
+        $missingComponents = array_diff($expectedComponents, $allCandidates->keys()->all());
 
         foreach ($missingComponents as $component) {
             $warnings[] = [
@@ -471,7 +507,7 @@ class TaxCalculationService
             ];
         }
 
-        foreach ($rates as $component => $rate) {
+        foreach ($allCandidates as $component => $rate) {
             $effectiveDate = $rate->effective_date;
             $validUntil = $rate->valid_until;
             $isExpired = false;
@@ -506,24 +542,6 @@ class TaxCalculationService
                             $monthsSinceEffective
                         ),
                     ];
-                }
-            } elseif (! $effectiveDate && ! $validUntil) {
-                // No date fields set — fall back to updated_at staleness check
-                $updatedAt = $rate->updated_at;
-                if ($updatedAt) {
-                    $monthsSinceUpdate = Carbon::parse($updatedAt)->diffInMonths($now);
-                    if ($monthsSinceUpdate >= static::BPJS_RATE_STALENESS_MONTHS) {
-                        $isPotentiallyOutdated = true;
-                        $warnings[] = [
-                            'component' => $component,
-                            'type' => 'potentially_outdated',
-                            'message' => sprintf(
-                                'BPJS rate for "%s" was last updated %d months ago. Consider verifying against the latest regulation.',
-                                $rate->description ?? $component,
-                                $monthsSinceUpdate
-                            ),
-                        ];
-                    }
                 }
             }
 
@@ -563,8 +581,12 @@ class TaxCalculationService
      *     }>
      * }
      */
-    public function getBpjsCapWarnings(float $grossSalary): array
+    public function getBpjsCapWarnings(float $grossSalary, ?string $contributionPeriod = null): array
     {
+        if ($contributionPeriod) {
+            $this->loadBpjsRates($contributionPeriod);
+        }
+
         $capsApplied = [];
 
         foreach ($this->bpjsRates as $component => $rate) {

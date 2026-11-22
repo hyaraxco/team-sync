@@ -28,22 +28,27 @@ class PayslipPdfService
         $bonus = 0; // Not yet in PayrollDetail schema — placeholder for future feature
         $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus;
 
+        // Determine contribution period from payroll salary_month
+        $salaryMonth = $payroll?->salary_month ? Carbon::parse($payroll->salary_month) : null;
+        $contributionPeriod = $salaryMonth ? $salaryMonth->format('Y-m') : null;
+
         // Calculate BPJS breakdown
-        $bpjsBreakdown = $this->calculateBpjsBreakdown($basicSalary);
+        $bpjsBreakdown = $this->calculateBpjsBreakdown($basicSalary, $contributionPeriod);
 
         // Calculate tax — use TER for Jan–Nov, annualized for December
-        $salaryMonth = $payroll?->salary_month ? Carbon::parse($payroll->salary_month) : null;
         $isDecember = $salaryMonth && $salaryMonth->month === 12;
         $taxResult = $isDecember
             ? $this->taxService->calculateAnnualizedPph21(
                 $basicSalary,
                 $employee?->ptkp_status,
-                ! empty($employee?->npwp)
+                ! empty($employee?->npwp),
+                $contributionPeriod
             )
             : $this->taxService->calculateMonthlyTer(
                 $basicSalary,
                 $employee?->ptkp_status,
-                ! empty($employee?->npwp)
+                ! empty($employee?->npwp),
+                $contributionPeriod
             );
         $tax = $taxResult['pph21_monthly'];
 
@@ -138,9 +143,9 @@ class PayslipPdfService
         return $pdf->output();
     }
 
-    private function calculateBpjsBreakdown(float $basicSalary): array
+    private function calculateBpjsBreakdown(float $basicSalary, ?string $contributionPeriod = null): array
     {
-        $bpjs = $this->taxService->calculateBpjs($basicSalary);
+        $bpjs = $this->taxService->calculateBpjs($basicSalary, $contributionPeriod);
         $breakdown = $bpjs['breakdown'];
 
         return [

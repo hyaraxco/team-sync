@@ -88,9 +88,9 @@ class RecalculatePayrollTaxCommand extends Command
             // Use TER for Jan–Nov, annualized for December
             $isDecember = Carbon::parse($month.'-01')->month === 12;
             $taxResult = $isDecember
-                ? $taxService->calculateAnnualizedPph21($gross, $ptkp, $hasNpwp)
-                : $taxService->calculateMonthlyTer($gross, $ptkp, $hasNpwp);
-            $bpjsResult = $taxService->calculateBpjs($gross);
+                ? $taxService->calculateAnnualizedPph21($gross, $ptkp, $hasNpwp, $month)
+                : $taxService->calculateMonthlyTer($gross, $ptkp, $hasNpwp, $month);
+            $bpjsResult = $taxService->calculateBpjs($gross, $month);
 
             $newPph21 = round($taxResult['pph21_monthly'], 2);
             $newBpjsTkEmp = round(
