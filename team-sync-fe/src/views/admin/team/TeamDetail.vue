@@ -6,7 +6,6 @@ import { storeToRefs } from "pinia";
 import {
     Calendar,
     Folder,
-    CheckCircle,
     Users,
     UserPlus,
     Mail,
@@ -468,45 +467,11 @@ watch(
                 </div>
                 <h2 class="text-brand-dark text-lg font-semibold">Recent Activity</h2>
             </div>
-            <div class="space-y-4">
-                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div class="w-3 h-3 bg-green-500 rounded-full"></div>
-                    <div class="flex-1">
-                        <p class="text-brand-dark text-sm font-medium">
-                            Project milestone completed: API Integration Phase
-                        </p>
-                        <p class="text-brand-light text-xs">3 days ago</p>
-                    </div>
-                    <div class="flex items-center gap-1 text-green-600">
-                        <CheckCircle class="w-4 h-4" />
-                        <span class="text-sm font-medium">Completed</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
-                    <div class="flex-1">
-                        <p class="text-brand-dark text-sm font-medium">New team member joined: Emily Rodriguez</p>
-                        <p class="text-brand-light text-xs">1 week ago</p>
-                    </div>
-                    <div class="flex items-center gap-1 text-blue-600">
-                        <UserPlus class="w-4 h-4" />
-                        <span class="text-sm font-medium">Member Added</span>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                    <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
-                    <div class="flex-1">
-                        <p class="text-brand-dark text-sm font-medium">
-                            Team training session conducted: Advanced React Patterns
-                        </p>
-                        <p class="text-brand-light text-xs">2 weeks ago</p>
-                    </div>
-                    <div class="flex items-center gap-1 text-purple-600">
-                        <i data-lucide="graduation-cap" class="w-4 h-4"></i>
-                        <span class="text-sm font-medium">Training</span>
-                    </div>
-                </div>
-            </div>
+            <EmptyState
+                icon="Layout"
+                title="Belum ada aktivitas"
+                subtitle="Aktivitas tim akan tampil di sini setelah ada data dari server"
+            />
         </div>
 
         <div class="bg-white border border-brand-border rounded-2xl p-6">
