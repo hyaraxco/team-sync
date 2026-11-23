@@ -127,6 +127,94 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         );
     }
 
+    /**
+     * When variable pay (approved overtime) pushes gross across a TER rate boundary,
+     * the payroll generation must calculate PPh 21 using the higher bracket rate on
+     * the combined gross (team-sync-kyp).
+     *
+     * In Category A (TK/0, NPWP):
+     * - Base salary Rp 8.500.000 alone is in the 1.5% bracket (<= Rp 8.550.000).
+     * - Approved overtime pushes gross above Rp 8.550.000 into the 1.75% bracket.
+     * - PPh 21 must be withheld at 1.75% on the entire gross, jumping above the 1.5% rate.
+     */
+    public function test_pph21_ter_bracket_jump_when_overtime_pushes_gross_over_threshold(): void
+    {
+        Carbon::setTestNow('2026-04-28 09:00:00');
+        PayrollSetting::current()->update(['attendance_cutoff_day' => 25]);
+
+        $salary = 8_500_000;
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () use ($salary) {
+            $employee = StaffMemberProfile::factory()->create([
+                'ptkp_status' => 'TK/0',
+                'npwp' => '12.345.678.9-012.000',
+            ]);
+
+            JobInformation::factory()
+                ->forEmployee($employee)
+                ->active()
+                ->state([
+                    'monthly_salary' => $salary,
+                    'status' => 'active',
+                    'employment_type' => 'full_time',
+                ])
+                ->create();
+
+            $startDate = Carbon::now()->startOfMonth();
+            $endDate = Carbon::now()->endOfMonth();
+
+            $cursor = $startDate->copy();
+            while ($cursor->lte($endDate)) {
+                if (! $cursor->isWeekend()) {
+                    Attendance::create([
+                        'staff_member_id' => $employee->id,
+                        'date' => $cursor->toDateString(),
+                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
+                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                        'status' => 'present',
+                        'notes' => 'TER boundary test',
+                    ]);
+                }
+                $cursor->addDay();
+            }
+
+            return $employee;
+        });
+
+        // 2 hours overtime on workday: 1st hr 1.5x, 2nd hr 2x => 3.5 * (8.500.000 / 173) = ~171.965
+        OvertimeRecord::factory()->approved()->workday()->create([
+            'staff_member_id' => $employee->id,
+            'date' => Carbon::now()->startOfMonth()->addDays(3)->toDateString(),
+            'hours' => 2,
+        ]);
+
+        $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
+
+        $this->assertNotNull($detail);
+        $this->assertGreaterThan(0, (float) $detail->overtime_amount);
+
+        $combinedGross = $salary + (float) $detail->overtime_amount;
+        $this->assertGreaterThan(8_550_000, $combinedGross, 'Combined gross must exceed Category A 8.550.000 threshold');
+
+        $meta = json_decode($detail->tax_calculation_meta, true);
+
+        // Verify the bracket jumped to 1.75%:
+        $this->assertEquals(0.0175, (float) $meta['meta']['ter_rate'], 'TER rate must jump to 1.75%');
+
+        // Verified against independent calculation: combinedGross * 0.0175
+        $expectedTax = round($combinedGross * 0.0175);
+        $this->assertEqualsWithDelta(
+            $expectedTax,
+            (float) $detail->pph21_amount,
+            1.0,
+            'PPh 21 must be calculated at the 1.75% rate on the combined gross'
+        );
+
+        // Confirm it strictly does NOT equal the lower 1.5% bracket rate applied to combined gross
+        $lowerBracketTax = round($combinedGross * 0.015);
+        $this->assertNotEquals($lowerBracketTax, (float) $detail->pph21_amount);
+    }
+
     /** @test */
     public function test_payroll_detail_includes_bpjs_tk_employee(): void
     {

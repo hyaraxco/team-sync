@@ -167,4 +167,30 @@ class TerBoundaryTest extends TestCase
         $this->assertSame(0.33, $this->service->calculateMonthlyTer(1_400_000_000, 'TK/0', true)['ter_rate']);
         $this->assertSame(0.34, $this->service->calculateMonthlyTer(1_400_000_001, 'TK/0', true)['ter_rate']);
     }
+
+    /** @test */
+    public function test_category_a_variable_pay_jumps_bracket_boundary(): void
+    {
+        // PP 58/2023 Category A (TK/0, TK/1, K/0):
+        // Bracket <= 8.550.000: 1.5% (rate 0.015) -> 8.550.000 * 0.015 = 128.250
+        // Bracket 8.550.001 - 9.650.000: 1.75% (rate 0.0175) -> 8.600.000 * 0.0175 = 150.500
+        $baseSalary = 8_550_000;
+        $overtimePay = 50_000;
+        $combinedGross = $baseSalary + $overtimePay; // 8.600.000
+
+        // Base salary alone sits exactly at the 1.5% ceiling:
+        $baseOnly = $this->service->calculateMonthlyTer($baseSalary, 'TK/0', true);
+        $this->assertSame(0.015, $baseOnly['ter_rate']);
+        $this->assertSame(128_250.0, $baseOnly['pph21_monthly']);
+
+        // Adding overtime pushes gross across the 8.550.000 threshold to 8.600.000,
+        // which must jump to the 1.75% rate for the whole gross:
+        $withOvertime = $this->service->calculateMonthlyTer($combinedGross, 'TK/0', true);
+        $this->assertSame(0.0175, $withOvertime['ter_rate']);
+        $this->assertSame(150_500.0, $withOvertime['pph21_monthly']);
+
+        // Proves that combined withholding differs from taxing overtime at the base rate:
+        $naiveTax = round($combinedGross * 0.015); // 129.000
+        $this->assertNotEquals($naiveTax, $withOvertime['pph21_monthly']);
+    }
 }
