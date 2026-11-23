@@ -5,8 +5,10 @@ namespace Tests\Feature\Payroll;
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\JobInformation;
+use App\Models\OvertimeRecord;
 use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
+use App\Services\Payroll\TaxCalculationService;
 use Carbon\Carbon;
 use Database\Seeders\BpjsRateSeeder;
 use Database\Seeders\PermissionSeeder;
@@ -71,6 +73,58 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $this->assertNotNull($detail, 'PayrollDetail should exist for employee');
         $this->assertGreaterThan(0, (float) $detail->pph21_amount, 'PPh 21 should be non-zero for 10jt salary');
+    }
+
+    /**
+     * Paid approved overtime is taxable employment income for the same month, so it
+     * must be in the TER gross (PMK 168/2023 Art. 5, 8). The previous implementation
+     * taxed salary only and added overtime afterwards.
+     */
+    public function test_pph21_taxed_gross_includes_approved_overtime(): void
+    {
+        Carbon::setTestNow('2026-04-28 09:00:00');
+        PayrollSetting::current()->update(['attendance_cutoff_day' => 25]);
+
+        $salary = 8_000_000;
+        $employee = $this->createEmployeeWithAttendance($salary);
+
+        $overtime = OvertimeRecord::factory()->approved()->workday()->create([
+            'staff_member_id' => $employee->id,
+            'date' => Carbon::now()->startOfMonth()->addDays(3)->toDateString(),
+            'hours' => 4,
+        ]);
+
+        $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
+        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
+
+        $this->assertNotNull($detail);
+        $this->assertGreaterThan(0, (float) $detail->overtime_amount, 'overtime must be paid');
+
+        $meta = json_decode($detail->tax_calculation_meta, true);
+
+        // The gross handed to the TER calculation must be salary + overtime, not salary.
+        $expectedGross = $salary + (float) $detail->overtime_amount;
+        $this->assertEqualsWithDelta(
+            $expectedGross,
+            (float) $meta['meta']['gross_monthly'],
+            1.0,
+            'taxed gross must include paid overtime'
+        );
+
+        // And the tax must match TER applied to that combined gross, not to salary alone.
+        $taxService = app(TaxCalculationService::class);
+        $expected = $taxService->calculateMonthlyTer(
+            $expectedGross,
+            $employee->ptkp_status ?? null,
+            ! empty($employee->npwp),
+            '2026-04'
+        );
+        $this->assertEqualsWithDelta(
+            (float) $expected['pph21_monthly'],
+            (float) $detail->pph21_amount,
+            1.0,
+            'pph21 must be withheld on the combined gross'
+        );
     }
 
     /** @test */
