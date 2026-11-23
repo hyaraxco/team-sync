@@ -1,6 +1,6 @@
 # Manual Testing Guide — Team Sync HRIS
 
-> **Last Updated:** 2026-04-26
+> **Payroll role expectations updated:** 2026-11-23 (source review only, not a fresh E2E sign-off). Other scenarios retain the 2026-04-26 baseline and need revalidation.
 > **Prerequisites:** `docker compose up -d` (BE) + `bun run dev` (FE)
 > **Login:** All users use password `teamsync`
 
@@ -15,14 +15,16 @@
 | **Staff** | Dina Maharani | `dina@teamsync.com` | Same as above |
 | **Manager** | Yudhis | `yudhis@teamsync.com` | General (+ Employees, Teams, Attendance), Performance (+ Team Reviews), Personal |
 | **Manager** | Rina Wulandari | `rina@teamsync.com` | Same as above |
-| **HR** | Tasyia | `tasyia@teamsync.com` | General (all), Performance (all), Personal |
+| **HR** | Tasyia | `tasyia@teamsync.com` | Workforce/attendance/leave, Performance, Personal; payroll readiness/THR read-only |
 | **HR** | Fajar Pratama | `fajar@teamsync.com` | Same as above |
-| **Finance** | Dwimeta | `dwimeta@teamsync.com` | General (Employees, Payroll, Analytics), Performance (self-service), Personal |
+| **Finance** | Dwimeta | `dwimeta@teamsync.com` | Payroll/THR, payroll analytics, projects (view-only), Performance (self-service), Personal |
 | **Finance** | Sari Dewi | `sari@teamsync.com` | Same as above |
 
 ---
 
 ## Pre-Test Setup
+
+Use an isolated test database with dummy data. `migrate:fresh`, seeders and E2E preparation reset data; never run them against a working or production database.
 
 ```bash
 # 1. Fresh database with demo data
@@ -173,10 +175,9 @@ bun run dev
 - [ ] Leave Requests → Approve/reject pending requests
 
 #### Payroll
-- [ ] Payroll Dashboard → View list (if payroll exists)
-- [ ] Payroll Create → Can generate payroll
-- [ ] **Cannot** access Payroll Settings (finance only)
-- [ ] **Cannot** approve/mark-as-paid (finance only)
+- [ ] Payroll Dashboard, Create, Detail and Settings are denied; `Process Payroll` quick action is hidden
+- [ ] `/admin/payroll/readiness` and `/admin/payroll/thr` are accessible read-only for HR coordination
+- [ ] Payroll generate/approve/pay and THR generate/approve/process actions are unavailable; mutation APIs return `403`
 
 #### Performance Management
 - [ ] Review Cycles → Create new cycle
@@ -188,14 +189,14 @@ bun run dev
 - [ ] My Reviews → Own review
 
 #### Analytics
-- [ ] Navigate to Analytics → All dashboards accessible
-- [ ] Workforce, Attendance, Payroll, Performance, Project analytics
+- [ ] Workforce, Attendance, Leave, Performance and Project analytics are accessible
+- [ ] Finance-only payroll analytics are unavailable
 
 #### Self-Service
 - [ ] My Profile, My Attendance, My Payroll → All accessible
 
 #### Denied Access
-- [ ] URL `/admin/payroll/settings` → Redirects to dashboard
+- [ ] URLs `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/payroll/settings` redirect to dashboard; corresponding admin APIs return `403`
 
 ---
 
@@ -205,19 +206,21 @@ bun run dev
 - [ ] Login → Dashboard with payroll-focused stats
 
 #### Employees
-- [ ] Navigate to Employees → View list only
-- [ ] **Cannot** create/edit/delete
+- [ ] Staff directory and staff create/edit/delete routes are denied; own profile remains accessible
 
 #### Payroll (Full Access)
 - [ ] Payroll Dashboard → View all periods
+- [ ] `Process Payroll` quick action and `/admin/payroll/create` are available
+- [ ] Payroll Create: inspect readiness, generate an eligible month, wait for `pending`; duplicate month is rejected
 - [ ] Payroll Settings → Configure cutoff day, deduction rate, rounding
 - [ ] Payroll Detail → Edit notes, adjust final salary
-- [ ] Approve Payroll → Approve pending payroll
-- [ ] Mark as Paid → Process payment with date
+- [ ] Approve Payroll: complete required approval decisions for pending payroll
+- [ ] Mark as Paid: process approved payroll with payment date
 - [ ] Reopen Payroll → Reopen for correction
 - [ ] Export Excel → Download payroll report
 - [ ] Export Report → Generate summary report
 - [ ] Notification Deliveries → View send history
+- [ ] THR list and generate/approve/process actions are available to Finance
 
 #### Analytics
 - [ ] Navigate to Analytics → Payroll analytics, trends
@@ -227,9 +230,9 @@ bun run dev
 - [ ] My Profile, My Attendance, My Payroll → All accessible
 
 #### Denied Access
-- [ ] URL `/admin/payroll/create` → Redirects to dashboard
+- [ ] URL `/admin/staff-members` → Redirects to dashboard
 - [ ] URL `/admin/teams` → Redirects to dashboard
-- [ ] URL `/admin/projects` → Redirects to dashboard
+- [ ] `/admin/projects` allows view-only project access; project create/edit/delete remain denied
 - [ ] URL `/admin/attendances` → Redirects to dashboard
 - [ ] URL `/admin/performance/cycles` → Redirects to dashboard
 
@@ -238,12 +241,14 @@ bun run dev
 ## Cross-Role Interaction Tests
 
 ### Payroll Full Cycle
-1. **HR** (Tasyia): Generate payroll for current month
+> Finance owns payroll/THR operations. HR retains read-only readiness/THR access, but cannot generate, approve or pay. These are current expectations, not newly executed QA results.
+1. **Finance** (Dwimeta): Generate payroll for current month
 2. **Finance** (Dwimeta): Review payroll detail, edit notes
-3. **Finance** (Dwimeta): Approve payroll
+3. **Finance** (Dwimeta): Complete required approval decisions; payroll becomes `approved`
 4. **Finance** (Dwimeta): Mark as paid with today's date
-5. **Staff** (Agung): Check My Payroll → Payslip visible
-6. **Staff** (Agung): Check notifications → "Payroll Paid" notification
+5. **HR** (Tasyia): Verify payroll dashboard/create/detail/settings and mutation APIs are denied; readiness/THR remain read-only
+6. **Staff** (Agung): Check My Payroll → Payslip visible
+7. **Staff** (Agung): Check notifications → "Payroll Paid" notification
 
 ### Task Assignment Flow
 1. **Manager** (Yudhis): Create task in HRIS project, assign to Agung
