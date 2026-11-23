@@ -7,6 +7,7 @@ import VueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vite.dev/config/
 export default defineConfig(() => ({
+  cacheDir: process.env.VITE_CACHE_DIR,
   plugins: [
     vue(),
     vueJsx(),
