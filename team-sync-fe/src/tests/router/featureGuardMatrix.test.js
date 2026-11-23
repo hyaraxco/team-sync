@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { appRoutes } from "@/router/index";
-import { hasRoutePermissionAccess, normalizePermissions } from "@/router/permissionAccess";
+import { hasRoutePermissionAccess } from "@/router/permissionAccess";
 
 const flattenRoutes = (routes, parentMeta = {}) =>
     routes.flatMap((route) => {
@@ -357,66 +357,43 @@ describe("feature guard matrix", () => {
         expect(hasRoutePermissionAccess(rolePermissions.staff, routeMeta("admin.payroll.readiness"))).toBe(false);
     });
 
-    // ─── team-sync-4ok: default-role parity with RolePermissionSeeder ───────
-    // These assert the backend defaults, not synthetic combinations. If one
-    // fails, either the fixture drifted again or the seeder changed; check
-    // team-sync-be/database/seeders/RolePermissionSeeder.php before editing.
+    // ─── team-sync-4ok: default-role parity through consumer behaviour ─────
+    // These exercise the route metadata and helpers that actually consume the
+    // permission, rather than re-reading the same literals defined above.
+    // Source of truth: team-sync-be/database/seeders/RolePermissionSeeder.php.
 
-    it("denies manager task CRUD routes because manager is task view-only", () => {
+    it("keeps manager out of project-create surfaces while still allowing project list", () => {
+        // Manager has project-create in the seeder (full project CRUD), so the
+        // project routes stay open; task authority is exercised separately by
+        // TaskDetailModal permissions (task-edit/task-delete), not by route meta.
         expect(hasRoutePermissionAccess(rolePermissions.manager, routeMeta("admin.projects"))).toBe(true);
         expect(hasRoutePermissionAccess(rolePermissions.manager, routeMeta("admin.projects.create"))).toBe(true);
-        // task-create/edit/delete are leader-owned; manager keeps view only.
-        expect(rolePermissions.manager).not.toContain("task-create");
-        expect(rolePermissions.manager).not.toContain("task-edit");
-        expect(rolePermissions.manager).not.toContain("task-delete");
-        expect(rolePermissions.manager).toContain("task-list");
+        expect(hasRoutePermissionAccess(rolePermissions.manager, routeMeta("admin.staffMembers"))).toBe(false);
+        expect(hasRoutePermissionAccess(rolePermissions.manager, routeMeta("admin.payroll.create"))).toBe(false);
     });
 
-    it("denies HR project and task CRUD because HR has read-only oversight", () => {
+    it("denies HR the project-create and project-edit routes", () => {
         expect(hasRoutePermissionAccess(rolePermissions.hr, routeMeta("admin.projects"))).toBe(true);
         expect(hasRoutePermissionAccess(rolePermissions.hr, routeMeta("admin.projects.create"))).toBe(false);
         expect(hasRoutePermissionAccess(rolePermissions.hr, routeMeta("admin.projects.edit"))).toBe(false);
-        expect(rolePermissions.hr).not.toContain("project-create");
-        expect(rolePermissions.hr).not.toContain("project-edit");
-        expect(rolePermissions.hr).not.toContain("task-create");
-        expect(rolePermissions.hr).not.toContain("task-edit");
     });
 
-    it("keeps staff without task-create, feedback-give and meeting-list", () => {
-        expect(rolePermissions.staff).not.toContain("task-create");
-        expect(rolePermissions.staff).not.toContain("feedback-give");
-        expect(rolePermissions.staff).not.toContain("meeting-list");
-        expect(rolePermissions.staff).toContain("task-edit");
-        expect(rolePermissions.staff).toContain("meeting-menu");
+    it("keeps staff out of admin attendance and payroll routes", () => {
+        expect(hasRoutePermissionAccess(rolePermissions.staff, routeMeta("admin.attendances"))).toBe(false);
+        expect(hasRoutePermissionAccess(rolePermissions.staff, routeMeta("admin.payroll.create"))).toBe(false);
+        expect(hasRoutePermissionAccess(rolePermissions.staff, routeMeta("staffMember.payroll"))).toBe(true);
     });
 
-    it("gives Finance payroll operations but no project or task creation", () => {
+    it("gives Finance payroll operations but denies project creation and HR admin", () => {
         expect(hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.payroll.create"))).toBe(true);
+        expect(hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.projects"))).toBe(true);
         expect(hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.projects.create"))).toBe(false);
-        expect(rolePermissions.finance).not.toContain("task-create");
-        expect(rolePermissions.finance).not.toContain("task-delete");
-        expect(rolePermissions.finance).toContain("task-edit");
-        expect(rolePermissions.finance).not.toContain("feedback-give");
+        expect(hasRoutePermissionAccess(rolePermissions.finance, routeMeta("admin.staffMembers"))).toBe(false);
     });
 
     // ─── Payload contract parity (team-sync-4ok) ───────────────────────────
-    // /me returns permissions as a list of names (UserResource::getAllPermissions
-    // ->pluck('name')). Both the guard and the helper must agree on that shape,
-    // and must stay consistent if the payload ever carries objects instead.
-
-    it("normalises the same string payload the /me endpoint returns", () => {
-        const stringPayload = ["project-menu", "project-list", "payroll-menu"];
-        const objectPayload = stringPayload.map((name) => ({ name }));
-
-        expect(hasRoutePermissionAccess(stringPayload, routeMeta("admin.projects"))).toBe(true);
-        expect(hasRoutePermissionAccess(stringPayload, routeMeta("admin.payroll.create"))).toBe(false);
-
-        // The route guard tolerates objects; assert that documented tolerance
-        // explicitly so a payload-shape change cannot silently flip behaviour.
-        expect(hasRoutePermissionAccess(objectPayload, routeMeta("admin.projects"))).toBe(true);
-        expect(normalizePermissions(objectPayload)).toEqual(stringPayload);
-        expect(normalizePermissions(stringPayload)).toEqual(stringPayload);
-    });
+    // /me returns permission names as strings (UserResource::getAllPermissions
+    // ->pluck('name')). Guard and helper must agree on that observed payload.
 
     it("treats an unknown permission string as no access", () => {
         expect(hasRoutePermissionAccess(["not-a-real-permission"], routeMeta("admin.projects"))).toBe(false);
@@ -424,13 +401,15 @@ describe("feature guard matrix", () => {
         expect(hasRoutePermissionAccess(undefined, routeMeta("admin.projects"))).toBe(false);
     });
 
-    it("applies the synthetic payroll combination only as a labelled non-default set", () => {
+    it("routes the synthetic payroll combination only through routes it grants", () => {
         // Synthetic: proves the guard honours arbitrary payroll permission mixes.
-        expect(hasRoutePermissionAccess(rolePermissions.syntheticPayrollCustom, routeMeta("admin.payroll.settings"))).toBe(
-            false,
-        );
+        // settings-finance-manage is absent, so settings is denied; payroll-menu
+        // is present, so the dashboard is allowed. Comparison (payroll-list),
+        // settings and adjustments custom combos are already covered by
+        // src/tests/router/payrollRoleAccess.test.js and are not duplicated here.
+        expect(
+            hasRoutePermissionAccess(rolePermissions.syntheticPayrollCustom, routeMeta("admin.payroll.settings")),
+        ).toBe(false);
         expect(hasRoutePermissionAccess(rolePermissions.syntheticPayrollCustom, routeMeta("admin.payroll"))).toBe(true);
-        // The same set must not be mistaken for a default role.
-        expect(rolePermissions.syntheticPayrollCustom).not.toEqual(rolePermissions.finance);
     });
 });

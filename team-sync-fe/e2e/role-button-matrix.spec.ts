@@ -51,8 +51,8 @@ test.describe.serial("Staff Member module — button visibility per role", () =>
         await expectTextVisible(page, "Import CSV");
 
         // Wait for staff member API data to load and cards to render.
-        // Scope to the heading: "All Staff Members" also appears as a link in
-        // the success screen, so an unscoped getByText matches two elements.
+        // PR #103 evidence: two elements carry this text (a subtitle paragraph
+        // plus the <h3>), so an unscoped getByText matches two.
         await expect(
             page.getByRole("heading", { name: "All Staff Members" }),
         ).toBeVisible({ timeout: 15_000 });
