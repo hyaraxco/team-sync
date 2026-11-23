@@ -39,9 +39,9 @@ class AttendanceFilterTest extends TestCase
         $this->actingAsHr();
         $staff = StaffMemberProfile::factory()->create();
 
-        Attendance::factory()->create(['staff_member_id' => $staff->id, 'status' => 'present']);
-        Attendance::factory()->create(['staff_member_id' => $staff->id, 'status' => 'late']);
-        Attendance::factory()->create(['staff_member_id' => $staff->id, 'status' => 'absent']);
+        Attendance::factory()->create(['staff_member_id' => $staff->id, 'date' => '2026-11-02', 'status' => 'present']);
+        Attendance::factory()->create(['staff_member_id' => $staff->id, 'date' => '2026-11-03', 'status' => 'late']);
+        Attendance::factory()->create(['staff_member_id' => $staff->id, 'date' => '2026-11-04', 'status' => 'absent']);
 
         $response = $this->getJson('/api/v1/attendances/all/paginated?row_per_page=15&status=late');
 
@@ -56,7 +56,9 @@ class AttendanceFilterTest extends TestCase
         $this->actingAsHr();
         $staff = StaffMemberProfile::factory()->create();
 
-        Attendance::factory()->count(3)->create(['staff_member_id' => $staff->id]);
+        foreach (['2026-11-02', '2026-11-03', '2026-11-04'] as $date) {
+            Attendance::factory()->create(['staff_member_id' => $staff->id, 'date' => $date]);
+        }
 
         $response = $this->getJson('/api/v1/attendances/all/paginated?row_per_page=15');
 
