@@ -6,16 +6,26 @@ use App\Enums\AttendanceStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\TaskStatus;
 use App\Models\Attendance;
+use App\Models\Payroll;
+use App\Models\PayrollDetail;
 use App\Models\Project;
 use App\Models\ProjectTask;
 use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\TeamMember;
+use App\Models\User;
 use App\Repositories\AnalyticsRepository;
 use Carbon\Carbon;
+use Database\Seeders\PermissionSeeder;
+use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Laravel\Sanctum\Sanctum;
 use ReflectionMethod;
+use Spatie\Permission\Models\Role;
+use Spatie\Permission\PermissionRegistrar;
+use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
 /**
@@ -25,7 +35,7 @@ use Tests\TestCase;
  */
 class AnalyticsRepositoryAggregationTest extends TestCase
 {
-    use RefreshDatabase;
+    use ActivatesLicense, RefreshDatabase;
 
     private AnalyticsRepository $repository;
 
@@ -233,6 +243,82 @@ class AnalyticsRepositoryAggregationTest extends TestCase
         $this->assertSame(1, $row['member_count']);
         // Only Task 1 participates: 1 of 1 task done = 100.0% completion rate
         $this->assertSame(100.0, $row['task_completion_rate']);
+    }
+
+    public function test_payroll_analytics_endpoint_returns_200_with_deterministic_totals_on_mysql(): void
+    {
+        // The endpoint uses DATE_FORMAT, which SQLite does not provide.
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            $this->markTestSkipped('Payroll analytics requires MySQL; SQLite lacks DATE_FORMAT.');
+        }
+
+        $this->seed([RoleSeeder::class, PermissionSeeder::class, RolePermissionSeeder::class]);
+        $this->activateTestLicense();
+        app(PermissionRegistrar::class)->forgetCachedPermissions();
+        cache()->flush();
+
+        // salary_month is unique: one payroll per month, with two employees in the latest.
+        $approvedPayroll = Payroll::factory()->create([
+            'salary_month' => Carbon::now()->startOfMonth()->format('Y-m-01'),
+            'status' => 'approved',
+        ]);
+        $paidPayroll = Payroll::factory()->create([
+            'salary_month' => Carbon::now()->subMonth()->startOfMonth()->format('Y-m-01'),
+            'status' => 'paid',
+        ]);
+        $pendingPayroll = Payroll::factory()->create([
+            'salary_month' => Carbon::now()->subMonths(2)->startOfMonth()->format('Y-m-01'),
+            'status' => 'pending',
+        ]);
+
+        $alice = StaffMemberProfile::factory()->create();
+        $bob = StaffMemberProfile::factory()->create();
+        $this->createPayrollDetail($approvedPayroll, $alice, 5_000_000.0, 100_000.0);
+        $this->createPayrollDetail($approvedPayroll, $bob, 3_000_000.0, 50_000.0);
+        $this->createPayrollDetail($paidPayroll, $alice, 2_000_000.0, 25_000.0);
+        $this->createPayrollDetail($pendingPayroll, $alice, 9_000_000.0, 900_000.0);
+
+        $user = User::factory()->create();
+        $user->assignRole(Role::findByName('finance', 'sanctum'));
+        Sanctum::actingAs($user);
+
+        $response = $this->getJson('/api/v1/analytics/payroll?period=3m');
+
+        $response->assertOk()->assertJson(['success' => true]);
+        $trend = collect($response->json('data.cost_trend'))->keyBy('month');
+
+        $this->assertCount(2, $trend);
+        $this->assertSame(8_000_000, $trend[Carbon::now()->format('M Y')]['total_salary']);
+        $this->assertSame(150_000, $trend[Carbon::now()->format('M Y')]['total_deductions']);
+        $this->assertSame(2, $trend[Carbon::now()->format('M Y')]['employee_count']);
+        $this->assertSame(4_000_000, $trend[Carbon::now()->format('M Y')]['avg_salary']);
+        $this->assertSame(2_000_000, $trend[Carbon::now()->subMonth()->format('M Y')]['total_salary']);
+    }
+
+    public function test_payroll_analytics_does_not_reference_missing_model_status_constants(): void
+    {
+        $this->assertSame(
+            0,
+            preg_match_all('/Payroll::STATUS_[A-Z_]+/', (string) file_get_contents(app_path('Repositories/AnalyticsRepository.php'))),
+            'AnalyticsRepository must use PayrollStatus::*->value; the Payroll model defines no STATUS_* constants.'
+        );
+    }
+
+    private function createPayrollDetail(Payroll $payroll, StaffMemberProfile $employee, float $finalSalary, float $deduction): void
+    {
+        PayrollDetail::create([
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $employee->id,
+            'original_salary' => $finalSalary + $deduction,
+            'final_salary' => $finalSalary,
+            'deduction_amount' => $deduction,
+            'pph21_amount' => 0,
+            'bpjs_tk_employee' => 0,
+            'bpjs_tk_employer' => 0,
+            'bpjs_kes_employee' => 0,
+            'bpjs_kes_employer' => 0,
+            'overtime_amount' => 0,
+        ]);
     }
 
     private function createTasks(Project $project, StaffMemberProfile $assignee, int $count, TaskStatus $status = TaskStatus::TODO): void
