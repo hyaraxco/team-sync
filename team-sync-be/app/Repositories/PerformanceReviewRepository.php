@@ -150,30 +150,45 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getGoalsForReview(int $staffMemberId, int $reviewId, $cycle)
     {
+        [$cycleStart, $cycleEnd] = $this->cycleWindow($cycle);
+
         return PerformanceGoal::where('staff_member_id', $staffMemberId)
-            ->where(function ($q) use ($reviewId, $cycle) {
+            ->where(function ($q) use ($reviewId, $cycleStart, $cycleEnd) {
                 $q->where('linked_review_id', $reviewId)
-                    ->orWhere(function ($dateQ) use ($cycle) {
-                        $dateQ->whereBetween('start_date', [
-                            $cycle->start_date,
-                            $cycle->end_date,
-                        ])->orWhereBetween('created_at', [
-                            $cycle->start_date.' 00:00:00',
-                            $cycle->end_date.' 23:59:59',
-                        ]);
+                    ->orWhere(function ($dateQ) use ($cycleStart, $cycleEnd) {
+                        $dateQ->whereBetween('start_date', [$cycleStart, $cycleEnd])
+                            ->orWhereBetween('created_at', [$cycleStart, $cycleEnd]);
                     });
             })
             ->get(['id', 'status', 'completed_at', 'due_date']);
     }
 
+    /**
+     * Resolve the inclusive date window of a review cycle.
+     *
+     * The model casts start_date/end_date to Carbon, so string concatenation such
+     * as `$cycle->end_date.' 23:59:59'` produced malformed bounds
+     * ("2026-03-31 00:00:00 23:59:59") and silently dropped last-day records
+     * (team-sync-6g5). Carbon::parse keeps this non-mutating and tolerant of
+     * callers that pass raw date strings.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function cycleWindow($cycle): array
+    {
+        return [
+            Carbon::parse($cycle->start_date)->startOfDay(),
+            Carbon::parse($cycle->end_date)->endOfDay(),
+        ];
+    }
+
     public function getPositiveFeedbackCount(int $staffMemberId, $cycle): int
     {
+        [$cycleStart, $cycleEnd] = $this->cycleWindow($cycle);
+
         return PerformanceFeedback::where('staff_member_id', $staffMemberId)
             ->where('feedback_type', 'positive')
-            ->whereBetween('created_at', [
-                $cycle->start_date.' 00:00:00',
-                $cycle->end_date.' 23:59:59',
-            ])
+            ->whereBetween('created_at', [$cycleStart, $cycleEnd])
             ->count();
     }
 
@@ -437,12 +452,11 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         // Pre-calculate feedback normalization cap for this cycle
         // Cap = max(10, max positive feedback count among all employees in cycle)
         $cycle = PerformanceReviewCycle::find($cycleId);
+        [$cycleStart, $cycleEnd] = $this->cycleWindow($cycle);
+
         $maxFeedbackInCycle = PerformanceFeedback::whereIn('staff_member_id', $reviewScores->pluck('staff_member_id'))
             ->where('feedback_type', 'positive')
-            ->whereBetween('created_at', [
-                $cycle->start_date.' 00:00:00',
-                $cycle->end_date.' 23:59:59',
-            ])
+            ->whereBetween('created_at', [$cycleStart, $cycleEnd])
             ->selectRaw('staff_member_id, COUNT(*) as cnt')
             ->groupBy('staff_member_id')
             ->pluck('cnt')
@@ -497,15 +511,11 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 : 0;
 
             // C3 & C4: From performance_goals within the cycle period
-            $cycle = $review->cycle ?? PerformanceReviewCycle::find($cycleId);
             $goals = PerformanceGoal::where('staff_member_id', $employeeId)
-                ->where(function ($q) use ($review, $cycle) {
+                ->where(function ($q) use ($review, $cycleStart, $cycleEnd) {
                     // Goals linked to this review OR created within the cycle period
                     $q->where('linked_review_id', $review->id)
-                        ->orWhereBetween('created_at', [
-                            $cycle->start_date.' 00:00:00',
-                            $cycle->end_date.' 23:59:59',
-                        ]);
+                        ->orWhereBetween('created_at', [$cycleStart, $cycleEnd]);
                 })
                 ->get();
 
@@ -516,7 +526,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             // C4: On-time ratio (goals completed before or on due_date)
             $onTimeGoals = $goals->where('status', 'completed')
                 ->filter(function ($g) {
-                    return $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date;
+                    return $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date->copy()->endOfDay();
                 })
                 ->count();
             $goalCompletionRatio = $completedGoals > 0 ? ($onTimeGoals / $completedGoals) : 0;
@@ -524,10 +534,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             // C5: Positive feedback count within cycle period
             $positiveFeedbackCount = PerformanceFeedback::where('staff_member_id', $employeeId)
                 ->where('feedback_type', 'positive')
-                ->whereBetween('created_at', [
-                    $cycle->start_date.' 00:00:00',
-                    $cycle->end_date.' 23:59:59',
-                ])
+                ->whereBetween('created_at', [$cycleStart, $cycleEnd])
                 ->count();
 
             $attendanceRecords = Attendance::where('staff_member_id', $employeeId)

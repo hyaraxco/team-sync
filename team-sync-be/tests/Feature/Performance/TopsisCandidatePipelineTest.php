@@ -220,4 +220,102 @@ class TopsisCandidatePipelineTest extends TestCase
 
         $this->assertSame([], $this->candidates());
     }
+
+    /**
+     * team-sync-6g5: cycle dates are Carbon casts, so `$cycle->end_date.' 23:59:59'`
+     * concatenated onto an already-timestamped string produced malformed bounds
+     * like "2026-03-31 00:00:00 23:59:59". Feedback created during the last day
+     * of the cycle was therefore excluded.
+     *
+     * @test
+     */
+    public function test_last_day_of_cycle_feedback_is_counted(): void
+    {
+        $emp = User::where('email', 'agung@teamsync.com')->first();
+        $this->completedReviewFor($emp);
+
+        // 1 feedback on the first day, 4 on the last day of the cycle.
+        Carbon::setTestNow('2026-01-01 00:00:00');
+        $this->positiveFeedback($emp, 1);
+
+        Carbon::setTestNow('2026-03-31 18:30:00');
+        $this->positiveFeedback($emp, 4);
+
+        // A day after the cycle must not count.
+        Carbon::setTestNow('2026-04-01 00:00:01');
+        $this->positiveFeedback($emp, 2);
+
+        $candidates = $this->candidates();
+        $row = collect($candidates)->firstWhere('staff_member_id', $emp->staffMemberProfile->id);
+
+        // 5 in-window / cap max(10, 5) = 10 → 50.  The 2 out-of-window are ignored.
+        $this->assertEqualsWithDelta(50.0, $row['feedback_score'], 0.01);
+    }
+
+    /**
+     * A shared cycle maximum must be used, not a per-employee denominator.
+     * Two candidates: 15 positive entries → 100, 7 entries → 46.6667 against
+     * cap 15.  A fixed cap of 10 or a per-employee denominator would break this.
+     *
+     * @test
+     */
+    public function test_feedback_score_uses_shared_cycle_maximum_across_candidates(): void
+    {
+        $this->insideCycleWindow();
+
+        $top = User::where('email', 'agung@teamsync.com')->first();
+        // EmployeeSeeder only seeds this one account, so build a second candidate
+        // explicitly instead of relying on another seeded email.
+        $secondProfile = \App\Models\StaffMemberProfile::factory()->create();
+        $second = $secondProfile->user;
+        $this->assertNotNull($second, 'Second candidate needs a user');
+
+        $this->completedReviewFor($top);
+        $this->completedReviewFor($second);
+
+        $this->positiveFeedback($top, 15);
+        $this->positiveFeedback($second, 7);
+
+        $candidates = collect($this->candidates());
+
+        $topRow = $candidates->firstWhere('staff_member_id', $top->staffMemberProfile->id);
+        $secondRow = $candidates->firstWhere('staff_member_id', $secondProfile->id);
+
+        $this->assertNotNull($topRow, 'Top candidate row missing');
+        $this->assertNotNull($secondRow, 'Second candidate row missing');
+
+        // Cap is the cycle maximum 15.
+        $this->assertEqualsWithDelta(100.0, $topRow['feedback_score'], 0.01);
+        // 7 / 15 * 100 = 46.6667
+        $this->assertEqualsWithDelta(46.6667, $secondRow['feedback_score'], 0.01);
+    }
+
+    /**
+     * Goals created on the last day of the cycle must participate in C3/C4.
+     *
+     * @test
+     */
+    public function test_last_day_of_cycle_goals_are_included(): void
+    {
+        $emp = User::where('email', 'agung@teamsync.com')->first();
+        $this->completedReviewFor($emp);
+
+        Carbon::setTestNow('2026-03-31 20:00:00');
+
+        $goal = \App\Models\PerformanceGoal::factory()->create([
+            'staff_member_id' => $emp->staffMemberProfile->id,
+            'title' => 'Last day goal',
+            'goal_type' => 'kpi',
+            'status' => 'completed',
+            'start_date' => '2026-03-01',
+            'due_date' => '2026-03-31',
+            'completed_at' => '2026-03-31 19:00:00',
+        ]);
+
+        $candidates = $this->candidates();
+        $row = collect($candidates)->firstWhere('staff_member_id', $emp->staffMemberProfile->id);
+
+        // 1 goal, completed on time → 100% completion + 100% on-time
+        $this->assertEqualsWithDelta(100.0, $row['goal_completion'], 0.01);
+    }
 }
