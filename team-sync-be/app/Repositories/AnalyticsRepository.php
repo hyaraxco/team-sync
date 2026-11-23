@@ -2139,9 +2139,14 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as attended_attendances
             ");
 
+        // Bounded by the report window so the aggregate does not scan every task
+        // ever created. A task counts once it exists (created by the window end);
+        // its completion is read from its current status. Keep this predicate in
+        // step with getProjectResourceUtilization.
         $taskStats = DB::table('project_tasks')
             ->whereIn('status', ['todo', 'in_progress', 'review', 'done'])
             ->whereNotNull('assignee_id')
+            ->where('created_at', '<=', $end->copy()->endOfDay()->toDateTimeString())
             ->groupBy('assignee_id')
             ->selectRaw("
                 assignee_id,

@@ -179,6 +179,47 @@ class AnalyticsRepositoryAggregationTest extends TestCase
         $this->assertSame(2, $kpis['active_projects']);
     }
 
+    public function test_team_performance_ignores_tasks_created_after_the_window(): void
+    {
+        $team = Team::factory()->active()->create();
+        $member = StaffMemberProfile::factory()->create();
+
+        TeamMember::factory()->forTeam($team)->forEmployee($member)->create();
+
+        $project = Project::factory()->create();
+
+        // Inside the window: 1 of 2 tasks done.
+        $this->createTasks($project, $member, 1, TaskStatus::DONE);
+        $this->createTasks($project, $member, 1, TaskStatus::TODO);
+
+        // Outside the window: created well after it ends. Must not be counted,
+        // otherwise the aggregate scans every task ever created.
+        ProjectTask::factory()->count(5)->create([
+            'project_id' => $project->id,
+            'assignee_id' => $member->id,
+            'status' => TaskStatus::DONE->value,
+            'created_at' => Carbon::today()->addMonths(3),
+            'updated_at' => Carbon::today()->addMonths(3),
+        ]);
+
+        $method = new ReflectionMethod(AnalyticsRepository::class, 'getTeamPerformanceData');
+        $method->setAccessible(true);
+
+        $rows = $method->invoke(
+            $this->repository,
+            Carbon::today()->subDays(30),
+            Carbon::today(),
+            null,
+            $team->id,
+        );
+
+        $row = collect($rows)->firstWhere('team_name', $team->name);
+
+        // 1 of 2 in-window tasks done = 50%. Counting the 5 future tasks would
+        // report 6 of 7 done = 85.7%.
+        $this->assertSame(50.0, $row['task_completion_rate']);
+    }
+
     private function createTasks(Project $project, StaffMemberProfile $assignee, int $count, TaskStatus $status = TaskStatus::TODO): void
     {
         ProjectTask::factory()->count($count)->create([
