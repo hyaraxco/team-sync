@@ -150,30 +150,45 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function getGoalsForReview(int $staffMemberId, int $reviewId, $cycle)
     {
+        [$cycleStart, $cycleEnd] = $this->cycleWindow($cycle);
+
         return PerformanceGoal::where('staff_member_id', $staffMemberId)
-            ->where(function ($q) use ($reviewId, $cycle) {
+            ->where(function ($q) use ($reviewId, $cycleStart, $cycleEnd) {
                 $q->where('linked_review_id', $reviewId)
-                    ->orWhere(function ($dateQ) use ($cycle) {
-                        $dateQ->whereBetween('start_date', [
-                            $cycle->start_date->copy()->startOfDay(),
-                            $cycle->end_date->copy()->endOfDay(),
-                        ])->orWhereBetween('created_at', [
-                            $cycle->start_date->copy()->startOfDay(),
-                            $cycle->end_date->copy()->endOfDay(),
-                        ]);
+                    ->orWhere(function ($dateQ) use ($cycleStart, $cycleEnd) {
+                        $dateQ->whereBetween('start_date', [$cycleStart, $cycleEnd])
+                            ->orWhereBetween('created_at', [$cycleStart, $cycleEnd]);
                     });
             })
             ->get(['id', 'status', 'completed_at', 'due_date']);
     }
 
+    /**
+     * Resolve the inclusive date window of a review cycle.
+     *
+     * The model casts start_date/end_date to Carbon, so string concatenation such
+     * as `$cycle->end_date.' 23:59:59'` produced malformed bounds
+     * ("2026-03-31 00:00:00 23:59:59") and silently dropped last-day records
+     * (team-sync-6g5). Carbon::parse keeps this non-mutating and tolerant of
+     * callers that pass raw date strings.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    private function cycleWindow($cycle): array
+    {
+        return [
+            Carbon::parse($cycle->start_date)->startOfDay(),
+            Carbon::parse($cycle->end_date)->endOfDay(),
+        ];
+    }
+
     public function getPositiveFeedbackCount(int $staffMemberId, $cycle): int
     {
+        [$cycleStart, $cycleEnd] = $this->cycleWindow($cycle);
+
         return PerformanceFeedback::where('staff_member_id', $staffMemberId)
             ->where('feedback_type', 'positive')
-            ->whereBetween('created_at', [
-                $cycle->start_date->copy()->startOfDay(),
-                $cycle->end_date->copy()->endOfDay(),
-            ])
+            ->whereBetween('created_at', [$cycleStart, $cycleEnd])
             ->count();
     }
 
@@ -437,8 +452,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         // Pre-calculate feedback normalization cap for this cycle
         // Cap = max(10, max positive feedback count among all employees in cycle)
         $cycle = PerformanceReviewCycle::find($cycleId);
-        $cycleStart = $cycle->start_date->copy()->startOfDay();
-        $cycleEnd = $cycle->end_date->copy()->endOfDay();
+        [$cycleStart, $cycleEnd] = $this->cycleWindow($cycle);
 
         $maxFeedbackInCycle = PerformanceFeedback::whereIn('staff_member_id', $reviewScores->pluck('staff_member_id'))
             ->where('feedback_type', 'positive')

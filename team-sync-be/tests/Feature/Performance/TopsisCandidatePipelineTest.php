@@ -264,7 +264,11 @@ class TopsisCandidatePipelineTest extends TestCase
         $this->insideCycleWindow();
 
         $top = User::where('email', 'agung@teamsync.com')->first();
-        $second = User::where('email', 'yudhis@teamsync.com')->first();
+        // EmployeeSeeder only seeds this one account, so build a second candidate
+        // explicitly instead of relying on another seeded email.
+        $secondProfile = \App\Models\StaffMemberProfile::factory()->create();
+        $second = $secondProfile->user;
+        $this->assertNotNull($second, 'Second candidate needs a user');
 
         $this->completedReviewFor($top);
         $this->completedReviewFor($second);
@@ -275,7 +279,10 @@ class TopsisCandidatePipelineTest extends TestCase
         $candidates = collect($this->candidates());
 
         $topRow = $candidates->firstWhere('staff_member_id', $top->staffMemberProfile->id);
-        $secondRow = $candidates->firstWhere('staff_member_id', $second->staffMemberProfile->id);
+        $secondRow = $candidates->firstWhere('staff_member_id', $secondProfile->id);
+
+        $this->assertNotNull($topRow, 'Top candidate row missing');
+        $this->assertNotNull($secondRow, 'Second candidate row missing');
 
         // Cap is the cycle maximum 15.
         $this->assertEqualsWithDelta(100.0, $topRow['feedback_score'], 0.01);
