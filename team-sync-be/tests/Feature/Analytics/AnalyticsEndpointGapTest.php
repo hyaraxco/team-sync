@@ -2,6 +2,14 @@
 
 namespace Tests\Feature\Analytics;
 
+use App\Models\Attendance;
+use App\Models\AttendanceCorrection;
+use App\Models\LeaveRequest;
+use App\Models\Payroll;
+use App\Models\PayrollApproval;
+use App\Models\PayrollApprovalPolicy;
+use App\Models\PayrollDetail;
+use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -20,6 +28,7 @@ class AnalyticsEndpointGapTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+        $this->travelTo(now()->setDate(2026, 11, 23)->startOfDay());
 
         $this->seed([
             RoleSeeder::class,
@@ -51,26 +60,6 @@ class AnalyticsEndpointGapTest extends TestCase
         return $user;
     }
 
-    /**
-     * Helper: assert the route exists, the caller is authorized, and the endpoint
-     * answers without a server error.
-     *
-     * Historically this helper accepted HTTP 500 because several analytics queries
-     * use MySQL-only SQL (DATE_FORMAT, TIMESTAMPDIFF) that fails on the SQLite test
-     * database. That made the suite unable to detect a genuine 500 - a real
-     * arithmetic or column bug looked identical to the known dialect gap.
-     *
-     * Endpoints listed in MySQL_ONLY_ENDPOINTS are still expected to 500 here; they
-     * are asserted as such explicitly, so the unsupported state is visible instead
-     * of silent. Any other 500 fails the test.
-     */
-    private const MYSQL_ONLY_ENDPOINTS = [
-        '/api/v1/analytics/attendance/correction-frequency',
-        '/api/v1/analytics/leave/approval-turnaround',
-        '/api/v1/analytics/payroll/cost-per-employee',
-        '/api/v1/analytics/payroll/processing-time',
-    ];
-
     private function assertAnalyticsRouteAccessible(string $uri, string $role = 'hr'): void
     {
         if ($role === 'finance') {
@@ -79,34 +68,8 @@ class AnalyticsEndpointGapTest extends TestCase
             $this->actingAsHr();
         }
 
-        $response = $this->getJson($uri);
-        $status = $response->status();
-
-        // Route must exist (not 404) and user must be authorized (not 401/403)
-        $this->assertNotEquals(404, $status, "Route {$uri} should exist (got 404)");
-        $this->assertNotEquals(401, $status, "Route {$uri} should not require re-auth (got 401)");
-        $this->assertNotEquals(403, $status, "Route {$uri} should be accessible to {$role} (got 403)");
-
-        if (in_array($uri, self::MYSQL_ONLY_ENDPOINTS, true)) {
-            // Known dialect gap on SQLite. Pin it so that fixing the query makes this
-            // test fail loudly (and the endpoint gets moved to the strict path).
-            $this->assertSame(
-                500,
-                $status,
-                "{$uri} is listed as MySQL-only. If it now returns {$status} on SQLite, "
-                .'remove it from MySQL_ONLY_ENDPOINTS and assert its payload instead.'
-            );
-
-            return;
-        }
-
-        $this->assertSame(
-            200,
-            $status,
-            "{$uri} should return 200 for {$role}; a 500 here is a real failure, not the "
-            .'known MySQL/SQLite dialect gap.'
-        );
-        $response->assertJsonStructure(['success', 'message', 'data'])
+        $this->getJson($uri)->assertOk()
+            ->assertJsonStructure(['success', 'message', 'data'])
             ->assertJson(['success' => true]);
     }
 
@@ -126,16 +89,55 @@ class AnalyticsEndpointGapTest extends TestCase
 
     // ─── GAP-4b: Attendance Correction Frequency ────────────────────
 
-    public function test_attendance_correction_frequency_endpoint_exists(): void
+    public function test_attendance_correction_frequency_returns_counts_and_approval_rate(): void
     {
-        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/attendance/correction-frequency');
+        $member = StaffMemberProfile::factory()->create();
+        foreach (['approved', 'approved', 'rejected', 'pending'] as $index => $status) {
+            $attendance = Attendance::factory()->create([
+                'staff_member_id' => $member->id,
+                'date' => '2026-11-'.(10 + $index),
+            ]);
+            AttendanceCorrection::factory()->create([
+                'attendance_id' => $attendance->id,
+                'staff_member_id' => $member->id,
+                'status' => $status,
+                'created_at' => '2026-11-23 23:59:59',
+            ]);
+        }
+        $this->actingAsHr();
+
+        $this->getJson('/api/v1/analytics/attendance/correction-frequency?period=1m')
+            ->assertOk()->assertJsonPath('success', true)
+            ->assertJsonPath('data.correction_trend', [[
+                'month' => 'Nov 2026', 'total' => 4, 'approved' => 2,
+                'rejected' => 1, 'pending' => 1, 'approval_rate' => 50,
+            ]])
+            ->assertJsonPath('data.top_requesters', [[
+                'employee_name' => $member->user->name,
+                'employee_code' => $member->code, 'correction_count' => 4,
+            ]]);
     }
 
     // ─── GAP-4c: Leave Approval Turnaround ──────────────────────────
 
-    public function test_leave_approval_turnaround_endpoint_exists(): void
+    public function test_leave_approval_turnaround_returns_whole_hour_statistics(): void
     {
-        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/leave/approval-turnaround');
+        $member = StaffMemberProfile::factory()->create();
+        foreach (['approved' => '2026-11-10 11:59:59', 'rejected' => '2026-11-10 14:05:00', 'pending' => '2026-11-20 10:00:00'] as $status => $updatedAt) {
+            LeaveRequest::factory()->create([
+                'staff_member_id' => $member->id, 'status' => $status,
+                'start_date' => '2026-11-15', 'end_date' => '2026-11-15', 'total_days' => 1,
+                'created_at' => '2026-11-10 10:00:00', 'updated_at' => $updatedAt,
+            ]);
+        }
+        $this->actingAsHr();
+
+        $this->getJson('/api/v1/analytics/leave/approval-turnaround?period=1m')
+            ->assertOk()->assertJsonPath('success', true)
+            ->assertJsonPath('data.turnaround_by_month', [[
+                'month' => 'Nov 2026', 'avg_hours' => 2.5,
+                'min_hours' => 1, 'max_hours' => 4, 'total_processed' => 2,
+            ]]);
     }
 
     // ─── GAP-4d: Leave Type Distribution ────────────────────────────
@@ -154,18 +156,77 @@ class AnalyticsEndpointGapTest extends TestCase
 
     // ─── GAP-4e: Payroll Cost Per Employee ──────────────────────────
 
-    public function test_payroll_cost_per_employee_endpoint_exists(): void
+    public function test_payroll_cost_per_employee_returns_exact_cost_and_distinct_headcount(): void
     {
-        // Payroll analytics requires analytics-finance-view (Finance role)
-        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/payroll/cost-per-employee', 'finance');
+        $members = StaffMemberProfile::factory()->count(3)->create();
+        foreach (['2026-11-01' => 'approved', '2026-11-02' => 'paid', '2026-11-03' => 'pending'] as $date => $status) {
+            $payroll = Payroll::factory()->create([
+                'salary_month' => $date, 'status' => $status, 'attendance_period_id' => null,
+            ]);
+            foreach ($members as $index => $member) {
+                $salary = $status === 'pending' ? 90000000 : ($status === 'paid' ? 1 : [3000000, 3000000, 4000001][$index]);
+                PayrollDetail::create([
+                    'payroll_id' => $payroll->id, 'staff_member_id' => $member->id,
+                    'original_salary' => $salary, 'final_salary' => $salary,
+                ]);
+            }
+        }
+        $this->actingAsFinance();
+
+        $this->getJson('/api/v1/analytics/payroll/cost-per-employee?period=1m')
+            ->assertOk()->assertJsonPath('success', true)
+            ->assertJsonPath('data.cost_per_employee_trend', [[
+                'month' => 'Nov 2026', 'total_cost' => 10000004,
+                'employee_count' => 3, 'cost_per_employee' => 3333334.67,
+            ]]);
     }
 
     // ─── GAP-4f: Payroll Processing Time ────────────────────────────
 
-    public function test_payroll_processing_time_endpoint_exists(): void
+    public function test_payroll_processing_time_counts_each_payroll_at_its_final_approved_step(): void
     {
-        // Payroll analytics requires analytics-finance-view (Finance role)
-        $this->assertAnalyticsRouteAccessible('/api/v1/analytics/payroll/processing-time', 'finance');
+        $policies = [];
+        foreach ([1, 2] as $order) {
+            $policies[] = PayrollApprovalPolicy::create([
+                'name' => 'Approval '.$order, 'min_amount' => 0,
+                'required_role' => 'finance', 'approval_order' => $order,
+            ]);
+        }
+        foreach ([
+            ['2026-11-01', 'approved', '2026-11-10 11:59:59'],
+            ['2026-11-02', 'paid', '2026-11-10 14:05:00'],
+            ['2026-11-03', 'pending', '2026-11-20 10:00:00'],
+            ['2026-11-04', 'approved', null],
+            ['2026-08-01', 'approved', '2026-11-20 10:00:00'],
+        ] as [$date, $status, $approvedAt]) {
+            $payroll = Payroll::factory()->create([
+                'salary_month' => $date, 'status' => $status, 'attendance_period_id' => null,
+                'created_at' => '2026-11-10 10:00:00',
+            ]);
+            PayrollApproval::create([
+                'payroll_id' => $payroll->id, 'policy_id' => $policies[0]->id,
+                'status' => 'approved', 'approved_at' => $approvedAt,
+            ]);
+            if ($date === '2026-11-02') {
+                PayrollApproval::create([
+                    'payroll_id' => $payroll->id, 'policy_id' => $policies[1]->id,
+                    'status' => 'approved', 'approved_at' => '2026-11-10 10:30:00',
+                ]);
+            }
+            if ($date === '2026-11-01') {
+                PayrollApproval::create([
+                    'payroll_id' => $payroll->id, 'policy_id' => $policies[1]->id,
+                    'status' => 'rejected', 'approved_at' => '2026-11-20 10:00:00',
+                ]);
+            }
+        }
+        $this->actingAsFinance();
+
+        $this->getJson('/api/v1/analytics/payroll/processing-time?period=1m')
+            ->assertOk()->assertJsonPath('success', true)
+            ->assertJsonPath('data.processing_time_trend', [[
+                'month' => 'Nov 2026', 'avg_hours_to_approve' => 2.5, 'total_payrolls' => 2,
+            ]]);
     }
 
     // ─── GAP-4g: Project Resource Utilization ───────────────────────
