@@ -511,9 +511,8 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 : 0;
 
             // C3 & C4: From performance_goals within the cycle period
-            $cycle = $review->cycle ?? PerformanceReviewCycle::find($cycleId);
             $goals = PerformanceGoal::where('staff_member_id', $employeeId)
-                ->where(function ($q) use ($review, $cycle) {
+                ->where(function ($q) use ($review, $cycleStart, $cycleEnd) {
                     // Goals linked to this review OR created within the cycle period
                     $q->where('linked_review_id', $review->id)
                         ->orWhereBetween('created_at', [$cycleStart, $cycleEnd]);
