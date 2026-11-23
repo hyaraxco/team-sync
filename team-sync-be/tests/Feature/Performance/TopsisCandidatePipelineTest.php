@@ -302,10 +302,12 @@ class TopsisCandidatePipelineTest extends TestCase
 
         Carbon::setTestNow('2026-03-31 20:00:00');
 
-        $goal = \App\Models\PerformanceGoal::create([
+        $goal = \App\Models\PerformanceGoal::factory()->create([
             'staff_member_id' => $emp->staffMemberProfile->id,
             'title' => 'Last day goal',
+            'goal_type' => 'kpi',
             'status' => 'completed',
+            'start_date' => '2026-03-01',
             'due_date' => '2026-03-31',
             'completed_at' => '2026-03-31 19:00:00',
         ]);
