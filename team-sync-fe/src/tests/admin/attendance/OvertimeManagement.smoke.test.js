@@ -135,8 +135,10 @@ vi.mock("@/composables/useConfirmAction", () => ({
     }),
 }));
 
+let currentPermissions = ["overtime-list", "overtime-approve", "overtime-create"];
+
 vi.mock("@/helpers/permissionHelper", () => ({
-    can: (_permission) => true,
+    can: (permission) => currentPermissions.includes(permission),
 }));
 
 vi.mock("@/utils/dateUtils", () => ({
@@ -181,6 +183,7 @@ describe("OvertimeManagement.vue", () => {
     let wrapper;
 
     beforeEach(() => {
+        currentPermissions = ["overtime-list", "overtime-approve", "overtime-create"];
         mockStore.records = mockRecords;
         mockStore.summary = mockSummary;
         mockStore.loading = false;
@@ -233,12 +236,54 @@ describe("OvertimeManagement.vue", () => {
         expect(wrapper.text()).toContain("3.0h");
     });
 
-    it("shows approve/reject buttons for pending records", async () => {
-        const buttons = wrapper.findAll(
-            'button[aria-label="Approve overtime"], button[aria-label="Reject overtime"]',
-        );
-        // Only the pending record (id=1) should have action buttons
-        expect(buttons.length).toBeGreaterThanOrEqual(2);
+    it("shows approve and reject buttons for pending records when user has overtime-approve (no overtime-reject required)", () => {
+        // currentPermissions has overtime-approve, but NOT overtime-reject
+        expect(currentPermissions).toContain("overtime-approve");
+        expect(currentPermissions).not.toContain("overtime-reject");
+
+        const approveButtons = wrapper.findAll('button[aria-label="Approve overtime"]');
+        const rejectButtons = wrapper.findAll('button[aria-label="Reject overtime"]');
+
+        expect(approveButtons.length).toBe(1);
+        expect(rejectButtons.length).toBe(1);
+    });
+
+    it("hides approve and reject buttons when user lacks overtime-approve permission", () => {
+        currentPermissions = ["overtime-list"];
+        const unprivilegedWrapper = mount(OvertimeManagement, {
+            global: {
+                stubs: {
+                    Pagination: true,
+                    EmptyState: true,
+                    ModalWrapper: { template: '<div v-if="show"><slot /></div>', props: ["show", "title"] },
+                },
+            },
+        });
+
+        const approveButtons = unprivilegedWrapper.findAll('button[aria-label="Approve overtime"]');
+        const rejectButtons = unprivilegedWrapper.findAll('button[aria-label="Reject overtime"]');
+
+        expect(approveButtons.length).toBe(0);
+        expect(rejectButtons.length).toBe(0);
+    });
+
+    it("does not render action buttons for terminal states (approved/rejected)", () => {
+        const rows = wrapper.findAll("tbody tr");
+        expect(rows.length).toBe(3);
+
+        // Row 1 (pending): has action buttons
+        expect(rows[0].find('button[aria-label="Approve overtime"]').exists()).toBe(true);
+        expect(rows[0].find('button[aria-label="Reject overtime"]').exists()).toBe(true);
+
+        // Row 2 (approved): shows dash, no action buttons
+        expect(rows[1].find('button[aria-label="Approve overtime"]').exists()).toBe(false);
+        expect(rows[1].find('button[aria-label="Reject overtime"]').exists()).toBe(false);
+        expect(rows[1].text()).toContain("—");
+
+        // Row 3 (rejected): shows dash, no action buttons
+        expect(rows[2].find('button[aria-label="Approve overtime"]').exists()).toBe(false);
+        expect(rows[2].find('button[aria-label="Reject overtime"]').exists()).toBe(false);
+        expect(rows[2].text()).toContain("—");
     });
 
     it("shows Record Overtime button", () => {
