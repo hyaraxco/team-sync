@@ -155,11 +155,11 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 $q->where('linked_review_id', $reviewId)
                     ->orWhere(function ($dateQ) use ($cycle) {
                         $dateQ->whereBetween('start_date', [
-                            $cycle->start_date,
-                            $cycle->end_date,
+                            $cycle->start_date->copy()->startOfDay(),
+                            $cycle->end_date->copy()->endOfDay(),
                         ])->orWhereBetween('created_at', [
-                            $cycle->start_date.' 00:00:00',
-                            $cycle->end_date.' 23:59:59',
+                            $cycle->start_date->copy()->startOfDay(),
+                            $cycle->end_date->copy()->endOfDay(),
                         ]);
                     });
             })
@@ -171,8 +171,8 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         return PerformanceFeedback::where('staff_member_id', $staffMemberId)
             ->where('feedback_type', 'positive')
             ->whereBetween('created_at', [
-                $cycle->start_date.' 00:00:00',
-                $cycle->end_date.' 23:59:59',
+                $cycle->start_date->copy()->startOfDay(),
+                $cycle->end_date->copy()->endOfDay(),
             ])
             ->count();
     }
@@ -437,12 +437,12 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
         // Pre-calculate feedback normalization cap for this cycle
         // Cap = max(10, max positive feedback count among all employees in cycle)
         $cycle = PerformanceReviewCycle::find($cycleId);
+        $cycleStart = $cycle->start_date->copy()->startOfDay();
+        $cycleEnd = $cycle->end_date->copy()->endOfDay();
+
         $maxFeedbackInCycle = PerformanceFeedback::whereIn('staff_member_id', $reviewScores->pluck('staff_member_id'))
             ->where('feedback_type', 'positive')
-            ->whereBetween('created_at', [
-                $cycle->start_date.' 00:00:00',
-                $cycle->end_date.' 23:59:59',
-            ])
+            ->whereBetween('created_at', [$cycleStart, $cycleEnd])
             ->selectRaw('staff_member_id, COUNT(*) as cnt')
             ->groupBy('staff_member_id')
             ->pluck('cnt')
@@ -502,10 +502,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                 ->where(function ($q) use ($review, $cycle) {
                     // Goals linked to this review OR created within the cycle period
                     $q->where('linked_review_id', $review->id)
-                        ->orWhereBetween('created_at', [
-                            $cycle->start_date.' 00:00:00',
-                            $cycle->end_date.' 23:59:59',
-                        ]);
+                        ->orWhereBetween('created_at', [$cycleStart, $cycleEnd]);
                 })
                 ->get();
 
@@ -524,10 +521,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             // C5: Positive feedback count within cycle period
             $positiveFeedbackCount = PerformanceFeedback::where('staff_member_id', $employeeId)
                 ->where('feedback_type', 'positive')
-                ->whereBetween('created_at', [
-                    $cycle->start_date.' 00:00:00',
-                    $cycle->end_date.' 23:59:59',
-                ])
+                ->whereBetween('created_at', [$cycleStart, $cycleEnd])
                 ->count();
 
             $attendanceRecords = Attendance::where('staff_member_id', $employeeId)
