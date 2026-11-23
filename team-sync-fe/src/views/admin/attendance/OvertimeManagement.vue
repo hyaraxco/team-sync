@@ -286,7 +286,7 @@ const submitCreate = async () => {
                                         <Check class="w-4 h-4" />
                                     </button>
                                     <button
-                                        v-if="can('overtime-reject')"
+                                        v-if="can('overtime-approve')"
                                         @click="openRejectModal(record)"
                                         class="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition-all duration-300"
                                         aria-label="Reject overtime"

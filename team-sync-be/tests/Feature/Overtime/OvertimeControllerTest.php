@@ -303,6 +303,104 @@ class OvertimeControllerTest extends TestCase
             ->assertBadRequest();
     }
 
+    public function test_staff_without_overtime_approve_permission_cannot_reject_overtime(): void
+    {
+        $this->actingAsRole('staff');
+
+        $record = StaffMemberProfile::withoutSyncingToSearch(function () {
+            $employee = StaffMemberProfile::factory()->create();
+
+            return OvertimeRecord::factory()->forEmployee($employee)->create([
+                'status' => OvertimeRecord::STATUS_PENDING,
+            ]);
+        });
+
+        $this->postJson("/api/v1/overtime/{$record->id}/reject", [
+            'rejection_reason' => 'Valid rejection reason from staff',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $record->id,
+            'status' => OvertimeRecord::STATUS_PENDING,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    public function test_finance_without_overtime_approve_permission_cannot_reject_overtime(): void
+    {
+        $this->actingAsRole('finance');
+
+        $record = StaffMemberProfile::withoutSyncingToSearch(function () {
+            $employee = StaffMemberProfile::factory()->create();
+
+            return OvertimeRecord::factory()->forEmployee($employee)->create([
+                'status' => OvertimeRecord::STATUS_PENDING,
+            ]);
+        });
+
+        $this->postJson("/api/v1/overtime/{$record->id}/reject", [
+            'rejection_reason' => 'Valid rejection reason from finance',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $record->id,
+            'status' => OvertimeRecord::STATUS_PENDING,
+            'rejection_reason' => null,
+        ]);
+    }
+
+    public function test_manager_with_overtime_approve_permission_can_reject_overtime(): void
+    {
+        $this->actingAsRole('manager');
+
+        $record = StaffMemberProfile::withoutSyncingToSearch(function () {
+            $employee = StaffMemberProfile::factory()->create();
+
+            return OvertimeRecord::factory()->forEmployee($employee)->create([
+                'status' => OvertimeRecord::STATUS_PENDING,
+            ]);
+        });
+
+        $this->postJson("/api/v1/overtime/{$record->id}/reject", [
+            'rejection_reason' => 'Overtime rejected by manager with valid reason',
+        ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.status', 'rejected');
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $record->id,
+            'status' => 'rejected',
+            'rejection_reason' => 'Overtime rejected by manager with valid reason',
+        ]);
+    }
+
+    public function test_superadmin_can_reject_overtime(): void
+    {
+        $this->actingAsRole('superadmin');
+
+        $record = StaffMemberProfile::withoutSyncingToSearch(function () {
+            $employee = StaffMemberProfile::factory()->create();
+
+            return OvertimeRecord::factory()->forEmployee($employee)->create([
+                'status' => OvertimeRecord::STATUS_PENDING,
+            ]);
+        });
+
+        $this->postJson("/api/v1/overtime/{$record->id}/reject", [
+            'rejection_reason' => 'Overtime rejected by superadmin with valid reason',
+        ])
+            ->assertOk()
+            ->assertJsonPath('success', true)
+            ->assertJsonPath('data.status', 'rejected');
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $record->id,
+            'status' => 'rejected',
+            'rejection_reason' => 'Overtime rejected by superadmin with valid reason',
+        ]);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // Filtering
     // ─────────────────────────────────────────────────────────────────────────
