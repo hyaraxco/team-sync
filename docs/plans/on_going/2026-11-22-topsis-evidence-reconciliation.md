@@ -1,7 +1,29 @@
 # TOPSIS Evidence & Release Reconciliation — team-sync-lzo
 
-**Status:** IN_PROGRESS (review correction 2026-11-23). PR #92 is open; `team-sync-lzo` remains in review. This plan was archived prematurely and is reopened until the remaining acceptance criteria are met.
-**Branch:** fix/team-sync-lzo-topsis-evidence
+**Status:** IN_PROGRESS (continuation 2026-11-23). PR #92 merged as `026b972`; the ticket remains open until the remaining acceptance criteria are met.
+**Branch:** test/team-sync-lzo-complete-evidence
+
+## Continuation plan
+
+1. Extend independent fixed normalized/weighted references to all five R1 candidates.
+2. Assert observable default/partial/negative/zero weight results through the ranking endpoint and retain dummy numerical response evidence.
+3. Obtain affected/full BE results and retained dummy endpoint responses from exact-head CI. Fresh FE/build/accessibility and role/ranking E2E remain pending; local target execution requires all mandatory sandbox controls, not merely a disposable database.
+4. Self-review, publish a scoped PR with user attribution, and obtain final approval before merge. Archive and close only after complete acceptance and verified merge/checks.
+
+Scope: existing TOPSIS tests, endpoint fixtures, BE CI artifact retention and this plan. No new product features or payroll/security fixes. Preserve the unrelated untracked release-policy document.
+
+### Continuation changes (not yet runtime-verified)
+
+- Full 5x5 normalized and weighted fixed reference matrices, independently checked with Python standard-library arithmetic against the R1 sample.
+- Endpoint fixtures freeze time; default/custom/partial scenarios assert three differentiated candidates and fixed coefficients. Default/custom distances use independent fixed references so an echoed weight change alone cannot pass. Partial weights assert all normalized values; negative and all-zero scenarios assert zero contributions/distances/coefficients rather than only an HTTP status.
+- `TOPSIS_EVIDENCE_DIR` optionally captures only default/custom dummy endpoint JSON. BE CI uploads those two files as `topsis-endpoint-<sha>` for 30 days, failing if evidence is missing. No development credentials, environment dumps or database exports are included.
+- Local PHP/FE/E2E execution remains unperformed: complete OS-enforced network/environment/filesystem/resource isolation is not established. CI outcomes must be read on the new head before these assertions are reported as passed.
+
+### Verified baseline and static checks
+
+- PR #92 merged as `026b9721a985874050dbbc74012932bf54dd4834`. Post-merge BE CI run `45109948733` passed on that SHA: 1687 tests / 7515 assertions, 75.16s, including frozen Bun install and asset build. This baseline does not validate the continuation diff.
+- `git diff --check` passed. Trusted Python standard-library calculations rechecked all 50 fixed matrix cells within `1e-8` and the default/custom endpoint distance references within `1e-6`. No application code ran locally.
+- Before merge: require successful new-head BE CI and GitGuardian, inspect and retain the dummy endpoint evidence, and obtain user approval for this separate PR. Ticket closure still requires the fresh FE/role E2E evidence below.
 
 ## AC#1 — Jalankan suite TOPSIS nyata
 
@@ -20,7 +42,7 @@ Ditambahkan `tests/Unit/TopsisIntermediateTest.php` (9 test, 81 assertions):
 - **D+/D− untuk semua 5 kandidat** terhadap rekomputasi independen — bukan estimasi plan arsip
 - Jurnal-rounded K17: D+=0.0093, D−=0.0220 (R1 pp.90-91). Estimasi plan arsip (0.0048/0.0115) **tidak dipakai** dan tercatat salah di test
 - Sumber: Arundaa, Sopacua & Tamonob, IJIDS 3(2) 2024, pp.85-94, Table 2 & 3
-- Batas: nilai normalized/weighted tetap hanya mencakup K17, belum seluruh matriks lima kandidat yang diminta AC#2.
+- Batas historis PR #92: normalized/weighted hanya mencakup K17. Continuation memperluas ke lima kandidat; hasil runtime head baru masih harus diperoleh.
 
 ## AC#3 — Tie ordering, konvensi, boundary repository
 
@@ -28,8 +50,8 @@ Ditambahkan `tests/Unit/TopsisIntermediateTest.php` (9 test, 81 assertions):
 - **Single-candidate convention**: normalized=1.0 (positif) / 0.0 (nol), weighted=weight, ideals collapse, D+=D−=0, CC=1.0 konvensional (rasio 0/0 tak terdefinisi) — didokumentasikan eksplisit di test
 - **Zero-column convention**: kolom semua-nol → normalisasi 0 via fallback denominator 1.0
 - **Repository boundary** (`TopsisCandidatePipelineTest`, 6 test): feedback floor 10 (3/10→30), cap cycle-max (15/15→100), bukan positive → 0, feedback luar window cycle dikecualikan, tenure cap 60 bulan (80→100), hanya review `completed` jadi kandidat
-- Koreksi review: fixture constructive feedback dibekukan di dalam cycle dan timestamp tersimpan diperiksa, sehingga filter tanggal tidak menutupi kerusakan filter tipe. Rerun pada head koreksi belum tersedia.
-- Batas: assertion observable untuk partial/negative/all-zero weights masih perlu diperkuat; status HTTP saja tidak membuktikan hasil bobot yang dimaksud AC#3.
+- Koreksi review PR #92: fixture constructive feedback dibekukan di dalam cycle dan timestamp tersimpan diperiksa, sehingga filter tanggal tidak menutupi kerusakan filter tipe. Test lulus pada CI head koreksi `81c5d3c` dan merge `026b972`; bukan rerun lokal.
+- Batas historis PR #92: assertion partial/negative/all-zero weights lemah. Continuation menambahkan nilai bobot, kontribusi dan koefisien yang dimaksud; hasil runtime head baru masih harus diperoleh.
 
 ## AC#4 — Rekonsiliasi plan arsip vs merge/CI
 
@@ -50,4 +72,4 @@ Ditambahkan `tests/Unit/TopsisIntermediateTest.php` (9 test, 81 assertions):
 1. E2E role-based fresh sign-off belum dijalankan (membutuhkan lingkungan terisolasi + seed penuh) — AC#5 terpenuhi parsial, dicatat jujur.
 2. Repository-secret availability untuk Strix tidak diperiksa (butuh otorisasi).
 3. Angka 1687/7514 adalah snapshot 2026-11-22 pada `02fdcf0` + perubahan branch ini.
-4. Local rerun 2026-11-23 belum dijalankan karena seluruh kontrol sandbox wajib belum tersedia. Checks head lama `94dd88328cc50fd72fd33ab74b0e45f3723f1e21` tidak memvalidasi perubahan review berikutnya.
+4. Local rerun 2026-11-23 belum dijalankan karena seluruh kontrol sandbox wajib belum tersedia. CI `026b972` hanya baseline; continuation memerlukan checks pada head baru. Hasil CI adalah bukti CI, bukan sertifikasi seluruh kontrol sandbox security-audit.

@@ -39,9 +39,26 @@ class PerformanceTopsisControllerTest extends TestCase
 
     private PerformanceReviewSection $sectionC5;
 
+    private function retainRankingEvidence(string $scenario, array $data): void
+    {
+        $directory = getenv('TOPSIS_EVIDENCE_DIR');
+        if ($directory === false || $directory === '') {
+            return;
+        }
+
+        $this->assertDirectoryExists($directory);
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_THROW_ON_ERROR).PHP_EOL;
+        $written = file_put_contents(
+            $directory.'/'.$scenario.'.json',
+            $json
+        );
+        $this->assertSame(strlen($json), $written);
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
+        Carbon::setTestNow('2026-11-23 12:00:00');
 
         // Run seeders required for full data
         $this->artisan('db:seed', ['--class' => 'RoleSeeder']);
@@ -69,6 +86,12 @@ class PerformanceTopsisControllerTest extends TestCase
         $this->completedCycle = PerformanceReviewCycle::where('name', 'Q4 2025 Performance Review')->first();
         $this->activeCycle = PerformanceReviewCycle::where('name', 'Q1 2026 Performance Review')->first();
         $this->seedDifferentiatedCompletedReviews();
+    }
+
+    protected function tearDown(): void
+    {
+        Carbon::setTestNow();
+        parent::tearDown();
     }
 
     /**
@@ -217,25 +240,24 @@ class PerformanceTopsisControllerTest extends TestCase
             ],
         ]);
 
-        $this->assertGreaterThanOrEqual(1, $response->json('data.total_candidates'));
-        $this->assertNotEmpty($response->json('data.ranking'));
+        $this->assertSame(3, $response->json('data.total_candidates'));
+        $this->assertSame([
+            'performance_score' => 0.30,
+            'attendance_rate' => 0.20,
+            'goal_completion' => 0.25,
+            'feedback_score' => 0.15,
+            'tenure_factor' => 0.10,
+        ], $response->json('data.weights'));
 
-        // Regression guard: closeness_coefficient must be > 0 when candidates differ.
-        // The original bug caused all coefficients to resolve to 0.0 due to weight/criteria key mismatch.
         $ranking = $response->json('data.ranking');
-        $top = $ranking[0];
-        $this->assertGreaterThan(0.0, $top['closeness_coefficient'],
-            'Top candidate closeness_coefficient must be > 0 (regression guard for criteria-weight key mismatch)');
-
-        // If multiple candidates, top CC should exceed bottom CC (proves ordering works).
-        if (count($ranking) > 1) {
-            $bottom = $ranking[count($ranking) - 1];
-            $this->assertGreaterThanOrEqual(
-                $bottom['closeness_coefficient'],
-                $top['closeness_coefficient'],
-                'Top candidate must rank >= bottom candidate'
-            );
+        $this->assertSame(['Yudhis', 'Agung Ramadhan', 'Tasyia'], array_column($ranking, 'employee_name'));
+        // Only performance differs (100/80/40); the middle coefficient is (80-40)/(100-40).
+        foreach ([1.0, 0.666667, 0.0] as $index => $expected) {
+            $this->assertEqualsWithDelta($expected, $ranking[$index]['closeness_coefficient'], 1e-6);
+            $this->assertEqualsWithDelta([0.0, 0.044721, 0.134164][$index], $ranking[$index]['distance_positive'], 1e-6);
+            $this->assertEqualsWithDelta([0.134164, 0.089443, 0.0][$index], $ranking[$index]['distance_negative'], 1e-6);
         }
+        $this->retainRankingEvidence('default', $response->json('data'));
     }
 
     public function test_topsis_endpoint_returns_422_empty_state_when_no_completed_reviews()
@@ -297,8 +319,14 @@ class PerformanceTopsisControllerTest extends TestCase
         $this->assertEquals(0.10, $weights['feedback_score']);
         $this->assertEquals(0.10, $weights['tenure_factor']);
 
-        // Top candidate must still produce non-zero closeness with custom weights
-        $this->assertGreaterThan(0.0, $response->json('data.ranking.0.closeness_coefficient'));
+        $ranking = $response->json('data.ranking');
+        $this->assertSame(['Yudhis', 'Agung Ramadhan', 'Tasyia'], array_column($ranking, 'employee_name'));
+        foreach ([1.0, 0.666667, 0.0] as $index => $expected) {
+            $this->assertEqualsWithDelta($expected, $ranking[$index]['closeness_coefficient'], 1e-6);
+            $this->assertEqualsWithDelta([0.0, 0.059628, 0.178885][$index], $ranking[$index]['distance_positive'], 1e-6);
+            $this->assertEqualsWithDelta([0.178885, 0.119257, 0.0][$index], $ranking[$index]['distance_negative'], 1e-6);
+        }
+        $this->retainRankingEvidence('custom', $response->json('data'));
     }
 
     public function test_employee_cannot_access_topsis_ranking()
@@ -366,11 +394,32 @@ class PerformanceTopsisControllerTest extends TestCase
 
         // Total weights must normalize to ~1.0
         $total = array_sum($weights);
+        $expectedWeights = [
+            'performance_score' => 0.416667,
+            'attendance_rate' => 0.166667,
+            'goal_completion' => 0.208333,
+            'feedback_score' => 0.125,
+            'tenure_factor' => 0.083333,
+        ];
+        foreach ($expectedWeights as $criterion => $expected) {
+            $this->assertEqualsWithDelta($expected, $weights[$criterion], 1e-6);
+        }
+        $this->assertCount(3, $response->json('data.ranking'));
+        foreach ($response->json('data.ranking') as $index => $candidate) {
+            $this->assertEqualsWithDelta([1.0, 0.666667, 0.0][$index], $candidate['closeness_coefficient'], 1e-6);
+            foreach ($weights as $criterion => $weight) {
+                $this->assertEqualsWithDelta(
+                    $candidate['normalized_scores'][$criterion] * $weight,
+                    $candidate['weighted_scores'][$criterion],
+                    1e-6
+                );
+            }
+        }
         $this->assertEqualsWithDelta(1.0, $total, 0.01,
             'Weights must auto-normalize to 1.0 when partial custom weights provided');
     }
 
-    public function test_all_zero_custom_weights_returns_gracefully_without_division_error()
+    public function test_all_zero_custom_weights_returns_zero_scores_in_id_order()
     {
         Sanctum::actingAs($this->hrAdmin);
 
@@ -380,9 +429,24 @@ class PerformanceTopsisControllerTest extends TestCase
             'w_feedback_score=0&w_tenure_factor=0'
         );
 
-        // Must NOT 500 — endpoint must handle pathological input gracefully
-        $this->assertNotEquals(500, $response->status(),
-            'All-zero weights must not cause server error');
+        $response->assertOk();
+        $this->assertCount(3, $response->json('data.ranking'));
+        $this->assertCount(5, $response->json('data.weights'));
+        foreach ($response->json('data.weights') as $weight) {
+            $this->assertEquals(0, $weight);
+        }
+        foreach ($response->json('data.ranking') as $candidate) {
+            foreach ($candidate['weighted_scores'] as $score) {
+                $this->assertEquals(0, $score);
+            }
+            $this->assertEquals(0, $candidate['distance_positive']);
+            $this->assertEquals(0, $candidate['distance_negative']);
+            $this->assertEquals(0, $candidate['closeness_coefficient']);
+        }
+        $ids = array_column($response->json('data.ranking'), 'staff_member_id');
+        $sorted = $ids;
+        sort($sorted, SORT_STRING);
+        $this->assertSame($sorted, $ids);
     }
 
     /**
@@ -405,8 +469,24 @@ class PerformanceTopsisControllerTest extends TestCase
         $response->assertStatus(200);
         $weights = $response->json('data.weights');
 
-        // Negative weight must be clamped to 0 (then normalization redistributes)
-        $this->assertGreaterThanOrEqual(0.0, $weights['performance_score'],
-            'Negative weight values must be clamped to 0.0 to prevent silent ranking corruption');
+        // Clamping removes the only varying criterion, so all candidates tie at zero.
+        $this->assertEquals(0, $weights['performance_score']);
+        foreach (['attendance_rate' => 0.30, 'goal_completion' => 0.30, 'feedback_score' => 0.20, 'tenure_factor' => 0.20] as $criterion => $expected) {
+            $this->assertEqualsWithDelta($expected, $weights[$criterion], 1e-6);
+        }
+        $this->assertCount(3, $response->json('data.ranking'));
+        foreach ($response->json('data.ranking') as $candidate) {
+            $this->assertEquals(0, $candidate['weighted_scores']['performance_score']);
+            $this->assertEquals(0, $candidate['distance_positive']);
+            $this->assertEquals(0, $candidate['distance_negative']);
+            $this->assertEquals(0, $candidate['closeness_coefficient']);
+            foreach ($weights as $criterion => $weight) {
+                $this->assertEqualsWithDelta(
+                    $candidate['normalized_scores'][$criterion] * $weight,
+                    $candidate['weighted_scores'][$criterion],
+                    1e-6
+                );
+            }
+        }
     }
 }

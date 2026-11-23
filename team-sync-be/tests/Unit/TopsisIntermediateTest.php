@@ -8,8 +8,9 @@ use App\Services\TopsisService;
  * Every expected number below was computed independently in JavaScript from
  * the R1 journal sample (Arundaa, Sopacua & Tamonob, IJIDS 3(2) 2024, pp.85-94,
  * Table 2, weights C1-C5 = 0.25/0.20/0.20/0.10/0.25) — not derived from the
- * PHP implementation. Rounding: service rounds distances and CC to 6
- * decimals, so tolerances are 1e-6 against full-precision references.
+ * PHP implementation. All matrix rows were independently rechecked in Python.
+ * Matrix references use 9 decimals (tolerance 1e-8); output distances and CC
+ * use 6 decimals (tolerance 1e-6).
  *
  * Convention note (thesis-facing): with a single candidate, D+ = D- = 0 and
  * the ratio D-/(D+ + D-) is mathematically undefined (0/0). The application
@@ -95,37 +96,41 @@ it('computes the R1 normalization denominators as fixed values', function () {
     }
 });
 
-it('produces fixed normalized matrix values for K17 against the R1 sample', function () {
-    $expectedK17 = [
-        'performance_score' => 0.458694877,
-        'attendance_rate' => 0.460077318,
-        'goal_completion' => 0.485642931,
-        'feedback_score' => 0.371390676,
-        'tenure_factor' => 0.470407414,
+it('produces fixed normalized matrix values for every R1 candidate', function () {
+    $expectedRows = [
+        'K2' => [0.429416481, 0.460077318, 0.437078638, 0.464238345, 0.441006950],
+        'K3' => [0.458694877, 0.460077318, 0.437078638, 0.464238345, 0.441006950],
+        'K6' => [0.458694877, 0.460077318, 0.437078638, 0.464238345, 0.421406641],
+        'K11' => [0.429416481, 0.391555164, 0.437078638, 0.464238345, 0.460607259],
+        'K17' => [0.458694877, 0.460077318, 0.485642931, 0.371390676, 0.470407414],
     ];
 
     $result = (new TopsisService)->calculate(topsisR1Candidates(), topsisR1Weights());
 
-    $k17 = collect($result['ranking'])->firstWhere('staff_member_id', 'K17');
-    foreach ($expectedK17 as $criterion => $expected) {
-        expect($k17['normalized_scores'][$criterion])->toEqualWithDelta($expected, 1e-8);
+    foreach ($expectedRows as $id => $values) {
+        $ranked = collect($result['ranking'])->firstWhere('staff_member_id', $id);
+        foreach (array_keys(topsisR1Weights()) as $index => $criterion) {
+            expect($ranked['normalized_scores'][$criterion])->toEqualWithDelta($values[$index], 1e-8);
+        }
     }
 });
 
-it('produces fixed weighted matrix values for K17 against the R1 sample', function () {
-    $expectedK17 = [
-        'performance_score' => 0.114673719,
-        'attendance_rate' => 0.092015464,
-        'goal_completion' => 0.097128586,
-        'feedback_score' => 0.037139068,
-        'tenure_factor' => 0.117601853,
+it('produces fixed weighted matrix values for every R1 candidate', function () {
+    $expectedRows = [
+        'K2' => [0.107354120, 0.092015464, 0.087415728, 0.046423835, 0.110251738],
+        'K3' => [0.114673719, 0.092015464, 0.087415728, 0.046423835, 0.110251738],
+        'K6' => [0.114673719, 0.092015464, 0.087415728, 0.046423835, 0.105351660],
+        'K11' => [0.107354120, 0.078311033, 0.087415728, 0.046423835, 0.115151815],
+        'K17' => [0.114673719, 0.092015464, 0.097128586, 0.037139068, 0.117601853],
     ];
 
     $result = (new TopsisService)->calculate(topsisR1Candidates(), topsisR1Weights());
 
-    $k17 = collect($result['ranking'])->firstWhere('staff_member_id', 'K17');
-    foreach ($expectedK17 as $criterion => $expected) {
-        expect($k17['weighted_scores'][$criterion])->toEqualWithDelta($expected, 1e-8);
+    foreach ($expectedRows as $id => $values) {
+        $ranked = collect($result['ranking'])->firstWhere('staff_member_id', $id);
+        foreach (array_keys(topsisR1Weights()) as $index => $criterion) {
+            expect($ranked['weighted_scores'][$criterion])->toEqualWithDelta($values[$index], 1e-8);
+        }
     }
 });
 
