@@ -125,7 +125,9 @@ const factory = () =>
                     template: '<div class="confirmation-modal-stub"></div>',
                 },
                 EmptyState: {
-                    template: '<div class="empty-state-stub"></div>',
+                    props: ["icon", "title", "subtitle"],
+                    template:
+                        '<div class="empty-state-stub" :data-icon="icon" :data-title="title" :data-subtitle="subtitle">{{ title }} {{ subtitle }}<slot /></div>',
                 },
                 RouterLink: {
                     props: ["to"],
@@ -186,6 +188,20 @@ describe("TeamDetail smoke", () => {
             limit: 6,
         });
         expect(wrapper.text()).toContain("Add Team Member");
+    });
+
+    it("renders empty state when there is no team activity", async () => {
+        const wrapper = factory();
+        await flushAsync();
+
+        const emptyState = wrapper.find(".empty-state-stub");
+        expect(emptyState.exists()).toBe(true);
+        expect(emptyState.attributes("data-icon")).toBe("Layout");
+        expect(emptyState.attributes("data-title")).toBe("Belum ada aktivitas");
+        expect(emptyState.attributes("data-subtitle")).toContain(
+            "Aktivitas tim akan tampil di sini"
+        );
+        expect(wrapper.text()).toContain("Belum ada aktivitas");
     });
 
     it("does not render fabricated demo activity entries", async () => {
