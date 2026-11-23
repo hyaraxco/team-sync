@@ -108,6 +108,8 @@ test('create user flow', async ({ userFactory, page }) => {
 - **`backend.ts`** — `processQueueOnce()` and `drainQueue()` for triggering queued jobs during E2E
 - **`evidence.ts`** — `captureEvidence(page, filename)` for full-page screenshots
 
+`drainQueue()` checks for a running Compose `web` container before selecting the worker. If Compose or the container is unavailable, it uses PHP in `E2E_BE_DIR` (default `../team-sync-be`). Both workers inherit the selected backend environment: use only a disposable test database. Worker failures propagate without retrying against another backend. Payroll generation checks require an observed `POST /payrolls/generate`; a disabled submit button must have an explicit readiness denial.
+
 ## Best Practices
 
 1. **Selectors**: Use `data-testid` attributes, `getByRole()`, `getByText()`, or `getByLabel()` — never CSS class selectors

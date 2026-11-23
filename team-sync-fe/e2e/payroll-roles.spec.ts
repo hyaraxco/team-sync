@@ -110,13 +110,12 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
 
     const canGenerateForMonth = async (month: string) => {
       await monthInput.fill(month);
+
+      // Readiness resolves asynchronously after the month changes and the submit
+      // button stays disabled until it does. Wait for it to become enabled; a
+      // timeout means this month cannot be generated, which is a supported state.
       try {
-        await expect
-          .poll(async () => submitButton.isEnabled(), {
-            timeout: 6_000,
-            intervals: [250, 500, 1_000],
-          })
-          .toBe(true);
+        await expect(submitButton).toBeEnabled({ timeout: 15_000 });
         return true;
       } catch (error) {
         if (!isExpectedWaitFailure(error)) {
@@ -133,7 +132,16 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
       : await canGenerateForMonth(previousMonth());
 
     if (canGenerateCurrentMonth || canGeneratePreviousMonth) {
+      // A successful generation path MUST issue the POST. Wait for it without a
+      // catch: if no request fires, this fails the test instead of passing
+      // silently, which is what a nullable catch (`.catch(() => null)`) did.
+      const generateRequest = page.waitForRequest(
+        (req) => req.url().includes("/payrolls/generate") && req.method() === "POST",
+        { timeout: 20_000 }
+      );
+
       await submitButton.click();
+      await generateRequest;
       await expect(page).toHaveURL(/\/admin\/payroll$/);
       await expect(
         page.locator("text=/processed in the background|being processed|successfully generated/i").first()
@@ -166,6 +174,21 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
         await page.reload();
       }
     } else {
+      // Neither month could be generated: readiness blocks both. Assert the
+      // explicit denial instead of silently falling through, so a broken
+      // readiness gate cannot hide behind the skip.
+      const denial = page.getByText(/Payroll not ready|belum siap|cannot be generated/i).first();
+      const denialVisible = await denial.isVisible().catch(() => false);
+
+      if (!denialVisible) {
+        // No visible denial either: fail with the reason the month was rejected.
+        throw new Error(
+          `Payroll generation was unavailable for ${thisMonth()} and ${previousMonth()}, ` +
+            "and no readiness denial message was shown. A disabled submit button " +
+            "with no explanation means the readiness gate failed to report why."
+        );
+      }
+
       await page.goto("/admin/payroll");
     }
 
