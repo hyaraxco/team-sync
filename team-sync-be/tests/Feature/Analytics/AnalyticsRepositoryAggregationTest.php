@@ -3,6 +3,7 @@
 namespace Tests\Feature\Analytics;
 
 use App\Enums\AttendanceStatus;
+use App\Enums\PayrollStatus;
 use App\Enums\ProjectStatus;
 use App\Enums\TaskStatus;
 use App\Models\Attendance;
@@ -15,6 +16,7 @@ use App\Repositories\AnalyticsRepository;
 use Carbon\Carbon;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use ReflectionMethod;
 use Tests\TestCase;
 
@@ -233,6 +235,44 @@ class AnalyticsRepositoryAggregationTest extends TestCase
         $this->assertSame(1, $row['member_count']);
         // Only Task 1 participates: 1 of 1 task done = 100.0% completion rate
         $this->assertSame(100.0, $row['task_completion_rate']);
+    }
+
+    public function test_payroll_analytics_methods_run_without_undefined_status_constants(): void
+    {
+        // Guards team-sync-gwe: these methods referenced Payroll::STATUS_APPROVED,
+        // a constant the Payroll model does not define, so every call threw
+        // "Undefined constant" and the analytics endpoints answered a generic 500.
+        //
+        // The real guard is that no source file still references the missing
+        // constant. A value check cannot catch this: the constant simply throws.
+        $repository = file_get_contents(app_path('Repositories/AnalyticsRepository.php'));
+
+        $this->assertSame(
+            0,
+            preg_match_all('/Payroll::STATUS_[A-Z_]+/', $repository),
+            'AnalyticsRepository must use PayrollStatus::*->value, not Payroll::STATUS_*: '
+            .'the Payroll model does not define those constants and every query throws.'
+        );
+
+        $this->assertSame('approved', PayrollStatus::APPROVED->value);
+        $this->assertSame('paid', PayrollStatus::PAID->value);
+
+        // The methods use DATE_FORMAT, which SQLite lacks, so a functional call is
+        // only meaningful on MySQL.
+        if (DB::connection()->getDriverName() !== 'mysql') {
+            return;
+        }
+
+        foreach (['getPayrollAnalytics' => 6, 'getPayrollCostTrends' => 2, 'getPayrollCostPerEmployee' => 2] as $method => $minKeys) {
+            $result = $this->repository->{$method}('6m', null);
+
+            $this->assertIsArray($result, "{$method} should return an array instead of throwing");
+            $this->assertGreaterThanOrEqual(
+                $minKeys,
+                count($result),
+                "{$method} should still return its expected payload keys"
+            );
+        }
     }
 
     private function createTasks(Project $project, StaffMemberProfile $assignee, int $count, TaskStatus $status = TaskStatus::TODO): void
