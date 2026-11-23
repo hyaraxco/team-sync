@@ -317,9 +317,11 @@ test.describe.serial("Payroll settings — role access", () => {
         await expect(page).toHaveURL(/\/admin\/payroll\/settings$/);
         await page.waitForLoadState("networkidle");
 
-        // The payroll dashboard also renders a "Payroll Settings" card link, so
-        // scope to the page heading to avoid matching two elements.
-        await expect(page.getByRole("heading", { name: "Payroll Settings" })).toBeVisible();
+        // Two <h1> nodes carry this title: the shell header (data-testid
+        // "page-title", rendered from Header.vue) and the page's own heading.
+        // PR #103 evidence shows the pair, so scope to main/scoped content
+        // instead of relying on heading level or an exact-name match.
+        await expect(page.locator("main").getByRole("heading", { name: "Payroll Settings", exact: true })).toBeVisible();
         await expectButtonVisible(page, '[data-testid="payroll-settings-save"]', "Save Configuration");
 
         await captureEvidence(page, "rbm-finance-payroll-settings.png");

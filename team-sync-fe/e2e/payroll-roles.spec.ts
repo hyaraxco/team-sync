@@ -231,7 +231,9 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     await page.goto("/admin/payroll");
     await page.getByTestId("payroll-settings-link").click();
     await expect(page).toHaveURL(/\/admin\/payroll\/settings$/);
-    await expect(page.getByRole("heading", { name: "Payroll Settings" })).toBeVisible();
+    // Scope to main: the shell header renders its own "Payroll Settings" <h1>
+    // (data-testid page-title), so an unscoped heading locator matches two.
+    await expect(page.locator("main").getByRole("heading", { name: "Payroll Settings", exact: true })).toBeVisible();
     await page.getByTestId("payroll-settings-back").click();
     await expect(page).toHaveURL(/\/admin\/payroll$/);
 
