@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Constants\CacheConstants;
+use App\Enums\PayrollStatus;
 use App\Enums\ProjectStatus;
 use App\Interfaces\AnalyticsRepositoryInterface;
 use App\Models\Payroll;
@@ -1852,6 +1853,20 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         });
     }
 
+    private function monthExpression(string $column): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%Y-%m', {$column})"
+            : "DATE_FORMAT({$column}, '%Y-%m')";
+    }
+
+    private function elapsedHoursExpression(string $start, string $end): string
+    {
+        return DB::connection()->getDriverName() === 'sqlite'
+            ? "CAST((strftime('%s', {$end}) - strftime('%s', {$start})) / 3600 AS INTEGER)"
+            : "TIMESTAMPDIFF(HOUR, {$start}, {$end})";
+    }
+
     public function getAttendanceCorrectionFrequency(string $period, ?string $department): array
     {
         $parsed = $this->parsePeriod($period);
@@ -1861,12 +1876,13 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
             $startDate = $parsed['start']->toDateString();
             $endDate = $parsed['end']->toDateString();
+            $month = $this->monthExpression('created_at');
 
             $correctionTrend = DB::table('attendance_corrections')
                 ->whereIn('staff_member_id', $filteredEmployeeIds)
-                ->whereBetween('created_at', [$startDate, $endDate])
+                ->whereBetween('created_at', [$parsed['start'], $parsed['end']->copy()->endOfDay()])
                 ->selectRaw("
-                    DATE_FORMAT(created_at, '%Y-%m') as month_key,
+                    {$month} as month_key,
                     COUNT(*) as total,
                     COUNT(CASE WHEN status = 'approved' THEN 1 END) as approved,
                     COUNT(CASE WHEN status = 'rejected' THEN 1 END) as rejected,
@@ -1896,7 +1912,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->join('staff_member_profiles', 'staff_member_profiles.id', '=', 'attendance_corrections.staff_member_id')
                 ->join('users', 'users.id', '=', 'staff_member_profiles.user_id')
                 ->whereIn('attendance_corrections.staff_member_id', $filteredEmployeeIds)
-                ->whereBetween('attendance_corrections.created_at', [$startDate, $endDate])
+                ->whereBetween('attendance_corrections.created_at', [$parsed['start'], $parsed['end']->copy()->endOfDay()])
                 ->groupBy('attendance_corrections.staff_member_id', 'users.name', 'staff_member_profiles.code')
                 ->selectRaw('attendance_corrections.staff_member_id, users.name, staff_member_profiles.code, COUNT(*) as correction_count')
                 ->orderByDesc('correction_count')
@@ -1927,6 +1943,8 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
             $startDate = $parsed['start']->toDateString();
             $endDate = $parsed['end']->toDateString();
+            $month = $this->monthExpression('start_date');
+            $hours = $this->elapsedHoursExpression('created_at', 'updated_at');
 
             $turnaroundByMonth = DB::table('leave_requests')
                 ->whereIn('staff_member_id', $filteredEmployeeIds)
@@ -1934,10 +1952,10 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 ->whereIn('status', ['approved', 'rejected'])
                 ->whereNotNull('updated_at')
                 ->selectRaw("
-                    DATE_FORMAT(start_date, '%Y-%m') as month_key,
-                    ROUND(AVG(TIMESTAMPDIFF(HOUR, created_at, updated_at)), 1) as avg_hours,
-                    MIN(TIMESTAMPDIFF(HOUR, created_at, updated_at)) as min_hours,
-                    MAX(TIMESTAMPDIFF(HOUR, created_at, updated_at)) as max_hours,
+                    {$month} as month_key,
+                    ROUND(AVG({$hours}), 1) as avg_hours,
+                    MIN({$hours}) as min_hours,
+                    MAX({$hours}) as max_hours,
                     COUNT(*) as total_processed
                 ")
                 ->groupBy('month_key')
@@ -2001,17 +2019,18 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             $filteredEmployeeIds = $this->getFilteredEmployeeIds($department, null);
             $startDate = $parsed['start']->toDateString();
             $endDate = $parsed['end']->toDateString();
+            $month = $this->monthExpression('payrolls.salary_month');
 
             $costPerEmployee = DB::table('payroll_details')
                 ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
                 ->whereIn('payroll_details.staff_member_id', $filteredEmployeeIds)
-                ->whereIn('payrolls.status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
+                ->whereIn('payrolls.status', [PayrollStatus::APPROVED->value, PayrollStatus::PAID->value])
                 ->whereBetween('payrolls.salary_month', [$startDate, $endDate])
                 ->selectRaw("
-                    DATE_FORMAT(payrolls.salary_month, '%Y-%m') as month_key,
+                    {$month} as month_key,
                     COALESCE(SUM(payroll_details.final_salary), 0) as total_cost,
                     COUNT(DISTINCT payroll_details.staff_member_id) as employee_count,
-                    ROUND(COALESCE(SUM(payroll_details.final_salary), 0) / NULLIF(COUNT(DISTINCT payroll_details.staff_member_id), 0), 2) as cost_per_employee
+                    ROUND(COALESCE(SUM(payroll_details.final_salary), 0) * 1.0 / NULLIF(COUNT(DISTINCT payroll_details.staff_member_id), 0), 2) as cost_per_employee
                 ")
                 ->groupBy('month_key')
                 ->orderBy('month_key')
@@ -2040,14 +2059,23 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () use ($parsed) {
             $startDate = $parsed['start']->toDateString();
             $endDate = $parsed['end']->toDateString();
+            $month = $this->monthExpression('payrolls.salary_month');
+            $hours = $this->elapsedHoursExpression('payrolls.created_at', 'approval_completion.approved_at');
+            $approvalCompletion = DB::table('payroll_approvals')
+                ->where('status', 'approved')
+                ->whereNotNull('approved_at')
+                ->groupBy('payroll_id')
+                ->selectRaw('payroll_id, MAX(approved_at) as approved_at');
 
             $processingTime = DB::table('payrolls')
-                ->whereIn('status', [Payroll::STATUS_APPROVED, Payroll::STATUS_PAID])
-                ->whereBetween('salary_month', [$startDate, $endDate])
-                ->whereNotNull('approved_at')
+                ->joinSub($approvalCompletion, 'approval_completion', function ($join) {
+                    $join->on('approval_completion.payroll_id', '=', 'payrolls.id');
+                })
+                ->whereIn('payrolls.status', [PayrollStatus::APPROVED->value, PayrollStatus::PAID->value])
+                ->whereBetween('payrolls.salary_month', [$startDate, $endDate])
                 ->selectRaw("
-                    DATE_FORMAT(salary_month, '%Y-%m') as month_key,
-                    ROUND(AVG(TIMESTAMPDIFF(HOUR, created_at, approved_at)), 1) as avg_hours_to_approve,
+                    {$month} as month_key,
+                    ROUND(AVG({$hours}), 1) as avg_hours_to_approve,
                     COUNT(*) as total_payrolls
                 ")
                 ->groupBy('month_key')
