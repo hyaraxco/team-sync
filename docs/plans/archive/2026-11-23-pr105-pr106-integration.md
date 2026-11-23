@@ -16,7 +16,7 @@ Skills: antislop and security-audit reviewed; ponytail-review unavailable. No UI
 
 - Original rebased PR105 candidate: full BE 1703 passed, but four endpoint 500 expectations do not satisfy acceptance.
 - Portable candidate: three numeric fixtures passed; processing fixture errored because `approved_at` is not a payroll column. Full BE: 1703 tests, zero assertion failures, one error. Backend asset build passed.
-- User correction applied: processing time joins approved-step completion grouped by payroll ID using `MAX(approved_at)` from `payroll_approvals`. The fixture includes two approved steps, a rejected timestamp, pending payroll, null completion and out-of-window payroll. Corrected full BE completed: 1703 passed, 7701 assertions, zero failures/errors/skips.
+- Review correction applied: processing time joins approved-step completion grouped by payroll ID using `MAX(approved_at)` from `payroll_approvals`. The fixture includes two approved steps, a rejected timestamp, pending payroll, null completion and out-of-window payroll. Corrected full BE completed: 1703 passed, 7701 assertions, zero failures/errors/skips.
 
 Overlap: team-sync-gwe owns the remaining undefined payroll model status constants. PR105 changes only its two affected endpoints; GWE owner notified. No closure claim for GWE.
 
@@ -30,5 +30,5 @@ PR106 remains open and untouched because latest-main merge simulation conflicts 
 
 ## Archive persistence correction
 
-The first completion claim was premature: this archive existed only in the auxiliary ARN worktree, not root main. Cleanup was reopened and ARN returned to review. [PR112](https://github.com/hyaraxco/team-sync/pull/112) persisted the archive, but its intervention attribution was incorrect. Review guidance, not a user message, flagged the omission. A follow-up docs PR corrects that record before cleanup closes. The worktree remains available; no application checks are relabelled. Docs-only verification checks archive content and Markdown links; application suites are N/A.
+The first completion claim was premature: the archive existed only in the auxiliary ARN worktree, not root main. Cleanup was reopened and ARN returned to review. [PR112](https://github.com/hyaraxco/team-sync/pull/112) persisted the archive as [b164cbe](https://github.com/hyaraxco/team-sync/commit/b164cbefe951c1f34343fe02872e7633d8125acb). [PR113](https://github.com/hyaraxco/team-sync/pull/113) corrected the intervention attribution as [ca16075](https://github.com/hyaraxco/team-sync/commit/ca160755699c8c3d37c0e612853c7d79d2aa1ace): review guidance, not a user message, flagged the omission. Root main was fast-forwarded and its archive content verified after PR113. Documentation checks covered content and Markdown links; application suites were N/A for both docs-only PRs. No application checks were relabelled.
 
