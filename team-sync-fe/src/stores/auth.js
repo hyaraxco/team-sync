@@ -86,6 +86,27 @@ export const useAuthStore = defineStore("auth", {
             this.loading = true;
 
             const token = this.token;
+            const loginRoute = { name: "login" };
+            const loginPath = "/auth/login";
+
+            // Revoke the Sanctum token BEFORE any navigation/cookie removal.
+            // A full page navigation cancels in-flight XHR, so a fire-and-forget
+            // request after window.location.replace() would never reach the server
+            // and the token would stay valid until it expired.
+            if (token) {
+                try {
+                    await axiosInstance.post("/logout", null, {
+                        timeout: 5000,
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    });
+                } catch {
+                    // Local session is cleared regardless of the revoke outcome.
+                    // In tests or on network failure we still finish the logout.
+                }
+            }
+
             Cookies.remove("token");
 
             if (axiosInstance?.defaults?.headers?.common) {
@@ -97,9 +118,6 @@ export const useAuthStore = defineStore("auth", {
             this.error = null;
             this.loading = false;
             resetAllStores();
-
-            const loginRoute = { name: "login" };
-            const loginPath = "/auth/login";
 
             // Trigger SPA navigation without blocking the logout flow.
             void router.replace(loginRoute).catch(() => {});
@@ -114,20 +132,6 @@ export const useAuthStore = defineStore("auth", {
                     // Ignore jsdom navigation errors in tests.
                 }
             }
-
-            if (!token) {
-                return;
-            }
-
-            // Revoke token on server as a best-effort background call.
-            void axiosInstance
-                .post("/logout", null, {
-                    timeout: 5000,
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
-                .catch(() => {});
         },
 
         async updateProfile(payload) {
