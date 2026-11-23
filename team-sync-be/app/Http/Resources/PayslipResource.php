@@ -13,9 +13,19 @@ class PayslipResource extends JsonResource
         $user = $employee?->user;
         $jobInformation = $employee?->jobInformation;
         $payroll = $this->payroll;
+
         $basicSalary = (float) $this->original_salary;
+        $overtimeAmount = (float) ($this->overtime_amount ?? 0);
+        $allowances = 0.0;
+        $bonus = 0.0;
+        $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus;
+
+        $tax = (float) ($this->pph21_amount ?? 0);
+        $insurance = (float) (($this->bpjs_tk_employee ?? 0) + ($this->bpjs_kes_employee ?? 0));
+        $absenceDeductions = (float) ($this->deduction_amount ?? 0);
+        $otherDeductions = $absenceDeductions;
+        $totalDeductions = $tax + $insurance + $otherDeductions;
         $netSalary = (float) $this->final_salary;
-        $totalDeductions = (float) ($this->deduction_amount ?? max(0, $basicSalary - $netSalary));
 
         $adjustments = $this->whenLoaded('appliedAdjustments', function () {
             return $this->appliedAdjustments
@@ -55,12 +65,13 @@ class PayslipResource extends JsonResource
             'company_name' => config('app.name'),
             'company_address' => 'Indonesia',
             'basic_salary' => $basicSalary,
-            'allowances' => 0,
-            'bonus' => 0,
-            'gross_salary' => $basicSalary,
-            'tax' => 0,
-            'insurance' => 0,
-            'other_deductions' => $totalDeductions,
+            'overtime_amount' => $overtimeAmount,
+            'allowances' => $allowances,
+            'bonus' => $bonus,
+            'gross_salary' => $grossSalary,
+            'tax' => $tax,
+            'insurance' => $insurance,
+            'other_deductions' => $otherDeductions,
             'total_deductions' => $totalDeductions,
             'adjustments' => $adjustments,
             'adjustment_total_amount' => (float) $adjustmentTotalAmount,

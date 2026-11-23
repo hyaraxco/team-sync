@@ -202,4 +202,36 @@ class PayslipAccessTest extends TestCase
 
         return $repository->markAsPaid($payroll->id, now()->endOfMonth()->toDateString());
     }
+
+    public function test_payslip_endpoint_reports_stored_gross_tax_and_insurance_consistently(): void
+    {
+        $employee = User::where('email', 'agung@teamsync.com')->firstOrFail();
+        $payroll = $this->createPaidPayrollForCurrentMonth();
+
+        $detail = $payroll->payrollDetails()->where('staff_member_id', $employee->staffMemberProfile->id)->firstOrFail();
+
+        $detail->update([
+            'overtime_amount' => 500_000,
+            'overtime_hours' => 4,
+            'pph21_amount' => 150_000,
+            'bpjs_tk_employee' => 180_000,
+            'bpjs_kes_employee' => 60_000,
+            'deduction_amount' => 100_000,
+        ]);
+
+        Sanctum::actingAs($employee);
+
+        $response = $this->getJson("/api/v1/my-payslips/{$detail->id}")
+            ->assertOk();
+
+        $data = $response->json('data');
+
+        $this->assertEquals((float) $detail->original_salary, $data['basic_salary']);
+        $this->assertEquals((float) $detail->original_salary + 500_000, $data['gross_salary']);
+        $this->assertEquals(500_000, $data['overtime_amount']);
+        $this->assertEquals(150_000, $data['tax']);
+        $this->assertEquals(240_000, $data['insurance']);
+        $this->assertEquals(100_000, $data['other_deductions']);
+        $this->assertEquals(150_000 + 240_000 + 100_000, $data['total_deductions']);
+    }
 }
