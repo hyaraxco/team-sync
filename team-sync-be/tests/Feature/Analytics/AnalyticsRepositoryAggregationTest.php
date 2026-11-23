@@ -179,6 +179,62 @@ class AnalyticsRepositoryAggregationTest extends TestCase
         $this->assertSame(2, $kpis['active_projects']);
     }
 
+    public function test_team_performance_excludes_tasks_outside_reporting_window(): void
+    {
+        $team = Team::factory()->active()->create();
+        $member = StaffMemberProfile::factory()->create();
+        TeamMember::factory()->forTeam($team)->forEmployee($member)->create();
+
+        // 1 present attendance in period
+        $this->createAttendance($member, Carbon::today()->subDays(5), AttendanceStatus::PRESENT);
+
+        $project = Project::factory()->create();
+
+        // Task 1: in window (created 15 days ago, due 5 days ago) - DONE
+        ProjectTask::factory()->create([
+            'project_id' => $project->id,
+            'assignee_id' => $member->id,
+            'status' => TaskStatus::DONE->value,
+            'created_at' => Carbon::today()->subDays(15),
+            'due_date' => Carbon::today()->subDays(5)->toDateString(),
+        ]);
+
+        // Task 2: finished long before window (due 60 days ago) - TODO (would drag completion rate down if included)
+        ProjectTask::factory()->create([
+            'project_id' => $project->id,
+            'assignee_id' => $member->id,
+            'status' => TaskStatus::TODO->value,
+            'created_at' => Carbon::today()->subDays(90),
+            'due_date' => Carbon::today()->subDays(60)->toDateString(),
+        ]);
+
+        // Task 3: created in the future after reporting window - TODO
+        ProjectTask::factory()->create([
+            'project_id' => $project->id,
+            'assignee_id' => $member->id,
+            'status' => TaskStatus::TODO->value,
+            'created_at' => Carbon::today()->addDays(5),
+            'due_date' => Carbon::today()->addDays(10)->toDateString(),
+        ]);
+
+        $method = new ReflectionMethod(AnalyticsRepository::class, 'getTeamPerformanceData');
+        $method->setAccessible(true);
+
+        $rows = $method->invoke(
+            $this->repository,
+            Carbon::today()->subDays(30),
+            Carbon::today(),
+            null,
+            $team->id,
+        );
+
+        $row = collect($rows)->firstWhere('team_name', $team->name);
+
+        $this->assertSame(1, $row['member_count']);
+        // Only Task 1 participates: 1 of 1 task done = 100.0% completion rate
+        $this->assertSame(100.0, $row['task_completion_rate']);
+    }
+
     private function createTasks(Project $project, StaffMemberProfile $assignee, int $count, TaskStatus $status = TaskStatus::TODO): void
     {
         ProjectTask::factory()->count($count)->create([
