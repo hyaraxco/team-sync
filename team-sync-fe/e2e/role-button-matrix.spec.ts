@@ -50,8 +50,12 @@ test.describe.serial("Staff Member module — button visibility per role", () =>
         await expectTextVisible(page, "Add Staff Member");
         await expectTextVisible(page, "Import CSV");
 
-        // Wait for staff member API data to load and cards to render
-        await expect(page.getByText("All Staff Members")).toBeVisible({ timeout: 15_000 });
+        // Wait for staff member API data to load and cards to render.
+        // Scope to the heading: "All Staff Members" also appears as a link in
+        // the success screen, so an unscoped getByText matches two elements.
+        await expect(
+            page.getByRole("heading", { name: "All Staff Members" }),
+        ).toBeVisible({ timeout: 15_000 });
         // Wait for actual employee name to appear (proves cards rendered)
         await expect(page.getByText("Dwimeta").first()).toBeVisible({ timeout: 20_000 });
 
@@ -178,7 +182,7 @@ test.describe.serial("Team module — button visibility per role", () => {
 test.describe.serial("Project module — button visibility per role", () => {
     test.setTimeout(90_000);
 
-    test("HR sees Add Project button", async ({ browser }) => {
+    test("HR does NOT see Add Project button (read-only project oversight)", async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
         await loginAsRole(page, "hr");
@@ -187,8 +191,10 @@ test.describe.serial("Project module — button visibility per role", () => {
         await expect(page).toHaveURL(/\/admin\/projects$/);
         await page.waitForLoadState("networkidle");
 
-        await expectTextVisible(page, "Add Project");
-        await captureEvidence(page, "rbm-hr-project-add.png");
+        // HR has project-menu/project-list only; ProjectList gates the button
+        // on can('project-create'), which HR does not hold.
+        await expectTextHidden(page, "Add Project");
+        await captureEvidence(page, "rbm-hr-project-no-add.png");
         await context.close();
     });
 
@@ -219,13 +225,18 @@ test.describe.serial("Project module — button visibility per role", () => {
         await context.close();
     });
 
-    test("Finance is denied access to projects (redirects to dashboard)", async ({ browser }) => {
+    test("Finance can view the project list (staff-level) but has no project CRUD", async ({ browser }) => {
         const context = await browser.newContext();
         const page = await context.newPage();
         await loginAsRole(page, "finance");
 
+        // Seeder grants Finance project-menu + project-list only, so the list is
+        // accessible while create/edit remain denied.
         await page.goto("/admin/projects");
-        await expect(page).toHaveURL(/\/admin\/dashboard$/);
+        await expect(page).toHaveURL(/\/admin\/projects$/);
+        await page.waitForLoadState("networkidle");
+
+        await expectTextHidden(page, "Add Project");
         await context.close();
     });
 });
@@ -306,6 +317,8 @@ test.describe.serial("Payroll settings — role access", () => {
         await expect(page).toHaveURL(/\/admin\/payroll\/settings$/);
         await page.waitForLoadState("networkidle");
 
+        // The payroll dashboard also renders a "Payroll Settings" card link, so
+        // scope to the page heading to avoid matching two elements.
         await expect(page.getByRole("heading", { name: "Payroll Settings" })).toBeVisible();
         await expectButtonVisible(page, '[data-testid="payroll-settings-save"]', "Save Configuration");
 

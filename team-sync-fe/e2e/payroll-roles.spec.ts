@@ -217,9 +217,11 @@ test.describe.serial("Payroll role journey (Bun + Docker BE)", () => {
     // Finance CAN access payroll/create (owns payroll operations)
     await page.goto("/admin/payroll/create");
     await expect(page).toHaveURL(/\/admin\/payroll\/create$/);
-    // But Finance is denied teams/projects
+    // Finance has staff-level project visibility (project-menu + project-list),
+    // so the list is allowed; teams and attendance admin remain denied.
     await expectRedirectToDashboard(page, "/admin/teams");
-    await expectRedirectToDashboard(page, "/admin/projects");
+    await page.goto("/admin/projects");
+    await expect(page).toHaveURL(/\/admin\/projects$/);
     await page.goto("/admin/my-payroll");
     await expect(page).toHaveURL(/\/admin\/my-payroll$/);
     await expect(

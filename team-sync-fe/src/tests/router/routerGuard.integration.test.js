@@ -121,22 +121,24 @@ describe("router guard integration", () => {
         expect(router.currentRoute.value.name).toBe("admin.projects.edit");
     });
 
-    it("allows HR to access payroll create and denies finance on the same route", async () => {
+    it("denies HR on payroll create and allows finance on the same route (Finance owns payroll operations)", async () => {
+        // HR has no payroll-create; only payroll-readiness-view and thr-list (read-only).
         setAuth({
-            permissions: ["dashboard-menu", "payroll-menu", "payroll-list", "payroll-create"],
+            permissions: ["dashboard-menu", "payroll-readiness-view", "thr-list"],
         });
         const hrRouter = createTestRouter();
 
         await goTo(hrRouter, "/admin/payroll/create");
-        expect(hrRouter.currentRoute.value.name).toBe("admin.payroll.create");
+        expect(hrRouter.currentRoute.value.name).toBe("admin.dashboard");
 
+        // Finance owns payroll operations and holds payroll-create.
         setAuth({
-            permissions: ["dashboard-menu", "payroll-menu", "payroll-list", "payroll-edit", "payroll-process"],
+            permissions: ["dashboard-menu", "payroll-menu", "payroll-list", "payroll-create", "payroll-edit"],
         });
         const financeRouter = createTestRouter();
 
         await goTo(financeRouter, "/admin/payroll/create");
-        expect(financeRouter.currentRoute.value.name).toBe("admin.dashboard");
+        expect(financeRouter.currentRoute.value.name).toBe("admin.payroll.create");
     });
 
     it("allows finance to access payroll settings and denies HR on the same route", async () => {
@@ -167,21 +169,11 @@ describe("router guard integration", () => {
 
     it("enforces payroll detail access while allowing dual-role self-service payroll", async () => {
         setAuth({
-            permissions: ["dashboard-menu", "payroll-menu", "payroll-list", "payroll-create", "payslip-view"],
-        });
-        const hrRouter = createTestRouter();
-
-        await goTo(hrRouter, "/admin/payroll/99");
-        expect(hrRouter.currentRoute.value.name).toBe("admin.payroll.detail");
-
-        await goTo(hrRouter, "/admin/my-payroll");
-        expect(hrRouter.currentRoute.value.name).toBe("staffMember.payroll");
-
-        setAuth({
             permissions: [
                 "dashboard-menu",
                 "payroll-menu",
                 "payroll-list",
+                "payroll-create",
                 "payroll-edit",
                 "payroll-process",
                 "payroll-statistics",
@@ -193,8 +185,21 @@ describe("router guard integration", () => {
         await goTo(financeRouter, "/admin/payroll/99");
         expect(financeRouter.currentRoute.value.name).toBe("admin.payroll.detail");
 
-        await goTo(financeRouter, "/admin/my-payslips");
+        await goTo(financeRouter, "/admin/my-payroll");
         expect(financeRouter.currentRoute.value.name).toBe("staffMember.payroll");
+
+        // HR has no payroll-list, so admin payroll detail is denied, but the
+        // self-service payslip page stays available via payslip-view.
+        setAuth({
+            permissions: ["dashboard-menu", "payroll-readiness-view", "thr-list", "payslip-view"],
+        });
+        const hrRouter = createTestRouter();
+
+        await goTo(hrRouter, "/admin/payroll/99");
+        expect(hrRouter.currentRoute.value.name).toBe("admin.dashboard");
+
+        await goTo(hrRouter, "/admin/my-payroll");
+        expect(hrRouter.currentRoute.value.name).toBe("staffMember.payroll");
 
         setAuth({
             permissions: ["dashboard-menu", "team-menu", "staff-member-menu", "payslip-view"],
