@@ -3,6 +3,7 @@ import { defineConfig } from "vitest/config";
 import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
+  cacheDir: process.env.VITE_CACHE_DIR,
   plugins: [vue()],
   resolve: {
     alias: {
@@ -13,6 +14,11 @@ export default defineConfig({
     environment: "jsdom",
     globals: true,
     include: ["src/**/*.test.{js,ts}"],
-
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{js,vue}"],
+      exclude: ["src/tests/**", "src/**/*.test.js", "src/**/*.spec.js"],
+      reporter: ["text", "json", "json-summary", "lcov"],
+    },
   },
 });
