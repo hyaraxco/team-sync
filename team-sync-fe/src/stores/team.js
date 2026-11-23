@@ -116,6 +116,8 @@ export const useTeamStore = defineStore("team", {
 
         async createTeam(payload) {
             this.loading = true;
+            this.error = null;
+            this.success = null;
 
             try {
                 const formData = buildTeamFormData(payload);
@@ -131,6 +133,8 @@ export const useTeamStore = defineStore("team", {
 
         async updateTeam(id, payload) {
             this.loading = true;
+            this.error = null;
+            this.success = null;
 
             try {
                 const formData = buildTeamFormData(payload, "PUT");
