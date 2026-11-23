@@ -291,9 +291,10 @@ test.describe.serial("Role-based navigation and access control", () => {
     await page.goto("/admin/teams");
     await expect(page).toHaveURL(/\/admin\/dashboard$/);
 
-    // DENIED: Projects
+    // ALLOWED: Projects list (Finance has staff-level project-menu/project-list;
+    // create/edit stay denied). See RolePermissionSeeder.
     await page.goto("/admin/projects");
-    await expect(page).toHaveURL(/\/admin\/dashboard$/);
+    await expect(page).toHaveURL(/\/admin\/projects$/);
 
     // DENIED: Attendance admin
     await page.goto("/admin/attendances");
