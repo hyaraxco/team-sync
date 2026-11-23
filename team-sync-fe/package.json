@@ -31,11 +31,7 @@
     "caniuse-lite": "^1.0.30001791",
     "dompurify": "^3.4.18",
     "js-cookie": "^3.0.8",
-    "jspdf": "^4.2.1",
-    "jspdf-autotable": "^5.0.7",
     "lodash": "^4.18.1",
-    "lodash-es": "^4.18.1",
-    "lucide": "^0.544.0",
     "lucide-vue-next": "^0.544.0",
     "luxon": "^3.7.2",
     "pinia": "^3.0.3",
@@ -43,8 +39,7 @@
     "vue": "^3.5.46",
     "vue-draggable-next": "^2.3.0",
     "vue-router": "^4.5.1",
-    "vue3-apexcharts": "^1.8.0",
-    "vue3-emoji-picker": "^1.1.8"
+    "vue3-apexcharts": "^1.8.0"
   },
   "overrides": {
     "glob": "14.0.6",
@@ -59,7 +54,6 @@
     "@vue/test-utils": "^2.6.0",
     "autoprefixer": "^10.4.21",
     "baseline-browser-mapping": "^2.11.39",
-    "concurrently": "^10.0.7",
     "eslint": "^10.15.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-vue": "^10.9.1",
