@@ -187,4 +187,24 @@ describe("TeamDetail smoke", () => {
         });
         expect(wrapper.text()).toContain("Add Team Member");
     });
+
+    it("does not render fabricated demo activity entries", async () => {
+        const wrapper = factory();
+        await flushAsync();
+
+        const text = wrapper.text();
+        expect(text).toContain("Recent Activity");
+        expect(text).not.toContain("Advanced React Patterns");
+        expect(text).not.toContain("Emily Rodriguez");
+        expect(text).not.toContain("API Integration Phase");
+    });
+
+    it("renders no uninitialised vanilla lucide placeholder icons", async () => {
+        const wrapper = factory();
+        await flushAsync();
+
+        // <i data-lucide="..."> only works when createIcons() runs, which it never
+        // does here, so such elements rendered as invisible/empty icons.
+        expect(wrapper.findAll("i[data-lucide]")).toHaveLength(0);
+    });
 });
