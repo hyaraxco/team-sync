@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Constants\CacheConstants;
+use App\Enums\ProjectStatus;
 use App\Interfaces\AnalyticsRepositoryInterface;
 use App\Models\Payroll;
 use Carbon\Carbon;
@@ -1706,7 +1707,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
     private function getProjectKpis(array $filteredEmployeeIds): array
     {
         $activeProjects = DB::table('projects')
-            ->whereIn('status', ['in_progress', 'on_hold'])
+            ->whereIn('status', [ProjectStatus::ACTIVE->value, ProjectStatus::ON_HOLD->value])
             ->count();
 
         $tasksDone = DB::table('project_tasks')
@@ -2083,26 +2084,29 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                     $join->on('team_members.team_id', '=', 'teams.id')
                         ->whereNull('team_members.left_at');
                 })
+                // A task counts for a period when it was created by the period end
+                // and had not finished before the period began.
                 ->leftJoin('project_tasks', function ($join) use ($startDate, $endDate) {
                     $join->on('project_tasks.assignee_id', '=', 'team_members.staff_member_id')
-                        ->where(function ($q) use ($startDate, $endDate) {
-                            $q->whereBetween('project_tasks.created_at', [$startDate, $endDate])
-                                ->orWhere(function ($q2) use ($startDate, $endDate) {
-                                    $q2->where('project_tasks.start_date', '<=', $endDate)
-                                        ->where(function ($q3) use ($startDate) {
-                                            $q3->whereNull('project_tasks.due_date')
-                                                ->orWhere('project_tasks.due_date', '>=', $startDate);
-                                        });
-                                });
+                        ->where('project_tasks.created_at', '<=', $endDate.' 23:59:59')
+                        ->where(function ($q) use ($startDate) {
+                            $q->whereNull('project_tasks.due_date')
+                                ->orWhere('project_tasks.due_date', '>=', $startDate);
                         });
                 })
                 ->groupBy('teams.id', 'teams.name')
+                // Teams with no active members are not utilizable; hide them
+                // instead of reporting a phantom 0% row.
+                ->havingRaw('COUNT(DISTINCT team_members.staff_member_id) > 0')
                 ->selectRaw('
                     teams.name as team_name,
                     COUNT(DISTINCT team_members.staff_member_id) as total_members,
                     COUNT(DISTINCT CASE WHEN project_tasks.id IS NOT NULL THEN team_members.staff_member_id END) as members_with_tasks,
                     COUNT(project_tasks.id) as total_tasks,
-                    ROUND(AVG(CASE WHEN project_tasks.id IS NOT NULL THEN 1 ELSE 0 END) * 100, 1) as utilization_rate
+                    ROUND(
+                        COUNT(DISTINCT CASE WHEN project_tasks.id IS NOT NULL THEN team_members.staff_member_id END)
+                        * 100.0 / COUNT(DISTINCT team_members.staff_member_id), 1
+                    ) as utilization_rate
                 ')
                 ->orderByDesc('utilization_rate')
                 ->get()
@@ -2125,6 +2129,26 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
 
     private function getTeamPerformanceData(Carbon $start, Carbon $end, ?string $department, ?int $teamId): array
     {
+        // Per-member aggregates first, so attendance and task rows cannot multiply each other.
+        $attendanceStats = DB::table('attendances')
+            ->whereBetween('date', [$start->toDateString(), $end->toDateString()])
+            ->groupBy('staff_member_id')
+            ->selectRaw("
+                staff_member_id,
+                COUNT(*) as total_attendances,
+                COUNT(CASE WHEN status IN ('present', 'late', 'half_day') THEN 1 END) as attended_attendances
+            ");
+
+        $taskStats = DB::table('project_tasks')
+            ->whereIn('status', ['todo', 'in_progress', 'review', 'done'])
+            ->whereNotNull('assignee_id')
+            ->groupBy('assignee_id')
+            ->selectRaw("
+                assignee_id,
+                COUNT(*) as total_tasks,
+                COUNT(CASE WHEN status = 'done' THEN 1 END) as completed_tasks
+            ");
+
         return DB::table('teams')
             ->where('teams.status', 'active')
             ->when($department, function ($q) use ($department) {
@@ -2137,35 +2161,33 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
                 $join->on('team_members.team_id', '=', 'teams.id')
                     ->whereNull('team_members.left_at');
             })
-            ->leftJoin('attendances', function ($join) use ($start, $end) {
-                $join->on('attendances.staff_member_id', '=', 'team_members.staff_member_id')
-                    ->whereBetween('attendances.date', [$start->toDateString(), $end->toDateString()]);
+            ->leftJoinSub($attendanceStats, 'attendance_stats', function ($join) {
+                $join->on('attendance_stats.staff_member_id', '=', 'team_members.staff_member_id');
             })
-            ->leftJoin('project_tasks', function ($join) {
-                $join->on('project_tasks.assignee_id', '=', 'team_members.staff_member_id')
-                    ->whereIn('project_tasks.status', ['todo', 'in_progress', 'review', 'done']);
+            ->leftJoinSub($taskStats, 'task_stats', function ($join) {
+                $join->on('task_stats.assignee_id', '=', 'team_members.staff_member_id');
             })
             ->groupBy('teams.id', 'teams.name')
-            ->selectRaw("
+            ->selectRaw('
                 teams.name as team_name,
                 COUNT(DISTINCT team_members.staff_member_id) as member_count,
                 CASE
-                    WHEN COUNT(attendances.id) > 0
+                    WHEN COALESCE(SUM(attendance_stats.total_attendances), 0) > 0
                     THEN ROUND(
-                        COUNT(CASE WHEN attendances.status IN ('present', 'late', 'half_day') THEN 1 END)
-                        / COUNT(attendances.id) * 100, 1
+                        SUM(attendance_stats.attended_attendances) * 100.0
+                        / SUM(attendance_stats.total_attendances), 1
                     )
                     ELSE 0
                 END as attendance_rate,
                 CASE
-                    WHEN COUNT(project_tasks.id) > 0
+                    WHEN COALESCE(SUM(task_stats.total_tasks), 0) > 0
                     THEN ROUND(
-                        COUNT(CASE WHEN project_tasks.status = 'done' THEN 1 END)
-                        / COUNT(project_tasks.id) * 100, 1
+                        SUM(task_stats.completed_tasks) * 100.0
+                        / SUM(task_stats.total_tasks), 1
                     )
                     ELSE 0
                 END as task_completion_rate
-            ")
+            ')
             ->orderBy('attendance_rate', 'desc')
             ->get()
             ->map(fn ($t) => [
