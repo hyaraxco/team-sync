@@ -526,7 +526,7 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
             // C4: On-time ratio (goals completed before or on due_date)
             $onTimeGoals = $goals->where('status', 'completed')
                 ->filter(function ($g) {
-                    return $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date;
+                    return $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date->copy()->endOfDay();
                 })
                 ->count();
             $goalCompletionRatio = $completedGoals > 0 ? ($onTimeGoals / $completedGoals) : 0;
