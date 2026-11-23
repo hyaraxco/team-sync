@@ -2,6 +2,8 @@
 
 > [!NOTE]
 > **Executable Test**: [PayrollRoleJourneyTest.php](../../../team-sync-be/tests/Feature/Payroll/PayrollRoleJourneyTest.php)
+>
+> Ekspektasi payroll direkonsiliasi pada 2026-11-23 terhadap `RolePermissionSeeder.php`, router payroll, dan quick actions. Ini pemeriksaan sumber, bukan hasil E2E baru. Sign-off historis ada di bagian terakhir.
 
 ## Tujuan
 - Memverifikasi fitur payroll berjalan sesuai role `manager`, `hr`, `finance`, dan `employee`.
@@ -9,9 +11,12 @@
 - Mencatat gap implementasi employee payslip bila handoff backend belum tersedia.
 
 ## Persiapan
+
+Gunakan database uji terpisah dengan data dummy. Seeder, `qa:payroll-ready`, dan persiapan E2E dapat mereset data; jangan arahkan ke database kerja atau produksi. Path berikut relatif terhadap root repo.
+
 1. Seed data minimum:
    ```bash
-   cd /Users/hyarax/Documents/project/team-sync/team-sync-be
+   cd team-sync-be
    php artisan db:seed --class=MinimalPayrollE2ESeeder
    ```
    Alternatif jika ingin employee langsung melihat data `My Payroll` tanpa generate manual:
@@ -44,19 +49,22 @@
    - Dashboard quick action **tidak** menampilkan `Process Payroll`.
    - Akses `/admin/payroll`, `/admin/payroll/create`, dan detail payroll diarahkan kembali atau ditolak.
    - API payroll utama (generate, approve, settings) harus `403`.
+   - `/admin/payroll/readiness` dan `/admin/payroll/thr` tetap dapat dibuka untuk koordinasi read-only (`payroll-readiness-view`, `thr-list`).
+   - Tidak ada action generate/approve/process THR; API mutasi THR harus `403`.
 3. `Finance`
    - Login berhasil.
    - Sidebar menampilkan menu `Payroll`.
-   - Dashboard quick action tidak menampilkan `Process Payroll`.
+   - Dashboard quick action menampilkan `Process Payroll` (`payroll-create`).
    - Masuk ke `/admin/payroll`, statistik payroll sensitif tampil.
-   - Action utama finance adalah `Export Payroll Report`.
+   - Action generate payroll dan `Export Payroll Report` tersedia sesuai permission.
    - `Payroll Settings` bisa diakses dan disimpan untuk role finance.
-   - Akses `/admin/payroll/create` harus ditolak atau diarahkan kembali.
-   - Buka detail payroll `pending`, statistik payroll tampil, dan tombol `Mark as Paid` tersedia.
+   - Buka `/admin/payroll/create`, periksa readiness, lalu generate bulan uji. Setelah job selesai, status menjadi `pending`; duplicate month harus ditolak.
+   - Buka detail payroll `pending`, periksa statistik dan selesaikan seluruh approval yang diwajibkan. `Mark as Paid` hanya dijalankan setelah status `approved`.
    - `Export Payroll Report` dan export Excel detail dianggap valid untuk role ini.
    - Jalankan `Mark as Paid` lalu pastikan status berubah menjadi `paid` di dashboard, detail, dan API.
    - Setelah `paid`, detail payroll menampilkan informasi bahwa notifikasi employee sudah dikirim otomatis.
-   - API `generate payroll` harus tetap `403`.
+   - API generate tidak ditolak oleh permission Finance; validasi input, readiness, dan status tetap berlaku.
+   - Finance memiliki operasi THR generate/approve/process; verifikasi transisi yang sesuai dengan data uji.
 4. `Employee`
    - Login berhasil.
    - Tidak bisa masuk route payroll admin dan tidak melihat menu payroll admin.
@@ -68,17 +76,17 @@
 
 ## Expected Result
 - `manager` tidak punya akses payroll admin, tetapi tetap punya self-service personal.
-- `hr` tidak punya akses payroll admin atau operasi payroll apa pun (least-privilege saat ini: payroll dimiliki `finance`).
-- `finance` hanya bisa review, generate, lihat statistik, export report, export detail, dan mark payroll sebagai `paid`.
+- `hr` tidak punya operasi payroll/THR atau akses dashboard/detail/settings payroll; readiness dan THR tetap read-only untuk koordinasi.
+- `finance` memiliki operasi payroll/THR, termasuk generate, review, settings, approval, export, dan pembayaran; prasyarat status/approval tetap berlaku.
 - `employee` tidak punya akses payroll admin.
 - `employee` bisa melihat dan mengunduh payslip miliknya sendiri jika payroll sudah `paid`.
-- Transisi status payroll dari `pending` ke `paid` harus konsisten di UI dan API.
+- Transisi status payroll `processing`, `pending`, `approved`, lalu `paid` harus konsisten di UI dan API.
 
 ## Stage 1 Done Criteria
 - `manager` tidak melihat payroll admin menu/quick action, tidak bisa direct URL payroll admin, dan API payroll admin tetap `403`.
 - `manager`, `hr`, dan `finance` bisa mengakses self-service personal (`My Profile`, `My Attendance`, `My Payroll`) dari akun yang sama.
-- `hr` tidak bisa generate atau membuka payroll admin; semua route payroll ditolak.
-- `finance` bisa create/generate payroll, buka detail payroll, melihat statistik, mengakses payroll settings, export payroll report, export Excel, dan mark payroll menjadi `paid`.
+- `hr` tidak bisa generate atau membuka dashboard/detail/settings payroll; hanya readiness dan THR read-only yang diizinkan.
+- `finance` bisa create/generate payroll, buka detail payroll, melihat statistik, mengakses payroll settings, menyelesaikan approval, export payroll report, export Excel, dan mark payroll `approved` menjadi `paid`.
 - Setelah payroll `paid`, finance melihat info auto notification, bukan tombol manual send.
 - `employee` bisa buka `My Payroll`, detail, dan download PDF miliknya sendiri, tetapi semua route payroll admin tetap deny.
 - `bun run test:guards` dan `bun run e2e` harus hijau.
@@ -88,25 +96,25 @@
 - Semua kasus `deny` harus kembali ke dashboard (`/admin/dashboard`) atau login bila sesi invalid.
 
 ### Manager (`yudhis@teamsync.com`)
-- Allow: `/admin/dashboard`, `/admin/teams`, `/admin/staff-members`, `/admin/projects`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
-- Deny: `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/payroll/settings`
+- Allow: `/admin/dashboard`, `/admin/teams`, `/admin/projects`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
+- Deny: `/admin/staff-members`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/payroll/settings`, `/admin/payroll/readiness`, `/admin/payroll/thr`
 
 ### HR (`tasyia@teamsync.com`)
-- Allow: `/admin/dashboard`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/teams`, `/admin/staff-members`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
-- Deny: `/admin/payroll/settings`
+- Allow: `/admin/dashboard`, `/admin/payroll/readiness`, `/admin/payroll/thr`, `/admin/teams`, `/admin/staff-members`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
+- Deny: `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/payroll/settings`, `/admin/payroll/approval-matrix`, `/admin/payroll/adjustments`, `/admin/payroll/comparison`
 
 ### Finance (`dwimeta@teamsync.com`)
-- Allow: `/admin/dashboard`, `/admin/payroll`, `/admin/payroll/1`, `/admin/payroll/settings`, `/admin/attendances`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
-- Deny: `/admin/payroll/create`, `/admin/teams`, `/admin/projects`
+- Allow: `/admin/dashboard`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/1`, `/admin/payroll/settings`, `/admin/payroll/readiness`, `/admin/payroll/thr`, `/admin/payroll/approval-matrix`, `/admin/payroll/adjustments`, `/admin/payroll/comparison`, `/admin/projects`, `/admin/my-profile`, `/admin/attendance/my-attendances`, `/admin/my-payroll`, `/admin/my-payslips`
+- Deny: `/admin/staff-members`, `/admin/teams`, `/admin/attendances`
 
 ### Employee (`agung@teamsync.com`)
 - Allow: `/admin/dashboard`, `/admin/my-profile`, `/admin/my-team`, `/admin/attendance/my-attendances`, `/admin/attendance/clock`, `/admin/my-payroll`, `/admin/my-payslips`
-- Deny: `/admin/staff-members`, `/admin/teams`, `/admin/attendances`, `/admin/payroll`, `/admin/payroll/create`
+- Deny: `/admin/staff-members`, `/admin/teams`, `/admin/attendances`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/readiness`, `/admin/payroll/thr`
 
 ## Automated UI E2E (Bun + Docker BE)
 - Install browser dependency once:
   ```bash
-  cd /Users/hyarax/Documents/project/team-sync/team-sync-fe
+  cd team-sync-fe
   bun run e2e:install
   ```
 - Run full payroll role journey automation:
@@ -124,14 +132,17 @@
   E2E_FE_BASE_URL=http://127.0.0.1:4173
   VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
   ```
-- Artifacts:
+- Contoh nama artifact dari runbook lama (bukan bukti run baru; nama `hr-pending-created` mencerminkan pembagian role lama):
   - `team-sync-fe/playwright-artifacts/manager-deny-payroll.png`
   - `team-sync-fe/playwright-artifacts/hr-pending-created.png`
   - `team-sync-fe/playwright-artifacts/finance-paid.png`
   - `team-sync-fe/playwright-artifacts/employee-my-payroll.png`
 
-## CI Automation (GitHub Actions)
-- Workflow: `.github/workflows/payroll-ui-e2e.yml`
+## CI Automation historis (GitHub Actions)
+
+Workflow `payroll-ui-e2e.yml` dan `fe-guard-smoke.yml` di bawah tidak ada pada checkout 2026-11-23. Konfigurasi berikut dipertahankan sebagai referensi lama, bukan gate aktif atau bukti sign-off. Workflow aktif ada di `.github/workflows/be-tests.yml` dan `.github/workflows/fe-tests.yml`; keduanya bukan pengganti bukti role E2E.
+
+- Workflow historis: `.github/workflows/payroll-ui-e2e.yml`
 - Trigger:
   - manual `workflow_dispatch`
   - `pull_request` yang menyentuh `team-sync-fe/**` atau `team-sync-be/**`
@@ -151,8 +162,8 @@
   - `backend-compose-ps.log`
   - `backend-health-check.txt`
 
-## Fast FE Guard Gate (CI)
-- Workflow: `.github/workflows/fe-guard-smoke.yml`
+## Fast FE Guard Gate historis (CI)
+- Workflow historis: `.github/workflows/fe-guard-smoke.yml`
 - Tujuan: guard regression cepat di FE tanpa menunggu full Playwright E2E.
 - Command yang dijalankan:
   ```bash
@@ -165,11 +176,14 @@
   - payroll admin smoke (dashboard/create/detail)
   - employee workspace smoke (profile, attendance, my payroll, payslip detail)
 
-## Latest QA Sign-Off (2026-04-08)
+## QA Sign-Off historis (2026-04-08, pembagian role lama)
+
+Hasil asli berikut dipertahankan sebagai catatan historis. Pembagian payroll HR/Finance saat itu sudah usang dan bukan ekspektasi saat ini. E2E baru belum dijalankan dalam rekonsiliasi 2026-11-23; checklist aktif di atas masih memerlukan sign-off baru.
+
 - Full automation `bun run e2e` lulus untuk 4 role (`manager`, `hr`, `finance`, `employee`) dalam satu run.
 - QA role-by-role tambahan lulus:
-  - `HR`: payroll admin tetap deny (`403`); tidak ada operasi payroll (least-privilege saat ini).
-  - `Finance`: generate/review/export/approve/mark-as-paid, status final `paid`.
+  - `HR`: generate draft `pending`, duplicate month guard aktif, tidak bisa approve/mark-as-paid.
+  - `Finance`: tidak bisa generate, bisa review/export/approve/mark-as-paid, status final `paid`.
   - `Manager`: payroll admin tetap deny (`403`), self-service personal tetap usable.
   - `Employee`: my payroll list/detail/download milik sendiri lulus, admin payroll endpoint tetap `403`.
 - Catatan eksekusi:

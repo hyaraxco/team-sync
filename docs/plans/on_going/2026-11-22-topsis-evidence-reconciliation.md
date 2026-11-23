@@ -1,14 +1,16 @@
 # TOPSIS Evidence & Release Reconciliation — team-sync-lzo
 
-**Status:** COMPLETED (2026-11-22) — ke archive
+**Status:** IN_PROGRESS (review correction 2026-11-23). PR #92 is open; `team-sync-lzo` remains in review. This plan was archived prematurely and is reopened until the remaining acceptance criteria are met.
 **Branch:** fix/team-sync-lzo-topsis-evidence
 
 ## AC#1 — Jalankan suite TOPSIS nyata
 
+Catatan di bawah adalah bukti eksekusi historis 2026-11-22, bukan rerun setelah koreksi review 2026-11-23.
+
 - Perintah: `./vendor/bin/pest tests/Unit/TopsisServiceTest.php tests/Unit/TopsisIntermediateTest.php tests/Feature/Performance/PerformanceTopsisControllerTest.php tests/Feature/Performance/TopsisCandidatePipelineTest.php`
 - Runtime: PHP 8.4.28 CLI, revision `02fdcf0`, 2026-11-22T16:32Z
 - Hasil: Unit 19 passed (565 assertions); Feature 15 passed (55 assertions)
-- Endpoint ranking diuji oleh `PerformanceTopsisControllerTest` dengan 3 kandidat terdiferensiasi (Yudhis > Agung > Tasyia), default dan custom weights, plus permission matrix. Output tercatat pada sesi eksekusi; angka final: full suite **1687 passed / 7514 assertions** (`composer test`).
+- Endpoint ranking diuji oleh `PerformanceTopsisControllerTest` dengan 3 kandidat terdiferensiasi (Yudhis > Agung > Tasyia), default dan custom weights, plus permission matrix. Output numerik endpoint yang dapat diperiksa belum disimpan sebagai bukti tiket. Angka full suite historis: **1687 passed / 7514 assertions** (`composer test`); ini bukan pengganti output endpoint.
 
 ## AC#2 — Fixed-value intermediates dari sampel R1
 
@@ -18,6 +20,7 @@ Ditambahkan `tests/Unit/TopsisIntermediateTest.php` (9 test, 81 assertions):
 - **D+/D− untuk semua 5 kandidat** terhadap rekomputasi independen — bukan estimasi plan arsip
 - Jurnal-rounded K17: D+=0.0093, D−=0.0220 (R1 pp.90-91). Estimasi plan arsip (0.0048/0.0115) **tidak dipakai** dan tercatat salah di test
 - Sumber: Arundaa, Sopacua & Tamonob, IJIDS 3(2) 2024, pp.85-94, Table 2 & 3
+- Batas: nilai normalized/weighted tetap hanya mencakup K17, belum seluruh matriks lima kandidat yang diminta AC#2.
 
 ## AC#3 — Tie ordering, konvensi, boundary repository
 
@@ -25,6 +28,8 @@ Ditambahkan `tests/Unit/TopsisIntermediateTest.php` (9 test, 81 assertions):
 - **Single-candidate convention**: normalized=1.0 (positif) / 0.0 (nol), weighted=weight, ideals collapse, D+=D−=0, CC=1.0 konvensional (rasio 0/0 tak terdefinisi) — didokumentasikan eksplisit di test
 - **Zero-column convention**: kolom semua-nol → normalisasi 0 via fallback denominator 1.0
 - **Repository boundary** (`TopsisCandidatePipelineTest`, 6 test): feedback floor 10 (3/10→30), cap cycle-max (15/15→100), bukan positive → 0, feedback luar window cycle dikecualikan, tenure cap 60 bulan (80→100), hanya review `completed` jadi kandidat
+- Koreksi review: fixture constructive feedback dibekukan di dalam cycle dan timestamp tersimpan diperiksa, sehingga filter tanggal tidak menutupi kerusakan filter tipe. Rerun pada head koreksi belum tersedia.
+- Batas: assertion observable untuk partial/negative/all-zero weights masih perlu diperkuat; status HTTP saja tidak membuktikan hasil bobot yang dimaksud AC#3.
 
 ## AC#4 — Rekonsiliasi plan arsip vs merge/CI
 
@@ -36,11 +41,13 @@ Ditambahkan `tests/Unit/TopsisIntermediateTest.php` (9 test, 81 assertions):
 
 - E2E Playwright penuh **tidak dijalankan** pada pengerjaan ini (butuh environment seeded + backend live). Full BE Pest suite dijalankan sebagai verifikasi terprogram; E2E fresh sign-off tetap terbuka sebagai tindak lanjut.
 - Dokumen QA legacy dikoreksi sesuai least-privilege berjalan:
-  - `docs/testing/be/payroll-role-e2e-qa.md`: HR **tidak** lagi generator payroll; Finance melakukan generate/review/export/approve/mark-as-paid
-  - `docs/testing/fe/manual-testing-guide.md`: Payroll Full Cycle direvisi (Finance generate; HR jadi negative check 403)
+  - `docs/testing/be/payroll-role-e2e-qa.md`: Finance melakukan generate/review/export/approve/mark-as-paid. HR tidak memiliki operasi payroll/THR, tetapi mempertahankan readiness/THR read-only. Hasil QA 2026-04-08 dipulihkan sebagai bukti historis pembagian role lama, bukan sign-off saat ini.
+  - `docs/testing/fe/manual-testing-guide.md`: checklist aktif diselaraskan dengan Finance sebagai operator dan HR sebagai read-only coordination/negative mutation check.
+- Scope koreksi PR bukan penutupan tiket: FE/BE terkini, role E2E termasuk ranking, dan output numerik endpoint tetap belum lengkap. Jangan arsipkan plan ini sebagai COMPLETED dari BE-only checks.
 
 ## Batas verifikasi
 
 1. E2E role-based fresh sign-off belum dijalankan (membutuhkan lingkungan terisolasi + seed penuh) — AC#5 terpenuhi parsial, dicatat jujur.
 2. Repository-secret availability untuk Strix tidak diperiksa (butuh otorisasi).
 3. Angka 1687/7514 adalah snapshot 2026-11-22 pada `02fdcf0` + perubahan branch ini.
+4. Local rerun 2026-11-23 belum dijalankan karena seluruh kontrol sandbox wajib belum tersedia. Checks head lama `94dd88328cc50fd72fd33ab74b0e45f3723f1e21` tidak memvalidasi perubahan review berikutnya.

@@ -5,8 +5,8 @@ namespace Tests\Feature\Performance;
 use App\Models\PerformanceFeedback;
 use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
-use Carbon\Carbon;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -144,17 +144,23 @@ class TopsisCandidatePipelineTest extends TestCase
     /** @test */
     public function test_feedback_score_is_zero_without_positive_feedback(): void
     {
+        $this->insideCycleWindow();
         $emp = User::where('email', 'agung@teamsync.com')->first();
         $this->completedReviewFor($emp);
 
-        // Negative feedback must not count toward the positive cap.
-        PerformanceFeedback::create([
+        // In-window constructive feedback must not count as positive feedback.
+        $feedback = PerformanceFeedback::create([
             'staff_member_id' => $emp->staffMemberProfile->id,
             'given_by' => $this->hr->staffMemberProfile->id,
             'feedback_type' => 'constructive',
             'category' => 'teamwork',
             'content' => 'Constructive note',
         ]);
+
+        $this->assertTrue($feedback->fresh()->created_at->betweenIncluded(
+            $this->cycle->start_date->startOfDay(),
+            $this->cycle->end_date->endOfDay(),
+        ));
 
         $candidates = $this->candidates();
         $row = collect($candidates)->firstWhere('staff_member_id', $emp->staffMemberProfile->id);
