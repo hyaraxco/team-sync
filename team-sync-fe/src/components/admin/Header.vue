@@ -17,7 +17,18 @@ import { useDarkMode } from "@/composables/useDarkMode";
 import { storeToRefs } from "pinia";
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute, useRouter, RouterLink } from "vue-router";
-import { join } from "lodash-es";
+
+const formatUserRoles = (roles) => {
+    if (!roles) return "";
+    if (Array.isArray(roles)) {
+        return roles
+            .map((r) => (typeof r === "object" && r ? r.name : r))
+            .filter(Boolean)
+            .join(", ")
+            .toUpperCase();
+    }
+    return String(roles).toUpperCase();
+};
 
 const authStore = useAuthStore();
 const notificationStore = useNotificationStore();
@@ -563,7 +574,7 @@ onUnmounted(() => {
                                 {{ user?.name }}
                             </p>
                             <p class="text-brand-dark text-sm sm:text-base font-normal leading-7">
-                                {{ join(user?.roles, ", ").toUpperCase() }}
+                                {{ formatUserRoles(user?.roles) }}
                             </p>
                         </div>
                         <ChevronDownIcon
@@ -587,7 +598,7 @@ onUnmounted(() => {
                             </p>
                             <p class="text-xs text-gray-600">{{ user?.email }}</p>
                             <p class="text-xs text-gray-500">
-                                {{ join(user?.roles, ", ").toUpperCase() }}
+                                {{ formatUserRoles(user?.roles) }}
                             </p>
                         </div>
 
