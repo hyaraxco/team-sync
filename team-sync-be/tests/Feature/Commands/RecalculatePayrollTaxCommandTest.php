@@ -6,6 +6,7 @@ use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Services\Payroll\TaxCalculationService;
 use Database\Seeders\RoleSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\DB;
@@ -124,6 +125,64 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         $this->artisan('payroll:recalculate-tax --month=2026-04 --dry-run')
             ->expectsOutputToContain('[DRY-RUN]')
             ->assertSuccessful();
+    }
+
+    public function test_command_taxes_overtime_in_the_taxable_gross(): void
+    {
+        $this->seedTaxConfig();
+
+        $user = User::factory()->create();
+        $profile = StaffMemberProfile::factory()->create([
+            'user_id' => $user->id,
+            'ptkp_status' => 'TK/0',
+            'npwp' => '12.345.678.9-001.000',
+        ]);
+
+        $payroll = Payroll::factory()->create([
+            'salary_month' => '2026-04-01',
+            'status' => 'pending',
+        ]);
+
+        $detail = PayrollDetail::create([
+            'payroll_id' => $payroll->id,
+            'staff_member_id' => $profile->id,
+            'original_salary' => 8000000,
+            'final_salary' => 8346820.81,
+            'overtime_amount' => 346820.81,
+            'pph21_amount' => 0,
+            'bpjs_tk_employee' => 0,
+            'bpjs_tk_employer' => 0,
+            'bpjs_kes_employee' => 0,
+            'bpjs_kes_employer' => 0,
+        ]);
+
+        $this->artisan('payroll:recalculate-tax --month=2026-04')->assertSuccessful();
+
+        $detail->refresh();
+
+        // Same base as payroll generation: salary + paid overtime.
+        $service = app(TaxCalculationService::class);
+        $expected = $service->calculateMonthlyTer(
+            8000000 + 346820.81,
+            'TK/0',
+            true,
+            '2026-04'
+        );
+        $salaryOnly = $service->calculateMonthlyTer(8000000, 'TK/0', true, '2026-04');
+
+        $this->assertEqualsWithDelta(
+            (float) $expected['pph21_monthly'],
+            (float) $detail->pph21_amount,
+            1.0,
+            'command must tax salary plus overtime, matching payroll generation'
+        );
+
+        // Guards against a silent revert to salary-only taxation.
+        $this->assertGreaterThan(
+            (float) $salaryOnly['pph21_monthly'],
+            (float) $detail->pph21_amount,
+            'taxing salary only would under-withhold'
+        );
     }
 
     private function seedTaxConfig(): void

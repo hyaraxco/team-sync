@@ -388,34 +388,9 @@ class PayrollRepository implements PayrollRepositoryInterface
         $absentDays = (int) ($fairnessSummary['absent_days'] ?? 0);
         $warningFlags = $fairnessSummary['warning_flags'] ?? [];
 
-        // ── Tax & BPJS Calculation ────────────────────────────
-        $ptkpStatus = $employee->ptkp_status ?? null;
-        $hasNpwp = ! empty($employee->npwp);
-        $grossForTax = (float) $originalSalary;
-
-        // Use TER method for Jan–Nov, annualized progressive for December true-up
-        $isDecember = $startOfMonth->month === 12;
-        $contributionPeriod = $startOfMonth->format('Y-m');
-        $taxResult = $isDecember
-            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod)
-            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod);
-
-        $bpjsResult = $this->taxCalculationService->calculateBpjs($grossForTax, $contributionPeriod);
-
-        $pph21Amount = $taxResult['pph21_monthly'];
-
-        // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
-        $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
-            + ($bpjsResult['breakdown']['jp_employee'] ?? 0);
-        $bpjsTkEmployer = ($bpjsResult['breakdown']['jht_employer'] ?? 0)
-            + ($bpjsResult['breakdown']['jkk_employer'] ?? 0)
-            + ($bpjsResult['breakdown']['jkm_employer'] ?? 0)
-            + ($bpjsResult['breakdown']['jp_employer'] ?? 0);
-
-        $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
-        $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
-
         // ── Overtime Calculation ──────────────────────────────────────
+        // Computed before tax: paid overtime is taxable employment income for the
+        // same month, so it belongs in the TER gross (PMK 168/2023 Art. 5, 8).
         $approvedOvertimeRecords = OvertimeRecord::query()
             ->approved()
             ->forStaffMember($employee->id)
@@ -430,6 +405,35 @@ class PayrollRepository implements PayrollRepositoryInterface
         $overtimeAmount = $overtimeResult['total_amount'];
         $overtimeHours = $overtimeResult['total_hours'];
         $overtimeRecordsCount = $approvedOvertimeRecords->count();
+
+        // ── Tax & BPJS Calculation ────────────────────────────
+        $ptkpStatus = $employee->ptkp_status ?? null;
+        $hasNpwp = ! empty($employee->npwp);
+        // Taxable gross = regular salary + taxable irregular earnings paid this month.
+        $grossForTax = (float) $originalSalary + (float) $overtimeAmount;
+
+        // Use TER method for Jan–Nov, annualized progressive for December true-up
+        $isDecember = $startOfMonth->month === 12;
+        $contributionPeriod = $startOfMonth->format('Y-m');
+        $taxResult = $isDecember
+            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod)
+            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod);
+
+        // BPJS keeps its own wage base; taxable gross must not be used here.
+        $bpjsResult = $this->taxCalculationService->calculateBpjs((float) $originalSalary, $contributionPeriod);
+
+        $pph21Amount = $taxResult['pph21_monthly'];
+
+        // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
+        $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
+            + ($bpjsResult['breakdown']['jp_employee'] ?? 0);
+        $bpjsTkEmployer = ($bpjsResult['breakdown']['jht_employer'] ?? 0)
+            + ($bpjsResult['breakdown']['jkk_employer'] ?? 0)
+            + ($bpjsResult['breakdown']['jkm_employer'] ?? 0)
+            + ($bpjsResult['breakdown']['jp_employer'] ?? 0);
+
+        $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
+        $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
 
         // Add overtime to final salary
         $finalSalary = $this->applyRounding(

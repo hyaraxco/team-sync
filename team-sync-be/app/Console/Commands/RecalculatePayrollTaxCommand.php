@@ -81,16 +81,20 @@ class RecalculatePayrollTaxCommand extends Command
                 continue;
             }
 
-            $gross = (float) $detail->original_salary;
+            // Taxable gross must match payroll generation: regular salary plus paid
+            // approved overtime (PMK 168/2023). BPJS keeps its own salary-only base.
+            // Keep this in step with PayrollRepository::buildPayrollDetailRow.
+            $taxableGross = (float) $detail->original_salary + (float) $detail->overtime_amount;
+            $bpjsWageBase = (float) $detail->original_salary;
             $ptkp = $employee->ptkp_status ?? null;
             $hasNpwp = ! empty($employee->npwp);
 
             // Use TER for Jan–Nov, annualized for December
             $isDecember = Carbon::parse($month.'-01')->month === 12;
             $taxResult = $isDecember
-                ? $taxService->calculateAnnualizedPph21($gross, $ptkp, $hasNpwp, $month)
-                : $taxService->calculateMonthlyTer($gross, $ptkp, $hasNpwp, $month);
-            $bpjsResult = $taxService->calculateBpjs($gross, $month);
+                ? $taxService->calculateAnnualizedPph21($taxableGross, $ptkp, $hasNpwp, $month)
+                : $taxService->calculateMonthlyTer($taxableGross, $ptkp, $hasNpwp, $month);
+            $bpjsResult = $taxService->calculateBpjs($bpjsWageBase, $month);
 
             $newPph21 = round($taxResult['pph21_monthly'], 2);
             $newBpjsTkEmp = round(
