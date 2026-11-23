@@ -5,11 +5,13 @@ on:
   pull_request:
     paths:
       - "team-sync-be/**"
+      - ".github/workflows/be-tests.yml"
   push:
     branches:
       - main
     paths:
       - "team-sync-be/**"
+      - ".github/workflows/be-tests.yml"
 
 concurrency:
   group: be-tests-${{ github.ref }}
@@ -67,4 +69,18 @@ jobs:
 
       - name: Run Pest tests
         working-directory: team-sync-be
-        run: php artisan test
+        env:
+          TOPSIS_EVIDENCE_DIR: ${{ runner.temp }}/topsis-evidence
+        run: |
+          mkdir -p "$TOPSIS_EVIDENCE_DIR"
+          php artisan test
+
+      - name: Retain dummy TOPSIS endpoint responses
+        uses: actions/upload-artifact@v7
+        with:
+          name: topsis-endpoint-${{ github.sha }}
+          path: |
+            ${{ runner.temp }}/topsis-evidence/default.json
+            ${{ runner.temp }}/topsis-evidence/custom.json
+          if-no-files-found: error
+          retention-days: 30
