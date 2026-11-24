@@ -167,6 +167,19 @@ class PayrollSettlementReapprovalTest extends TestCase
             $this->assertStringContainsString($row['provenance'], $year->fresh()->provenance);
             $this->assertSame($history, $year->fresh()->history);
 
+            $repository->approvePayroll((string) $payroll->id, $actor->id);
+            $currentApproval = $payroll->approvals()->whereNull('superseded_at')->sole();
+            $yearSnapshot = $year->fresh()->getAttributes();
+            $detailSnapshot = $detail->fresh()->getAttributes();
+            $approvalSnapshot = $currentApproval->getAttributes();
+            $this->travel(1)->minutes();
+            $this->artisan('payroll:import-tax-history', ['path' => $path, '--update-profile' => true])->assertSuccessful();
+            $this->assertSame($yearSnapshot, $year->fresh()->getAttributes());
+            $this->assertSame($detailSnapshot, $detail->fresh()->getAttributes());
+            $this->assertSame($approvalSnapshot, $currentApproval->fresh()->getAttributes());
+            $this->assertSame(PayrollStatus::APPROVED, $payroll->fresh()->status);
+            $this->travelBack();
+
             foreach ([['employment_end_date' => '2026-05-31'], ['history' => []]] as $invalid) {
                 file_put_contents($path, json_encode([array_replace($row, $invalid)], JSON_THROW_ON_ERROR));
                 $this->artisan('payroll:import-tax-history', ['path' => $path, '--update-profile' => true])->assertFailed();

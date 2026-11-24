@@ -43,6 +43,7 @@ php artisan payroll:import-tax-history /absolute/path/verified-history.json --up
 ```
 
 Gunakan history yang sama persis dengan impor tersimpan (atau array kosong jika seluruh riwayat berasal dari ledger internal). Pembaruan memakai transaksi yang menghitung ulang sumber belum dibayar dan membatalkan approval terdampak. Tanggal awal dan nominal history yang sudah menjadi dasar settlement tidak boleh diganti; perubahan tanggal akhir tidak boleh menyentuh masa settled. Provenance tambahan dipertahankan bersama sumber sebelumnya. Kegagalan perhitungan membatalkan seluruh pembaruan.
+Replay profil dengan provenance terbaru yang sama tidak menambah teks audit, mengubah timestamp, atau membatalkan approval yang masih berlaku.
 
 DTP nonzero pada sumber aktif ditolak, bukan dibebankan kepada pegawai. Kredit `government_borne_tax` tetap didukung pada history impor untuk rekonsiliasi akhir; input DTP sumber aktif memerlukan implementasi alokasi bulanan terlebih dahulu.
 

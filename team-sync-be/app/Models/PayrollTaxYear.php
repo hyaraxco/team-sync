@@ -41,7 +41,9 @@ class PayrollTaxYear extends Model
                     }
                 }
                 if ($year->exists && $year->isDirty('provenance')) {
-                    $year->provenance = $year->getOriginal('provenance')."\n".$year->provenance;
+                    $previous = $year->getOriginal('provenance');
+                    $year->provenance = str_ends_with($previous, "\n".$year->provenance)
+                        ? $previous : $previous."\n".$year->provenance;
                 }
             }
         });

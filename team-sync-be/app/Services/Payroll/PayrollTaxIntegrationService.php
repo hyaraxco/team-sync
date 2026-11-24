@@ -203,8 +203,13 @@ class PayrollTaxIntegrationService
             if (($year->history ?? []) != $row['history']) {
                 throw new PayrollStateException('Profile updates must preserve imported history.');
             }
+            $profile = array_intersect_key($row, array_flip(['employment_start_date', 'employment_end_date', 'subjective_start_date', 'subjective_end_date']));
+            if ($year->exists && $year->profile == $profile && ($year->provenance === $row['provenance']
+                || str_ends_with($year->provenance, "\n".$row['provenance']))) {
+                return;
+            }
             $year->fill([
-                'profile' => array_intersect_key($row, array_flip(['employment_start_date', 'employment_end_date', 'subjective_start_date', 'subjective_end_date'])),
+                'profile' => $profile,
                 'history' => $row['history'], 'provenance' => $row['provenance'],
             ])->save();
             foreach ($this->periods->reallocateEmployee($row['employee_id'], $row['year']) as $source) {

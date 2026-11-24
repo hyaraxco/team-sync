@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Store new taxable corrections as integer rupiah, reject fractional imported history, and document employee-funded withholding separately from government-borne tax credits.
 - Report the persisted applied correction total in payroll-detail and payslip APIs while retaining raw per-item adjustment audit amounts.
 - Allow verified later employment/subjective end dates to refresh unpaid tax sources and invalidate approvals without changing settled history; preserve provenance and reject retrospective edits.
+- Keep repeated verified profile imports idempotent: do not duplicate the latest provenance or invalidate unchanged approvals.
 - Reject active-source government-borne tax until monthly credit allocation is supported; retain imported historical credits for final reconciliation.
 - Prevent deletion of approval policies with retained decisions, including superseded revisions; retire them through the existing inactive state.
 - Include overtime, applied taxable corrections and rounding in the 20-column payroll XLSX so exported earnings and deductions reconcile to persisted net pay.
