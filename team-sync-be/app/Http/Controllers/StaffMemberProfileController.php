@@ -101,16 +101,9 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         $data = $request->validated();
 
         try {
-            $response = Gate::inspect('create', [StaffMemberProfile::class, $data]);
-            if ($response->denied()) {
-                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
-            }
-
             $employee = $this->staffMemberProfileRepository->create($data);
 
             return ResponseHelper::jsonResponse(true, 'Employee Created Successfully', StaffMemberProfileResource::make($employee), 201);
-        } catch (AuthorizationException $e) {
-            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -183,20 +176,11 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         $data = $request->validated();
 
         try {
-            $profile = StaffMemberProfile::findOrFail($id);
-
-            $response = Gate::inspect('update', [$profile, $data]);
-            if ($response->denied()) {
-                return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
-            }
-
             $employee = $this->staffMemberProfileRepository->update($id, $data);
 
             return ResponseHelper::jsonResponse(true, 'Employee Updated Successfully', StaffMemberProfileResource::make($employee), 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
-        } catch (AuthorizationException $e) {
-            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
