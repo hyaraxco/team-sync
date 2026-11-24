@@ -37,6 +37,7 @@ php artisan payroll:import-tax-history /absolute/path/verified-history.json
 File berisi array objek `employee_id`, `year`, `provenance`, `employment_start_date`, `employment_end_date` (boleh null), `subjective_start_date`, `subjective_end_date` (boleh null), dan `history`. Key `history` berupa `YYYY-MM`; setiap bulan wajib mempunyai `gross_income`, `employee_pension_contributions`, `deductible_donations`, `withheld`, `government_borne_tax`, dan `provenance`. Nominal harus integer rupiah; hanya `withheld` boleh negatif untuk refund aktual. `withheld` adalah pemotongan yang didanai pegawai, tidak termasuk DTP; `government_borne_tax` adalah kredit terpisah, bukan subset `withheld`. Kalkulator mengurangkan kedua kredit tepat sekali. Bulan nol harus eksplisit dan bersumber. Jangan impor bulan yang juga ditangani sumber ledger internal. Impor atomik menolak duplikasi employee/tahun, overlap, draft aktif, dan penggantian tahun yang sudah settled.
 
 Koreksi upah yang bersumber dari perhitungan legacy pecahan dibulatkan ke rupiah terdekat sekali pada total koreksi pegawai sebelum disimpan sebagai `taxable_adjustment_amount` integer. Kolom nominal legacy lain tidak dimigrasikan ulang dalam perubahan ini.
+`adjustment_total_amount` pada API detail/slip memakai total integer persisted yang diterapkan, bukan menjumlah ulang audit. Setiap item `amount_delta` tetap menyimpan angka sumber legacy.
 
 ## Approval, recalculation, dan pembayaran
 

@@ -149,8 +149,15 @@ class PayrollAdjustmentApplicationTest extends TestCase
                 'adjustment_kind' => PayrollAdjustment::KIND_ABSENCE_CORRECTION_CREDIT,
             ])
             ->assertJsonFragment([
-                'adjustment_total_amount' => 250000.49,
+                'adjustment_total_amount' => 250000,
             ]);
+
+        $detail->setRelation('appliedAdjustments', collect([$adjustment->fresh()]));
+        foreach ([\App\Http\Resources\PayrollDetailResource::class, \App\Http\Resources\PayslipResource::class] as $resource) {
+            $payload = (new $resource($detail))->resolve();
+            $this->assertSame(250000, $payload['adjustment_total_amount']);
+            $this->assertSame(250000.49, $payload['adjustments'][0]['amount_delta']);
+        }
     }
 
     private function actingAsRole(string $roleName): User

@@ -45,12 +45,6 @@ class PayslipResource extends JsonResource
                 ->all();
         }, []);
 
-        $adjustmentTotalAmount = $this->whenLoaded('appliedAdjustments', function () {
-            return round((float) $this->appliedAdjustments->sum(function ($adjustment) {
-                return (float) $adjustment->amount_delta;
-            }), 2);
-        }, 0.0);
-
         return [
             'id' => $this->getKey(),
             'payroll_id' => $this->payroll_id,
@@ -74,7 +68,7 @@ class PayslipResource extends JsonResource
             'other_deductions' => $otherDeductions,
             'total_deductions' => $totalDeductions,
             'adjustments' => $adjustments,
-            'adjustment_total_amount' => (float) $adjustmentTotalAmount,
+            'adjustment_total_amount' => (int) $this->taxable_adjustment_amount,
             'net_salary' => $netSalary,
             'notes' => $this->notes,
         ];
