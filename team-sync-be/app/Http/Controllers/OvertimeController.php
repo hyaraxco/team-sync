@@ -10,6 +10,7 @@ use App\Http\Requests\StoreOvertimeRequest;
 use App\Http\Resources\OvertimeRecordResource;
 use App\Http\Resources\PaginateResource;
 use App\Services\OvertimeService;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -92,6 +93,8 @@ class OvertimeController extends Controller implements HasMiddleware
                 new OvertimeRecordResource($record),
                 200
             );
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Overtime Record Not Found', null, 404);
         } catch (\Throwable $e) {
@@ -116,6 +119,8 @@ class OvertimeController extends Controller implements HasMiddleware
                 new OvertimeRecordResource($result['record']),
                 200
             );
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Overtime Record Not Found', null, 404);
         } catch (\Throwable $e) {
@@ -144,6 +149,8 @@ class OvertimeController extends Controller implements HasMiddleware
                 new OvertimeRecordResource($result['record']),
                 200
             );
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Overtime Record Not Found', null, 404);
         } catch (\Throwable $e) {

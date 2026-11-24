@@ -6,6 +6,8 @@ use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\OvertimeRecord;
 use App\Models\StaffMemberProfile;
+use App\Models\Team;
+use App\Models\TeamMember;
 use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
@@ -349,12 +351,14 @@ class OvertimeControllerTest extends TestCase
         ]);
     }
 
-    public function test_manager_with_overtime_approve_permission_can_reject_overtime(): void
+    public function test_manager_with_overtime_approve_permission_can_reject_same_team_overtime(): void
     {
-        $this->actingAsRole('manager');
+        $manager = $this->actingAsRole('manager');
+        $team = Team::factory()->active()->create(['team_lead_id' => $manager->id]);
 
-        $record = StaffMemberProfile::withoutSyncingToSearch(function () {
+        $record = StaffMemberProfile::withoutSyncingToSearch(function () use ($team) {
             $employee = StaffMemberProfile::factory()->create();
+            TeamMember::factory()->forTeam($team)->forEmployee($employee)->create();
 
             return OvertimeRecord::factory()->forEmployee($employee)->create([
                 'status' => OvertimeRecord::STATUS_PENDING,
@@ -372,6 +376,156 @@ class OvertimeControllerTest extends TestCase
             'id' => $record->id,
             'status' => 'rejected',
             'rejection_reason' => 'Overtime rejected by manager with valid reason',
+        ]);
+    }
+
+    public function test_manager_list_and_summary_are_scoped_to_managed_teams(): void
+    {
+        // Two managers and two teams
+        $managerA = $this->actingAsRole('manager');
+        $teamA = Team::factory()->active()->create(['team_lead_id' => $managerA->id]);
+
+        $managerB = User::factory()->create();
+        $managerB->assignRole(Role::findByName('manager', 'sanctum'));
+        $teamB = Team::factory()->active()->create(['team_lead_id' => $managerB->id]);
+
+        $employeeA = StaffMemberProfile::withoutSyncingToSearch(fn () => StaffMemberProfile::factory()->create());
+        TeamMember::factory()->forTeam($teamA)->forEmployee($employeeA)->create();
+
+        $employeeB = StaffMemberProfile::withoutSyncingToSearch(fn () => StaffMemberProfile::factory()->create());
+        TeamMember::factory()->forTeam($teamB)->forEmployee($employeeB)->create();
+
+        $recordA = OvertimeRecord::factory()->forEmployee($employeeA)->create([
+            'status' => OvertimeRecord::STATUS_PENDING,
+            'date' => now()->toDateString(),
+            'hours' => 2.0,
+        ]);
+
+        $recordB = OvertimeRecord::factory()->forEmployee($employeeB)->create([
+            'status' => OvertimeRecord::STATUS_PENDING,
+            'date' => now()->toDateString(),
+            'hours' => 3.0,
+        ]);
+
+        // Manager A list only includes Record A, excludes Record B
+        Sanctum::actingAs($managerA);
+        $responseA = $this->getJson('/api/v1/overtime')
+            ->assertOk();
+        $idsA = collect($responseA->json('data.data'))->pluck('id')->all();
+        $this->assertContains($recordA->id, $idsA);
+        $this->assertNotContains($recordB->id, $idsA);
+
+        // Manager A querying with employeeB's id gets empty results
+        $this->getJson("/api/v1/overtime?staff_member_id={$employeeB->id}")
+            ->assertOk()
+            ->assertJsonCount(0, 'data.data');
+
+        // Manager A summary only includes Record A
+        $summaryA = $this->getJson('/api/v1/overtime/summary')->assertOk()->json('data');
+        $this->assertSame(1, $summaryA['total_pending']);
+
+        // Manager B list only includes Record B, excludes Record A
+        Sanctum::actingAs($managerB);
+        $responseB = $this->getJson('/api/v1/overtime')
+            ->assertOk();
+        $idsB = collect($responseB->json('data.data'))->pluck('id')->all();
+        $this->assertContains($recordB->id, $idsB);
+        $this->assertNotContains($recordA->id, $idsB);
+
+        // Manager B summary only includes Record B
+        $summaryB = $this->getJson('/api/v1/overtime/summary')->assertOk()->json('data');
+        $this->assertSame(1, $summaryB['total_pending']);
+
+        // HR sees both records in list and summary
+        $this->actingAsRole('hr');
+        $responseHr = $this->getJson('/api/v1/overtime')->assertOk();
+        $idsHr = collect($responseHr->json('data.data'))->pluck('id')->all();
+        $this->assertContains($recordA->id, $idsHr);
+        $this->assertContains($recordB->id, $idsHr);
+
+        $summaryHr = $this->getJson('/api/v1/overtime/summary')->assertOk()->json('data');
+        $this->assertGreaterThanOrEqual(2, $summaryHr['total_pending']);
+    }
+
+    public function test_manager_cross_team_show_approve_reject_denied_with_403_and_record_unmutated(): void
+    {
+        $managerA = $this->actingAsRole('manager');
+        $teamA = Team::factory()->active()->create(['team_lead_id' => $managerA->id]);
+
+        $managerB = User::factory()->create();
+        $managerB->assignRole(Role::findByName('manager', 'sanctum'));
+        $teamB = Team::factory()->active()->create(['team_lead_id' => $managerB->id]);
+
+        $employeeA = StaffMemberProfile::withoutSyncingToSearch(fn () => StaffMemberProfile::factory()->create());
+        TeamMember::factory()->forTeam($teamA)->forEmployee($employeeA)->create();
+
+        $employeeB = StaffMemberProfile::withoutSyncingToSearch(fn () => StaffMemberProfile::factory()->create());
+        TeamMember::factory()->forTeam($teamB)->forEmployee($employeeB)->create();
+
+        $recordA = OvertimeRecord::factory()->forEmployee($employeeA)->create([
+            'status' => OvertimeRecord::STATUS_PENDING,
+        ]);
+        $recordB = OvertimeRecord::factory()->forEmployee($employeeB)->create([
+            'status' => OvertimeRecord::STATUS_PENDING,
+        ]);
+
+        Sanctum::actingAs($managerA);
+
+        // Direct show cross-team ID returns 403
+        $this->getJson("/api/v1/overtime/{$recordB->id}")
+            ->assertForbidden();
+
+        // Direct approve cross-team ID returns 403 and leaves status unchanged
+        $this->postJson("/api/v1/overtime/{$recordB->id}/approve")
+            ->assertForbidden();
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $recordB->id,
+            'status' => OvertimeRecord::STATUS_PENDING,
+            'approved_by' => null,
+        ]);
+
+        // Direct reject cross-team ID returns 403 and leaves rejection fields unchanged
+        $this->postJson("/api/v1/overtime/{$recordB->id}/reject", [
+            'rejection_reason' => 'Cross team rejection attempt with valid length',
+        ])->assertForbidden();
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $recordB->id,
+            'status' => OvertimeRecord::STATUS_PENDING,
+            'rejection_reason' => null,
+        ]);
+
+        // Same-team show, approve, reject work for Manager A
+        $this->getJson("/api/v1/overtime/{$recordA->id}")
+            ->assertOk()
+            ->assertJsonPath('data.id', $recordA->id);
+
+        $this->postJson("/api/v1/overtime/{$recordA->id}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.status', 'approved');
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $recordA->id,
+            'status' => 'approved',
+            'approved_by' => $managerA->id,
+        ]);
+
+        // Same-team reject also works on another pending record in team A
+        $recordA2 = OvertimeRecord::factory()->forEmployee($employeeA)->create([
+            'status' => OvertimeRecord::STATUS_PENDING,
+        ]);
+
+        $this->postJson("/api/v1/overtime/{$recordA2->id}/reject", [
+            'rejection_reason' => 'Legitimate same team rejection by manager',
+        ])
+            ->assertOk()
+            ->assertJsonPath('data.status', 'rejected');
+
+        $this->assertDatabaseHas('overtime_records', [
+            'id' => $recordA2->id,
+            'status' => 'rejected',
+            'rejection_reason' => 'Legitimate same team rejection by manager',
         ]);
     }
 
