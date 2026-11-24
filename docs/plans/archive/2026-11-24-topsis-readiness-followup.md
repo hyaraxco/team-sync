@@ -1,6 +1,6 @@
 # TOPSIS readiness and cycle regression follow-up
 
-Status: IN_PROGRESS. Ticket: `team-sync-c94`, discovered from closed `team-sync-6g5`.
+Status: COMPLETED (2026-11-24), with verification limits recorded below. Ticket: `team-sync-c94`, discovered from closed `team-sync-6g5`.
 Baseline: `dc24691365b75e56a3542d5508427218df06ff7f`.
 Branch: `fix/team-sync-c94-topsis-readiness`, separate worktree `team-sync-c94`.
 
@@ -19,8 +19,8 @@ Branch: `fix/team-sync-c94-topsis-readiness`, separate worktree `team-sync-c94`.
 - [x] Demonstrate readiness failure before the fix, then apply the copied end-of-day comparison and run full backend tests and asset build.
 - [x] Record before/after evidence and remaining mutation/MySQL/browser limits below. Broader evidence acceptance is not certified.
 - [x] Review scope, timestamp persistence, null behavior and linked-goal semantics. Reconcile historical plan/status with observed CI versus reported local evidence.
-- [ ] Commit scoped verified checkpoints with authenticated identity; squash final scope, push and open PR. Require latest-head checks and explicit final-content approval before merge.
-- [ ] Verify merge/post-merge checks before closure and archive. No release/deploy.
+- [x] Commit scoped verified checkpoints with authenticated identity; squash final scope, push and open PR. Latest-head checks passed and the user authorized safe merge; see integration evidence below.
+- [x] Verify merge/post-merge checks and archive this plan. Ticket closure follows the verified archive PR merge. No release/deploy.
 
 ## Existing evidence and limits
 
@@ -50,5 +50,14 @@ The approved runner uses SQLite; no isolated MySQL lifecycle is provided. Histor
 - Before/after proves the readiness defect only. Cap/count date boundary tests pass on current code, but fixed-ten, per-employee denominator and missing-copy mutation runs have not been executed. The approved runner exposes full phases, not targeted mutation execution. No runner changes are included in this fix.
 - MySQL verification requires an isolated, owner-reviewed lifecycle and a toolchain with `pdo_mysql`; the existing recipe provides SQLite. No development database fallback is authorized.
 - Current-source browser ranking smoke requires a reviewed ranking phase/recipe; existing runner phases do not provide it. Historical browser 2/2 is not reused as a c94 pass.
-- FE unit/build/accessibility checks are outside this backend-only diff, not claimed passed. Backend CI including frozen Bun install/build remains required on the final PR head.
-- User approval of the final content, latest-head checks and verified merge/post-merge are required before ticket closure. The plan remains ongoing, not COMPLETED.
+- FE unit/build/accessibility checks are outside this backend-only diff, not claimed passed. Required backend CI including frozen Bun install/build passed on the final PR head and merge commit.
+- Completion records the readiness fix, strengthened regressions and verified integration; it does not certify the unrun MySQL, mutation or current-source browser checks above.
+
+## Integration evidence
+
+- The user authorized merging PR120 and PR121 after safety checks. [PR120](https://github.com/hyaraxco/team-sync/pull/120) was rebased onto the merged payroll baseline; its only conflict was additive changelog entries, both preserved without application/test changes.
+- Final head [9873ba9c6c42b913b3ed56c65f2755ddcbe6f4c1](https://github.com/hyaraxco/team-sync/commit/9873ba9c6c42b913b3ed56c65f2755ddcbe6f4c1) passed [backend CI](https://github.com/hyaraxco/team-sync/actions/runs/45389780352) and GitGuardian. The earlier head's neutral GitGuardian result explicitly reported an incomplete scan and was not accepted as a pass.
+- PR120 merged on 2026-11-24 as [cc8ab91b4a79e0820b80ba3fc7558361e3862596](https://github.com/hyaraxco/team-sync/commit/cc8ab91b4a79e0820b80ba3fc7558361e3862596), authored by Agung Ramadhan and committed by GitHub. [Post-merge backend CI](https://github.com/hyaraxco/team-sync/actions/runs/45390262887) passed on that exact SHA, including Pest, frozen Bun install/build and endpoint evidence upload.
+- Local `main` was fast-forwarded and the merged implementation branch removed; worktrees and excluded user files were retained. No release, deployment or production recalculation occurred.
+- The first ticket closure was premature: PR120 left this plan ongoing with unchecked integration items. The ticket was reopened for this documentation-only completion and archive correction. Closure must cite the follow-up PR and verified merge in Beads; no application suite was rerun for the archive-only change.
+
