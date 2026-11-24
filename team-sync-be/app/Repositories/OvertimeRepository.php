@@ -3,9 +3,15 @@
 namespace App\Repositories;
 
 use App\Interfaces\OvertimeRepositoryInterface;
+use App\Models\JobInformation;
 use App\Models\OvertimeRecord;
+use App\Models\Team;
+use App\Models\TeamMember;
+use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Auth;
 
 class OvertimeRepository implements OvertimeRepositoryInterface
 {
@@ -20,6 +26,15 @@ class OvertimeRepository implements OvertimeRepositoryInterface
     ): LengthAwarePaginator {
         $query = OvertimeRecord::with(['staffMember.user', 'approvedByUser'])
             ->orderByDesc('date');
+
+        $manageableEmployeeIds = $this->getManageableEmployeeIdsForManager();
+        if (is_array($manageableEmployeeIds)) {
+            if (empty($manageableEmployeeIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('staff_member_id', $manageableEmployeeIds);
+            }
+        }
 
         if ($search !== null && $search !== '') {
             $query->whereHas('staffMember.user', function ($q) use ($search) {
@@ -52,8 +67,12 @@ class OvertimeRepository implements OvertimeRepositoryInterface
 
     public function getById(int $id): OvertimeRecord
     {
-        return OvertimeRecord::with(['staffMember.user', 'approvedByUser', 'attendance'])
+        $record = OvertimeRecord::with(['staffMember.user', 'approvedByUser', 'attendance'])
             ->findOrFail($id);
+
+        $this->authorizeManagerScope($record);
+
+        return $record;
     }
 
     public function getByStaffMember(int $staffMemberId, ?string $status, int $perPage = 15): LengthAwarePaginator
@@ -78,6 +97,8 @@ class OvertimeRepository implements OvertimeRepositoryInterface
 
     public function approve(OvertimeRecord $record, int $approvedBy): OvertimeRecord
     {
+        $this->authorizeManagerScope($record);
+
         $record->update([
             'status' => OvertimeRecord::STATUS_APPROVED,
             'approved_by' => $approvedBy,
@@ -91,6 +112,8 @@ class OvertimeRepository implements OvertimeRepositoryInterface
 
     public function reject(OvertimeRecord $record, string $reason): OvertimeRecord
     {
+        $this->authorizeManagerScope($record);
+
         $record->update([
             'status' => OvertimeRecord::STATUS_REJECTED,
             'rejection_reason' => $reason,
@@ -106,21 +129,31 @@ class OvertimeRepository implements OvertimeRepositoryInterface
         $currentMonth = now()->startOfMonth();
         $endOfMonth = now()->endOfMonth();
 
-        $totalPending = OvertimeRecord::pending()->count();
+        $query = OvertimeRecord::query();
+        $manageableEmployeeIds = $this->getManageableEmployeeIdsForManager();
+        if (is_array($manageableEmployeeIds)) {
+            if (empty($manageableEmployeeIds)) {
+                $query->whereRaw('1 = 0');
+            } else {
+                $query->whereIn('staff_member_id', $manageableEmployeeIds);
+            }
+        }
 
-        $approvedThisMonth = OvertimeRecord::approved()
+        $totalPending = (clone $query)->pending()->count();
+
+        $approvedThisMonth = (clone $query)->approved()
             ->whereBetween('date', [$currentMonth, $endOfMonth])
             ->count();
 
-        $totalHoursThisMonth = (float) OvertimeRecord::approved()
+        $totalHoursThisMonth = (float) (clone $query)->approved()
             ->whereBetween('date', [$currentMonth, $endOfMonth])
             ->sum('hours');
 
-        $rejectedThisMonth = OvertimeRecord::rejected()
+        $rejectedThisMonth = (clone $query)->rejected()
             ->whereBetween('date', [$currentMonth, $endOfMonth])
             ->count();
 
-        $byType = OvertimeRecord::approved()
+        $byType = (clone $query)->approved()
             ->whereBetween('date', [$currentMonth, $endOfMonth])
             ->selectRaw('overtime_type, COUNT(*) as count, SUM(hours) as total_hours')
             ->groupBy('overtime_type')
@@ -163,5 +196,45 @@ class OvertimeRepository implements OvertimeRepositoryInterface
             ->whereBetween('date', [$weekStart, $weekEnd])
             ->lockForUpdate()
             ->sum('hours');
+    }
+
+    private function getManageableEmployeeIdsForManager(): ?array
+    {
+        /** @var User|null $user */
+        $user = Auth::user();
+        if (! $user || ! $user->hasRole('manager') || $user->hasRole('superadmin') || $user->hasRole('hr')) {
+            return null;
+        }
+
+        $leadTeamIds = Team::where('team_lead_id', $user->id)
+            ->pluck('id')
+            ->toArray();
+
+        if (empty($leadTeamIds)) {
+            return [];
+        }
+
+        $fromTeamMembers = TeamMember::whereIn('team_id', $leadTeamIds)
+            ->whereNull('left_at')
+            ->pluck('staff_member_id')
+            ->toArray();
+
+        $fromJobInformation = JobInformation::whereIn('team_id', $leadTeamIds)
+            ->pluck('staff_member_id')
+            ->toArray();
+
+        return array_values(array_unique(array_merge($fromTeamMembers, $fromJobInformation)));
+    }
+
+    private function authorizeManagerScope(OvertimeRecord $record): void
+    {
+        $manageableEmployeeIds = $this->getManageableEmployeeIdsForManager();
+        if (! is_array($manageableEmployeeIds)) {
+            return;
+        }
+
+        if (! in_array($record->staff_member_id, $manageableEmployeeIds, true)) {
+            throw new AuthorizationException('You can only access overtime records from your direct reports.');
+        }
     }
 }
