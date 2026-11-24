@@ -2,15 +2,15 @@
 
 Baseline: `0d5bc4b30f88f74259f6fd299af68e859caeecd2`. Bead: `team-sync-b0v`. Status: keputusan simulasi untuk review; bukan gate produksi yang telah terpenuhi.
 
-Menetapkan asumsi simulasi skripsi untuk timing payroll, THR, riwayat withholding, alur pembayaran dan fakta penghentian kerja sebelum implementasi pajak pada `team-sync-62b`/`team-sync-d9d`. Tidak mengubah aplikasi, database atau formula pajak; tidak menambahkan modul penghasilan. `team-sync-v93` tetap memiliki integritas approval. Plan taxable-gross lama yang dilarang tidak dibaca atau disentuh.
+Dokumen ini menetapkan asumsi simulasi skripsi untuk timing payroll, THR, riwayat withholding, alur pembayaran dan fakta penghentian kerja sebelum implementasi pajak. Dokumen tidak mengubah aplikasi, database atau formula pajak dan tidak menambahkan modul penghasilan.
 
 Konfirmasi user melalui formulir 24 November 2026: konteks `simulation`, riwayat `synthetic_only`; user meminta jadwal dan sumber mengikuti contoh umum perusahaan Indonesia. Ini izin memilih kebijakan contoh, bukan bukti adanya perusahaan, pemilik Finance/HR, kontrak, atau riwayat pajak riil.
 
-## Fakta source dan perubahan sejak baseline bead
+## Field aplikasi pada baseline
 
 `PayrollSetting.php:13-22,47-61,109-123`: payday versioned/default25. `Payroll.php:14-29`: salary_month/version/payment_date/status, payment_date hanya date. `PayrollDetail.php:18-65`: nominal PPh21/BPJS tersimpan, bukan bukti kelengkapan withholding aktual. `PayrollRepository.php:911-985` dan `ThrService.php:175-189`: status paid menggunakan tanggal yang disuplai. `ThrPayroll.php:72-100`: hari raya, deadline, payment berbeda. `JobInformation.php:13-30`: kontrak model yang diperiksa tidak menyediakan tanggal penghentian/kewajiban subjektif.
 
-Klaim lama bead bahwa PDF menghitung ulang sudah superseded oleh PR117: `PayslipPdfService.php:26-29` membaca potongan tersimpan. Tidak membuka kembali tiket4jl/kyp. Bukti source berasal dari pembacaan file, bukan runtime/DB. Index graph generation `2026-11-24T02:24:47Z`; tidak ada LSP dikonfigurasi.
+`PayslipPdfService.php:26-29` membaca potongan tersimpan setelah [PR 117](https://github.com/hyaraxco/team-sync/pull/117). Konsistensi PDF dengan field tersebut tidak membuktikan kelengkapan riwayat pemotongan aktual. Pemeriksaan ini terbatas pada source, bukan rekonsiliasi database atau bukti bank.
 
 ## Keputusan simulasi, bukan fakta perusahaan
 
@@ -33,12 +33,8 @@ Ledger dasar harus mencakup semua periode sebelum periode yang dihitung. Untuk k
 - [Permenaker6/2016](https://jdih.kemnaker.go.id/asset/data_puu/permenaker_6_2016.pdf), halaman5-6 dibaca sebagai raster: Pasal4 mempertahankan besaran lebih tinggi dari perjanjian/kebiasaan; Pasal5 mengatur hari raya dan batas H-7; Pasal6 rupiah; Pasal7 membedakan PHK pada hubungan PKWTT dalam rentang30 hari sebelum hari raya dan pengecualian PKWT berakhir sebelum hari raya. Ini tidak membenarkan menganggap semua resign/termination sama. Review kelayakan lengkap tetap bagian implementasi, bukan inferensi dari status active.
 - [SE Menaker M/3/HK.04.00/III/2026](https://jdih.kemnaker.go.id/asset/data_puu/2026senaker003.pdf),2 Maret2026, halaman1-2 dibaca sebagai raster: masa kerja1 bulan, batas H-7 dengan imbauan lebih awal, proporsi, rata-rata upah harian/satuan hasil dan pembayaran penuh tanpa cicilan. Tidak ada dasar dari halaman yang diperiksa untuk menyatakan payment_deadline selalu menjadi tanggal penilaian masa kerja. Naskah/summary lama tidak tersedia sebagai bukti perbandingan penuh pada task ini, jadi tidak ada klaim seluruh isinya sudah diverifikasi.
 
-## Verifikasi dan handoff
+## Batas implementasi dan penggunaan produksi
 
-Perubahan docs-only. Pemeriksaan dokumen: seluruh lima area memiliki keputusan simulasi dan limit produksi, tautan sumber eksplisit, path source cocok baseline, tidak ada credential/data pegawai nyata, tidak ada klaim aplikasi sudah menjalankan spesifikasi ini. Suite aplikasi dan sandbox tidak dijalankan karena tidak ada perubahan executable. Tidak ada dependency baru, migration, DB, atau akses environment.
+Spesifikasi ini dapat dipakai untuk implementasi dan fixture sintetis. Agregasi penghasilan berada dalam `team-sync-62b`, history/periode akhir/refund dalam `team-sync-d9d`, dan integritas reapproval dalam `team-sync-v93`. Alur yang ditetapkan di sini belum dinyatakan sudah diimplementasikan.
 
-Handoff: 62b dapat memakai keputusan ini untuk implementasi dan fixture sintetis tanpa menunggu kontrak perusahaan fiktif; d9d memiliki history/periode akhir/refund; v93 memiliki reapproval. Gate produksi dan acceptance penuh tidak otomatis terpenuhi. Plan tetap IN_PROGRESS, tidak diarsip COMPLETED selama acceptance b0v belum terpenuhi.
-
-## Gate produksi dan penyelesaian
-
-Asumsi simulasi tidak memverifikasi data perusahaan riil. Histori tidak diketahui bukan nol; pengubahan status atau tanggal tidak membuktikan transfer. Untuk produksi tetap butuh kontrak/jadwal efektif, bukti transfer, ledger/bukti potong lengkap, pemilik konfirmasi dan approval, serta fakta penghentian dan pajak subjektif. b0v tetap terbuka sesuai acceptance6 selama bukti manusia/produksi tersebut belum tersedia. Plan ini tidak ditandai COMPLETED hanya karena keputusan simulasi dicatat atau PR docs merged. Parent62b tetap in_progress; d9d tidak ditutup.
+Asumsi simulasi tidak memverifikasi data perusahaan riil. Histori tidak diketahui bukan nol; pengubahan status atau tanggal tidak membuktikan transfer. Penggunaan produksi membutuhkan kontrak/jadwal efektif, bukti transfer, ledger/bukti potong lengkap, penanggung jawab dan approval, serta fakta penghentian kerja dan kewajiban pajak subjektif. Gate produksi pada `team-sync-b0v` tetap belum terpenuhi.
