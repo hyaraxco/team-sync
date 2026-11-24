@@ -20,6 +20,7 @@ import {
 } from "lucide-vue-next";
 import { ref, computed, onMounted, watch } from "vue";
 import { useTeamStore } from "@/stores/team";
+import { useAuthStore } from "@/stores/auth";
 import { useOptionStore } from "@/stores/option";
 import { usePayrollStore } from "@/stores/payroll";
 import { usePerformanceReviewStore } from "@/stores/performanceReview";
@@ -39,6 +40,18 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["update:modelValue"]);
+
+// Role changes are server-side superadmin-only; keep the current role visible for everyone else.
+const canAssignRoles = computed(() => useAuthStore().user?.roles?.includes("superadmin") ?? false);
+const roleOptions = computed(() =>
+    [
+        { value: "superadmin", label: "Superadmin" },
+        { value: "manager", label: "Manager" },
+        { value: "hr", label: "HR" },
+        { value: "finance", label: "Finance" },
+        { value: "staff", label: "Staff" },
+    ].filter((option) => canAssignRoles.value || option.value === (form.value.role || "staff")),
+);
 
 const form = computed({
     get: () => props.modelValue,
@@ -246,13 +259,7 @@ watch(
                             v-model="form.role"
                             label="Role *"
                             placeholder="Select role"
-                            :options="[
-                                { value: 'superadmin', label: 'Superadmin' },
-                                { value: 'manager', label: 'Manager' },
-                                { value: 'hr', label: 'HR' },
-                                { value: 'finance', label: 'Finance' },
-                                { value: 'staff', label: 'Staff' },
-                            ]"
+                            :options="roleOptions"
                             :error="errors?.roles?.join(', ') || errors?.['roles.0']?.join(', ')"
                             required
                         >

@@ -36,9 +36,9 @@ class StaffMemberProfilePolicy
     /**
      * Determine if the user can create staff member profiles.
      */
-    public function create(User $user): Response
+    public function create(User $user, array $data = []): Response
     {
-        if ($user->hasPermissionTo('staff-member-create')) {
+        if ($user->hasPermissionTo('staff-member-create') && $this->canManageAccount($user, $data)) {
             return Response::allow();
         }
 
@@ -48,9 +48,9 @@ class StaffMemberProfilePolicy
     /**
      * Determine if the user can update a staff member profile.
      */
-    public function update(User $user, StaffMemberProfile $profile): Response
+    public function update(User $user, StaffMemberProfile $profile, array $data = []): Response
     {
-        if ($user->hasPermissionTo('staff-member-edit')) {
+        if ($user->hasPermissionTo('staff-member-edit') && $this->canManageAccount($user, $data, $profile->user)) {
             return Response::allow();
         }
 
@@ -103,5 +103,31 @@ class StaffMemberProfilePolicy
         }
 
         return Response::deny('You do not have permission to view your team.');
+    }
+
+    private function canManageAccount(User $actor, array $data, ?User $target = null): bool
+    {
+        if ($actor->hasRole('superadmin')) {
+            return true;
+        }
+
+        if (array_key_exists('roles', $data)) {
+            $roles = $data['roles'];
+            if (! is_array($roles) || array_filter($roles, fn ($role) => ! is_string($role))) {
+                return false;
+            }
+
+            $existingRoles = $target ? $target->getRoleNames()->all() : ['staff'];
+            if (array_diff($roles, $existingRoles) || ($target && array_diff($existingRoles, $roles))) {
+                return false;
+            }
+        }
+
+        if ($target && $actor->id !== $target->id && $target->roles->contains(fn ($role) => $role->name !== 'staff')) {
+            return ! array_key_exists('password', $data)
+                && (! array_key_exists('email', $data) || $data['email'] === $target->email);
+        }
+
+        return true;
     }
 }

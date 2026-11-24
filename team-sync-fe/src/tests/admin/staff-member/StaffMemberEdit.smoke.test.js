@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { nextTick } from "vue";
+import { nextTick, ref } from "vue";
 
 const {
     routeState,
@@ -135,11 +135,11 @@ const staffMemberPayload = {
     },
 };
 
-const factory = () =>
+const factory = (providedStep = currentStep) =>
     mount(StaffMemberEdit, {
         global: {
             provide: {
-                currentStep,
+                currentStep: providedStep,
                 totalSteps,
                 nextStep: nextStepMock,
                 previousStep: previousStepMock,
@@ -187,6 +187,23 @@ describe("StaffMemberEdit smoke", () => {
         });
         await cancelButton.trigger("click");
 
+        expect(routerPushMock).toHaveBeenCalledWith({ name: "admin.staffMembers" });
+    });
+
+    it("preserves multiple roles when submitting ordinary profile maintenance", async () => {
+        staffMemberStoreMock.fetchStaffMember.mockResolvedValue({
+            ...staffMemberPayload,
+            user: { ...staffMemberPayload.user, roles: ["manager", "staff"] },
+        });
+        const wrapper = factory(ref(4));
+        await flushAsync();
+
+        await wrapper.find("form").trigger("submit");
+        await flushAsync();
+
+        const [, payload] = staffMemberStoreMock.updateStaffMember.mock.calls[0];
+        expect(payload.has("roles[]")).toBe(false);
+        expect(payload.get("email")).toBe("rina@example.com");
         expect(routerPushMock).toHaveBeenCalledWith({ name: "admin.staffMembers" });
     });
 });
