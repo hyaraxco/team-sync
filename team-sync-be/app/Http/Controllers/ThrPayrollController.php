@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PayrollStateException;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\GenerateThrRequest;
 use App\Http\Requests\MarkThrPaidRequest;
@@ -167,6 +168,8 @@ class ThrPayrollController extends Controller implements HasMiddleware
                 new ThrPayrollResource($result['thr_payroll']),
                 201
             );
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('ThrPayrollController@generate Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -194,6 +197,8 @@ class ThrPayrollController extends Controller implements HasMiddleware
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('ThrPayrollController@approve Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -225,6 +230,8 @@ class ThrPayrollController extends Controller implements HasMiddleware
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('ThrPayrollController@markAsPaid Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
@@ -252,6 +259,8 @@ class ThrPayrollController extends Controller implements HasMiddleware
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'THR Payroll Not Found', null, 404);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('ThrPayrollController@reopen Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

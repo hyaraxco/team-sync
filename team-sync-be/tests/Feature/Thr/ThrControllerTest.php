@@ -53,6 +53,15 @@ class ThrControllerTest extends TestCase
         $this->staffUser->assignRole('staff');
     }
 
+    private function generateCalculatedThr(): ThrPayroll
+    {
+        $this->createEmployee(salary: 10_000_000, startDate: Carbon::parse('2024-01-01'), religion: 'islam');
+        return app(\App\Services\ThrService::class)->generate([
+            'religion_event' => 'idul_fitri', 'year' => 2026,
+            'religion_holiday_date' => '2026-04-15', 'income_due_date' => '2026-04-05',
+        ], $this->financeUser)['thr_payroll'];
+    }
+
     public function test_unauthenticated_user_cannot_access_thr(): void
     {
         $this->getJson('/api/v1/thr')->assertStatus(401);
@@ -159,7 +168,7 @@ class ThrControllerTest extends TestCase
 
     public function test_finance_can_approve_pending_thr(): void
     {
-        $thr = ThrPayroll::factory()->pending()->create();
+        $thr = $this->generateCalculatedThr();
 
         $this->actingAs($this->financeUser)
             ->postJson("/api/v1/thr/{$thr->id}/approve")
@@ -190,11 +199,12 @@ class ThrControllerTest extends TestCase
 
     public function test_finance_can_mark_approved_thr_as_paid(): void
     {
-        $thr = ThrPayroll::factory()->approved()->create();
+        $thr = $this->generateCalculatedThr();
+        app(\App\Services\ThrService::class)->approve($thr->id, $this->financeUser);
 
         $this->actingAs($this->financeUser)
             ->postJson("/api/v1/thr/{$thr->id}/mark-as-paid", [
-                'payment_date' => now()->format('Y-m-d'),
+                'payment_date' => '2026-04-05',
             ])
             ->assertStatus(200)
             ->assertJsonPath('success', true)

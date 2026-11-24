@@ -32,12 +32,6 @@ class PayrollDetailResource extends JsonResource
                 ->all();
         }, []);
 
-        $adjustmentTotalAmount = $this->whenLoaded('appliedAdjustments', function () {
-            return round((float) $this->appliedAdjustments->sum(function ($adjustment) {
-                return (float) $adjustment->amount_delta;
-            }), 2);
-        }, 0.0);
-
         return [
             'id' => $this->id,
             'payroll_id' => $this->payroll_id,
@@ -60,12 +54,13 @@ class PayrollDetailResource extends JsonResource
             'policy_mismatch_days' => (int) ($this->policy_mismatch_days ?? 0),
             'warning_flags' => $this->warning_flags ?? [],
             'adjustments' => $adjustments,
-            'adjustment_total_amount' => (float) $adjustmentTotalAmount,
+            'adjustment_total_amount' => (int) $this->taxable_adjustment_amount,
             'notes' => $this->notes,
             'overtime_hours' => (float) ($this->overtime_hours ?? 0),
             'overtime_amount' => (float) ($this->overtime_amount ?? 0),
             'overtime_records_count' => (int) ($this->overtime_records_count ?? 0),
             'pph21_amount' => (float) ($this->pph21_amount ?? 0),
+            'tax_calculation_meta' => $this->tax_calculation_meta === null ? null : json_decode($this->tax_calculation_meta, true, 512, JSON_THROW_ON_ERROR),
             'bpjs_tk_employee' => (float) ($this->bpjs_tk_employee ?? 0),
             'bpjs_tk_employer' => (float) ($this->bpjs_tk_employer ?? 0),
             'bpjs_kes_employee' => (float) ($this->bpjs_kes_employee ?? 0),

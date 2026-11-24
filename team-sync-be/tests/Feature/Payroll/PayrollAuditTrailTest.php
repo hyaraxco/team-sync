@@ -26,7 +26,7 @@ use Tests\TestCase;
 
 class PayrollAuditTrailTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -39,6 +39,8 @@ class PayrollAuditTrailTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
@@ -57,7 +59,6 @@ class PayrollAuditTrailTest extends TestCase
 
         $repository->updatePayrollDetail((string) $payroll->payrollDetails->first()->id, [
             'notes' => 'Finance reviewed this draft',
-            'final_salary' => 9200000,
         ], $actor->id);
 
         $repository->approvePayroll((string) $payroll->id, $actor->id);
@@ -357,7 +358,8 @@ class PayrollAuditTrailTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-04-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'payment_date' => $paymentDate,
         ]);
 
@@ -371,6 +373,8 @@ class PayrollAuditTrailTest extends TestCase
             'absent_days' => 1,
             'notes' => 'Audit trail seed',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll->load('payrollDetails');
     }

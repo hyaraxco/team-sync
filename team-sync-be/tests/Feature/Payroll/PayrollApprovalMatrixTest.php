@@ -11,7 +11,9 @@ use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
@@ -22,7 +24,7 @@ use Tests\TestCase;
 
 class PayrollApprovalMatrixTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -35,6 +37,8 @@ class PayrollApprovalMatrixTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
@@ -56,13 +60,21 @@ class PayrollApprovalMatrixTest extends TestCase
 
     public function test_multi_step_blocks_mark_as_paid_until_all_approved(): void
     {
-        // Create a policy requiring 'director' role for amounts > 1M
+        // Finance reviews first; the director must approve before payment.
+        PayrollApprovalPolicy::create([
+            'name' => 'Finance Review',
+            'min_amount' => 1000000,
+            'max_amount' => null,
+            'required_role' => 'finance',
+            'approval_order' => 1,
+            'is_active' => true,
+        ]);
         PayrollApprovalPolicy::create([
             'name' => 'Director Approval',
             'min_amount' => 1000000,
             'max_amount' => null,
             'required_role' => 'director',
-            'approval_order' => 1,
+            'approval_order' => 2,
             'is_active' => true,
         ]);
 
@@ -72,7 +84,7 @@ class PayrollApprovalMatrixTest extends TestCase
         $finance = $this->actingAsRole('finance');
         $payroll = $this->createPayrollWithDetail(status: 'pending', totalSalary: 9500000);
 
-        // Finance tries to approve — multi-step kicks in, stays pending
+        // Finance approves its step; the director step remains pending
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
 
         // Payroll should still be pending (finance doesn't have director role)
@@ -80,8 +92,9 @@ class PayrollApprovalMatrixTest extends TestCase
 
         // Verify approval records were created
         $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
-        $this->assertCount(1, $approvals);
-        $this->assertSame('pending', $approvals->first()->status);
+        $this->assertCount(2, $approvals);
+        $this->assertSame('approved', $approvals->first()->status);
+        $this->assertSame('pending', $approvals->last()->status);
 
         // Mark as paid should fail
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
@@ -144,6 +157,74 @@ class PayrollApprovalMatrixTest extends TestCase
             ->assertOk();
 
         $this->assertNull(PayrollApprovalPolicy::find($policyId));
+    }
+
+    public function test_referenced_policy_cannot_be_deleted_and_can_be_retired_without_losing_history(): void
+    {
+        $this->actingAsRole('finance');
+        $policy = PayrollApprovalPolicy::create([
+            'name' => 'Finance Review',
+            'min_amount' => 0,
+            'required_role' => 'finance',
+            'approval_order' => 1,
+            'is_active' => true,
+        ]);
+        $payroll = $this->createPayrollWithDetail();
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
+        $approval = PayrollApproval::where('policy_id', $policy->id)->sole();
+        $originalDecision = $approval->getAttributes();
+
+        $this->deleteJson("/api/v1/payroll-approval-policies/{$policy->id}")
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Approval policies with approval history cannot be deleted. Deactivate the policy instead.');
+        $this->assertSame($originalDecision, $approval->fresh()->getAttributes());
+        $this->assertModelExists($policy);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
+            'reason' => 'Correct the payroll before retirement.',
+        ])->assertOk();
+        $this->assertNotNull($approval->fresh()->superseded_at);
+        $supersededDecision = $approval->fresh()->getAttributes();
+
+        $this->deleteJson("/api/v1/payroll-approval-policies/{$policy->id}")
+            ->assertUnprocessable();
+        $this->assertSame($supersededDecision, $approval->fresh()->getAttributes());
+
+        $this->putJson("/api/v1/payroll-approval-policies/{$policy->id}", [
+            'is_active' => false,
+        ])->assertOk();
+        $this->assertFalse($policy->fresh()->is_active);
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
+        $this->assertSame('approved', $payroll->fresh()->status->value);
+        $this->assertSame($supersededDecision, $approval->fresh()->getAttributes());
+        $this->assertSame(1, PayrollApproval::where('policy_id', $policy->id)->count());
+        $this->assertSame(0, PayrollApproval::where('payroll_id', $payroll->id)->whereNull('superseded_at')->count());
+    }
+
+    public function test_database_rejects_deleting_a_referenced_approval_policy(): void
+    {
+        $this->actingAsRole('finance');
+        $policy = PayrollApprovalPolicy::create([
+            'name' => 'Finance Review',
+            'min_amount' => 0,
+            'required_role' => 'finance',
+            'approval_order' => 1,
+            'is_active' => true,
+        ]);
+        $payroll = $this->createPayrollWithDetail();
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
+        $approval = PayrollApproval::where('policy_id', $policy->id)->sole();
+
+        try {
+            DB::transaction(fn () => DB::table('payroll_approval_policies')->where('id', $policy->id)->delete());
+        } catch (QueryException $e) {
+            $this->assertModelExists($policy);
+            $this->assertModelExists($approval);
+
+            return;
+        }
+
+        $this->fail('The database must reject deleting an approval policy with approval history.');
     }
 
     public function test_approval_status_endpoint(): void
@@ -231,7 +312,8 @@ class PayrollApprovalMatrixTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'correction_count' => 0,
         ]);
 
@@ -245,6 +327,8 @@ class PayrollApprovalMatrixTest extends TestCase
             'absent_days' => 0,
             'notes' => 'Approval matrix test',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll->load('payrollDetails.staffMember.user');
     }

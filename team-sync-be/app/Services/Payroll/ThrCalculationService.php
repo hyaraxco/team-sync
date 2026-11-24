@@ -10,9 +10,6 @@ use Illuminate\Database\Eloquent\Collection;
 
 class ThrCalculationService
 {
-    public function __construct(
-        private readonly TaxCalculationService $taxService
-    ) {}
 
     /**
      * Calculate THR for a single employee.
@@ -28,10 +25,8 @@ class ThrCalculationService
      *     ineligibility_reason: string|null
      * }
      */
-    public function calculateForEmployee(
-        StaffMemberProfile $employee,
-        Carbon $paymentDate
-    ): array {
+    public function calculateForEmployee(StaffMemberProfile $employee, Carbon $paymentDate): array
+    {
         $jobInfo = $employee->jobInformation;
 
         if (! $jobInfo || ! $jobInfo->start_date) {
@@ -77,69 +72,19 @@ class ThrCalculationService
         // Calculate gross THR
         $grossThr = round($monthlySalary * $prorationFactor, 0);
 
-        // Calculate PPh 21 on THR (treated as irregular/bonus income)
-        $taxResult = $this->calculateThrTax(
-            $monthlySalary,
-            $grossThr,
-            $employee->ptkp_status,
-            ! empty($employee->npwp),
-            $paymentDate->format('Y-m')
-        );
-
-        $pph21Amount = $taxResult['pph21_on_thr'];
-        $netThr = round($grossThr - $pph21Amount, 0);
 
         return [
             'eligible' => true,
             'tenure_months' => $tenureMonths,
             'proration_factor' => $prorationFactor,
             'gross_thr_amount' => $grossThr,
-            'pph21_amount' => $pph21Amount,
-            'net_thr_amount' => $netThr,
-            'tax_calculation_meta' => $taxResult['meta'],
+            'pph21_amount' => 0,
+            'net_thr_amount' => $grossThr,
+            'tax_calculation_meta' => null,
             'ineligibility_reason' => null,
         ];
     }
 
-    /**
-     * Calculate PPh 21 on THR using the annualization method for irregular income.
-     *
-     * Method: PPh21 on (regular + THR) annualized - PPh21 on regular annualized = PPh21 on THR
-     *
-     * @return array{pph21_on_thr: float, meta: array}
-     */
-    public function calculateThrTax(
-        float $monthlySalary,
-        float $thrAmount,
-        ?string $ptkpStatus,
-        bool $hasNpwp,
-        ?string $contributionPeriod = null
-    ): array {
-        // Step 1: Calculate annual PPh21 on regular salary only
-        $regularTax = $this->taxService->calculateMonthlyPph21($monthlySalary, $ptkpStatus, $hasNpwp, $contributionPeriod);
-        $regularAnnualPph21 = $regularTax['meta']['pph21_annual'];
-
-        // Step 2: Calculate annual PPh21 on (regular salary + THR spread over 12 months)
-        $salaryWithThr = $monthlySalary + ($thrAmount / 12);
-        $withThrTax = $this->taxService->calculateMonthlyPph21($salaryWithThr, $ptkpStatus, $hasNpwp, $contributionPeriod);
-        $withThrAnnualPph21 = $withThrTax['meta']['pph21_annual'];
-
-        // Step 3: Difference = tax attributable to THR
-        $pph21OnThr = max(0, round($withThrAnnualPph21 - $regularAnnualPph21, 0));
-
-        return [
-            'pph21_on_thr' => $pph21OnThr,
-            'meta' => [
-                'method' => 'annualization_difference',
-                'regular_annual_pph21' => round($regularAnnualPph21, 0),
-                'with_thr_annual_pph21' => round($withThrAnnualPph21, 0),
-                'thr_amount' => $thrAmount,
-                'monthly_salary' => $monthlySalary,
-                'ptkp_status' => $ptkpStatus,
-                'has_npwp' => $hasNpwp,
-            ],
-        ];
-    }
 
     /**
      * Calculate payment deadline (7 days before holiday).

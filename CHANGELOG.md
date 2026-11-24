@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Aggregate payroll/THR taxable income by recognition period, include taxable employer BPJS benefits, preserve distinct cash/BPJS bases, and persist consistent tax/net outputs (`team-sync-62b`).
+- Reconcile final-period PPh 21 against explicit actual history, carry employee refunds and deadlines, and reject missing or overlapping history instead of inferring withholding from paid status (`team-sync-d9d`).
+- Bind payroll approvals to current revisions, amounts and policies; preserve superseded decisions and require reapproval after tax/payment-context changes (`team-sync-v93`).
+- Store new taxable corrections as integer rupiah, reject fractional imported history, and document employee-funded withholding separately from government-borne tax credits.
+- Report the persisted applied correction total in payroll-detail and payslip APIs while retaining raw per-item adjustment audit amounts.
+- Allow verified later employment/subjective end dates to refresh unpaid tax sources and invalidate approvals without changing settled history; preserve provenance and reject retrospective edits.
+- Keep repeated verified profile imports idempotent: do not duplicate the latest provenance or invalidate unchanged approvals.
+- Reject active-source government-borne tax until monthly credit allocation is supported; retain imported historical credits for final reconciliation.
+- Prevent deletion of approval policies with retained decisions, including superseded revisions; retire them through the existing inactive state.
+- Include overtime, applied taxable corrections and rounding in the 20-column payroll XLSX so exported earnings and deductions reconcile to persisted net pay.
 - Correct monthly TER B/C thresholds against PP 58/2023 Annex A-C, restore the missing category C 33% band, and cover every A/B/C boundary plus persisted payroll tax regressions (`team-sync-2fo`). Existing paid payroll is not recalculated.
 - Select BPJS rates by contribution period instead of a single timeless row per component: payroll, THR, payslip PDF, tax recalc command, and the readiness dashboard now pass the salary month to the calculation service, and JP ceilings are period-qualified (Rp 10.042.300 through Feb 2025, Rp 10.547.400 for Mar 2025-Feb 2026, Rp 11.086.300 from Mar 2026) with provenance recorded in `bpjs_rates` descriptions (PR #85).
 

@@ -21,7 +21,7 @@ use Tests\TestCase;
 
 class PayrollReopenCycleTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -34,6 +34,8 @@ class PayrollReopenCycleTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
@@ -49,6 +51,8 @@ class PayrollReopenCycleTest extends TestCase
     {
         $finance = $this->actingAsRole('finance');
         $payroll = $this->createPayrollWithDetail(status: 'approved');
+
+        $baselineLogId = PayrollActivityLog::where('payroll_id', $payroll->id)->max('id') ?? 0;
 
         // Step 1: Reopen
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
@@ -80,6 +84,7 @@ class PayrollReopenCycleTest extends TestCase
 
         // Verify audit trail has all events in correct order
         $events = PayrollActivityLog::where('payroll_id', $payroll->id)
+            ->where('id', '>', $baselineLogId)
             ->orderBy('occurred_at')
             ->pluck('event_type')
             ->all();
@@ -114,27 +119,28 @@ class PayrollReopenCycleTest extends TestCase
         $payroll = $this->createPayrollWithDetail(status: 'approved');
         $detail = $payroll->payrollDetails->first();
 
+        $calculatedSalary = $detail->final_salary;
+
         // Reopen
         $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
-            'reason' => 'Salary needs manual adjustment for bonus.',
+            'reason' => 'Payroll review notes need a correction.',
         ])->assertOk();
 
         // Edit detail while pending
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 11000000,
-            'notes' => 'Added performance bonus.',
+            'notes' => 'Verified performance bonus documentation.',
         ])->assertOk();
 
         $detail->refresh();
-        $this->assertEquals(11000000, $detail->final_salary);
-        $this->assertSame('Added performance bonus.', $detail->notes);
+        $this->assertEquals($calculatedSalary, $detail->final_salary);
+        $this->assertSame('Verified performance bonus documentation.', $detail->notes);
 
-        // Re-approve — edited salary should persist
+        // Re-approve without changing the derived salary
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
         $this->assertSame('approved', $payroll->fresh()->status->value);
 
         $detail->refresh();
-        $this->assertEquals(11000000, $detail->final_salary);
+        $this->assertEquals($calculatedSalary, $detail->final_salary);
     }
 
     public function test_cannot_reopen_processing_payroll(): void
@@ -219,7 +225,8 @@ class PayrollReopenCycleTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'payment_date' => $paymentDate,
         ]);
 
@@ -233,6 +240,8 @@ class PayrollReopenCycleTest extends TestCase
             'absent_days' => 1,
             'notes' => 'Reopen cycle seed',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll->load('payrollDetails');
     }

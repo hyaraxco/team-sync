@@ -22,7 +22,7 @@ use Tests\TestCase;
 
 class PayrollEdgeCaseTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -35,6 +35,8 @@ class PayrollEdgeCaseTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
@@ -97,6 +99,7 @@ class PayrollEdgeCaseTest extends TestCase
         $payroll = Payroll::create([
             'salary_month' => '2026-06-01',
             'status' => 'approved',
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'correction_count' => 0,
         ]);
 
@@ -229,7 +232,8 @@ class PayrollEdgeCaseTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-07-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'correction_count' => 0,
         ]);
 
@@ -243,6 +247,8 @@ class PayrollEdgeCaseTest extends TestCase
             'absent_days' => 0,
             'notes' => 'Edge case test',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll->load('payrollDetails.staffMember.user');
     }
