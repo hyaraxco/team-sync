@@ -285,7 +285,7 @@
             <td>Gaji Pokok</td>
             <td class="amount">{{ $basicSalary }}</td>
         </tr>
-        @if($overtimeAmount > 0)
+        @if($hasOvertime)
         <tr>
             <td>Lembur ({{ $overtimeHours }} jam)</td>
             <td class="amount">{{ $overtimeAmount }}</td>
@@ -312,40 +312,25 @@
     <!-- Deductions Section -->
     <h3 class="section-title">POTONGAN</h3>
     <table class="salary-table">
-        <!-- BPJS Breakdown -->
-        @if($bpjsKesehatan > 0)
+        <!-- Persisted employee BPJS contributions -->
         <tr>
-            <td>BPJS Kesehatan ({{ $bpjsKesehatanRate }}%)</td>
+            <td>BPJS Kesehatan (Karyawan)</td>
             <td class="amount">{{ $bpjsKesehatan }}</td>
         </tr>
-        @endif
-        @if($bpjsJht > 0)
         <tr>
-            <td>BPJS JHT - Jaminan Hari Tua ({{ $bpjsJhtRate }}%)</td>
-            <td class="amount">{{ $bpjsJht }}</td>
+            <td>BPJS Ketenagakerjaan (Karyawan)</td>
+            <td class="amount">{{ $bpjsKetenagakerjaan }}</td>
         </tr>
-        @endif
-        @if($bpjsJp > 0)
-        <tr>
-            <td>BPJS JP - Jaminan Pensiun ({{ $bpjsJpRate }}%)</td>
-            <td class="amount">{{ $bpjsJp }}</td>
-        </tr>
-        @endif
-        
-        @if($bpjsKesehatan > 0 || $bpjsJht > 0 || $bpjsJp > 0)
         <tr class="subtotal">
             <td>Subtotal BPJS</td>
             <td class="amount">{{ $totalBpjs }}</td>
         </tr>
-        @endif
         
         <!-- Tax -->
-        @if($tax > 0)
         <tr>
             <td>PPh 21 (Pajak Penghasilan)</td>
             <td class="amount">{{ $tax }}</td>
         </tr>
-        @endif
         
         <!-- Absence Deductions -->
         @if($absenceDeduction > 0)
