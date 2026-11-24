@@ -90,7 +90,7 @@ class TeamPolicy
      */
     public function manageMember(User $user, Team $team): Response
     {
-        if ($user->hasPermissionTo('team-edit')) {
+        if ($user->hasPermissionTo('team-edit') && $this->canManageTeam($user, $team)) {
             return Response::allow();
         }
 

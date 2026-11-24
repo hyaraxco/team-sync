@@ -26,6 +26,7 @@ class GoalAuthorizationTest extends TestCase
         parent::setUp();
         $this->activateTestLicense();
         Notification::fake();
+        Role::findOrCreate('staff', 'sanctum');
         foreach (['goal-create-own', 'goal-assign-team', 'team-edit', 'team-delete'] as $permission) {
             Permission::findOrCreate($permission, 'sanctum');
         }
@@ -155,22 +156,49 @@ class GoalAuthorizationTest extends TestCase
         $own = Team::factory()->create(['team_lead_id' => $manager->id]);
         $other = Team::factory()->create();
         $policy = new TeamPolicy;
-        foreach (['update', 'delete'] as $action) {
+        foreach (['update', 'delete', 'manageMember'] as $action) {
             $this->assertTrue($policy->$action($manager, $own)->allowed());
             $this->assertTrue($policy->$action($manager, $other)->denied());
         }
         $this->putJson("/api/v1/teams/{$other->id}", ['name' => 'Forged'])->assertForbidden();
         $this->deleteJson("/api/v1/teams/{$other->id}")->assertForbidden();
+
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
+            $emp = StaffMemberProfile::factory()->create();
+            JobInformation::factory()->forEmployee($emp)->create(['team_id' => null]);
+
+            return $emp;
+        });
+        $this->postJson("/api/v1/teams/{$other->id}/add-member", ['staff_member_id' => $employee->id])->assertForbidden();
+        $this->postJson("/api/v1/teams/{$other->id}/remove-member", ['staff_member_id' => $employee->id])->assertForbidden();
+
+        // Own team member management allowed for manager
+        $this->postJson("/api/v1/teams/{$own->id}/add-member", ['staff_member_id' => $employee->id])->assertOk();
+        $this->assertDatabaseHas('team_members', [
+            'team_id' => $own->id,
+            'staff_member_id' => $employee->id,
+            'left_at' => null,
+        ]);
+        $this->postJson("/api/v1/teams/{$own->id}/remove-member", ['staff_member_id' => $employee->id])->assertOk();
+        $this->assertDatabaseMissing('team_members', [
+            'team_id' => $own->id,
+            'staff_member_id' => $employee->id,
+            'left_at' => null,
+        ]);
+
         foreach (['hr', 'superadmin'] as $role) {
             $user = $this->actor($role, false);
             $this->assertTrue($policy->update($user, $other)->denied());
             $this->assertTrue($policy->delete($user, $other)->denied());
+            $this->assertTrue($policy->manageMember($user, $other)->denied());
             $user->givePermissionTo(['team-edit', 'team-delete']);
             $this->assertTrue($policy->update($user, $other)->allowed());
             $this->assertTrue($policy->delete($user, $other)->allowed());
+            $this->assertTrue($policy->manageMember($user, $other)->allowed());
         }
         $manager->revokePermissionTo(['team-edit', 'team-delete']);
         $this->assertTrue($policy->update($manager, $own)->denied());
         $this->assertTrue($policy->delete($manager, $own)->denied());
+        $this->assertTrue($policy->manageMember($manager, $own)->denied());
     }
 }
