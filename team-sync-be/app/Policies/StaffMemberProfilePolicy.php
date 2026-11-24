@@ -36,7 +36,7 @@ class StaffMemberProfilePolicy
     /**
      * Determine if the user can create staff member profiles.
      */
-    public function create(User $user, array $data = []): Response
+    public function create(User $user, array $data): Response
     {
         if ($user->hasPermissionTo('staff-member-create') && $this->canManageAccount($user, $data)) {
             return Response::allow();
@@ -48,7 +48,7 @@ class StaffMemberProfilePolicy
     /**
      * Determine if the user can update a staff member profile.
      */
-    public function update(User $user, StaffMemberProfile $profile, array $data = []): Response
+    public function update(User $user, StaffMemberProfile $profile, array $data): Response
     {
         if ($user->hasPermissionTo('staff-member-edit') && $this->canManageAccount($user, $data, $profile->user)) {
             return Response::allow();
