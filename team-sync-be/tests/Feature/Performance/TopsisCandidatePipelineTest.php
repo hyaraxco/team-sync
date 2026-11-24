@@ -8,6 +8,7 @@ use App\Models\PerformanceReviewCycle;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Tests\Concerns\ActivatesLicense;
@@ -94,17 +95,20 @@ class TopsisCandidatePipelineTest extends TestCase
         Carbon::setTestNow('2026-02-10 10:00:00');
     }
 
-    private function positiveFeedback(User $emp, int $count): void
+    private function positiveFeedback(User $emp, int $count): array
     {
+        $feedback = [];
         for ($i = 0; $i < $count; $i++) {
-            PerformanceFeedback::create([
+            $feedback[] = PerformanceFeedback::create([
                 'staff_member_id' => $emp->staffMemberProfile->id,
                 'given_by' => $this->hr->staffMemberProfile->id,
                 'feedback_type' => 'positive',
                 'category' => 'teamwork',
                 'content' => "Positive note {$i}",
-            ]);
+            ])->fresh();
         }
+
+        return $feedback;
     }
 
     /** @test */
@@ -158,8 +162,8 @@ class TopsisCandidatePipelineTest extends TestCase
         ]);
 
         $this->assertTrue($feedback->fresh()->created_at->betweenIncluded(
-            $this->cycle->start_date->startOfDay(),
-            $this->cycle->end_date->endOfDay(),
+            $this->cycle->start_date->copy()->startOfDay(),
+            $this->cycle->end_date->copy()->endOfDay(),
         ));
 
         $candidates = $this->candidates();
@@ -234,21 +238,22 @@ class TopsisCandidatePipelineTest extends TestCase
         $emp = User::where('email', 'agung@teamsync.com')->first();
         $this->completedReviewFor($emp);
 
-        // 1 feedback on the first day, 4 on the last day of the cycle.
-        Carbon::setTestNow('2026-01-01 00:00:00');
-        $this->positiveFeedback($emp, 1);
-
-        Carbon::setTestNow('2026-03-31 18:30:00');
-        $this->positiveFeedback($emp, 4);
-
-        // A day after the cycle must not count.
-        Carbon::setTestNow('2026-04-01 00:00:01');
-        $this->positiveFeedback($emp, 2);
+        foreach ([
+            '2025-12-31 23:59:59' => 2,
+            '2026-01-01 00:00:00' => 1,
+            '2026-03-31 23:59:59' => 4,
+            '2026-04-01 00:00:00' => 2,
+        ] as $timestamp => $count) {
+            Carbon::setTestNow($timestamp);
+            $feedback = $this->positiveFeedback($emp, $count);
+            $this->assertSame(array_fill(0, $count, $timestamp), array_map(
+                fn ($entry) => $entry->created_at->toDateTimeString(), $feedback,
+            ));
+        }
 
         $candidates = $this->candidates();
         $row = collect($candidates)->firstWhere('staff_member_id', $emp->staffMemberProfile->id);
 
-        // 5 in-window / cap max(10, 5) = 10 → 50.  The 2 out-of-window are ignored.
         $this->assertEqualsWithDelta(50.0, $row['feedback_score'], 0.01);
     }
 
@@ -261,8 +266,6 @@ class TopsisCandidatePipelineTest extends TestCase
      */
     public function test_feedback_score_uses_shared_cycle_maximum_across_candidates(): void
     {
-        $this->insideCycleWindow();
-
         $top = User::where('email', 'agung@teamsync.com')->first();
         // EmployeeSeeder only seeds this one account, so build a second candidate
         // explicitly instead of relying on another seeded email.
@@ -273,8 +276,17 @@ class TopsisCandidatePipelineTest extends TestCase
         $this->completedReviewFor($top);
         $this->completedReviewFor($second);
 
-        $this->positiveFeedback($top, 15);
-        $this->positiveFeedback($second, 7);
+        Carbon::setTestNow('2026-03-31 23:59:59');
+        $topFeedback = $this->positiveFeedback($top, 15);
+        $this->assertSame(array_fill(0, 15, '2026-03-31 23:59:59'), array_map(
+            fn ($entry) => $entry->created_at->toDateTimeString(), $topFeedback,
+        ));
+
+        Carbon::setTestNow('2026-01-01 00:00:00');
+        $secondFeedback = $this->positiveFeedback($second, 7);
+        $this->assertSame(array_fill(0, 7, '2026-01-01 00:00:00'), array_map(
+            fn ($entry) => $entry->created_at->toDateTimeString(), $secondFeedback,
+        ));
 
         $candidates = collect($this->candidates());
 
@@ -288,34 +300,61 @@ class TopsisCandidatePipelineTest extends TestCase
         $this->assertEqualsWithDelta(100.0, $topRow['feedback_score'], 0.01);
         // 7 / 15 * 100 = 46.6667
         $this->assertEqualsWithDelta(46.6667, $secondRow['feedback_score'], 0.01);
+
+        foreach (['2025-12-31 23:59:59', '2026-04-01 00:00:00'] as $timestamp) {
+            Carbon::setTestNow($timestamp);
+            $outsideFeedback = $this->positiveFeedback($second, 16);
+            $this->assertSame(array_fill(0, 16, $timestamp), array_map(
+                fn ($entry) => $entry->created_at->toDateTimeString(), $outsideFeedback,
+            ));
+
+            $candidates = collect($this->candidates());
+            $topRow = $candidates->firstWhere('staff_member_id', $top->staffMemberProfile->id);
+            $secondRow = $candidates->firstWhere('staff_member_id', $secondProfile->id);
+
+            $this->assertNotNull($topRow);
+            $this->assertNotNull($secondRow);
+            $this->assertEqualsWithDelta(100.0, $topRow['feedback_score'], 0.01);
+            $this->assertEqualsWithDelta(46.6667, $secondRow['feedback_score'], 0.01);
+        }
     }
 
-    /**
-     * Goals created on the last day of the cycle must participate in C3/C4.
-     *
-     * @test
-     */
-    public function test_last_day_of_cycle_goals_are_included(): void
+    #[DataProvider('goalCycleBoundaries')]
+    public function test_last_day_of_cycle_goals_are_included(string $createdAt, bool $linked, int $expectedScore): void
     {
         $emp = User::where('email', 'agung@teamsync.com')->first();
-        $this->completedReviewFor($emp);
+        $review = $this->completedReviewFor($emp);
 
-        Carbon::setTestNow('2026-03-31 20:00:00');
+        Carbon::setTestNow($createdAt);
 
         $goal = \App\Models\PerformanceGoal::factory()->create([
             'staff_member_id' => $emp->staffMemberProfile->id,
-            'title' => 'Last day goal',
+            'linked_review_id' => $linked ? $review->id : null,
+            'title' => 'Cycle boundary goal',
             'goal_type' => 'kpi',
             'status' => 'completed',
-            'start_date' => '2026-03-01',
-            'due_date' => '2026-03-31',
-            'completed_at' => '2026-03-31 19:00:00',
+            'start_date' => '2025-12-01',
+            'due_date' => '2026-04-30',
+            'completed_at' => '2026-04-02 19:00:00',
         ]);
+        $this->assertSame($createdAt, $goal->fresh()->created_at->toDateTimeString());
 
         $candidates = $this->candidates();
         $row = collect($candidates)->firstWhere('staff_member_id', $emp->staffMemberProfile->id);
 
-        // 1 goal, completed on time → 100% completion + 100% on-time
-        $this->assertEqualsWithDelta(100.0, $row['goal_completion'], 0.01);
+        $this->assertNotNull($row);
+        $this->assertEqualsWithDelta($expectedScore, $row['goal_completion'], 0.01);
+    }
+
+    public static function goalCycleBoundaries(): array
+    {
+        return [
+            'unlinked first instant' => ['2026-01-01 00:00:00', false, 100],
+            'unlinked final second' => ['2026-03-31 23:59:59', false, 100],
+            'unlinked immediately before' => ['2025-12-31 23:59:59', false, 0],
+            'unlinked next midnight' => ['2026-04-01 00:00:00', false, 0],
+            'linked immediately before' => ['2025-12-31 23:59:59', true, 100],
+            'linked next midnight' => ['2026-04-01 00:00:00', true, 100],
+        ];
     }
 }
