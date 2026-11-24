@@ -78,6 +78,7 @@
         }
         
         .section-title {
+            page-break-after: avoid;
             font-size: 12pt;
             font-weight: bold;
             color: #1e40af;
@@ -128,7 +129,8 @@
         .net-salary-box {
             margin: 25px 0;
             padding: 20px;
-            background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+            background-color: #1e40af;
+            page-break-inside: avoid;
             color: white;
             border-radius: 8px;
             text-align: center;
@@ -148,6 +150,7 @@
         }
         
         .attendance-grid {
+            page-break-inside: avoid;
             display: table;
             width: 100%;
             border-collapse: collapse;

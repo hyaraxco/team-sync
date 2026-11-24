@@ -96,4 +96,66 @@ class PayslipPdfStoredValuesTest extends TestCase
         $this->assertStringStartsWith('%PDF-', $pdf);
         $this->assertStringContainsString('%%EOF', $pdf);
     }
+
+    public function test_real_pdf_paints_net_pay_on_blue_and_keeps_its_title_and_amount_together(): void
+    {
+        foreach ([0, 20] as $adjustmentCount) {
+            $wrapper = app('dompdf.wrapper');
+            $dompdf = $wrapper->getDomPDF();
+            $canvas = new class('a4', 'portrait', $dompdf) extends \Dompdf\Adapter\CPDF
+            {
+                public array $texts = [];
+
+                public array $backgrounds = [];
+
+                public function text($x, $y, $text, $font, $size, $color = [0, 0, 0], $word_space = 0.0, $char_space = 0.0, $angle = 0.0)
+                {
+                    $this->texts[] = [$this->get_page_number(), $x, $y, $text, $color];
+                    parent::text($x, $y, $text, $font, $size, $color, $word_space, $char_space, $angle);
+                }
+
+                public function filled_rectangle($x1, $y1, $w, $h, $color)
+                {
+                    $this->backgrounds[] = [$this->get_page_number(), $x1, $y1, $w, $h, $color];
+                    parent::filled_rectangle($x1, $y1, $w, $h, $color);
+                }
+            };
+            $dompdf->setCanvas($canvas);
+            \Barryvdh\DomPDF\Facade\Pdf::clearResolvedInstance('dompdf.wrapper');
+            app()->instance('dompdf.wrapper', $wrapper);
+            $detail = $this->historicalDetail(123_456, 234_567, 45_678);
+            $adjustments = collect();
+            for ($index = 0; $index < $adjustmentCount; $index++) {
+                $adjustments->push(new \App\Models\PayrollAdjustment([
+                    'reason' => 'Synthetic correction '.$index,
+                    'amount_delta' => 1_000,
+                ]));
+            }
+            $detail->setRelation('appliedAdjustments', $adjustments);
+
+            $output = app(PayslipPdfService::class)->render($detail);
+            $this->assertStringStartsWith('%PDF-', $output);
+            $title = array_values(array_filter($canvas->texts, fn ($text) => str_contains($text[3], 'GAJI BERSIH')));
+            $amount = array_values(array_filter($canvas->texts, fn ($text) => $text[3] === 'Rp 8.000.000'));
+            $this->assertCount(1, $title);
+            $this->assertCount(1, $amount);
+            $this->assertSame($title[0][0], $amount[0][0]);
+
+            foreach ([$title[0], $amount[0]] as [$page, $x, $y, $text, $color]) {
+                $this->assertEquals([1, 1, 1], array_slice($color, 0, 3));
+                $painted = array_filter($canvas->backgrounds, fn ($box) =>
+                    $box[0] === $page
+                    && $box[1] <= $x && $box[1] + $box[3] > $x
+                    && $box[2] <= $y && $box[2] + $box[4] > $y
+                    && abs($box[5][0] - 30 / 255) < 0.001
+                    && abs($box[5][1] - 64 / 255) < 0.001
+                    && abs($box[5][2] - 175 / 255) < 0.001
+                );
+                $this->assertNotEmpty($painted, 'Net pay text must be painted over the solid house blue.');
+                $this->assertLessThan($canvas->get_height(), $y);
+            }
+            app()->forgetInstance('dompdf.wrapper');
+            \Barryvdh\DomPDF\Facade\Pdf::clearResolvedInstance('dompdf.wrapper');
+        }
+    }
 }
