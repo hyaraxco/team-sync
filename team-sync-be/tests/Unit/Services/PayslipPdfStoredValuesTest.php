@@ -97,7 +97,7 @@ class PayslipPdfStoredValuesTest extends TestCase
         $this->assertStringContainsString('%%EOF', $pdf);
     }
 
-    public function test_real_pdf_paints_net_pay_on_blue_and_keeps_its_title_and_amount_together(): void
+    public function test_real_pdf_paints_readable_net_pay_and_keeps_its_title_and_amount_together(): void
     {
         foreach ([0, 20] as $adjustmentCount) {
             $wrapper = app('dompdf.wrapper');
@@ -142,17 +142,26 @@ class PayslipPdfStoredValuesTest extends TestCase
             $this->assertSame($title[0][0], $amount[0][0]);
 
             foreach ([$title[0], $amount[0]] as [$page, $x, $y, $text, $color]) {
-                $this->assertEquals([1, 1, 1], array_slice($color, 0, 3));
                 $painted = array_filter($canvas->backgrounds, fn ($box) =>
                     $box[0] === $page
                     && $box[1] <= $x && $box[1] + $box[3] > $x
                     && $box[2] <= $y && $box[2] + $box[4] > $y
-                    && abs($box[5][0] - 30 / 255) < 0.001
-                    && abs($box[5][1] - 64 / 255) < 0.001
-                    && abs($box[5][2] - 175 / 255) < 0.001
                 );
-                $this->assertNotEmpty($painted, 'Net pay text must be painted over the solid house blue.');
+                $this->assertNotEmpty($painted, 'Net pay text must have a painted background.');
+                $luminance = function (array $rgb): float {
+                    $linear = array_map(fn ($channel) => $channel <= 0.04045 ? $channel / 12.92 : (($channel + 0.055) / 1.055) ** 2.4, array_slice($rgb, 0, 3));
+
+                    return 0.2126 * $linear[0] + 0.7152 * $linear[1] + 0.0722 * $linear[2];
+                };
+                $background = array_values($painted)[count($painted) - 1][5];
+                $foregroundLuminance = $luminance($color);
+                $backgroundLuminance = $luminance($background);
+                $contrast = (max($foregroundLuminance, $backgroundLuminance) + 0.05) / (min($foregroundLuminance, $backgroundLuminance) + 0.05);
+                $this->assertGreaterThanOrEqual(4.5, $contrast, 'Actual net-pay paint must have readable contrast.');
                 $this->assertLessThan($canvas->get_height(), $y);
+            }
+            if ($adjustmentCount === 0) {
+                $this->assertSame(1, $canvas->get_page_count(), 'The standard payslip should fit naturally on A4.');
             }
             app()->forgetInstance('dompdf.wrapper');
             \Barryvdh\DomPDF\Facade\Pdf::clearResolvedInstance('dompdf.wrapper');
