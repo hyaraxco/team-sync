@@ -1,5 +1,6 @@
 <?php
 
+use App\Interfaces\PerformanceReviewRepositoryInterface;
 use App\Models\PerformanceGoal;
 use App\Models\PerformanceReview;
 use App\Models\PerformanceReviewCycle;
@@ -7,6 +8,7 @@ use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
@@ -168,4 +170,63 @@ it('summary goals_on_time is zero when no completed goals', function () {
     $response->assertOk()
         ->assertJsonPath('data.summary.goals_completed', 0)
         ->assertJsonPath('data.summary.goals_on_time', 0);
+});
+
+it('keeps readiness and ranking on-time scores consistent at the due-date boundary', function (?string $completedAt, int $onTime, int $score) {
+    actingAsHRForReadiness();
+    ['review' => $review, 'employee' => $employee, 'cycle' => $cycle] = makeReviewWithCycle([
+        'start_date' => '2026-01-01',
+        'end_date' => '2026-03-31',
+    ], 'completed');
+
+    $goal = PerformanceGoal::factory()->create([
+        'staff_member_id' => $employee->id,
+        'linked_review_id' => $review->id,
+        'status' => 'completed',
+        'start_date' => '2026-01-01',
+        'due_date' => '2026-03-31',
+        'completed_at' => $completedAt,
+    ]);
+    $dueDate = $goal->due_date->copy();
+
+    $this->getJson("/api/v1/performance/reviews/{$review->id}/validate-readiness")
+        ->assertOk()
+        ->assertJsonPath('data.summary.goals_count', 1)
+        ->assertJsonPath('data.summary.goals_completed', 1)
+        ->assertJsonPath('data.summary.goals_on_time', $onTime);
+
+    $candidates = app(PerformanceReviewRepositoryInterface::class)->getEmployeeScoresForCycle($cycle->id);
+    $row = collect($candidates)->firstWhere('staff_member_id', $employee->id);
+
+    $this->assertNotNull($row);
+    $this->assertEqualsWithDelta($score, $row['goal_completion'], 0.01);
+    $this->assertSame($dueDate->format('Y-m-d H:i:s.u e'), $goal->fresh()->due_date->format('Y-m-d H:i:s.u e'));
+})->with([
+    'due-date evening' => ['2026-03-31 19:00:00', 1, 100],
+    'due-date final second' => ['2026-03-31 23:59:59', 1, 100],
+    'next midnight' => ['2026-04-01 00:00:00', 0, 80],
+    'missing completion timestamp' => [null, 0, 80],
+]);
+
+it('preserves the readiness goal date instance and timezone and ignores a missing due date', function () {
+    actingAsHRForReadiness();
+    ['review' => $review] = makeReviewWithCycle();
+    $dueDate = Carbon::parse('2026-03-31 00:00:00', 'Asia/Jakarta');
+    $completedAt = Carbon::parse('2026-03-31 19:00:00', 'Asia/Jakarta');
+    $goals = collect([
+        (object) ['status' => 'completed', 'due_date' => $dueDate, 'completed_at' => $completedAt],
+        (object) ['status' => 'completed', 'due_date' => null, 'completed_at' => $completedAt],
+    ]);
+    $repository = $this->mock(PerformanceReviewRepositoryInterface::class);
+    $repository->shouldReceive('getReviewById')->once()->with($review->id)->andReturn($review);
+    $repository->shouldReceive('getActiveSections')->once()->andReturn(collect());
+    $repository->shouldReceive('getGoalsForReview')->once()->andReturn($goals);
+    $repository->shouldReceive('getPositiveFeedbackCount')->once()->andReturn(0);
+
+    $this->getJson("/api/v1/performance/reviews/{$review->id}/validate-readiness")
+        ->assertOk()
+        ->assertJsonPath('data.summary.goals_count', 2)
+        ->assertJsonPath('data.summary.goals_on_time', 1);
+
+    $this->assertSame('2026-03-31 00:00:00.000000 Asia/Jakarta', $dueDate->format('Y-m-d H:i:s.u e'));
 });

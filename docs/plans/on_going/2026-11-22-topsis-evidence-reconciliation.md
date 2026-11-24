@@ -1,7 +1,19 @@
 # TOPSIS Evidence & Release Reconciliation — team-sync-lzo
 
-**Status:** IN_PROGRESS (continuation 2026-11-23). PR #92 merged as `026b972`; the ticket remains open until the remaining acceptance criteria are met.
-**Branch:** test/team-sync-lzo-complete-evidence
+**Status:** HISTORICAL RECORD, reconciled 2026-11-24. Beads `team-sync-lzo` is closed; subsequent cycle-window work merged in PR #104 under `team-sync-6g5` (also closed). Residual readiness consistency and boundary-verification work is tracked separately as `team-sync-c94`. Tracker closure is not certification that every evidence gap below was independently resolved.
+**Historical branch:** test/team-sync-lzo-complete-evidence
+
+## Reconciliation as of 2026-11-24
+
+The continuation sections below retain what was known during their original execution; their pending statements are historical, not the current tracker state.
+
+- PR #92 merged as `026b972`. PR #93 subsequently merged as `41a06724f92bf02d0390341eced22af96eb4c4ba`.
+- Independently observed PR #93 post-merge BE run [45118829577](https://github.com/hyaraxco/team-sync/actions/runs/45118829577) passed 1687 tests / 7661 assertions in 102.67 seconds, including config clear and frozen Bun install/build. The endpoint artifact upload step passed; archive contents were not independently inspected in this review.
+- The later `lzo` owner report records ranking browser 2/2 and other performance flows passing. Preserve this as reported historical browser evidence, not a current-c94 rerun. Its role/payroll/project failures were separate follow-ups, not automatically harmless harness defects.
+- PR #104 merged as `73463f1f42373d09f92fd0f8d419ee8fdffe74dc`. Independently inspected post-merge BE run [45193628215](https://github.com/hyaraxco/team-sync/actions/runs/45193628215) passed 1700 tests / 7705 assertions in 77.12 seconds, config clear, frozen asset install/build and endpoint upload. The merge fixed cycle query bounds and separately made same-due-date goal completion on time. The latter can change recalculated goal scores from 80 to 100 for a single otherwise completed goal; it did not rewrite history.
+- PR #103 sandbox integration merged as `452a7c48b2450a984765753d645ac6355791ca49`, with observed successful post-merge BE/FE runs [45206288248](https://github.com/hyaraxco/team-sync/actions/runs/45206288248) and [45206288286](https://github.com/hyaraxco/team-sync/actions/runs/45206288286). Owner [exact-head acceptance](https://github.com/hyaraxco/team-sync/pull/103#issuecomment-7105691845) reports BE 1703 tests / 7714 assertions, FE 1167 and roles 61/61 on `541456791e7fe13353a16081d2d3a16dd73d8945`. Its login-only accessibility has one incomplete; it does not certify authenticated pages or all object isolation.
+- `team-sync-c94` owns readiness/ranking date-rule consistency, cap-query-sensitive boundary regressions and evidence reconciliation. Its [ongoing plan](2026-11-24-topsis-readiness-followup.md) records observed isolated SQLite before/after: exactly two same-day readiness failures before the fix, then 1722 passed / 7878 assertions and one skip after, plus a backend asset build pass. Isolated MySQL, observed denominator mutations and a current-source ranking browser run remain unexecuted; SQLite and historical browser results do not replace them.
+- Strix secrets, scan execution and SARIF enforcement remain outside this proof. No release or deployment is implied by these merges.
 
 ## Continuation plan
 

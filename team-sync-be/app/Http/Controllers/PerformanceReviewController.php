@@ -236,7 +236,7 @@ class PerformanceReviewController extends Controller implements HasMiddleware
             $goalCount = $goals->count();
             $goalsCompleted = $goals->where('status', 'completed')->count();
             $goalsOnTime = $goals->where('status', 'completed')
-                ->filter(fn ($g) => $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date)
+                ->filter(fn ($g) => $g->completed_at && $g->due_date && $g->completed_at <= $g->due_date->copy()->endOfDay())
                 ->count();
 
             if ($goalCount === 0) {
