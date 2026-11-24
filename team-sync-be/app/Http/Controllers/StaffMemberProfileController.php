@@ -101,7 +101,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         $data = $request->validated();
 
         try {
-            $response = Gate::inspect('create', StaffMemberProfile::class);
+            $response = Gate::inspect('create', [StaffMemberProfile::class, $data]);
             if ($response->denied()) {
                 return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
             }
@@ -185,7 +185,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
         try {
             $profile = StaffMemberProfile::findOrFail($id);
 
-            $response = Gate::inspect('update', $profile);
+            $response = Gate::inspect('update', [$profile, $data]);
             if ($response->denied()) {
                 return ResponseHelper::jsonResponse(false, $response->message(), null, 403);
             }

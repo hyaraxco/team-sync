@@ -20,6 +20,13 @@ use Illuminate\Validation\Rule;
 
 class StaffMemberProfileUpdateRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        $profile = StaffMemberProfile::findOrFail($this->route('staff_member') ?? $this->route('id'));
+
+        return $this->user()?->can('update', [$profile, $this->only(['roles', 'email', 'password'])]) ?? false;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

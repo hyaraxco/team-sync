@@ -11,6 +11,7 @@ use App\Enums\MaritalStatus;
 use App\Enums\PtkpStatus;
 use App\Enums\Religion;
 use App\Enums\WorkLocation;
+use App\Models\StaffMemberProfile;
 use App\Support\SensitiveData;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
@@ -18,6 +19,11 @@ use Illuminate\Validation\Rule;
 
 class StaffMemberProfileStoreRequest extends FormRequest
 {
+    public function authorize(): bool
+    {
+        return $this->user()?->can('create', [StaffMemberProfile::class, $this->only('roles')]) ?? false;
+    }
+
     /**
      * Get the validation rules that apply to the request.
      *

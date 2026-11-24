@@ -20,6 +20,7 @@ const { loading, error } = storeToRefs(staffMemberStore);
 
 // Modal state
 const showErrorModal = ref(false);
+const originalRole = ref("");
 
 // Inject step management from layout
 const currentStep = inject("currentStep");
@@ -163,6 +164,7 @@ const loadStaffMemberData = async () => {
             step2Data.value.bpjs_kesehatan = staffMember.bpjs_kesehatan || "";
             step2Data.value.ptkp_status = staffMember.ptkp_status || "";
             step2Data.value.role = extractRoleValue(staffMember.user?.roles);
+            originalRole.value = step2Data.value.role;
 
             // Reset emergency contact values before applying loaded data.
             step3Data.value.emergency_contact_name = "";
@@ -240,7 +242,9 @@ const handleSubmit = async () => {
             formData.append("bpjs_ketenagakerjaan", step2Data.value.bpjs_ketenagakerjaan);
         if (step2Data.value.bpjs_kesehatan) formData.append("bpjs_kesehatan", step2Data.value.bpjs_kesehatan);
         if (step2Data.value.ptkp_status) formData.append("ptkp_status", step2Data.value.ptkp_status);
-        formData.append("roles[]", step2Data.value.role);
+        if (step2Data.value.role !== originalRole.value) {
+            formData.append("roles[]", step2Data.value.role);
+        }
 
         // Step 3 data (Emergency Contacts & Additional Info)
         formData.append("emergency_contacts[0][full_name]", step3Data.value.emergency_contact_name);
