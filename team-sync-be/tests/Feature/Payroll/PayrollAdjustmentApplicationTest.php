@@ -86,7 +86,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             'source_reference_id' => 999,
             'adjustment_kind' => PayrollAdjustment::KIND_ABSENCE_CORRECTION_CREDIT,
             'days_delta' => 2,
-            'amount_delta' => 250000,
+            'amount_delta' => 250000.49,
             'reason' => 'Post-lock sick proof approved',
             'status' => PayrollAdjustment::STATUS_APPROVED,
         ]);
@@ -118,7 +118,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             + (float) $detail->overtime_amount + 250000;
         $meta = json_decode($detail->tax_calculation_meta, true);
 
-        $this->assertEquals(250000.0, (float) $detail->taxable_adjustment_amount);
+        $this->assertSame(250000, $detail->taxable_adjustment_amount);
         $this->assertEquals(250000.0, $meta['meta']['components']['taxable_adjustments']);
         $this->assertEquals($cashBase, $meta['meta']['cash_base']);
         $this->assertEquals(
@@ -149,7 +149,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
                 'adjustment_kind' => PayrollAdjustment::KIND_ABSENCE_CORRECTION_CREDIT,
             ])
             ->assertJsonFragment([
-                'adjustment_total_amount' => 250000,
+                'adjustment_total_amount' => 250000.49,
             ]);
     }
 

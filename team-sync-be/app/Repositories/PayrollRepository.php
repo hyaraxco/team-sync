@@ -2995,7 +2995,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             $totalAmountDelta = round((float) $employeeAdjustments->sum(function (PayrollAdjustment $adjustment) {
                 return (float) $adjustment->amount_delta;
-            }), 2);
+            }), 0);
 
             if ($totalAmountDelta !== 0.0) {
                 $adjustedFinalSalary = max(

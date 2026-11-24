@@ -50,7 +50,7 @@ class ImportPayrollTaxHistoryCommand extends Command
                         throw new PayrollStateException('History keys must be strict YYYY-MM within the supplied year.');
                     }
                     foreach (['gross_income', 'employee_pension_contributions', 'deductible_donations', 'withheld', 'government_borne_tax'] as $field) {
-                        Validator::make($month, [$field => 'required|numeric'])->validate();
+                        Validator::make($month, [$field => 'required|integer'])->validate();
                         if (! is_finite((float) $month[$field]) || ($field !== 'withheld' && $month[$field] < 0)) {
                             throw new PayrollStateException('History amounts must be finite; only withheld may be negative.');
                         }

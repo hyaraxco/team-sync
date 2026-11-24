@@ -12,7 +12,7 @@ return new class extends Migration
             $table->date('planned_credit_date')->nullable();
         });
         Schema::table('payroll_details', function (Blueprint $table) {
-            $table->decimal('taxable_adjustment_amount', 14, 2)->default(0);
+            $table->bigInteger('taxable_adjustment_amount')->default(0);
         });
         Schema::table('thr_payrolls', function (Blueprint $table) {
             $table->date('income_due_date')->nullable();

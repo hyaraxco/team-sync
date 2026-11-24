@@ -53,7 +53,7 @@ class PayrollDetail extends Model
         return [
             'original_salary' => 'decimal:2',
             'final_salary' => 'decimal:2',
-            'taxable_adjustment_amount' => 'decimal:2',
+            'taxable_adjustment_amount' => 'integer',
             'daily_rate' => 'decimal:2',
             'deduction_days' => 'decimal:2',
             'deduction_amount' => 'decimal:2',

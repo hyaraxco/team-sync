@@ -211,7 +211,7 @@ class PayrollTaxIntegrationService
         $tax = (float) $result['pph21_monthly'];
         if ($type === 'payroll') {
             $detail = PayrollDetail::findOrFail($id);
-            $payroll = Payroll::whereKey($detail->payroll_id)->lockForUpdate()->firstOrFail();
+            $payroll = Payroll::with('payrollSettingVersion')->whereKey($detail->payroll_id)->lockForUpdate()->firstOrFail();
             if ($payroll->status === PayrollStatus::PAID) {
                 throw new PayrollStateException('Paid payroll history is immutable.');
             }

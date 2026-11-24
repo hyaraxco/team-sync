@@ -35,4 +35,5 @@ Status: COMPLETED (implementasi dan acceptance lokal); PR/CI serta persetujuan m
 - Pembacaan PDF tetap memakai nilai persisted. Tidak mengulang audit layout PDF yang sudah merged pada PR117. Tidak memakai development DB atau `.env` host.
 - SQLite browser login memicu error endpoint analytics `DATE_FORMAT`; preview THR tetap lulus. Tidak menyatakan analytics SQLite kompatibel.
 - Full Pest, full Vitest, frozen backend asset build dan accessibility dijalankan gate CI pada SHA PR terbaru; hasil belum tersedia ketika plan diarsipkan. Tidak merge, menutup bead, release atau deploy tanpa gate yang berlaku.
+- Review susulan: `taxable_adjustment_amount` memakai bigint/cast integer; total koreksi legacy dibulatkan sekali, sumber audit pecahan tetap utuh. Impor menolak nominal pecahan; kontrak `withheld` employee-funded dan DTP kredit terpisah dijelaskan. `writeResult` eager-load versi pengaturan. Tes terarah history/adjustment/settlement/final-period: 21 lulus, 95 assertions. CI pada head sebelumnya lulus; perubahan ini memerlukan CI/review ulang.
 

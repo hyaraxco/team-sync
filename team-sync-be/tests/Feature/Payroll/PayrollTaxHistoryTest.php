@@ -124,6 +124,12 @@ it('imports explicit history atomically and refuses replacement after drafts exi
         $this->artisan('payroll:import-tax-history', ['path' => $path])->assertFailed();
         expect(PayrollTaxYear::query()->count())->toBe(0);
 
+        $fractionalRow = $row;
+        $fractionalRow['history']['2026-01']['withheld'] = 200_000.25;
+        file_put_contents($path, json_encode([$fractionalRow], JSON_THROW_ON_ERROR));
+        $this->artisan('payroll:import-tax-history', ['path' => $path])->assertFailed();
+        expect(PayrollTaxYear::query()->count())->toBe(0);
+
         $otherEmployee = StaffMemberProfile::withoutSyncingToSearch(fn () => StaffMemberProfile::factory()->for(User::factory())->create([
             'code' => 'TAX-002', 'ptkp_status' => 'TK/0', 'npwp' => '987654321012345',
         ]));
