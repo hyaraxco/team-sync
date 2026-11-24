@@ -10,6 +10,8 @@ use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\ReviewerRule;
 use App\Models\StaffMemberProfile;
+use App\Models\Team;
+use App\Models\TeamMember;
 use App\Models\User;
 use App\Notifications\Performance\FeedbackReceived;
 use App\Notifications\Performance\GoalAssigned;
@@ -155,6 +157,9 @@ class PerformanceNotificationTest extends TestCase
         [$employeeUser, $employeeProfile] = $this->createUserWithProfile('staff');
 
         Sanctum::actingAs($managerUser);
+
+        $team = Team::factory()->create(['team_lead_id' => $managerUser->id]);
+        TeamMember::factory()->create(['team_id' => $team->id, 'staff_member_id' => $employeeProfile->id]);
 
         $this->postJson('/api/v1/performance/goals', [
             'staff_member_id' => $employeeProfile->id,

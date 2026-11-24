@@ -54,7 +54,7 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): Response
     {
-        if ($user->hasPermissionTo('team-edit')) {
+        if ($user->hasPermissionTo('team-edit') && $this->canManageTeam($user, $team)) {
             return Response::allow();
         }
 
@@ -66,7 +66,7 @@ class TeamPolicy
      */
     public function delete(User $user, Team $team): Response
     {
-        if ($user->hasPermissionTo('team-delete')) {
+        if ($user->hasPermissionTo('team-delete') && $this->canManageTeam($user, $team)) {
             return Response::allow();
         }
 
@@ -95,5 +95,10 @@ class TeamPolicy
         }
 
         return Response::deny('You do not have permission to manage team members.');
+    }
+
+    private function canManageTeam(User $user, Team $team): bool
+    {
+        return $user->hasAnyRole(['hr', 'superadmin']) || $team->team_lead_id === $user->id;
     }
 }
