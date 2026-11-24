@@ -88,6 +88,29 @@ class PayslipPdfStoredValuesTest extends TestCase
         }
     }
 
+    public function test_rendered_slip_keeps_allowance_bonus_absence_and_other_deduction_rows_when_zero(): void
+    {
+        $detail = $this->historicalDetail(0, 0, 0);
+        $detail->final_salary = 10_750_000;
+        $detail->deduction_days = 0;
+
+        $pdf = Mockery::mock(PDF::class);
+        $pdf->shouldReceive('loadView')->once()->withArgs(function ($view, $data) {
+            $html = view($view, $data)->render();
+            foreach (['Tunjangan', 'Bonus', 'Potongan Ketidakhadiran (0,0 hari)', 'Potongan Lainnya'] as $label) {
+                $this->assertMatchesRegularExpression('/'.preg_quote($label, '/').'<\/td>\s*<td class="amount">Rp 0<\/td>/', $html);
+            }
+
+            return true;
+        })->andReturnSelf();
+        $pdf->shouldReceive('setPaper')->once()->with('a4', 'portrait')->andReturnSelf();
+        $pdf->shouldReceive('output')->once()->andReturn('synthetic-pdf');
+        \Barryvdh\DomPDF\Facade\Pdf::clearResolvedInstance('dompdf.wrapper');
+        app()->instance('dompdf.wrapper', $pdf);
+
+        $this->assertSame('synthetic-pdf', app(PayslipPdfService::class)->render($detail));
+    }
+
     public function test_synthetic_historical_record_renders_a_real_pdf_without_rate_tables(): void
     {
         DB::listen(fn () => throw new LogicException('PDF must not query current rates or history.'));

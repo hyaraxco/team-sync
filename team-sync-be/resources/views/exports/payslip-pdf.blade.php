@@ -68,12 +68,8 @@
                         @if($hasOvertime)
                         <tr><td>Lembur ({{ $overtimeHours }} jam)</td><td class="amount">{{ $overtimeAmount }}</td></tr>
                         @endif
-                        @if($allowances !== 'Rp 0')
                         <tr><td>Tunjangan</td><td class="amount">{{ $allowances }}</td></tr>
-                        @endif
-                        @if($bonus !== 'Rp 0')
                         <tr><td>Bonus</td><td class="amount">{{ $bonus }}</td></tr>
-                        @endif
                         <tr class="total"><td>Total Penghasilan Bruto</td><td class="amount">{{ $grossSalary }}</td></tr>
                     </tbody>
                 </table>
@@ -87,12 +83,8 @@
                         <tr><td>BPJS Ketenagakerjaan (Karyawan)</td><td class="amount">{{ $bpjsKetenagakerjaan }}</td></tr>
                         <tr class="subtotal"><td>Subtotal BPJS</td><td class="amount">{{ $totalBpjs }}</td></tr>
                         <tr><td>PPh 21 (Pajak Penghasilan)</td><td class="amount">{{ $tax }}</td></tr>
-                        @if($absenceDeduction !== 'Rp 0')
                         <tr><td>Potongan Ketidakhadiran ({{ $deductionDays }} hari)</td><td class="amount">{{ $absenceDeduction }}</td></tr>
-                        @endif
-                        @if($otherDeductions !== 'Rp 0')
                         <tr><td>Potongan Lainnya</td><td class="amount">{{ $otherDeductions }}</td></tr>
-                        @endif
                         <tr class="total"><td>Total Potongan</td><td class="amount">{{ $totalDeductions }}</td></tr>
                     </tbody>
                 </table>
