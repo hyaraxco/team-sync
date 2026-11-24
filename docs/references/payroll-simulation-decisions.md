@@ -1,6 +1,6 @@
 # Keputusan simulasi payroll dan withholding
 
-Baseline: `0d5bc4b30f88f74259f6fd299af68e859caeecd2`. Bead: `team-sync-b0v`. Status: keputusan simulasi untuk review; bukan gate produksi yang telah terpenuhi.
+Baseline: `0d5bc4b30f88f74259f6fd299af68e859caeecd2`. Bead: `team-sync-b0v`. Status: keputusan simulasi tercatat; bukan gate produksi yang telah terpenuhi.
 
 Dokumen ini menetapkan asumsi simulasi skripsi untuk timing payroll, THR, riwayat withholding, alur pembayaran dan fakta penghentian kerja sebelum implementasi pajak. Dokumen tidak mengubah aplikasi, database atau formula pajak dan tidak menambahkan modul penghasilan.
 
