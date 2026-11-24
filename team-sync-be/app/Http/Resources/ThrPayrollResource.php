@@ -18,6 +18,8 @@ class ThrPayrollResource extends JsonResource
             'religion_holiday_date' => $this->religion_holiday_date?->format('Y-m-d'),
             'payment_deadline' => $this->payment_deadline?->format('Y-m-d'),
             'payment_date' => $this->payment_date?->format('Y-m-d'),
+            'income_due_date' => $this->income_due_date?->format('Y-m-d'),
+            'planned_credit_date' => $this->planned_credit_date?->format('Y-m-d'),
             'status' => $this->status,
             'total_employees' => $this->total_employees,
             'total_thr_amount' => (float) $this->total_thr_amount,

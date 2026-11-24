@@ -35,6 +35,9 @@ use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
 use App\Services\Payroll\OvertimeCalculationService;
 use App\Services\Payroll\TaxCalculationService;
+use App\Services\Payroll\PayrollApprovalService;
+use App\Services\Payroll\PayrollTaxIntegrationService;
+use App\Services\Payroll\PayrollTaxPeriodService;
 use App\Services\PayrollActivityLogger;
 use App\Support\AttendanceHelper;
 use Carbon\Carbon;
@@ -76,7 +79,10 @@ class PayrollRepository implements PayrollRepositoryInterface
         AttendanceClassifier $attendanceClassifier,
         AttendancePeriodService $attendancePeriodService,
         TaxCalculationService $taxCalculationService,
-        OvertimeCalculationService $overtimeCalculationService
+        OvertimeCalculationService $overtimeCalculationService,
+        private readonly PayrollTaxIntegrationService $taxIntegration,
+        private readonly PayrollTaxPeriodService $taxPeriods,
+        private readonly PayrollApprovalService $approvalService,
     ) {
         $this->emailService = $emailService;
         $this->activityLogger = $activityLogger;
@@ -221,7 +227,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function generatePayroll(string $salaryMonth, ?int $actorId = null): Payroll
     {
-        return DB::transaction(function () use ($salaryMonth, $actorId) {
+        return $this->taxIntegration->transaction(function () use ($salaryMonth, $actorId) {
             $month = Carbon::parse($salaryMonth)->startOfMonth();
             $readiness = $this->buildGenerateReadiness($month);
 
@@ -306,6 +312,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 $attendancePeriod
             );
 
+            $this->taxIntegration->refreshPayroll($payroll);
             Attendance::query()
                 ->whereDate('date', '>=', $startOfMonth->toDateString())
                 ->whereDate('date', '<=', $endOfMonth->toDateString())
@@ -406,23 +413,8 @@ class PayrollRepository implements PayrollRepositoryInterface
         $overtimeHours = $overtimeResult['total_hours'];
         $overtimeRecordsCount = $approvedOvertimeRecords->count();
 
-        // ── Tax & BPJS Calculation ────────────────────────────
-        $ptkpStatus = $employee->ptkp_status ?? null;
-        $hasNpwp = ! empty($employee->npwp);
-        // Taxable gross = regular salary + taxable irregular earnings paid this month.
-        $grossForTax = (float) $originalSalary + (float) $overtimeAmount;
-
-        // Use TER method for Jan–Nov, annualized progressive for December true-up
-        $isDecember = $startOfMonth->month === 12;
         $contributionPeriod = $startOfMonth->format('Y-m');
-        $taxResult = $isDecember
-            ? $this->taxCalculationService->calculateAnnualizedPph21($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod)
-            : $this->taxCalculationService->calculateMonthlyTer($grossForTax, $ptkpStatus, $hasNpwp, $contributionPeriod);
-
-        // BPJS keeps its own wage base; taxable gross must not be used here.
         $bpjsResult = $this->taxCalculationService->calculateBpjs((float) $originalSalary, $contributionPeriod);
-
-        $pph21Amount = $taxResult['pph21_monthly'];
 
         // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
         $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
@@ -436,11 +428,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
 
         // Add overtime to final salary
-        $finalSalary = $this->applyRounding(
-            max(0, $originalSalary - $deduction) + $overtimeAmount,
-            $settingsVersion->rounding_mode,
-            (int) $settingsVersion->rounding_unit
-        );
+        $finalSalary = max(0, $originalSalary - $deduction) + $overtimeAmount;
 
         return [
             'payroll_id' => $payroll->id,
@@ -463,12 +451,12 @@ class PayrollRepository implements PayrollRepositoryInterface
             'overtime_hours' => round($overtimeHours, 2),
             'overtime_amount' => round($overtimeAmount, 2),
             'overtime_records_count' => $overtimeRecordsCount,
-            'pph21_amount' => round($pph21Amount, 2),
+            'pph21_amount' => 0,
             'bpjs_tk_employee' => round($bpjsTkEmployee, 2),
             'bpjs_tk_employer' => round($bpjsTkEmployer, 2),
             'bpjs_kes_employee' => round($bpjsKesEmployee, 2),
             'bpjs_kes_employer' => round($bpjsKesEmployer, 2),
-            'tax_calculation_meta' => json_encode($taxResult, JSON_THROW_ON_ERROR),
+            'tax_calculation_meta' => null,
             'policy_mismatch_days' => (int) ($fairnessSummary['policy_mismatch_days'] ?? 0),
             'warning_flags' => empty($warningFlags) ? null : json_encode(array_values($warningFlags), JSON_THROW_ON_ERROR),
             'notes' => $this->buildPayrollNote($settingsVersion, [
@@ -714,8 +702,10 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function updatePayrollDetail(string $id, array $data, ?int $actorId = null): PayrollDetail
     {
-        return DB::transaction(function () use ($id, $data, $actorId) {
+        return $this->taxIntegration->transaction(function () use ($id, $data, $actorId) {
             $payrollDetail = PayrollDetail::findOrFail($id);
+            $payroll = Payroll::whereKey($payrollDetail->payroll_id)->lockForUpdate()->firstOrFail();
+            $payrollDetail->setRelation('payroll', $payroll);
 
             if (isset($data['updated_at']) && $data['updated_at'] !== $payrollDetail->updated_at->toISOString()) {
                 throw new ConcurrentModificationException;
@@ -729,8 +719,8 @@ class PayrollRepository implements PayrollRepositoryInterface
             if (isset($data['notes'])) {
                 $updateData['notes'] = $data['notes'];
             }
-            if (isset($data['final_salary'])) {
-                $updateData['final_salary'] = $data['final_salary'];
+            if (array_key_exists('final_salary', $data) || array_key_exists('taxable_adjustment_amount', $data)) {
+                throw new PayrollStateException('Payroll amounts are derived. Submit sourced corrections through PayrollAdjustment.');
             }
 
             $payrollDetail->update($updateData);
@@ -762,7 +752,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         // Use NOWAIT to fail immediately if another process holds the lock,
         try {
-            return DB::transaction(function () use ($payrollId, $actorId) {
+            return $this->taxIntegration->transaction(function () use ($payrollId, $actorId) {
                 $payroll = Payroll::query()
                     ->whereKey($payrollId)
                     ->lock('for update nowait')
@@ -783,103 +773,15 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ));
                 }
 
-                // Check if multi-step approval policies apply
-                $totalAmount = PayrollDetail::where('payroll_id', $payroll->id)->sum('final_salary');
-                $applicablePolicies = PayrollApprovalPolicy::getApplicablePolicies((float) $totalAmount);
-
-                if ($applicablePolicies->isNotEmpty()) {
-                    // Check if multi-step approval is active for this payroll
-                    $existingApprovals = PayrollApproval::where('payroll_id', $payroll->id)->count();
-                    $isFirstCall = ($existingApprovals === 0);
-
-                    if ($isFirstCall) {
-                        // Create approval records for the first time
-                        foreach ($applicablePolicies as $policy) {
-                            PayrollApproval::create([
-                                'payroll_id' => $payroll->id,
-                                'policy_id' => $policy->id,
-                                'status' => PayrollApproval::STATUS_PENDING,
-                            ]);
-                        }
+                $this->taxIntegration->refreshPayroll($payroll);
+                $steps = $this->approvalService->synchronize($payroll);
+                if ($steps->isNotEmpty()) {
+                    $this->approvalService->approveForActor($payroll, $actorId);
+                    if ($this->approvalService->currentApprovals($payroll)->contains(fn ($step) => $step->status !== PayrollApproval::STATUS_APPROVED)) {
+                        return $payroll->loadCount('payrollDetails');
                     }
-
-                    // Multi-step is active — check if all steps are complete
-                    $pendingCount = PayrollApproval::where('payroll_id', $payroll->id)
-                        ->where('status', PayrollApproval::STATUS_PENDING)
-                        ->count();
-
-                    if ($pendingCount > 0) {
-                        // Find if this actor has a pending approval
-                        $actorApproval = PayrollApproval::where('payroll_id', $payroll->id)
-                            ->where('status', PayrollApproval::STATUS_PENDING)
-                            ->whereHas('policy', function ($q) use ($actorId) {
-                                $user = User::find($actorId);
-                                if ($user) {
-                                    $q->whereIn('required_role', $user->getRoleNames()->toArray());
-                                }
-                            })
-                            ->first();
-
-                        if ($actorApproval) {
-                            $actorApproval->update([
-                                'status' => PayrollApproval::STATUS_APPROVED,
-                                'approver_id' => $actorId,
-                                'approved_at' => now(),
-                            ]);
-
-                            // Re-check if all are now complete
-                            $stillPending = PayrollApproval::where('payroll_id', $payroll->id)
-                                ->where('status', PayrollApproval::STATUS_PENDING)
-                                ->count();
-
-                            if ($stillPending > 0) {
-                                $this->activityLogger->log(
-                                    $payroll->id,
-                                    'approval_initiated',
-                                    'Multi-step approval initiated',
-                                    sprintf(
-                                        'Payroll requires %d approval step(s). %d still pending.',
-                                        $isFirstCall ? $applicablePolicies->count() : $existingApprovals,
-                                        $stillPending
-                                    ),
-                                    $actorId,
-                                    [
-                                        'total_steps' => $isFirstCall ? $applicablePolicies->count() : $existingApprovals,
-                                        'pending_steps' => $stillPending,
-                                    ]
-                                );
-
-                                return $payroll->loadCount('payrollDetails');
-                            }
-                            // Fall through to approve below
-                        } else {
-                            if ($isFirstCall) {
-                                // First call initiating multi-step — actor doesn't have a matching role
-                                // but they triggered the process. Log and return pending.
-                                $this->activityLogger->log(
-                                    $payroll->id,
-                                    'approval_initiated',
-                                    'Multi-step approval initiated',
-                                    sprintf(
-                                        'Payroll requires %d approval step(s). %d still pending.',
-                                        $applicablePolicies->count(),
-                                        $pendingCount
-                                    ),
-                                    $actorId,
-                                    [
-                                        'total_steps' => $applicablePolicies->count(),
-                                        'pending_steps' => $pendingCount,
-                                    ]
-                                );
-
-                                return $payroll->loadCount('payrollDetails');
-                            }
-
-                            throw new PayrollStateException('You do not have the required role to approve this payroll step.');
-                        }
-                    }
-                    // All approvals complete — fall through to set status = approved
                 }
+                $this->approvalService->assertComplete($payroll);
 
                 $payroll->update([
                     'status' => PayrollStatus::APPROVED,
@@ -912,7 +814,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         // Use NOWAIT to fail immediately if another process holds the lock,
         try {
-            $result = DB::transaction(function () use ($payrollId, $paymentDate, $actorId) {
+            $result = $this->taxIntegration->transaction(function () use ($payrollId, $paymentDate, $actorId) {
                 $payroll = Payroll::query()
                     ->whereKey($payrollId)
                     ->lock('for update nowait')
@@ -929,17 +831,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ));
                 }
 
-                // Check multi-step approval completion
-                $pendingApprovals = PayrollApproval::where('payroll_id', $payroll->id)
-                    ->where('status', PayrollApproval::STATUS_PENDING)
-                    ->count();
-
-                if ($pendingApprovals > 0) {
-                    throw new PayrollStateException(sprintf(
-                        'Payroll cannot be marked as paid because %d approval step(s) are still pending.',
-                        $pendingApprovals
-                    ));
-                }
+                $this->approvalService->assertComplete($payroll);
 
                 $reconciliation = $this->buildPayrollReconciliationPayload($payroll);
                 $criticalCount = (int) ($reconciliation['summary']['unresolved_critical_count'] ?? 0);
@@ -970,6 +862,16 @@ class PayrollRepository implements PayrollRepositoryInterface
                     ];
                 }
 
+                $settled = $this->taxIntegration->settlePayroll($payroll, $paymentDate);
+                $payroll->refresh();
+                if (! $settled || $payroll->status !== PayrollStatus::APPROVED) {
+                    return [
+                        'blocked' => true,
+                        'message' => 'Settlement changed the approved calculation. Approve the recalculated payroll before retrying payment.',
+                        'details' => ['reason' => 'settlement_changed'],
+                    ];
+                }
+                $this->approvalService->assertComplete($payroll);
                 $payroll->update([
                     'status' => PayrollStatus::PAID,
                     'payment_date' => Carbon::parse($paymentDate)->format('Y-m-d'),
@@ -1026,7 +928,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         // Use NOWAIT to fail immediately if another process holds the lock,
         try {
-            return DB::transaction(function () use ($payrollId, $reason, $actorId) {
+            return $this->taxIntegration->transaction(function () use ($payrollId, $reason, $actorId) {
                 $payroll = Payroll::query()
                     ->whereKey($payrollId)
                     ->lock('for update nowait')
@@ -1059,6 +961,7 @@ class PayrollRepository implements PayrollRepositoryInterface
                 $previousStatus = $payroll->status;
                 $previousPaymentDate = optional($payroll->payment_date)?->format('Y-m-d');
                 $newCorrectionCount = ((int) $payroll->correction_count) + 1;
+                $this->approvalService->invalidate($payroll, $actorId);
 
                 $payroll->update([
                     'status' => PayrollStatus::PENDING,
@@ -1782,10 +1685,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         $payroll = Payroll::findOrFail($payrollId);
 
-        $approvals = PayrollApproval::with(['policy', 'approver'])
-            ->where('payroll_id', $payroll->id)
-            ->orderBy('id')
-            ->get();
+        $approvals = $this->approvalService->currentApprovals($payroll);
 
         $allApproved = $approvals->isNotEmpty() && $approvals->every(fn (PayrollApproval $a) => $a->status === PayrollApproval::STATUS_APPROVED);
         $hasRejection = $approvals->contains(fn (PayrollApproval $a) => $a->status === PayrollApproval::STATUS_REJECTED);
@@ -1798,9 +1698,10 @@ class PayrollRepository implements PayrollRepositoryInterface
             'approvals' => $approvals->map(function (PayrollApproval $approval) {
                 return [
                     'id' => $approval->id,
+                    'revision' => $approval->revision,
                     'policy_name' => $approval->policy?->name,
-                    'required_role' => $approval->policy?->required_role,
-                    'approval_order' => $approval->policy?->approval_order,
+                    'required_role' => $approval->policy_snapshot['required_role'] ?? $approval->policy?->required_role,
+                    'approval_order' => $approval->policy_snapshot['approval_order'] ?? $approval->policy?->approval_order,
                     'status' => $approval->status,
                     'approver' => $approval->approver ? [
                         'id' => $approval->approver->id,
@@ -1817,7 +1718,7 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         // Use NOWAIT to fail immediately if another process holds the lock,
         try {
-            return DB::transaction(function () use ($payrollId, $data, $actorId) {
+            return $this->taxIntegration->transaction(function () use ($payrollId, $data, $actorId) {
                 $payroll = Payroll::query()
                     ->whereKey($payrollId)
                     ->lock('for update nowait')
@@ -1827,30 +1728,24 @@ class PayrollRepository implements PayrollRepositoryInterface
                     throw new \Exception('Payroll must be pending or approved to submit approval decisions');
                 }
 
-                $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
+                if ($payroll->status !== PayrollStatus::PENDING) {
+                    throw new PayrollStateException('Payroll must be pending to submit a new decision.');
+                }
+                $this->taxIntegration->refreshPayroll($payroll);
+                $approvals = $this->approvalService->synchronize($payroll);
 
                 if ($approvals->isEmpty()) {
                     throw new \Exception('No approval steps found for this payroll');
                 }
 
-                // Find the next pending approval for the actor's role
-                $actor = $actorId ? User::find($actorId) : null;
-                $targetApproval = null;
-
-                foreach ($approvals as $approval) {
-                    if ($approval->status !== PayrollApproval::STATUS_PENDING) {
-                        continue;
-                    }
-
-                    $requiredRole = $approval->policy?->required_role;
-                    if ($actor && $requiredRole && $actor->hasRole($requiredRole)) {
-                        $targetApproval = $approval;
-                        break;
-                    }
+                if ($approvals->contains('status', PayrollApproval::STATUS_REJECTED)) {
+                    throw new PayrollStateException('Payroll has a rejected approval step. Reopen it before requesting fresh approvals.');
                 }
-
+                $actor = $actorId ? User::find($actorId) : null;
+                $targetApproval = $approvals->first(fn (PayrollApproval $approval) => $approval->status === PayrollApproval::STATUS_PENDING
+                    && $actor?->hasRole($approval->policy_snapshot['required_role']));
                 if (! $targetApproval) {
-                    throw new \Exception('No pending approval step found for your role');
+                    throw new PayrollStateException('No pending approval step found for your role');
                 }
 
                 $status = $data['status']; // 'approved' or 'rejected'
@@ -1879,9 +1774,8 @@ class PayrollRepository implements PayrollRepositoryInterface
                 );
 
                 // Check if all approvals are now approved
-                $allApproved = PayrollApproval::where('payroll_id', $payroll->id)
-                    ->where('status', '!=', PayrollApproval::STATUS_APPROVED)
-                    ->doesntExist();
+                $allApproved = $this->approvalService->currentApprovals($payroll)
+                    ->every(fn (PayrollApproval $approval) => $approval->status === PayrollApproval::STATUS_APPROVED);
 
                 if ($allApproved && $payroll->status === PayrollStatus::PENDING) {
                     $payroll->update(['status' => PayrollStatus::APPROVED]);
@@ -3019,22 +2913,6 @@ class PayrollRepository implements PayrollRepositoryInterface
         return $this->calculateWorkingDays($startDate, $endDate);
     }
 
-    private function applyRounding(float $amount, string $mode, int $unit): float
-    {
-        if ($mode === 'none' || $unit <= 1) {
-            return round($amount, 2);
-        }
-
-        $scaled = $amount / $unit;
-
-        $rounded = match ($mode) {
-            'floor' => floor($scaled),
-            'ceil' => ceil($scaled),
-            default => round($scaled),
-        };
-
-        return (float) ($rounded * $unit);
-    }
 
     private function buildPayrollNote(PayrollSetting|PayrollSettingVersion $settings, array $context): string
     {
@@ -3127,6 +3005,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
                 $payrollDetail->update([
                     'final_salary' => $adjustedFinalSalary,
+                    'taxable_adjustment_amount' => $totalAmountDelta,
                 ]);
             }
 

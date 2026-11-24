@@ -66,6 +66,7 @@ class PayrollDetailResource extends JsonResource
             'overtime_amount' => (float) ($this->overtime_amount ?? 0),
             'overtime_records_count' => (int) ($this->overtime_records_count ?? 0),
             'pph21_amount' => (float) ($this->pph21_amount ?? 0),
+            'tax_calculation_meta' => $this->tax_calculation_meta === null ? null : json_decode($this->tax_calculation_meta, true, 512, JSON_THROW_ON_ERROR),
             'bpjs_tk_employee' => (float) ($this->bpjs_tk_employee ?? 0),
             'bpjs_tk_employer' => (float) ($this->bpjs_tk_employer ?? 0),
             'bpjs_kes_employee' => (float) ($this->bpjs_kes_employee ?? 0),

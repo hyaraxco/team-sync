@@ -21,7 +21,7 @@ class PayslipPdfService
         $overtimeHours = (float) $payrollDetail->overtime_hours;
         $allowances = 0; // Not yet in PayrollDetail schema — placeholder for future feature
         $bonus = 0; // Not yet in PayrollDetail schema — placeholder for future feature
-        $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus;
+        $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus + (float) $payrollDetail->taxable_adjustment_amount;
 
         // Historical deductions must not change when employee details or rates change.
         $bpjsKetenagakerjaan = (float) ($payrollDetail->bpjs_tk_employee ?? 0);

@@ -5,7 +5,6 @@ namespace Tests\Unit\Services;
 use App\Models\JobInformation;
 use App\Models\StaffMemberProfile;
 use App\Models\ThrPayroll;
-use App\Services\Payroll\TaxCalculationService;
 use App\Services\Payroll\ThrCalculationService;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -18,16 +17,13 @@ class ThrCalculationServiceTest extends TestCase
 
     private ThrCalculationService $service;
 
-    private TaxCalculationService $taxService;
-
     protected function setUp(): void
     {
         parent::setUp();
 
         Role::create(['name' => 'staff', 'guard_name' => 'sanctum']);
 
-        $this->taxService = $this->createMock(TaxCalculationService::class);
-        $this->service = new ThrCalculationService($this->taxService);
+        $this->service = new ThrCalculationService;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -47,14 +43,15 @@ class ThrCalculationServiceTest extends TestCase
             'monthly_salary' => 10_000_000,
         ]);
 
-        $this->mockTaxCalculation(10_000_000, 'TK/0', true);
-
         $result = $this->service->calculateForEmployee($employee, Carbon::now());
 
         $this->assertTrue($result['eligible']);
         $this->assertEquals(12, $result['tenure_months']);
         $this->assertEquals(1.0, $result['proration_factor']);
         $this->assertEquals(10_000_000, $result['gross_thr_amount']);
+        $this->assertSame(0, $result['pph21_amount']);
+        $this->assertEquals(10_000_000, $result['net_thr_amount']);
+        $this->assertNull($result['tax_calculation_meta']);
         $this->assertNull($result['ineligibility_reason']);
     }
 
@@ -136,8 +133,6 @@ class ThrCalculationServiceTest extends TestCase
             'monthly_salary' => 10_000_000,
         ]);
 
-        $this->mockTaxCalculation(10_000_000, 'TK/0', true);
-
         $result = $this->service->calculateForEmployee($employee, Carbon::now());
 
         $this->assertTrue($result['eligible']);
@@ -159,116 +154,11 @@ class ThrCalculationServiceTest extends TestCase
             'monthly_salary' => 10_000_000,
         ]);
 
-        $this->mockTaxCalculation(10_000_000, 'TK/0', true);
-
         $result = $this->service->calculateForEmployee($employee, Carbon::now());
 
         $this->assertTrue($result['eligible']);
         $this->assertEquals(24, $result['tenure_months']);
         $this->assertEquals(1.0, $result['proration_factor']);
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // PPh21 Calculation
-    // ─────────────────────────────────────────────────────────────────────────
-
-    public function test_pph21_is_subtracted_from_gross_thr(): void
-    {
-        $employee = StaffMemberProfile::factory()->create([
-            'ptkp_status' => 'TK/0',
-            'npwp' => '12.345.678.9-012.345',
-        ]);
-
-        JobInformation::factory()->active()->create([
-            'staff_member_id' => $employee->id,
-            'start_date' => Carbon::now()->subMonths(12)->toDateString(),
-            'monthly_salary' => 10_000_000,
-        ]);
-
-        // The service calls calculateMonthlyPph21 twice:
-        // 1) for regular salary only (lower tax)
-        // 2) for salary + THR spread (higher tax)
-        // The difference is the PPh21 on THR
-        $this->taxService
-            ->method('calculateMonthlyPph21')
-            ->willReturnCallback(function (float $salary) {
-                $annualPph21 = $salary <= 10_000_000
-                    ? 3_000_000
-                    : 4_500_000;
-
-                return [
-                    'pph21_monthly' => $annualPph21 / 12,
-                    'has_npwp' => true,
-                    'ptkp_status' => 'TK/0',
-                    'meta' => [
-                        'pph21_annual' => $annualPph21,
-                    ],
-                ];
-            });
-
-        $result = $this->service->calculateForEmployee($employee, Carbon::now());
-
-        $this->assertTrue($result['eligible']);
-        $this->assertEquals(10_000_000, $result['gross_thr_amount']);
-        // 4_500_000 - 3_000_000 = 1_500_000 (PPh21 on THR)
-        $this->assertEquals(1_500_000, $result['pph21_amount']);
-        $this->assertEqualsWithDelta(
-            $result['gross_thr_amount'] - $result['pph21_amount'],
-            $result['net_thr_amount'],
-            0.01
-        );
-    }
-
-    public function test_no_npwp_increases_tax_amount(): void
-    {
-        $employeeWithNpwp = StaffMemberProfile::factory()->create([
-            'ptkp_status' => 'TK/0',
-            'npwp' => '12.345.678.9-012.345',
-        ]);
-
-        JobInformation::factory()->active()->create([
-            'staff_member_id' => $employeeWithNpwp->id,
-            'start_date' => Carbon::now()->subMonths(12)->toDateString(),
-            'monthly_salary' => 10_000_000,
-        ]);
-
-        $employeeNoNpwp = StaffMemberProfile::factory()->create([
-            'ptkp_status' => 'TK/0',
-            'npwp' => null,
-        ]);
-
-        JobInformation::factory()->active()->create([
-            'staff_member_id' => $employeeNoNpwp->id,
-            'start_date' => Carbon::now()->subMonths(12)->toDateString(),
-            'monthly_salary' => 10_000_000,
-        ]);
-
-        // Base annual tax: 3_000_000
-        $this->taxService
-            ->method('calculateMonthlyPph21')
-            ->willReturnCallback(function (float $salary, ?string $ptkp, bool $hasNpwp) {
-                $annualPph21 = $salary <= 10_000_000 ? 3_000_000 : 4_500_000;
-                if (! $hasNpwp) {
-                    $annualPph21 *= 1.20;
-                }
-
-                return [
-                    'pph21_monthly' => $annualPph21 / 12,
-                    'has_npwp' => $hasNpwp,
-                    'ptkp_status' => $ptkp,
-                    'meta' => [
-                        'pph21_annual' => $annualPph21,
-                    ],
-                ];
-            });
-
-        $resultWithNpwp = $this->service->calculateForEmployee($employeeWithNpwp, Carbon::now());
-        $resultNoNpwp = $this->service->calculateForEmployee($employeeNoNpwp, Carbon::now());
-
-        $this->assertTrue($resultWithNpwp['eligible']);
-        $this->assertTrue($resultNoNpwp['eligible']);
-        // No NPWP should result in higher tax (20% surcharge)
-        $this->assertGreaterThan($resultWithNpwp['pph21_amount'], $resultNoNpwp['pph21_amount']);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -376,21 +266,4 @@ class ThrCalculationServiceTest extends TestCase
         $this->assertCount(0, $result);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Helpers
-    // ─────────────────────────────────────────────────────────────────────────
-
-    private function mockTaxCalculation(float $salary, string $ptkpStatus, bool $hasNpwp): void
-    {
-        $this->taxService
-            ->method('calculateMonthlyPph21')
-            ->willReturn([
-                'pph21_monthly' => 0,
-                'has_npwp' => $hasNpwp,
-                'ptkp_status' => $ptkpStatus,
-                'meta' => [
-                    'pph21_annual' => 0,
-                ],
-            ]);
-    }
 }

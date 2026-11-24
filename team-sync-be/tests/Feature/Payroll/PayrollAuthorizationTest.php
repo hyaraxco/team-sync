@@ -22,7 +22,7 @@ use Tests\TestCase;
 
 class PayrollAuthorizationTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -35,6 +35,8 @@ class PayrollAuthorizationTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
@@ -117,7 +119,6 @@ class PayrollAuthorizationTest extends TestCase
 
         $this->putJson("/api/v1/payroll-details/{$payrollDetail->id}", [
             'notes' => 'Reviewed by Finance',
-            'final_salary' => 9800000,
         ])->assertOk();
 
         $this->postJson("/api/v1/payrolls/{$payrollDetail->payroll_id}/approve")
@@ -261,9 +262,10 @@ class PayrollAuthorizationTest extends TestCase
         $payroll = Payroll::create([
             'salary_month' => '2026-04-01',
             'status' => 'pending',
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
         ]);
 
-        return PayrollDetail::create([
+        $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
             'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => 10000000,
@@ -273,6 +275,10 @@ class PayrollAuthorizationTest extends TestCase
             'absent_days' => 1,
             'notes' => 'Initial draft',
         ]);
+
+        $this->calculatePayrollFixture($payroll, 'pending');
+
+        return $detail->fresh();
     }
 
     private function createActiveEmployeeWithAttendance(string $salaryMonth): StaffMemberProfile

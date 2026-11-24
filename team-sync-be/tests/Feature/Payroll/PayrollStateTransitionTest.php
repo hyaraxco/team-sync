@@ -19,7 +19,7 @@ use Tests\TestCase;
 
 class PayrollStateTransitionTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -32,6 +32,8 @@ class PayrollStateTransitionTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
@@ -207,7 +209,8 @@ class PayrollStateTransitionTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'payment_date' => $paymentDate,
         ]);
 
@@ -221,6 +224,8 @@ class PayrollStateTransitionTest extends TestCase
             'absent_days' => 1,
             'notes' => 'State transition seed',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll;
     }

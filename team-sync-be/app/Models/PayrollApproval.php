@@ -22,12 +22,18 @@ class PayrollApproval extends Model
         'status',
         'notes',
         'approved_at',
+        'revision',
+        'policy_snapshot',
+        'superseded_at',
     ];
 
     protected function casts(): array
     {
         return [
             'approved_at' => 'datetime',
+            'revision' => 'integer',
+            'policy_snapshot' => 'array',
+            'superseded_at' => 'datetime',
         ];
     }
 

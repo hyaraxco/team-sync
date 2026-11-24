@@ -142,6 +142,7 @@ describe("ThrManagement smoke", () => {
         };
         thrStore.loading = false;
         thrStore.error = null;
+        thrStore.simulation = null;
         thrStore.fetchThrPayrolls = vi.fn(async () => ({ data: thrStore.thrPayrolls }));
         thrStore.fetchYearSummary = vi.fn(async () => thrStore.yearSummary);
         thrStore.simulate = vi.fn();
@@ -162,6 +163,29 @@ describe("ThrManagement smoke", () => {
         expect(wrapper.findAll("button").some((button) => button.text() === "Generate THR")).toBe(true);
         expect(wrapper.findAll("button").some((button) => button.attributes("title") === "Approve")).toBe(false);
         expect(wrapper.findAll("button").some((button) => button.text() === "Mark Paid")).toBe(false);
+    });
+
+    it("labels gross-only preview without showing uncalculated tax or net as zero", async () => {
+        authState.permissions = ["thr-list", "thr-generate"];
+        const preview = {
+            eligible_count: 1, ineligible_count: 0, total_gross_amount: 10000000,
+            total_tax_amount: null, total_net_amount: null,
+            calculation_status: "gross_only", calculation_notice: "Gross entitlement preview only.",
+        };
+        thrStore.simulate = vi.fn(async () => { thrStore.simulation = preview; });
+        const wrapper = factory();
+        await flushAsync();
+        await wrapper.findAll("button").find((button) => button.text() === "Generate THR").trigger("click");
+        const selects = wrapper.findAll("select");
+        await selects[selects.length - 1].setValue("idul_fitri");
+        await wrapper.get('input[type="date"]').setValue("2026-04-15");
+        await wrapper.findAll("button").find((button) => button.text() === "Preview / Simulate").trigger("click");
+        await flushAsync();
+        const modal = wrapper.findAll('[data-testid="modal"]').find((dialog) => dialog.text().includes("THR Simulation Preview"));
+        expect(modal.text()).toContain("Gross entitlement preview only.");
+        expect(modal.text()).toContain("Tax and net pay are calculated after generation");
+        expect(modal.text()).not.toContain("Total Net");
+        expect(modal.text()).not.toContain("Total Tax:");
     });
 
     it("shows finance approval and payment processing actions without generate action", async () => {

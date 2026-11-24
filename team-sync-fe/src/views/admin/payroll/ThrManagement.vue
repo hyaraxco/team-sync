@@ -368,6 +368,7 @@ function handlePageChange(page) {
         <!-- Simulation Results Modal -->
         <ModalWrapper :show="showSimulationModal" title="THR Simulation Preview" @close="showSimulationModal = false">
             <div v-if="simulation" class="p-4 space-y-4">
+                <p class="text-sm text-gray-700" role="status">{{ simulation.calculation_notice }}</p>
                 <div class="grid grid-cols-3 gap-4">
                     <div class="text-center p-3 bg-green-50 rounded-lg">
                         <p class="text-xs text-gray-500">Eligible</p>
@@ -378,8 +379,8 @@ function handlePageChange(page) {
                         <p class="text-xl font-bold text-red-700 tabular-nums">{{ simulation.ineligible_count }}</p>
                     </div>
                     <div class="text-center p-3 bg-blue-50 rounded-lg">
-                        <p class="text-xs text-gray-500">Total Net</p>
-                        <p class="text-lg font-bold text-blue-700 tabular-nums">{{ formatCurrency(simulation.total_net_amount) }}</p>
+                        <p class="text-xs text-gray-500">Total Gross</p>
+                        <p class="text-lg font-bold text-blue-700 tabular-nums">{{ formatCurrency(simulation.total_gross_amount) }}</p>
                     </div>
                 </div>
 
@@ -388,7 +389,7 @@ function handlePageChange(page) {
                     <p class="text-sm text-gray-500">
                         Total Gross: <span class="tabular-nums">{{ formatCurrency(simulation.total_gross_amount) }}</span>
                     </p>
-                    <p class="text-sm text-gray-500">Total Tax: <span class="tabular-nums">{{ formatCurrency(simulation.total_tax_amount) }}</span></p>
+                    <p class="text-sm text-gray-700">Tax and net pay are calculated after generation using the complete tax period.</p>
                 </div>
 
                 <div class="flex justify-end gap-3 pt-2">

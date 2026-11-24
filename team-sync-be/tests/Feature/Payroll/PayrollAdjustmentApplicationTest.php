@@ -114,14 +114,20 @@ class PayrollAdjustmentApplicationTest extends TestCase
             ->where('staff_member_id', $employee->id)
             ->firstOrFail();
 
-        $baseFinalSalary = max(
-            0,
-            round((float) $detail->original_salary - (float) $detail->deduction_amount, 2)
-        );
+        $cashBase = max(0, (float) $detail->original_salary - (float) $detail->deduction_amount)
+            + (float) $detail->overtime_amount + 250000;
+        $meta = json_decode($detail->tax_calculation_meta, true);
 
+        $this->assertEquals(250000.0, (float) $detail->taxable_adjustment_amount);
+        $this->assertEquals(250000.0, $meta['meta']['components']['taxable_adjustments']);
+        $this->assertEquals($cashBase, $meta['meta']['cash_base']);
         $this->assertEquals(
-            250000.0,
-            round((float) $detail->final_salary - $baseFinalSalary, 2)
+            $cashBase + $meta['meta']['components']['taxable_employer_benefits'],
+            $meta['meta']['gross_monthly']
+        );
+        $this->assertEquals(
+            round($cashBase - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 2),
+            (float) $detail->final_salary
         );
 
         $this->assertSame(

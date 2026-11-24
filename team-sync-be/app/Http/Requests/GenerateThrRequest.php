@@ -23,6 +23,8 @@ class GenerateThrRequest extends FormRequest
             ],
             'year' => ['required', 'integer', 'min:2020', 'max:2100'],
             'religion_holiday_date' => ['required', 'date', 'after:today'],
+            'income_due_date' => ['sometimes', 'date_format:Y-m-d', 'before_or_equal:religion_holiday_date'],
+            'planned_credit_date' => ['sometimes', 'date_format:Y-m-d', 'before_or_equal:religion_holiday_date'],
             'notes' => ['nullable', 'string', 'max:1000'],
         ];
     }

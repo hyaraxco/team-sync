@@ -22,7 +22,7 @@ use Tests\TestCase;
 
 class PayrollApprovalMatrixTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -35,6 +35,8 @@ class PayrollApprovalMatrixTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
@@ -56,13 +58,21 @@ class PayrollApprovalMatrixTest extends TestCase
 
     public function test_multi_step_blocks_mark_as_paid_until_all_approved(): void
     {
-        // Create a policy requiring 'director' role for amounts > 1M
+        // Finance reviews first; the director must approve before payment.
+        PayrollApprovalPolicy::create([
+            'name' => 'Finance Review',
+            'min_amount' => 1000000,
+            'max_amount' => null,
+            'required_role' => 'finance',
+            'approval_order' => 1,
+            'is_active' => true,
+        ]);
         PayrollApprovalPolicy::create([
             'name' => 'Director Approval',
             'min_amount' => 1000000,
             'max_amount' => null,
             'required_role' => 'director',
-            'approval_order' => 1,
+            'approval_order' => 2,
             'is_active' => true,
         ]);
 
@@ -72,7 +82,7 @@ class PayrollApprovalMatrixTest extends TestCase
         $finance = $this->actingAsRole('finance');
         $payroll = $this->createPayrollWithDetail(status: 'pending', totalSalary: 9500000);
 
-        // Finance tries to approve — multi-step kicks in, stays pending
+        // Finance approves its step; the director step remains pending
         $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
 
         // Payroll should still be pending (finance doesn't have director role)
@@ -80,8 +90,9 @@ class PayrollApprovalMatrixTest extends TestCase
 
         // Verify approval records were created
         $approvals = PayrollApproval::where('payroll_id', $payroll->id)->get();
-        $this->assertCount(1, $approvals);
-        $this->assertSame('pending', $approvals->first()->status);
+        $this->assertCount(2, $approvals);
+        $this->assertSame('approved', $approvals->first()->status);
+        $this->assertSame('pending', $approvals->last()->status);
 
         // Mark as paid should fail
         $this->postJson("/api/v1/payrolls/{$payroll->id}/mark-as-paid", [
@@ -231,7 +242,8 @@ class PayrollApprovalMatrixTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'correction_count' => 0,
         ]);
 
@@ -245,6 +257,8 @@ class PayrollApprovalMatrixTest extends TestCase
             'absent_days' => 0,
             'notes' => 'Approval matrix test',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll->load('payrollDetails.staffMember.user');
     }

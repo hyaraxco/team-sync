@@ -137,27 +137,29 @@ class ThrCalculationTest extends TestCase
         $this->assertEquals('2026-03-25', $deadline->format('Y-m-d'));
     }
 
-    public function test_thr_tax_uses_annualization_difference_method(): void
+    public function test_generation_allocates_tax_with_real_detail_ids_and_preview_does_not_persist(): void
     {
-        $result = $this->service->calculateThrTax(
-            monthlySalary: 10_000_000,
-            thrAmount: 10_000_000,
-            ptkpStatus: 'TK/0',
-            hasNpwp: true
-        );
+        $this->createEmployee(salary: 10_000_000, startDate: Carbon::parse('2024-04-15'));
+        $service = app(\App\Services\ThrService::class);
+        $preview = $service->simulate('idul_fitri', 2026, '2026-04-15');
+        $this->assertSame('gross_only', $preview['calculation_status']);
+        $this->assertNull($preview['total_tax_amount']);
+        $this->assertNull($preview['total_net_amount']);
+        $this->assertDatabaseCount('thr_payrolls', 0);
+        $this->assertDatabaseCount('payroll_tax_entries', 0);
 
-        $this->assertArrayHasKey('pph21_on_thr', $result);
-        $this->assertArrayHasKey('meta', $result);
-        $this->assertEquals('annualization_difference', $result['meta']['method']);
-        $this->assertGreaterThanOrEqual(0, $result['pph21_on_thr']);
-    }
-
-    public function test_thr_tax_higher_without_npwp(): void
-    {
-        $withNpwp = $this->service->calculateThrTax(10_000_000, 10_000_000, 'TK/0', true);
-        $withoutNpwp = $this->service->calculateThrTax(10_000_000, 10_000_000, 'TK/0', false);
-
-        $this->assertGreaterThanOrEqual($withNpwp['pph21_on_thr'], $withoutNpwp['pph21_on_thr']);
+        $result = $service->generate([
+            'religion_event' => 'idul_fitri', 'year' => 2026,
+            'religion_holiday_date' => '2026-04-15', 'income_due_date' => '2026-04-05',
+        ], User::factory()->create());
+        $this->assertTrue($result['success']);
+        $detail = $result['thr_payroll']->details()->sole();
+        $entry = \App\Models\PayrollTaxEntry::where('source_type', 'thr')->sole();
+        $this->assertSame($detail->id, (int) $entry->source_id);
+        $this->assertEquals(200000, (float) $detail->pph21_amount);
+        $this->assertEquals(9800000, (float) $detail->net_thr_amount);
+        $this->assertEquals(10000000, $detail->tax_calculation_meta['meta']['gross_monthly']);
+        $this->assertEquals(200000, (float) $result['thr_payroll']->fresh()->total_tax_amount);
     }
 
     public function test_get_eligible_employees_filters_by_religion(): void

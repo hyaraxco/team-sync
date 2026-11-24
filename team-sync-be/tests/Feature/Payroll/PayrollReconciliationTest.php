@@ -22,7 +22,7 @@ use Tests\TestCase;
 
 class PayrollReconciliationTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -35,6 +35,8 @@ class PayrollReconciliationTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
@@ -95,7 +97,7 @@ class PayrollReconciliationTest extends TestCase
         [$payroll, , $employeeUser] = $this->createApprovedPayrollDetail(
             withBankInformation: true,
             originalSalary: 10000000,
-            finalSalary: 4000000,
+            cashSalary: 4000000,
             warningFlags: ['unresolved_policy_mismatch']
         );
 
@@ -152,6 +154,9 @@ class PayrollReconciliationTest extends TestCase
             'notes' => 'Server filter warning fixture',
         ]);
 
+        $payroll->update(['status' => 'pending']);
+        $this->calculatePayrollFixture($payroll, 'approved');
+
         $criticalResponse = $this->getJson(
             "/api/v1/payrolls/{$payroll->id}/reconciliation?severity=critical"
         )
@@ -190,7 +195,7 @@ class PayrollReconciliationTest extends TestCase
         [$payroll] = $this->createApprovedPayrollDetail(
             withBankInformation: true,
             originalSalary: 10000000,
-            finalSalary: 0
+            cashSalary: 400000
         );
 
         $response = $this->getJson("/api/v1/payrolls/{$payroll->id}/reconciliation")
@@ -209,7 +214,7 @@ class PayrollReconciliationTest extends TestCase
         [$payroll] = $this->createApprovedPayrollDetail(
             withBankInformation: true,
             originalSalary: 10000000,
-            finalSalary: 4000000
+            cashSalary: 4000000
         );
 
         $response = $this->getJson("/api/v1/payrolls/{$payroll->id}/reconciliation")
@@ -350,7 +355,7 @@ class PayrollReconciliationTest extends TestCase
     private function createApprovedPayrollDetail(
         bool $withBankInformation,
         int $originalSalary = 10000000,
-        int $finalSalary = 9500000,
+        int $cashSalary = 9500000,
         array $warningFlags = []
     ): array {
         $user = User::factory()->create([
@@ -373,21 +378,24 @@ class PayrollReconciliationTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => 'approved',
+            'status' => 'pending',
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
         ]);
 
         PayrollDetail::create([
             'payroll_id' => $payroll->id,
             'staff_member_id' => $staffMemberProfile->id,
             'original_salary' => $originalSalary,
-            'final_salary' => $finalSalary,
+            'final_salary' => $cashSalary,
             'attended_days' => 20,
             'sick_days' => 0,
             'absent_days' => 2,
-            'deduction_amount' => max(0, $originalSalary - $finalSalary),
+            'deduction_amount' => max(0, $originalSalary - $cashSalary),
             'warning_flags' => empty($warningFlags) ? null : $warningFlags,
             'notes' => 'Reconciliation test fixture',
         ]);
+
+        $this->calculatePayrollFixture($payroll, 'approved');
 
         return [$payroll, $staffMemberProfile, $user];
     }

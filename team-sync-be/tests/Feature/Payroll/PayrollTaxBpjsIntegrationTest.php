@@ -83,7 +83,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
     public function test_pph21_taxed_gross_includes_approved_overtime(): void
     {
         Carbon::setTestNow('2026-04-28 09:00:00');
-        PayrollSetting::current()->update(['attendance_cutoff_day' => 25]);
+        PayrollSetting::current()->update(['attendance_cutoff_day' => 25, 'rounding_mode' => 'none']);
 
         $salary = 8_000_000;
         $employee = $this->createEmployeeWithAttendance($salary);
@@ -102,8 +102,13 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $meta = json_decode($detail->tax_calculation_meta, true);
 
-        // The gross handed to the TER calculation must be salary + overtime, not salary.
-        $expectedGross = $salary + (float) $detail->overtime_amount;
+        // Employer JKK, JKM and health are taxable non-cash benefits; JHT/JP are exempt.
+        $expectedBenefits = $salary * (0.0024 + 0.003 + 0.04);
+        $expectedCash = $salary - (float) $detail->deduction_amount + (float) $detail->overtime_amount;
+        $expectedGross = $expectedCash + $expectedBenefits;
+        $this->assertEqualsWithDelta($expectedBenefits, $meta['meta']['components']['taxable_employer_benefits'], 0.01);
+        $this->assertEqualsWithDelta($salary * (0.037 + 0.02), $meta['meta']['components']['exempt_employer_pension'], 0.01);
+        $this->assertEqualsWithDelta($expectedCash, $meta['meta']['cash_base'], 0.01);
         $this->assertEqualsWithDelta(
             $expectedGross,
             (float) $meta['meta']['gross_monthly'],
@@ -111,7 +116,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             'taxed gross must include paid overtime'
         );
 
-        // And the tax must match TER applied to that combined gross, not to salary alone.
+        // TER applies to cash earnings plus taxable employer benefits.
         $taxService = app(TaxCalculationService::class);
         $expected = $taxService->calculateMonthlyTer(
             $expectedGross,
@@ -125,6 +130,10 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             1.0,
             'pph21 must be withheld on the combined gross'
         );
+        $this->assertEquals(
+            round($expectedCash - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 2),
+            (float) $detail->final_salary
+        );
     }
 
     /**
@@ -133,8 +142,8 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
      * the combined gross (team-sync-kyp).
      *
      * In Category A (TK/0, NPWP):
-     * - Base salary Rp 8.500.000 alone is in the 1.5% bracket (<= Rp 8.550.000).
-     * - Approved overtime pushes gross above Rp 8.550.000 into the 1.75% bracket.
+     * - Salary Rp 8.100.000 plus taxable employer BPJS is below Rp 8.550.000.
+     * - Approved overtime pushes taxable gross above Rp 8.550.000 into the 1.75% bracket.
      * - PPh 21 must be withheld at 1.75% on the entire gross, jumping above the 1.5% rate.
      */
     public function test_pph21_ter_bracket_jump_when_overtime_pushes_gross_over_threshold(): void
@@ -142,7 +151,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         Carbon::setTestNow('2026-04-28 09:00:00');
         PayrollSetting::current()->update(['attendance_cutoff_day' => 25]);
 
-        $salary = 8_500_000;
+        $salary = 8_100_000;
         $employee = StaffMemberProfile::withoutSyncingToSearch(function () use ($salary) {
             $employee = StaffMemberProfile::factory()->create([
                 'ptkp_status' => 'TK/0',
@@ -180,7 +189,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             return $employee;
         });
 
-        // 2 hours overtime on workday: 1st hr 1.5x, 2nd hr 2x => 3.5 * (8.500.000 / 173) = ~171.965
+        // Two workday hours add 3.5 times the hourly wage and cross the TER threshold.
         OvertimeRecord::factory()->approved()->workday()->create([
             'staff_member_id' => $employee->id,
             'date' => Carbon::now()->startOfMonth()->addDays(3)->toDateString(),
@@ -193,7 +202,9 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $this->assertNotNull($detail);
         $this->assertGreaterThan(0, (float) $detail->overtime_amount);
 
-        $combinedGross = $salary + (float) $detail->overtime_amount;
+        $salaryGross = $salary + $salary * (0.0024 + 0.003 + 0.04);
+        $this->assertLessThanOrEqual(8_550_000, $salaryGross);
+        $combinedGross = $salaryGross + (float) $detail->overtime_amount;
         $this->assertGreaterThan(8_550_000, $combinedGross, 'Combined gross must exceed Category A 8.550.000 threshold');
 
         $meta = json_decode($detail->tax_calculation_meta, true);
@@ -322,12 +333,14 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
 
-        foreach ([[$b, 'B', 0.08, 1_680_000], [$c, 'C', 0.16, 6_888_000]] as [$employee, $category, $rate, $tax]) {
+        foreach ([[$b, 'B', 0.08, 21_593_400], [$c, 'C', 0.16, 43_762_470]] as [$employee, $category, $rate, $gross]) {
+            $tax = round($gross * $rate);
             $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
             $this->assertNotNull($detail);
             $detail->refresh();
             $meta = $detail->tax_calculation_meta;
             $meta = is_string($meta) ? json_decode($meta, true) : $meta;
+            $this->assertEquals($gross, $meta['meta']['gross_monthly']);
 
             $this->assertEquals($tax, (float) $detail->pph21_amount);
             $this->assertSame('ter_2024', $meta['method']);

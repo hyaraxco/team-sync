@@ -379,8 +379,7 @@ class TaxCalculationService
      * PTKP deduction, biaya jabatan (5%), and pension contributions (JHT/JP employee)
      * are already factored into the TER rate tables.
      *
-     * Use this method for **January–November** payroll runs.
-     * For December year-end true-up, use calculateAnnualizedPph21() instead.
+     * Final employment/subjective-liability periods use calculateFinalPeriodPph21().
      *
      * @see https://peraturan.go.id/pp-58-2023.pdf
      *
@@ -430,17 +429,67 @@ class TaxCalculationService
         ];
     }
 
-    /**
-     * Annualized PPh 21 using Pasal 17 progressive brackets (UU HPP).
-     *
-     * Use for **December** year-end true-up or when the annual method is explicitly required.
-     * This is the same as calculateMonthlyPph21() — provided as a semantic alias.
-     *
-     * @return array Same structure as calculateMonthlyPph21
-     */
-    public function calculateAnnualizedPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp, ?string $contributionPeriod = null): array
+    public function calculateFinalPeriodPph21(array $facts, ?string $ptkpStatus, bool $hasNpwp): array
     {
-        return $this->calculateMonthlyPph21($grossMonthly, $ptkpStatus, $hasNpwp, $contributionPeriod);
+        \Illuminate\Support\Facades\Validator::make($facts, [
+            'gross_income' => ['required', 'numeric', 'min:0'],
+            'employee_pension_contributions' => ['required', 'numeric', 'min:0'],
+            'deductible_donations' => ['required', 'numeric', 'min:0'],
+            'employment_months' => ['required', 'integer', 'between:1,12'],
+            'tax_liability_months' => ['required', 'integer', 'between:1,12'],
+            'annualize' => ['required', 'boolean'],
+            'previously_withheld' => ['required', 'numeric'],
+            'government_borne_tax' => ['required', 'numeric', 'min:0'],
+            'final_period' => ['required', 'date_format:Y-m'],
+        ])->validate();
+        foreach (['gross_income', 'employee_pension_contributions', 'deductible_donations', 'previously_withheld', 'government_borne_tax'] as $field) {
+            if (! is_finite((float) $facts[$field])) {
+                throw new \App\Exceptions\PayrollStateException('Final tax facts must be finite.');
+            }
+        }
+        if ($facts['employment_months'] > $facts['tax_liability_months']) {
+            throw new \App\Exceptions\PayrollStateException('Employment months exceed subjective tax liability.');
+        }
+        $status = $ptkpStatus ?: 'TK/0';
+        $ptkp = $this->ptkpAmounts->get($status);
+        if (! $ptkp || $this->taxBrackets->isEmpty()) {
+            throw new \App\Exceptions\PayrollStateException('Verified PTKP and progressive tax rates are required.');
+        }
+        $gross = (float) $facts['gross_income'];
+        $jobExpense = min($gross * static::JABATAN_RATE, static::JABATAN_MAX_MONTHLY * $facts['employment_months']);
+        $net = max(0, $gross - $jobExpense - $facts['employee_pension_contributions'] - $facts['deductible_donations']);
+        $annualNet = $facts['annualize'] ? $net * 12 / $facts['tax_liability_months'] : $net;
+        $pkp = floor(max(0, $annualNet - (float) $ptkp->annual_amount) / 1000) * 1000;
+        $annualTax = 0.0;
+        foreach ($this->taxBrackets as $bracket) {
+            $upper = $bracket->max_income === null ? $pkp : (float) $bracket->max_income;
+            $annualTax += max(0, min($pkp, $upper) - (float) $bracket->min_income) * (float) $bracket->rate / 100;
+        }
+        if (! $hasNpwp) {
+            $annualTax *= 1.20;
+        }
+        $liability = round($annualTax * ($facts['annualize'] ? $facts['tax_liability_months'] / 12 : 1), 0);
+        $balance = $liability - (float) $facts['previously_withheld'] - (float) $facts['government_borne_tax'];
+        $overpayment = max(0, -$balance);
+        $refund = min($overpayment, max(0, (float) $facts['previously_withheld']));
+
+        return [
+            'pph21_monthly' => $balance >= 0 ? $balance : -$refund,
+            'method' => 'final_period_actual', 'ptkp_status' => $status, 'has_npwp' => $hasNpwp,
+            'meta' => [
+                'gross_income' => $gross, 'biaya_jabatan' => $jobExpense,
+                'employee_pension_contributions' => (float) $facts['employee_pension_contributions'],
+                'deductible_donations' => (float) $facts['deductible_donations'],
+                'net_income' => $net, 'annualized_net_income' => $annualNet,
+                'ptkp_amount' => (float) $ptkp->annual_amount, 'pkp' => $pkp,
+                'tax_liability' => $liability, 'previously_withheld' => (float) $facts['previously_withheld'],
+                'signed_balance' => $balance, 'refundable_overpayment' => $refund,
+                'nonrefundable_government_overpayment' => $overpayment - $refund,
+                'employment_months' => (int) $facts['employment_months'],
+                'tax_liability_months' => (int) $facts['tax_liability_months'],
+                'annualized' => (bool) $facts['annualize'], 'final_period' => $facts['final_period'],
+            ],
+        ];
     }
 
     /**

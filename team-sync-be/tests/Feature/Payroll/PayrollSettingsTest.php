@@ -202,7 +202,13 @@ class PayrollSettingsTest extends TestCase
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll($month->format('Y-m'));
         $detail = $payroll->payrollDetails()->firstOrFail();
 
-        $this->assertSame(8500000.0, (float) $detail->final_salary);
+        $this->assertSame(1500000.0, (float) $detail->deduction_amount);
+        $meta = json_decode($detail->tax_calculation_meta, true);
+        $this->assertEquals(8500000, $meta['meta']['cash_base']);
+        $this->assertEquals(
+            round((8500000 - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount) / 1000) * 1000,
+            (float) $detail->final_salary
+        );
         $this->assertSame('Alpha 2 | Potongan Rp 1.500.000', $detail->notes);
         $this->assertNotNull($payroll->payroll_setting_version_id);
         $this->assertDatabaseHas('payroll_setting_versions', [

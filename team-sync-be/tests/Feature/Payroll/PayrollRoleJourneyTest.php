@@ -21,7 +21,7 @@ use Tests\TestCase;
 
 class PayrollRoleJourneyTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -32,6 +32,8 @@ class PayrollRoleJourneyTest extends TestCase
 
         $this->seed(MinimalPayrollE2ESeeder::class);
         $this->activateTestLicense();
+        $this->seedPayrollTaxFixtures();
+
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
     }
@@ -104,6 +106,9 @@ class PayrollRoleJourneyTest extends TestCase
         $this
             ->getJson("/api/v1/payrolls/{$payroll->id}/statistics")
             ->assertOk();
+
+        $payroll->update(['planned_credit_date' => now()->toDateString()]);
+        app(\App\Services\Payroll\PayrollTaxIntegrationService::class)->refreshPayroll($payroll);
 
         $this
             ->postJson("/api/v1/payrolls/{$payroll->id}/approve")

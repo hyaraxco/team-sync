@@ -529,15 +529,6 @@ class TaxCalculationServiceTest extends TestCase
         $this->assertGreaterThanOrEqual($catC['pph21_monthly'], $catB['pph21_monthly']);
     }
 
-    /** @test */
-    public function test_annualized_pph21_is_alias_for_calculate_monthly_pph21(): void
-    {
-        $annualized = $this->service->calculateAnnualizedPph21(10_000_000, 'TK/0', true);
-        $direct = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
-
-        $this->assertEquals($direct['pph21_monthly'], $annualized['pph21_monthly']);
-        $this->assertEquals($direct['meta']['pph21_annual'], $annualized['meta']['pph21_annual']);
-    }
 
     // ─────────────────────────────────────────────────────────────────────────
     // Helpers

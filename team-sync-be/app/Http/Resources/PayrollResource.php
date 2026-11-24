@@ -29,6 +29,7 @@ class PayrollResource extends JsonResource
                     : null
             ),
             'payment_date' => $this->payment_date,
+            'planned_credit_date' => $this->planned_credit_date?->toDateString(),
             'status' => $this->status,
             'correction_count' => (int) ($this->correction_count ?? 0),
 

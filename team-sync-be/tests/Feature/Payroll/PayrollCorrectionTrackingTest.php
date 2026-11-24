@@ -20,7 +20,7 @@ use Tests\TestCase;
 
 class PayrollCorrectionTrackingTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -33,6 +33,8 @@ class PayrollCorrectionTrackingTest extends TestCase
             PermissionSeeder::class,
             RolePermissionSeeder::class,
         ]);
+
+        $this->seedPayrollTaxFixtures();
 
         app(PermissionRegistrar::class)->forgetCachedPermissions();
         Notification::fake();
@@ -158,7 +160,8 @@ class PayrollCorrectionTrackingTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'payment_date' => $paymentDate,
             'correction_count' => 0,
         ]);
@@ -173,6 +176,8 @@ class PayrollCorrectionTrackingTest extends TestCase
             'absent_days' => 1,
             'notes' => 'Correction tracking test',
         ]);
+
+        $this->calculatePayrollFixture($payroll, $status);
 
         return $payroll->load('payrollDetails.staffMember.user');
     }

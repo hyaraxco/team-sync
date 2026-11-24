@@ -7,6 +7,7 @@ use App\Models\ThrPayroll;
 use App\Models\User;
 use App\Notifications\ThrPaymentNotification;
 use App\Services\Payroll\ThrCalculationService;
+use App\Services\Payroll\PayrollTaxIntegrationService;
 use Carbon\Carbon;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +16,8 @@ class ThrService
 {
     public function __construct(
         private readonly ThrPayrollRepositoryInterface $repository,
-        private readonly ThrCalculationService $calculationService
+        private readonly ThrCalculationService $calculationService,
+        private readonly PayrollTaxIntegrationService $taxIntegration,
     ) {}
 
     public function getAllPaginated(?int $year, ?string $status, int $perPage = 15): LengthAwarePaginator
@@ -71,13 +73,16 @@ class ThrService
             ];
         }
 
-        return DB::transaction(function () use ($religionEvent, $year, $holidayDate, $paymentDeadline, $employees, $creator, $validated) {
+        return $this->taxIntegration->transaction(function () use ($religionEvent, $year, $holidayDate, $paymentDeadline, $employees, $creator, $validated) {
+            $dueDate = isset($validated['income_due_date']) ? Carbon::parse($validated['income_due_date']) : $holidayDate->copy()->subDays(10);
             // Create THR payroll record
             $thrPayroll = $this->repository->create([
                 'year' => $year,
                 'religion_event' => $religionEvent,
                 'religion_holiday_date' => $holidayDate,
                 'payment_deadline' => $paymentDeadline,
+                'income_due_date' => $dueDate,
+                'planned_credit_date' => $validated['planned_credit_date'] ?? null,
                 'status' => ThrPayroll::STATUS_PROCESSING,
                 'created_by' => $creator->id,
                 'notes' => $validated['notes'] ?? null,
@@ -88,7 +93,7 @@ class ThrService
             $skipped = 0;
 
             foreach ($employees as $employee) {
-                $result = $this->calculationService->calculateForEmployee($employee, $paymentDeadline);
+                $result = $this->calculationService->calculateForEmployee($employee, $holidayDate);
 
                 if (! $result['eligible']) {
                     $skipped++;
@@ -125,6 +130,7 @@ class ThrService
 
             // Bulk insert details
             $this->repository->bulkCreateDetails($thrPayroll->id, $details);
+            $this->taxIntegration->refreshThr($thrPayroll);
 
             // Update totals and status
             $this->repository->updateTotals($thrPayroll);
@@ -145,7 +151,8 @@ class ThrService
      */
     public function approve(int $id, User $approver): array
     {
-        $thrPayroll = $this->repository->getById($id);
+        return $this->taxIntegration->transaction(function () use ($id, $approver) {
+        $thrPayroll = ThrPayroll::whereKey($id)->lockForUpdate()->firstOrFail();
 
         if ($thrPayroll->status !== ThrPayroll::STATUS_PENDING) {
             return [
@@ -155,6 +162,7 @@ class ThrService
             ];
         }
 
+        $this->taxIntegration->refreshThr($thrPayroll);
         $thrPayroll = $this->repository->updateStatus($thrPayroll, ThrPayroll::STATUS_APPROVED, [
             'approved_by' => $approver->id,
             'approved_at' => now(),
@@ -165,6 +173,7 @@ class ThrService
             'message' => 'THR payroll approved successfully',
             'thr_payroll' => $thrPayroll,
         ];
+        });
     }
 
     /**
@@ -174,7 +183,8 @@ class ThrService
      */
     public function markAsPaid(int $id, string $paymentDate, User $actor): array
     {
-        $thrPayroll = $this->repository->getById($id);
+        return $this->taxIntegration->transaction(function () use ($id, $paymentDate, $actor) {
+        $thrPayroll = ThrPayroll::whereKey($id)->lockForUpdate()->firstOrFail();
 
         if ($thrPayroll->status !== ThrPayroll::STATUS_APPROVED) {
             return [
@@ -184,18 +194,28 @@ class ThrService
             ];
         }
 
+        $settled = $this->taxIntegration->settleThr($thrPayroll, $paymentDate);
+        $thrPayroll->refresh();
+        if (! $settled || $thrPayroll->status !== ThrPayroll::STATUS_APPROVED || ! $thrPayroll->approved_by || ! $thrPayroll->approved_at) {
+            return [
+                'success' => false,
+                'message' => 'Settlement changed the approved calculation. Approve the recalculated THR before retrying payment.',
+                'thr_payroll' => $thrPayroll,
+            ];
+        }
         $thrPayroll = $this->repository->updateStatus($thrPayroll, ThrPayroll::STATUS_PAID, [
             'payment_date' => $paymentDate,
         ]);
 
         // Notify all employees
-        $this->notifyEmployees($thrPayroll);
+        DB::afterCommit(fn () => $this->notifyEmployees($thrPayroll));
 
         return [
             'success' => true,
             'message' => 'THR marked as paid. Notifications sent to employees.',
             'thr_payroll' => $thrPayroll,
         ];
+        });
     }
 
     /**
@@ -205,7 +225,8 @@ class ThrService
      */
     public function reopen(int $id, User $actor): array
     {
-        $thrPayroll = $this->repository->getById($id);
+        return $this->taxIntegration->transaction(function () use ($id, $actor) {
+        $thrPayroll = ThrPayroll::whereKey($id)->lockForUpdate()->firstOrFail();
 
         if ($thrPayroll->status === ThrPayroll::STATUS_PENDING) {
             return [
@@ -223,10 +244,10 @@ class ThrService
             ];
         }
 
-        if (! in_array($thrPayroll->status, [ThrPayroll::STATUS_APPROVED, ThrPayroll::STATUS_PAID], true)) {
+        if ($thrPayroll->status !== ThrPayroll::STATUS_APPROVED) {
             return [
                 'success' => false,
-                'message' => 'Only approved or paid THR payrolls can be reopened for correction',
+                'message' => 'Only unpaid approved THR can be reopened; paid history requires a separate sourced correction',
                 'thr_payroll' => null,
             ];
         }
@@ -242,6 +263,7 @@ class ThrService
             'message' => 'THR payroll reopened for correction successfully',
             'thr_payroll' => $thrPayroll,
         ];
+        });
     }
 
     /**
@@ -256,11 +278,9 @@ class ThrService
         $eligible = [];
         $ineligible = [];
         $totalGross = 0;
-        $totalTax = 0;
-        $totalNet = 0;
 
         foreach ($employees as $employee) {
-            $result = $this->calculationService->calculateForEmployee($employee, $paymentDeadline);
+            $result = $this->calculationService->calculateForEmployee($employee, $holiday);
 
             if ($result['eligible']) {
                 $eligible[] = [
@@ -271,12 +291,10 @@ class ThrService
                     'tenure_months' => $result['tenure_months'],
                     'proration_factor' => $result['proration_factor'],
                     'gross_thr_amount' => $result['gross_thr_amount'],
-                    'pph21_amount' => $result['pph21_amount'],
-                    'net_thr_amount' => $result['net_thr_amount'],
+                    'pph21_amount' => null,
+                    'net_thr_amount' => null,
                 ];
                 $totalGross += $result['gross_thr_amount'];
-                $totalTax += $result['pph21_amount'];
-                $totalNet += $result['net_thr_amount'];
             } else {
                 $ineligible[] = [
                     'staff_member_id' => $employee->id,
@@ -287,6 +305,8 @@ class ThrService
         }
 
         return [
+            'calculation_status' => 'gross_only',
+            'calculation_notice' => 'Gross entitlement preview only. Tax and net pay require generated source IDs and complete period history.',
             'religion_event' => $religionEvent,
             'event_label' => ThrPayroll::eventLabel($religionEvent),
             'year' => $year,
@@ -295,8 +315,8 @@ class ThrService
             'eligible_count' => count($eligible),
             'ineligible_count' => count($ineligible),
             'total_gross_amount' => round($totalGross, 0),
-            'total_tax_amount' => round($totalTax, 0),
-            'total_net_amount' => round($totalNet, 0),
+            'total_tax_amount' => null,
+            'total_net_amount' => null,
             'eligible_employees' => $eligible,
             'ineligible_employees' => $ineligible,
         ];

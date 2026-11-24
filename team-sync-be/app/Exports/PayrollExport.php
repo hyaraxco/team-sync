@@ -110,7 +110,7 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
             $detail->sick_days ?? 0,
             $detail->absent_days ?? 0,
             $detail->original_salary ?? 0,
-            ($detail->original_salary - $detail->final_salary) ?? 0,
+            (float) $detail->deduction_amount + (float) $detail->pph21_amount + (float) $detail->bpjs_tk_employee + (float) $detail->bpjs_kes_employee,
             $detail->final_salary ?? 0,
             $this->payroll->status === 'paid' ? 'Sudah Dibayar' : 'Menunggu',
             $detail->notes ?? '',

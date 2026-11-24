@@ -4,6 +4,7 @@ namespace Tests\Feature\Commands;
 
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
+use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Services\Payroll\TaxCalculationService;
@@ -21,6 +22,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         parent::setUp();
 
         $this->seed(RoleSeeder::class);
+        PayrollSetting::current()->update(['rounding_mode' => 'none']);
     }
 
     public function test_command_fails_with_invalid_month_format(): void
@@ -45,7 +47,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         ]);
 
         $this->artisan('payroll:recalculate-tax --month=2026-04')
-            ->expectsOutputToContain("is in status 'approved'")
+            ->expectsOutputToContain('Only pending/processing payroll can be recalculated.')
             ->assertExitCode(1);
     }
 
@@ -75,9 +77,10 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         $payroll = Payroll::factory()->create([
             'salary_month' => '2026-04-01',
             'status' => 'pending',
+            'payroll_setting_version_id' => PayrollSetting::current()->resolveActiveVersion()->id,
         ]);
 
-        PayrollDetail::create([
+        $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
             'staff_member_id' => $profile->id,
             'original_salary' => 10000000,
@@ -90,8 +93,15 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         ]);
 
         $this->artisan('payroll:recalculate-tax --month=2026-04')
-            ->expectsOutputToContain('Recalculating tax & BPJS for 1 employees')
+            ->expectsOutputToContain('Recalculated PPh 21, BPJS and net pay for 2026-04.')
             ->assertSuccessful();
+
+        $detail->refresh();
+        $this->assertGreaterThan(0, (float) $detail->pph21_amount);
+        $this->assertEquals(300000, (float) $detail->bpjs_tk_employee);
+        $this->assertEquals(100000, (float) $detail->bpjs_kes_employee);
+        $this->assertEquals(round(10000000 - 400000 - (float) $detail->pph21_amount, 2), (float) $detail->final_salary);
+        $this->assertDatabaseHas('payroll_tax_entries', ['source_type' => 'payroll', 'source_id' => $detail->id]);
     }
 
     public function test_command_dry_run_does_not_write_changes(): void
@@ -108,9 +118,10 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         $payroll = Payroll::factory()->create([
             'salary_month' => '2026-04-01',
             'status' => 'pending',
+            'payroll_setting_version_id' => PayrollSetting::current()->resolveActiveVersion()->id,
         ]);
 
-        PayrollDetail::create([
+        $detail = PayrollDetail::create([
             'payroll_id' => $payroll->id,
             'staff_member_id' => $profile->id,
             'original_salary' => 10000000,
@@ -121,10 +132,14 @@ class RecalculatePayrollTaxCommandTest extends TestCase
             'bpjs_kes_employee' => 0,
             'bpjs_kes_employer' => 0,
         ]);
+        $before = $detail->fresh()->getAttributes();
 
         $this->artisan('payroll:recalculate-tax --month=2026-04 --dry-run')
             ->expectsOutputToContain('[DRY-RUN]')
             ->assertSuccessful();
+
+        $this->assertSame($before, $detail->fresh()->getAttributes());
+        $this->assertDatabaseCount('payroll_tax_entries', 0);
     }
 
     public function test_command_taxes_overtime_in_the_taxable_gross(): void
@@ -141,6 +156,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         $payroll = Payroll::factory()->create([
             'salary_month' => '2026-04-01',
             'status' => 'pending',
+            'payroll_setting_version_id' => PayrollSetting::current()->resolveActiveVersion()->id,
         ]);
 
         $detail = PayrollDetail::create([
@@ -160,15 +176,24 @@ class RecalculatePayrollTaxCommandTest extends TestCase
 
         $detail->refresh();
 
-        // Same base as payroll generation: salary + paid overtime.
+        // Taxable gross includes overtime and employer JKK/JKM/health, not employer JHT/JP.
+        $benefits = 8000000 * (0.0024 + 0.003 + 0.04);
+        $expectedGross = round(8000000 + 346820.81 + $benefits);
         $service = app(TaxCalculationService::class);
         $expected = $service->calculateMonthlyTer(
-            8000000 + 346820.81,
+            $expectedGross,
             'TK/0',
             true,
             '2026-04'
         );
-        $salaryOnly = $service->calculateMonthlyTer(8000000, 'TK/0', true, '2026-04');
+        $salaryOnly = $service->calculateMonthlyTer(8000000 + $benefits, 'TK/0', true, '2026-04');
+        $meta = json_decode($detail->tax_calculation_meta, true);
+        $this->assertEqualsWithDelta($expectedGross, $meta['meta']['gross_monthly'], 0.01);
+        $this->assertEqualsWithDelta(8346820.81, $meta['meta']['cash_base'], 0.01);
+        $this->assertEquals(
+            round(8346820.81 - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 2),
+            (float) $detail->final_salary
+        );
 
         $this->assertEqualsWithDelta(
             (float) $expected['pph21_monthly'],

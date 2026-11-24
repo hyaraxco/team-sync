@@ -7,6 +7,7 @@ use App\Models\JobInformation;
 use App\Models\StaffMemberProfile;
 use App\Models\ThrPayroll;
 use App\Models\User;
+use App\Services\Payroll\PayrollTaxIntegrationService;
 use App\Services\Payroll\ThrCalculationService;
 use App\Services\ThrService;
 use Carbon\Carbon;
@@ -27,6 +28,8 @@ class ThrServiceTest extends TestCase
 
     private ThrCalculationService $calculationService;
 
+    private PayrollTaxIntegrationService $taxIntegration;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -37,7 +40,9 @@ class ThrServiceTest extends TestCase
         $this->repository = $this->createMock(ThrPayrollRepositoryInterface::class);
         $this->calculationService = $this->createMock(ThrCalculationService::class);
 
-        $this->service = new ThrService($this->repository, $this->calculationService);
+        $this->taxIntegration = $this->createMock(PayrollTaxIntegrationService::class);
+        $this->taxIntegration->method('transaction')->willReturnCallback(fn (callable $operation) => $operation());
+        $this->service = new ThrService($this->repository, $this->calculationService, $this->taxIntegration);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -81,9 +86,9 @@ class ThrServiceTest extends TestCase
                 'tenure_months' => 12,
                 'proration_factor' => 1.0,
                 'gross_thr_amount' => 10_000_000,
-                'pph21_amount' => 500_000,
-                'net_thr_amount' => 9_500_000,
-                'tax_calculation_meta' => ['method' => 'annualization_difference'],
+                'pph21_amount' => 0,
+                'net_thr_amount' => 10_000_000,
+                'tax_calculation_meta' => null,
                 'ineligibility_reason' => null,
             ]);
 
@@ -99,8 +104,13 @@ class ThrServiceTest extends TestCase
             ->willReturn($thrPayroll);
 
         $this->repository
+            ->expects($this->once())
             ->method('bulkCreateDetails')
+            ->with(999, $this->callback(fn (array $details) => $details[0]['pph21_amount'] === 0
+                && $details[0]['net_thr_amount'] === 10_000_000))
             ->willReturn(1);
+
+        $this->taxIntegration->expects($this->once())->method('refreshThr')->with($thrPayroll);
 
         $this->repository
             ->method('updateTotals')
@@ -185,6 +195,9 @@ class ThrServiceTest extends TestCase
 
         $thrPayroll = ThrPayroll::factory()->pending()->create();
 
+        $this->taxIntegration->expects($this->once())->method('refreshThr')
+            ->with($this->callback(fn (ThrPayroll $payroll) => $payroll->id === $thrPayroll->id));
+
         $this->repository
             ->method('getById')
             ->willReturn($thrPayroll);
@@ -223,7 +236,10 @@ class ThrServiceTest extends TestCase
     public function test_mark_as_paid_approves_paid_thr_payroll(): void
     {
         $actor = User::factory()->create();
-        $thrPayroll = ThrPayroll::factory()->approved()->create();
+        $thrPayroll = ThrPayroll::factory()->approved()->create(['approved_by' => $actor->id]);
+        $this->taxIntegration->expects($this->once())->method('settleThr')
+            ->with($this->callback(fn (ThrPayroll $payroll) => $payroll->id === $thrPayroll->id), '2026-06-01')
+            ->willReturn(true);
 
         $this->repository
             ->method('getById')
@@ -291,8 +307,8 @@ class ThrServiceTest extends TestCase
                 'tenure_months' => 12,
                 'proration_factor' => 1.0,
                 'gross_thr_amount' => 10_000_000,
-                'pph21_amount' => 500_000,
-                'net_thr_amount' => 9_500_000,
+                'pph21_amount' => 0,
+                'net_thr_amount' => 10_000_000,
                 'tax_calculation_meta' => null,
                 'ineligibility_reason' => null,
             ]);
@@ -311,8 +327,14 @@ class ThrServiceTest extends TestCase
         $this->assertEquals(1, $result['eligible_count']);
         $this->assertEquals(0, $result['ineligible_count']);
         $this->assertEquals(10_000_000, $result['total_gross_amount']);
-        $this->assertEquals(500_000, $result['total_tax_amount']);
-        $this->assertEquals(9_500_000, $result['total_net_amount']);
+        $this->assertSame('gross_only', $result['calculation_status']);
+        $this->assertSame('Gross entitlement preview only. Tax and net pay require generated source IDs and complete period history.', $result['calculation_notice']);
+        $this->assertNull($result['total_tax_amount']);
+        $this->assertNull($result['total_net_amount']);
+        $this->assertNull($result['eligible_employees'][0]['pph21_amount']);
+        $this->assertNull($result['eligible_employees'][0]['net_thr_amount']);
+        $this->assertDatabaseCount('thr_payrolls', 0);
+        $this->assertDatabaseCount('thr_payroll_details', 0);
     }
 
     public function test_simulate_separates_eligible_and_ineligible(): void
@@ -354,8 +376,8 @@ class ThrServiceTest extends TestCase
                         'tenure_months' => 12,
                         'proration_factor' => 1.0,
                         'gross_thr_amount' => 10_000_000,
-                        'pph21_amount' => 500_000,
-                        'net_thr_amount' => 9_500_000,
+                        'pph21_amount' => 0,
+                        'net_thr_amount' => 10_000_000,
                         'tax_calculation_meta' => null,
                         'ineligibility_reason' => null,
                     ];

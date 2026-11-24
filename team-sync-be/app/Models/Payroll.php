@@ -16,6 +16,7 @@ class Payroll extends Model
         'attendance_period_id',
         'payroll_setting_version_id',
         'payment_date',
+        'planned_credit_date',
         'status',
         'processed_count',
         'correction_count',
@@ -26,6 +27,7 @@ class Payroll extends Model
         return [
             'salary_month' => 'date',
             'payment_date' => 'date',
+            'planned_credit_date' => 'date',
             'status' => PayrollStatus::class,
         ];
     }

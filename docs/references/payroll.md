@@ -3,6 +3,55 @@
 ## Dokumen Utama
 - [Payroll Role E2E QA Runbook](../testing/be/payroll-role-e2e-qa.md)
   - Runbook manual QA, checklist guard per role, dan referensi automation payroll v1.
+- [Keputusan simulasi payroll](payroll-simulation-decisions.md): asumsi dataset sintetis, bukan bukti kontrak atau ledger produksi.
+
+## PPh 21 periode gabungan
+
+Implementasi `team-sync-62b`, `team-sync-d9d`, dan `team-sync-v93` memakai satu ledger `payroll_tax_entries` untuk detail gaji dan THR. Pengakuan cash memakai tanggal lebih awal antara jatuh tempo dan kredit, dalam `Asia/Jakarta`. Gaji memakai `payday_day` versi pengaturan payroll; THR mempunyai `income_due_date` tersendiri, bukan `payment_deadline`. `planned_credit_date` adalah rencana, sedangkan `payment_date` dicatat saat konfirmasi kredit.
+
+| Sumber | Perlakuan |
+| --- | --- |
+| `original_salary - deduction_amount`, overtime yang disetujui, `taxable_adjustment_amount` | Pendapatan cash kena pajak. Koreksi upah harus diklasifikasikan; edit langsung net tidak lagi menjadi sumber penghasilan. |
+| BPJS Kesehatan, JKK, JKM pemberi kerja | Ditambahkan ke bruto pajak, bukan cash yang diterima pegawai. |
+| JHT dan JP pemberi kerja | Tidak ditambahkan ke bruto pajak. |
+| JHT dan JP pegawai | Dikurangkan pada rekonsiliasi periode terakhir; bukan pengurang bruto TER bulanan. |
+| BPJS Kesehatan pegawai | Potongan take-home, bukan pengurang penghasilan neto fiskal. |
+| `gross_thr_amount` | Digabung dengan sumber lain dalam masa pengakuannya; tidak lagi memakai selisih pajak tahunan terpisah. |
+
+Dasar: [PMK 168/2023](https://jdih.kemenkeu.go.id/dok/pmk-168-tahun-2023), Pasal 5, 8, 10, 15, 19, dan 21. Tidak ada modul bonus/natura baru. Upah kontribusi BPJS tetap terpisah dari bruto pajak. Metadata menyimpan komponen, masa, sumber, pemotongan aktual terdahulu, reservasi draft, dan hash konteks.
+
+Urutan alokasi memakai waktu pengakuan lalu tipe/ID sumber stabil, bukan urutan generate. TER dihitung dari bruto kumulatif sumber sebelumnya dalam masa yang sama, dikurangi withholding settled dan reservasi draft sebelumnya. Sumber lebih awal yang ditambahkan atau berubah menghitung ulang draft terdampak dan membatalkan approval lama. Transfer tidak boleh mendahului draft yang diakui lebih awal. Hasil persisted yang sama memasok net, API, PDF dan ekspor.
+
+## Periode terakhir dan riwayat aktual
+
+Periode terakhir adalah Desember atau bulan berakhirnya pekerjaan/kewajiban subjektif yang dinyatakan eksplisit. Berhenti bekerja tidak otomatis mengakhiri kewajiban subjektif Indonesia. Kalkulator memakai penghasilan aktual tahun/bagian tahun, biaya jabatan, iuran pensiun pegawai, donasi yang dapat dikurangkan, PTKP, tarif Pasal 17, dan pemotongan sebelumnya. Annualisasi hanya berlaku pada awal/akhir kewajiban subjektif di dalam tahun.
+
+Saldo negatif menjadi refund pada net payroll/THR, dengan metadata tenggat akhir bulan berikutnya. Refund tidak melebihi withholding pegawai yang dapat dikembalikan; kelebihan pajak ditanggung pemerintah dicatat terpisah sebagai nonrefundable. Metadata tenggat bukan bukti refund telah ditransfer.
+
+Riwayat yang hilang atau belum settled memblokir perhitungan akhir, bukan dianggap nol. Record legacy `paid` bukan bukti withholding aktual. Impor JSON harus dilakukan sebelum membuat draft aktif:
+
+```sh
+php artisan payroll:import-tax-history /absolute/path/verified-history.json
+```
+
+File berisi array objek `employee_id`, `year`, `provenance`, `employment_start_date`, `employment_end_date` (boleh null), `subjective_start_date`, `subjective_end_date` (boleh null), dan `history`. Key `history` berupa `YYYY-MM`; setiap bulan wajib mempunyai `gross_income`, `employee_pension_contributions`, `deductible_donations`, `withheld`, `government_borne_tax`, dan `provenance`. Nominal harus finite; hanya `withheld` boleh negatif untuk refund aktual. Bulan nol harus eksplisit dan bersumber. Jangan impor bulan yang juga ditangani sumber ledger internal. Impor atomik menolak duplikasi employee/tahun, overlap, draft aktif, dan penggantian tahun yang sudah settled.
+
+## Approval, recalculation, dan pembayaran
+
+Approval menyimpan revisi serta snapshot policy/nominal. Semua langkah yang berlaku harus berstatus approved; rejected atau sebagian approved tidak cukup. Reopen, perubahan monetary, policy, threshold, atau konteks pajak membuat keputusan lama superseded tanpa menghapus auditnya. Edit detail dan transisi memakai transaksi/lock bersama.
+
+```sh
+php artisan payroll:recalculate-tax --month=2026-04 --dry-run
+php artisan payroll:recalculate-tax --month=2026-04
+```
+
+Command hanya menerima pending/processing, menghitung pajak, BPJS dan net bersama, serta me-rollback seluruh perubahan pada dry-run. Payroll memerlukan versi pengaturan terverifikasi. Tepat sebelum mark-paid, sistem mengevaluasi tanggal kredit aktual dan freshness. Perubahan pengakuan/perhitungan mengembalikan draft untuk review/reapproval, bukan langsung membayar nominal baru. Sumber settled dan histori paid tidak ditulis ulang; koreksi berikutnya harus bersumber terpisah.
+
+THR simulation hanya menampilkan entitlement bruto. Pajak/net memerlukan generated source IDs dan konteks periode lengkap; preview tidak menampilkan nilai belum dihitung sebagai nol.
+
+## Batas verifikasi dan produksi
+
+Fixture sintetis tidak memverifikasi kontrak, pembayaran bank, atau bukti potong perusahaan. Produksi membutuhkan rekonsiliasi ledger, fakta HR/kewajiban subjektif, dan penanggung jawab yang memverifikasi input. Tidak ada release/deploy otomatis. Smoke browser THR memakai SQLite; endpoint analytics lain melaporkan `DATE_FORMAT` yang tidak tersedia di SQLite, di luar jalur preview yang diperiksa.
 
 ## Arsip
 - [Payroll Phase 3 Plan](../plans/archive/payroll-phase-3-plan.md) — Rencana historis reconciliation, readiness dashboard, settings versioning, dan operasi payroll; bukan backlog aktif.

@@ -20,7 +20,7 @@ use Tests\TestCase;
 
 class PayrollDetailUpdateTest extends TestCase
 {
-    use ActivatesLicense, RefreshDatabase;
+    use ActivatesLicense, BuildsCalculatedPayroll, RefreshDatabase;
 
     protected function setUp(): void
     {
@@ -34,6 +34,8 @@ class PayrollDetailUpdateTest extends TestCase
             RolePermissionSeeder::class,
         ]);
 
+        $this->seedPayrollTaxFixtures();
+
         app(PermissionRegistrar::class)->forgetCachedPermissions();
     }
 
@@ -43,20 +45,38 @@ class PayrollDetailUpdateTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_finance_can_update_notes_and_final_salary_on_pending_payroll(): void
+    public function test_finance_can_update_notes_without_changing_derived_salary_on_pending_payroll(): void
     {
         $this->actingAsRole('finance');
         [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
 
+        $calculatedSalary = $detail->final_salary;
+
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'notes' => 'Reviewed and adjusted by finance.',
-            'final_salary' => 9200000,
+            'notes' => 'Reviewed by finance.',
         ])
             ->assertOk();
 
         $detail->refresh();
-        $this->assertSame('Reviewed and adjusted by finance.', $detail->notes);
-        $this->assertEquals(9200000, $detail->final_salary);
+        $this->assertSame('Reviewed by finance.', $detail->notes);
+        $this->assertEquals($calculatedSalary, $detail->final_salary);
+    }
+
+    public function test_derived_amount_edits_are_rejected(): void
+    {
+        $this->actingAsRole('finance');
+        [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
+        $calculatedSalary = $detail->final_salary;
+
+        $this->putJson("/api/v1/payroll-details/{$detail->id}", [
+            'final_salary' => 9200000,
+            'taxable_adjustment_amount' => 1000000,
+        ])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['final_salary', 'taxable_adjustment_amount']);
+
+        $this->assertEquals($calculatedSalary, $detail->fresh()->final_salary);
+        $this->assertEquals(0, $detail->fresh()->taxable_adjustment_amount);
     }
 
     public function test_cannot_update_detail_on_approved_payroll(): void
@@ -65,14 +85,14 @@ class PayrollDetailUpdateTest extends TestCase
         [$payroll, $detail] = $this->createPayrollWithDetail(status: 'approved');
 
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 8000000,
+            'notes' => 'Attempt to overwrite reviewed notes.',
         ])
             ->assertStatus(422)
             ->assertJsonPath('message', 'Cannot update payroll details for a payroll that has already been approved or paid.');
 
         // Verify detail unchanged
         $detail->refresh();
-        $this->assertEquals(9500000, $detail->final_salary);
+        $this->assertSame('Detail update test seed', $detail->notes);
     }
 
     public function test_cannot_update_detail_on_paid_payroll(): void
@@ -113,7 +133,6 @@ class PayrollDetailUpdateTest extends TestCase
         [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
 
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 9800000,
             'notes' => 'Audit log test.',
         ])->assertOk();
 
@@ -129,18 +148,20 @@ class PayrollDetailUpdateTest extends TestCase
             ->firstOrFail();
 
         $this->assertSame($detail->id, $log->metadata['payroll_detail_id'] ?? null);
-        $this->assertContains('final_salary', $log->metadata['changed_fields'] ?? []);
+        $this->assertNotContains('final_salary', $log->metadata['changed_fields'] ?? []);
         $this->assertContains('notes', $log->metadata['changed_fields'] ?? []);
     }
 
-    public function test_update_detail_then_approve_then_pay_preserves_edited_salary(): void
+    public function test_update_detail_then_approve_then_pay_preserves_notes_and_calculated_salary(): void
     {
         $this->actingAsRole('finance');
         [$payroll, $detail] = $this->createPayrollWithDetail(status: 'pending');
 
+        $calculatedSalary = $detail->final_salary;
+
         // Update
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 11500000,
+            'notes' => 'Verified bank account and payroll calculation.',
         ])->assertOk();
 
         // Approve
@@ -152,9 +173,10 @@ class PayrollDetailUpdateTest extends TestCase
             'payment_date' => '2026-05-15',
         ])->assertOk();
 
-        // Verify the edited salary persisted through the entire lifecycle
+        // Notes and calculated salary persist through the entire lifecycle
         $detail->refresh();
-        $this->assertEquals(11500000, $detail->final_salary);
+        $this->assertEquals($calculatedSalary, $detail->final_salary);
+        $this->assertSame('Verified bank account and payroll calculation.', $detail->notes);
         $this->assertSame('paid', $payroll->fresh()->status->value);
     }
 
@@ -188,7 +210,8 @@ class PayrollDetailUpdateTest extends TestCase
 
         $payroll = Payroll::create([
             'salary_month' => '2026-05-01',
-            'status' => $status,
+            'status' => $status === 'approved' ? 'pending' : $status,
+            'payroll_setting_version_id' => $this->payrollSettingVersionId(),
             'payment_date' => $paymentDate,
         ]);
 
@@ -203,7 +226,9 @@ class PayrollDetailUpdateTest extends TestCase
             'notes' => 'Detail update test seed',
         ]);
 
-        return [$payroll, $detail];
+        $this->calculatePayrollFixture($payroll, $status);
+
+        return [$payroll, $detail->fresh()];
     }
 
     public function test_update_with_stale_updated_at_returns_409(): void
@@ -222,7 +247,7 @@ class PayrollDetailUpdateTest extends TestCase
 
         // Try to update with stale updated_at
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 8000000,
+            'notes' => 'Attempt to overwrite reviewed notes.',
             'updated_at' => $originalUpdatedAt,
         ])
             ->assertStatus(409)
@@ -230,7 +255,7 @@ class PayrollDetailUpdateTest extends TestCase
 
         // Verify detail was NOT updated with the stale request
         $detail->refresh();
-        $this->assertEquals(9500000, $detail->final_salary);
+        $this->assertNotSame('Attempt to overwrite reviewed notes.', $detail->notes);
         $this->assertSame('Modified by another user', $detail->notes);
     }
 
@@ -243,13 +268,13 @@ class PayrollDetailUpdateTest extends TestCase
         $currentUpdatedAt = $detail->updated_at->toISOString();
 
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 8500000,
+            'notes' => 'Reviewed using the current record version.',
             'updated_at' => $currentUpdatedAt,
         ])
             ->assertOk();
 
         $detail->refresh();
-        $this->assertEquals(8500000, $detail->final_salary);
+        $this->assertSame('Reviewed using the current record version.', $detail->notes);
     }
 
     public function test_update_without_updated_at_skips_lock_check(): void
@@ -262,11 +287,11 @@ class PayrollDetailUpdateTest extends TestCase
 
         // Update without providing updated_at (backward compatible)
         $this->putJson("/api/v1/payroll-details/{$detail->id}", [
-            'final_salary' => 7000000,
+            'notes' => 'Reviewed without an explicit version token.',
         ])
             ->assertOk();
 
         $detail->refresh();
-        $this->assertEquals(7000000, $detail->final_salary);
+        $this->assertSame('Reviewed without an explicit version token.', $detail->notes);
     }
 }
