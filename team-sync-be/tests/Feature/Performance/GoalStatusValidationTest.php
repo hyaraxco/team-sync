@@ -32,14 +32,14 @@ class GoalStatusValidationTest extends TestCase
         $staff = Role::firstOrCreate(['name' => 'staff', 'guard_name' => 'sanctum']);
         $staff->syncPermissions(['goal-create-own', 'feedback-give']);
 
-        $hr = Role::firstOrCreate(['name' => 'HR', 'guard_name' => 'sanctum']);
+        $hr = Role::firstOrCreate(['name' => 'hr', 'guard_name' => 'sanctum']);
         $hr->syncPermissions(['goal-create-own', 'goal-assign-team', 'feedback-give']);
     }
 
     private function actingAsHr(): User
     {
         $user = User::factory()->create();
-        $user->assignRole('HR');
+        $user->assignRole('hr');
         Sanctum::actingAs($user);
 
         return $user;

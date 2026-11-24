@@ -60,7 +60,11 @@ class PerformanceGoalController extends Controller implements HasMiddleware
 
     public function store(CreateGoalRequest $request)
     {
-        $dto = GoalDto::fromRequest($request->validated());
+        $data = $request->validated();
+        $data['assigned_by'] = (int) $data['staff_member_id'] === $request->user()->staffMemberProfile?->id
+            ? null
+            : $request->user()->staffMemberProfile?->id;
+        $dto = GoalDto::fromRequest($data);
         $goal = $this->repository->createGoal($dto->toArray());
 
         // Notify the assigned staff member when a manager assigns a goal to them
@@ -81,9 +85,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     {
         $goal = $this->repository->getGoalById($id);
 
-        // Ownership check: staff can only see their own goals unless they can assign team goals
         $user = Auth::user();
-        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+        if (! $user->can('view', $goal)) {
             return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
         }
 
@@ -94,9 +97,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     {
         $goal = $this->repository->getGoalById($id);
 
-        // Ownership check: only assigner/team managers can update others' goals
         $user = Auth::user();
-        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+        if (! $user->can('update', $goal)) {
             return ResponseHelper::jsonResponse(false, 'You can only update your own goals.', null, 403);
         }
 
@@ -110,9 +112,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
         try {
             $goal = $this->repository->getGoalById($id);
 
-            // Ownership check: only assigner/team managers can delete others' goals
             $user = Auth::user();
-            if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+            if (! $user->can('delete', $goal)) {
                 return ResponseHelper::jsonResponse(false, 'You can only delete your own goals.', null, 403);
             }
 
@@ -130,9 +131,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     {
         $goal = $this->repository->getGoalById($id);
 
-        // Ownership check: only the goal owner or a team manager can add progress
         $user = Auth::user();
-        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+        if (! $user->can('update', $goal)) {
             return ResponseHelper::jsonResponse(false, 'You can only update progress on your own goals.', null, 403);
         }
 
@@ -157,9 +157,8 @@ class PerformanceGoalController extends Controller implements HasMiddleware
     {
         $goal = $this->repository->getGoalById($id);
 
-        // Ownership check: only the goal owner or a team manager can see progress
         $user = Auth::user();
-        if (! $user->can('goal-assign-team') && $goal->staff_member_id !== $user->staffMemberProfile?->id) {
+        if (! $user->can('view', $goal)) {
             return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
         }
 
