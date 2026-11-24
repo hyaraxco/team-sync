@@ -8,7 +8,6 @@ use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
 use App\Models\StaffMemberProfile;
 use App\Models\Team;
-use App\Services\Payroll\TaxCalculationService;
 use App\Services\PayslipPdfService;
 use Barryvdh\DomPDF\PDF;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -16,28 +15,13 @@ use Mockery\MockInterface;
 use Spatie\Permission\Models\Role;
 use Tests\TestCase;
 
-/*
- |--------------------------------------------------------------------------
- | PayslipPdfService Unit Tests
- |
- | Tests the PayslipPdfService which generates payslip PDF content.
- | The service has one public method (render) and three private helpers
- | (calculateBpjsBreakdown, formatRupiah, formatSignedRupiah) that are
- | exercised indirectly through render().
- |
- | Dependencies mocked:
- |  - TaxCalculationService (constructor-injected, PHPUnit mock)
- |  - PDF (barryvdh/laravel-dompdf, bound as mock in container)
- |--------------------------------------------------------------------------
- */
-
 class PayslipPdfServiceTest extends TestCase
 {
     use RefreshDatabase;
 
     private PayslipPdfService $service;
 
-    private \PHPUnit\Framework\MockObject\MockObject|TaxCalculationService $taxService;
+    private array $persistedDeductions = [];
 
     /** @var array<string, mixed> Captured view data passed to PDF::loadView */
     private array $capturedViewData = [];
@@ -52,9 +36,7 @@ class PayslipPdfServiceTest extends TestCase
         // Seed roles required by StaffMemberProfile factory
         Role::create(['name' => 'staff', 'guard_name' => 'sanctum']);
 
-        // Mock TaxCalculationService to avoid DB dependencies on tax/bpjs tables
-        $this->taxService = $this->createMock(TaxCalculationService::class);
-        $this->service = new PayslipPdfService($this->taxService);
+        $this->service = new PayslipPdfService;
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -62,46 +44,20 @@ class PayslipPdfServiceTest extends TestCase
     // ─────────────────────────────────────────────────────────────────────────
 
     /**
-     * Configure the TaxCalculationService mock with default return values.
+     * Set stored deductions for the next payroll detail fixture.
      */
-    private function stubTaxService(
+    private function storedDeductions(
         float $pph21Monthly = 500_000,
         float $employeeShareBpjs = 350_000,
         array $bpjsBreakdown = [],
     ): void {
-        $bpjsBreakdown = $bpjsBreakdown ?: [
-            'jht_employee' => 200_000,
-            'jht_employer' => 370_000,
-            'jkk_employer' => 24_000,
-            'jkm_employer' => 30_000,
-            'jp_employee' => 100_000,
-            'jp_employer' => 200_000,
-            'bpjs_kesehatan_employee' => 50_000,
-            'bpjs_kesehatan_employer' => 200_000,
+        $kesehatan = $bpjsBreakdown['bpjs_kesehatan_employee'] ?? ($employeeShareBpjs > 0 ? 50_000 : 0);
+
+        $this->persistedDeductions = [
+            'pph21_amount' => $pph21Monthly,
+            'bpjs_tk_employee' => $employeeShareBpjs - $kesehatan,
+            'bpjs_kes_employee' => $kesehatan,
         ];
-
-        $taxReturn = [
-            'pph21_monthly' => $pph21Monthly,
-            'has_npwp' => true,
-            'ptkp_status' => 'TK/0',
-            'meta' => ['pkp' => 100_000_000],
-        ];
-
-        $this->taxService
-            ->method('calculateMonthlyTer')
-            ->willReturn($taxReturn);
-
-        $this->taxService
-            ->method('calculateAnnualizedPph21')
-            ->willReturn($taxReturn);
-
-        $this->taxService
-            ->method('calculateBpjs')
-            ->willReturn([
-                'employee_share' => $employeeShareBpjs,
-                'employer_share' => 700_000,
-                'breakdown' => $bpjsBreakdown,
-            ]);
     }
 
     /**
@@ -194,7 +150,7 @@ class PayslipPdfServiceTest extends TestCase
             'policy_mismatch_days' => 0,
             'warning_flags' => null,
             'notes' => null,
-        ], $overrides));
+        ], $this->persistedDeductions, $overrides));
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -203,7 +159,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_render_returns_string_content(): void
     {
-        $this->stubTaxService();
+        $this->storedDeductions();
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -215,7 +171,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_render_calls_pdf_load_view_with_correct_template(): void
     {
-        $this->stubTaxService();
+        $this->storedDeductions();
 
         $viewUsed = null;
         $mockPdf = Mockery::mock(PDF::class);
@@ -242,7 +198,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_gross_salary_is_basic_plus_overtime(): void
     {
-        $this->stubTaxService();
+        $this->storedDeductions();
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -258,7 +214,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_gross_salary_with_zero_overtime(): void
     {
-        $this->stubTaxService();
+        $this->storedDeductions();
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -288,7 +244,7 @@ class PayslipPdfServiceTest extends TestCase
             'bpjs_kesehatan_employer' => 200_000,
         ];
 
-        $this->stubTaxService(
+        $this->storedDeductions(
             pph21Monthly: 500_000,
             employeeShareBpjs: 350_000,
             bpjsBreakdown: $bpjsBreakdown
@@ -301,12 +257,8 @@ class PayslipPdfServiceTest extends TestCase
 
         $this->service->render($detail);
 
-        $this->assertSame('Rp 200.000', $this->capturedViewData['bpjsJht']);
-        $this->assertSame(2, $this->capturedViewData['bpjsJhtRate']);
-        $this->assertSame('Rp 100.000', $this->capturedViewData['bpjsJp']);
-        $this->assertSame(1, $this->capturedViewData['bpjsJpRate']);
+        $this->assertSame('Rp 300.000', $this->capturedViewData['bpjsKetenagakerjaan']);
         $this->assertSame('Rp 50.000', $this->capturedViewData['bpjsKesehatan']);
-        $this->assertSame(1, $this->capturedViewData['bpjsKesehatanRate']);
         $this->assertSame('Rp 350.000', $this->capturedViewData['totalBpjs']);
     }
 
@@ -323,7 +275,7 @@ class PayslipPdfServiceTest extends TestCase
             'bpjs_kesehatan_employer' => 0,
         ];
 
-        $this->stubTaxService(
+        $this->storedDeductions(
             pph21Monthly: 0,
             employeeShareBpjs: 0,
             bpjsBreakdown: $bpjsBreakdown
@@ -345,7 +297,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_tax_amount_is_reflected_in_view_data(): void
     {
-        $this->stubTaxService(pph21Monthly: 1_500_000);
+        $this->storedDeductions(pph21Monthly: 1_500_000);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -356,7 +308,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_zero_tax_amount(): void
     {
-        $this->stubTaxService(pph21Monthly: 0);
+        $this->storedDeductions(pph21Monthly: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -373,7 +325,7 @@ class PayslipPdfServiceTest extends TestCase
     {
         // When gross - netSalary - totalBpjs - tax - absenceDeduction < 0,
         // otherDeductions should be 0 (max guard)
-        $this->stubTaxService(pph21Monthly: 5_000_000, employeeShareBpjs: 2_000_000);
+        $this->storedDeductions(pph21Monthly: 5_000_000, employeeShareBpjs: 2_000_000);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -395,7 +347,7 @@ class PayslipPdfServiceTest extends TestCase
     {
         // Construct a scenario where otherDeductions > 0:
         // gross - netSalary > totalBpjs + tax + absenceDeduction
-        $this->stubTaxService(pph21Monthly: 500_000, employeeShareBpjs: 300_000);
+        $this->storedDeductions(pph21Monthly: 500_000, employeeShareBpjs: 300_000);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -419,7 +371,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_adjustments_loaded_when_relation_is_eager_loaded(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -452,7 +404,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_adjustment_items_contain_formatted_amount_and_reason(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -476,7 +428,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_adjustment_fallback_reason_when_null(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -501,7 +453,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_adjustments_empty_when_relation_not_loaded(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -531,7 +483,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_null_employee_falls_back_to_na(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -548,7 +500,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_employee_without_job_information_falls_back_to_na_for_department(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -567,7 +519,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_zero_effective_working_days_is_passed_to_view(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -586,7 +538,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_rupiah_large_amount(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -601,7 +553,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_rupiah_small_amount(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -616,7 +568,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_rupiah_zero_amount(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -631,7 +583,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_rupiah_exact_millions(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -651,7 +603,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_signed_rupiah_positive_value(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -672,7 +624,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_signed_rupiah_negative_value(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -693,7 +645,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_format_signed_rupiah_zero_value(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -715,7 +667,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_adjustment_total_formatted_with_mixed_values(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -745,7 +697,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_adjustment_total_formatted_negative(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -771,7 +723,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_attendance_days_are_correctly_passed(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -797,7 +749,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_overtime_hours_formatted_with_one_decimal(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -813,7 +765,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_deduction_days_formatted_with_one_decimal(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -828,7 +780,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_company_name_from_config(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -840,7 +792,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_notes_from_payroll_detail_are_passed(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -854,7 +806,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_net_salary_is_final_salary_formatted(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -868,7 +820,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_total_deductions_sum_includes_all_components(): void
     {
-        $this->stubTaxService(pph21Monthly: 500_000, employeeShareBpjs: 350_000);
+        $this->storedDeductions(pph21Monthly: 500_000, employeeShareBpjs: 350_000);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail([
@@ -889,7 +841,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_employee_name_uses_user_name_over_full_name(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $detail = $this->createPayrollDetail();
@@ -906,7 +858,7 @@ class PayslipPdfServiceTest extends TestCase
 
     public function test_department_uses_team_name_over_job_title(): void
     {
-        $this->stubTaxService(pph21Monthly: 0, employeeShareBpjs: 0);
+        $this->storedDeductions(pph21Monthly: 0, employeeShareBpjs: 0);
         $this->mockPdfFacade();
 
         $employee = StaffMemberProfile::factory()->create();

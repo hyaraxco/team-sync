@@ -3,16 +3,11 @@
 namespace App\Services;
 
 use App\Models\PayrollDetail;
-use App\Services\Payroll\TaxCalculationService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
 class PayslipPdfService
 {
-    public function __construct(
-        private readonly TaxCalculationService $taxService
-    ) {}
-
     public function render(PayrollDetail $payrollDetail): string
     {
         $payroll = $payrollDetail->payroll;
@@ -28,36 +23,17 @@ class PayslipPdfService
         $bonus = 0; // Not yet in PayrollDetail schema — placeholder for future feature
         $grossSalary = $basicSalary + $overtimeAmount + $allowances + $bonus;
 
-        // Determine contribution period from payroll salary_month
-        $salaryMonth = $payroll?->salary_month ? Carbon::parse($payroll->salary_month) : null;
-        $contributionPeriod = $salaryMonth ? $salaryMonth->format('Y-m') : null;
-
-        // Calculate BPJS breakdown
-        $bpjsBreakdown = $this->calculateBpjsBreakdown($basicSalary, $contributionPeriod);
-
-        // Calculate tax — use TER for Jan–Nov, annualized for December
-        $isDecember = $salaryMonth && $salaryMonth->month === 12;
-        $taxResult = $isDecember
-            ? $this->taxService->calculateAnnualizedPph21(
-                $basicSalary,
-                $employee?->ptkp_status,
-                ! empty($employee?->npwp),
-                $contributionPeriod
-            )
-            : $this->taxService->calculateMonthlyTer(
-                $basicSalary,
-                $employee?->ptkp_status,
-                ! empty($employee?->npwp),
-                $contributionPeriod
-            );
-        $tax = $taxResult['pph21_monthly'];
+        // Historical deductions must not change when employee details or rates change.
+        $bpjsKetenagakerjaan = (float) ($payrollDetail->bpjs_tk_employee ?? 0);
+        $bpjsKesehatan = (float) ($payrollDetail->bpjs_kes_employee ?? 0);
+        $tax = (float) ($payrollDetail->pph21_amount ?? 0);
 
         // Absence deduction
         $absenceDeduction = (float) $payrollDetail->deduction_amount;
         $deductionDays = (float) $payrollDetail->deduction_days;
 
         // Other deductions (calculated as remainder)
-        $totalBpjs = $bpjsBreakdown['total'];
+        $totalBpjs = $bpjsKetenagakerjaan + $bpjsKesehatan;
         $otherDeductions = max(0, ($grossSalary - (float) $payrollDetail->final_salary) - $totalBpjs - $tax - $absenceDeduction);
         $totalDeductions = $totalBpjs + $tax + $absenceDeduction + $otherDeductions;
 
@@ -93,17 +69,14 @@ class PayslipPdfService
             'basicSalary' => $this->formatRupiah($basicSalary),
             'overtimeHours' => number_format($overtimeHours, 1, ',', '.'),
             'overtimeAmount' => $this->formatRupiah($overtimeAmount),
+            'hasOvertime' => $overtimeAmount > 0,
             'allowances' => $this->formatRupiah($allowances),
             'bonus' => $this->formatRupiah($bonus),
             'grossSalary' => $this->formatRupiah($grossSalary),
 
             // Deductions - BPJS
-            'bpjsKesehatan' => $this->formatRupiah($bpjsBreakdown['bpjs_kesehatan']),
-            'bpjsKesehatanRate' => $bpjsBreakdown['bpjs_kesehatan_rate'],
-            'bpjsJht' => $this->formatRupiah($bpjsBreakdown['jht']),
-            'bpjsJhtRate' => $bpjsBreakdown['jht_rate'],
-            'bpjsJp' => $this->formatRupiah($bpjsBreakdown['jp']),
-            'bpjsJpRate' => $bpjsBreakdown['jp_rate'],
+            'bpjsKesehatan' => $this->formatRupiah($bpjsKesehatan),
+            'bpjsKetenagakerjaan' => $this->formatRupiah($bpjsKetenagakerjaan),
             'totalBpjs' => $this->formatRupiah($totalBpjs),
 
             // Deductions - Tax & Others
@@ -141,22 +114,6 @@ class PayslipPdfService
         $pdf->setPaper('a4', 'portrait');
 
         return $pdf->output();
-    }
-
-    private function calculateBpjsBreakdown(float $basicSalary, ?string $contributionPeriod = null): array
-    {
-        $bpjs = $this->taxService->calculateBpjs($basicSalary, $contributionPeriod);
-        $breakdown = $bpjs['breakdown'];
-
-        return [
-            'bpjs_kesehatan' => $breakdown['bpjs_kesehatan_employee'] ?? 0,
-            'bpjs_kesehatan_rate' => 1, // 1% employee contribution
-            'jht' => $breakdown['jht_employee'] ?? 0,
-            'jht_rate' => 2, // 2% employee contribution
-            'jp' => $breakdown['jp_employee'] ?? 0,
-            'jp_rate' => 1, // 1% employee contribution
-            'total' => $bpjs['employee_share'],
-        ];
     }
 
     private function formatRupiah(float $amount): string
