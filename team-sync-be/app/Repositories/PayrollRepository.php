@@ -1677,8 +1677,14 @@ class PayrollRepository implements PayrollRepositoryInterface
 
     public function deleteApprovalPolicy(int $id): void
     {
-        $policy = PayrollApprovalPolicy::findOrFail($id);
-        $policy->delete();
+        $this->taxIntegration->transaction(function () use ($id) {
+            $policy = PayrollApprovalPolicy::findOrFail($id);
+            if ($policy->approvals()->exists()) {
+                throw new PayrollStateException('Approval policies with approval history cannot be deleted. Deactivate the policy instead.');
+            }
+
+            $policy->delete();
+        });
     }
 
     public function getApprovalStatus(string $payrollId): array

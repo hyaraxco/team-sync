@@ -36,12 +36,26 @@ php artisan payroll:import-tax-history /absolute/path/verified-history.json
 
 File berisi array objek `employee_id`, `year`, `provenance`, `employment_start_date`, `employment_end_date` (boleh null), `subjective_start_date`, `subjective_end_date` (boleh null), dan `history`. Key `history` berupa `YYYY-MM`; setiap bulan wajib mempunyai `gross_income`, `employee_pension_contributions`, `deductible_donations`, `withheld`, `government_borne_tax`, dan `provenance`. Nominal harus integer rupiah; hanya `withheld` boleh negatif untuk refund aktual. `withheld` adalah pemotongan yang didanai pegawai, tidak termasuk DTP; `government_borne_tax` adalah kredit terpisah, bukan subset `withheld`. Kalkulator mengurangkan kedua kredit tepat sekali. Bulan nol harus eksplisit dan bersumber. Jangan impor bulan yang juga ditangani sumber ledger internal. Impor atomik menolak duplikasi employee/tahun, overlap, draft aktif, dan penggantian tahun yang sudah settled.
 
+Tanggal akhir kerja/kewajiban subjektif yang baru terverifikasi setelah pembayaran sebelumnya dapat diperbarui tanpa mengganti history:
+
+```sh
+php artisan payroll:import-tax-history /absolute/path/verified-history.json --update-profile
+```
+
+Gunakan history yang sama persis dengan impor tersimpan (atau array kosong jika seluruh riwayat berasal dari ledger internal). Pembaruan memakai transaksi yang menghitung ulang sumber belum dibayar dan membatalkan approval terdampak. Tanggal awal dan nominal history yang sudah menjadi dasar settlement tidak boleh diganti; perubahan tanggal akhir tidak boleh menyentuh masa settled. Provenance tambahan dipertahankan bersama sumber sebelumnya. Kegagalan perhitungan membatalkan seluruh pembaruan.
+
+DTP nonzero pada sumber aktif ditolak, bukan dibebankan kepada pegawai. Kredit `government_borne_tax` tetap didukung pada history impor untuk rekonsiliasi akhir; input DTP sumber aktif memerlukan implementasi alokasi bulanan terlebih dahulu.
+
 Koreksi upah yang bersumber dari perhitungan legacy pecahan dibulatkan ke rupiah terdekat sekali pada total koreksi pegawai sebelum disimpan sebagai `taxable_adjustment_amount` integer. Kolom nominal legacy lain tidak dimigrasikan ulang dalam perubahan ini.
 `adjustment_total_amount` pada API detail/slip memakai total integer persisted yang diterapkan, bukan menjumlah ulang audit. Setiap item `amount_delta` tetap menyimpan angka sumber legacy.
+
+Ekspor XLSX memuat upah lembur, koreksi kena pajak signed, serta selisih pembulatan terhadap net persisted. Gaji pokok ditambah lembur/koreksi, dikurangi potongan, lalu ditambah pembulatan harus sama dengan gaji bersih. Layout berubah menjadi 20 kolom; konsumen berbasis indeks kolom perlu menyesuaikan.
 
 ## Approval, recalculation, dan pembayaran
 
 Approval menyimpan revisi serta snapshot policy/nominal. Semua langkah yang berlaku harus berstatus approved; rejected atau sebagian approved tidak cukup. Reopen, perubahan monetary, policy, threshold, atau konteks pajak membuat keputusan lama superseded tanpa menghapus auditnya. Edit detail dan transisi memakai transaksi/lock bersama.
+
+Policy yang sudah dirujuk approval tidak dapat dihapus (HTTP 422 dan foreign key restrict). Nonaktifkan melalui `is_active=false` agar policy tidak dipakai untuk langkah berikutnya; approval saat ini dan revisi superseded tetap tersimpan. Policy yang belum pernah dirujuk tetap dapat dihapus.
 
 ```sh
 php artisan payroll:recalculate-tax --month=2026-04 --dry-run

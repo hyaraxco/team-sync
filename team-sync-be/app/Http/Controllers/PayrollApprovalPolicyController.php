@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PayrollStateException;
 use App\Helpers\ResponseHelper;
 use App\Http\Requests\PayrollApprovalDecisionRequest;
 use App\Http\Requests\PayrollApprovalPolicyStoreRequest;
@@ -105,6 +106,8 @@ class PayrollApprovalPolicyController extends Controller implements HasMiddlewar
             );
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Approval Policy Not Found', null, 404);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
         } catch (\Throwable $e) {
             Log::error('PayrollApprovalPolicyController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

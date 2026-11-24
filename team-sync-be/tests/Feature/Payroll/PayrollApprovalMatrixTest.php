@@ -11,7 +11,9 @@ use App\Models\User;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
@@ -155,6 +157,74 @@ class PayrollApprovalMatrixTest extends TestCase
             ->assertOk();
 
         $this->assertNull(PayrollApprovalPolicy::find($policyId));
+    }
+
+    public function test_referenced_policy_cannot_be_deleted_and_can_be_retired_without_losing_history(): void
+    {
+        $this->actingAsRole('finance');
+        $policy = PayrollApprovalPolicy::create([
+            'name' => 'Finance Review',
+            'min_amount' => 0,
+            'required_role' => 'finance',
+            'approval_order' => 1,
+            'is_active' => true,
+        ]);
+        $payroll = $this->createPayrollWithDetail();
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
+        $approval = PayrollApproval::where('policy_id', $policy->id)->sole();
+        $originalDecision = $approval->getAttributes();
+
+        $this->deleteJson("/api/v1/payroll-approval-policies/{$policy->id}")
+            ->assertUnprocessable()
+            ->assertJsonPath('message', 'Approval policies with approval history cannot be deleted. Deactivate the policy instead.');
+        $this->assertSame($originalDecision, $approval->fresh()->getAttributes());
+        $this->assertModelExists($policy);
+
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/reopen", [
+            'reason' => 'Correct the payroll before retirement.',
+        ])->assertOk();
+        $this->assertNotNull($approval->fresh()->superseded_at);
+        $supersededDecision = $approval->fresh()->getAttributes();
+
+        $this->deleteJson("/api/v1/payroll-approval-policies/{$policy->id}")
+            ->assertUnprocessable();
+        $this->assertSame($supersededDecision, $approval->fresh()->getAttributes());
+
+        $this->putJson("/api/v1/payroll-approval-policies/{$policy->id}", [
+            'is_active' => false,
+        ])->assertOk();
+        $this->assertFalse($policy->fresh()->is_active);
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
+        $this->assertSame('approved', $payroll->fresh()->status->value);
+        $this->assertSame($supersededDecision, $approval->fresh()->getAttributes());
+        $this->assertSame(1, PayrollApproval::where('policy_id', $policy->id)->count());
+        $this->assertSame(0, PayrollApproval::where('payroll_id', $payroll->id)->whereNull('superseded_at')->count());
+    }
+
+    public function test_database_rejects_deleting_a_referenced_approval_policy(): void
+    {
+        $this->actingAsRole('finance');
+        $policy = PayrollApprovalPolicy::create([
+            'name' => 'Finance Review',
+            'min_amount' => 0,
+            'required_role' => 'finance',
+            'approval_order' => 1,
+            'is_active' => true,
+        ]);
+        $payroll = $this->createPayrollWithDetail();
+        $this->postJson("/api/v1/payrolls/{$payroll->id}/approve")->assertOk();
+        $approval = PayrollApproval::where('policy_id', $policy->id)->sole();
+
+        try {
+            DB::transaction(fn () => DB::table('payroll_approval_policies')->where('id', $policy->id)->delete());
+        } catch (QueryException $e) {
+            $this->assertModelExists($policy);
+            $this->assertModelExists($approval);
+
+            return;
+        }
+
+        $this->fail('The database must reject deleting an approval policy with approval history.');
     }
 
     public function test_approval_status_endpoint(): void

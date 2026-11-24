@@ -181,6 +181,9 @@ class PayrollTaxPeriodService
                 throw new PayrollStateException('Tax amounts must be finite and nonnegative.');
             }
         }
+        if ((float) ($components['government_borne_tax'] ?? 0) !== 0.0) {
+            throw new PayrollStateException('Active-source government-borne tax is not supported; import verified historical credits only.');
+        }
         $recognized = $this->recognition($due, $credit);
 
         return new PayrollTaxEntry([
@@ -193,10 +196,11 @@ class PayrollTaxPeriodService
         ]);
     }
 
-    private function reallocateEmployee(int $employeeId): array
+    public function reallocateEmployee(int $employeeId, ?int $year = null): array
     {
         $affected = [];
-        foreach (PayrollTaxEntry::query()->where('employee_id', $employeeId)->where('active', true)->whereNull('settled_at')->orderBy('allocation_key')->get() as $entry) {
+        foreach (PayrollTaxEntry::query()->where('employee_id', $employeeId)->where('active', true)->whereNull('settled_at')
+            ->when($year !== null, fn ($query) => $query->where('period', 'like', $year.'-%'))->orderBy('allocation_key')->get() as $entry) {
             $result = $this->allocation($entry);
             if (PayrollTaxMetadata::hash($entry->calculation) !== PayrollTaxMetadata::hash($result)) {
                 $entry->update(['calculation' => $result]);

@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Exceptions\PayrollStateException;
 use App\Models\PayrollTaxEntry;
 use App\Models\PayrollTaxYear;
+use App\Services\Payroll\PayrollTaxIntegrationService;
 use App\Services\Payroll\PayrollTaxPeriodService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Validator;
@@ -12,11 +13,11 @@ use Throwable;
 
 class ImportPayrollTaxHistoryCommand extends Command
 {
-    protected $signature = 'payroll:import-tax-history {path : JSON array of employee/year facts and monthly actual history}';
+    protected $signature = 'payroll:import-tax-history {path : JSON array of employee/year facts and monthly actual history} {--update-profile : Update verified dates and refresh unpaid sources without replacing history}';
 
     protected $description = 'Import explicit, provenanced tax history without inferring withholding from paid status';
 
-    public function handle(PayrollTaxPeriodService $service): int
+    public function handle(PayrollTaxPeriodService $service, PayrollTaxIntegrationService $integration): int
     {
         try {
             $path = $this->argument('path');
@@ -57,8 +58,12 @@ class ImportPayrollTaxHistoryCommand extends Command
                     }
                 }
             }
-            $service->transaction(array_column($rows, 'employee_id'), function () use ($rows) {
+            $service->transaction(array_column($rows, 'employee_id'), function () use ($rows, $integration) {
                 foreach ($rows as $row) {
+                    if ($this->option('update-profile')) {
+                        $integration->updateTaxYearProfile($row);
+                        continue;
+                    }
                     $entries = PayrollTaxEntry::query()->where('employee_id', $row['employee_id'])->where('period', 'like', $row['year'].'-%');
                     if ((clone $entries)->where('active', true)->whereNull('settled_at')->exists()) {
                         throw new PayrollStateException('Import history before creating active drafts; deactivate drafts and refresh/reapprove after import.');
@@ -77,7 +82,9 @@ class ImportPayrollTaxHistoryCommand extends Command
                     ]);
                 }
             });
-            $this->info('Tax history imported; no application amounts or paid records changed.');
+            $this->info($this->option('update-profile')
+                ? 'Verified dates updated; unpaid sources refreshed for reapproval. Paid records unchanged.'
+                : 'Tax history imported; no application amounts or paid records changed.');
 
             return self::SUCCESS;
         } catch (Throwable $exception) {

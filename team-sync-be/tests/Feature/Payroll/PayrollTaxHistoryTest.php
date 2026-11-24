@@ -36,6 +36,13 @@ it('allocates two pending sources exactly once in either generation order', func
         ->and($entries->sum('actual_withholding'))->toEqual(0);
 })->with([true, false]);
 
+it('rejects active government credits instead of charging them to the employee', function () {
+    expect(fn () => $this->tax->persistDraft($this->employee, 'payroll', 1, '2026-03-25', null,
+        10_000_000, 0, 10_000_000, ['government_borne_tax' => 200_000]))
+        ->toThrow(PayrollStateException::class, 'Active-source government-borne tax is not supported');
+    expect(PayrollTaxEntry::query()->exists())->toBeFalse();
+});
+
 it('ripples earlier changes to later drafts even when their approval must be invalidated', function () {
     $this->tax->persistDraft($this->employee, 'payroll', 1, '2026-03-25', null, 10_000_000, 0, 10_000_000);
     $result = $this->tax->persistDraft($this->employee, 'thr', 2, '2026-03-15', null, 8_000_000, 0, 8_000_000);

@@ -82,7 +82,10 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
             'Sakit',
             'Alpha',
             'Gaji Pokok',
+            'Upah Lembur',
+            'Koreksi Penghasilan Kena Pajak',
             'Potongan',
+            'Penyesuaian Pembulatan',
             'Gaji Bersih',
             'Status',
             'Catatan',
@@ -95,6 +98,11 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
     public function map($detail): array
     {
         $this->rowNumber++;
+
+        $deductions = (float) $detail->deduction_amount + (float) $detail->pph21_amount
+            + (float) $detail->bpjs_tk_employee + (float) $detail->bpjs_kes_employee;
+        $unroundedNet = (float) $detail->original_salary + (float) $detail->overtime_amount
+            + (float) $detail->taxable_adjustment_amount - $deductions;
 
         return [
             $this->rowNumber,
@@ -110,7 +118,10 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
             $detail->sick_days ?? 0,
             $detail->absent_days ?? 0,
             $detail->original_salary ?? 0,
-            (float) $detail->deduction_amount + (float) $detail->pph21_amount + (float) $detail->bpjs_tk_employee + (float) $detail->bpjs_kes_employee,
+            $detail->overtime_amount ?? 0,
+            $detail->taxable_adjustment_amount ?? 0,
+            $deductions,
+            round((float) $detail->final_salary - $unroundedNet, 2),
             $detail->final_salary ?? 0,
             $this->payroll->status === 'paid' ? 'Sudah Dibayar' : 'Menunggu',
             $detail->notes ?? '',
@@ -176,13 +187,13 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
                 // Center align specific columns
                 $sheet->getStyle("A2:A{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // No
                 $sheet->getStyle("I2:L{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Attendance columns
-                $sheet->getStyle("P2:P{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Status
+                $sheet->getStyle("S2:S{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER); // Status
 
                 // Right align currency columns
-                $sheet->getStyle("M2:O{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT); // Salary columns
+                $sheet->getStyle("M2:R{$highestRow}")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT); // Salary columns
 
                 // Format currency columns
-                $sheet->getStyle("M2:O{$highestRow}")->getNumberFormat()->setFormatCode('#,##0');
+                $sheet->getStyle("M2:R{$highestRow}")->getNumberFormat()->setFormatCode('#,##0');
 
                 // Set row height for header
                 $sheet->getRowDimension(1)->setRowHeight(25);
@@ -197,7 +208,6 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
 
                 $sheet->setCellValue('A1', 'LAPORAN GAJI KARYAWAN');
                 $sheet->setCellValue('A2', "Periode: {$month}");
-                $sheet->setCellValue('A3', "Total Karyawan: {$totalEmployees}");
                 $sheet->setCellValue('A3', "Total Karyawan: {$totalEmployees}");
                 $sheet->setCellValue('D3', 'Total Gaji: Rp '.number_format($totalAmount, 0, ',', '.'));
                 $sheet->setCellValue('A4', 'Rata-rata Gaji: Rp '.number_format($avgSalary, 0, ',', '.'));
@@ -218,9 +228,9 @@ class PayrollExport implements FromQuery, ShouldAutoSize, WithCustomChunkSize, W
                         'horizontal' => Alignment::HORIZONTAL_CENTER,
                     ],
                 ]);
-                $sheet->mergeCells('A1:Q1');
+                $sheet->mergeCells("A1:{$highestColumn}1");
 
-                $sheet->getStyle('A2:Q5')->applyFromArray([
+                $sheet->getStyle("A2:{$highestColumn}5")->applyFromArray([
                     'font' => [
                         'bold' => true,
                         'size' => 11,

@@ -7,6 +7,7 @@ use App\Exceptions\PayrollStateException;
 use App\Models\Payroll;
 use App\Models\PayrollDetail;
 use App\Models\PayrollSetting;
+use App\Models\PayrollTaxYear;
 use App\Models\ThrPayroll;
 use App\Models\ThrPayrollDetail;
 use App\Support\PayrollTaxMetadata;
@@ -190,6 +191,26 @@ class PayrollTaxIntegrationService
             );
             $this->apply('thr', $detail->id, $result);
         }
+    }
+
+    public function updateTaxYearProfile(array $row): void
+    {
+        $this->transaction(function () use ($row) {
+            $this->lockSources([$row['employee_id']]);
+            $year = PayrollTaxYear::query()->firstOrNew([
+                'employee_id' => $row['employee_id'], 'year' => $row['year'],
+            ]);
+            if (($year->history ?? []) != $row['history']) {
+                throw new PayrollStateException('Profile updates must preserve imported history.');
+            }
+            $year->fill([
+                'profile' => array_intersect_key($row, array_flip(['employment_start_date', 'employment_end_date', 'subjective_start_date', 'subjective_end_date'])),
+                'history' => $row['history'], 'provenance' => $row['provenance'],
+            ])->save();
+            foreach ($this->periods->reallocateEmployee($row['employee_id'], $row['year']) as $source) {
+                $this->writeResult($source['source_type'], (int) $source['source_id'], $source['calculation']);
+            }
+        });
     }
 
     private function apply(string $sourceType, int $sourceId, array $result): void

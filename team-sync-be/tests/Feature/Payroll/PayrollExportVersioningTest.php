@@ -11,6 +11,9 @@ use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Maatwebsite\Excel\Facades\Excel;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
@@ -76,6 +79,78 @@ class PayrollExportVersioningTest extends TestCase
         $this->assertSame(22, $row[8]);
     }
 
+    public function test_xlsx_reconciles_stored_overtime_corrections_refunds_and_rounding(): void
+    {
+        $this->activateTestLicense();
+
+        $cases = [
+            ['2026-08-01', 'floor', 125000, 12345, 512345, 9862500, -280],
+            ['2026-09-01', 'ceil', -125000, -550000, -50000, 10175500, 375],
+        ];
+
+        foreach ($cases as [$month, $roundingMode, $correction, $tax, $deductions, $net, $rounding]) {
+            $setting = PayrollSetting::current();
+            $setting->update(['rounding_mode' => $roundingMode, 'rounding_unit' => 500]);
+            $version = $setting->resolveActiveVersion();
+            $detail = $this->createPayrollDetail($month, (int) $version->id, 20);
+            $detail->update([
+                'overtime_amount' => 250125,
+                'taxable_adjustment_amount' => $correction,
+                'deduction_amount' => 100000,
+                'pph21_amount' => $tax,
+                'bpjs_tk_employee' => 300000,
+                'bpjs_kes_employee' => 100000,
+                'final_salary' => $net,
+            ]);
+
+            $export = new PayrollExport($detail->payroll_id);
+            $response = Excel::download($export, 'payroll.xlsx');
+            $path = $response->getFile()->getPathname();
+            $workbook = null;
+
+            try {
+                $workbook = IOFactory::load($path);
+                $sheet = $workbook->getActiveSheet();
+
+                $this->assertSame('T', $sheet->getHighestColumn());
+                $this->assertSame($export->headings(), $sheet->rangeToArray('A6:T6')[0]);
+                $this->assertSame([
+                    'Gaji Pokok',
+                    'Upah Lembur',
+                    'Koreksi Penghasilan Kena Pajak',
+                    'Potongan',
+                    'Penyesuaian Pembulatan',
+                    'Gaji Bersih',
+                    'Status',
+                    'Catatan',
+                ], $sheet->rangeToArray('M6:T6')[0]);
+
+                $money = $sheet->rangeToArray('M7:R7', null, true, false)[0];
+                $this->assertEquals([10000000, 250125, $correction, $deductions, $rounding, $net], $money);
+                $this->assertEquals(
+                    (float) $detail->final_salary,
+                    $money[0] + $money[1] + $money[2] - $money[3] + $money[4]
+                );
+                $this->assertSame('Menunggu', $sheet->getCell('S7')->getValue());
+                $this->assertSame('Export payload', $sheet->getCell('T7')->getValue());
+                $this->assertSame('Total Karyawan: 1', $sheet->getCell('A3')->getValue());
+                $this->assertSame('Total Gaji: Rp '.number_format($net, 0, ',', '.'), $sheet->getCell('D3')->getValue());
+                $this->assertSame('Rata-rata Gaji: Rp '.number_format($net, 0, ',', '.'), $sheet->getCell('A4')->getValue());
+                $this->assertContains('A1:T1', $sheet->getMergeCells());
+                foreach (range('M', 'R') as $column) {
+                    $this->assertSame('#,##0', $sheet->getStyle($column.'7')->getNumberFormat()->getFormatCode());
+                    $this->assertSame(Alignment::HORIZONTAL_RIGHT, $sheet->getStyle($column.'7')->getAlignment()->getHorizontal());
+                }
+                $this->assertSame(Alignment::HORIZONTAL_CENTER, $sheet->getStyle('S7')->getAlignment()->getHorizontal());
+                $this->assertTrue($sheet->getStyle('T5')->getFont()->getBold());
+                $this->assertEquals($tax, $detail->fresh()->pph21_amount);
+            } finally {
+                $workbook?->disconnectWorksheets();
+                unlink($path);
+            }
+        }
+    }
+
     private function createPayrollDetail(string $salaryMonth, ?int $settingsVersionId, int $effectiveWorkingDays): PayrollDetail
     {
         $user = User::factory()->create();
@@ -98,7 +173,7 @@ class PayrollExportVersioningTest extends TestCase
         $employee->bankInformation()->create([
             'staff_member_id' => $employee->id,
             'bank_name' => 'BCA',
-            'account_number' => '5566778899',
+            'account_number' => '556677'.str_pad((string) $employee->id, 4, '0', STR_PAD_LEFT),
             'account_holder_name' => 'Payroll Export User',
             'account_type' => 'saving',
         ]);

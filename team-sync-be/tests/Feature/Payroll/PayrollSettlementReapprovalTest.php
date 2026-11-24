@@ -126,6 +126,59 @@ class PayrollSettlementReapprovalTest extends TestCase
         $this->assertSame(PayrollStatus::APPROVED, $payroll->fresh()->status);
     }
 
+    public function test_verified_departure_after_payment_refreshes_final_tax_and_preserves_paid_history(): void
+    {
+        [$payroll, $thr, $actor] = $this->sources();
+        $year = PayrollTaxYear::sole();
+        $history = array_intersect_key($year->history, array_flip(['2026-01', '2026-02', '2026-03', '2026-04']));
+        $year->update(['history' => $history]);
+        $payroll->update(['salary_month' => '2026-06-01']);
+        $thr->update(['income_due_date' => '2026-05-15']);
+        $actor->assignRole('finance');
+        \App\Models\PayrollApprovalPolicy::create(['name' => 'Finance review', 'min_amount' => 0,
+            'required_role' => 'finance', 'approval_order' => 1, 'is_active' => true]);
+        $thrService = app(ThrService::class);
+        $this->assertTrue($thrService->approve($thr->id, $actor)['success']);
+        $this->assertTrue($thrService->markAsPaid($thr->id, '2026-05-15', $actor)['success']);
+        $settled = PayrollTaxEntry::where('source_type', 'thr')->sole();
+        $paidSnapshot = $settled->getAttributes();
+        $repository = app(PayrollRepositoryInterface::class);
+        $repository->approvePayroll((string) $payroll->id, $actor->id);
+        $approval = $payroll->approvals()->whereNull('superseded_at')->sole();
+        $detail = $payroll->payrollDetails()->sole();
+        $before = (float) $detail->pph21_amount;
+        $row = array_merge($year->profile, ['employee_id' => $year->employee_id, 'year' => 2026,
+            'history' => $history, 'provenance' => 'Verified synthetic June departure', 'employment_end_date' => '2026-06-30']);
+        $path = tempnam(sys_get_temp_dir(), 'tax-profile-');
+        try {
+            file_put_contents($path, json_encode([$row], JSON_THROW_ON_ERROR));
+            $this->artisan('payroll:import-tax-history', ['path' => $path, '--update-profile' => true])->assertSuccessful();
+            $detail->refresh();
+            $meta = json_decode($detail->tax_calculation_meta, true, 512, JSON_THROW_ON_ERROR);
+            $this->assertSame('final_period_actual', $meta['method']);
+            $this->assertNotEquals($before, (float) $detail->pph21_amount);
+            $this->assertEquals($meta['meta']['cash_base'] - (float) $detail->bpjs_tk_employee
+                - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, (float) $detail->final_salary);
+            $this->assertSame(PayrollStatus::PENDING, $payroll->fresh()->status);
+            $this->assertNotNull($approval->fresh()->superseded_at);
+            $this->assertSame('approved', $approval->fresh()->status);
+            $this->assertSame($paidSnapshot, $settled->fresh()->getAttributes());
+            $this->assertStringContainsString('Synthetic complete Jan-Nov ledger', $year->fresh()->provenance);
+            $this->assertStringContainsString($row['provenance'], $year->fresh()->provenance);
+            $this->assertSame($history, $year->fresh()->history);
+
+            foreach ([['employment_end_date' => '2026-05-31'], ['history' => []]] as $invalid) {
+                file_put_contents($path, json_encode([array_replace($row, $invalid)], JSON_THROW_ON_ERROR));
+                $this->artisan('payroll:import-tax-history', ['path' => $path, '--update-profile' => true])->assertFailed();
+                $this->assertSame('2026-06-30', $year->fresh()->profile['employment_end_date']);
+                $this->assertSame($history, $year->fresh()->history);
+                $this->assertSame($paidSnapshot, $settled->fresh()->getAttributes());
+            }
+        } finally {
+            unlink($path);
+        }
+    }
+
     private function sources(): array
     {
         Mail::fake();

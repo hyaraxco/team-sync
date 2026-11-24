@@ -1,0 +1,24 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::table('payroll_approvals', function (Blueprint $table) {
+            $table->dropForeign(['policy_id']);
+            $table->foreign('policy_id')->references('id')->on('payroll_approval_policies')->restrictOnDelete();
+        });
+    }
+
+    public function down(): void
+    {
+        Schema::table('payroll_approvals', function (Blueprint $table) {
+            $table->dropForeign(['policy_id']);
+            $table->foreign('policy_id')->references('id')->on('payroll_approval_policies')->cascadeOnDelete();
+        });
+    }
+};
