@@ -91,6 +91,12 @@ describe("MyGoals smoke", () => {
         performanceGoalRefs.myGoals.value = [];
         performanceGoalRefs.goalsLoading.value = false;
         performanceGoalRefs.error.value = null;
+        authRefs.user.value = {
+            id: 1,
+            name: "Ahmad Fauzi",
+            email: "john@example.com",
+            roles: ["staff"],
+        };
     });
 
     it("renders without crashing", () => {
@@ -152,5 +158,40 @@ describe("MyGoals smoke", () => {
         ];
         const wrapper = factory();
         expect(wrapper.text()).toContain("75");
+    });
+
+    it("passes staff_member_id from auth store when creating a goal", async () => {
+        authRefs.user.value = {
+            id: 1,
+            name: "Ahmad Fauzi",
+            email: "john@example.com",
+            roles: ["staff"],
+            permissions: ["goal-create-own"],
+            employee_profile: { id: 42 },
+        };
+        performanceGoalStoreMock.createGoal.mockResolvedValue({ id: 99 });
+        performanceGoalStoreMock.fetchMyGoals.mockResolvedValue({ data: [] });
+
+        const wrapper = factory();
+
+        const createBtn = wrapper.findAll("button").find((b) => b.text().includes("Create Goal"));
+        expect(createBtn.exists()).toBe(true);
+        await createBtn.trigger("click");
+        await wrapper.vm.$nextTick();
+
+        const modal = wrapper.find(".fixed");
+        expect(modal.exists()).toBe(true);
+
+        await modal.find("input[type='text']").setValue("Test Goal");
+
+        const dateInputs = modal.findAll("input[type='date']");
+        await dateInputs[0].setValue("2026-01-01");
+        await dateInputs[1].setValue("2026-12-01");
+
+        await modal.find("form").trigger("submit");
+        await wrapper.vm.$nextTick();
+
+        expect(performanceGoalStoreMock.createGoal).toHaveBeenCalledOnce();
+        expect(performanceGoalStoreMock.createGoal.mock.calls[0][0]).toHaveProperty("staff_member_id", 42);
     });
 });

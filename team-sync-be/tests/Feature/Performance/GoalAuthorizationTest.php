@@ -65,6 +65,7 @@ class GoalAuthorizationTest extends TestCase
         $user = $this->actor();
         $this->postJson('/api/v1/performance/goals', $this->payload($other->id))->assertForbidden();
         $this->assertDatabaseCount('performance_goals', 0);
+        Notification::assertNothingSent();
         $this->postJson('/api/v1/performance/goals', $this->payload($user->staffMemberProfile->id) + [
             'assigned_by' => $other->id,
             'created_by' => $other->user_id,
@@ -78,6 +79,7 @@ class GoalAuthorizationTest extends TestCase
         $manager = $this->actor('manager');
         $team = Team::factory()->create(['team_lead_id' => $manager->id]);
         $this->postJson('/api/v1/performance/goals', $this->payload($employee->id))->assertForbidden();
+        Notification::assertNothingSent();
         $membership = TeamMember::factory()->create(['team_id' => $team->id, 'staff_member_id' => $employee->id]);
         $this->postJson('/api/v1/performance/goals', $this->payload($employee->id) + ['assigned_by' => $employee->id])
             ->assertCreated()->assertJsonPath('data.assigned_by', $manager->staffMemberProfile->id);
@@ -107,6 +109,7 @@ class GoalAuthorizationTest extends TestCase
         $this->postJson("{$url}/update-progress", ['update_type' => 'completion', 'completion_percentage' => 50])->assertForbidden();
         $this->assertDatabaseHas('performance_goals', ['id' => $goal->id, 'title' => $goal->title]);
         $this->assertDatabaseCount('performance_goal_updates', 0);
+        Notification::assertNothingSent();
         $unledTeam = Team::factory()->create();
         TeamMember::factory()->create(['team_id' => $unledTeam->id, 'staff_member_id' => $manager->staffMemberProfile->id]);
         TeamMember::factory()->create(['team_id' => $unledTeam->id, 'staff_member_id' => $owner->staffMemberProfile->id]);

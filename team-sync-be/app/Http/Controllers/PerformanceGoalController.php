@@ -53,7 +53,7 @@ class PerformanceGoalController extends Controller implements HasMiddleware
 
     public function getTeamGoals(Request $request)
     {
-        $goals = $this->repository->getGoalsForManager(Auth::user()->staffMemberProfile?->id, $request->only(['status', 'cycle_id']));
+        $goals = $this->repository->getGoalsForTeam(Auth::user(), $request->only(['status', 'cycle_id']));
 
         return ResponseHelper::jsonResponse(true, 'Team goals retrieved successfully', $goals);
     }
