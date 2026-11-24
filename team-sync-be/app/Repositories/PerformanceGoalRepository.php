@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Interfaces\PerformanceGoalRepositoryInterface;
 use App\Models\PerformanceGoal;
 use App\Models\PerformanceGoalUpdate;
+use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Auth;
 
@@ -27,12 +28,20 @@ class PerformanceGoalRepository implements PerformanceGoalRepositoryInterface
             ->paginate($filters['per_page'] ?? 15);
     }
 
-    public function getGoalsForManager(string $managerId, array $filters = []): LengthAwarePaginator
+    public function getGoalsForTeam(User $user, array $filters = []): LengthAwarePaginator
     {
-        // Assuming a manager can see goals they assigned OR goals of their direct reports.
-        // For simplicity based on the current model, let's fetch goals assigned by this manager.
-        $query = PerformanceGoal::with(['staffMember', 'linkedReview'])
-            ->where('assigned_by', $managerId);
+        $query = PerformanceGoal::with(['staffMember', 'linkedReview']);
+
+        if (! $user->hasAnyRole(['hr', 'superadmin'])) {
+            $teamIds = $user->leadTeams()->pluck('teams.id');
+            $query->whereHas('staffMember', function ($q) use ($teamIds) {
+                $q->where(function ($inner) use ($teamIds) {
+                    $inner->whereHas('teamMembers', fn ($m) => $m
+                        ->whereNull('left_at')->whereIn('team_id', $teamIds))
+                        ->orWhereHas('jobInformation', fn ($j) => $j->whereIn('team_id', $teamIds));
+                });
+            });
+        }
 
         if (isset($filters['status'])) {
             $query->where('status', $filters['status']);

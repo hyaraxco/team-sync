@@ -2,13 +2,14 @@
 
 namespace App\Interfaces;
 
+use App\Models\User;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 interface PerformanceGoalRepositoryInterface
 {
     public function getGoalsForEmployee(string $employeeId, array $filters = []): LengthAwarePaginator;
 
-    public function getGoalsForManager(string $managerId, array $filters = []): LengthAwarePaginator;
+    public function getGoalsForTeam(User $user, array $filters = []): LengthAwarePaginator;
 
     public function getGoalById(int $id);
 

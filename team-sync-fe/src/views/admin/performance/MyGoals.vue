@@ -225,6 +225,7 @@ const submitGoal = async () => {
     try {
         const payload = {
             ...createForm.value,
+            staff_member_id: currentEmployeeId.value,
             target_value: createForm.value.target_value === "" ? null : Number(createForm.value.target_value),
         };
 
