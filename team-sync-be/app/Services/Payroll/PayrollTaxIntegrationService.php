@@ -304,7 +304,7 @@ class PayrollTaxIntegrationService
     private function applyRounding(float $amount, string $mode, int $unit): float
     {
         if ($mode === 'none' || $unit <= 1) {
-            return round($amount, 2);
+            return round($amount, 0);
         }
 
         $scaled = $amount / $unit;

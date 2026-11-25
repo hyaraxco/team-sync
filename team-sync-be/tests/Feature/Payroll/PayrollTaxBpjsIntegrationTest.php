@@ -142,7 +142,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             'pph21 must be withheld on the combined gross'
         );
         $this->assertEquals(
-            round($expectedCash - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 2),
+            round($expectedCash - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 0),
             (float) $detail->final_salary
         );
     }

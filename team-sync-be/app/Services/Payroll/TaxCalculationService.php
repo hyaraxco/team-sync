@@ -60,6 +60,10 @@ class TaxCalculationService
         'K/1' => 'B',
         'K/2' => 'B',
         'K/3' => 'C',
+        'K/I/0' => 'B',
+        'K/I/1' => 'B',
+        'K/I/2' => 'C',
+        'K/I/3' => 'C',
     ];
 
     /**
@@ -274,8 +278,8 @@ class TaxCalculationService
                 default => $wage,
             };
 
-            $employeeAmount = round($baseSalary * ((float) $rate->employee_rate / 100), 2);
-            $employerAmount = round($baseSalary * ((float) $rate->employer_rate / 100), 2);
+            $employeeAmount = round($baseSalary * ((float) $rate->employee_rate / 100), 0);
+            $employerAmount = round($baseSalary * ((float) $rate->employer_rate / 100), 0);
 
             $breakdown["{$component}_employee"] = $employeeAmount;
             $breakdown["{$component}_employer"] = $employerAmount;
@@ -382,18 +386,18 @@ class TaxCalculationService
         $pph21Monthly = $pph21Annual / 12;
 
         return [
-            'pph21_monthly' => round($pph21Monthly, 2),
+            'pph21_monthly' => round($pph21Monthly, 0),
             'has_taxpayer_id' => $hasTaxpayerId,
             'ptkp_status' => $ptkpStatusToUse,
             'meta' => [
-                'gross_monthly' => round($grossMonthly, 2),
-                'gross_annual' => round($grossAnnual, 2),
-                'biaya_jabatan_annual' => round($biayaJabatanAnnual, 2),
-                'bpjs_deduction_annual' => round($bpjsDeductionAnnual, 2),
-                'net_income_annual' => round($netIncomeAnnual, 2),
-                'ptkp_amount' => round($ptkpAmount, 2),
-                'pkp' => round($pkpRoundedDown, 2),
-                'pph21_annual' => round($pph21Annual, 2),
+                'gross_monthly' => round($grossMonthly, 0),
+                'gross_annual' => round($grossAnnual, 0),
+                'biaya_jabatan_annual' => round($biayaJabatanAnnual, 0),
+                'bpjs_deduction_annual' => round($bpjsDeductionAnnual, 0),
+                'net_income_annual' => round($netIncomeAnnual, 0),
+                'ptkp_amount' => round($ptkpAmount, 0),
+                'pkp' => round($pkpRoundedDown, 0),
+                'pph21_annual' => round($pph21Annual, 0),
             ],
         ];
     }

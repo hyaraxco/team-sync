@@ -68,7 +68,7 @@ class TaxCalculationServiceTest extends TestCase
         // gross_annual=120jt, biaya_jabatan=5.4jt, bpjs_annual~3.6jt → net~111jt, pkp=111-54=57jt
         // PKP should be > 0 and < 60jt (first bracket only)
         $this->assertGreaterThan(0.0, $result['meta']['pkp']);
-        $this->assertLessThan(60_000_001, $result['meta']['pkp']);
+        $this->assertLessThan(60_000_000, $result['meta']['pkp']);
     }
 
     /** @test */
@@ -81,11 +81,11 @@ class TaxCalculationServiceTest extends TestCase
         // PPh 21 annual should be > 0 and monthly > 0
         $this->assertGreaterThan(0.0, $result['meta']['pph21_annual']);
         $this->assertGreaterThan(0.0, $result['pph21_monthly']);
-        // Monthly is annual/12 rounded — allow 0.02 delta for rounding
+        // Monthly is annual/12 rounded to 0dp — allow 1.0 delta for integer rounding
         $this->assertEqualsWithDelta(
-            round($result['meta']['pph21_annual'] / 12, 2),
+            round($result['meta']['pph21_annual'] / 12, 0),
             $result['pph21_monthly'],
-            0.02
+            1.0
         );
     }
 
@@ -176,7 +176,7 @@ class TaxCalculationServiceTest extends TestCase
         $result = $this->service->calculateBpjs(new BpjsPayrollInput(20_000_000, 0, 1, 3_000_000), '2025-02');
         $jpRate = BpjsRate::where('component', 'jp')->first();
 
-        $expectedJpEmployee = round((float) $jpRate->max_salary_base * ((float) $jpRate->employee_rate / 100), 2);
+        $expectedJpEmployee = round((float) $jpRate->max_salary_base * ((float) $jpRate->employee_rate / 100), 0);
 
         $this->assertEquals($expectedJpEmployee, $result['breakdown']['jp_employee']);
     }
@@ -188,7 +188,7 @@ class TaxCalculationServiceTest extends TestCase
         $result = $this->service->calculateBpjs(new BpjsPayrollInput(20_000_000, 0, 1, 3_000_000), '2025-02');
         $kesRate = BpjsRate::where('component', 'bpjs_kesehatan')->first();
 
-        $expectedKesEmployee = round((float) $kesRate->max_salary_base * ((float) $kesRate->employee_rate / 100), 2);
+        $expectedKesEmployee = round((float) $kesRate->max_salary_base * ((float) $kesRate->employee_rate / 100), 0);
 
         $this->assertEquals($expectedKesEmployee, $result['breakdown']['bpjs_kesehatan_employee']);
     }
@@ -201,7 +201,7 @@ class TaxCalculationServiceTest extends TestCase
         $result = $this->service->calculateBpjs(new BpjsPayrollInput($salary, 0, 1, 3_000_000), '2025-02');
         $jhtRate = BpjsRate::where('component', 'jht')->first();
 
-        $expectedJhtEmployee = round($salary * ((float) $jhtRate->employee_rate / 100), 2);
+        $expectedJhtEmployee = round($salary * ((float) $jhtRate->employee_rate / 100), 0);
 
         $this->assertEquals($expectedJhtEmployee, $result['breakdown']['jht_employee']);
     }
@@ -558,10 +558,10 @@ class TaxCalculationServiceTest extends TestCase
         // Tax Brackets (UU HPP)
         $brackets = [
             ['min_income' => 0, 'max_income' => 60_000_000, 'rate' => 5.00, 'order' => 1],
-            ['min_income' => 60_000_001, 'max_income' => 250_000_000, 'rate' => 15.00, 'order' => 2],
-            ['min_income' => 250_000_001, 'max_income' => 500_000_000, 'rate' => 25.00, 'order' => 3],
-            ['min_income' => 500_000_001, 'max_income' => 5_000_000_000, 'rate' => 30.00, 'order' => 4],
-            ['min_income' => 5_000_000_001, 'max_income' => null, 'rate' => 35.00, 'order' => 5],
+            ['min_income' => 60_000_000, 'max_income' => 250_000_000, 'rate' => 15.00, 'order' => 2],
+            ['min_income' => 250_000_000, 'max_income' => 500_000_000, 'rate' => 25.00, 'order' => 3],
+            ['min_income' => 500_000_000, 'max_income' => 5_000_000_000, 'rate' => 30.00, 'order' => 4],
+            ['min_income' => 5_000_000_000, 'max_income' => null, 'rate' => 35.00, 'order' => 5],
         ];
         foreach ($brackets as $b) {
             TaxBracket::updateOrCreate(['order' => $b['order']], $b);
