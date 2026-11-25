@@ -92,6 +92,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
             'bpjs_kes_employer' => 0,
         ]);
 
+        $this->seedBpjsPayroll('2026-04', [$profile->id => 10_000_000]);
         $this->artisan('payroll:recalculate-tax --month=2026-04')
             ->expectsOutputToContain('Recalculated PPh 21, BPJS and net pay for 2026-04.')
             ->assertSuccessful();
@@ -134,6 +135,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         ]);
         $before = $detail->fresh()->getAttributes();
 
+        $this->seedBpjsPayroll('2026-04', [$profile->id => 10_000_000]);
         $this->artisan('payroll:recalculate-tax --month=2026-04 --dry-run')
             ->expectsOutputToContain('[DRY-RUN]')
             ->assertSuccessful();
@@ -172,6 +174,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
             'bpjs_kes_employer' => 0,
         ]);
 
+        $this->seedBpjsPayroll('2026-04', [$profile->id => 8_000_000]);
         $this->artisan('payroll:recalculate-tax --month=2026-04')->assertSuccessful();
 
         $detail->refresh();

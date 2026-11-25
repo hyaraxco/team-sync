@@ -85,6 +85,9 @@ class MinimalPayrollE2ESeeder extends Seeder
             $this->resetPayrollMonth($payrollMonth->copy()->subMonth());
             $this->clearPayrollBlockers($payrollMonth);
             $this->seedAttendanceForActiveEmployeesForMonth($payrollMonth);
+            foreach ([$payrollMonth, $payrollMonth->copy()->subMonth()] as $period) {
+                $this->callWith(BpjsPayrollFixtureSeeder::class, ['period' => $period->format('Y-m')]);
+            }
 
             // Create an empty Performance Review Cycle for E2E testing (ID 1)
             PerformanceReviewCycle::updateOrCreate(

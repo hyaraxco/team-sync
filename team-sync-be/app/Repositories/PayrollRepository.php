@@ -33,6 +33,7 @@ use App\Notifications\PayrollCorrected;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
+use App\Services\Payroll\BpjsPayrollFacts;
 use App\Services\Payroll\OvertimeCalculationService;
 use App\Services\Payroll\TaxCalculationService;
 use App\Services\Payroll\PayrollApprovalService;
@@ -413,20 +414,6 @@ class PayrollRepository implements PayrollRepositoryInterface
         $overtimeHours = $overtimeResult['total_hours'];
         $overtimeRecordsCount = $approvedOvertimeRecords->count();
 
-        $contributionPeriod = $startOfMonth->format('Y-m');
-        $bpjsResult = $this->taxCalculationService->calculateBpjs((float) $originalSalary, $contributionPeriod);
-
-        // BPJS Ketenagakerjaan = JHT + JKK + JKM + JP
-        $bpjsTkEmployee = ($bpjsResult['breakdown']['jht_employee'] ?? 0)
-            + ($bpjsResult['breakdown']['jp_employee'] ?? 0);
-        $bpjsTkEmployer = ($bpjsResult['breakdown']['jht_employer'] ?? 0)
-            + ($bpjsResult['breakdown']['jkk_employer'] ?? 0)
-            + ($bpjsResult['breakdown']['jkm_employer'] ?? 0)
-            + ($bpjsResult['breakdown']['jp_employer'] ?? 0);
-
-        $bpjsKesEmployee = $bpjsResult['breakdown']['bpjs_kesehatan_employee'] ?? 0;
-        $bpjsKesEmployer = $bpjsResult['breakdown']['bpjs_kesehatan_employer'] ?? 0;
-
         // Add overtime to final salary
         $finalSalary = max(0, $originalSalary - $deduction) + $overtimeAmount;
 
@@ -452,10 +439,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             'overtime_amount' => round($overtimeAmount, 2),
             'overtime_records_count' => $overtimeRecordsCount,
             'pph21_amount' => 0,
-            'bpjs_tk_employee' => round($bpjsTkEmployee, 2),
-            'bpjs_tk_employer' => round($bpjsTkEmployer, 2),
-            'bpjs_kes_employee' => round($bpjsKesEmployee, 2),
-            'bpjs_kes_employer' => round($bpjsKesEmployer, 2),
             'tax_calculation_meta' => null,
             'policy_mismatch_days' => (int) ($fairnessSummary['policy_mismatch_days'] ?? 0),
             'warning_flags' => empty($warningFlags) ? null : json_encode(array_values($warningFlags), JSON_THROW_ON_ERROR),
@@ -1102,12 +1085,14 @@ class PayrollRepository implements PayrollRepositoryInterface
     {
         return BpjsRate::query()
             ->orderBy('component')
+            ->orderBy('risk_class')
             ->orderByDesc('effective_date')
             ->get()
             ->map(function (BpjsRate $rate) {
                 return [
                     'id' => $rate->id,
                     'component' => $rate->component,
+                    'risk_class' => $rate->risk_class ? (int) $rate->risk_class : null,
                     'description' => $rate->description,
                     'employee_rate' => (float) $rate->employee_rate,
                     'employer_rate' => (float) $rate->employer_rate,
@@ -2016,6 +2001,29 @@ class PayrollRepository implements PayrollRepositoryInterface
                     'blocked_employee_count' => count($blockedEmployees['blocked_staff_member_ids']),
                     'blocked_staff_member_ids' => $blockedEmployees['blocked_staff_member_ids'],
                     'blocked_reasons' => $blockedEmployees['blocked_reasons'],
+                ],
+            ];
+        }
+
+        try {
+            $period = $basePayload['salary_month'];
+            $facts = BpjsPayrollFacts::load($period);
+            $this->taxCalculationService->assertBpjsRates($period, $facts['jkk_class']);
+            $employees = StaffMemberProfile::with('jobInformation')
+                ->whereIn('id', array_intersect($activeEmployeeIds, $employeeIdsWithAttendance))->get();
+            foreach ($employees as $employee) {
+                BpjsPayrollFacts::forEmployee($facts, $employee->id, (float) $employee->jobInformation?->monthly_salary);
+            }
+        } catch (PayrollStateException $exception) {
+            return [
+                'can_generate' => false,
+                'reason_code' => 'bpjs_inputs_invalid',
+                'message' => $exception->getMessage(),
+                'meta' => [
+                    ...$basePayload,
+                    'active_employee_count' => $activeEmployeesCount,
+                    'active_employees_with_attendance_count' => $activeEmployeesWithAttendanceCount,
+                    'staff_member_ids_with_attendance' => $employeeIdsWithAttendance,
                 ],
             ];
         }

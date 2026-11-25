@@ -56,6 +56,7 @@ class PayrollCalculationTest extends TestCase
         $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 9999999);
         $repository = app(PayrollRepositoryInterface::class);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -77,6 +78,7 @@ class PayrollCalculationTest extends TestCase
         $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 9999001);
         $repository = app(PayrollRepositoryInterface::class);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -97,6 +99,7 @@ class PayrollCalculationTest extends TestCase
         $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 10000000);
         $repository = app(PayrollRepositoryInterface::class);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -134,6 +137,7 @@ class PayrollCalculationTest extends TestCase
             ]);
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
 
         $fullDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $fullEmployee->id);
@@ -153,22 +157,21 @@ class PayrollCalculationTest extends TestCase
         $this->assertGreaterThan(0, (int) $absentDetail->absent_days);
     }
 
-    public function test_zero_salary_employee_produces_zero_final_salary(): void
+    public function test_zero_salary_requires_verified_bpjs_wage_before_payroll(): void
     {
         Carbon::setTestNow('2026-04-28 09:00:00');
         PayrollSetting::current()->update([
             'attendance_cutoff_day' => 25,
         ]);
 
-        $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 0);
+        $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 0);
         $repository = app(PayrollRepositoryInterface::class);
 
-        $payroll = $repository->generatePayroll('2026-04', null);
-        $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
-
-        $this->assertNotNull($detail);
-        $this->assertEquals(0, (float) $detail->original_salary);
-        $this->assertEquals(0, (float) $detail->final_salary);
+        $readiness = $repository->getGenerateReadiness('2026-04');
+        $this->assertFalse($readiness['can_generate']);
+        $this->assertSame('bpjs_inputs_invalid', $readiness['reason_code']);
+        $this->expectExceptionMessage('Verified BPJS payroll inputs are missing');
+        $repository->generatePayroll('2026-04', null);
     }
 
     public function test_payroll_detail_captures_attendance_breakdown(): void
@@ -181,6 +184,7 @@ class PayrollCalculationTest extends TestCase
         $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 10000000);
         $repository = app(PayrollRepositoryInterface::class);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 

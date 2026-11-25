@@ -199,6 +199,7 @@ class PayrollSettingsTest extends TestCase
 
         $this->seedFullMonthAttendance($employee, $month, $absentDates);
 
+        $this->seedBpjsPayroll($month->format('Y-m'));
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll($month->format('Y-m'));
         $detail = $payroll->payrollDetails()->firstOrFail();
 
@@ -253,6 +254,7 @@ class PayrollSettingsTest extends TestCase
         $this->seedFullMonthAttendance($employee, $mayMonth);
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll($aprilMonth->format('Y-m'));
         $aprilPayroll = $repository->generatePayroll($aprilMonth->format('Y-m'));
         $aprilVersionId = (int) $aprilPayroll->payroll_setting_version_id;
 
@@ -265,6 +267,7 @@ class PayrollSettingsTest extends TestCase
             'note_template' => 'Version 2 {absent_days}',
         ]);
 
+        $this->seedBpjsPayroll($mayMonth->format('Y-m'));
         $mayPayroll = $repository->generatePayroll($mayMonth->format('Y-m'));
 
         $aprilPayroll = Payroll::with('payrollSettingVersion')->findOrFail($aprilPayroll->id);

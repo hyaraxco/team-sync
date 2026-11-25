@@ -104,6 +104,9 @@ foreach (\$ids as \$id) {
         }
     }
 }
+foreach ([\$prev, \$cur] as \$period) {
+    app(\\Database\\Seeders\\BpjsPayrollFixtureSeeder::class)->run(\$period->format('Y-m'));
+}
 "
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceReviewSectionSeeder
 "${compose_cmd[@]}" exec -T web php artisan db:seed --class=PerformanceOutcomeRuleSeeder

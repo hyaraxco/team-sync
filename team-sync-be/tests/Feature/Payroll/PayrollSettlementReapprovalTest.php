@@ -133,6 +133,7 @@ class PayrollSettlementReapprovalTest extends TestCase
         $history = array_intersect_key($year->history, array_flip(['2026-01', '2026-02', '2026-03', '2026-04']));
         $year->update(['history' => $history]);
         $payroll->update(['salary_month' => '2026-06-01']);
+        $this->seedBpjsPayroll('2026-06', [$year->employee_id => 10_000_000]);
         $thr->update(['income_due_date' => '2026-05-15']);
         $actor->assignRole('finance');
         \App\Models\PayrollApprovalPolicy::create(['name' => 'Finance review', 'min_amount' => 0,
@@ -223,6 +224,7 @@ class PayrollSettlementReapprovalTest extends TestCase
         $payroll = Payroll::create(['salary_month' => '2026-12-01', 'status' => 'pending', 'payroll_setting_version_id' => $version->id]);
         PayrollDetail::create(['payroll_id' => $payroll->id, 'staff_member_id' => $employee->id,
             'original_salary' => 10000000, 'final_salary' => 10000000, 'attended_days' => 22, 'sick_days' => 0, 'absent_days' => 0]);
+        $this->seedBpjsPayroll('2026-12', [$employee->id => 10_000_000]);
         $thr = ThrPayroll::create(['year' => 2026, 'religion_event' => 'natal', 'religion_holiday_date' => '2026-12-25',
             'payment_deadline' => '2026-12-18', 'income_due_date' => '2026-12-15', 'status' => 'pending', 'created_by' => $actor->id]);
         ThrPayrollDetail::create(['thr_payroll_id' => $thr->id, 'staff_member_id' => $employee->id,

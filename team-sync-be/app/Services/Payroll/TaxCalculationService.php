@@ -2,7 +2,10 @@
 
 namespace App\Services\Payroll;
 
+use App\DTOs\BpjsPayrollInput;
+use App\Exceptions\PayrollStateException;
 use App\Models\BpjsRate;
+use App\Models\PayrollBpjsPeriod;
 use App\Models\PtkpAmount;
 use App\Models\TaxBracket;
 use Carbon\Carbon;
@@ -15,6 +18,7 @@ class TaxCalculationService
     protected ?Collection $bpjsRates = null;
 
     protected ?string $bpjsLoadedPeriod = null;
+    protected ?int $bpjsLoadedJkkClass = null;
 
     protected ?Collection $ptkpAmounts = null;
 
@@ -28,6 +32,17 @@ class TaxCalculationService
      * Number of months after which BPJS rates are considered potentially outdated.
      */
     protected const BPJS_RATE_STALENESS_MONTHS = 12;
+
+    private const BPJS_COMPONENTS = ['jht', 'jkk', 'jkm', 'jp', 'bpjs_kesehatan'];
+
+    private const ORDINARY_BPJS_SPLITS = [
+        'jht' => [2.0, 3.7],
+        'jkm' => [0.0, 0.3],
+        'jp' => [1.0, 2.0],
+        'bpjs_kesehatan' => [1.0, 4.0],
+    ];
+
+    private const ORDINARY_JKK_RATES = [1 => 0.24, 2 => 0.54, 3 => 0.89, 4 => 1.27, 5 => 1.74];
 
     /**
      * TER 2024 — PTKP status to TER category mapping (PP 58/2023).
@@ -215,19 +230,20 @@ class TaxCalculationService
         $this->loadBpjsRates($contributionPeriod);
     }
 
-    protected function loadBpjsRates(?string $contributionPeriod = null): void
+    protected function loadBpjsRates(?string $contributionPeriod = null, ?int $jkkClass = null): void
     {
-        if ($contributionPeriod && $this->bpjsLoadedPeriod === $contributionPeriod) {
+        if ($contributionPeriod && $this->bpjsLoadedPeriod === $contributionPeriod && $this->bpjsLoadedJkkClass === $jkkClass) {
             return;
         }
 
         if ($contributionPeriod) {
-            $this->bpjsRates = BpjsRate::forPeriod($contributionPeriod);
+            $this->bpjsRates = BpjsRate::forPeriod($contributionPeriod, $jkkClass);
         } else {
-            $this->bpjsRates = BpjsRate::all()->keyBy('component');
+            $this->bpjsRates = BpjsRate::forPeriod(now()->format('Y-m'));
         }
 
         $this->bpjsLoadedPeriod = $contributionPeriod;
+        $this->bpjsLoadedJkkClass = $jkkClass;
     }
 
     /**
@@ -242,22 +258,21 @@ class TaxCalculationService
      *     }
      * }
      */
-    public function calculateBpjs(float $grossMonthly, ?string $contributionPeriod = null): array
+    public function calculateBpjs(BpjsPayrollInput $input, string $contributionPeriod): array
     {
-        if ($contributionPeriod) {
-            $this->loadBpjsRates($contributionPeriod);
-        }
+        $this->assertBpjsRates($contributionPeriod, $input->jkkRiskClass);
+        $wage = $input->basicWage + $input->fixedAllowances;
 
         $breakdown = [];
         $employeeShareTotal = 0.0;
         $employerShareTotal = 0.0;
 
         foreach ($this->bpjsRates as $component => $rate) {
-            // Apply salary cap if configured
-            $baseSalary = $grossMonthly;
-            if ($rate->max_salary_base && $grossMonthly > $rate->max_salary_base) {
-                $baseSalary = (float) $rate->max_salary_base;
-            }
+            $baseSalary = match ($component) {
+                'jp' => min($wage, (float) $rate->max_salary_base),
+                'bpjs_kesehatan' => min(max($wage, $input->healthFloor), (float) $rate->max_salary_base),
+                default => $wage,
+            };
 
             $employeeAmount = round($baseSalary * ((float) $rate->employee_rate / 100), 2);
             $employerAmount = round($baseSalary * ((float) $rate->employer_rate / 100), 2);
@@ -274,6 +289,32 @@ class TaxCalculationService
             'employer_share' => $employerShareTotal,
             'breakdown' => $breakdown,
         ];
+    }
+
+    public function assertBpjsRates(string $period, int $jkkClass): void
+    {
+        $this->loadBpjsRates($period, $jkkClass);
+        foreach (self::BPJS_COMPONENTS as $component) {
+            $rate = $this->bpjsRates->get($component);
+            if (! $rate) {
+                throw new PayrollStateException("Required BPJS rate {$component} is missing for {$period}.");
+            }
+            if (! $this->isOrdinaryBpjsRate($rate)) {
+                throw new PayrollStateException("BPJS rate {$component} is not a supported ordinary rate for {$period}.");
+            }
+        }
+    }
+
+    private function isOrdinaryBpjsRate(BpjsRate $rate): bool
+    {
+        $expected = $rate->component === 'jkk'
+            ? [0.0, self::ORDINARY_JKK_RATES[$rate->risk_class] ?? null]
+            : self::ORDINARY_BPJS_SPLITS[$rate->component];
+        $validCap = in_array($rate->component, ['jp', 'bpjs_kesehatan'], true)
+            ? (float) $rate->max_salary_base > 0
+            : $rate->max_salary_base === null;
+
+        return $validCap && [(float) $rate->employee_rate, (float) $rate->employer_rate] === $expected;
     }
 
     /**
@@ -293,29 +334,15 @@ class TaxCalculationService
      *    }
      * }
      */
-    public function calculateMonthlyPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasTaxpayerId, ?string $contributionPeriod = null): array
+    public function calculateMonthlyPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasTaxpayerId, float $employeePensionMonthly): array
     {
-        if ($contributionPeriod) {
-            $this->loadBpjsRates($contributionPeriod);
-        }
-
         // 1. Annualize gross
         $grossAnnual = $grossMonthly * 12;
 
         // 2. Biaya Jabatan (5% max 6jt/year)
         $biayaJabatanAnnual = min($grossAnnual * static::JABATAN_RATE, static::JABATAN_MAX_ANNUAL);
 
-        // 3. Deductible BPJS (JHT & JP employee portions)
-        $jhtRate = $this->bpjsRates->get('jht');
-        $jpRate = $this->bpjsRates->get('jp');
-
-        $jhtBase = $grossMonthly;
-        $jhtAmountMonthly = $jhtBase * ((float) $jhtRate?->employee_rate / 100);
-
-        $jpBase = min($grossMonthly, $jpRate?->max_salary_base !== null ? (float) $jpRate->max_salary_base : $grossMonthly);
-        $jpAmountMonthly = $jpBase * ((float) $jpRate?->employee_rate / 100);
-
-        $bpjsDeductionAnnual = ($jhtAmountMonthly + $jpAmountMonthly) * 12;
+        $bpjsDeductionAnnual = $employeePensionMonthly * 12;
 
         // 4. Net Income Annual
         $netIncomeAnnual = $grossAnnual - $biayaJabatanAnnual - $bpjsDeductionAnnual;
@@ -535,27 +562,43 @@ class TaxCalculationService
     {
         $period = $contributionPeriod ?: now()->format('Y-m');
         $firstOfMonth = Carbon::parse($period.'-01');
+        $facts = PayrollBpjsPeriod::query()->where('contribution_month', $period)->first()?->facts;
+        $jkkClass = data_get($facts, 'jkk_class');
+        $jkkClass = is_int($jkkClass) && $jkkClass >= 1 && $jkkClass <= 5 ? $jkkClass : null;
+        $active = BpjsRate::forPeriod($period, $jkkClass);
 
         // Load the latest rate per component with effective_date <= target,
         // regardless of valid_until, so we can detect expired configurations.
         $allCandidates = BpjsRate::whereDate('effective_date', '<=', $firstOfMonth->toDateString())
+            ->forJkkClass($jkkClass)
             ->orderByDesc('effective_date')
             ->get()
             ->groupBy('component')
             ->map->first();
+        $allCandidates = $active->union($allCandidates);
 
         $warnings = [];
         $rateDetails = [];
         $now = Carbon::now();
+        foreach ($active as $component => $rate) {
+            if (! $this->isOrdinaryBpjsRate($rate)) {
+                $warnings[] = [
+                    'component' => $component,
+                    'type' => 'unsupported_rate',
+                    'message' => "BPJS rate {$component} is not a supported ordinary rate for {$period}.",
+                ];
+            }
+        }
 
-        $expectedComponents = ['jht', 'jkk', 'jkm', 'jp', 'bpjs_kesehatan'];
-        $missingComponents = array_diff($expectedComponents, $allCandidates->keys()->all());
+        $missingComponents = array_diff(self::BPJS_COMPONENTS, $allCandidates->keys()->all());
 
         foreach ($missingComponents as $component) {
             $warnings[] = [
                 'component' => $component,
                 'type' => 'missing_component',
-                'message' => sprintf('BPJS component "%s" is not configured in the database.', $component),
+                'message' => $component === 'jkk' && $jkkClass === null
+                    ? "Verified BPJS JKK risk class is not configured for {$period}."
+                    : sprintf('BPJS component "%s" is not configured for %s.', $component, $period),
             ];
         }
 
@@ -566,7 +609,7 @@ class TaxCalculationService
             $isPotentiallyOutdated = false;
 
             // Check if rate has expired based on valid_until
-            if ($validUntil && Carbon::parse($validUntil)->lt($now)) {
+            if ($validUntil && $validUntil->lt($firstOfMonth)) {
                 $isExpired = true;
                 $warnings[] = [
                     'component' => $component,
@@ -599,6 +642,7 @@ class TaxCalculationService
 
             $rateDetails[$component] = [
                 'component' => $component,
+                'risk_class' => $component === 'jkk' ? (int) $rate->risk_class : null,
                 'description' => $rate->description,
                 'employee_rate' => (float) $rate->employee_rate,
                 'employer_rate' => (float) $rate->employer_rate,

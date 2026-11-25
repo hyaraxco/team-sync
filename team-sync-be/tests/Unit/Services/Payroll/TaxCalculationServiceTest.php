@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Services\Payroll;
 
+use App\DTOs\BpjsPayrollInput;
 use App\Models\BpjsRate;
 use App\Models\PtkpAmount;
 use App\Models\TaxBracket;
@@ -40,7 +41,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_pph21_zero_for_income_below_ptkp(): void
     {
         // TK/0 PTKP = 54_000_000/year. Monthly gaji 4jt => annual 48jt < PTKP
-        $result = $this->service->calculateMonthlyPph21(4_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(4_000_000, 'TK/0', true, 120_000);
 
         $this->assertEquals(0.0, $result['pph21_monthly']);
         $this->assertEquals(0.0, $result['meta']['pkp']);
@@ -50,7 +51,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_pph21_applies_5_percent_bracket_for_low_pkp(): void
     {
         // Gaji 6jt/bulan => annual 72jt. PTKP TK/0 = 54jt. PKP = ~18jt -> 5%
-        $result = $this->service->calculateMonthlyPph21(6_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(6_000_000, 'TK/0', true, 180_000);
 
         // PKP ~18jt falls in bracket 1 (5%)
         $this->assertGreaterThan(0.0, $result['pph21_monthly']);
@@ -61,7 +62,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_pph21_applies_15_percent_bracket_for_mid_pkp(): void
     {
         // Gaji 10jt/bulan => annual 120jt. PTKP TK/0 54jt. PKP ~66jt -> spans 5% & 15%
-        $result = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true, 300_000);
 
         // PKP after deductions (biaya jabatan + BPJS) — for gaji 10jt TK/0
         // gross_annual=120jt, biaya_jabatan=5.4jt, bpjs_annual~3.6jt → net~111jt, pkp=111-54=57jt
@@ -75,7 +76,7 @@ class TaxCalculationServiceTest extends TestCase
     {
         // Gaji 30jt/bulan => annual 360jt. PTKP TK/0 54jt.
         // PKP = 360jt - biaya jabatan - BPJS - 54jt
-        $result = $this->service->calculateMonthlyPph21(30_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(30_000_000, 'TK/0', true, 700_423);
 
         // PPh 21 annual should be > 0 and monthly > 0
         $this->assertGreaterThan(0.0, $result['meta']['pph21_annual']);
@@ -92,7 +93,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_pph21_high_earner_hits_25_percent_bracket(): void
     {
         // Gaji 25jt/bulan => annual 300jt. Should enter 25% bracket
-        $result = $this->service->calculateMonthlyPph21(25_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(25_000_000, 'TK/0', true, 600_423);
 
         // PKP should be > 250jt (enters 25% bracket)
         $this->assertGreaterThan(0.0, $result['pph21_monthly']);
@@ -106,8 +107,8 @@ class TaxCalculationServiceTest extends TestCase
     public function test_pph21_married_status_produces_lower_tax(): void
     {
         // K/0 PTKP is higher than TK/0 => lower PKP => lower tax
-        $singleResult = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
-        $marriedResult = $this->service->calculateMonthlyPph21(10_000_000, 'K/0', true);
+        $singleResult = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true, 300_000);
+        $marriedResult = $this->service->calculateMonthlyPph21(10_000_000, 'K/0', true, 300_000);
 
         $this->assertGreaterThan($marriedResult['pph21_monthly'], $singleResult['pph21_monthly']);
     }
@@ -115,8 +116,8 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_pph21_null_ptkp_status_defaults_to_tk0(): void
     {
-        $withNull = $this->service->calculateMonthlyPph21(10_000_000, null, true);
-        $withTk0 = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
+        $withNull = $this->service->calculateMonthlyPph21(10_000_000, null, true, 300_000);
+        $withTk0 = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true, 300_000);
 
         $this->assertEquals($withTk0['pph21_monthly'], $withNull['pph21_monthly']);
         $this->assertEquals('TK/0', $withNull['ptkp_status']);
@@ -125,8 +126,8 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_pph21_k1_status_has_lower_tax_than_k0(): void
     {
-        $k0Result = $this->service->calculateMonthlyPph21(10_000_000, 'K/0', true);
-        $k1Result = $this->service->calculateMonthlyPph21(10_000_000, 'K/1', true);
+        $k0Result = $this->service->calculateMonthlyPph21(10_000_000, 'K/0', true, 300_000);
+        $k1Result = $this->service->calculateMonthlyPph21(10_000_000, 'K/1', true, 300_000);
 
         // K/1 has one dependent → higher PTKP → lower tax
         $this->assertGreaterThanOrEqual($k1Result['pph21_monthly'], $k0Result['pph21_monthly']);
@@ -139,8 +140,8 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_pph21_no_npwp_applies_20_percent_surcharge(): void
     {
-        $withNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
-        $withoutNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', false);
+        $withNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true, 300_000);
+        $withoutNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', false, 300_000);
 
         if ($withNpwp['pph21_monthly'] > 0) {
             $this->assertEqualsWithDelta(
@@ -157,8 +158,8 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_pph21_has_taxpayer_id_flag_is_returned(): void
     {
-        $withNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
-        $withoutNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', false);
+        $withNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true, 300_000);
+        $withoutNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', false, 300_000);
 
         $this->assertTrue($withNpwp['has_taxpayer_id']);
         $this->assertFalse($withoutNpwp['has_taxpayer_id']);
@@ -172,7 +173,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_bpjs_jp_component_capped_at_max_salary_base(): void
     {
         // JP cap = 10_042_300. Test with salary well above cap.
-        $result = $this->service->calculateBpjs(20_000_000);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput(20_000_000, 0, 1, 3_000_000), '2025-02');
         $jpRate = BpjsRate::where('component', 'jp')->first();
 
         $expectedJpEmployee = round((float) $jpRate->max_salary_base * ((float) $jpRate->employee_rate / 100), 2);
@@ -184,7 +185,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_bpjs_kesehatan_capped_at_max_salary_base(): void
     {
         // BPJS Kes cap = 12_000_000
-        $result = $this->service->calculateBpjs(20_000_000);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput(20_000_000, 0, 1, 3_000_000), '2025-02');
         $kesRate = BpjsRate::where('component', 'bpjs_kesehatan')->first();
 
         $expectedKesEmployee = round((float) $kesRate->max_salary_base * ((float) $kesRate->employee_rate / 100), 2);
@@ -197,7 +198,7 @@ class TaxCalculationServiceTest extends TestCase
     {
         // Salary 5jt is below all caps
         $salary = 5_000_000;
-        $result = $this->service->calculateBpjs($salary);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput($salary, 0, 1, 3_000_000), '2025-02');
         $jhtRate = BpjsRate::where('component', 'jht')->first();
 
         $expectedJhtEmployee = round($salary * ((float) $jhtRate->employee_rate / 100), 2);
@@ -214,7 +215,7 @@ class TaxCalculationServiceTest extends TestCase
     {
         // Employer pays JHT(3.7%) + JKK(0.24%) + JKM(0.3%) + JP(2%) + Kes(4%)
         // Employee pays JHT(2%) + JP(1%) + Kes(1%)
-        $result = $this->service->calculateBpjs(10_000_000);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput(10_000_000, 0, 1, 3_000_000), '2025-02');
 
         $this->assertGreaterThan($result['employee_share'], $result['employer_share']);
     }
@@ -222,7 +223,7 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_bpjs_jkk_jkm_are_employer_only(): void
     {
-        $result = $this->service->calculateBpjs(10_000_000);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput(10_000_000, 0, 1, 3_000_000), '2025-02');
 
         // JKK and JKM employee portions are 0%
         $this->assertEquals(0.0, $result['breakdown']['jkk_employee']);
@@ -234,7 +235,7 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_bpjs_breakdown_keys_are_present(): void
     {
-        $result = $this->service->calculateBpjs(8_000_000);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput(8_000_000, 0, 1, 3_000_000), '2025-02');
 
         $expectedKeys = [
             'jht_employee', 'jht_employer',
@@ -252,7 +253,7 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_bpjs_total_equals_sum_of_breakdown(): void
     {
-        $result = $this->service->calculateBpjs(10_000_000);
+        $result = $this->service->calculateBpjs(new BpjsPayrollInput(10_000_000, 0, 1, 3_000_000), '2025-02');
 
         $sumEmployee = 0.0;
         $sumEmployer = 0.0;
@@ -275,7 +276,7 @@ class TaxCalculationServiceTest extends TestCase
     /** @test */
     public function test_pph21_result_contains_all_meta_keys(): void
     {
-        $result = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true, 300_000);
 
         $expectedMeta = [
             'gross_monthly', 'gross_annual', 'biaya_jabatan_annual',
@@ -292,7 +293,7 @@ class TaxCalculationServiceTest extends TestCase
     public function test_biaya_jabatan_capped_at_500k_monthly(): void
     {
         // High earner should be capped at 500k/month (6jt/year)
-        $result = $this->service->calculateMonthlyPph21(50_000_000, 'TK/0', true);
+        $result = $this->service->calculateMonthlyPph21(50_000_000, 'TK/0', true, 1_100_423);
 
         $this->assertEquals(6_000_000.0, $result['meta']['biaya_jabatan_annual']);
     }
@@ -569,7 +570,7 @@ class TaxCalculationServiceTest extends TestCase
         // BPJS Rates
         $rates = [
             ['component' => 'jht', 'employee_rate' => 2.00, 'employer_rate' => 3.70, 'max_salary_base' => null, 'effective_date' => '2020-01-01'],
-            ['component' => 'jkk', 'employee_rate' => 0.00, 'employer_rate' => 0.24, 'max_salary_base' => null, 'effective_date' => '2020-01-01'],
+            ['component' => 'jkk', 'risk_class' => 1, 'employee_rate' => 0.00, 'employer_rate' => 0.24, 'max_salary_base' => null, 'effective_date' => '2020-01-01'],
             ['component' => 'jkm', 'employee_rate' => 0.00, 'employer_rate' => 0.30, 'max_salary_base' => null, 'effective_date' => '2020-01-01'],
             ['component' => 'jp', 'employee_rate' => 1.00, 'employer_rate' => 2.00, 'max_salary_base' => 10_042_300, 'effective_date' => '2020-01-01'],
             ['component' => 'bpjs_kesehatan', 'employee_rate' => 1.00, 'employer_rate' => 4.00, 'max_salary_base' => 12_000_000, 'effective_date' => '2020-01-01'],

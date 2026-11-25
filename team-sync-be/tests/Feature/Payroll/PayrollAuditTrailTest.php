@@ -102,6 +102,7 @@ class PayrollAuditTrailTest extends TestCase
         $month = now()->startOfMonth();
         $this->seedFullMonthAttendance($employee, $month);
 
+        $this->seedBpjsPayroll($month->format('Y-m'));
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll($month->format('Y-m'), $hr->id);
 
         $this->assertDatabaseHas('payroll_activity_logs', [

@@ -2,6 +2,9 @@
 
 namespace Tests\Unit\Services\Payroll;
 
+use App\DTOs\BpjsPayrollInput;
+use App\Exceptions\PayrollStateException;
+use Database\Seeders\BpjsRateSeeder;
 use App\Models\BpjsRate;
 use App\Models\PtkpAmount;
 use App\Models\TaxBracket;
@@ -25,13 +28,14 @@ class BpjsPeriodSelectionTest extends TestCase
     {
         parent::setUp();
         $this->seedRatesAndBrackets();
+        $this->seed(BpjsRateSeeder::class);
     }
 
     /** @test */
     public function test_feb_2025_payroll_uses_old_jp_ceiling(): void
     {
         $service = app(TaxCalculationService::class);
-        $result = $service->calculateBpjs(15_000_000, '2025-02');
+        $result = $service->calculateBpjs(new BpjsPayrollInput(15_000_000, 0, 1, 3_000_000), '2025-02');
 
         $jpEmployee = $result['breakdown']['jp_employee'];
         $expected = round(10_042_300 * 0.01, 2);
@@ -43,7 +47,7 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_mar_2025_payroll_uses_new_jp_ceiling(): void
     {
         $service = app(TaxCalculationService::class);
-        $result = $service->calculateBpjs(15_000_000, '2025-03');
+        $result = $service->calculateBpjs(new BpjsPayrollInput(15_000_000, 0, 1, 3_000_000), '2025-03');
 
         $jpEmployee = $result['breakdown']['jp_employee'];
         $expected = round(10_547_400 * 0.01, 2);
@@ -55,7 +59,7 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_feb_2026_payroll_uses_2025_jp_ceiling(): void
     {
         $service = app(TaxCalculationService::class);
-        $result = $service->calculateBpjs(15_000_000, '2026-02');
+        $result = $service->calculateBpjs(new BpjsPayrollInput(15_000_000, 0, 1, 3_000_000), '2026-02');
 
         $jpEmployee = $result['breakdown']['jp_employee'];
         $expected = round(10_547_400 * 0.01, 2);
@@ -67,7 +71,7 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_mar_2026_payroll_uses_2026_jp_ceiling(): void
     {
         $service = app(TaxCalculationService::class);
-        $result = $service->calculateBpjs(15_000_000, '2026-03');
+        $result = $service->calculateBpjs(new BpjsPayrollInput(15_000_000, 0, 1, 3_000_000), '2026-03');
 
         $jpEmployee = $result['breakdown']['jp_employee'];
         $expected = round(11_086_300 * 0.01, 2);
@@ -81,7 +85,7 @@ class BpjsPeriodSelectionTest extends TestCase
         $service = app(TaxCalculationService::class);
 
         foreach (['2025-02', '2025-03', '2026-02', '2026-03'] as $period) {
-            $result = $service->calculateBpjs(5_000_000, $period);
+            $result = $service->calculateBpjs(new BpjsPayrollInput(5_000_000, 0, 1, 3_000_000), $period);
             $jpEmployee = $result['breakdown']['jp_employee'];
             $expected = round(5_000_000 * 0.01, 2);
             $this->assertEquals($expected, $jpEmployee, "Period {$period} should use actual salary below cap");
@@ -93,7 +97,7 @@ class BpjsPeriodSelectionTest extends TestCase
     {
         $service = app(TaxCalculationService::class);
 
-        $result = $service->calculateBpjs(10_547_400, '2025-03');
+        $result = $service->calculateBpjs(new BpjsPayrollInput(10_547_400, 0, 1, 3_000_000), '2025-03');
         $jpEmployee = $result['breakdown']['jp_employee'];
         $expected = round(10_547_400 * 0.01, 2);
         $this->assertEquals($expected, $jpEmployee);
@@ -104,7 +108,7 @@ class BpjsPeriodSelectionTest extends TestCase
     {
         $service = app(TaxCalculationService::class);
 
-        $result = $service->calculateBpjs(10_547_401, '2025-03');
+        $result = $service->calculateBpjs(new BpjsPayrollInput(10_547_401, 0, 1, 3_000_000), '2025-03');
         $jpEmployee = $result['breakdown']['jp_employee'];
         $expected = round(10_547_400 * 0.01, 2);
         $this->assertEquals($expected, $jpEmployee);
@@ -114,11 +118,10 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_different_periods_return_different_jp_amounts_for_same_salary(): void
     {
         $service = app(TaxCalculationService::class);
-        $salary = 15_000_000;
-
-        $feb2025 = $service->calculateBpjs($salary, '2025-02');
-        $mar2025 = $service->calculateBpjs($salary, '2025-03');
-        $mar2026 = $service->calculateBpjs($salary, '2026-03');
+        $input = new BpjsPayrollInput(15_000_000, 0, 1, 3_000_000);
+        $feb2025 = $service->calculateBpjs($input, '2025-02');
+        $mar2025 = $service->calculateBpjs($input, '2025-03');
+        $mar2026 = $service->calculateBpjs($input, '2026-03');
 
         // Each period's JP ceiling is higher, so JP employee contribution increases
         $this->assertLessThan(
@@ -135,10 +138,9 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_jht_jkk_jkm_kesehatan_unchanged_across_periods(): void
     {
         $service = app(TaxCalculationService::class);
-        $salary = 8_000_000;
-
-        $feb2025 = $service->calculateBpjs($salary, '2025-02');
-        $mar2026 = $service->calculateBpjs($salary, '2026-03');
+        $input = new BpjsPayrollInput(8_000_000, 0, 1, 3_000_000);
+        $feb2025 = $service->calculateBpjs($input, '2025-02');
+        $mar2026 = $service->calculateBpjs($input, '2026-03');
 
         $this->assertEquals($feb2025['breakdown']['jht_employee'], $mar2026['breakdown']['jht_employee']);
         $this->assertEquals($feb2025['breakdown']['jkk_employer'], $mar2026['breakdown']['jkk_employer']);
@@ -150,56 +152,48 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_historical_recalculation_uses_correct_period_rate(): void
     {
         $service = app(TaxCalculationService::class);
-        $salary = 12_000_000;
-
-        $jan2025 = $service->calculateBpjs($salary, '2025-01');
+        $input = new BpjsPayrollInput(12_000_000, 0, 1, 3_000_000);
+        $jan2025 = $service->calculateBpjs($input, '2025-01');
         $jpJan = $jan2025['breakdown']['jp_employee'];
         $this->assertEquals(round(10_042_300 * 0.01, 2), $jpJan);
 
-        $jul2025 = $service->calculateBpjs($salary, '2025-07');
+        $jul2025 = $service->calculateBpjs($input, '2025-07');
         $jpJul = $jul2025['breakdown']['jp_employee'];
         $this->assertEquals(round(10_547_400 * 0.01, 2), $jpJul);
     }
 
     /** @test */
-    public function test_missing_period_configuration_uses_no_rate(): void
+    public function test_missing_effective_rate_blocks_calculation(): void
     {
-        BpjsRate::query()->delete();
+        BpjsRate::query()->where('component', 'jp')->whereDate('effective_date', '2026-03-01')->delete();
 
-        BpjsRate::create([
-            'component' => 'jp',
-            'employee_rate' => 1.00,
-            'employer_rate' => 2.00,
-            'max_salary_base' => 11_086_300,
-            'effective_date' => '2026-03-01',
-            'valid_until' => null,
-        ]);
+        $this->expectException(PayrollStateException::class);
+        $this->expectExceptionMessage('Required BPJS rate jp is missing for 2026-04.');
+        app(TaxCalculationService::class)->calculateBpjs(new BpjsPayrollInput(15_000_000, 0, 1, 3_000_000), '2026-04');
+    }
 
-        $service = app(TaxCalculationService::class);
-        $result = $service->calculateBpjs(15_000_000, '2025-01');
+    public function test_class_five_cannot_use_a_class_one_rate(): void
+    {
+        BpjsRate::query()->where('component', 'jkk')->where('risk_class', 5)->update(['employer_rate' => 0.24]);
 
-        $this->assertArrayNotHasKey('jp_employee', $result['breakdown']);
+        $this->expectException(PayrollStateException::class);
+        $this->expectExceptionMessage('BPJS rate jkk is not a supported ordinary rate for 2026-04.');
+        app(TaxCalculationService::class)->calculateBpjs(new BpjsPayrollInput(5_000_000, 0, 5, 3_000_000), '2026-04');
     }
 
     /** @test */
-    public function test_pph21_annual_uses_correct_jp_ceiling_for_period(): void
+    public function test_tax_helper_uses_supplied_employee_pension_instead_of_gross(): void
     {
         $this->seedPtkp();
+        $result = app(TaxCalculationService::class)->calculateMonthlyPph21(15_000_000, 'TK/0', true, 225_000);
 
-        $service = app(TaxCalculationService::class);
-
-        $feb2025 = $service->calculateMonthlyPph21(15_000_000, 'TK/0', true, '2025-02');
-        $mar2026 = $service->calculateMonthlyPph21(15_000_000, 'TK/0', true, '2026-03');
-
-        // Lower JP ceiling (Feb 2025) means smaller BPJS deduction, so higher
-        // taxable income and higher PPh 21 than Mar 2026's larger ceiling.
-        $this->assertGreaterThan($mar2026['pph21_monthly'], $feb2025['pph21_monthly']);
+        $this->assertEquals(2_700_000, $result['meta']['bpjs_deduction_annual']);
     }
 
     /** @test */
     public function test_for_period_returns_correct_components(): void
     {
-        $rates = BpjsRate::forPeriod('2026-04');
+        $rates = BpjsRate::forPeriod('2026-04', 1);
 
         $this->assertCount(5, $rates);
         $this->assertArrayHasKey('jht', $rates->toArray());
@@ -207,6 +201,31 @@ class BpjsPeriodSelectionTest extends TestCase
         $this->assertArrayHasKey('jkm', $rates->toArray());
         $this->assertArrayHasKey('jp', $rates->toArray());
         $this->assertArrayHasKey('bpjs_kesehatan', $rates->toArray());
+    }
+
+    public function test_ppu_uses_all_five_assigned_jkk_rates_and_kesehatan_floor_without_floors_for_other_programs(): void
+    {
+        $service = app(TaxCalculationService::class);
+        foreach ([1 => 9_600, 2 => 21_600, 3 => 35_600, 4 => 50_800, 5 => 69_600] as $class => $expectedJkk) {
+            $bpjs = $service->calculateBpjs(new BpjsPayrollInput(3_500_000, 500_000, $class, 5_000_000), '2026-04')['breakdown'];
+            $this->assertEquals($expectedJkk, $bpjs['jkk_employer']);
+            $this->assertEquals(0, $bpjs['jkk_employee']);
+            $this->assertEquals(80_000, $bpjs['jht_employee']);
+            $this->assertEquals(40_000, $bpjs['jp_employee']);
+            $this->assertEquals(12_000, $bpjs['jkm_employer']);
+            $this->assertEquals(50_000, $bpjs['bpjs_kesehatan_employee']);
+            $this->assertEquals(200_000, $bpjs['bpjs_kesehatan_employer']);
+            $this->assertArrayNotHasKey('jkp_employee', $bpjs);
+        }
+    }
+
+    public function test_ppu_kesehatan_clamps_only_outside_floor_and_ceiling(): void
+    {
+        $service = app(TaxCalculationService::class);
+        foreach ([4_999_999 => 50_000, 5_000_000 => 50_000, 5_000_001 => 50_000.01, 11_999_999 => 119_999.99, 12_000_000 => 120_000, 12_000_001 => 120_000] as $salary => $amount) {
+            $bpjs = $service->calculateBpjs(new BpjsPayrollInput($salary, 0, 1, 5_000_000), '2026-04')['breakdown'];
+            $this->assertEquals($amount, $bpjs['bpjs_kesehatan_employee']);
+        }
     }
 
     /** @test */

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Payroll;
 
 use App\Models\BpjsRate;
+use App\Models\PayrollBpjsPeriod;
 use App\Models\User;
 use App\Services\Payroll\TaxCalculationService;
 use Carbon\Carbon;
@@ -53,9 +54,10 @@ class BpjsValidationTest extends TestCase
         ];
 
         $opts = array_merge($defaults, $overrides);
+        PayrollBpjsPeriod::create(['contribution_month' => now()->format('Y-m'), 'facts' => ['jkk_class' => 1]]);
 
         BpjsRate::create(['component' => 'jht', 'employee_rate' => 2.00, 'employer_rate' => 3.70, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JHT']);
-        BpjsRate::create(['component' => 'jkk', 'employee_rate' => 0.00, 'employer_rate' => 0.24, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JKK']);
+        BpjsRate::create(['component' => 'jkk', 'risk_class' => 1, 'employee_rate' => 0.00, 'employer_rate' => 0.24, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JKK']);
         BpjsRate::create(['component' => 'jkm', 'employee_rate' => 0.00, 'employer_rate' => 0.30, 'max_salary_base' => null, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JKM']);
         BpjsRate::create(['component' => 'jp', 'employee_rate' => 1.00, 'employer_rate' => 2.00, 'max_salary_base' => 10_042_300, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'JP']);
         BpjsRate::create(['component' => 'bpjs_kesehatan', 'employee_rate' => 1.00, 'employer_rate' => 4.00, 'max_salary_base' => 12_000_000, 'effective_date' => $opts['effective_date'], 'valid_until' => $opts['valid_until'], 'description' => 'Kesehatan']);

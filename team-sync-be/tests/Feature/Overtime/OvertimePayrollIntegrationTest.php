@@ -70,6 +70,7 @@ class OvertimePayrollIntegrationTest extends TestCase
             'overtime_type' => 'workday',
         ]);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -112,6 +113,7 @@ class OvertimePayrollIntegrationTest extends TestCase
             'status' => OvertimeRecord::STATUS_PENDING,
         ]);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -148,6 +150,7 @@ class OvertimePayrollIntegrationTest extends TestCase
             'overtime_type' => 'workday',
         ]);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -164,6 +167,7 @@ class OvertimePayrollIntegrationTest extends TestCase
 
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -206,6 +210,7 @@ class OvertimePayrollIntegrationTest extends TestCase
             'overtime_type' => 'weekend',
         ]);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 

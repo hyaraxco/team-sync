@@ -386,6 +386,7 @@ class ProjectCapabilityBenchmarkTest extends TestCase
         $employee = $this->createActiveEmployeeWithAttendance(now()->startOfMonth(), 10000000);
         $repository = app(PayrollRepositoryInterface::class);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -419,6 +420,7 @@ class ProjectCapabilityBenchmarkTest extends TestCase
             ]);
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
 
         $fullDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $fullEmployee->id);
