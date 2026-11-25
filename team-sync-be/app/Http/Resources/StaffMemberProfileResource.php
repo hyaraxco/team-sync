@@ -28,6 +28,8 @@ class StaffMemberProfileResource extends JsonResource
             'bpjs_ketenagakerjaan' => $this->when($canSeeSensitive, $this->bpjs_ketenagakerjaan),
             'bpjs_kesehatan' => $this->when($canSeeSensitive, $this->bpjs_kesehatan),
             'ptkp_status' => $this->when($canSeeSensitive, $this->ptkp_status),
+            'nik_taxpayer_accepted' => $this->when($canSeeSensitive, fn () => $this->nik_taxpayer_accepted_hash !== null && $this->nik_taxpayer_accepted_hash === $this->identity_number_hash),
+            'nik_taxpayer_accepted_at' => $this->when($canSeeSensitive, $this->nik_taxpayer_accepted_at),
             'phone' => $this->phone,
             'date_of_birth' => $this->date_of_birth?->format('Y-m-d'),
             'gender' => $this->gender,

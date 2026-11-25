@@ -2,6 +2,8 @@
 
 namespace App\Interfaces;
 
+use App\Models\StaffMemberProfile;
+
 interface StaffMemberProfileRepositoryInterface
 {
     public function getAll(
@@ -59,4 +61,13 @@ interface StaffMemberProfileRepositoryInterface
     public function identityNumberExists(
         string $identityNumber
     ): bool;
+
+    public function getByIdForUpdate(string $id): StaffMemberProfile;
+
+    public function persistNikTaxpayerAcceptance(
+        StaffMemberProfile $employee,
+        string $acceptedHash,
+        \DateTimeInterface $acceptedAt,
+        int $actorUserId,
+    ): void;
 }

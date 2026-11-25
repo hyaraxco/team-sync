@@ -38,7 +38,7 @@ class PayslipPdfStoredValuesTest extends TestCase
             'bpjs_kes_employee' => $kes,
             'bpjs_tk_employer' => 9_999_999,
             'bpjs_kes_employer' => 8_888_888,
-            'tax_calculation_meta' => json_encode(['meta' => ['ptkp_status' => 'TK/0', 'has_npwp' => true]]),
+            'tax_calculation_meta' => json_encode(['meta' => ['ptkp_status' => 'TK/0', 'has_taxpayer_id' => true]]),
         ]);
         $detail->setRelation('payroll', $payroll);
         $detail->setRelation('staffMember', $employee);

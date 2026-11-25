@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\PayrollStateException;
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\AcceptNikTaxpayerRequest;
 use App\Http\Requests\StaffMemberProfileAvailabilityRequest;
 use App\Http\Requests\StaffMemberProfilePaginatedListRequest;
 use App\Http\Requests\StaffMemberProfileStoreRequest;
@@ -14,6 +16,7 @@ use App\Http\Resources\TeamMemberResource;
 use App\Http\Resources\TeamResource;
 use App\Interfaces\StaffMemberProfileRepositoryInterface;
 use App\Models\StaffMemberProfile;
+use App\Services\Payroll\NikTaxpayerAcceptanceService;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\JsonResponse;
@@ -29,9 +32,14 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
 {
     private StaffMemberProfileRepositoryInterface $staffMemberProfileRepository;
 
-    public function __construct(StaffMemberProfileRepositoryInterface $staffMemberProfileRepository)
-    {
+    private NikTaxpayerAcceptanceService $nikTaxpayerAcceptanceService;
+
+    public function __construct(
+        StaffMemberProfileRepositoryInterface $staffMemberProfileRepository,
+        NikTaxpayerAcceptanceService $nikTaxpayerAcceptanceService,
+    ) {
         $this->staffMemberProfileRepository = $staffMemberProfileRepository;
+        $this->nikTaxpayerAcceptanceService = $nikTaxpayerAcceptanceService;
     }
 
     public static function middleware()
@@ -44,6 +52,7 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             new Middleware(PermissionMiddleware::using(['staff-member-delete']), only: ['destroy']),
             new Middleware(PermissionMiddleware::using(['profile-view']), only: ['getMyProfile', 'getPerformanceStatistics']),
             new Middleware(PermissionMiddleware::using(['team-view']), only: ['getMyTeam', 'getMyTeamMembers', 'getMyTeamProjects']),
+            new Middleware(PermissionMiddleware::using(['payroll-process']), only: ['acceptNikTaxpayer']),
         ];
     }
 
@@ -342,6 +351,28 @@ class StaffMemberProfileController extends Controller implements HasMiddleware
             if (str_contains($e->getMessage(), 'not assigned to any team')) {
                 return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 404);
             }
+            Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
+
+            return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);
+        }
+    }
+
+    /**
+     * Accept an employee's NIK as a valid taxpayer identity (Finance only).
+     */
+    public function acceptNikTaxpayer(AcceptNikTaxpayerRequest $request, string $id): JsonResponse
+    {
+        try {
+            $result = $this->nikTaxpayerAcceptanceService->accept($id, $request->user()->id);
+
+            return ResponseHelper::jsonResponse(true, 'NIK accepted as taxpayer identity.', [
+                'accepted_at' => $result->accepted_at,
+            ]);
+        } catch (ModelNotFoundException $e) {
+            return ResponseHelper::jsonResponse(false, 'Employee Not Found', null, 404);
+        } catch (PayrollStateException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 422);
+        } catch (\Throwable $e) {
             Log::error('StaffMemberProfileController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 
             return ResponseHelper::jsonResponse(false, 'Internal Server Error', null, 500);

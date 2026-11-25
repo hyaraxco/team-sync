@@ -279,7 +279,7 @@ class TaxCalculationService
     /**
      * @return array{
      *    pph21_monthly: float,
-     *    has_npwp: bool,
+     *    has_taxpayer_id: bool,
      *    ptkp_status: string,
      *    meta: array{
      *        gross_monthly: float,
@@ -293,7 +293,7 @@ class TaxCalculationService
      *    }
      * }
      */
-    public function calculateMonthlyPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp, ?string $contributionPeriod = null): array
+    public function calculateMonthlyPph21(float $grossMonthly, ?string $ptkpStatus, bool $hasTaxpayerId, ?string $contributionPeriod = null): array
     {
         if ($contributionPeriod) {
             $this->loadBpjsRates($contributionPeriod);
@@ -347,8 +347,8 @@ class TaxCalculationService
             $remainingPkp -= $taxableInBracket;
         }
 
-        // 8. NPWP Surcharge (+20% if no NPWP)
-        if (! $hasNpwp) {
+        // 8. Taxpayer-identity surcharge (+20% if no accepted taxpayer identity)
+        if (! $hasTaxpayerId) {
             $pph21Annual *= 1.20;
         }
 
@@ -356,7 +356,7 @@ class TaxCalculationService
 
         return [
             'pph21_monthly' => round($pph21Monthly, 2),
-            'has_npwp' => $hasNpwp,
+            'has_taxpayer_id' => $hasTaxpayerId,
             'ptkp_status' => $ptkpStatusToUse,
             'meta' => [
                 'gross_monthly' => round($grossMonthly, 2),
@@ -385,7 +385,7 @@ class TaxCalculationService
      *
      * @return array{
      *     pph21_monthly: float,
-     *     has_npwp: bool,
+     *     has_taxpayer_id: bool,
      *     ptkp_status: string,
      *     ter_category: string,
      *     ter_rate: float,
@@ -398,7 +398,7 @@ class TaxCalculationService
      *     }
      * }
      */
-    public function calculateMonthlyTer(float $grossMonthly, ?string $ptkpStatus, bool $hasNpwp, ?string $contributionPeriod = null): array
+    public function calculateMonthlyTer(float $grossMonthly, ?string $ptkpStatus, bool $hasTaxpayerId, ?string $contributionPeriod = null): array
     {
         $defaultPtkpStatus = 'TK/0';
         $ptkpStatusToUse = $ptkpStatus ?: $defaultPtkpStatus;
@@ -408,14 +408,14 @@ class TaxCalculationService
 
         $pph21Monthly = $grossMonthly * $terRate;
 
-        // NPWP surcharge: +20% if no NPWP
-        if (! $hasNpwp) {
+        // Taxpayer-identity surcharge: +20% if no accepted taxpayer identity
+        if (! $hasTaxpayerId) {
             $pph21Monthly *= 1.20;
         }
 
         return [
             'pph21_monthly' => round($pph21Monthly, 0),
-            'has_npwp' => $hasNpwp,
+            'has_taxpayer_id' => $hasTaxpayerId,
             'ptkp_status' => $ptkpStatusToUse,
             'ter_category' => $category,
             'ter_rate' => $terRate,
@@ -429,7 +429,7 @@ class TaxCalculationService
         ];
     }
 
-    public function calculateFinalPeriodPph21(array $facts, ?string $ptkpStatus, bool $hasNpwp): array
+    public function calculateFinalPeriodPph21(array $facts, ?string $ptkpStatus, bool $hasTaxpayerId): array
     {
         \Illuminate\Support\Facades\Validator::make($facts, [
             'gross_income' => ['required', 'numeric', 'min:0'],
@@ -465,7 +465,7 @@ class TaxCalculationService
             $upper = $bracket->max_income === null ? $pkp : (float) $bracket->max_income;
             $annualTax += max(0, min($pkp, $upper) - (float) $bracket->min_income) * (float) $bracket->rate / 100;
         }
-        if (! $hasNpwp) {
+        if (! $hasTaxpayerId) {
             $annualTax *= 1.20;
         }
         $liability = round($annualTax * ($facts['annualize'] ? $facts['tax_liability_months'] / 12 : 1), 0);
@@ -475,7 +475,7 @@ class TaxCalculationService
 
         return [
             'pph21_monthly' => $balance >= 0 ? $balance : -$refund,
-            'method' => 'final_period_actual', 'ptkp_status' => $status, 'has_npwp' => $hasNpwp,
+            'method' => 'final_period_actual', 'ptkp_status' => $status, 'has_taxpayer_id' => $hasTaxpayerId,
             'meta' => [
                 'gross_income' => $gross, 'biaya_jabatan' => $jobExpense,
                 'employee_pension_contributions' => (float) $facts['employee_pension_contributions'],

@@ -21,7 +21,7 @@ class ThrPayrollDetail extends Model
         'pph21_amount',
         'net_thr_amount',
         'ptkp_status',
-        'has_npwp',
+        'has_taxpayer_id',
         'tax_calculation_meta',
         'notes',
     ];
@@ -35,7 +35,7 @@ class ThrPayrollDetail extends Model
             'gross_thr_amount' => 'decimal:0',
             'pph21_amount' => 'decimal:0',
             'net_thr_amount' => 'decimal:0',
-            'has_npwp' => 'boolean',
+            'has_taxpayer_id' => 'boolean',
             'join_date' => 'date',
             'tax_calculation_meta' => 'array',
         ];
