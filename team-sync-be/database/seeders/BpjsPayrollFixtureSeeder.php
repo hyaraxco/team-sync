@@ -39,7 +39,7 @@ class BpjsPayrollFixtureSeeder extends Seeder
                 'jkk_assignment_ref' => 'Synthetic test assignment',
                 'employees' => [],
             ];
-            $facts['employees'] += $employees;
+            $facts['employees'] = array_replace($facts['employees'], $employees);
             $record->fill(['facts' => $facts])->save();
         }
     }
