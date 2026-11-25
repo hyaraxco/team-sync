@@ -176,6 +176,70 @@ class PayrollAdjustmentControllerTest extends TestCase
             ->assertJsonPath('message', 'Only pending adjustments can be approved');
     }
 
+    public function test_user_with_only_payroll_menu_cannot_approve(): void
+    {
+        $user = User::factory()->create();
+        $user->givePermissionTo('payroll-menu');
+        Sanctum::actingAs($user);
+
+        $employee = StaffMemberProfile::factory()->create();
+        $sourcePeriod = AttendancePeriod::create([
+            'start_date' => '2026-04-01',
+            'end_date' => '2026-04-30',
+            'cutoff_date' => '2026-04-25',
+            'status' => AttendancePeriod::STATUS_LOCKED,
+            'locked_at' => now(),
+        ]);
+
+        $adjustment = PayrollAdjustment::create([
+            'staff_member_id' => $employee->id,
+            'source_period_id' => $sourcePeriod->id,
+            'target_period_id' => $sourcePeriod->id,
+            'source_reference_type' => 'manual',
+            'source_reference_id' => 1,
+            'adjustment_kind' => PayrollAdjustment::KIND_ABSENCE_CORRECTION_DEDUCTION,
+            'amount_delta' => -50000,
+            'reason' => 'Test deduction',
+            'status' => PayrollAdjustment::STATUS_PENDING,
+        ]);
+
+        $this->postJson("/api/v1/payroll-adjustments/{$adjustment->id}/approve")
+            ->assertForbidden();
+    }
+
+    public function test_user_with_payroll_edit_can_approve(): void
+    {
+        $user = User::factory()->create();
+        $user->givePermissionTo(['payroll-menu', 'payroll-edit']);
+        Sanctum::actingAs($user);
+
+        $employee = StaffMemberProfile::factory()->create();
+        $sourcePeriod = AttendancePeriod::create([
+            'start_date' => '2026-05-01',
+            'end_date' => '2026-05-31',
+            'cutoff_date' => '2026-05-25',
+            'status' => AttendancePeriod::STATUS_LOCKED,
+            'locked_at' => now(),
+        ]);
+
+        $adjustment = PayrollAdjustment::create([
+            'staff_member_id' => $employee->id,
+            'source_period_id' => $sourcePeriod->id,
+            'target_period_id' => $sourcePeriod->id,
+            'source_reference_type' => 'manual',
+            'source_reference_id' => 1,
+            'adjustment_kind' => PayrollAdjustment::KIND_ABSENCE_CORRECTION_DEDUCTION,
+            'amount_delta' => -50000,
+            'reason' => 'Test deduction',
+            'status' => PayrollAdjustment::STATUS_PENDING,
+        ]);
+
+        $this->postJson("/api/v1/payroll-adjustments/{$adjustment->id}/approve")
+            ->assertOk()
+            ->assertJsonPath('data.status', PayrollAdjustment::STATUS_APPROVED)
+            ->assertJsonPath('data.approved_by', $user->id);
+    }
+
     private function actingAsRole(string $roleName): User
     {
         $user = User::factory()->create();
