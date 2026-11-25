@@ -16,8 +16,6 @@ class CacheConstants
      */
     public const PAYROLL_BULK_INSERT_CHUNK_SIZE = 500;
 
-    public const DEFAULT_PAGINATION_SIZE = 50;
-
     /**
      * Cache key prefixes
      */

@@ -158,9 +158,6 @@ const factory = () =>
                 AttendanceCorrectionsList: {
                     template: '<div class="corrections-list-stub" />',
                 },
-                AttendanceCorrectionModal: {
-                    template: '<div class="correction-modal-stub" />',
-                },
                 MyOvertime: {
                     template: '<div class="my-overtime-stub" />',
                 },
