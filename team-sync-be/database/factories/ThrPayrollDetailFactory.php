@@ -27,7 +27,7 @@ class ThrPayrollDetailFactory extends Factory
             'pph21_amount' => $tax,
             'net_thr_amount' => round($gross - $tax, 2),
             'ptkp_status' => 'TK/0',
-            'has_npwp' => true,
+            'has_taxpayer_id' => true,
         ];
     }
 }

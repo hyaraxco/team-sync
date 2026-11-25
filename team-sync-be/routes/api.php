@@ -197,6 +197,7 @@ Route::prefix('v1')
                 Route::get('my-payslips/{id}', [PayslipController::class, 'show']);
                 Route::get('payslips/{id}/download', [PayslipController::class, 'download']);
                 Route::post('payslips/{id}/email', [PayslipController::class, 'email']);
+                Route::post('staff-members/{id}/accept-nik-taxpayer', [StaffMemberProfileController::class, 'acceptNikTaxpayer']);
             });
 
             // Overtime routes

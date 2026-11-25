@@ -688,4 +688,24 @@ class StaffMemberProfileRepository implements StaffMemberProfileRepositoryInterf
             ->where('identity_number_hash', SensitiveData::hash($identityNumber))
             ->exists();
     }
+
+    public function getByIdForUpdate(string $id): StaffMemberProfile
+    {
+        return StaffMemberProfile::query()
+            ->lockForUpdate()
+            ->findOrFail($id);
+    }
+
+    public function persistNikTaxpayerAcceptance(
+        StaffMemberProfile $employee,
+        string $acceptedHash,
+        \DateTimeInterface $acceptedAt,
+        int $actorUserId,
+    ): void {
+        $employee->update([
+            'nik_taxpayer_accepted_hash' => $acceptedHash,
+            'nik_taxpayer_accepted_at' => $acceptedAt,
+            'nik_taxpayer_accepted_by' => $actorUserId,
+        ]);
+    }
 }

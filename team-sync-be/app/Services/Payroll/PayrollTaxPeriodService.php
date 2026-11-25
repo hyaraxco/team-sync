@@ -12,6 +12,7 @@ use App\Models\StaffMemberProfile;
 use App\Models\TaxBracket;
 use App\Models\ThrPayrollDetail;
 use App\Support\PayrollTaxMetadata;
+use App\Support\SensitiveData;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
@@ -307,17 +308,22 @@ class PayrollTaxPeriodService
                 'annualize' => $subjectiveStart > $year.'-01-01' || $subjectiveEnd < $year.'-12-31',
                 'previously_withheld' => $actual, 'government_borne_tax' => $government, 'final_period' => $current->period,
             ];
-            $result = $calculator->calculateFinalPeriodPph21($finalFacts, $employee->ptkp_status, filled($employee->npwp));
+            $result = $calculator->calculateFinalPeriodPph21($finalFacts, $employee->ptkp_status, $employee->hasTaxpayerId());
             $result['pph21_monthly'] -= $reserved;
         } else {
-            $result = $calculator->calculateMonthlyTer($gross, $employee->ptkp_status, filled($employee->npwp), $current->period);
+            $result = $calculator->calculateMonthlyTer($gross, $employee->ptkp_status, $employee->hasTaxpayerId(), $current->period);
             $result['pph21_monthly'] -= $actual + $reserved;
         }
         $context = [
             'period' => $current->period, 'allocation_key' => $current->allocation_key,
             'input' => array_diff_key($current->input, ['credit_date' => true, 'due_date' => true]),
             'profile' => $facts, 'history' => $history, 'ptkp_status' => $employee->ptkp_status,
-            'has_npwp' => filled($employee->npwp), 'identity' => hash('sha256', (string) $employee->npwp),
+            'has_taxpayer_id' => $employee->hasTaxpayerId(),
+            'taxpayer_identity' => filled($employee->npwp)
+                ? ['type' => 'npwp', 'hash' => SensitiveData::hash($employee->npwp)]
+                : ($employee->hasTaxpayerId()
+                    ? ['type' => 'nik', 'hash' => $employee->nik_taxpayer_accepted_hash]
+                    : null),
             'job_start' => $employee->jobInformation?->start_date?->format('Y-m-d'),
             'entries' => array_map(fn ($entry) => [$entry->source_type, $entry->source_id, $entry->allocation_key, $entry->input, $entry->settled_at?->format('c'), $entry->actual_withholding, $entry->settled_at ? null : $entry->calculation], $prefix),
             'prior_entries' => $final ? $entries->filter(fn ($entry) => $entry->period < $current->period)->map(fn ($entry) => [$entry->source_type, $entry->source_id, $entry->input, $entry->actual_withholding, $entry->settled_at?->format('c')])->values()->all() : [],

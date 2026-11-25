@@ -112,7 +112,7 @@ class ThrService
                     'pph21_amount' => $result['pph21_amount'],
                     'net_thr_amount' => $result['net_thr_amount'],
                     'ptkp_status' => $employee->ptkp_status,
-                    'has_npwp' => ! empty($employee->npwp),
+                    'has_taxpayer_id' => $employee->hasTaxpayerId(),
                     'tax_calculation_meta' => json_encode($result['tax_calculation_meta']),
                 ];
             }

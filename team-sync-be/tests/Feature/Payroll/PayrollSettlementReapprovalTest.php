@@ -228,7 +228,7 @@ class PayrollSettlementReapprovalTest extends TestCase
         ThrPayrollDetail::create(['thr_payroll_id' => $thr->id, 'staff_member_id' => $employee->id,
             'religion' => 'kristen', 'monthly_salary' => 10000000, 'join_date' => '2026-01-01',
             'tenure_months' => 12, 'proration_factor' => 1, 'gross_thr_amount' => 10000000,
-            'pph21_amount' => 0, 'net_thr_amount' => 10000000, 'ptkp_status' => 'TK/0', 'has_npwp' => true]);
+            'pph21_amount' => 0, 'net_thr_amount' => 10000000, 'ptkp_status' => 'TK/0', 'has_taxpayer_id' => true]);
 
         return [$payroll, $thr, $actor];
     }

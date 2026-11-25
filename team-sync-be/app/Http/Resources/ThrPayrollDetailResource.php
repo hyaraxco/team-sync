@@ -22,7 +22,7 @@ class ThrPayrollDetailResource extends JsonResource
             'pph21_amount' => (float) $this->pph21_amount,
             'net_thr_amount' => (float) $this->net_thr_amount,
             'ptkp_status' => $this->ptkp_status,
-            'has_npwp' => $this->has_npwp,
+            'has_taxpayer_id' => $this->has_taxpayer_id,
             'tax_calculation_meta' => $this->tax_calculation_meta,
             'notes' => $this->notes,
             'staff_member' => $this->whenLoaded('staffMember', function () {

@@ -346,7 +346,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             $this->assertSame('ter_2024', $meta['method']);
             $this->assertSame($category, $meta['ter_category']);
             $this->assertSame($rate, $meta['ter_rate']);
-            $this->assertTrue($meta['has_npwp']);
+            $this->assertTrue($meta['has_taxpayer_id']);
             $this->assertEquals($tax, $meta['pph21_monthly']);
         }
     }

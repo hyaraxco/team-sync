@@ -26,6 +26,9 @@ class StaffMemberProfile extends Model
         'identity_number',
         'identity_number_hash',
         'npwp',
+        'nik_taxpayer_accepted_hash',
+        'nik_taxpayer_accepted_at',
+        'nik_taxpayer_accepted_by',
         'bpjs_ketenagakerjaan',
         'bpjs_kesehatan',
         'ptkp_status',
@@ -51,6 +54,7 @@ class StaffMemberProfile extends Model
             'bpjs_ketenagakerjaan' => 'encrypted',
             'bpjs_kesehatan' => 'encrypted',
             'date_of_birth' => 'date',
+            'nik_taxpayer_accepted_at' => 'datetime',
         ];
     }
 
@@ -59,6 +63,23 @@ class StaffMemberProfile extends Model
         static::saving(function (self $profile) {
             $profile->identity_number_hash = SensitiveData::hash($profile->identity_number);
         });
+    }
+
+    /**
+     * Whether the employee has a recognised taxpayer identity (NPWP or accepted NIK).
+     *
+     * Per PENG-6/PJ.09/2024: an integrated NIK accepted by Finance exempts
+     * the employee from the +20 % PPh 21 surcharge, same as a filled NPWP.
+     * Acceptance is bound to the identity hash — a NIK change auto-invalidates.
+     */
+    public function hasTaxpayerId(): bool
+    {
+        if (filled($this->npwp)) {
+            return true;
+        }
+
+        return $this->nik_taxpayer_accepted_hash !== null
+            && $this->nik_taxpayer_accepted_hash === $this->identity_number_hash;
     }
 
     public function getFullNameAttribute(): ?string

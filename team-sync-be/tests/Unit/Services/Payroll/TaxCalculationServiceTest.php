@@ -155,13 +155,13 @@ class TaxCalculationServiceTest extends TestCase
     }
 
     /** @test */
-    public function test_pph21_has_npwp_flag_is_returned(): void
+    public function test_pph21_has_taxpayer_id_flag_is_returned(): void
     {
         $withNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', true);
         $withoutNpwp = $this->service->calculateMonthlyPph21(10_000_000, 'TK/0', false);
 
-        $this->assertTrue($withNpwp['has_npwp']);
-        $this->assertFalse($withoutNpwp['has_npwp']);
+        $this->assertTrue($withNpwp['has_taxpayer_id']);
+        $this->assertFalse($withoutNpwp['has_taxpayer_id']);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -500,7 +500,7 @@ class TaxCalculationServiceTest extends TestCase
         $result = $this->service->calculateMonthlyTer(10_000_000, 'TK/0', true);
 
         $this->assertArrayHasKey('pph21_monthly', $result);
-        $this->assertArrayHasKey('has_npwp', $result);
+        $this->assertArrayHasKey('has_taxpayer_id', $result);
         $this->assertArrayHasKey('ptkp_status', $result);
         $this->assertArrayHasKey('ter_category', $result);
         $this->assertArrayHasKey('ter_rate', $result);
