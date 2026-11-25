@@ -158,6 +158,7 @@ class PayslipEmailTest extends TestCase
 
         $repository = app(PayrollRepositoryInterface::class);
         $salaryMonth = now()->startOfMonth()->format('Y-m');
+        $this->seedBpjsPayroll($salaryMonth);
         $payroll = $repository->generatePayroll($salaryMonth);
         $repository->approvePayroll($payroll->id);
 

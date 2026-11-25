@@ -93,6 +93,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
 
         $this->actingAsRole('finance');
 
+        $this->seedBpjsPayroll('2026-05');
         $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-05',
         ])

@@ -106,6 +106,7 @@ class PayrollAuthorizationTest extends TestCase
         $user = $this->actingAsRole('finance');
         $payrollDetail = $this->createPayrollDetail();
         $this->createActiveEmployeeWithAttendance('2026-05');
+        $this->seedBpjsPayroll('2026-05');
 
         $this->postJson('/api/v1/payrolls/generate', [
             'salary_month' => '2026-05',

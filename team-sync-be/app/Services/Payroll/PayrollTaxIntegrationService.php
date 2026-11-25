@@ -50,6 +50,12 @@ class PayrollTaxIntegrationService
                 throw new PayrollStateException('Only an approved payroll can be settled.');
             }
             $this->approvals->assertComplete($payroll);
+            foreach ($details as $detail) {
+                $meta = json_decode($detail->tax_calculation_meta ?? 'null', true, 512, JSON_THROW_ON_ERROR);
+                if (data_get($meta, 'meta.components.bpjs.contribution_month') !== $payroll->salary_month->format('Y-m')) {
+                    throw new PayrollStateException('Payroll has no verified BPJS calculation. Reopen it, import the contribution month inputs, and approve again.');
+                }
+            }
             $payroll->update(['planned_credit_date' => $creditDate]);
             $ready = true;
             foreach ($details as $detail) {
@@ -132,12 +138,15 @@ class PayrollTaxIntegrationService
             $payroll->salary_month->daysInMonth
         ))->toDateString();
 
+        $period = $payroll->salary_month->format('Y-m');
+        $facts = BpjsPayrollFacts::load($period);
         foreach ($payroll->payrollDetails()->with('staffMember.jobInformation')->orderBy('staff_member_id')->get() as $detail) {
-            $bpjs = $this->calculator->calculateBpjs((float) $detail->original_salary, $payroll->salary_month->format('Y-m'))['breakdown'];
-            $pension = ($bpjs['jht_employee'] ?? 0) + ($bpjs['jp_employee'] ?? 0);
-            $health = $bpjs['bpjs_kesehatan_employee'] ?? 0;
+            $input = BpjsPayrollFacts::forEmployee($facts, $detail->staff_member_id, (float) $detail->original_salary);
+            $bpjs = $this->calculator->calculateBpjs($input, $period)['breakdown'];
+            $pension = $bpjs['jht_employee'] + $bpjs['jp_employee'];
+            $health = $bpjs['bpjs_kesehatan_employee'];
             // PMK 168 Art. 5: employer health/JKK/JKM are taxable; employer JHT/JP are not cash earnings.
-            $benefits = ($bpjs['bpjs_kesehatan_employer'] ?? 0) + ($bpjs['jkk_employer'] ?? 0) + ($bpjs['jkm_employer'] ?? 0);
+            $benefits = $bpjs['bpjs_kesehatan_employer'] + $bpjs['jkk_employer'] + $bpjs['jkm_employer'];
             $cash = max(0, (float) $detail->original_salary - (float) $detail->deduction_amount)
                 + (float) $detail->overtime_amount + (float) $detail->taxable_adjustment_amount;
             if ($cash < 0) {
@@ -145,9 +154,9 @@ class PayrollTaxIntegrationService
             }
             $detail->update([
                 'bpjs_tk_employee' => $pension,
-                'bpjs_tk_employer' => ($bpjs['jht_employer'] ?? 0) + ($bpjs['jp_employer'] ?? 0) + ($bpjs['jkk_employer'] ?? 0) + ($bpjs['jkm_employer'] ?? 0),
+                'bpjs_tk_employer' => $bpjs['jht_employer'] + $bpjs['jp_employer'] + $bpjs['jkk_employer'] + $bpjs['jkm_employer'],
                 'bpjs_kes_employee' => $health,
-                'bpjs_kes_employer' => $bpjs['bpjs_kesehatan_employer'] ?? 0,
+                'bpjs_kes_employer' => $bpjs['bpjs_kesehatan_employer'],
             ]);
             $result = $this->periods->persistDraft(
                 $detail->staffMember, 'payroll', $detail->id, $dueDate,
@@ -158,8 +167,15 @@ class PayrollTaxIntegrationService
                     'overtime' => (float) $detail->overtime_amount,
                     'taxable_adjustments' => (float) $detail->taxable_adjustment_amount,
                     'taxable_employer_benefits' => $benefits,
-                    'exempt_employer_pension' => ($bpjs['jht_employer'] ?? 0) + ($bpjs['jp_employer'] ?? 0),
+                    'exempt_employer_pension' => $bpjs['jht_employer'] + $bpjs['jp_employer'],
                     'employee_bpjs' => $pension + $health,
+                    'bpjs' => [
+                        'contribution_month' => $period,
+                        'wage_base' => $input->basicWage + $input->fixedAllowances,
+                        'jkk_risk_class' => $input->jkkRiskClass,
+                        'health_floor' => $input->healthFloor,
+                        'contributions' => $bpjs,
+                    ],
                 ]
             );
             $this->apply('payroll', $detail->id, $result);

@@ -98,6 +98,7 @@ class AttendancePeriodLifecycleTest extends TestCase
             ->whereDate('date', $month->copy()->startOfMonth()->toDateString())
             ->firstOrFail();
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04');
 
         $this->assertNotNull($payroll->attendance_period_id);

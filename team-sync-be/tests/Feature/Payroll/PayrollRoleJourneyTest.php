@@ -62,6 +62,8 @@ class PayrollRoleJourneyTest extends TestCase
         $this->assertContains('payroll-create', $financeMe->json('data.permissions'));
         $this->assertContains('payroll-process', $financeMe->json('data.permissions'));
 
+        $this->seedBpjsPayroll($salaryMonth);
+
         $this
             ->postJson('/api/v1/payrolls/generate', [
                 'salary_month' => $salaryMonth,

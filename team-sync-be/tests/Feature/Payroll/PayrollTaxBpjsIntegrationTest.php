@@ -68,6 +68,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         // Use salary high enough to trigger PPh 21 (>4.5jt/bulan -> PKP > 0)
         $employee = $this->createEmployeeWithAttendance(10_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -94,6 +95,14 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             'hours' => 4,
         ]);
 
+        $this->seedBpjsPayroll('2026-04');
+        $record = \App\Models\PayrollBpjsPeriod::firstOrFail();
+        $facts = $record->facts;
+        $facts['jkk_class'] = 3;
+        $facts['employees'][$employee->id]['basic_wage'] = 5_000_000;
+        $facts['employees'][$employee->id]['fixed_allowances'] = 1_000_000;
+        $facts['employees'][$employee->id]['health_floor'] = 7_000_000;
+        $record->update(['facts' => $facts]);
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -103,11 +112,13 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $meta = json_decode($detail->tax_calculation_meta, true);
 
         // Employer JKK, JKM and health are taxable non-cash benefits; JHT/JP are exempt.
-        $expectedBenefits = $salary * (0.0024 + 0.003 + 0.04);
+        $expectedBenefits = 53_400 + 18_000 + 280_000;
         $expectedCash = $salary - (float) $detail->deduction_amount + (float) $detail->overtime_amount;
         $expectedGross = $expectedCash + $expectedBenefits;
         $this->assertEqualsWithDelta($expectedBenefits, $meta['meta']['components']['taxable_employer_benefits'], 0.01);
-        $this->assertEqualsWithDelta($salary * (0.037 + 0.02), $meta['meta']['components']['exempt_employer_pension'], 0.01);
+        $this->assertEquals(342_000, $meta['meta']['components']['exempt_employer_pension']);
+        $this->assertEquals(180_000, (float) $detail->bpjs_tk_employee);
+        $this->assertEquals(70_000, (float) $detail->bpjs_kes_employee);
         $this->assertEqualsWithDelta($expectedCash, $meta['meta']['cash_base'], 0.01);
         $this->assertEqualsWithDelta(
             $expectedGross,
@@ -196,6 +207,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
             'hours' => 2,
         ]);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -234,6 +246,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -250,6 +263,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -270,6 +284,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -293,6 +308,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         // TK/0 PTKP = 4.5jt/bulan. Salary below PTKP threshold → PPh = 0
         $employee = $this->createEmployeeWithAttendance(3_500_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -308,6 +324,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $employee = $this->createEmployeeWithAttendance(10_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 
@@ -331,6 +348,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $c = $this->createEmployeeWithAttendance(43_050_000);
         $c->update(['ptkp_status' => 'K/3', 'npwp' => '123456789012346']);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
 
         foreach ([[$b, 'B', 0.08, 21_593_400], [$c, 'C', 0.16, 43_762_470]] as [$employee, $category, $rate, $gross]) {
@@ -362,6 +380,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         $highEarner = $this->createEmployeeWithAttendance(20_000_000);
         $normalEarner = $this->createEmployeeWithAttendance(10_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
 
         $highDetail = $payroll->payrollDetails->firstWhere('staff_member_id', $highEarner->id);
@@ -393,6 +412,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
 
         $employee = $this->createEmployeeWithAttendance(8_000_000);
 
+        $this->seedBpjsPayroll('2026-04');
         $payroll = app(PayrollRepositoryInterface::class)->generatePayroll('2026-04', null);
         $detail = $payroll->payrollDetails->firstWhere('staff_member_id', $employee->id);
 

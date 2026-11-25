@@ -579,6 +579,8 @@ class PayrollGenerateRulesTest extends TestCase
                 $cursor->addDay();
             }
 
+            $this->seedBpjsPayroll($month->format('Y-m'));
+
             return $employee;
         });
     }

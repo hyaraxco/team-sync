@@ -11,6 +11,7 @@ class BpjsRate extends Model
 {
     protected $fillable = [
         'component',
+        'risk_class',
         'employee_rate',
         'employer_rate',
         'max_salary_base',
@@ -48,15 +49,24 @@ class BpjsRate extends Model
             });
     }
 
+    public function scopeForJkkClass(Builder $query, ?int $jkkClass): Builder
+    {
+        return $query->where(fn (Builder $eligible) => $eligible
+            ->where(fn (Builder $standard) => $standard->whereIn('component', ['jht', 'jkm', 'jp', 'bpjs_kesehatan'])->where('risk_class', 0))
+            ->when($jkkClass !== null, fn (Builder $classified) => $classified->orWhere(fn (Builder $jkk) => $jkk
+                ->where('component', 'jkk')->where('risk_class', $jkkClass))));
+    }
+
     /**
      * Load one rate per component for the given contribution period.
      * When multiple rows match, the latest effective_date wins.
      */
-    public static function forPeriod(string $contributionMonth): Collection
+    public static function forPeriod(string $contributionMonth, ?int $jkkClass = null): Collection
     {
         $firstOfMonth = Carbon::parse($contributionMonth.'-01');
 
         $rates = static::effectiveOn($firstOfMonth)
+            ->forJkkClass($jkkClass)
             ->orderByDesc('effective_date')
             ->get();
 

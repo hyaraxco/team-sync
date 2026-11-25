@@ -255,10 +255,10 @@ Rate dibaca dari database. Nilai referensi yang dicatat proyek:
 | Komponen | Karyawan | Perusahaan | Batas upah |
 |---|---|---|---|
 | JHT | 2% | 3.7% | Tanpa batas |
-| JKK | - | 0.24% | Tanpa batas |
+| JKK | - | 0.24%, 0.54%, 0.89%, 1.27%, atau 1.74% sesuai kelas yang ditetapkan BPJS | Tanpa batas |
 | JKM | - | 0.30% | Tanpa batas |
 | JP | 1% | 2% | Per periode kontribusi (lihat bawah) |
-| Kesehatan | 1% | 4% | Rp 12.000.000 |
+| Kesehatan | 1% | 4% | UMK/UMP yang berlaku sampai Rp 12.000.000 |
 
 Batas upah JP dipilih berdasarkan periode payroll (kolom `effective_date` /
 `valid_until` pada tabel `bpjs_rates`):
@@ -269,8 +269,7 @@ Batas upah JP dipilih berdasarkan periode payroll (kolom `effective_date` /
 | Mar 2025 – Feb 2026 | Rp 10.547.400 | 1 Mar 2025 |
 | Mar 2026 – sekarang | Rp 11.086.300 | 1 Mar 2026 |
 
-Angka ini bukan jaminan kepatuhan untuk periode berjalan. Verifikasi rate dan
-batas yang berlaku sebelum memproses payroll.
+Payroll memakai upah pokok dan tunjangan tetap yang sudah diverifikasi untuk bulan kontribusi, bukan bruto pajak. Payroll standar hanya mendukung PPU/PU swasta bergaji bulanan yang terdaftar pada kelima program di atas. Ikuti [konfigurasi BPJS payroll](docs/references/payroll.md#bpjs-ppu-swasta) sebelum membuat draft. Angka referensi ini tidak membuktikan kepatuhan atau kelayakan perusahaan.
 
 ### PPh 21
 

@@ -82,6 +82,7 @@ class SandboxRoleSeeder extends Seeder
                     $day->addDay();
                 }
             }
+            $this->callWith(BpjsPayrollFixtureSeeder::class, ['period' => now()->format('Y-m')]);
         });
     }
 }

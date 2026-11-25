@@ -29,6 +29,7 @@ trait BuildsCalculatedPayroll
             return;
         }
 
+        $this->seedBpjsPayroll($payroll->salary_month->format('Y-m'), $payroll->payrollDetails()->pluck('original_salary', 'staff_member_id')->all());
         app(PayrollTaxIntegrationService::class)->refreshPayroll($payroll);
         if ($status === 'approved') {
             app(PayrollRepositoryInterface::class)->approvePayroll((string) $payroll->id);

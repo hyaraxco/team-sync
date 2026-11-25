@@ -22,6 +22,45 @@ Dasar: [PMK 168/2023](https://jdih.kemenkeu.go.id/dok/pmk-168-tahun-2023), Pasal
 
 Urutan alokasi memakai waktu pengakuan lalu tipe/ID sumber stabil, bukan urutan generate. TER dihitung dari bruto kumulatif sumber sebelumnya dalam masa yang sama, dikurangi withholding settled dan reservasi draft sebelumnya. Sumber lebih awal yang ditambahkan atau berubah menghitung ulang draft terdampak dan membatalkan approval lama. Transfer tidak boleh mendahului draft yang diakui lebih awal. Hasil persisted yang sama memasok net, API, PDF dan ekspor.
 
+## BPJS PPU swasta
+
+Payroll standar memakai upah pokok ditambah tunjangan tetap. `job_information.monthly_salary` tetap menjadi nominal gaji pada payroll, bukan bukti komposisi BPJS. Jangan masukkan lembur, tunjangan makan/transport berbasis kehadiran, bonus, atau koreksi kena pajak ke dasar iuran. Potongan absen tidak mengurangi dasar BPJS yang tercatat. JHT, JKK dan JKM memakai upah kontribusi penuh. JP memakai plafon pada periode kontribusi. Kesehatan menaikkan dasar ke UMK yang berlaku (UMP jika tidak ada UMK), lalu menerapkan plafon periode itu.
+
+Dasar: [PP 44/2015 Pasal 16–19](https://www.bpjsketenagakerjaan.go.id/assets/uploads/peraturan/15122015_104557_PP%2044%20Tahun%202015.pdf), [PP 46/2015 Pasal 16–17](https://www.bpjsketenagakerjaan.go.id/assets/uploads/peraturan/15122015_104556_PP%2046%20Tahun%202015.pdf), [PP 45/2015 Pasal 28–29](https://www.bpjsketenagakerjaan.go.id/assets/uploads/peraturan/15122015_104556_PP%2045%20Tahun%202015.pdf), dan [Perpres 75/2019 Pasal 32–33](https://peraturan.go.id/files/ps75-2019.pdf). JKK dibayar perusahaan dan dipilih berdasarkan kelas I–V yang ditetapkan BPJS Ketenagakerjaan, bukan jabatan pegawai. Baris JKK lama tanpa kelas tetap ada untuk histori, tetapi tidak bisa dipakai menghitung payroll.
+
+Jalankan migrasi dan seed tarif sebagai bagian dari rollout. Finance memverifikasi sendiri penetapan kelas yang berlaku pada bulan tersebut, klasifikasi pemberi kerja, pendaftaran tiap pekerja pada kelima program, dasar upah dari perjanjian, dan keputusan UMK/UMP menurut lokasi dan tahun. Simpan dokumen sumber di penyimpanan privat; gunakan nomor referensi internal yang tidak memuat kredensial atau identitas pribadi. Impor satu file per bulan menggunakan akses operator yang berwenang:
+
+```sh
+php artisan migrate
+php artisan db:seed --class=BpjsRateSeeder
+php artisan payroll:import-bpjs 2026-04 /absolute/private/verified-bpjs.json
+```
+
+Contoh struktur dengan angka dan referensi sintetis (jangan pakai untuk payroll nyata):
+
+```json
+{
+    "employer_class": "ordinary",
+    "jkk_class": 3,
+    "jkk_assignment_ref": "SYNTHETIC-JKK",
+    "employees": {
+        "42": {
+            "coverage": "private_salaried_ppu_all_five",
+            "basic_wage": 5000000,
+            "fixed_allowances": 1000000,
+            "health_floor": 7000000,
+            "floor_type": "umk",
+            "region": "Synthetic jurisdiction",
+            "floor_ref": "SYNTHETIC-DECREE"
+        }
+    }
+}
+```
+
+Key `employees` adalah `staff_member_id`. Gunakan rupiah bulat dan isi `fixed_allowances: 0` hanya jika ketiadaan tunjangan tetap sudah dikonfirmasi. Aplikasi memeriksa format dan kelengkapan, bukan keaslian bukti. Readiness menolak input atau tarif efektif yang hilang. Impor ulang mengganti input bulan yang belum disetujui; hitung ulang dan review draft sebelum pembayaran. Draft approved lama yang belum punya perhitungan BPJS terverifikasi harus dibuka ulang dan disetujui kembali. Payroll paid tidak dihitung ulang.
+
+[Perpres 59/2024 Pasal 32 ayat 4–5, sebagaimana dijelaskan DJSN](https://djsn.go.id/berita/press-release-djsn-terkait-perpres-nomor-59-tahun-2024-tentang-perubahan-ketiga-atas-perpres-nomor-82-tahun-2018-tentang-jaminan-kesehatan), mengecualikan usaha mikro/kecil dari lantai UMK/UMP dan mengatur penetapan lantai tersendiri. Kalkulator ini menolak klasifikasi tersebut sampai kelayakan dan lantai pengganti berotoritas dapat diverifikasi. Tidak ada fallback nol. Keringanan JKK industri padat karya [PP 7/2025](https://peraturan.bpk.go.id/Details/314624/pp-no-7-tahun-2025) sebagaimana diubah oleh [PP 36/2025](https://peraturan.bpk.go.id/Details/327872/pp-no-36-tahun-2025) bersyarat dan terbatas periode, bukan tarif normal. Jangan masukkan keringanan tersebut atau diskon BPU sebagai tarif PPU biasa. Rekompensasi pendanaan JKP menurut [PP 6/2025](https://jdih.kemnaker.go.id/asset/data_puu/2025pp006.pdf) bukan potongan baru pegawai; implementasi ini tidak menilai kelayakan atau menghitung alokasi dana JKP. Tidak ada data produksi yang diperiksa.
+
 ## Periode terakhir dan riwayat aktual
 
 Periode terakhir adalah Desember atau bulan berakhirnya pekerjaan/kewajiban subjektif yang dinyatakan eksplisit. Berhenti bekerja tidak otomatis mengakhiri kewajiban subjektif Indonesia. Kalkulator memakai penghasilan aktual tahun/bagian tahun, biaya jabatan, iuran pensiun pegawai, donasi yang dapat dikurangkan, PTKP, tarif Pasal 17, dan pemotongan sebelumnya. Annualisasi hanya berlaku pada awal/akhir kewajiban subjektif di dalam tahun.

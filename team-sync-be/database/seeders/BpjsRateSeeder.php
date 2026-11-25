@@ -9,7 +9,7 @@ class BpjsRateSeeder extends Seeder
 {
     /**
      * BPJS Ketenagakerjaan & Kesehatan rates.
-     * JKK uses risk level I (0.24%) — typical for IT/office-based companies.
+     * JKK rates cover all five classes; payroll requires the assigned class separately.
      *
      * JP ceiling sources:
      * - Pre-Mar 2025: Rp 10.042.300 (PP 45/2015 prior adjustments)
@@ -27,15 +27,6 @@ class BpjsRateSeeder extends Seeder
                 'effective_date' => '2020-01-01',
                 'valid_until' => null,
                 'description' => 'Jaminan Hari Tua',
-            ],
-            [
-                'component' => 'jkk',
-                'employee_rate' => 0.00,
-                'employer_rate' => 0.24,
-                'max_salary_base' => null,
-                'effective_date' => '2020-01-01',
-                'valid_until' => null,
-                'description' => 'Jaminan Kecelakaan Kerja (Risk Level I)',
             ],
             [
                 'component' => 'jkm',
@@ -83,15 +74,26 @@ class BpjsRateSeeder extends Seeder
                 'description' => 'BPJS Kesehatan',
             ],
         ];
+        foreach ([1 => 0.24, 2 => 0.54, 3 => 0.89, 4 => 1.27, 5 => 1.74] as $class => $employerRate) {
+            $rates[] = [
+                'component' => 'jkk',
+                'risk_class' => $class,
+                'employee_rate' => 0,
+                'employer_rate' => $employerRate,
+                'max_salary_base' => null,
+                'effective_date' => '2020-01-01',
+                'valid_until' => null,
+                'description' => "Jaminan Kecelakaan Kerja (Risk Class {$class})",
+            ];
+        }
 
         foreach ($rates as $rate) {
-            BpjsRate::updateOrCreate(
-                [
-                    'component' => $rate['component'],
-                    'effective_date' => $rate['effective_date'],
-                ],
-                $rate
-            );
+            $riskClass = $rate['risk_class'] ?? 0;
+            $exists = BpjsRate::query()->where('component', $rate['component'])->where('risk_class', $riskClass)
+                ->whereDate('effective_date', $rate['effective_date'])->exists();
+            if (! $exists) {
+                BpjsRate::create($rate);
+            }
         }
     }
 }

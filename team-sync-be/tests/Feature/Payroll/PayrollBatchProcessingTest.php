@@ -70,6 +70,7 @@ class PayrollBatchProcessingTest extends TestCase
         }
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
 
         // All employees should have payroll details
@@ -100,6 +101,7 @@ class PayrollBatchProcessingTest extends TestCase
         }
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
 
         // After generation, processed_count should reflect total employees processed
@@ -122,6 +124,7 @@ class PayrollBatchProcessingTest extends TestCase
         }
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
 
         foreach ($employees as $employee) {
@@ -148,6 +151,7 @@ class PayrollBatchProcessingTest extends TestCase
         $employee2 = $this->createEmployeeWithAttendance(15_000_000);
 
         $repository = app(PayrollRepositoryInterface::class);
+        $this->seedBpjsPayroll('2026-04');
         $payroll = $repository->generatePayroll('2026-04', null);
 
         $detail1 = $payroll->payrollDetails->firstWhere('staff_member_id', $employee1->id);
