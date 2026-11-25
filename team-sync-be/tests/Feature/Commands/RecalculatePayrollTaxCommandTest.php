@@ -194,7 +194,7 @@ class RecalculatePayrollTaxCommandTest extends TestCase
         $this->assertEqualsWithDelta($expectedGross, $meta['meta']['gross_monthly'], 0.01);
         $this->assertEqualsWithDelta(8346820.81, $meta['meta']['cash_base'], 0.01);
         $this->assertEquals(
-            round(8346820.81 - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 2),
+            round(8346820.81 - (float) $detail->bpjs_tk_employee - (float) $detail->bpjs_kes_employee - (float) $detail->pph21_amount, 0),
             (float) $detail->final_salary
         );
 

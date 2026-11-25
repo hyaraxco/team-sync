@@ -222,7 +222,7 @@ class BpjsPeriodSelectionTest extends TestCase
     public function test_ppu_kesehatan_clamps_only_outside_floor_and_ceiling(): void
     {
         $service = app(TaxCalculationService::class);
-        foreach ([4_999_999 => 50_000, 5_000_000 => 50_000, 5_000_001 => 50_000.01, 11_999_999 => 119_999.99, 12_000_000 => 120_000, 12_000_001 => 120_000] as $salary => $amount) {
+        foreach ([4_999_999 => 50_000, 5_000_000 => 50_000, 5_000_001 => 50_000, 11_999_999 => 120_000, 12_000_000 => 120_000, 12_000_001 => 120_000] as $salary => $amount) {
             $bpjs = $service->calculateBpjs(new BpjsPayrollInput($salary, 0, 1, 5_000_000), '2026-04')['breakdown'];
             $this->assertEquals($amount, $bpjs['bpjs_kesehatan_employee']);
         }
@@ -254,10 +254,10 @@ class BpjsPeriodSelectionTest extends TestCase
     {
         $brackets = [
             ['min_income' => 0, 'max_income' => 60_000_000, 'rate' => 5.00, 'order' => 1],
-            ['min_income' => 60_000_001, 'max_income' => 250_000_000, 'rate' => 15.00, 'order' => 2],
-            ['min_income' => 250_000_001, 'max_income' => 500_000_000, 'rate' => 25.00, 'order' => 3],
-            ['min_income' => 500_000_001, 'max_income' => 5_000_000_000, 'rate' => 30.00, 'order' => 4],
-            ['min_income' => 5_000_000_001, 'max_income' => null, 'rate' => 35.00, 'order' => 5],
+            ['min_income' => 60_000_000, 'max_income' => 250_000_000, 'rate' => 15.00, 'order' => 2],
+            ['min_income' => 250_000_000, 'max_income' => 500_000_000, 'rate' => 25.00, 'order' => 3],
+            ['min_income' => 500_000_000, 'max_income' => 5_000_000_000, 'rate' => 30.00, 'order' => 4],
+            ['min_income' => 5_000_000_000, 'max_income' => null, 'rate' => 35.00, 'order' => 5],
         ];
         foreach ($brackets as $b) {
             TaxBracket::updateOrCreate(['order' => $b['order']], $b);

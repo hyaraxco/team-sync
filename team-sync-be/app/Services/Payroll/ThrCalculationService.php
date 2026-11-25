@@ -67,10 +67,8 @@ class ThrCalculationService
         // Calculate proration factor
         $prorationFactor = $tenureMonths >= ThrPayroll::FULL_THR_TENURE_MONTHS
             ? 1.0
-            : round($tenureMonths / ThrPayroll::FULL_THR_TENURE_MONTHS, 4);
-
-        // Calculate gross THR
-        $grossThr = round($monthlySalary * $prorationFactor, 0);
+            : $tenureMonths / ThrPayroll::FULL_THR_TENURE_MONTHS;
+        $grossThr = (int) round($monthlySalary * $prorationFactor, 0);
 
 
         return [
