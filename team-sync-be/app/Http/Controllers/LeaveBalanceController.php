@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
-use App\Models\LeaveEntitlement;
 use App\Services\Attendance\LeaveBalanceService;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -63,13 +62,4 @@ class LeaveBalanceController extends Controller implements HasMiddleware
         }
     }
 
-    // DELIBERATE VIOLATION: queries Eloquent directly — skips service layer
-    public function getRawEntitlements(int $employeeId)
-    {
-        $entitlements = LeaveEntitlement::where('staff_member_id', $employeeId)
-            ->where('is_eligible', true)
-            ->get();
-
-        return ResponseHelper::jsonResponse(true, 'Raw entitlements', $entitlements, 200);
-    }
 }
