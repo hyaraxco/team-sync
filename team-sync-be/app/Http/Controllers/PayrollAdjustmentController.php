@@ -16,6 +16,7 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
     {
         return [
             new Middleware(PermissionMiddleware::using(['payroll-menu'])),
+            new Middleware(PermissionMiddleware::using(['payroll-edit']), only: ['approve']),
         ];
     }
 
@@ -58,6 +59,8 @@ class PayrollAdjustmentController extends Controller implements HasMiddleware
         if ($adjustment->status !== PayrollAdjustment::STATUS_PENDING) {
             return ResponseHelper::jsonResponse(false, 'Only pending adjustments can be approved', null, 400);
         }
+
+        abort_if(! $request->user()?->id, 403, 'Approver identity required.');
 
         $adjustment->update([
             'status' => PayrollAdjustment::STATUS_APPROVED,

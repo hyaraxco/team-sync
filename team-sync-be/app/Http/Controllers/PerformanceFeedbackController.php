@@ -22,13 +22,13 @@ class PerformanceFeedbackController extends Controller implements HasMiddleware
         return [
             // Self-service feedback viewing (received, detail, acknowledge): ownership-checked in controller
             new Middleware(
-                PermissionMiddleware::using('feedback-give'),
-                only: ['getGivenFeedback']
+                PermissionMiddleware::using('performance-menu'),
+                only: ['getReceivedFeedback', 'show', 'acknowledge']
             ),
             // Giving feedback
             new Middleware(
                 PermissionMiddleware::using('feedback-give'),
-                only: ['store']
+                only: ['getGivenFeedback', 'store']
             ),
         ];
     }
