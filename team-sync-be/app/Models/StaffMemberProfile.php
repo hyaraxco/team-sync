@@ -60,6 +60,14 @@ class StaffMemberProfile extends Model
 
     protected static function booted(): void
     {
+        // Profiles created outside the API (factory, seeders) must still belong
+        // to the current company, otherwise company timezone reads fall back.
+        static::creating(function (self $profile) {
+            if (! array_key_exists('company_id', $profile->getAttributes())) {
+                $profile->company_id = $profile->user?->company_id ?? Company::current()?->id;
+            }
+        });
+
         static::saving(function (self $profile) {
             $profile->identity_number_hash = SensitiveData::hash($profile->identity_number);
         });

@@ -33,6 +33,9 @@ class Company extends Model
     /**
      * Get the current (default) company.
      * In single-tenant mode, this returns the first company.
+     *
+     * One indexed select per call. Caching it was measured and saved nothing:
+     * a user+profile create issued the same queries either way.
      */
     public static function current(): ?self
     {
