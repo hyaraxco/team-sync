@@ -158,6 +158,36 @@ describe("Header smoke", () => {
         expect(wrapper.emitted("toggle-sidebar")).toHaveLength(1);
     });
 
+    it("exposes drawer state on the mobile menu trigger", async () => {
+        const closed = factory();
+
+        expect(closed.get('[data-testid="header-mobile-menu-toggle"]').attributes("aria-expanded")).toBe("false");
+        expect(closed.get('[data-testid="header-mobile-menu-toggle"]').attributes("aria-controls")).toBe("sidebar");
+
+        const open = mount(Header, {
+            props: { isOpen: true, sidebarId: "custom-sidebar" },
+            global: { stubs: { RouterLink: routerLinkStub } },
+        });
+
+        expect(open.get('[data-testid="header-mobile-menu-toggle"]').attributes("aria-expanded")).toBe("true");
+        expect(open.get('[data-testid="header-mobile-menu-toggle"]').attributes("aria-controls")).toBe(
+            "custom-sidebar",
+        );
+    });
+
+    it("moves focus to the menu trigger on request", async () => {
+        const wrapper = mount(Header, {
+            attachTo: document.body,
+            global: { stubs: { RouterLink: routerLinkStub } },
+        });
+        const trigger = wrapper.get('[data-testid="header-mobile-menu-toggle"]').element;
+
+        wrapper.vm.focusMenuTrigger();
+
+        expect(document.activeElement).toBe(trigger);
+        wrapper.unmount();
+    });
+
     it("renders the route title as a page-level h1 heading", () => {
         const wrapper = factory();
 
