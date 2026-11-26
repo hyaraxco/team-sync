@@ -121,9 +121,8 @@ const onNavigate = () => closeMobile();
                             'nav-link-active': $route.name === 'admin.dashboard',
                         }"
                         :aria-current="$route.name === 'admin.dashboard' ? 'page' : undefined"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         v-if="can('dashboard-menu')"
-                        data-tooltip="Dashboard"
                         @click="onNavigate"
                     >
                         <HomeIcon
@@ -133,7 +132,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.dashboard',
@@ -146,13 +144,12 @@ const onNavigate = () => closeMobile();
                     <!-- 2. Projects (employee daily, manager daily) -->
                     <RouterLink
                         :to="{ name: 'admin.projects' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.project'),
                         }"
                         :aria-current="$route.name?.startsWith('admin.project') ? 'page' : undefined"
                         v-if="can('project-menu')"
-                        data-tooltip="Projects"
                         @click="onNavigate"
                     >
                         <FileTextIcon
@@ -162,7 +159,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.project'),
@@ -175,13 +171,12 @@ const onNavigate = () => closeMobile();
                     <!-- 3. Employees (HR/Manager core) -->
                     <RouterLink
                         :to="{ name: 'admin.staffMembers' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.staffMember'),
                         }"
                         :aria-current="$route.name?.startsWith('admin.staffMember') ? 'page' : undefined"
                         v-if="can('staff-member-menu')"
-                        data-tooltip="Employees"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -191,7 +186,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.staffMember'),
@@ -204,13 +198,12 @@ const onNavigate = () => closeMobile();
                     <!-- 4. Our Teams (HR/Manager) -->
                     <RouterLink
                         :to="{ name: 'admin.teams' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.team'),
                         }"
                         :aria-current="$route.name?.startsWith('admin.team') ? 'page' : undefined"
                         v-if="can('team-menu')"
-                        data-tooltip="Our Teams"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -220,7 +213,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.team'),
@@ -233,13 +225,12 @@ const onNavigate = () => closeMobile();
                     <!-- 5. Meetings -->
                     <RouterLink
                         :to="{ name: 'admin.meetings' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.meeting'),
                         }"
                         :aria-current="$route.name?.startsWith('admin.meeting') ? 'page' : undefined"
                         v-if="can('meeting-menu')"
-                        data-tooltip="Meetings"
                         @click="onNavigate"
                     >
                         <VideoIcon
@@ -249,7 +240,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.meeting'),
@@ -262,13 +252,12 @@ const onNavigate = () => closeMobile();
                     <!-- 6. Attendance (HR/Manager admin) -->
                     <RouterLink
                         :to="{ name: 'admin.attendances' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.attendances',
                         }"
                         :aria-current="$route.name === 'admin.attendances' ? 'page' : undefined"
                         v-if="can('attendance-menu')"
-                        data-tooltip="Attendance"
                         @click="onNavigate"
                     >
                         <CalendarIcon
@@ -278,7 +267,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.attendances',
@@ -291,14 +279,13 @@ const onNavigate = () => closeMobile();
                     <!-- 6. Payroll (HR/Finance core) -->
                     <RouterLink
                         :to="{ name: 'admin.payroll.dashboard' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active':
                                 $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
                         }"
                         :aria-current="$route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments' ? 'page' : undefined"
                         v-if="can('payroll-menu')"
-                        data-tooltip="Payroll"
                         @click="onNavigate"
                     >
                         <WalletIcon
@@ -310,7 +297,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white':
@@ -324,13 +310,12 @@ const onNavigate = () => closeMobile();
 
                     <RouterLink
                         :to="{ name: 'admin.payroll.adjustments' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.payroll.adjustments',
                         }"
                         :aria-current="$route.name === 'admin.payroll.adjustments' ? 'page' : undefined"
                         v-if="can('payroll-menu')"
-                        data-tooltip="Payroll Adjustments"
                         @click="onNavigate"
                     >
                         <FileWarningIcon
@@ -340,7 +325,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.payroll.adjustments',
@@ -353,13 +337,12 @@ const onNavigate = () => closeMobile();
                     <!-- 7. Analytics (periodic) -->
                     <RouterLink
                         :to="{ name: 'admin.analytics' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.analytics'),
                         }"
                         :aria-current="$route.name?.startsWith('admin.analytics') ? 'page' : undefined"
                         v-if="can('analytics-menu')"
-                        data-tooltip="Analytics"
                         @click="onNavigate"
                     >
                         <BarChart3Icon
@@ -369,7 +352,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name?.startsWith('admin.analytics'),
@@ -389,12 +371,11 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-manager-submit')"
                         :to="{ name: 'admin.performance.team-reviews' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-reviews',
                         }"
                         :aria-current="$route.name === 'admin.performance.team-reviews' ? 'page' : undefined"
-                        data-tooltip="Team Reviews"
                         @click="onNavigate"
                     >
                         <UsersIcon
@@ -402,7 +383,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.team-reviews' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.team-reviews' }"
                         >
@@ -414,12 +394,11 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-calibrate')"
                         :to="{ name: 'admin.performance.pending-calibration' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.pending-calibration',
                         }"
                         :aria-current="$route.name === 'admin.performance.pending-calibration' ? 'page' : undefined"
-                        data-tooltip="Pending Calibration"
                         @click="onNavigate"
                     >
                         <ScaleIcon
@@ -427,7 +406,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.pending-calibration' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.pending-calibration' }"
                         >
@@ -439,12 +417,11 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-cycle-manage')"
                         :to="{ name: 'admin.performance.cycles' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name?.startsWith('admin.performance.cycles'),
                         }"
                         :aria-current="$route.name?.startsWith('admin.performance.cycles') ? 'page' : undefined"
-                        data-tooltip="Review Cycles"
                         @click="onNavigate"
                     >
                         <CalendarIcon
@@ -452,7 +429,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name?.startsWith('admin.performance.cycles') }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name?.startsWith('admin.performance.cycles') }"
                         >
@@ -463,12 +439,11 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-cycle-manage')"
                         :to="{ name: 'admin.performance.outcome-rules' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.outcome-rules',
                         }"
                         :aria-current="$route.name === 'admin.performance.outcome-rules' ? 'page' : undefined"
-                        data-tooltip="Outcome Rules"
                         @click="onNavigate"
                     >
                         <AwardIcon
@@ -476,7 +451,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.outcome-rules' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.outcome-rules' }"
                         >
@@ -487,12 +461,11 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('review-cycle-manage')"
                         :to="{ name: 'admin.performance.templates' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.templates',
                         }"
                         :aria-current="$route.name === 'admin.performance.templates' ? 'page' : undefined"
-                        data-tooltip="Review Templates"
                         @click="onNavigate"
                     >
                         <FileTextIcon
@@ -500,7 +473,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.templates' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.templates' }"
                         >
@@ -511,11 +483,10 @@ const onNavigate = () => closeMobile();
                     <!-- 3. My Reviews (personal) -->
                     <RouterLink
                         :to="{ name: 'admin.performance.my-reviews' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.my-reviews',
                         }"
-                        data-tooltip="My Reviews"
                         @click="onNavigate"
                     >
                         <StarIcon
@@ -523,7 +494,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.my-reviews' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.my-reviews' }"
                         >
@@ -535,11 +505,10 @@ const onNavigate = () => closeMobile();
                     <RouterLink
                         v-if="can('goal-assign-team')"
                         :to="{ name: 'admin.performance.team-goals' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.team-goals',
                         }"
-                        data-tooltip="Team Goals"
                         @click="onNavigate"
                     >
                         <TrendingUpIcon
@@ -547,7 +516,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.team-goals' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.team-goals' }"
                         >
@@ -558,11 +526,10 @@ const onNavigate = () => closeMobile();
                     <!-- 5. My Goals (personal) -->
                     <RouterLink
                         :to="{ name: 'admin.performance.my-goals' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.performance.my-goals',
                         }"
-                        data-tooltip="My Goals"
                         @click="onNavigate"
                     >
                         <TargetIcon
@@ -570,7 +537,6 @@ const onNavigate = () => closeMobile();
                             :class="{ 'text-white': $route.name === 'admin.performance.my-goals' }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{ 'text-brand-white': $route.name === 'admin.performance.my-goals' }"
                         >
@@ -581,13 +547,12 @@ const onNavigate = () => closeMobile();
                     <!-- 6. Feedback (least frequent) -->
                     <RouterLink
                         :to="{ name: 'admin.performance.feedback.received' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active':
                                 $route.name === 'admin.performance.feedback.received' ||
                                 $route.name === 'admin.performance.feedback.given',
                         }"
-                        data-tooltip="Feedback"
                         @click="onNavigate"
                     >
                         <MessageSquareIcon
@@ -599,7 +564,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white':
@@ -634,7 +598,7 @@ const onNavigate = () => closeMobile();
                         <template #default="{ href, navigate }">
                             <a
                                 :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                                 :class="{
                                     'nav-link-active':
                                         $route.name === 'staffMember.attendance.my-attendances' ||
@@ -646,7 +610,6 @@ const onNavigate = () => closeMobile();
                                         ? 'page'
                                         : undefined
                                 "
-                                data-tooltip="My Attendance"
                                 @click="navigate($event); onNavigate()"
                             >
                                 <CalendarIcon
@@ -658,7 +621,6 @@ const onNavigate = () => closeMobile();
                                     }"
                                 />
                                 <span
-                                    v-show="!isCollapsed"
                                     class="text-brand-dark text-base font-medium"
                                     :class="{
                                         'text-brand-white':
@@ -677,10 +639,9 @@ const onNavigate = () => closeMobile();
                         <template #default="{ href, navigate }">
                             <a
                                 :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                                 :class="{ 'nav-link-active': $route.name === 'staffMember.team' }"
                                 :aria-current="$route.name === 'staffMember.team' ? 'page' : undefined"
-                                data-tooltip="My Team"
                                 @click="navigate($event); onNavigate()"
                             >
                                 <UsersIcon
@@ -688,7 +649,6 @@ const onNavigate = () => closeMobile();
                                     :class="{ 'text-white': $route.name === 'staffMember.team' }"
                                 />
                                 <span
-                                    v-show="!isCollapsed"
                                     class="text-brand-dark text-base font-medium"
                                     :class="{ 'text-brand-white': $route.name === 'staffMember.team' }"
                                 >
@@ -703,7 +663,7 @@ const onNavigate = () => closeMobile();
                         <template #default="{ href, navigate }">
                             <a
                                 :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                                 :class="{
                                     'nav-link-active':
                                         $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
@@ -713,7 +673,6 @@ const onNavigate = () => closeMobile();
                                         ? 'page'
                                         : undefined
                                 "
-                                data-tooltip="My Payroll"
                                 @click="navigate($event); onNavigate()"
                             >
                                 <WalletIcon
@@ -725,7 +684,6 @@ const onNavigate = () => closeMobile();
                                     }"
                                 />
                                 <span
-                                    v-show="!isCollapsed"
                                     class="text-brand-dark text-base font-medium"
                                     :class="{
                                         'text-brand-white':
@@ -744,7 +702,7 @@ const onNavigate = () => closeMobile();
                         <template #default="{ href, navigate }">
                             <a
                                 :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                                 :class="{
                                     'nav-link-active':
                                         $route.name === 'staffMember.profile' ||
@@ -755,7 +713,6 @@ const onNavigate = () => closeMobile();
                                         ? 'page'
                                         : undefined
                                 "
-                                data-tooltip="My Profile"
                                 @click="navigate($event); onNavigate()"
                             >
                                 <UserIcon
@@ -767,7 +724,6 @@ const onNavigate = () => closeMobile();
                                     }"
                                 />
                                 <span
-                                    v-show="!isCollapsed"
                                     class="text-brand-dark text-base font-medium"
                                     :class="{
                                         'text-brand-white':
@@ -789,12 +745,11 @@ const onNavigate = () => closeMobile();
                 <div class="space-y-3">
                     <RouterLink
                         :to="{ name: 'admin.settings' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
                         :class="{
                             'nav-link-active': $route.name === 'admin.settings',
                         }"
                         v-if="canOneOf(['settings-hr-manage', 'settings-finance-manage', 'settings-system-manage'])"
-                        data-tooltip="Settings"
                         @click="onNavigate"
                     >
                         <SettingsIcon
@@ -804,7 +759,6 @@ const onNavigate = () => closeMobile();
                             }"
                         />
                         <span
-                            v-show="!isCollapsed"
                             class="text-brand-dark text-base font-medium"
                             :class="{
                                 'text-brand-white': $route.name === 'admin.settings',
