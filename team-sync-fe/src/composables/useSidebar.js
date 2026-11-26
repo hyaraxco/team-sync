@@ -4,7 +4,7 @@ const SIDEBAR_KEY = Symbol("sidebar");
 const STORAGE_KEY = "sidebar-collapsed";
 
 export function provideSidebar() {
-    const isOpen = ref(true); // mobile open/close
+    const isOpen = ref(false); // mobile open/close
     const isCollapsed = ref(localStorage.getItem(STORAGE_KEY) === "true");
 
     function toggleCollapse() {
