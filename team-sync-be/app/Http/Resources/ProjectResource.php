@@ -41,6 +41,9 @@ class ProjectResource extends JsonResource
             'description' => $this->description,
             'photo' => $this->photo ? asset('storage/'.$this->photo) : null,
             'budget' => (float) (string) $this->budget,
+            // Client identity is commercial context: managers and HR only.
+            'client_name' => $this->when($user?->can('project-statistic'), $this->client_name),
+            'client_contact' => $this->when($user?->can('project-statistic'), $this->client_contact),
             'progress' => $progress,
             'leader' => new StaffMemberProfileResource($this->projectLeader),
             'teams' => TeamResource::collection($this->whenLoaded('teams')),

@@ -16,6 +16,7 @@ import {
     UserCheck,
     Search,
     SearchX,
+    Building2,
 } from "lucide-vue-next";
 import { useRoute } from "vue-router";
 import router from "@/router";
@@ -487,6 +488,27 @@ onMounted(async () => {
                     </div>
                     <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center">
                         <DollarSign class="w-6 h-6 text-green-600" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Client Card: same audience as Budget, commercial context -->
+            <div
+                v-if="canViewProjectStats && project.client_name"
+                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+            >
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-brand-dark text-sm font-medium">Client</p>
+                        <p class="text-brand-dark text-xl font-extrabold leading-none my-2">
+                            {{ project.client_name }}
+                        </p>
+                        <p v-if="project.client_contact" class="text-gray-500 text-sm">
+                            {{ project.client_contact }}
+                        </p>
+                    </div>
+                    <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
+                        <Building2 class="w-6 h-6 text-blue-600" />
                     </div>
                 </div>
             </div>

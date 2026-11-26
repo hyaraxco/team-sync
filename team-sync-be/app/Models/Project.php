@@ -20,6 +20,8 @@ class Project extends Model
         'description',
         'photo',
         'budget',
+        'client_name',
+        'client_contact',
         'project_leader_id',
     ];
 
