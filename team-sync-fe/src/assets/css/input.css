@@ -341,9 +341,12 @@ html {
     position: relative;
 }
 
-.sidebar-collapsed .nav-link::after,
-.sidebar-collapsed .nav-link-active::after {
-    content: attr(data-tooltip);
+/* Icon-only links keep their label in the accessibility tree, and that same
+   label doubles as the tooltip: one text source for the accessible name and
+   the visible hint. Positioned outside the 44px link so it never covers the
+   focused control. */
+.sidebar-collapsed .nav-link > span,
+.sidebar-collapsed .nav-link-active > span {
     position: absolute;
     left: calc(100% + 12px);
     top: 50%;
@@ -377,10 +380,14 @@ html {
     transition: opacity 0.15s ease;
 }
 
-.sidebar-collapsed .nav-link:hover::after,
-.sidebar-collapsed .nav-link-active:hover::after,
+.sidebar-collapsed .nav-link:hover > span,
+.sidebar-collapsed .nav-link-active:hover > span,
+.sidebar-collapsed .nav-link:focus-visible > span,
+.sidebar-collapsed .nav-link-active:focus-visible > span,
 .sidebar-collapsed .nav-link:hover::before,
-.sidebar-collapsed .nav-link-active:hover::before {
+.sidebar-collapsed .nav-link-active:hover::before,
+.sidebar-collapsed .nav-link:focus-visible::before,
+.sidebar-collapsed .nav-link-active:focus-visible::before {
     opacity: 1;
 }
 

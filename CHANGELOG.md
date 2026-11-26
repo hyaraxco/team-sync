@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Reveal collapsed sidebar tooltips on keyboard focus as well as hover, keep the icon-only labels in the accessibility tree so links retain accessible names, and replace the focused-link white background that made the current link unreadable in dark mode (`team-sync-mc3`).
 - Scope the payroll month unique key to `(company_id, salary_month)`, and make readiness plus the queued job's unique lock per company, so one company's payroll no longer blocks another company's payroll row or job for the same month; legacy rows are backfilled only when the install has a single company (`team-sync-0fr`).
 - Assign `company_id` on user and staff-profile creation (factory, seeder, API create, and first-boot setup) so tenant scoping and company timezone reads stop silently falling back to `Asia/Jakarta`. Profiles inherit their user's company, the E2E seed path now seeds the company, and first boot creates one (`team-sync-rmh`).
 - Aggregate payroll/THR taxable income by recognition period, include taxable employer BPJS benefits, preserve distinct cash/BPJS bases, and persist consistent tax/net outputs (`team-sync-62b`).

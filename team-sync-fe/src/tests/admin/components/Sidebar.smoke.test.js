@@ -185,6 +185,25 @@ describe("Sidebar smoke", () => {
         expect(wrapper.find('a[href="#"]').exists()).toBe(false);
     });
 
+    it("keeps link labels in the DOM while collapsed so icons have accessible names", () => {
+        setPermissions(["dashboard-menu", "project-menu"]);
+        sidebarHolder.refs.isCollapsed.value = true;
+
+        const wrapper = factory();
+        const links = wrapper.findAll("nav .nav-link, nav .nav-link-active");
+
+        expect(links.length).toBeGreaterThan(0);
+        links.forEach((link) => {
+            const label = link.find(":scope > span");
+
+            expect(label.exists()).toBe(true);
+            expect(label.text().length).toBeGreaterThan(0);
+            expect(label.attributes("style") ?? "").not.toContain("display: none");
+        });
+
+        expect(wrapper.get('nav a[data-route-name="admin.dashboard"]').text()).toContain("Dashboard");
+    });
+
     it("marks the drawer as an open dialog only while it is open", async () => {
         setPermissions(["dashboard-menu"]);
 
