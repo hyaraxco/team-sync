@@ -12,6 +12,7 @@ class Payroll extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'company_id',
         'salary_month',
         'attendance_period_id',
         'payroll_setting_version_id',

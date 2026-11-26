@@ -273,7 +273,11 @@ class PayrollController extends Controller implements HasMiddleware
                 );
             }
 
-            GeneratePayrollJob::dispatch($validated['salary_month'], $request->user()?->id);
+            GeneratePayrollJob::dispatch(
+                $validated['salary_month'],
+                $request->user()?->id,
+                $request->user()?->company_id,
+            );
 
             return ResponseHelper::jsonResponse(
                 true,

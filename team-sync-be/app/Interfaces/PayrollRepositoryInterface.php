@@ -23,7 +23,7 @@ interface PayrollRepositoryInterface
 
     public function getPayrollDetailsPaginated(string $payrollId, int $perPage);
 
-    public function generatePayroll(string $salaryMonth, ?int $actorId = null);
+    public function generatePayroll(string $salaryMonth, ?int $actorId = null, ?int $companyId = null);
 
     public function getGenerateReadiness(string $salaryMonth): array;
 

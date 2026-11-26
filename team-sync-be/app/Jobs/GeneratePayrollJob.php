@@ -16,20 +16,23 @@ class GeneratePayrollJob implements ShouldBeUnique, ShouldQueue
 
     public ?int $initiatedBy;
 
+    public ?int $companyId;
+
     public int $uniqueFor = 3600;
 
     /**
      * Create a new job instance.
      */
-    public function __construct(string $salaryMonth, ?int $initiatedBy = null)
+    public function __construct(string $salaryMonth, ?int $initiatedBy = null, ?int $companyId = null)
     {
         $this->salaryMonth = $salaryMonth;
         $this->initiatedBy = $initiatedBy;
+        $this->companyId = $companyId;
     }
 
     public function uniqueId(): string
     {
-        return sprintf('generate-payroll:%s', $this->salaryMonth);
+        return sprintf('generate-payroll:%s:%s', $this->companyId ?? 'default', $this->salaryMonth);
     }
 
     /**
@@ -41,9 +44,10 @@ class GeneratePayrollJob implements ShouldBeUnique, ShouldQueue
             Log::info('Starting payroll generation', [
                 'salary_month' => $this->salaryMonth,
                 'initiated_by' => $this->initiatedBy,
+                'company_id' => $this->companyId,
             ]);
 
-            $payroll = $generationService->generatePayroll($this->salaryMonth, $this->initiatedBy);
+            $payroll = $generationService->generatePayroll($this->salaryMonth, $this->initiatedBy, $this->companyId);
 
             Log::info('Payroll generation completed', [
                 'salary_month' => $this->salaryMonth,

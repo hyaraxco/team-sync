@@ -11,9 +11,9 @@ class PayrollGenerationService
         private readonly PayrollRepositoryInterface $payrollRepository,
     ) {}
 
-    public function generatePayroll(string $salaryMonth, ?int $actorId = null): Payroll
+    public function generatePayroll(string $salaryMonth, ?int $actorId = null, ?int $companyId = null): Payroll
     {
-        return $this->payrollRepository->generatePayroll($salaryMonth, $actorId);
+        return $this->payrollRepository->generatePayroll($salaryMonth, $actorId, $companyId);
     }
 
     public function getGenerateReadiness(string $salaryMonth): array
