@@ -144,7 +144,7 @@ class AttendancePeriodLifecycleTest extends TestCase
                     'staff_member_id' => $employee->id,
                     'date' => $cursor->toDateString(),
                     'check_in' => $cursor->format('Y-m-d').' 08:50:00',
-                    'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                    'check_out' => $this->localAttendanceTime($cursor->format('Y-m-d').' 17:00:00'),
                     'worked_minutes' => 490,
                     'status' => 'present',
                     'notes' => 'Lifecycle payroll lock test',

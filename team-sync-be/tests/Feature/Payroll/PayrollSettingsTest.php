@@ -339,10 +339,10 @@ class PayrollSettingsTest extends TestCase
                     'date' => $dateKey,
                     'status' => $status,
                     'check_in' => $status === 'present'
-                        ? $cursor->copy()->format('Y-m-d').' 08:00:00'
+                        ? $this->localAttendanceTime($cursor->copy()->format('Y-m-d').' 08:00:00')
                         : null,
                     'check_out' => $status === 'present'
-                        ? $cursor->copy()->format('Y-m-d').' 17:00:00'
+                        ? $this->localAttendanceTime($cursor->copy()->format('Y-m-d').' 17:00:00')
                         : null,
                 ]);
             }

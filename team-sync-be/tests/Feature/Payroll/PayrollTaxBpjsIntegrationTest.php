@@ -6,6 +6,7 @@ use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\JobInformation;
 use App\Models\OvertimeRecord;
+use App\Models\PayrollBpjsPeriod;
 use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
 use App\Services\Payroll\TaxCalculationService;
@@ -96,7 +97,7 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
         ]);
 
         $this->seedBpjsPayroll('2026-04');
-        $record = \App\Models\PayrollBpjsPeriod::firstOrFail();
+        $record = PayrollBpjsPeriod::firstOrFail();
         $facts = $record->facts;
         $facts['jkk_class'] = 3;
         $facts['employees'][$employee->id]['basic_wage'] = 5_000_000;
@@ -188,8 +189,8 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
                     Attendance::create([
                         'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
-                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                        'check_in' => $this->localAttendanceTime($cursor->format('Y-m-d').' 08:00:00'),
+                        'check_out' => $this->localAttendanceTime($cursor->format('Y-m-d').' 17:00:00'),
                         'status' => 'present',
                         'notes' => 'TER boundary test',
                     ]);
@@ -451,8 +452,8 @@ class PayrollTaxBpjsIntegrationTest extends TestCase
                     Attendance::create([
                         'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->format('Y-m-d').' 08:00:00',
-                        'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                        'check_in' => $this->localAttendanceTime($cursor->format('Y-m-d').' 08:00:00'),
+                        'check_out' => $this->localAttendanceTime($cursor->format('Y-m-d').' 17:00:00'),
                         'status' => 'present',
                         'notes' => 'Tax BPJS integration test',
                     ]);

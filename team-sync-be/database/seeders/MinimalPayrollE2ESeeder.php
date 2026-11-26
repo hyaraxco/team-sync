@@ -199,8 +199,8 @@ class MinimalPayrollE2ESeeder extends Seeder
                 Attendance::create([
                     'staff_member_id' => $employeeId,
                     'date' => $cursor->toDateString(),
-                    'check_in' => $cursor->format('Y-m-d').' 08:00:00',
-                    'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                    'check_in' => $this->utc('08:00:00', $cursor),
+                    'check_out' => $this->utc('17:00:00', $cursor),
                     'status' => 'present',
                     'notes' => 'Seeded for payroll E2E flow',
                 ]);
@@ -208,5 +208,11 @@ class MinimalPayrollE2ESeeder extends Seeder
 
             $cursor->addDay();
         }
+    }
+
+    /** Attendance timestamps are stored in UTC; seeders express company wall-clock times. */
+    private function utc(string $time, Carbon $date, string $timezone = 'Asia/Jakarta'): string
+    {
+        return Carbon::parse($date->format('Y-m-d').' '.$time, $timezone)->setTimezone('UTC')->toDateTimeString();
     }
 }

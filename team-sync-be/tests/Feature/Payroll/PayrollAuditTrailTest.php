@@ -330,8 +330,8 @@ class PayrollAuditTrailTest extends TestCase
                     'staff_member_id' => $employee->id,
                     'date' => $cursor->toDateString(),
                     'status' => 'present',
-                    'check_in' => $cursor->copy()->format('Y-m-d').' 08:00:00',
-                    'check_out' => $cursor->copy()->format('Y-m-d').' 17:00:00',
+                    'check_in' => $this->localAttendanceTime($cursor->copy()->format('Y-m-d').' 08:00:00'),
+                    'check_out' => $this->localAttendanceTime($cursor->copy()->format('Y-m-d').' 17:00:00'),
                 ]);
             }
 
