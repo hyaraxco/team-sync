@@ -10,6 +10,7 @@ use App\Models\ThrPayroll;
 use App\Models\ThrPayrollDetail;
 use App\Models\User;
 use Carbon\Carbon;
+use Database\Seeders\CompanySeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -38,6 +39,7 @@ class ThrControllerTest extends TestCase
             RoleSeeder::class,
             PermissionSeeder::class,
             RolePermissionSeeder::class,
+            CompanySeeder::class,
         ]);
 
         $this->activateTestLicense();
@@ -116,6 +118,9 @@ class ThrControllerTest extends TestCase
             ->assertJsonPath('success', true)
             ->assertJsonPath('data.religion_event', 'idul_fitri')
             ->assertJsonPath('data.status', 'pending');
+
+        // company_id must be written or the unique key treats rows as distinct.
+        $this->assertNotNull(ThrPayroll::where('year', 2026)->where('religion_event', 'idul_fitri')->sole()->company_id);
     }
 
     public function test_hr_cannot_generate_thr(): void
