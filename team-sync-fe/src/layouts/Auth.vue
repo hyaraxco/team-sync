@@ -14,15 +14,6 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
             <aside
                 class="relative hidden w-1/2 overflow-hidden bg-gray-900 text-white lg:flex flex-col items-start justify-between"
             >
-                <!-- Background Image with Overlay -->
-                <img loading="eager"
-                    src="https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=2940&auto=format&fit=crop"
-                    alt="Team collaboration"
-                    class="absolute inset-0 h-full w-full object-cover"
-                    width="960"
-                    height="1280"
-                    fetchpriority="high"
-                />
                 <div
                     class="absolute inset-0 bg-gradient-to-br from-brand-primary/90 via-[#1a3a6e]/85 to-[#0a1f44]/95"
                 ></div>
@@ -59,21 +50,6 @@ import ErrorBoundary from "@/components/common/ErrorBoundary.vue";
                             Penggajian, kehadiran, dan manajemen karyawan dalam satu platform.
                         </p>
 
-                        <!-- Stats Row -->
-                        <div class="flex gap-6 pt-4">
-                            <div>
-                                <p class="text-2xl font-bold text-white">6</p>
-                                <p class="text-xs text-white/90">Modul HR</p>
-                            </div>
-                            <div>
-                                <p class="text-2xl font-bold text-white">4</p>
-                                <p class="text-xs text-white/90">Role Pengguna</p>
-                            </div>
-                            <div>
-                                <p class="text-2xl font-bold text-white">PPh 21</p>
-                                <p class="text-xs text-white/90">TER 2024</p>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Footer -->

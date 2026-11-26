@@ -114,3 +114,4 @@ describe("Login smoke", () => {
         expect(wrapper.find('[data-testid="login-submit"]').attributes("disabled")).toBeDefined();
     });
 });
+
