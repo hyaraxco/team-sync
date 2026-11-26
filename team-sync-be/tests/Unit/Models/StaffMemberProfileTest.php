@@ -72,6 +72,27 @@ it('getEmailAttribute returns null when user is missing', function () {
     expect($profile->email)->toBeNull();
 });
 
+it('indexes searchable profile fields without sensitive identity or phone data', function () {
+    $user = User::factory()->create([
+        'name' => 'Budi Santoso',
+        'email' => 'budi@example.com',
+    ]);
+    $user->assignRole('staff');
+
+    $profile = StaffMemberProfile::factory()->forUser($user)->create([
+        'code' => 'EMP-2026-000001',
+        'phone' => '+628123456789',
+        'identity_number' => '3201234567890001',
+    ]);
+
+    expect($profile->toSearchableArray())->toBe([
+        'id' => $profile->id,
+        'code' => 'EMP-2026-000001',
+        'name' => 'Budi Santoso',
+        'email' => 'budi@example.com',
+    ]);
+});
+
 it('identity_number_hash uses SensitiveData::hash for hashing', function () {
     $identity = '3201234567890001';
     $profile = StaffMemberProfile::factory()->create([

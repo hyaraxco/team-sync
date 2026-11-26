@@ -63,6 +63,34 @@ composer test
 `composer test` membersihkan config sebelum menjalankan Pest. Jumlah tes di
 arsip adalah catatan historis, bukan hasil pengujian checkout saat ini.
 
+## Staff Search Index Privacy Cleanup
+
+`StaffMemberProfile` search documents contain only the profile ID, code, name,
+and email. Older indexed documents may still contain phone and identity-number
+fields. A cleanup import can update existing documents by profile ID, replacing
+their fields with the current searchable document and removing stale phone and
+identity-number fields. This command is for an explicitly authorized,
+non-production index only; it is not part of setup or deployment.
+
+Before importing, explicitly select the intended non-production Scout index in
+its environment configuration, verify its host and index name, and ensure its
+credentials cannot access production. Never run this procedure against
+production. Production cleanup requires separate explicit authorization and a
+reviewed maintenance plan.
+
+After verifying the target as non-production, run the import from `team-sync-be/`:
+
+```bash
+php artisan scout:import "App\Models\StaffMemberProfile"
+```
+
+This updates documents in the selected index and removes fields no longer
+returned by `toSearchableArray()`. Do not target production without separate
+authorization and a reviewed maintenance plan.
+
+The repository's current test count in the archive is historical, not a result
+for the current checkout.
+
 ## Dokumentasi Terkait
 
 - [Aturan backend dan struktur layer](AGENTS.md)
