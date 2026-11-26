@@ -625,124 +625,157 @@ const onNavigate = () => closeMobile();
                     <!-- 1. My Attendance (daily check-in/out) -->
                     <RouterLink
                         :to="{ name: 'staffMember.attendance.my-attendances' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
-                        :class="{
-                            'nav-link-active':
-                                $route.name === 'staffMember.attendance.my-attendances' ||
-                                $route.name === 'staffMember.attendance.clock',
-                        }"
+                        custom
                         v-if="canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
-                        data-tooltip="My Attendance"
-                        @click="onNavigate"
                     >
-                        <CalendarIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white':
+                        <template #default="{ href, navigate }">
+                            <a
+                                :href="href"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                :class="{
+                                    'nav-link-active':
+                                        $route.name === 'staffMember.attendance.my-attendances' ||
+                                        $route.name === 'staffMember.attendance.clock',
+                                }"
+                                :aria-current="
                                     $route.name === 'staffMember.attendance.my-attendances' ||
-                                    $route.name === 'staffMember.attendance.clock',
-                            }"
-                        />
-                        <span
-                            v-show="!isCollapsed"
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white':
-                                    $route.name === 'staffMember.attendance.my-attendances' ||
-                                    $route.name === 'staffMember.attendance.clock',
-                            }"
-                        >
-                            My Attendance
-                        </span>
+                                    $route.name === 'staffMember.attendance.clock'
+                                        ? 'page'
+                                        : undefined
+                                "
+                                data-tooltip="My Attendance"
+                                @click="navigate($event); onNavigate()"
+                            >
+                                <CalendarIcon
+                                    class="w-5 h-5 text-gray-600"
+                                    :class="{
+                                        'text-white':
+                                            $route.name === 'staffMember.attendance.my-attendances' ||
+                                            $route.name === 'staffMember.attendance.clock',
+                                    }"
+                                />
+                                <span
+                                    v-show="!isCollapsed"
+                                    class="text-brand-dark text-base font-medium"
+                                    :class="{
+                                        'text-brand-white':
+                                            $route.name === 'staffMember.attendance.my-attendances' ||
+                                            $route.name === 'staffMember.attendance.clock',
+                                    }"
+                                >
+                                    My Attendance
+                                </span>
+                            </a>
+                        </template>
                     </RouterLink>
 
                     <!-- 2. My Team (frequent collaboration) -->
-                    <RouterLink
-                        :to="{ name: 'staffMember.team' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'staffMember.team',
-                        }"
-                        v-if="can('team-view')"
-                        data-tooltip="My Team"
-                        @click="onNavigate"
-                    >
-                        <UsersIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'staffMember.team',
-                            }"
-                        />
-                        <span
-                            v-show="!isCollapsed"
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'staffMember.team',
-                            }"
-                        >
-                            My Team
-                        </span>
+                    <RouterLink :to="{ name: 'staffMember.team' }" custom v-if="can('team-view')">
+                        <template #default="{ href, navigate }">
+                            <a
+                                :href="href"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                :class="{ 'nav-link-active': $route.name === 'staffMember.team' }"
+                                :aria-current="$route.name === 'staffMember.team' ? 'page' : undefined"
+                                data-tooltip="My Team"
+                                @click="navigate($event); onNavigate()"
+                            >
+                                <UsersIcon
+                                    class="w-5 h-5 text-gray-600"
+                                    :class="{ 'text-white': $route.name === 'staffMember.team' }"
+                                />
+                                <span
+                                    v-show="!isCollapsed"
+                                    class="text-brand-dark text-base font-medium"
+                                    :class="{ 'text-brand-white': $route.name === 'staffMember.team' }"
+                                >
+                                    My Team
+                                </span>
+                            </a>
+                        </template>
                     </RouterLink>
 
                     <!-- 4. My Payroll (monthly) -->
-                    <RouterLink
-                        :to="{ name: 'staffMember.payroll' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
-                        :class="{
-                            'nav-link-active':
-                                $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
-                        }"
-                        v-if="can('payslip-view')"
-                        data-tooltip="My Payroll"
-                        @click="onNavigate"
-                    >
-                        <WalletIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white':
-                                    $route.name === 'staffMember.payroll' ||
-                                    $route.name === 'staffMember.payroll.detail',
-                            }"
-                        />
-                        <span
-                            v-show="!isCollapsed"
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white':
-                                    $route.name === 'staffMember.payroll' ||
-                                    $route.name === 'staffMember.payroll.detail',
-                            }"
-                        >
-                            My Payroll
-                        </span>
+                    <RouterLink :to="{ name: 'staffMember.payroll' }" custom v-if="can('payslip-view')">
+                        <template #default="{ href, navigate }">
+                            <a
+                                :href="href"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                :class="{
+                                    'nav-link-active':
+                                        $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
+                                }"
+                                :aria-current="
+                                    $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail'
+                                        ? 'page'
+                                        : undefined
+                                "
+                                data-tooltip="My Payroll"
+                                @click="navigate($event); onNavigate()"
+                            >
+                                <WalletIcon
+                                    class="w-5 h-5 text-gray-600"
+                                    :class="{
+                                        'text-white':
+                                            $route.name === 'staffMember.payroll' ||
+                                            $route.name === 'staffMember.payroll.detail',
+                                    }"
+                                />
+                                <span
+                                    v-show="!isCollapsed"
+                                    class="text-brand-dark text-base font-medium"
+                                    :class="{
+                                        'text-brand-white':
+                                            $route.name === 'staffMember.payroll' ||
+                                            $route.name === 'staffMember.payroll.detail',
+                                    }"
+                                >
+                                    My Payroll
+                                </span>
+                            </a>
+                        </template>
                     </RouterLink>
 
                     <!-- 5. My Profile (rarely used) -->
-                    <RouterLink
-                        :to="{ name: 'staffMember.profile' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'staffMember.profile',
-                        }"
-                        v-if="can('profile-menu')"
-                        data-tooltip="My Profile"
-                        @click="onNavigate"
-                    >
-                        <UserIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'staffMember.profile',
-                            }"
-                        />
-                        <span
-                            v-show="!isCollapsed"
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'staffMember.profile',
-                            }"
-                        >
-                            My Profile
-                        </span>
+                    <RouterLink :to="{ name: 'staffMember.profile' }" custom v-if="can('profile-menu')">
+                        <template #default="{ href, navigate }">
+                            <a
+                                :href="href"
+                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:bg-white transition-all duration-300"
+                                :class="{
+                                    'nav-link-active':
+                                        $route.name === 'staffMember.profile' ||
+                                        $route.name === 'staffMember.profile.edit',
+                                }"
+                                :aria-current="
+                                    $route.name === 'staffMember.profile' || $route.name === 'staffMember.profile.edit'
+                                        ? 'page'
+                                        : undefined
+                                "
+                                data-tooltip="My Profile"
+                                @click="navigate($event); onNavigate()"
+                            >
+                                <UserIcon
+                                    class="w-5 h-5 text-gray-600"
+                                    :class="{
+                                        'text-white':
+                                            $route.name === 'staffMember.profile' ||
+                                            $route.name === 'staffMember.profile.edit',
+                                    }"
+                                />
+                                <span
+                                    v-show="!isCollapsed"
+                                    class="text-brand-dark text-base font-medium"
+                                    :class="{
+                                        'text-brand-white':
+                                            $route.name === 'staffMember.profile' ||
+                                            $route.name === 'staffMember.profile.edit',
+                                    }"
+                                >
+                                    My Profile
+                                </span>
+                            </a>
+                        </template>
                     </RouterLink>
                 </div>
             </div>

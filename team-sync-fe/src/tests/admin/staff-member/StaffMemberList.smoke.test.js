@@ -15,7 +15,7 @@ const {
         fetchStaffMembersPaginated: vi.fn(),
     },
     staffMemberStoreRefs: {
-        employees: {
+        staffMembers: {
             __v_isRef: true,
             value: [],
         },
@@ -26,6 +26,10 @@ const {
                 to: 1,
                 total: 1,
             },
+        },
+        error: {
+            __v_isRef: true,
+            value: null,
         },
         loading: {
             __v_isRef: true,
@@ -122,7 +126,7 @@ const factory = () =>
                         "<button class=\"search-trigger\" @click=\"$emit('search', { search: 'John' })\">Search</button>",
                 },
                 Pagination: { template: '<div class="pagination-stub"></div>' },
-                Alert: { template: '<div class="alert-stub"></div>' },
+                Alert: { props: ["title", "message"], template: '<div class="alert-stub">{{ title }} {{ message }}</div>' },
                 RouterLink: {
                     props: ["to"],
                     template: '<a class="router-link-stub"><slot /></a>',
@@ -134,15 +138,66 @@ const factory = () =>
 describe("StaffMemberList smoke", () => {
     beforeEach(() => {
         vi.clearAllMocks();
-        staffMemberStoreRefs.employees.value = [{ id: 1, name: "John" }];
+        staffMemberStoreRefs.staffMembers.value = [{ id: 1, name: "John" }];
         staffMemberStoreRefs.meta.value = { from: 1, to: 1, total: 1 };
         staffMemberStoreRefs.loading.value = false;
+        staffMemberStoreRefs.error.value = null;
         staffMemberStoreRefs.success.value = null;
         optionStoreMock.fetchEmploymentTypes.mockResolvedValue(undefined);
         optionStoreMock.fetchJobStatuses.mockResolvedValue(undefined);
         searchFilterState.fetchData.mockResolvedValue(undefined);
     });
 
+    it("shows loading instead of empty while fetching", () => {
+        staffMemberStoreRefs.staffMembers.value = [];
+        staffMemberStoreRefs.loading.value = true;
+
+        const wrapper = factory();
+        expect(wrapper.text()).toContain("Loading staff members");
+        expect(wrapper.find(".empty-state-stub").exists()).toBe(false);
+    });
+
+    it("shows the empty message after successful load with no staff", () => {
+        staffMemberStoreRefs.staffMembers.value = [];
+
+        const wrapper = factory();
+        expect(wrapper.text()).toContain("No staff members found");
+    });
+
+    it("shows fetch failures instead of treating them as empty", () => {
+        staffMemberStoreRefs.staffMembers.value = [];
+        staffMemberStoreRefs.error.value = "Network unavailable";
+
+        const wrapper = factory();
+        expect(wrapper.text()).toContain("Unable to load staff members");
+        expect(wrapper.text()).toContain("Network unavailable");
+        expect(wrapper.text()).not.toContain("No staff members found");
+    });
+    it("retries a failed fetch and clears its error when loading succeeds", async () => {
+        staffMemberStoreRefs.error.value = "Network unavailable";
+        const wrapper = factory();
+        searchFilterState.fetchData.mockImplementation(async () => {
+            staffMemberStoreRefs.error.value = null;
+            staffMemberStoreRefs.staffMembers.value = [{ id: 2, name: "Jane" }];
+            await nextTick();
+        });
+
+        await wrapper.find("button.btn-secondary").trigger("click");
+        await wrapper.vm.$forceUpdate();
+        await nextTick();
+
+        expect(searchFilterState.fetchData).toHaveBeenCalled();
+        expect(staffMemberStoreRefs.error.value).toBeNull();
+        expect(wrapper.text()).not.toContain("Unable to load staff members");
+        expect(wrapper.findAll(".card-list-stub")).toHaveLength(1);
+    });
+
+    it("renders cards after successful loading", () => {
+        staffMemberStoreRefs.staffMembers.value = [{ id: 1, name: "John" }];
+
+        const wrapper = factory();
+        expect(wrapper.findAll(".card-list-stub")).toHaveLength(1);
+    });
     it("renders without crashing", () => {
         const wrapper = factory();
         expect(wrapper.exists()).toBe(true);

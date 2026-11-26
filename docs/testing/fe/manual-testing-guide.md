@@ -24,20 +24,13 @@
 
 ## Pre-Test Setup
 
-Use an isolated test database with dummy data. `migrate:fresh`, seeders and E2E preparation reset data; never run them against a working or production database.
+The default Docker Compose project and persistent `mysql-data` volume must never be reset for these manual scenarios. Manual seeders and `qa:payroll-ready` operate on the configured database, so first prove that database is disposable.
 
-```bash
-# 1. Fresh database with demo data
-cd team-sync-be
-docker compose exec web php artisan migrate:fresh --seed --force
+The normal Playwright wrapper now selects the pinned `teamsync-e2e-isolated` Compose target and fails closed for unapproved Compose files. Its refusal/preflight tests pass; no service startup or real database reset was run in this change. Use `bun run e2e` only with that approved target, never with development or production resources.
 
-# 2. Start queue worker + scheduler (for notifications and meeting reminders)
-docker compose up -d queue scheduler
+For destructive role tests without MySQL, use the guarded SQLite sandbox at [`../../../scripts/sandbox/README.md`](../../../scripts/sandbox/README.md). It creates a fresh `/scratch` database and refuses unsafe paths. For manual browser scenarios, use a separately verified disposable backend.
 
-# 3. Start FE dev server
-cd ../team-sync-fe
-bun run dev
-```
+To start only the frontend against an already-running backend, run `bun run dev` from `team-sync-fe/` and confirm that the configured API is not production or a working database.
 
 ---
 
@@ -267,38 +260,13 @@ bun run dev
 3. **Manager** (Yudhis): Submit manager assessment
 4. **HR** (Tasyia): Calibrate review → Finalize
 
----
-
-## Running Playwright E2E Tests
-
-```bash
-cd team-sync-fe
-
-# Prepare backend (fresh seed + queue)
-bun run e2e:prepare:be
-
-# Run all E2E tests
-bun run e2e
-
-# Run only role navigation tests
-npx playwright test e2e/role-navigation.spec.ts
-
-# Run with UI mode (interactive)
-npx playwright test --ui
-
-# View report after run
-bun run e2e:report
-```
-
----
 
 ## Troubleshooting
 
-| Issue | Solution |
-|-------|---------|
-| Login fails | Run `docker compose exec web php artisan migrate:fresh --seed --force` |
-| Notifications empty | Start queue worker: `docker compose up -d queue` |
-| Meeting reminders not delivered | Start scheduler too: `docker compose up -d scheduler` or run `php artisan schedule:work` locally |
-| Payroll create blocked | Need attendance records for current month — clock in/out first |
-| 403 on API calls | Check role permissions — user may not have required permission |
-| Meilisearch errors | Set `SCOUT_DRIVER=null` in `.env` or start Meilisearch container |
+| Issue | Safe action |
+|---|---|
+| Login fails in the isolated role sandbox | Rebuild or reseed only through the sandbox command in `scripts/sandbox/README.md`. |
+| Normal Playwright seed is required | Wait for `team-sync-wlk` to pass and use its documented isolated target. Do not use the default Compose database. |
+| Notifications empty | Start a queue worker only against a verified disposable backend. |
+| Meeting reminders not delivered | Start the scheduler only against a verified disposable backend. |
+| 403 on API calls | Check the assigned role permissions and the API authorization boundary. |

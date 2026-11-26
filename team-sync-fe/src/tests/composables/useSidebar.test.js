@@ -20,12 +20,29 @@ describe("provideSidebar", () => {
         );
 
         const ctx = wrapper.vm.ctx;
-        expect(ctx.isOpen.value).toBe(true);
+        expect(ctx.isOpen.value).toBe(false);
         expect(typeof ctx.isCollapsed.value).toBe("boolean");
         expect(typeof ctx.toggleCollapse).toBe("function");
         expect(typeof ctx.openMobile).toBe("function");
         expect(typeof ctx.closeMobile).toBe("function");
         expect(typeof ctx.toggleMobile).toBe("function");
+    });
+
+    it("starts closed on mobile and still preserves desktop collapse state", () => {
+        localStorage.setItem("sidebar-collapsed", "true");
+
+        const wrapper = mount(
+            defineComponent({
+                setup() {
+                    const ctx = provideSidebar();
+                    return { ctx };
+                },
+                template: "<div />",
+            }),
+        );
+
+        expect(wrapper.vm.ctx.isOpen.value).toBe(false);
+        expect(wrapper.vm.ctx.isCollapsed.value).toBe(true);
     });
 
     it("initializes isCollapsed from localStorage", () => {
@@ -98,7 +115,7 @@ describe("useSidebar", () => {
             },
         });
 
-        expect(wrapper.vm.ctx.isOpen.value).toBe(true);
+        expect(wrapper.vm.ctx.isOpen.value).toBe(false);
     });
 });
 
@@ -155,12 +172,12 @@ describe("sidebar toggle functions", () => {
         const wrapper = mountWithProvider();
         const ctx = wrapper.vm.ctx;
 
-        expect(ctx.isOpen.value).toBe(true);
-
-        ctx.toggleMobile();
         expect(ctx.isOpen.value).toBe(false);
 
         ctx.toggleMobile();
         expect(ctx.isOpen.value).toBe(true);
+
+        ctx.toggleMobile();
+        expect(ctx.isOpen.value).toBe(false);
     });
 });

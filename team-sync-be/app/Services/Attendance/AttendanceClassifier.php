@@ -277,10 +277,10 @@ class AttendanceClassifier
             return 'absent';
         }
 
-        $workStart = Carbon::parse($date->toDateString().' '.$context['policy']['work_start_time']);
+        $timezone = $context['timezone'];
+        $workStart = Carbon::parse($date->toDateString().' '.$context['policy']['work_start_time'], $timezone);
         $lateThreshold = $workStart->copy()->addMinutes((int) $context['policy']['late_grace_minutes']);
-        $checkIn = Carbon::parse($attendance->check_in);
-
+        $checkIn = Carbon::parse($attendance->getRawOriginal('check_in'), 'UTC')->setTimezone($timezone);
         if ($checkIn->lessThanOrEqualTo($workStart)) {
             return 'present';
         }
@@ -434,7 +434,7 @@ class AttendanceClassifier
     private function buildContext(int $employeeId): array
     {
         $employee = StaffMemberProfile::query()
-            ->with('jobInformation')
+            ->with(['jobInformation', 'company'])
             ->find($employeeId);
 
         if (! $employee) {
@@ -446,10 +446,11 @@ class AttendanceClassifier
         $policy = $this->resolvePolicy($employmentType);
 
         return [
+            'policy' => $policy,
             'staffMember' => $employee,
+            'timezone' => $employee->company?->timezone ?? 'Asia/Jakarta',
             'employment_type' => $employmentType,
             'work_location' => (string) ($employee->jobInformation?->work_location ?? 'office'),
-            'policy' => $policy,
             'scheduled_weekdays' => collect($policy['default_working_weekdays'])
                 ->map(fn ($day) => strtolower((string) $day))
                 ->values(),

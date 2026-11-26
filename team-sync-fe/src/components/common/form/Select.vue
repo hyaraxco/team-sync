@@ -33,15 +33,13 @@
                     {{ opt.label }}
                 </option>
             </select>
+            <!-- custom chevron -->
+            <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none opacity-50">
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
         </div>
-
-        <!-- custom chevron -->
-        <div class="absolute inset-y-0 right-0 pr-4 flex items-center pointer-events-none opacity-50">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-            </svg>
-        </div>
-
         <p v-if="error" :id="errorId" role="alert" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
             <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path

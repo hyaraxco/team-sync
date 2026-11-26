@@ -104,14 +104,19 @@ function createAttendanceRecord(
 ): Attendance {
     $periodId = $attendancePeriodId ?? AttendancePeriod::factory()->create()->id;
 
+    // Fixtures express wall-clock Jakarta times; the column stores UTC.
+    $toUtc = fn (?string $value) => $value === null
+        ? null
+        : Carbon::parse($value, 'Asia/Jakarta')->setTimezone('UTC')->toDateTimeString();
+
     return Attendance::create([
         'staff_member_id' => $employee->id,
         'date' => $date,
         'attendance_period_id' => $periodId,
-        'check_in' => $checkIn,
+        'check_in' => $toUtc($checkIn),
         'check_in_lat' => $checkIn ? '-6.2088' : null,
         'check_in_long' => $checkIn ? '106.8456' : null,
-        'check_out' => $checkOut,
+        'check_out' => $toUtc($checkOut),
         'worked_minutes' => $workedMinutes,
         'actual_work_mode' => $actualWorkMode,
         'policy_mismatch_flag' => $policyMismatchFlag,

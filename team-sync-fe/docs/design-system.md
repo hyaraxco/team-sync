@@ -1,7 +1,33 @@
-# Team Sync — Frontend Design System
+# Team Sync Frontend Design System
 
-> **Stack:** Vue 3 · Vite 7 · Tailwind CSS · Plus Jakarta Sans · Lucide Vue Next
-> **Last updated:** 2026-05-16
+Status: Canonical direction for future UI work. Existing screens are not yet fully aligned.
+Last reconciled with original HRIS source and current shared components: 2026-11-25
+
+## Source of truth
+
+This system follows the original HRIS frontend source preserved in the development backup, especially its `src/assets/css/input.css`, `components/admin/Sidebar.vue`, `components/admin/Header.vue`, and dashboard components. Those HRIS files establish the inherited visual language. The unrelated Point of Sale `overview.html` is not the product source of truth.
+
+The current Team Sync code shows what ships; this document sets the target for new and revised UI. Existing screens are not presumed compliant. Role-specific pages may have different content and hierarchy when their work requires it, while shared tokens and components remain consistent.
+
+Reading this as: an Indonesian HRIS for employees and HR, Manager, Finance and Superadmin operators. Calm, structured enterprise workspace. ENERGY 2 / RHYTHM 2 / MOTION 1. Light mode by default, with a user-controlled dark theme.
+RBAC role changes what an employee can access; `job_title` does not grant permissions. Keep role-specific screen content tied to permissions, not employment position labels.
+
+### Visual decisions
+
+- Navy (`#0C1C3C`) and cobalt (`#0C51D9`) continue the HRIS source identity and distinguish primary actions from neutral surfaces.
+- Plus Jakarta Sans stays because the original HRIS source uses it and current UI loads it globally.
+- White surfaces, a cool light-gray canvas, fine borders and rounded cards support employee and payroll data without making every surface float.
+- Keep the deep navy gradient as a focal treatment for active navigation and at most one role-relevant hero metric on a dashboard. Do not extend it to ordinary cards or every CTA.
+- Use semantic status colors only for real workflow states. Pastel icon tiles are optional, meaning-bearing accents, not decoration required on every card.
+- Keep the shared shell recognizable while arranging HR, Manager, Finance and employee dashboards around their distinct decisions.
+- Motion stays to useful transitions and feedback. No perpetual pulse for static information.
+
+### Adoption
+
+When revising a screen, identify its primary user decision and role/permission scope. Reuse shared tokens/components, preserve correct workflows and data, and change only hierarchy or states that do not serve that task. Do not apply one dashboard or card layout to every role.
+
+The source design establishes the visual language, not a pixel-for-pixel rollback. Keep a deliberate difference when the feature needs it; document its reason and test it.
+
 
 ---
 
@@ -36,14 +62,14 @@
 11. [Badge & Status Utilities](#11-badge--status-utilities)
 12. [Dark Mode](#12-dark-mode)
 13. [Accessibility](#13-accessibility)
-14. [Anti-Patterns](#14-anti-patterns)
+14. [Frontend Architecture Rules](#14-frontend-architecture-rules)
 
 ---
 
 
 ## 1. Design Tokens
 
-All tokens live in two places: `tailwind.config.js` (extended theme) and `src/assets/css/input.css` (global CSS classes).
+Runtime source of truth: `tailwind.config.js` and `src/assets/css/input.css`. The palette below records the inherited HRIS direction; inspect actual rendered classes before assuming every view uses each token.
 
 ### Primary Palette
 
@@ -61,24 +87,21 @@ All tokens live in two places: `tailwind.config.js` (extended theme) and `src/as
 | Token | Hex | Tailwind Class | Usage |
 |-------|-----|----------------|-------|
 | Brand Dark | `#0C1C3C` | `text-brand-dark` / `bg-brand-dark` | Primary text |
-| Brand Light | `#6B7280` | `text-brand-light` / `bg-brand-light` | Secondary / muted text |
-| Brand Border | `#DCDEDD` | `border-brand-border` | All card / input borders |
-| Brand Primary | `#0C51D9` | `border-brand-primary` / `text-brand-primary` | Focus rings, interactive borders |
+| Brand Light | `#6B7280` | `text-brand-light` / `bg-brand-light` | Secondary text; verify small text contrast on its actual surface |
+| Brand Border | `#DCDEDD` | `border-brand-border` | Brand structural border |
+| Brand Primary | `#0C51D9` | `text-brand-primary` / `bg-brand-primary` | Primary actions and focus |
 | Brand White | `#FFFFFF` | `.text-brand-white` | Text on dark surfaces |
-| Brand White 90 | `rgba(255,255,255,0.9)` | `.text-brand-white-90` | Card titles on dark bg |
-| Brand White 80 | `rgba(255,255,255,0.8)` | `.text-brand-white-80` | Card subtitles on dark bg |
-| Brand White 70 | `rgba(255,255,255,0.7)` | `.text-brand-white-70` | Tertiary on dark bg |
-| Success | `#059669` | `.text-success` / `bg-success-*` | Positive trends |
-| Danger | `#DC2626` | `.text-danger` / `bg-danger-*` | Error states |
-| Warning | (amber scale) | `bg-warning-*` | Warning states |
+| Success | `#059669` | `.text-success` / `bg-success-*` | Positive status only |
+| Danger | `#DC2626` | `.text-danger` / `bg-danger-*` | Error/destructive status |
+| Warning | amber scale | `bg-warning-*` | Warning status |
 
 ### Gradient Tokens
 
-| Name | Value | Class |
-|------|-------|-------|
-| Blue Gradient | `linear-gradient(265.5deg, #0C51D9 5.45%, #6F96E3 52%, #0C51D9 100.36%)` | `.blue-gradient` |
-| Dark Card Gradient | `linear-gradient(266deg, #040724 5.45%, #0C1448 52%, #040724 100.36%)` | `.main-card` |
-| Auth Left Panel | `linear-gradient(to br, #0C51D9/90 → #1a3a6e/85 → #0a1f44/95)` | inline in `Auth.vue` |
+| Name | Value | Class | Usage |
+|------|-------|-------|-------|
+| Brand blue | `linear-gradient(265.5deg, #0C51D9 5.45%, #6F96E3 52%, #0C51D9 100.36%)` | `.blue-gradient` | Primary action or specific brand treatment |
+| Navy focal | `linear-gradient(266deg, #040724 5.45%, #0C1448 52%, #040724 100.36%)` | `.main-card`, `.nav-link-active` | Focal metric or active route only |
+| Auth overlay | `from-brand-primary/90 via-[#1a3a6e]/85 to-[#0a1f44]/95` | `Auth.vue` | Contrast behind auth copy; hero image is separate |
 
 ---
 
@@ -111,23 +134,36 @@ html {
 | Tooltip | `12px` | `500` | `SidebarTooltip` |
 | Error message | `text-xs` | `400` | Form field errors |
 
+Metric, money and count values use `tabular-nums` so digit-width changes do not shift comparisons. Do not show invented deltas or praise; a trend needs real comparison data.
+
 ---
 
 ## 3. Color System
 
 ### Semantic Colors
 
-| Intent | Tailwind |
-|--------|---------|
-| Background (app) | `bg-gray-50` |
-| Surface (card) | `bg-white` |
-| Border | `border-brand-border` |
-| Text primary | `text-brand-dark` (`#0C1C3C`) |
-| Text muted | `text-brand-light` (`#6B7280`) |
-| Nav link bg | `.nav-link` (white) |
-| Nav link active | `.nav-link-active` (dark navy gradient) |
+| Intent | Current token/pattern |
+|--------|-----------------------|
+| App canvas | `--color-surface-raised` (`#F9FAFB` light, `#0F172A` dark) |
+| Card/header surface | `--color-surface` (`#FFFFFF` light, `#1E293B` dark) |
+| Raised/hover surface | `--color-surface-overlay` |
+| Structural border | `border-brand-border` or `--color-border-default` |
+| Primary text | `text-brand-dark` / `--color-text-primary` |
+| Secondary text | `text-brand-light` / `--color-text-secondary`; verify AA on the rendered surface |
+| Active navigation | `.nav-link-active`, inherited navy gradient |
 
 > **Note:** Dark mode uses CSS custom properties in `src/assets/css/input.css`, toggled by `useDarkMode()`. Use theme tokens instead of Tailwind `dark:` classes.
+
+### Surface tokens
+
+| Token | Light | Dark | Purpose |
+|-------|-------|------|---------|
+| `--color-surface-raised` | `#F9FAFB` | `#0F172A` | App canvas |
+| `--color-surface` | `#FFFFFF` | `#1E293B` | Standard card/header surface |
+| `--color-surface-overlay` | `#F3F4F6` | `#273549` | Raised/hover surface |
+| `--color-brand-border` | `#DCDEDD` | `#334155` | Brand boundary |
+
+`bg-gray-*` and literal colors remain in legacy screens. Convert shared components and touched views to theme tokens incrementally; do not assume a class is theme-safe without checking its rendered color.
 
 ### Status / Semantic Palette
 
@@ -163,42 +199,34 @@ The project uses **Tailwind's default spacing scale**. Recurring patterns:
 | Button gap | `8px` | `gap-2` |
 | Icon–label gap | `10px` | `gap-[10px]` |
 
-### Border Radius
+### Border radius
+Use a small Tailwind radius scale and distinguish controls, cards, badges and avatars. These are target defaults for new or revised shared components; existing screens are not yet uniform.
 
-All arbitrary `rounded-[Npx]` values have been standardized to Tailwind defaults:
-
-| Component | Radius | Tailwind |
+| Component | Target | Tailwind |
 |-----------|--------|---------|
-| Cards (all) | `20px` | `rounded-2xl` |
-| Inputs, Selects, Textareas | `16px` | `rounded-2xl` |
-| Buttons | `8px` | `rounded-lg` |
-| Icon containers (large) | `20px` | `rounded-2xl` |
-| Icon containers (small) | `12px` | `rounded-xl` |
-| Avatar / user photo | full circle | `rounded-full` |
-| Badges | `6px` | `rounded-md` |
-| Tooltip | `8px` | inline style |
-| Notification panel items | `16px` | `rounded-2xl` |
+| Standard card | `16–20px` | `rounded-2xl` |
+| Input/select | `8–12px` | `rounded-lg` or `rounded-xl` |
+| Button | `8–12px` | `rounded-lg` or `rounded-xl` |
+| Small icon tile | `8–12px` | `rounded-lg` or `rounded-xl` |
+| Avatar | Circle | `rounded-full` |
+| Status badge | `4–8px` | `rounded-md` |
 
-> **Anti-pattern:** Do not use `rounded-[Npx]` arbitrary values. Use Tailwind's built-in scale (`rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl`).
+Use arbitrary radii only for a documented screen need. Do not make every element pill-shaped.
+
 
 ---
 
 ## 5. Elevation & Shadows
 
-| Layer | Value | Usage |
-|-------|-------|-------|
-| Card default | `border border-brand-border` | All white cards |
-| Card hover | `hover:ring-2 hover:ring-primary-500/20` | StatsCard, SearchFilter inputs |
-| StatsCard left border | `border-l-4 border-l-{color}-500` | Color-coded accent matching `colorScheme` |
-| Dark card (MainCard) | `box-shadow: -2px 2px 1px 0 #1A2570 inset, 2px 2px 1px 0 rgba(26,37,112,0.55) inset` | `.main-card` |
-| Modal backdrop | `bg-black bg-opacity-50` | `ModalWrapper` |
-| Confirmation backdrop | `backdrop-blur-sm bg-black/30` | `ConfirmationModal` |
-| Toast | `shadow-lg shadow-black/5` | `ToastContainer` |
-| Dropdown menu | `shadow-md` | Header account menu |
-| Tooltip | `box-shadow: 0 4px 12px rgba(0,0,0,0.15)` | `SidebarTooltip` |
+| Layer | Current pattern | Usage |
+|-------|-----------------|-------|
+| Standard surface | `border border-brand-border` | Flat cards and panels on the page canvas |
+| Hover/focus | `hover:ring-2 hover:ring-primary-500/20` or theme-token equivalent | Visible interaction, not persistent elevation |
+| Navy focal card | `.main-card` inset navy treatment | One role-relevant primary metric when useful |
+| Modal backdrop | `bg-black/50` | Dialog layer |
+| Popover/toast | `shadow-md` / `shadow-lg` | Overlay elevation only |
 
-> **Anti-pattern:** Do not use `hover:border-2` — it causes 1px layout shift. Use `hover:ring-2` instead.
-> **Anti-pattern:** Do not use arbitrary `shadow-[...]` values. Use Tailwind defaults (`shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl`).
+Keep shadows rare. `StatsCard` currently uses a tinted icon tile and border, not a colored left stripe. Do not add decorative left stripes or page-wide shadows.
 
 ---
 
@@ -244,46 +272,22 @@ Pass `iconName="UsersIcon"` as a prop — if the name is invalid it falls back t
 
 Full-screen two-column shell: fixed sidebar + scrollable main area.
 
-```
-┌─────────────────────────────────────────────┐
-│  Sidebar (256px / 68px collapsed)           │
-│  ┌─────────────────────────────────────────┐ │
-│  │  Header (border-b, bg-white)            │ │
-│  ├─────────────────────────────────────────┤ │
-│  │  <main> p-3 sm:p-4 md:p-6 lg:p-8       │ │
-│  │  <RouterView />                          │ │
-│  └─────────────────────────────────────────┘ │
-└─────────────────────────────────────────────┘
-```
 
-- **Sidebar width:** `256px` expanded · `68px` collapsed (persisted in `localStorage`)
-- **Mobile:** sidebar is off-canvas (`-translate-x-full`), opened by a hamburger button; black overlay `bg-black/30` shown behind
-- **Main bg:** `bg-gray-50`
-- **Sidebar bg:** `bg-white`
-- **Layout height:** `min-h-[100dvh]` (NOT `h-screen` — iOS Safari viewport bug)
-- **Skip-link:** `<a href="#main-content">Skip to main content</a>` for keyboard accessibility
-- **ErrorBoundary:** wraps `<RouterView />` in all 3 layouts (Admin, Auth, StaffMemberCreateLayout)
+The admin shell uses a fixed sidebar and independently scrolling main region.
+
+- Sidebar width: `256px` expanded and `68px` collapsed, with collapse state persisted in `localStorage`.
+- On mobile, the sidebar is off-canvas and opens from the header menu trigger.
+- Main padding: `p-3 sm:p-4 md:p-6 lg:p-8`; app shell height uses `min-h-[100dvh]`.
+- Skip link targets the main content; `ErrorBoundary` wraps routed content.
 
 ### Auth Layout (`layouts/Auth.vue`)
 
-Split-screen 50/50 layout (hidden left panel on mobile):
-
-```
-┌──────────────────────┬──────────────────────┐
-│  Left panel (50%)    │  Right panel (50%)   │
-│  bg-gray-900         │  flex items-center   │
-│  Blue gradient       │  justify-center       │
-│  overlay + image     │  <RouterView />       │
-│  Brand copy + stats  │                       │
-└──────────────────────┴──────────────────────┘
-```
-
-- Left panel hidden below `lg` breakpoint
-- Right panel: `min-h-screen`, `bg-gradient-to-br from-slate-50 via-white to-blue-50`
+The desktop layout reserves about half the width for the visual panel and half for the form; the visual panel is hidden below `lg`. The existing page uses an external hero image and decorative gradients. Treat those as current implementation details, not required identity. Keep login usable if any optional image request fails.
 
 ### Page Content Convention
 
-Every view wraps its content in `<div class="space-y-6">` to maintain consistent vertical rhythm between sections.
+Most views use `space-y-6` between major sections. Use this as the default, not a requirement; let the page's task and content determine layout and spacing.
+For dashboard metric examples, use values and trends supplied by the backend for the signed-in employee or permitted company scope. Placeholder numbers in documentation examples are illustrative only and must never be copied into live screens.
 
 ---
 
@@ -360,7 +364,7 @@ Internally powered by `useAnimatedNumber` composable with ease-out cubic curve.
 
 **File:** `src/components/common/StatsCard.vue`
 
-Secondary metric card — white background, colored icon container.
+Secondary metric card with a theme-aware surface, thin border, value, optional subtitle and tinted icon tile.
 
 #### Props
 
@@ -390,11 +394,11 @@ Secondary metric card — white background, colored icon container.
 
 #### Visual Spec
 
-- `bg-white border border-brand-border rounded-2xl`
-- Hover: `hover:ring-2 hover:ring-primary-500/20`
-- Left accent: `border-l-4 border-l-{colorScheme}-500` (color-coded per scheme)
-- Value animates from 0 → target with ease-out cubic
-- Numeric values use `tabular-nums` for proper alignment
+- Current surface: theme-aware white card with a thin brand border and a tinted semantic icon tile.
+- Hover uses a light focus ring; it does not add a colored left stripe.
+- Icon schemes exist in code for blue, green, purple, orange, red, yellow, teal, cyan and gray. Prefer inherited HRIS blue, green, orange and purple for metric icons; reserve red/green/amber status colors for actual state.
+- Values animate through `useAnimatedNumber`; avoid count-up animation when frequent updates make data harder to read.
+- Use `tabular-nums` for money, rates and counts.
 
 #### Usage
 
@@ -436,20 +440,15 @@ Secondary metric card — white background, colored icon container.
 <MainCard title="Total Payroll" value="1234567" subtitle="This period" iconName="WalletIcon" />
 ```
 
-**Wrapper mode** (with default slot) — renders a plain white card:
-```vue
-<MainCard>
-  <h3>Custom content</h3>
-</MainCard>
-```
+**Wrapper mode** (with default slot) renders a theme-aware surface for custom content:
 
 **Named `footer` slot** available for additional info rows in metric mode.
 
 #### Visual Spec (metric mode)
 
 - `.main-card` class: `background: linear-gradient(266deg, #040724, #0C1448, #040724)`
-- Inset box-shadow for depth
-- `rounded-2xl border border-gray-800`
+- `.main-card` class supplies the navy focal background
+- `rounded-2xl border border-brand-dark` in metric mode
 - All text uses `.text-brand-white*` classes
 - Numeric values use `tabular-nums`
 
@@ -1158,101 +1157,45 @@ getJobStatusText('on_leave') // → "On Leave"
 
 ## 12. Dark Mode
 
-> **Status:** Implemented through CSS custom properties, not Tailwind `dark:` utilities.
+The app has a user-controlled dark theme implemented with CSS custom properties in `src/assets/css/input.css` and `useDarkMode()`. `.main-card` and `.nav-link-active` remain navy focal surfaces in both themes. New or revised UI should use theme-aware tokens rather than isolated `dark:` utility patches.
 
-### Infrastructure (in place)
-
-- `useDarkMode()` composable toggles `dark` class on `<html>` + persists in `localStorage`
-- `tailwind.config.js` has `darkMode: 'class'`
-- `.nav-link-active` and `.main-card` are dark navy by design — work on both themes
-
-### Current State
-
-- **Zero `dark:` classes** in any `.vue` file
-- Theme tokens in `src/assets/css/input.css` define light and `.dark` values.
-- The Header theme toggle uses `useDarkMode()` to switch the class on `<html>`.
-- Use `var(--color-*)` tokens for theme-aware surfaces and text. Do not add
-  Tailwind `dark:` classes; follow the conventions in `team-sync-fe/AGENTS.md`.
+Dark mode is not yet proven complete across all views. Check both themes whenever a screen or shared component changes, especially literal `bg-white`, `text-gray-*`, borders, charts and status badges.
 
 ---
-
 
 ## 13. Accessibility
 
-The project follows WCAG 2.1 AA practices throughout.
+Accessibility is a requirement to verify, not a blanket status claim. Use semantic controls, visible focus, keyboard behavior and clear state feedback. Check actual contrast pairs in both themes before claiming conformance.
 
-### Focus Management
+### Required patterns
 
-| Pattern | Implementation |
-|---------|---------------|
-| Skip link | `<a href="#main-content">Skip to main content</a>` — visually hidden, shown on focus |
-| Modal focus trap | `ModalWrapper` cycles Tab within focusable elements |
-| Modal auto-focus | First focusable element receives focus on open |
-| Escape key | Closes `ModalWrapper` |
-| Click outside | Closes `ModalWrapper` and `ConfirmationModal` |
+- Keep skip links and main landmarks in application layouts.
+- Mark the active route with `aria-current="page"`, including nested views.
+- Give icon-only controls accessible names and visible focus styles.
+- For dialogs and mobile navigation, manage Escape, focus entry/return and expanded state.
+- Distinguish loading, empty, filtered-empty, permission-denied and error states.
+- Never rely on color or a decorative/pulsing dot alone to communicate status.
+- Respect `prefers-reduced-motion` and avoid continuous animation for static state.
+- Check contrast for rendered text pairs. Normal text needs at least 4.5:1; large text needs at least 3:1.
 
-### ARIA
+### Known audit work
 
-| Component | ARIA attributes |
-|-----------|----------------|
-| `ModalWrapper` | `role="dialog" aria-modal="true" aria-labelledby="{titleId}"` |
-| `ConfirmationModal` | `role="dialog" aria-modal="true"` |
-| `Alert` | `role="alert" aria-live="polite"` |
-| `SearchFilter` inputs | `aria-label` on each input/select |
-| Header bell | `aria-label`, `aria-haspopup="dialog"`, `aria-expanded`, `aria-controls` |
-| Header profile | `aria-label`, `aria-haspopup="menu"`, `aria-expanded`, `aria-controls` |
-| Account menu items | `role="menuitem"` |
-| Sidebar nav links | `aria-current="page"` on active route |
-| Sidebar toggle | `aria-label="Toggle sidebar"` |
-| Toast dismiss | `aria-label="Dismiss notification"` |
-| Form inputs | `<label :for="fieldId">` — `id` auto-generated from label text |
-
-### Keyboard Navigation
-
-- All interactive elements reachable by keyboard
-- Focus rings visible on all buttons/inputs (Tailwind `focus:ring-*`)
-- `prefers-reduced-motion` respected in `Auth.vue` shell
-
-### Colour Contrast
-
-All text/background combinations use Tailwind's built-in palette at sufficient contrast:
-- Body text (`#0C1C3C`) on white: **AAA**
-- Muted text (`#6B7280`) on white: **AA**
-- White text on `#0C51D9`: **AA**
-- Badge text on badge background: verified per color pair
+Tickets `team-sync-y1k`, `team-sync-cwn`, `team-sync-mc3`, `team-sync-rvs` and `team-sync-e9x` track known contrast, current-route, keyboard-tooltip and mobile-sidebar gaps. Open tickets do not mean the fixes are complete.
 
 ---
 
-## 14. Anti-Patterns
+## 14. Frontend architecture rules
 
-These patterns **must not** be used in this project:
+These are implementation conventions, not visual tokens. Follow `team-sync-fe/AGENTS.md` for the full list.
 
-| ❌ Don't | ✅ Do instead |
-|----------|--------------|
-| Options API (`export default { data() {} }`) | `<script setup>` Composition API always |
-| TypeScript files (`.ts`, `.tsx`) | JavaScript (`.js`, `.vue`) |
-| Call Axios from components | Dispatch Pinia store actions |
-| `npm install` | `bun install` |
-| `npm run *` | `bun run *` |
-| Custom CSS classes | Tailwind utilities |
-| `moment` or `dayjs` | `Luxon` |
-| Custom chart library | `VueApexCharts` (globally registered) |
-| Multiple stores per domain | One Pinia store per domain (25 total) |
-| Put unit tests in `docs/` | `src/tests/{role}/` mirroring views |
-| Hardcode route names in components | Use named routes from `src/router/` |
-| Bypass `permissionAccess.js` | Use `meta.requiredPermission` on routes |
-| Role string checks | `can()` / `canOneOf()` from `permissionHelper.js` |
-| `npm` lockfile (`package-lock.json` in FE) | `bun.lock` only |
-| Mix `@/` alias inconsistently | Always use `@/` → `src/` alias |
-| Inline `style=` for colours | Tailwind classes (or CSS custom classes for brand tokens) |
-| `h-screen` for full-height layouts | `min-h-[100dvh]` (iOS Safari viewport bug) |
-| `hover:border-2` for hover states | `hover:ring-2 hover:ring-primary-500/20` (no layout shift) |
-| `dark:` classes on components | Use theme-aware CSS custom properties instead |
-| `rounded-[Npx]` arbitrary radius | `rounded-lg`, `rounded-xl`, `rounded-2xl`, `rounded-3xl` |
-| `shadow-[...]` arbitrary shadows | `shadow-sm`, `shadow-md`, `shadow-lg`, `shadow-xl` |
-| `border-[#DCDEDD]` hardcoded border | `border-brand-border` (Tailwind config token) |
-| `focus:ring-[#0C51D9]` hardcoded focus | `focus:ring-primary-500` (Tailwind config token) |
-| Proportional font for numbers | `tabular-nums` class on financial/data values |
+| Avoid | Use |
+|-------|-----|
+| Options API | Vue `<script setup>` Composition API |
+| Axios calls in view components | Pinia store actions |
+| `moment` or `dayjs` | Luxon |
+| `h-screen` for app shells | `min-h-[100dvh]` |
+| Hardcoded theme colors for shared surfaces | Existing CSS custom-property tokens |
+| Proportional numerals for data | `tabular-nums` |
 
 ---
 
@@ -1260,18 +1203,12 @@ These patterns **must not** be used in this project:
 
 | File | Purpose |
 |------|---------|
-| `tailwind.config.js` | Design tokens: primary, brand-dark/light/border/primary, success/danger/warning, border radius, animations |
-| `src/assets/css/input.css` | Global brand tokens, gradient classes, nav classes, badge classes, tooltips |
-| `src/components/common/` | 11 shared UI components (Alert, AnimatedValue, ConfirmationModal, EmptyState, ErrorBoundary, MainCard, ModalWrapper, SearchFilter, StatsCard, StatusBadge, ToastContainer) |
-| `src/components/common/form/` | Input, Select, TextArea |
-| `src/components/ui/` | SidebarTooltip |
-| `src/components/admin/Sidebar.vue` | Navigation rail |
-| `src/components/admin/Header.vue` | Top bar |
-| `src/layouts/Admin.vue` | Two-column app shell (ErrorBoundary wraps RouterView) |
-| `src/layouts/Auth.vue` | Split-screen auth shell (ErrorBoundary wraps RouterView) |
-| `src/layouts/StaffMemberCreateLayout.vue` | Staff creation wizard (ErrorBoundary wraps RouterView) |
-| `src/composables/` | 6 reusable logic hooks |
-| `src/utils/badgeUtils.js` | All status → CSS class mappings |
-| `src/utils/formatUtils.js` | Number, currency, string formatters |
-| `src/helpers/permissionHelper.js` | `can()`, `canOneOf()` permission checks |
-| `src/helpers/errorHelper.js` | `handleError()` — extracts user-friendly error messages |
+| `tailwind.config.js` | Tailwind color and type extensions |
+| `src/assets/css/input.css` | Brand/theme tokens, gradients, nav and status styles |
+| `src/components/common/` | Shared feedback, card, modal, table and state components |
+| `src/components/common/form/` | Shared Input, Select and TextArea |
+| `src/components/admin/Sidebar.vue` | Permission-filtered app navigation |
+| `src/components/admin/Header.vue` | Page title, theme control, notifications and account menu |
+| `src/layouts/Admin.vue` | Authenticated application shell |
+| `src/layouts/Auth.vue` | Login and account-access shell |
+| `src/composables/useDarkMode.js` | User theme preference |

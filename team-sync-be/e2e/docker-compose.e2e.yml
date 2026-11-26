@@ -1,0 +1,57 @@
+services:
+  web:
+    build:
+      context: ..
+      dockerfile: .docker/php/Dockerfile.local
+    ports:
+      - "127.0.0.1:8000:80"
+    environment:
+      APP_ENV: testing
+      APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      APP_URL: http://127.0.0.1:8000
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_DATABASE: teamsync_e2e
+      DB_USERNAME: teamsync_e2e
+      DB_PASSWORD: e2e-only-password
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CACHE_STORE: redis
+      CACHE_PREFIX: teamsync_e2e
+      QUEUE_CONNECTION: database
+      SESSION_DRIVER: database
+    volumes:
+      - ..:/var/www/html:cached
+      - /dev/null:/var/www/html/.env:ro
+      - e2e-storage:/var/www/html/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+  mysql:
+    image: mysql/mysql-server:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: e2e-only-root-password
+      MYSQL_DATABASE: teamsync_e2e
+      MYSQL_USER: teamsync_e2e
+      MYSQL_PASSWORD: e2e-only-password
+    volumes:
+      - e2e-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-pe2e-only-root-password"]
+      retries: 3
+      timeout: 5s
+  redis:
+    image: redis:alpine
+    volumes:
+      - e2e-redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      retries: 3
+      timeout: 5s
+volumes:
+  e2e-storage:
+  e2e-mysql-data:
+  e2e-redis-data:

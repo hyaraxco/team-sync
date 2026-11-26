@@ -134,7 +134,7 @@ describe("Header smoke", () => {
         toastInfoMock.mockReset();
     });
 
-    it("shows actionable dropdown items and removes placeholders", async () => {
+    it("shows actionable header controls and removes placeholders", async () => {
         const wrapper = factory();
 
         await openDropdown(wrapper);
@@ -153,6 +153,9 @@ describe("Header smoke", () => {
         expect(wrapper.text()).not.toContain("Pengaturan Sistem");
         expect(wrapper.text()).not.toContain("Bantuan");
         expect(wrapper.find('a[href="#"]').exists()).toBe(false);
+        expect(wrapper.find('[aria-label="Messages"]').exists()).toBe(false);
+        await wrapper.get('[data-testid="header-mobile-menu-toggle"]').trigger("click");
+        expect(wrapper.emitted("toggle-sidebar")).toHaveLength(1);
     });
 
     it("renders the route title as a page-level h1 heading", () => {

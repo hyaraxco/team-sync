@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Interfaces\AuthRepositoryInterface;
 use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -13,32 +14,22 @@ class AuthRepository implements AuthRepositoryInterface
 {
     public function login(array $data): User
     {
-        DB::beginTransaction();
-
-        try {
-            if (! Auth::guard('web')->attempt($data)) {
-                throw new \Exception('Unauthorized', 401);
-            }
-
-            /** @var User $user */
-            $user = Auth::user();
-            $user->load(['roles', 'permissions']);
-            $user->token = $user->createToken('auth_token')->plainTextToken;
-
-            DB::commit();
-
-            return $user;
-        } catch (\Exception $e) {
-            DB::rollBack();
-
-            throw new \Exception($e->getMessage(), $e->getCode());
+        if (! Auth::guard('web')->attempt($data)) {
+            throw new AuthenticationException('Unauthorized');
         }
+
+        /** @var User $user */
+        $user = Auth::user();
+        $user->load(['roles', 'permissions']);
+        $user->token = $user->createToken('auth_token')->plainTextToken;
+
+        return $user;
     }
 
     public function me(): User
     {
         if (! Auth::check()) {
-            throw new \Exception('Unauthorized', 401);
+            throw new AuthenticationException('Unauthorized');
         }
 
         /** @var User $user */
@@ -56,7 +47,7 @@ class AuthRepository implements AuthRepositoryInterface
     public function logout(): User
     {
         if (! Auth::check()) {
-            throw new \Exception('Unauthorized', 401);
+            throw new AuthenticationException('Unauthorized');
         }
 
         /** @var User $user */
@@ -72,7 +63,7 @@ class AuthRepository implements AuthRepositoryInterface
 
         try {
             if (! Auth::check()) {
-                throw new \Exception('Unauthorized', 401);
+                throw new AuthenticationException('Unauthorized');
             }
 
             /** @var User $user */
@@ -102,9 +93,9 @@ class AuthRepository implements AuthRepositoryInterface
             DB::commit();
 
             return $user->fresh()->load(['roles', 'permissions', 'staffMemberProfile']);
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
             DB::rollBack();
-            throw new \Exception($e->getMessage(), $e->getCode() ?: 500);
+            throw $e;
         }
     }
 }

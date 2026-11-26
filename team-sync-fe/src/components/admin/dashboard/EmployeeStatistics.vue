@@ -344,19 +344,11 @@ onMounted(() => {
                 title="Attendance Rate"
                 :value="(statsLoading ? '...' : statistics.attendance_rate) + '%'"
                 :subtitle="`${statistics.present_days} of ${currentDayOfMonth} days`"
-                iconName="CalendarCheckIcon"
-                trendLabel="This Month"
-                :isTrendUp="true"
-                :loading="statsLoading"
             >
                 <template #footer>
-                    <div class="flex items-center gap-1">
-                        <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                    <div v-if="!statsLoading && statistics.present_days > 0" class="flex items-center gap-1">
+                        <div class="w-2 h-2 bg-green-400 rounded-full"></div>
                         <span class="text-brand-white-70 text-xs font-normal">{{ onTimePercentage }}% On Time</span>
-                    </div>
-                    <div class="flex items-center gap-1">
-                        <StarIcon class="w-3 h-3 text-white opacity-70" />
-                        <span class="text-brand-white-70 text-xs font-normal">Great Performance</span>
                     </div>
                 </template>
             </MainCard>
@@ -418,10 +410,11 @@ onMounted(() => {
         <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-base sm:text-lg font-bold">Upcoming Tasks</h3>
-                <a href="#" class="text-brand-primary text-xs sm:text-sm font-medium hover:underline">View All</a>
             </div>
+            <div v-if="upcomingTasks.length === 0" class="text-gray-500 text-sm">No upcoming tasks assigned to you.</div>
 
-            <div class="space-y-3">
+
+            <div v-else class="space-y-3">
                 <div
                     v-for="task in upcomingTasks"
                     :key="task.id"

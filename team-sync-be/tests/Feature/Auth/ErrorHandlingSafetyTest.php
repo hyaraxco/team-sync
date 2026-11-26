@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Interfaces\AuthRepositoryInterface;
 use App\Models\User;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 use Laravel\Sanctum\Sanctum;
@@ -71,12 +72,13 @@ class ErrorHandlingSafetyTest extends TestCase
         $mock = $this->mock(AuthRepositoryInterface::class);
         $mock->shouldReceive('updateProfile')
             ->once()
-            ->andThrow(new \RuntimeException(self::INTERNAL_SECRET, 0));
+            ->andThrow(new \RuntimeException(self::INTERNAL_SECRET.' table users column password_hash', 0));
 
         Log::shouldReceive('error')
             ->once()
-            ->withArgs(fn (string $msg) => str_contains($msg, 'AuthController::updateProfile error'));
-
+            ->withArgs(fn (string $msg, array $context) => str_contains($msg, 'AuthController::updateProfile error')
+                && str_contains($msg, self::INTERNAL_SECRET)
+                && isset($context['trace']));
         $response = $this->putJson('/api/v1/me', [
             'name' => 'Test User',
         ]);
@@ -84,6 +86,8 @@ class ErrorHandlingSafetyTest extends TestCase
         $response->assertStatus(500);
         $response->assertJsonFragment(['message' => 'Internal Server Error']);
         $this->assertStringNotContainsString(self::INTERNAL_SECRET, $response->getContent());
+        $this->assertStringNotContainsString('password_hash', $response->getContent());
+        $this->assertStringNotContainsString('RuntimeException', $response->getContent());
     }
 
     public function test_update_profile_domain_error_returns_safe_message(): void
@@ -94,7 +98,7 @@ class ErrorHandlingSafetyTest extends TestCase
         $mock = $this->mock(AuthRepositoryInterface::class);
         $mock->shouldReceive('updateProfile')
             ->once()
-            ->andThrow(new \Exception('Unauthorized', 401));
+            ->andThrow(new AuthenticationException('Unauthorized'));
 
         $response = $this->putJson('/api/v1/me', [
             'name' => 'Test User',
@@ -113,10 +117,36 @@ class ErrorHandlingSafetyTest extends TestCase
         ]);
 
         $response->assertStatus(401);
+        $response->assertJsonFragment(['message' => 'Unauthorized']);
         // Should not contain SQL, stack trace, or file paths
         $content = $response->getContent();
         $this->assertStringNotContainsString('SQLSTATE', $content);
         $this->assertStringNotContainsString('Stack trace', $content);
         $this->assertStringNotContainsString('/app/', $content);
+    }
+
+    public function test_login_database_error_is_logged_without_leaking_details(): void
+    {
+        $mock = $this->mock(AuthRepositoryInterface::class);
+        $mock->shouldReceive('login')
+            ->once()
+            ->andThrow(new \RuntimeException(self::INTERNAL_SECRET.' table users column password_hash', 0));
+
+        Log::shouldReceive('error')
+            ->once()
+            ->withArgs(fn (string $msg, array $context) => str_contains($msg, 'AuthController::login error')
+                && str_contains($msg, self::INTERNAL_SECRET)
+                && isset($context['trace']));
+
+        $response = $this->postJson('/api/v1/login', [
+            'email' => 'person@example.com',
+            'password' => 'secret',
+        ]);
+
+        $response->assertStatus(500);
+        $response->assertJsonFragment(['message' => 'Internal Server Error']);
+        $this->assertStringNotContainsString(self::INTERNAL_SECRET, $response->getContent());
+        $this->assertStringNotContainsString('password_hash', $response->getContent());
+        $this->assertStringNotContainsString('RuntimeException', $response->getContent());
     }
 }

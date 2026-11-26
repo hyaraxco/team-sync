@@ -3,6 +3,7 @@
 namespace Tests\Feature\Leave;
 
 use App\Models\AttendancePeriod;
+use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
@@ -38,6 +39,36 @@ class LeaveRequestPeriodGuardTest extends TestCase
     {
         Carbon::setTestNow();
         parent::tearDown();
+    }
+
+    // SQLite cannot verify row-lock serialization; a real concurrent check requires an isolated MySQL lane.
+    public function test_employee_cannot_submit_overlapping_leave_request(): void
+    {
+        Carbon::setTestNow('2026-04-10 09:00:00');
+        $user = $this->actingAsEmployee();
+        $employeeId = $user->staffMemberProfile->id;
+
+        LeaveRequest::create([
+            'staff_member_id' => $employeeId,
+            'leave_type' => 'annual_leave',
+            'start_date' => '2026-04-13',
+            'end_date' => '2026-04-15',
+            'total_days' => 3,
+            'reason' => 'Existing request',
+            'status' => 'pending',
+        ]);
+
+        $response = $this->postJson('/api/v1/leave-requests', [
+            'leave_type' => 'annual_leave',
+            'start_date' => '2026-04-15',
+            'end_date' => '2026-04-16',
+            'reason' => 'Overlapping request',
+            'emergency_contact' => '08123456789',
+        ]);
+
+        $response->assertStatus(400);
+        $this->assertStringContainsString('overlapping leave request', (string) $response->json('message'));
+        $this->assertSame(1, LeaveRequest::where('staff_member_id', $employeeId)->count());
     }
 
     public function test_employee_cannot_submit_leave_request_when_period_is_review(): void

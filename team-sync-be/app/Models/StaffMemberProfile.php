@@ -102,8 +102,6 @@ class StaffMemberProfile extends Model
             'code' => $this->code,
             'name' => $this->user?->name,
             'email' => $this->user?->email,
-            'phone' => $this->phone,
-            'identity_number' => $this->identity_number,
         ];
     }
 

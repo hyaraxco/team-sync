@@ -4,12 +4,14 @@ namespace Tests\Feature\Attendance;
 
 use App\Models\Attendance;
 use App\Models\AttendancePolicyMismatch;
+use App\Models\Company;
 use App\Models\HolidayCalendar;
 use App\Models\HybridWorkSchedule;
 use App\Models\JobInformation;
 use App\Models\LeaveRequest;
 use App\Models\StaffMemberProfile;
 use App\Services\Attendance\AttendanceClassifier;
+use Carbon\Carbon;
 use Database\Seeders\AttendancePolicySeeder;
 use Database\Seeders\LeaveEntitlementSeeder;
 use Database\Seeders\RoleSeeder;
@@ -147,6 +149,30 @@ class AttendanceClassifierTest extends TestCase
         $this->assertSame('attendance', $classified['source']);
     }
 
+    public function test_check_in_at_grace_boundary_is_classified_as_late(): void
+    {
+        $employee = $this->createEmployeeWithEmploymentType('full_time');
+        $this->createAttendance($employee, '2026-04-10', [
+            'check_in' => '2026-04-10 09:30:00',
+        ]);
+
+        $classified = $this->classifier->classify($employee->id, '2026-04-10');
+
+        $this->assertSame('late', $classified['status']);
+    }
+
+    public function test_check_in_is_compared_in_non_jakarta_company_timezone(): void
+    {
+        $employee = $this->createEmployeeWithEmploymentType('full_time', 'office', 'America/Los_Angeles');
+        $this->createAttendance($employee, '2026-04-06', [
+            'check_in' => '2026-04-06 09:00:00',
+        ]);
+
+        $classified = $this->classifier->classify($employee->id, '2026-04-06');
+
+        $this->assertSame('present', $classified['status']);
+    }
+
     public function test_check_in_beyond_grace_with_null_worked_minutes_is_absent(): void
     {
         $employee = $this->createEmployeeWithEmploymentType('full_time');
@@ -210,10 +236,11 @@ class AttendanceClassifierTest extends TestCase
         $this->assertSame(1, AttendancePolicyMismatch::query()->where('attendance_id', $attendance->id)->count());
     }
 
-    private function createEmployeeWithEmploymentType(string $employmentType, string $workLocation = 'office'): StaffMemberProfile
+    private function createEmployeeWithEmploymentType(string $employmentType, string $workLocation = 'office', string $timezone = 'Asia/Jakarta'): StaffMemberProfile
     {
-        $employee = StaffMemberProfile::withoutSyncingToSearch(function () {
-            return StaffMemberProfile::factory()->create();
+        $company = Company::factory()->create(['timezone' => $timezone]);
+        $employee = StaffMemberProfile::withoutSyncingToSearch(function () use ($company) {
+            return StaffMemberProfile::factory()->create(['company_id' => $company->id]);
         });
 
         JobInformation::factory()
@@ -232,7 +259,13 @@ class AttendanceClassifierTest extends TestCase
 
     private function createAttendance(StaffMemberProfile $employee, string $date, array $overrides = []): Attendance
     {
-        return Attendance::create(array_merge([
+        // Fixtures express company wall-clock times; the column stores UTC.
+        $timezone = $employee->company?->timezone ?? 'Asia/Jakarta';
+        $toUtc = fn (?string $value) => $value === null
+            ? null
+            : Carbon::parse($value, $timezone)->setTimezone('UTC')->toDateTimeString();
+
+        $attributes = array_merge([
             'staff_member_id' => $employee->id,
             'date' => $date,
             'check_in' => $date.' 09:00:00',
@@ -240,6 +273,11 @@ class AttendanceClassifierTest extends TestCase
             'worked_minutes' => 480,
             'status' => 'present',
             'notes' => 'Classifier branch test',
-        ], $overrides));
+        ], $overrides);
+
+        $attributes['check_in'] = $toUtc($attributes['check_in'] ?? null);
+        $attributes['check_out'] = $toUtc($attributes['check_out'] ?? null);
+
+        return Attendance::create($attributes);
     }
 }

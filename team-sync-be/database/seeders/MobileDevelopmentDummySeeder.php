@@ -8,7 +8,6 @@ use App\Enums\JobStatus;
 use App\Enums\ProjectPriority;
 use App\Enums\ProjectStatus;
 use App\Enums\ProjectType;
-use App\Enums\SkillLevel;
 use App\Enums\TaskPriority;
 use App\Enums\TaskStatus;
 use App\Enums\TeamStatus;
@@ -142,7 +141,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                     'work_location' => WorkLocation::HYBRID->value,
                     'start_date' => now()->subMonths(6 + $sequence)->toDateString(),
                     'monthly_salary' => $employeeBlueprint['monthly_salary'],
-                    'skill_level' => $employeeBlueprint['skill_level'] ?? SkillLevel::INTERMEDIATE->value,
                 ]
             );
 
@@ -369,8 +367,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Jakarta',
                 'postal_code' => '12930',
                 'monthly_salary' => 22000000,
-                'skill_level' => SkillLevel::EXPERT->value,
-                'role' => 'manager',
                 'profile_photo' => 'profile-pictures/male/1.avif',
             ],
             [
@@ -385,8 +381,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Bandung',
                 'postal_code' => '40135',
                 'monthly_salary' => 18000000,
-                'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'staff',
                 'profile_photo' => 'profile-pictures/male/2.avif',
             ],
             [
@@ -401,8 +395,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Bogor',
                 'postal_code' => '16128',
                 'monthly_salary' => 13000000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -416,8 +408,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Surabaya',
                 'postal_code' => '60241',
                 'monthly_salary' => 12500000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -431,8 +421,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Semarang',
                 'postal_code' => '50134',
                 'monthly_salary' => 12000000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -446,8 +434,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Bekasi',
                 'postal_code' => '17143',
                 'monthly_salary' => 13500000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'frontend',
@@ -461,8 +447,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Depok',
                 'postal_code' => '16424',
                 'monthly_salary' => 12800000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -476,8 +460,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Tangerang',
                 'postal_code' => '15345',
                 'monthly_salary' => 15000000,
-                'skill_level' => SkillLevel::ADVANCED->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'backend',
@@ -491,8 +473,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Surakarta',
                 'postal_code' => '57141',
                 'monthly_salary' => 14500000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'qa',
@@ -506,8 +486,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Yogyakarta',
                 'postal_code' => '55281',
                 'monthly_salary' => 11000000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
             [
                 'stream' => 'uiux',
@@ -521,8 +499,6 @@ class MobileDevelopmentDummySeeder extends Seeder
                 'city' => 'Malang',
                 'postal_code' => '65119',
                 'monthly_salary' => 12000000,
-                'skill_level' => SkillLevel::INTERMEDIATE->value,
-                'role' => 'staff',
             ],
         ];
     }

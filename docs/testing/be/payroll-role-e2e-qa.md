@@ -12,27 +12,11 @@
 
 ## Persiapan
 
-Gunakan database uji terpisah dengan data dummy. Seeder, `qa:payroll-ready`, dan persiapan E2E dapat mereset data; jangan arahkan ke database kerja atau produksi. Path berikut relatif terhadap root repo.
+Perintah seed dan `qa:payroll-ready` di panduan lama dapat mereset payroll. Jangan jalankan pada database development atau production. `team-sync-wlk` melacak guard yang harus membuktikan target E2E terpisah sebelum perintah normal digunakan.
 
-1. Seed data minimum:
-   ```bash
-   cd team-sync-be
-   php artisan db:seed --class=MinimalPayrollE2ESeeder
-   ```
-   Alternatif jika ingin employee langsung melihat data `My Payroll` tanpa generate manual:
-   ```bash
-   php artisan db:seed --class=MinimalPayrollE2EReadySeeder
-   ```
-   Opsi paling cepat sebelum manual testing (reset data payroll QA + health check endpoint payroll per role):
-   ```bash
-   php artisan qa:payroll-ready
-   ```
-2. Gunakan bulan berjalan sebagai bulan uji payroll.
-3. Akun yang tersedia:
-   - `yudhis@teamsync.com` / `teamsync`
-   - `tasyia@teamsync.com` / `teamsync`
-   - `dwimeta@teamsync.com` / `teamsync`
-   - `agung@teamsync.com` / `teamsync`
+Sampai `team-sync-wlk` lulus, jangan seed data payroll ke backend Compose default. Untuk role test yang mereset data, gunakan hanya sandbox SQLite terjaga di [`../../../scripts/sandbox/README.md`](../../../scripts/sandbox/README.md). Akun di bawah hanya identitas fixture yang sudah ada, bukan izin untuk seed database.
+
+Uji perilaku payroll di repository dapat dijalankan melalui test Pest yang tercantum di atas, dengan database test yang dikelola harness Pest.
 
 ## Urutan Test Manual
 1. `Manager`
@@ -83,13 +67,13 @@ Gunakan database uji terpisah dengan data dummy. Seeder, `qa:payroll-ready`, dan
 - Transisi status payroll `processing`, `pending`, `approved`, lalu `paid` harus konsisten di UI dan API.
 
 ## Stage 1 Done Criteria
-- `manager` tidak melihat payroll admin menu/quick action, tidak bisa direct URL payroll admin, dan API payroll admin tetap `403`.
-- `manager`, `hr`, dan `finance` bisa mengakses self-service personal (`My Profile`, `My Attendance`, `My Payroll`) dari akun yang sama.
-- `hr` tidak bisa generate atau membuka dashboard/detail/settings payroll; hanya readiness dan THR read-only yang diizinkan.
-- `finance` bisa create/generate payroll, buka detail payroll, melihat statistik, mengakses payroll settings, menyelesaikan approval, export payroll report, export Excel, dan mark payroll `approved` menjadi `paid`.
-- Setelah payroll `paid`, finance melihat info auto notification, bukan tombol manual send.
-- `employee` bisa buka `My Payroll`, detail, dan download PDF miliknya sendiri, tetapi semua route payroll admin tetap deny.
-- `bun run test:guards` dan `bun run e2e` harus hijau.
+- `manager` does not see payroll admin menu/actions, cannot open admin URLs, and receives API `403`.
+- `manager`, `hr`, and `finance` can access their own employee self-service pages.
+- `hr` cannot generate or open payroll operations; only permission-allowed readiness/THR read-only pages are available.
+- `finance` can perform payroll operations allowed by its permissions, including generate, approve, export and pay.
+- After payroll is paid, finance sees the supported notification state, not an inert manual-send action.
+- `employee` can access only their own payroll details/downloads; payroll admin remains denied.
+- Run `bun run test:guards` as appropriate. Run Playwright E2E only after `team-sync-wlk` passes its isolated-target checks, or use the guarded SQLite role sandbox.
 
 ## FE Guard Direct URL Checklist
 - Jalankan sesudah login sesuai role dan paste URL langsung di browser.
@@ -111,32 +95,13 @@ Gunakan database uji terpisah dengan data dummy. Seeder, `qa:payroll-ready`, dan
 - Allow: `/admin/dashboard`, `/admin/my-profile`, `/admin/my-team`, `/admin/attendance/my-attendances`, `/admin/attendance/clock`, `/admin/my-payroll`, `/admin/my-payslips`
 - Deny: `/admin/staff-members`, `/admin/teams`, `/admin/attendances`, `/admin/payroll`, `/admin/payroll/create`, `/admin/payroll/readiness`, `/admin/payroll/thr`
 
-## Automated UI E2E (Bun + Docker BE)
-- Install browser dependency once:
-  ```bash
-  cd team-sync-fe
-  bun run e2e:install
-  ```
-- Run full payroll role journey automation:
-  ```bash
-  bun run e2e
-  ```
-- Open Playwright HTML report:
-  ```bash
-  bun run e2e:report
-  ```
-- Environment overrides yang didukung:
-  ```bash
-  E2E_BE_DIR=../team-sync-be
-  E2E_BE_COMPOSE_CMD="docker compose"
-  E2E_FE_BASE_URL=http://127.0.0.1:4173
-  VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
-  ```
-- Contoh nama artifact dari runbook lama (bukan bukti run baru; nama `hr-pending-created` mencerminkan pembagian role lama):
-  - `team-sync-fe/playwright-artifacts/manager-deny-payroll.png`
-  - `team-sync-fe/playwright-artifacts/hr-pending-created.png`
-  - `team-sync-fe/playwright-artifacts/finance-paid.png`
-  - `team-sync-fe/playwright-artifacts/employee-my-payroll.png`
+## Automated UI E2E
+
+The normal wrapper now uses the pinned `teamsync-e2e-isolated` Compose target. Its guard checks the canonical Compose file and SHA before Docker access; the Compose file supplies E2E-only credentials, project-scoped volumes, and masks the backend `.env`. Guard/refusal tests and Compose configuration parsing passed. No Docker services, migrations, or database reset were run during this change.
+
+Use `bun run e2e` only with this approved target. Do not override `E2E_BE_DIR`, Compose files, or database settings to point at development or production. For reset-capable role tests without MySQL, use the guarded SQLite sandbox in [`../../../scripts/sandbox/README.md`](../../../scripts/sandbox/README.md).
+
+`bun run e2e:install` installs the Playwright browser only; it does not prepare or reset the backend.
 
 ## CI Automation historis (GitHub Actions)
 

@@ -9,6 +9,7 @@ use App\Models\JobInformation;
 use App\Models\LeaveRequest;
 use App\Models\PayrollAdjustment;
 use App\Models\PayrollDetail;
+use App\Models\StaffMemberProfile;
 use App\Models\Team;
 use App\Models\TeamMember;
 use App\Models\User;
@@ -121,6 +122,9 @@ class LeaveRequestRepository implements LeaveRequestRepositoryInterface
     public function store(array $data)
     {
         return DB::transaction(function () use ($data) {
+            // Lock a guaranteed row so concurrent requests for this employee serialize even when no leave rows match.
+            StaffMemberProfile::whereKey($data['staff_member_id'])->lockForUpdate()->firstOrFail();
+
             $startDate = Carbon::parse($data['start_date']);
             $endDate = Carbon::parse($data['end_date']);
 

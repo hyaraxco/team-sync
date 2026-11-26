@@ -6,6 +6,7 @@ use App\Models\Attendance;
 use App\Models\License;
 use App\Models\PayrollSetting;
 use App\Models\StaffMemberProfile;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
@@ -73,8 +74,8 @@ class SandboxRoleSeeder extends Seeder
                         Attendance::create([
                             'staff_member_id' => $profile->id,
                             'date' => $day->toDateString(),
-                            'check_in' => $day->format('Y-m-d').' 08:00:00',
-                            'check_out' => $day->format('Y-m-d').' 17:00:00',
+                            'check_in' => $this->utc('08:00:00', $day),
+                            'check_out' => $this->utc('17:00:00', $day),
                             'status' => 'present',
                             'notes' => 'Sandbox payroll role fixture',
                         ]);
@@ -84,5 +85,11 @@ class SandboxRoleSeeder extends Seeder
             }
             $this->callWith(BpjsPayrollFixtureSeeder::class, ['period' => now()->format('Y-m')]);
         });
+    }
+
+    /** Attendance timestamps are stored in UTC; seeders express company wall-clock times. */
+    private function utc(string $time, Carbon $date, string $timezone = 'Asia/Jakarta'): string
+    {
+        return Carbon::parse($date->format('Y-m-d').' '.$time, $timezone)->setTimezone('UTC')->toDateTimeString();
     }
 }

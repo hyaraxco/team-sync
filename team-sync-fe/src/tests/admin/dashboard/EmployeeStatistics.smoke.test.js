@@ -136,7 +136,7 @@ describe("EmployeeStatistics smoke", () => {
         });
     });
 
-    it("uses notification feed for recent activities and keeps View All route wired", async () => {
+    it("uses notification feed and keeps its View All route wired", async () => {
         notificationStoreMock.notifications = [
             {
                 id: "n-1",
@@ -165,6 +165,18 @@ describe("EmployeeStatistics smoke", () => {
 
         const viewAll = wrapper.get('[data-testid="recent-activities-view-all"]');
         expect(viewAll.attributes("data-route-name")).toBe("admin.notifications");
+    });
+
+    it("shows an honest Upcoming Tasks empty state and no praise for zero attendance", async () => {
+        dashboardStoreMock.fetchMyStatistics.mockResolvedValueOnce({ attendance: { rate: 0, present_days: 0 } });
+
+        const wrapper = factory();
+        await flushUi();
+
+        expect(wrapper.text()).toContain("No upcoming tasks assigned to you.");
+        expect(wrapper.text()).not.toContain("Great Performance");
+        expect(wrapper.text()).not.toContain("On Time");
+        expect(wrapper.find("a[href='#']").exists()).toBe(false);
     });
 
     it("navigates to action_url when an activity is selected", async () => {

@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Payroll;
 
+use App\Http\Resources\PayrollDetailResource;
+use App\Http\Resources\PayslipResource;
 use App\Jobs\GeneratePayrollJob;
 use App\Models\Attendance;
 use App\Models\AttendancePeriod;
@@ -154,7 +156,7 @@ class PayrollAdjustmentApplicationTest extends TestCase
             ]);
 
         $detail->setRelation('appliedAdjustments', collect([$adjustment->fresh()]));
-        foreach ([\App\Http\Resources\PayrollDetailResource::class, \App\Http\Resources\PayslipResource::class] as $resource) {
+        foreach ([PayrollDetailResource::class, PayslipResource::class] as $resource) {
             $payload = (new $resource($detail))->resolve();
             $this->assertSame(250000, $payload['adjustment_total_amount']);
             $this->assertSame(250000.49, $payload['adjustments'][0]['amount_delta']);
@@ -197,8 +199,8 @@ class PayrollAdjustmentApplicationTest extends TestCase
                     Attendance::create([
                         'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->copy()->format('Y-m-d').' 08:00:00',
-                        'check_out' => $cursor->copy()->format('Y-m-d').' 17:00:00',
+                        'check_in' => $this->localAttendanceTime($cursor->copy()->format('Y-m-d').' 08:00:00'),
+                        'check_out' => $this->localAttendanceTime($cursor->copy()->format('Y-m-d').' 17:00:00'),
                         'status' => 'present',
                         'notes' => 'Adjustment application coverage',
                     ]);

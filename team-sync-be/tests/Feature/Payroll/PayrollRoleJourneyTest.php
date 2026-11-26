@@ -9,6 +9,7 @@ use App\Models\StaffMemberProfile;
 use App\Models\User;
 use App\Notifications\PayrollPaid;
 use App\Services\Payroll\PayrollGenerationService;
+use App\Services\Payroll\PayrollTaxIntegrationService;
 use Carbon\Carbon;
 use Database\Seeders\MinimalPayrollE2ESeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -110,7 +111,7 @@ class PayrollRoleJourneyTest extends TestCase
             ->assertOk();
 
         $payroll->update(['planned_credit_date' => now()->toDateString()]);
-        app(\App\Services\Payroll\PayrollTaxIntegrationService::class)->refreshPayroll($payroll);
+        app(PayrollTaxIntegrationService::class)->refreshPayroll($payroll);
 
         $this
             ->postJson("/api/v1/payrolls/{$payroll->id}/approve")
@@ -183,8 +184,8 @@ class PayrollRoleJourneyTest extends TestCase
 
                     if ($attendance) {
                         $attendance->update([
-                            'check_in' => $cursor->format('Y-m-d').' 08:00:00',
-                            'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                            'check_in' => $this->localAttendanceTime($cursor->format('Y-m-d').' 08:00:00'),
+                            'check_out' => $this->localAttendanceTime($cursor->format('Y-m-d').' 17:00:00'),
                             'status' => 'present',
                             'notes' => 'Role journey readiness coverage',
                         ]);
@@ -192,8 +193,8 @@ class PayrollRoleJourneyTest extends TestCase
                         Attendance::create([
                             'staff_member_id' => $employee->id,
                             'date' => $cursor->toDateString(),
-                            'check_in' => $cursor->format('Y-m-d').' 08:00:00',
-                            'check_out' => $cursor->format('Y-m-d').' 17:00:00',
+                            'check_in' => $this->localAttendanceTime($cursor->format('Y-m-d').' 08:00:00'),
+                            'check_out' => $this->localAttendanceTime($cursor->format('Y-m-d').' 17:00:00'),
                             'status' => 'present',
                             'notes' => 'Role journey readiness coverage',
                         ]);

@@ -157,8 +157,8 @@ class PayrollReadinessTeamSummaryTest extends TestCase
                     Attendance::create([
                         'staff_member_id' => $employee->id,
                         'date' => $cursor->toDateString(),
-                        'check_in' => $cursor->copy()->setTime(8, 0)->toDateTimeString(),
-                        'check_out' => $cursor->copy()->setTime(17, 0)->toDateTimeString(),
+                        'check_in' => $this->localAttendanceTime($cursor->copy()->setTime(8, 0)->toDateTimeString()),
+                        'check_out' => $this->localAttendanceTime($cursor->copy()->setTime(17, 0)->toDateTimeString()),
                         'status' => 'present',
                         'work_location' => 'office',
                     ]);

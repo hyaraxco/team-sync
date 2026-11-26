@@ -13,39 +13,51 @@ were removed during cleanup; do not commit page/API dumps as passing tests.
 
 - Node.js `^20.19.0 || >=22.12.0` (see `package.json`; `.nvmrc` selects the local version)
 - Bun package manager
-- Backend running at `http://127.0.0.1:8000`
-- Backend seeded with E2E test data
+- Backend at `http://127.0.0.1:8000` using a verified disposable test database only
+- Seeded E2E role accounts; Superadmin is pending `team-sync-dps`
 
 ## Setup
 
-Run commands from `team-sync-fe/`. Backend preparation resets/seeds database
-state: use a dedicated test database, never a production or working database.
+Run commands from `team-sync-fe/`. Preparation accepts only the checked-in E2E Compose file with its pinned hash. It uses the separate `teamsync-e2e-isolated` project, project-scoped volumes, test-only database credentials, and a read-only `/dev/null` mount over the backend `.env`. It does not read the development `.env` or use the default Compose project. `migrate:fresh` resets only this E2E database. Confirm `127.0.0.1:8000` is free; a port bind conflict stops startup. The guard and wrapper preflight pass without starting Docker. No Docker services or database reset were run during this change.
+
+Install dependencies and the browser without touching the backend database:
 
 ```bash
-# Install dependencies
 bun install
-
-# Install Playwright browsers (first time only)
 bun run e2e:install
-
-# Seed the backend database for E2E
-bun run e2e:prepare:be
 ```
+
+Run `bash ../team-sync-be/scripts/e2e-prepare-be-guard-test.sh` for isolated-target acceptance/refusal checks; it does not start Docker or run seeds. For destructive role coverage without MySQL, use the independent guarded SQLite sandbox described below. Never point reset commands at development or production resources.
 
 ## Running Tests
 
-```bash
-# Full E2E run (seeds backend + runs Playwright)
-bun run e2e
+`bun run e2e` runs backend preparation and resets the approved E2E database. Use only its pinned Compose target; do not override `E2E_BE_DIR` or the Compose file to point at a development or production stack. The guard acceptance test is `bash ../team-sync-be/scripts/e2e-prepare-be-guard-test.sh`. A full container/database reset was not run during this change.
 
-# Run Playwright only (skip backend seeding)
-bun run e2e:ui
+For destructive role coverage without MySQL, provision the guarded SQLite sandbox's local toolchain image as documented in [`../../scripts/sandbox/README.md`](../../scripts/sandbox/README.md), then run from the repository root:
 
-# View HTML report after a run
-bun run e2e:report
+```sh
+sh scripts/sandbox/run.sh team-sync-tea13-toolchain:local --phase roles --seconds 1800
 ```
 
-### Environment Variables
+`bun run e2e:ui` skips preparation but still sends requests to `VITE_API_BASE_URL`; use it only with an already seeded disposable backend.
+
+## Role fixtures and matrix
+
+Source-backed permissions and endpoint boundaries are tracked in [the RBAC route and API source inventory](./rbac-feature-matrix.md). Its allow/deny cells reflect source permissions, not verified runtime behavior; API authorization remains unverified where route declarations provide no explicit boundary. Unverified outcomes are not behavior-test evidence. A hidden link or frontend redirect does not prove that the backend denies access.
+
+## Current normal-fixture accounts
+
+Each listed account belongs to the normal E2E seed. The current seed does not create a Superadmin account. Passwords are local test values and must not be reused in production.
+
+| RBAC role | Employee account |
+|---|---|
+| Staff | `agung@teamsync.com` |
+| Manager | `yudhis@teamsync.com` |
+| HR | `tasyia@teamsync.com` |
+| Finance | `dwimeta@teamsync.com` |
+| Superadmin | Not seeded yet. Tracked by `team-sync-dps`. |
+
+### Environment variables
 
 | Variable | Default | Description |
 |----------|---------|-------------|
@@ -55,7 +67,6 @@ bun run e2e:report
 
 ## Architecture
 
-```
 e2e/
 ├── *.spec.ts              # Test spec files
 ├── global-setup.ts        # Health check + seeded login verification
@@ -104,7 +115,7 @@ test('create user flow', async ({ userFactory, page }) => {
 
 ### Helpers
 
-- **`auth.ts`** — `loginAsRole(page, role)` handles the full login flow for `manager`, `hr`, `finance`, or `employee`
+- **`auth.ts`** — `loginAsRole(page, role)` handles the seeded roles listed above.
 - **`backend.ts`** — `processQueueOnce()` and `drainQueue()` for triggering queued jobs during E2E
 - **`evidence.ts`** — `captureEvidence(page, filename)` for full-page screenshots
 
@@ -120,23 +131,14 @@ test('create user flow', async ({ userFactory, page }) => {
 
 ## CI Integration
 
-- **Reporter**: JUnit XML output at `test-results/junit-results.xml` for CI dashboards
-- **Retries**: 1 retry in CI (`process.env.CI`), 0 locally
-- **Artifacts**: Traces and screenshots retained on failure only
-- **Backend prep**: CI must run `bun run e2e:prepare:be` before E2E tests
+- FE CI runs Vitest, production build and the configured accessibility audit. It does not run Playwright role E2E.
+- Playwright writes JUnit output; the local config retains traces, screenshots and video on failure.
+- Do not describe normal E2E seeding as isolated until `team-sync-wlk` passes.
 
-## Seeded Test Accounts
-
-| Role | Email | Password |
-|------|-------|----------|
-| Manager | yudhis@teamsync.com | teamsync |
-| HR | tasyia@teamsync.com | teamsync |
-| Finance | dwimeta@teamsync.com | teamsync |
-| Employee | agung@teamsync.com | teamsync |
 
 ## Troubleshooting
 
 - **"Backend health endpoint is not ready"** — Start the backend: `cd ../team-sync-be && composer dev`
-- **"Seeded login for role X is unavailable"** — Run `bun run e2e:prepare:be` to seed the database
+- **"Seeded login for role X is unavailable"** — Do not run `bun run e2e:prepare:be` until `team-sync-wlk` proves the target is isolated. Use only the guarded SQLite sandbox for destructive role tests until then.
 - **Flaky timeout on login** — Increase `timeout` in `loginAsRole` or check backend response time
 - **"Cannot find module"** — Run `bun install` and `bun run e2e:install`
