@@ -41,7 +41,7 @@ class GeneratePayrollJobTest extends TestCase
     {
         $job = new GeneratePayrollJob('2026-05');
 
-        $this->assertSame('generate-payroll:2026-05', $job->uniqueId());
+        $this->assertSame('generate-payroll:default:2026-05', $job->uniqueId());
     }
 
     public function test_unique_id_changes_with_salary_month(): void
@@ -78,7 +78,7 @@ class GeneratePayrollJobTest extends TestCase
         $mockService = Mockery::mock(PayrollGenerationService::class);
         $mockService->shouldReceive('generatePayroll')
             ->once()
-            ->with('2026-05', 42)
+            ->with('2026-05', 42, null)
             ->andReturn($payroll);
 
         $job = new GeneratePayrollJob('2026-05', 42);
@@ -96,7 +96,7 @@ class GeneratePayrollJobTest extends TestCase
         $mockService = Mockery::mock(PayrollGenerationService::class);
         $mockService->shouldReceive('generatePayroll')
             ->once()
-            ->with('2026-06', null)
+            ->with('2026-06', null, null)
             ->andReturn($payroll);
 
         $job = new GeneratePayrollJob('2026-06');

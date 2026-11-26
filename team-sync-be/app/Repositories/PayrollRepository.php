@@ -13,6 +13,7 @@ use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicyMismatch;
 use App\Models\BpjsRate;
+use App\Models\Company;
 use App\Models\HolidayCalendar;
 use App\Models\LeaveEntitlement;
 use App\Models\LeaveRequest;
@@ -35,10 +36,10 @@ use App\Services\Attendance\AttendancePeriodService;
 use App\Services\EmailService;
 use App\Services\Payroll\BpjsPayrollFacts;
 use App\Services\Payroll\OvertimeCalculationService;
-use App\Services\Payroll\TaxCalculationService;
 use App\Services\Payroll\PayrollApprovalService;
 use App\Services\Payroll\PayrollTaxIntegrationService;
 use App\Services\Payroll\PayrollTaxPeriodService;
+use App\Services\Payroll\TaxCalculationService;
 use App\Services\PayrollActivityLogger;
 use App\Support\AttendanceHelper;
 use Carbon\Carbon;
@@ -48,6 +49,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Collection as SupportCollection;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class PayrollRepository implements PayrollRepositoryInterface
@@ -226,11 +228,38 @@ class PayrollRepository implements PayrollRepositoryInterface
      */
     private const PAYROLL_PROCESSING_BATCH_SIZE = 100;
 
-    public function generatePayroll(string $salaryMonth, ?int $actorId = null): Payroll
+    /**
+     * Tenant that owns the payroll: the initiating user's company when known,
+     * otherwise the install's company. Null means unknown.
+     */
+    private function resolveCompanyId(?int $actorId = null): ?int
     {
-        return $this->taxIntegration->transaction(function () use ($salaryMonth, $actorId) {
+        $userId = $actorId ?? Auth::id();
+        $companyId = $userId ? User::query()->whereKey($userId)->value('company_id') : null;
+
+        return $companyId !== null ? (int) $companyId : $this->soleCompanyId();
+    }
+
+    /**
+     * The install's company, only when there is exactly one. With several,
+     * picking the first row would write payroll into the wrong tenant.
+     */
+    private function soleCompanyId(): ?int
+    {
+        return Company::query()->count() > 1 ? null : Company::current()?->id;
+    }
+
+    public function generatePayroll(string $salaryMonth, ?int $actorId = null, ?int $companyId = null): Payroll
+    {
+        return $this->taxIntegration->transaction(function () use ($salaryMonth, $actorId, $companyId) {
             $month = Carbon::parse($salaryMonth)->startOfMonth();
-            $readiness = $this->buildGenerateReadiness($month);
+            $companyId ??= $this->resolveCompanyId($actorId);
+
+            if ($companyId === null && Company::query()->count() > 1) {
+                throw new \Exception('Cannot tell which company this payroll belongs to. Generate it as a user assigned to a company.');
+            }
+
+            $readiness = $this->buildGenerateReadiness($month, $companyId);
 
             if (! $readiness['can_generate']) {
                 throw new \Exception($readiness['message']);
@@ -245,6 +274,7 @@ class PayrollRepository implements PayrollRepositoryInterface
 
             try {
                 $payroll = Payroll::create([
+                    'company_id' => $companyId,
                     'salary_month' => $month->format('Y-m-d'),
                     'attendance_period_id' => $attendancePeriod->id,
                     'payroll_setting_version_id' => $settingsVersion->id,
@@ -461,13 +491,13 @@ class PayrollRepository implements PayrollRepositoryInterface
         // Append '-01' to avoid Carbon day-overflow when today > days-in-target-month.
         $month = Carbon::parse($salaryMonth.'-01');
 
-        return $this->buildGenerateReadiness($month);
+        return $this->buildGenerateReadiness($month, $this->resolveCompanyId());
     }
 
     public function getReadinessDashboard(string $salaryMonth): array
     {
         $month = Carbon::parse($salaryMonth.'-01');
-        $readiness = $this->buildGenerateReadiness($month);
+        $readiness = $this->buildGenerateReadiness($month, $this->resolveCompanyId());
 
         $activeEmployeeIds = StaffMemberProfile::query()
             ->whereHas('jobInformation', function ($query) {
@@ -1869,7 +1899,7 @@ class PayrollRepository implements PayrollRepositoryInterface
         }
     }
 
-    private function buildGenerateReadiness(Carbon $month): array
+    private function buildGenerateReadiness(Carbon $month, ?int $companyId = null): array
     {
         $settings = PayrollSetting::current();
         $monthLabel = $month->translatedFormat('F Y');
@@ -1894,6 +1924,9 @@ class PayrollRepository implements PayrollRepositoryInterface
 
         $existingPayroll = Payroll::query()
             ->whereDate('salary_month', $month->toDateString())
+            ->where(fn ($query) => $companyId === null
+                ? $query->whereNull('company_id')
+                : $query->where('company_id', $companyId))
             ->first();
 
         if ($existingPayroll) {
@@ -2926,7 +2959,6 @@ class PayrollRepository implements PayrollRepositoryInterface
 
         return $this->calculateWorkingDays($startDate, $endDate);
     }
-
 
     private function buildPayrollNote(PayrollSetting|PayrollSettingVersion $settings, array $context): string
     {

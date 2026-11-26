@@ -282,7 +282,7 @@ class PayrollGenerateRulesTest extends TestCase
         $mayJob = new GeneratePayrollJob('2026-05');
 
         $this->assertContains(ShouldBeUnique::class, class_implements($aprilJob));
-        $this->assertSame('generate-payroll:2026-04', $aprilJob->uniqueId());
+        $this->assertSame('generate-payroll:default:2026-04', $aprilJob->uniqueId());
         $this->assertSame($aprilJob->uniqueId(), $sameAprilJob->uniqueId());
         $this->assertNotSame($aprilJob->uniqueId(), $mayJob->uniqueId());
     }
@@ -292,7 +292,7 @@ class PayrollGenerateRulesTest extends TestCase
         $firstHrJob = new GeneratePayrollJob('2026-04', 101);
         $secondHrJob = new GeneratePayrollJob('2026-04', 202);
 
-        $this->assertSame('generate-payroll:2026-04', $firstHrJob->uniqueId());
+        $this->assertSame('generate-payroll:default:2026-04', $firstHrJob->uniqueId());
         $this->assertSame($firstHrJob->uniqueId(), $secondHrJob->uniqueId());
     }
 
@@ -303,7 +303,7 @@ class PayrollGenerateRulesTest extends TestCase
         $generationService = $this->createMock(PayrollGenerationService::class);
         $generationService->expects($this->once())
             ->method('generatePayroll')
-            ->with('2026-04', 777)
+            ->with('2026-04', 777, null)
             ->willThrowException(new \RuntimeException('queue processing failed'));
 
         $job = new GeneratePayrollJob('2026-04', 777);
