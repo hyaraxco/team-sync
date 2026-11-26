@@ -61,6 +61,7 @@ class ProjectClientVisibilityTest extends TestCase
             'priority' => ProjectPriority::HIGH->value,
             'status' => ProjectStatus::ACTIVE->value,
             'start_date' => now()->toDateString(),
+            'budget' => 2500000000,
             'client_name' => 'LP3ES',
             'client_contact' => 'PIC LP3ES / 0812',
         ]);
@@ -94,6 +95,37 @@ class ProjectClientVisibilityTest extends TestCase
 
         $this->assertArrayNotHasKey('client_name', $response->json('data'));
         $this->assertArrayNotHasKey('client_contact', $response->json('data'));
+    }
+
+    public function test_staff_on_the_project_does_not_receive_budget(): void
+    {
+        Sanctum::actingAs($this->userWithRole('staff', onProjectTeam: true));
+
+        $response = $this->getJson('/api/v1/projects/'.$this->project->id)->assertOk();
+
+        $this->assertArrayNotHasKey('budget', $response->json('data'));
+    }
+
+    public function test_staff_project_list_omits_budget_and_client(): void
+    {
+        Sanctum::actingAs($this->userWithRole('staff', onProjectTeam: true));
+
+        $project = $this->getJson('/api/v1/projects')->assertOk()->json('data.0');
+
+        $this->assertArrayNotHasKey('budget', $project);
+        $this->assertArrayNotHasKey('client_name', $project);
+    }
+
+    public function test_project_leader_who_is_staff_sees_client_identity(): void
+    {
+        $leader = $this->userWithRole('staff', onProjectTeam: true);
+        $this->project->update(['project_leader_id' => $leader->staffMemberProfile->id]);
+        Sanctum::actingAs($leader);
+
+        $this->getJson('/api/v1/projects/'.$this->project->id)
+            ->assertOk()
+            ->assertJsonPath('data.client_name', 'LP3ES')
+            ->assertJsonPath('data.budget', 2500000000);
     }
 
     public function test_client_identity_is_stored_from_the_create_path(): void
