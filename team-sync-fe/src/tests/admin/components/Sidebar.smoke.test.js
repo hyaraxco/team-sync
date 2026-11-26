@@ -17,14 +17,18 @@ vi.mock("@/helpers/permissionHelper", () => ({
     canOneOf: (permissions) => permissions.some((permission) => grantedPermissions.has(permission)),
 }));
 
-vi.mock("@/composables/useSidebar", () => ({
-    useSidebar: () => ({
+const sidebarHolder = vi.hoisted(() => ({ refs: null }));
+
+vi.mock("@/composables/useSidebar", () => {
+    sidebarHolder.refs = {
         isOpen: ref(true),
         isCollapsed: ref(false),
         toggleCollapse: vi.fn(),
         closeMobile: vi.fn(),
-    }),
-}));
+    };
+
+    return { useSidebar: () => sidebarHolder.refs };
+});
 
 import Sidebar from "@/components/admin/Sidebar.vue";
 
@@ -61,6 +65,8 @@ describe("Sidebar smoke", () => {
     beforeEach(() => {
         currentRoute.name = "admin.dashboard";
         setPermissions([]);
+        sidebarHolder.refs.isOpen.value = true;
+        sidebarHolder.refs.isCollapsed.value = false;
     });
 
     it.each([
@@ -177,5 +183,22 @@ describe("Sidebar smoke", () => {
 
         expect(wrapper.text()).not.toContain("Reports");
         expect(wrapper.find('a[href="#"]').exists()).toBe(false);
+    });
+
+    it("marks the drawer as an open dialog only while it is open", async () => {
+        setPermissions(["dashboard-menu"]);
+
+        const wrapper = factory();
+        const drawer = wrapper.get("#sidebar");
+
+        expect(drawer.attributes("role")).toBe("dialog");
+        expect(drawer.attributes("aria-modal")).toBe("true");
+        expect(drawer.attributes("aria-label")).toBe("Main sidebar");
+
+        sidebarHolder.refs.isOpen.value = false;
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.get("#sidebar").attributes("role")).toBeUndefined();
+        expect(wrapper.get("#sidebar").attributes("aria-modal")).toBeUndefined();
     });
 });

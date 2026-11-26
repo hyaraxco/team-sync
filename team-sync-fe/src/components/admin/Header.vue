@@ -45,6 +45,15 @@ const unreadPollingIntervalId = ref(null);
 const previousUnreadCount = ref(0);
 const emit = defineEmits(["toggle-sidebar"]);
 
+const props = defineProps({
+    isOpen: { type: Boolean, default: false },
+    sidebarId: { type: String, default: "sidebar" },
+});
+
+const menuToggleRef = ref(null);
+const focusMenuTrigger = () => menuToggleRef.value?.focus();
+defineExpose({ focusMenuTrigger });
+
 const route = useRoute();
 
 const titles = {
@@ -462,9 +471,12 @@ onUnmounted(() => {
         <div class="flex items-start sm:items-center justify-between gap-3 sm:gap-4">
             <div class="min-w-0 flex items-start sm:items-center gap-3 sm:gap-4">
                 <button
+                    ref="menuToggleRef"
                     type="button"
                     aria-label="Toggle sidebar"
                     data-testid="header-mobile-menu-toggle"
+                    :aria-expanded="props.isOpen ? 'true' : 'false'"
+                    :aria-controls="props.sidebarId"
                     class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     @click="emit('toggle-sidebar')"
                 >

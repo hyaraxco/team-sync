@@ -38,6 +38,9 @@ const onNavigate = () => closeMobile();
     <!-- Sidebar -->
     <aside
         id="sidebar"
+        :role="isOpen ? 'dialog' : undefined"
+        :aria-modal="isOpen ? 'true' : undefined"
+        aria-label="Main sidebar"
         class="fixed lg:relative inset-y-0 left-0 z-50 border-r flex flex-col transform transition-all duration-200 ease-in-out"
         style="background-color: var(--sidebar-bg); border-color: var(--sidebar-border)"
         :style="{ width: isCollapsed ? '68px' : '256px', minWidth: isCollapsed ? '68px' : '256px' }"
