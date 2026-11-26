@@ -97,7 +97,10 @@ const factory = () =>
                     template:
                         "<button class=\"search-trigger\" @click=\"$emit('search', { search: 'Mobile' })\">Search</button>",
                 },
-                Pagination: { template: '<div class="pagination-stub"></div>' },
+                Pagination: {
+                    props: ["meta"],
+                    template: '<div class="pagination-stub">{{ meta?.current_page }} / {{ meta?.last_page }}</div>',
+                },
                 Alert: { template: '<div class="alert-stub"></div>' },
                 EmptyState: { template: '<div class="empty-state-stub"></div>' },
                 RouterLink: {
@@ -147,5 +150,39 @@ describe("ProjectList smoke", () => {
         expect(searchFilterState.handleSearch).toHaveBeenCalledWith({
             search: "Mobile",
         });
+    });
+
+    it("hides empty state and pagination before the initial load completes", () => {
+        searchFilterState.fetchData.mockReturnValue(new Promise(() => {}));
+        projectStoreRefs.projects.value = [];
+        projectStoreRefs.meta.value = { current_page: undefined, last_page: undefined, per_page: undefined, total: undefined };
+
+        const wrapper = factory();
+
+        expect(wrapper.find(".empty-state-stub").exists()).toBe(false);
+        expect(wrapper.find(".pagination-stub").exists()).toBe(false);
+        expect(wrapper.text()).not.toContain("undefined");
+    });
+
+    it("shows an accurate empty state after a completed empty result", async () => {
+        projectStoreRefs.projects.value = [];
+        projectStoreRefs.meta.value = { current_page: 1, last_page: 1, per_page: 10, total: 0 };
+        const wrapper = factory();
+        await flushAsync();
+
+        expect(wrapper.find(".empty-state-stub").exists()).toBe(true);
+        expect(wrapper.find(".pagination-stub").text()).toContain("1 / 1");
+        expect(wrapper.text()).not.toContain("undefined");
+    });
+
+    it("shows populated results with metadata-backed pagination", async () => {
+        projectStoreRefs.projects.value = [{ id: 3, name: "Mobile Revamp" }];
+        projectStoreRefs.meta.value = { current_page: 2, last_page: 4, per_page: 10, total: 40 };
+        const wrapper = factory();
+        await flushAsync();
+
+        expect(wrapper.text()).toContain("Mobile Revamp");
+        expect(wrapper.find(".empty-state-stub").exists()).toBe(false);
+        expect(wrapper.find(".pagination-stub").text()).toContain("2 / 4");
     });
 });

@@ -10,10 +10,11 @@ import { Upload, UserPlus } from "lucide-vue-next";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import { can } from "@/helpers/permissionHelper";
 import Alert from "@/components/common/Alert.vue";
+import EmptyState from "@/components/common/EmptyState.vue";
 import { useSearchFilter } from "@/composables/useSearchFilter";
 
 const staffMemberStore = useStaffMemberStore();
-const { staffMembers: employees, meta, loading, success } = storeToRefs(staffMemberStore);
+const { staffMembers: employees, meta, loading, error, success } = storeToRefs(staffMemberStore);
 
 const optionStore = useOptionStore();
 const { employmentTypes, jobStatuses } = storeToRefs(optionStore);
@@ -88,9 +89,21 @@ onMounted(async () => {
 
         <!-- Employee Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 mb-6">
-            <CardList v-for="employee in employees" :key="employee.id" :data="employee" />
+            <div v-if="loading" class="col-span-full py-8 text-center text-brand-light" role="status">
+                Loading staff members…
+            </div>
+            <div v-else-if="error" class="col-span-full">
+                <Alert type="danger" title="Unable to load staff members" :message="error" :show="true" />
+                <button type="button" class="btn-secondary" @click="fetchData">Retry</button>
+            </div>
+            <EmptyState
+                v-else-if="employees.length === 0"
+                icon="Users"
+                title="No staff members found"
+                subtitle="Try adjusting your search or filters."
+            />
+            <CardList v-else v-for="employee in employees" :key="employee.id" :data="employee" />
         </div>
-
         <!-- Pagination -->
         <Pagination
             :meta="meta"

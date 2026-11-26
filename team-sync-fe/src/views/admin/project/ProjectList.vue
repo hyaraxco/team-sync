@@ -5,7 +5,7 @@ import SearchFilter from "@/components/common/SearchFilter.vue";
 import { useProjectStore } from "@/stores/project";
 import { storeToRefs } from "pinia";
 import { Upload, Plus, Briefcase } from "lucide-vue-next";
-import { onMounted } from "vue";
+import { onMounted, ref } from "vue";
 import Pagination from "@/components/admin/team/Pagination.vue";
 import { can } from "@/helpers/permissionHelper";
 import Alert from "@/components/common/Alert.vue";
@@ -14,6 +14,17 @@ import EmptyState from "@/components/common/EmptyState.vue";
 
 const projectStore = useProjectStore();
 const { projects, meta, loading, success } = storeToRefs(projectStore);
+const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
+    defaultFilters: { search: null, status: "" },
+    fetchFn: projectStore.fetchProjectsPaginated,
+});
+
+const hasLoaded = ref(false);
+
+onMounted(async () => {
+    await fetchData();
+    hasLoaded.value = true;
+});
 
 const projectStatuses = [
     { value: "draft", label: "Draft" },
@@ -24,14 +35,6 @@ const projectStatuses = [
     { value: "cancelled", label: "Cancelled" },
 ];
 
-const { filters, fetchData, handleSearch, handleReset, handlePageChange, handlePerPageChange } = useSearchFilter({
-    defaultFilters: { search: null, status: "" },
-    fetchFn: projectStore.fetchProjectsPaginated,
-});
-
-onMounted(async () => {
-    await fetchData();
-});
 </script>
 
 <template>
@@ -90,7 +93,7 @@ onMounted(async () => {
         </div>
 
         <EmptyState
-            v-if="projects.length === 0"
+            v-if="hasLoaded && !loading && projects.length === 0"
             icon="SearchX"
             title="Belum ada proyek"
             subtitle="Coba ubah kata kunci atau filter pencarian"
@@ -99,6 +102,7 @@ onMounted(async () => {
     </div>
 
     <Pagination
+        v-if="hasLoaded && meta?.current_page != null && meta?.last_page != null && meta?.per_page != null && meta?.total != null"
         :meta="meta"
         :loading="loading"
         @page-change="handlePageChange"

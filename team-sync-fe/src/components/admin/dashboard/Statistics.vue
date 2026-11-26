@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted, computed } from "vue";
-import { StarIcon } from "lucide-vue-next";
 import QuickActions from "./QuickActions.vue";
 import StatsCard from "@/components/common/StatsCard.vue";
 import MainCard from "@/components/common/MainCard.vue";
@@ -39,18 +38,7 @@ const loading = computed(() => dashboardStore.loading);
             :trendLabel="`+${employees.added_this_month} this month`"
             :isTrendUp="employees.added_this_month >= 0"
             :loading="loading"
-        >
-            <template #footer>
-                <div class="flex items-center gap-1">
-                    <div class="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
-                    <span class="text-brand-white-70 text-xs font-normal">Active Status</span>
-                </div>
-                <div class="flex items-center gap-1">
-                    <StarIcon class="w-3 h-3 text-white opacity-70" />
-                    <span class="text-brand-white-70 text-xs font-normal">Top Performers</span>
-                </div>
-            </template>
-        </MainCard>
+        />
 
         <!-- Row 1 Stats Cards -->
         <!-- Total Teams -->

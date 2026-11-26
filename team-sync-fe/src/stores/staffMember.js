@@ -52,6 +52,7 @@ export const useStaffMemberStore = defineStore("staffMember", {
 
         async fetchStaffMembersPaginated(params) {
             this.loading = true;
+            this.error = null;
 
             try {
                 const response = await axiosInstance.get("/staff-members/all/paginated", { params });
