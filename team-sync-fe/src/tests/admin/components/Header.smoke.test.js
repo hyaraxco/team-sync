@@ -243,6 +243,19 @@ describe("Header smoke", () => {
         expect(factory().get('[data-testid="page-title"]').text()).toContain("My Attendance");
     });
 
+    it.each(["constructor", "toString", "__proto__", "hasOwnProperty"])(
+        "ignores the inherited object key %s in the tab query",
+        (tab) => {
+            routeState.name = "staffMember.attendance.my-attendances";
+            routeState.query = { tab };
+
+            const wrapper = factory();
+
+            expect(wrapper.get('[data-testid="page-title"]').text()).toContain("My Attendance");
+            expect(wrapper.text()).toContain("Attendance, permissions, and leave summary.");
+        },
+    );
+
     it("uses the clock subtitle on the post-redirect clock route", () => {
         routeState.name = "staffMember.attendance.my-attendances";
         routeState.query = { action: "clock" };
@@ -251,6 +264,16 @@ describe("Header smoke", () => {
 
         expect(wrapper.get('[data-testid="page-title"]').text()).toContain("My Attendance");
         expect(wrapper.text()).toContain("clock logs");
+    });
+
+    it("ignores an inherited object key in the action query", () => {
+        routeState.name = "staffMember.attendance.my-attendances";
+        routeState.query = { action: "constructor" };
+
+        const wrapper = factory();
+
+        expect(wrapper.get('[data-testid="page-title"]').text()).toContain("My Attendance");
+        expect(wrapper.text()).toContain("Attendance, permissions, and leave summary.");
     });
 
     it("closes dropdown after profile link click", async () => {

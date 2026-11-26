@@ -329,8 +329,13 @@ const attendanceActionTitles = {
 const pageInfo = computed(() => {
     const name = route.name?.toString() || "";
     const isAttendance = name === "staffMember.attendance.my-attendances";
+    const tab = route.query?.tab;
+    const action = route.query?.action;
+    // Query values come from the URL, so an inherited key such as "constructor"
+    // must not resolve as a title.
     const queryTitle = isAttendance
-        ? attendanceTabTitles[route.query?.tab] || attendanceActionTitles[route.query?.action]
+        ? (Object.hasOwn(attendanceTabTitles, tab) && attendanceTabTitles[tab]) ||
+          (Object.hasOwn(attendanceActionTitles, action) && attendanceActionTitles[action])
         : null;
 
     return queryTitle || titles[name] || titles["admin.dashboard"];
