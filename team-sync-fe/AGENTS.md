@@ -181,9 +181,9 @@ Dashboard and analytics use permission-based branching:
 bun install                    # Install dependencies
 bun run dev                    # Vite dev server
 bun run build                  # Production build
-bun run test                   # Vitest unit/integration tests (981 tests)
-bun run e2e                    # Playwright E2E tests (109 tests)
-bun run e2e:prepare:be         # Seed backend for E2E (without running tests)
+bun run test                   # Vitest unit/integration tests
+# The normal E2E wrapper uses the pinned `teamsync-e2e-isolated` Compose target, not the default development project. Its guard and config checks pass; the actual container/reset run has not been executed here.
+# Do not override the E2E Compose file/database to point at development or production. For no-MySQL role reset coverage, use the guarded SQLite sandbox in scripts/sandbox/README.md.
 bun run test:a11y              # Accessibility audit (runs after build in CI)
 ```
 
@@ -193,8 +193,8 @@ bun run test:a11y              # Accessibility audit (runs after build in CI)
 - **`permissionAccess.js`** is the central route guard — checks `meta.requiredPermission` or `meta.requiredAnyPermissions`
 - **`permissionHelper.js`** provides `can(permission)` and `canOneOf(permissions)` using `includes()` on string arrays from auth store
 - **Test structure mirrors view structure**: `tests/admin/payroll/` tests `views/admin/payroll/`
-- **`e2e-prepare-be.sh`** must run before E2E tests — seeds backend database
-- **E2E test accounts**: `agung@teamsync.com` (staff), `yudhis@teamsync.com` (manager), `tasyia@teamsync.com` (hr), `dwimeta@teamsync.com` (finance) — password: `teamsync`
+- **Normal E2E reset is unsafe** until `team-sync-wlk` verifies a disposable backend; role reset tests use the guarded SQLite sandbox meanwhile.
+- **Current E2E accounts**: Staff (`agung@teamsync.com`), Manager (`yudhis@teamsync.com`), HR (`tasyia@teamsync.com`), Finance (`dwimeta@teamsync.com`); Superadmin fixture is pending `team-sync-dps`.
 - **E2E runs sequentially** (1 worker) — tests may share state
 - **Dashboard.vue** uses role-branched rendering — different components per role, not just show/hide
 - **AnalyticsDashboard.vue** auto-selects default tab based on user's first available permission
