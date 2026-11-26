@@ -57,8 +57,6 @@ class PasswordResetAndEmailVerificationTest extends TestCase
         }
     }
 
-    use RefreshDatabase;
-
     public function test_forgot_password_sends_reset_link_notification(): void
     {
         Notification::fake();
