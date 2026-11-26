@@ -307,38 +307,37 @@ const titles = {
 
 // The hybrid-schedule, my-overtime and clock routes all redirect into
 // my-attendances carrying a query, so the header resolves that query rather
-// than the redirect source name.
-const attendanceTabTitles = {
-    hybrid: {
-        title: "Hybrid Schedule",
-        subtitle: "View your weekly schedule and request day-specific overrides.",
-    },
-    overtime: {
-        title: "Overtime",
-        subtitle: "Track submitted overtime hours, approvals, and rejection notes.",
-    },
-};
+// than the redirect source name. A switch also keeps URL values such as
+// "constructor" from matching an inherited property.
+const attendanceQueryInfo = (tab, action) => {
+    switch (tab) {
+        case "hybrid":
+            return {
+                title: "Hybrid Schedule",
+                subtitle: "View your weekly schedule and request day-specific overrides.",
+            };
+        case "overtime":
+            return {
+                title: "Overtime",
+                subtitle: "Track submitted overtime hours, approvals, and rejection notes.",
+            };
+        default:
+            break;
+    }
 
-const attendanceActionTitles = {
-    clock: {
-        title: "My Attendance",
-        subtitle: "Check your attendance, clock logs, and leave status.",
-    },
+    if (action === "clock") {
+        return titles["staffMember.attendance.clock"];
+    }
+
+    return null;
 };
 
 const pageInfo = computed(() => {
     const name = route.name?.toString() || "";
     const isAttendance = name === "staffMember.attendance.my-attendances";
-    const tab = route.query?.tab;
-    const action = route.query?.action;
-    // Query values come from the URL, so an inherited key such as "constructor"
-    // must not resolve as a title.
-    const queryTitle = isAttendance
-        ? (Object.hasOwn(attendanceTabTitles, tab) && attendanceTabTitles[tab]) ||
-          (Object.hasOwn(attendanceActionTitles, action) && attendanceActionTitles[action])
-        : null;
+    const queryInfo = isAttendance ? attendanceQueryInfo(route.query?.tab, route.query?.action) : null;
 
-    return queryTitle || titles[name] || titles["admin.dashboard"];
+    return queryInfo || titles[name] || titles["admin.dashboard"];
 });
 
 const pageTitle = computed(() => pageInfo.value.title);
