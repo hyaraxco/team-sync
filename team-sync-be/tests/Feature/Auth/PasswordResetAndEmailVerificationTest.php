@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Auth\Events\Verified;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
@@ -14,6 +15,48 @@ use Tests\TestCase;
 
 class PasswordResetAndEmailVerificationTest extends TestCase
 {
+    use RefreshDatabase;
+
+    protected function tearDown(): void
+    {
+        app(RateLimiter::class)->clear(sha1('|127.0.0.1'));
+
+        parent::tearDown();
+    }
+
+    public function test_authentication_routes_are_limited_to_five_attempts_per_minute(): void
+    {
+        Notification::fake();
+        $user = User::factory()->create();
+        $requests = [
+            '/api/v1/login' => ['email' => 'missing@example.com', 'password' => 'wrong'],
+            '/api/v1/forgot-password' => ['email' => $user->email],
+            '/api/v1/reset-password' => [
+                'email' => $user->email,
+                'token' => 'invalid-token',
+                'password' => 'new-password',
+                'password_confirmation' => 'new-password',
+            ],
+        ];
+
+        foreach ($requests as $path => $payload) {
+            app(RateLimiter::class)->clear(sha1('|127.0.0.1'));
+
+            for ($attempt = 0; $attempt < 5; $attempt++) {
+                $response = $this->postJson($path, $payload);
+                $allowedStatuses = match ($path) {
+                    '/api/v1/login' => [401],
+                    '/api/v1/forgot-password' => [200, 422],
+                    default => [422],
+                };
+
+                $this->assertContains($response->status(), $allowedStatuses);
+            }
+
+            $this->postJson($path, $payload)->assertStatus(429);
+        }
+    }
+
     use RefreshDatabase;
 
     public function test_forgot_password_sends_reset_link_notification(): void
