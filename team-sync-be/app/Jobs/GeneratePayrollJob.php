@@ -58,6 +58,7 @@ class GeneratePayrollJob implements ShouldBeUnique, ShouldQueue
             Log::error('Payroll generation failed', [
                 'salary_month' => $this->salaryMonth,
                 'initiated_by' => $this->initiatedBy,
+                'company_id' => $this->companyId,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
             ]);

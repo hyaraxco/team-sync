@@ -303,10 +303,10 @@ class PayrollGenerateRulesTest extends TestCase
         $generationService = $this->createMock(PayrollGenerationService::class);
         $generationService->expects($this->once())
             ->method('generatePayroll')
-            ->with('2026-04', 777, null)
+            ->with('2026-04', 777, 9)
             ->willThrowException(new \RuntimeException('queue processing failed'));
 
-        $job = new GeneratePayrollJob('2026-04', 777);
+        $job = new GeneratePayrollJob('2026-04', 777, 9);
 
         try {
             $job->handle($generationService);
@@ -321,6 +321,7 @@ class PayrollGenerateRulesTest extends TestCase
                 return $message === 'Payroll generation failed'
                     && ($context['salary_month'] ?? null) === '2026-04'
                     && ($context['initiated_by'] ?? null) === 777
+                    && ($context['company_id'] ?? null) === 9
                     && ($context['error'] ?? null) === 'queue processing failed'
                     && is_string($context['trace'] ?? null)
                     && ($context['trace'] ?? '') !== '';
