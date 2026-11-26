@@ -193,8 +193,8 @@ bun run test:a11y              # Accessibility audit (runs after build in CI)
 - **`permissionAccess.js`** is the central route guard — checks `meta.requiredPermission` or `meta.requiredAnyPermissions`
 - **`permissionHelper.js`** provides `can(permission)` and `canOneOf(permissions)` using `includes()` on string arrays from auth store
 - **Test structure mirrors view structure**: `tests/admin/payroll/` tests `views/admin/payroll/`
-- **Normal E2E reset is unsafe** until `team-sync-wlk` verifies a disposable backend; role reset tests use the guarded SQLite sandbox meanwhile.
-- **Current E2E accounts**: Staff (`agung@teamsync.com`), Manager (`yudhis@teamsync.com`), HR (`tasyia@teamsync.com`), Finance (`dwimeta@teamsync.com`); Superadmin fixture is pending `team-sync-dps`.
+- **Normal E2E reset is guarded** by `team-sync-be/scripts/e2e-prepare-be-guard.sh`, which fails closed unless a dedicated E2E Compose target is selected; role reset tests also run in the guarded SQLite sandbox.
+- **Current E2E accounts**: Staff (`agung@teamsync.com`), Manager (`yudhis@teamsync.com`), HR (`tasyia@teamsync.com`), Finance (`dwimeta@teamsync.com`), Superadmin (`superadmin@teamsync.com`, E2E-only `E2ESuperadminSeeder`).
 - **E2E runs sequentially** (1 worker) — tests may share state
 - **Dashboard.vue** uses role-branched rendering — different components per role, not just show/hide
 - **AnalyticsDashboard.vue** auto-selects default tab based on user's first available permission
