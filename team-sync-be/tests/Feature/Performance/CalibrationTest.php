@@ -6,10 +6,13 @@ use App\Models\PerformanceReviewResponse;
 use App\Models\PerformanceReviewSection;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
+use App\Repositories\PerformanceReviewRepository;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Event;
 use Laravel\Sanctum\Sanctum;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\Concerns\ActivatesLicense;
 use Tests\TestCase;
 
@@ -265,4 +268,88 @@ it('non-hr user cannot access pending-calibration endpoint', function () {
     $response = $this->getJson('/api/v1/performance/reviews/pending-calibration');
 
     $response->assertForbidden();
+});
+it('rejects assessment replays without changing saved responses', function () {
+    $repository = app(PerformanceReviewRepository::class);
+    $section = PerformanceReviewSection::create(['name' => 'Replay', 'weight' => 100, 'order' => 1, 'is_active' => true]);
+
+    $selfReview = createReviewForCalibration(null, 'pending_manager');
+    $selfResponse = PerformanceReviewResponse::create([
+        'review_id' => $selfReview->id,
+        'section_id' => $section->id,
+        'self_rating' => 2,
+    ]);
+
+    $managerReview = createReviewForCalibration(null, 'pending_calibration');
+    $managerResponse = PerformanceReviewResponse::create([
+        'review_id' => $managerReview->id,
+        'section_id' => $section->id,
+        'manager_rating' => 2,
+    ]);
+
+    $completedReview = createReviewForCalibration(null, 'completed');
+    $finalResponse = PerformanceReviewResponse::create([
+        'review_id' => $completedReview->id,
+        'section_id' => $section->id,
+        'final_rating' => 2,
+    ]);
+
+    $assertRejected = function (callable $operation) {
+        try {
+            $operation();
+            $this->fail('Expected the review lifecycle guard to reject the replay.');
+        } catch (HttpException $exception) {
+            $this->assertSame(422, $exception->getStatusCode());
+        }
+    };
+
+    $assertRejected(fn () => $repository->submitSelfAssessment($selfReview->id, [
+        ['section_id' => $section->id, 'rating' => 5],
+    ], []));
+    $assertRejected(fn () => $repository->submitManagerAssessment($managerReview->id, [
+        ['section_id' => $section->id, 'rating' => 5],
+    ], []));
+    $assertRejected(fn () => $repository->calibrateReview($completedReview->id, [
+        ['section_id' => $section->id, 'rating' => 5],
+    ], []));
+
+    $this->assertSame(2, $selfResponse->fresh()->self_rating);
+    $this->assertSame(2, $managerResponse->fresh()->manager_rating);
+    $this->assertSame(2, $finalResponse->fresh()->final_rating);
+    $this->assertSame('pending_manager', $selfReview->fresh()->status);
+    $this->assertSame('pending_calibration', $managerReview->fresh()->status);
+    $this->assertSame('completed', $completedReview->fresh()->status);
+});
+
+it('rolls back earlier response writes when a later response write fails', function () {
+    $review = createReviewForCalibration(null, 'pending_self');
+    $section1 = PerformanceReviewSection::create(['name' => 'First', 'weight' => 50, 'order' => 1, 'is_active' => true]);
+    $section2 = PerformanceReviewSection::create(['name' => 'Second', 'weight' => 50, 'order' => 2, 'is_active' => true]);
+    $event = 'eloquent.saving: '.PerformanceReviewResponse::class;
+
+    Event::listen($event, function (PerformanceReviewResponse $response) use ($section2) {
+        if ($response->section_id === $section2->id) {
+            throw new RuntimeException('Simulated response write failure');
+        }
+    });
+
+    try {
+        try {
+            app(PerformanceReviewRepository::class)->submitSelfAssessment($review->id, [
+                ['section_id' => $section1->id, 'rating' => 4],
+                ['section_id' => $section2->id, 'rating' => 3],
+            ], []);
+            $this->fail('Expected the simulated response write failure.');
+        } catch (RuntimeException $exception) {
+            $this->assertSame('Simulated response write failure', $exception->getMessage());
+        }
+    } finally {
+        Event::forget($event);
+    }
+
+    $this->assertDatabaseMissing('performance_review_responses', [
+        'review_id' => $review->id,
+        'section_id' => $section1->id,
+    ]);
+    $this->assertSame('pending_self', $review->fresh()->status);
 });

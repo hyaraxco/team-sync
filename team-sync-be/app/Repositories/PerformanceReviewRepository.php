@@ -251,65 +251,69 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
 
     public function submitSelfAssessment(int $reviewId, array $responses, array $data)
     {
-        $review = $this->getReviewById($reviewId);
+        return DB::transaction(function () use ($reviewId, $responses) {
+            $review = $this->lockReviewForStatus($reviewId, 'pending_self');
 
-        foreach ($responses as $response) {
-            PerformanceReviewResponse::updateOrCreate(
-                ['review_id' => $reviewId, 'section_id' => $response['section_id']],
-                [
-                    'self_rating' => $response['rating'],
-                    'self_comments' => $response['comments'] ?? null,
-                ]
-            );
-        }
+            foreach ($responses as $response) {
+                PerformanceReviewResponse::updateOrCreate(
+                    ['review_id' => $reviewId, 'section_id' => $response['section_id']],
+                    [
+                        'self_rating' => $response['rating'],
+                        'self_comments' => $response['comments'] ?? null,
+                    ]
+                );
+            }
 
-        $review->update([
-            'status' => 'pending_manager',
-            'self_assessment_submitted_at' => now(),
-        ]);
+            $review->update([
+                'status' => 'pending_manager',
+                'self_assessment_submitted_at' => now(),
+            ]);
 
-        return $review;
+            return $review;
+        });
     }
 
     public function submitManagerAssessment(int $reviewId, array $responses, array $data)
     {
-        $review = $this->getReviewById($reviewId);
+        return DB::transaction(function () use ($reviewId, $responses) {
+            $review = $this->lockReviewForStatus($reviewId, 'pending_manager');
 
-        foreach ($responses as $response) {
-            PerformanceReviewResponse::updateOrCreate(
-                ['review_id' => $reviewId, 'section_id' => $response['section_id']],
-                [
-                    'manager_rating' => $response['rating'],
-                    'manager_comments' => $response['comments'] ?? null,
-                ]
-            );
-        }
+            foreach ($responses as $response) {
+                PerformanceReviewResponse::updateOrCreate(
+                    ['review_id' => $reviewId, 'section_id' => $response['section_id']],
+                    [
+                        'manager_rating' => $response['rating'],
+                        'manager_comments' => $response['comments'] ?? null,
+                    ]
+                );
+            }
 
-        $managerRating = PerformanceRatingHelper::calculateManagerRating($reviewId);
-        $calculated = PerformanceRatingHelper::calculateFinalRating($reviewId);
+            $managerRating = PerformanceRatingHelper::calculateManagerRating($reviewId);
+            $calculated = PerformanceRatingHelper::calculateFinalRating($reviewId);
 
-        $review->update([
-            'status' => 'pending_calibration',
-            'manager_assessment_submitted_at' => now(),
-            'manager_recommended_rating' => $managerRating,
-            'final_rating' => $calculated['final_rating'],
-            'final_rating_label' => $calculated['final_rating_label'],
-        ]);
+            $review->update([
+                'status' => 'pending_calibration',
+                'manager_assessment_submitted_at' => now(),
+                'manager_recommended_rating' => $managerRating,
+                'final_rating' => $calculated['final_rating'],
+                'final_rating_label' => $calculated['final_rating_label'],
+            ]);
 
-        return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator']);
+            return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator']);
+        });
     }
 
     public function calibrateReview(int $reviewId, array $responses, array $data)
     {
-        $review = $this->getReviewById($reviewId);
+        return DB::transaction(function () use ($reviewId, $responses) {
+            $review = $this->lockReviewForStatus($reviewId, 'pending_calibration');
 
-        $authUser = Auth::user();
-        $currentStaffId = $authUser?->staffMemberProfile?->id;
-        if ($currentStaffId && $review->staff_member_id == $currentStaffId) {
-            abort(403, 'Cannot calibrate your own review');
-        }
+            $authUser = Auth::user();
+            $currentStaffId = $authUser?->staffMemberProfile?->id;
+            if ($currentStaffId && $review->staff_member_id == $currentStaffId) {
+                abort(403, 'Cannot calibrate your own review');
+            }
 
-        if (! empty($responses)) {
             foreach ($responses as $response) {
                 PerformanceReviewResponse::updateOrCreate(
                     ['review_id' => $reviewId, 'section_id' => $response['section_id']],
@@ -318,23 +322,32 @@ class PerformanceReviewRepository implements PerformanceReviewRepositoryInterfac
                     ]
                 );
             }
+
+            $calculated = PerformanceRatingHelper::calculateFinalRating($reviewId);
+
+            $review->update([
+                'status' => 'completed',
+                'calibrated_at' => now(),
+                'calibrated_by' => $authUser?->id,
+                'final_rating' => $calculated['final_rating'],
+                'final_rating_label' => $calculated['final_rating_label'],
+                'completed_at' => now(),
+            ]);
+
+            $review = app(PerformanceOutcomeService::class)->applyOutcome($review);
+
+            return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator', 'outcomeRule']);
+        });
+    }
+
+    private function lockReviewForStatus(int $reviewId, string $expectedStatus): PerformanceReview
+    {
+        $review = PerformanceReview::whereKey($reviewId)->lockForUpdate()->firstOrFail();
+        if ($review->status !== $expectedStatus) {
+            abort(422, "Review must be in {$expectedStatus} status to continue");
         }
 
-        $calculated = PerformanceRatingHelper::calculateFinalRating($reviewId);
-
-        $review->update([
-            'status' => 'completed',
-            'calibrated_at' => now(),
-            'calibrated_by' => $authUser?->id,
-            'final_rating' => $calculated['final_rating'],
-            'final_rating_label' => $calculated['final_rating_label'],
-            'completed_at' => now(),
-        ]);
-
-        $outcomeService = app(PerformanceOutcomeService::class);
-        $review = $outcomeService->applyOutcome($review);
-
-        return $review->fresh()->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator', 'outcomeRule']);
+        return $review->load(['cycle', 'staffMember.user', 'reviewer.user', 'responses.section', 'calibrator']);
     }
 
     public function getReviewsPendingCalibration(array $filters = []): LengthAwarePaginator
