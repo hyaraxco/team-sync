@@ -29,6 +29,7 @@ class ProjectResource extends JsonResource
         }
 
         $user = $request->user();
+        $seesCommercials = $this->seesCommercials($user);
 
         return [
             'id' => $this->id,
@@ -40,10 +41,10 @@ class ProjectResource extends JsonResource
             'end_date' => $this->end_date,
             'description' => $this->description,
             'photo' => $this->photo ? asset('storage/'.$this->photo) : null,
-            'budget' => (float) (string) $this->budget,
-            // Client identity is commercial context: managers and HR only.
-            'client_name' => $this->when($user?->can('project-statistic'), $this->client_name),
-            'client_contact' => $this->when($user?->can('project-statistic'), $this->client_contact),
+            // Money and client identity are commercial context, not work context.
+            'budget' => $this->when($seesCommercials, (float) (string) $this->budget),
+            'client_name' => $this->when($seesCommercials, $this->client_name),
+            'client_contact' => $this->when($seesCommercials, $this->client_contact),
             'progress' => $progress,
             'leader' => new StaffMemberProfileResource($this->projectLeader),
             'teams' => TeamResource::collection($this->whenLoaded('teams')),
@@ -52,6 +53,20 @@ class ProjectResource extends JsonResource
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
+    }
+
+    /**
+     * Budget and client identity share one audience: project-statistic holders
+     * plus the project leader, who needs the client context to run delivery.
+     * Staff see the work (tasks, teams, dates) but never the money or client.
+     */
+    private function seesCommercials(?User $user): bool
+    {
+        if (! $user) {
+            return false;
+        }
+
+        return $user->can('project-statistic') || $this->resolveIsProjectLeader($user);
     }
 
     private function resolveIsProjectLeader(?User $user): bool

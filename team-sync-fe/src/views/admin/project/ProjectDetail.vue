@@ -60,6 +60,10 @@ const squadSummary = ref(null);
 const squadSummaryLoading = ref(false);
 
 const canViewProjectStats = computed(() => can("project-statistic") || !!project.value?.is_project_leader);
+// Budget and client are hidden for staff; the server omits the fields entirely.
+const canViewProjectCommercials = computed(
+    () => can("project-statistic") || !!project.value?.is_project_leader,
+);
 const canDeleteProject = computed(() => can("project-delete"));
 const canEditProject = computed(() => can("project-edit"));
 const canViewStaffMemberDetail = computed(() => can("staff-member-list"));
@@ -476,7 +480,7 @@ onMounted(async () => {
 
             <!-- Budget Card -->
             <div
-                v-if="canViewProjectStats"
+                v-if="canViewProjectCommercials"
                 class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
@@ -494,7 +498,7 @@ onMounted(async () => {
 
             <!-- Client Card: same audience as Budget, commercial context -->
             <div
-                v-if="canViewProjectStats && project.client_name"
+                v-if="canViewProjectCommercials && project.client_name"
                 class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between">
