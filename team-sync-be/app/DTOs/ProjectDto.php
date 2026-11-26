@@ -16,6 +16,8 @@ class ProjectDto
         public readonly ?string $description = null,
         public readonly ?string $photo = null,
         public readonly ?float $budget = null,
+        public readonly ?string $client_name = null,
+        public readonly ?string $client_contact = null,
         public readonly ?int $project_leader_id = null,
     ) {}
 
@@ -31,6 +33,8 @@ class ProjectDto
             'description' => $this->description,
             'photo' => $this->photo,
             'budget' => $this->budget,
+            'client_name' => $this->client_name,
+            'client_contact' => $this->client_contact,
             'project_leader_id' => $this->project_leader_id,
         ];
     }
@@ -47,6 +51,8 @@ class ProjectDto
             description: $data['description'] ?? null,
             photo: $data['photo'] ?? null,
             budget: isset($data['budget']) ? (float) $data['budget'] : null,
+            client_name: $data['client_name'] ?? null,
+            client_contact: $data['client_contact'] ?? null,
             project_leader_id: $data['project_leader_id'] ?? null,
         );
     }
@@ -63,6 +69,8 @@ class ProjectDto
             description: $data['description'] ?? $existingProject->description,
             photo: $data['photo'] ?? $existingProject->photo,
             budget: isset($data['budget']) ? (float) $data['budget'] : $existingProject->budget,
+            client_name: $data['client_name'] ?? $existingProject->client_name,
+            client_contact: $data['client_contact'] ?? $existingProject->client_contact,
             project_leader_id: $data['project_leader_id'] ?? $existingProject->project_leader_id,
         );
     }

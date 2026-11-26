@@ -26,6 +26,8 @@ import {
     Flag,
     Zap,
     Search,
+    Building2,
+    Phone,
 } from "lucide-vue-next";
 import { onMounted, ref, watch } from "vue";
 import { debounce } from "lodash";
@@ -64,6 +66,8 @@ const form = ref({
     photo: "",
     photo_url: "",
     budget: "",
+    client_name: "",
+    client_contact: "",
     project_leader_id: "",
     teams: [],
 });
@@ -643,6 +647,39 @@ watch(
                                 :error="error?.budget?.join(', ')"
                             >
                                 <template #icon>Rp</template>
+                            </Input>
+                        </div>
+
+                        <!-- Client -->
+                        <div class="mb-4">
+                            <Input
+                                id="client_name"
+                                name="client_name"
+                                type="text"
+                                v-model="form.client_name"
+                                label="Client Name"
+                                placeholder="LP3ES"
+                                :error="error?.client_name?.join(', ')"
+                            >
+                                <template #icon>
+                                    <Building2 class="h-5 w-5 text-gray-400" />
+                                </template>
+                            </Input>
+                        </div>
+
+                        <div class="mb-4">
+                            <Input
+                                id="client_contact"
+                                name="client_contact"
+                                type="text"
+                                v-model="form.client_contact"
+                                label="Client Contact"
+                                placeholder="Nama PIC / email / telepon"
+                                :error="error?.client_contact?.join(', ')"
+                            >
+                                <template #icon>
+                                    <Phone class="h-5 w-5 text-gray-400" />
+                                </template>
                             </Input>
                         </div>
 
