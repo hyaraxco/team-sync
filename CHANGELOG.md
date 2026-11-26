@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Fixed
+- Assign `company_id` on user and staff-profile creation (factory, seeder, API create, and first-boot setup) so tenant scoping and company timezone reads stop silently falling back to `Asia/Jakarta`. Profiles inherit their user's company, the E2E seed path now seeds the company, and first boot creates one (`team-sync-rmh`).
 - Aggregate payroll/THR taxable income by recognition period, include taxable employer BPJS benefits, preserve distinct cash/BPJS bases, and persist consistent tax/net outputs (`team-sync-62b`).
 - Reconcile final-period PPh 21 against explicit actual history, carry employee refunds and deadlines, and reject missing or overlapping history instead of inferring withholding from paid status (`team-sync-d9d`).
 - Bind payroll approvals to current revisions, amounts and policies; preserve superseded decisions and require reapproval after tax/payment-context changes (`team-sync-v93`).

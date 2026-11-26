@@ -4,6 +4,7 @@ namespace Tests\Feature\Payroll;
 
 use App\Interfaces\PayrollRepositoryInterface;
 use App\Models\Attendance;
+use App\Models\Company;
 use App\Models\StaffMemberProfile;
 use App\Models\User;
 use Carbon\Carbon;
@@ -38,6 +39,8 @@ class MinimalPayrollE2ESeederTest extends TestCase
         $manager = User::where('email', 'yudhis@teamsync.com')->firstOrFail();
         $employee = StaffMemberProfile::where('code', 'EMP001')->firstOrFail();
         $payrollMonth = now()->startOfMonth();
+
+        $this->assertSame(Company::current()->id, $employee->company_id);
 
         // PRD: Finance owns payroll operations; HR has readiness-view only
         $this->assertFalse($hr->hasPermissionTo('payroll-create', 'sanctum'));

@@ -39,6 +39,17 @@ class User extends Authenticatable implements MustVerifyEmail
         'remember_token',
     ];
 
+    protected static function booted(): void
+    {
+        // Tenant scoping and timezone fallbacks read company_id, so a created
+        // user joins the current company unless a caller set it explicitly.
+        static::creating(function (self $user) {
+            if (! array_key_exists('company_id', $user->getAttributes())) {
+                $user->company_id = Company::current()?->id;
+            }
+        });
+    }
+
     /**
      * Get the attributes that should be cast.
      *

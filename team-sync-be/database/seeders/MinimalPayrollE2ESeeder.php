@@ -24,6 +24,7 @@ class MinimalPayrollE2ESeeder extends Seeder
     {
         StaffMemberProfile::withoutSyncingToSearch(function () {
             $this->call([
+                CompanySeeder::class,
                 PermissionSeeder::class,
                 RoleSeeder::class,
                 RolePermissionSeeder::class,

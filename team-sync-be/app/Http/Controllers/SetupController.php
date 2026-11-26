@@ -8,6 +8,7 @@ use App\Models\Company;
 use App\Models\License;
 use App\Models\User;
 use App\Services\LicenseService;
+use Database\Seeders\CompanySeeder;
 use Database\Seeders\PermissionSeeder;
 use Database\Seeders\RolePermissionSeeder;
 use Database\Seeders\RoleSeeder;
@@ -131,6 +132,7 @@ class SetupController extends Controller
             DB::beginTransaction();
 
             // Ensure roles and permissions are seeded
+            Artisan::call('db:seed', ['--class' => CompanySeeder::class, '--force' => true]);
             Artisan::call('db:seed', ['--class' => RoleSeeder::class, '--force' => true]);
             Artisan::call('db:seed', ['--class' => PermissionSeeder::class, '--force' => true]);
             Artisan::call('db:seed', ['--class' => RolePermissionSeeder::class, '--force' => true]);

@@ -95,6 +95,7 @@ class SetupControllerTest extends TestCase
 
         $user = User::where('email', 'admin@teamsync.local')->first();
         $this->assertTrue($user->hasRole('superadmin'));
+        $this->assertSame(Company::current()->id, $user->company_id);
     }
 
     public function test_bootstrap_rejects_duplicate_setup(): void
