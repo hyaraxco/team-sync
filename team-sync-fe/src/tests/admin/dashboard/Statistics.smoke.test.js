@@ -25,6 +25,13 @@ const StatsCardStub = {
     template: `<div :data-title="title" :data-value="String(value)" :data-scheme="colorScheme" :data-icon="iconName"><slot /></div>`,
 };
 
+const MainCardStub = {
+    name: "MainCard",
+    props: ["title", "value", "subtitle"],
+    template: `<div :data-title="title" :data-value="String(value)">{{ subtitle }}<slot /></div>`,
+};
+
+
 import Statistics from "@/components/admin/dashboard/Statistics.vue";
 
 const factory = (statsOverride = {}, loading = false) => {
@@ -40,7 +47,8 @@ const factory = (statsOverride = {}, loading = false) => {
         global: {
             stubs: {
                 StatsCard: StatsCardStub,
-                MainCard: true,
+                MainCard: MainCardStub,
+
                 QuickActions: true,
             },
         },
@@ -57,6 +65,16 @@ describe("Statistics.vue — Sprint 5 performance widgets", () => {
         };
         mockLoading = false;
     });
+    it("keeps the employee total without unsupported status or performer claims", () => {
+        const wrapper = factory();
+        const employeeCard = wrapper.find('[data-title="Our Employees"]');
+
+        expect(employeeCard.attributes("data-value")).toBe("10");
+        expect(wrapper.text()).not.toContain("Active Status");
+        expect(wrapper.text()).not.toContain("Top Performers");
+        expect(wrapper.find(".animate-pulse").exists()).toBe(false);
+    });
+
 
     it('renders "Promotion Eligible" card with purple colorScheme and TrendingUpIcon', () => {
         const wrapper = factory({ performance: { promotion_eligible: 3, pip_required: 1 } });
