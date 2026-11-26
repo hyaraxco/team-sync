@@ -305,9 +305,35 @@ const titles = {
     },
 };
 
+// The hybrid-schedule, my-overtime and clock routes all redirect into
+// my-attendances carrying a query, so the header resolves that query rather
+// than the redirect source name.
+const attendanceTabTitles = {
+    hybrid: {
+        title: "Hybrid Schedule",
+        subtitle: "View your weekly schedule and request day-specific overrides.",
+    },
+    overtime: {
+        title: "Overtime",
+        subtitle: "Track submitted overtime hours, approvals, and rejection notes.",
+    },
+};
+
+const attendanceActionTitles = {
+    clock: {
+        title: "My Attendance",
+        subtitle: "Check your attendance, clock logs, and leave status.",
+    },
+};
+
 const pageInfo = computed(() => {
     const name = route.name?.toString() || "";
-    return titles[name] || titles["admin.dashboard"];
+    const isAttendance = name === "staffMember.attendance.my-attendances";
+    const queryTitle = isAttendance
+        ? attendanceTabTitles[route.query?.tab] || attendanceActionTitles[route.query?.action]
+        : null;
+
+    return queryTitle || titles[name] || titles["admin.dashboard"];
 });
 
 const pageTitle = computed(() => pageInfo.value.title);
