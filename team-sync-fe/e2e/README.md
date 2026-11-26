@@ -14,7 +14,7 @@ were removed during cleanup; do not commit page/API dumps as passing tests.
 - Node.js `^20.19.0 || >=22.12.0` (see `package.json`; `.nvmrc` selects the local version)
 - Bun package manager
 - Backend at `http://127.0.0.1:8000` using a verified disposable test database only
-- Seeded E2E role accounts; Superadmin is pending `team-sync-dps`
+- Seeded E2E role accounts for Staff, Manager, HR, Finance and Superadmin
 
 ## Setup
 
@@ -47,7 +47,7 @@ Source-backed permissions and endpoint boundaries are tracked in [the RBAC route
 
 ## Current normal-fixture accounts
 
-Each listed account belongs to the normal E2E seed. The current seed does not create a Superadmin account. Passwords are local test values and must not be reused in production.
+Each listed account belongs to the normal E2E seed. Passwords are local test values and must not be reused in production.
 
 | RBAC role | Employee account |
 |---|---|
@@ -55,7 +55,11 @@ Each listed account belongs to the normal E2E seed. The current seed does not cr
 | Manager | `yudhis@teamsync.com` |
 | HR | `tasyia@teamsync.com` |
 | Finance | `dwimeta@teamsync.com` |
-| Superadmin | Not seeded yet. Tracked by `team-sync-dps`. |
+| Superadmin | `superadmin@teamsync.com` |
+
+The Superadmin account comes from `E2ESuperadminSeeder` (`database/seeders/E2E/`), an E2E-only fixture that runs after `RolePermissionSeeder` and is called by both `MinimalPayrollE2ESeeder` (normal E2E setup) and `SandboxRoleSeeder` (guarded SQLite sandbox). It holds employee profile `SUP001` and explicitly assigns only the `superadmin` RBAC role. It is not registered in `DatabaseSeeder`, `DemoDataSeeder` or any production/demo path, and the 11 `MobileDevelopmentDummySeeder` accounts stay Staff-only.
+
+The guarded SQLite sandbox (`scripts/sandbox/run.sh <image> --phase roles`) builds the same five accounts from scratch in `/scratch` and refuses non-empty or non-scratch databases. Its database reset lives behind that guard; normal E2E setup uses the pinned `teamsync-e2e-isolated` Compose target.
 
 ### Environment variables
 
@@ -63,6 +67,7 @@ Each listed account belongs to the normal E2E seed. The current seed does not cr
 |----------|---------|-------------|
 | `E2E_FE_BASE_URL` | `http://127.0.0.1:4173` | Frontend URL |
 | `VITE_API_BASE_URL` | `http://127.0.0.1:8000/api/v1` | Backend API URL |
+| `E2E_SUPERADMIN_EMAIL` | `superadmin@teamsync.com` | Superadmin E2E fixture login |
 | `CI` | (unset) | Set in CI to enable retries |
 
 ## Architecture

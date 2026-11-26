@@ -19,6 +19,10 @@ export const roleCredentials = {
     email: process.env.E2E_EMPLOYEE_EMAIL || "agung@teamsync.com",
     password,
   },
+  superadmin: {
+    email: process.env.E2E_SUPERADMIN_EMAIL || "superadmin@teamsync.com",
+    password,
+  },
 } as const;
 
 export type RoleName = keyof typeof roleCredentials;
