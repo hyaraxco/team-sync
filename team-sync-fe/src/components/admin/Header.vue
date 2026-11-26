@@ -2,7 +2,6 @@
 import {
     BellIcon,
     ChevronDownIcon,
-    MessageCircleIcon,
     UserIcon,
     LogOutIcon,
     MenuIcon,
@@ -532,13 +531,6 @@ onUnmounted(() => {
                             @close="isNotificationPanelOpen = false"
                         />
                     </div>
-                    <button
-                        type="button"
-                        aria-label="Messages"
-                        class="hidden sm:flex w-10 h-10 rounded-full border border-brand-border items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
-                    >
-                        <MessageCircleIcon class="w-5 h-5 text-gray-600" />
-                    </button>
                 </div>
 
                 <!-- Divider -->

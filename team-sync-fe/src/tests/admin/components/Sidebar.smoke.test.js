@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { ref } from "vue";
+import { defineComponent, h, ref } from "vue";
 
 const grantedPermissions = new Set();
 const currentRoute = {
@@ -28,11 +28,18 @@ vi.mock("@/composables/useSidebar", () => ({
 
 import Sidebar from "@/components/admin/Sidebar.vue";
 
-const RouterLinkStub = {
+const RouterLinkStub = defineComponent({
     name: "RouterLink",
-    props: ["to"],
-    template: "<a><slot /></a>",
-};
+    props: ["to", "custom"],
+    setup(props, { slots }) {
+        return () => {
+            const href = typeof props.to === "string" ? props.to : `/${props.to?.name || ""}`;
+            const content = slots.default?.({ href, navigate: () => {} });
+
+            return props.custom ? content : h("a", { "data-route-name": props.to?.name }, content);
+        };
+    },
+});
 
 const factory = () =>
     mount(Sidebar, {
@@ -46,9 +53,48 @@ const factory = () =>
         },
     });
 
+const currentPersonalLinks = (wrapper) =>
+    wrapper.findAll('[data-testid="sidebar-section-personal"] a[aria-current="page"]');
+
+
 describe("Sidebar smoke", () => {
     beforeEach(() => {
+        currentRoute.name = "admin.dashboard";
         setPermissions([]);
+    });
+
+    it.each([
+        ["staffMember.attendance.my-attendances", "My Attendance"],
+        ["staffMember.attendance.clock", "My Attendance"],
+        ["staffMember.payroll", "My Payroll"],
+        ["staffMember.payroll.detail", "My Payroll"],
+        ["staffMember.profile", "My Profile"],
+        ["staffMember.profile.edit", "My Profile"],
+        ["staffMember.team", "My Team"],
+    ])("marks only %s as the current personal destination", (routeName, label) => {
+        setPermissions([
+            "dashboard-menu",
+            "attendance-my-attendances",
+            "attendance-check-in",
+            "attendance-check-out",
+            "payslip-view",
+            "profile-menu",
+            "team-view",
+        ]);
+        currentRoute.name = routeName;
+
+        const wrapper = factory();
+        const currentLinks = currentPersonalLinks(wrapper);
+
+        expect(currentLinks).toHaveLength(1);
+        expect(currentLinks[0].text()).toContain(label);
+        expect(currentLinks[0].classes()).toContain("nav-link-active");
+    });
+
+    it("does not mark a personal destination current on an unrelated route", () => {
+        setPermissions(["attendance-my-attendances", "payslip-view", "profile-menu", "team-view"]);
+
+        expect(currentPersonalLinks(factory())).toHaveLength(0);
     });
 
     it("hides payroll menu for manager-style permissions", () => {
