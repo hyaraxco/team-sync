@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
-import { ref } from "vue";
+import { reactive, ref } from "vue";
 
 const attendanceLoading = ref(false);
 const attendances = ref([]);
@@ -26,14 +26,15 @@ const fetchMyCorrections = vi.fn().mockResolvedValue(undefined);
 const requestCorrection = vi.fn().mockResolvedValue(undefined);
 const routerReplace = vi.fn().mockResolvedValue(undefined);
 
-let currentRoute = {
+const currentRoute = reactive({
     name: "staffMember.attendance.my-attendances",
     params: {},
     query: {},
     hash: "",
-};
+});
 let hasLeaveRequestPermission = false;
 let hasClockPermission = false;
+let hasAttendanceViewPermission = false;
 let mockWorkLocation = "office";
 
 vi.mock("@/stores/attendance", () => ({
@@ -116,6 +117,10 @@ vi.mock("@/helpers/permissionHelper", () => ({
             return hasClockPermission;
         }
 
+        if (permission === "attendance-my-attendances") {
+            return hasAttendanceViewPermission;
+        }
+
         return false;
     },
 }));
@@ -182,13 +187,11 @@ describe("MyAttendance smoke", () => {
         myCorrections.value = [];
         hasLeaveRequestPermission = false;
         hasClockPermission = false;
+        hasAttendanceViewPermission = false;
         mockWorkLocation = "office";
-        currentRoute = {
-            name: "staffMember.attendance.my-attendances",
-            params: {},
+        Object.assign(currentRoute, {
             query: {},
-            hash: "",
-        };
+        });
         fetchAttendances.mockClear();
         fetchStatistics.mockClear();
         fetchTodayAttendance.mockClear();
@@ -204,12 +207,9 @@ describe("MyAttendance smoke", () => {
 
     it("opens the leave request modal from the route query and clears the query", async () => {
         hasLeaveRequestPermission = true;
-        currentRoute = {
-            name: "staffMember.attendance.my-attendances",
-            params: {},
+        Object.assign(currentRoute, {
             query: { action: "request-leave", source: "dashboard" },
-            hash: "",
-        };
+        });
 
         const wrapper = factory();
         await flushPromises();
@@ -225,12 +225,9 @@ describe("MyAttendance smoke", () => {
     });
 
     it("ignores the query action when the user lacks leave permission", async () => {
-        currentRoute = {
-            name: "staffMember.attendance.my-attendances",
-            params: {},
+        Object.assign(currentRoute, {
             query: { action: "request-leave" },
-            hash: "",
-        };
+        });
 
         const wrapper = factory();
         await flushPromises();
@@ -242,12 +239,9 @@ describe("MyAttendance smoke", () => {
 
     it("opens the clock section from the route query and clears the query", async () => {
         hasClockPermission = true;
-        currentRoute = {
-            name: "staffMember.attendance.my-attendances",
-            params: {},
+        Object.assign(currentRoute, {
             query: { action: "clock", source: "dashboard" },
-            hash: "",
-        };
+        });
 
         const wrapper = factory();
         await flushPromises();
@@ -274,5 +268,60 @@ describe("MyAttendance smoke", () => {
             check_in_long: null,
             actual_work_mode: "remote",
         });
+    });
+
+    it("writes the selected tab to the URL so the header cannot disagree", async () => {
+        mockWorkLocation = "hybrid";
+        hasAttendanceViewPermission = true;
+        currentRoute.query = { tab: "hybrid" };
+
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
+
+        const overviewTab = wrapper.findAll("button").find((b) => b.text() === "Overview");
+        await overviewTab.trigger("click");
+
+        expect(routerReplace).toHaveBeenCalledWith({
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: {},
+            hash: "",
+        });
+    });
+
+    it("keeps the tab in the URL when a non-overview tab is selected", async () => {
+        mockWorkLocation = "hybrid";
+        hasAttendanceViewPermission = true;
+        currentRoute.query = {};
+
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
+
+        const hybridTab = wrapper.findAll("button").find((b) => b.text() === "Hybrid Schedule");
+        await hybridTab.trigger("click");
+
+        expect(routerReplace).toHaveBeenCalledWith({
+            name: "staffMember.attendance.my-attendances",
+            params: {},
+            query: { tab: "hybrid" },
+            hash: "",
+        });
+    });
+
+    it("follows tab changes made by navigation while the view stays mounted", async () => {
+        mockWorkLocation = "hybrid";
+
+        const wrapper = factory();
+        await flushPromises();
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find(".hybrid-schedules-stub").exists()).toBe(false);
+
+        currentRoute.query = { tab: "hybrid" };
+        await wrapper.vm.$nextTick();
+
+        expect(wrapper.find(".hybrid-schedules-stub").exists()).toBe(true);
     });
 });

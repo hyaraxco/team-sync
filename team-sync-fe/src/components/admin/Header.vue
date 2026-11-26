@@ -305,9 +305,39 @@ const titles = {
     },
 };
 
+// The hybrid-schedule, my-overtime and clock routes all redirect into
+// my-attendances carrying a query, so the header resolves that query rather
+// than the redirect source name. A switch also keeps URL values such as
+// "constructor" from matching an inherited property.
+const attendanceQueryInfo = (tab, action) => {
+    switch (tab) {
+        case "hybrid":
+            return {
+                title: "Hybrid Schedule",
+                subtitle: "View your weekly schedule and request day-specific overrides.",
+            };
+        case "overtime":
+            return {
+                title: "Overtime",
+                subtitle: "Track submitted overtime hours, approvals, and rejection notes.",
+            };
+        default:
+            break;
+    }
+
+    if (action === "clock") {
+        return titles["staffMember.attendance.clock"];
+    }
+
+    return null;
+};
+
 const pageInfo = computed(() => {
     const name = route.name?.toString() || "";
-    return titles[name] || titles["admin.dashboard"];
+    const isAttendance = name === "staffMember.attendance.my-attendances";
+    const queryInfo = isAttendance ? attendanceQueryInfo(route.query?.tab, route.query?.action) : null;
+
+    return queryInfo || titles[name] || titles["admin.dashboard"];
 });
 
 const pageTitle = computed(() => pageInfo.value.title);

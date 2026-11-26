@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from "vue";
+import { ref, onMounted, onUnmounted, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
     CalendarCheck,
@@ -480,16 +480,34 @@ const handleRouteActionQuery = async () => {
 
 const handleRouteTabQuery = () => {
     const tab = route.query.tab;
-    if (!tab) return;
-    const valid = sections.value.some((s) => s.id === tab);
-    if (valid) {
+
+    if (!tab) {
+        activeSection.value = "overview";
+        return;
+    }
+
+    if (sections.value.some((s) => s.id === tab)) {
         activeSection.value = tab;
     }
 };
 
+// The header reads the tab from the URL, so the URL must follow the selection.
 const setActiveSection = (sectionId) => {
     activeSection.value = sectionId;
+
+    const { tab, ...query } = route.query;
+    const nextQuery = sectionId === "overview" ? query : { ...query, tab: sectionId };
+
+    if (route.query.tab === nextQuery.tab) {
+        return;
+    }
+
+    router.replace({ name: route.name, params: route.params, query: nextQuery, hash: route.hash });
 };
+
+// Alias routes reuse this component, so mount alone does not cover history or
+// in-app navigation between tab URLs.
+watch(() => route.query.tab, handleRouteTabQuery);
 
 onMounted(async () => {
     clockInterval = setInterval(() => {
