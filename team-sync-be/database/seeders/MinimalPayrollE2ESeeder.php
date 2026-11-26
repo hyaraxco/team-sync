@@ -12,6 +12,7 @@ use App\Models\PerformanceReviewCycle;
 use App\Models\ReviewerRule;
 use App\Models\StaffMemberProfile;
 use Carbon\Carbon;
+use Database\Seeders\E2E\E2ESuperadminSeeder;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -34,6 +35,7 @@ class MinimalPayrollE2ESeeder extends Seeder
                 EmployeeSeeder::class,
                 HrSeeder::class,
                 FinanceSeeder::class,
+                E2ESuperadminSeeder::class,
             ]);
         });
 
@@ -50,7 +52,7 @@ class MinimalPayrollE2ESeeder extends Seeder
                     'is_active' => true,
                     'features' => ['attendance', 'leave', 'payroll', 'analytics', 'performance', 'overtime', 'thr'],
                     'max_users' => 100,
-                    'current_users' => 4,
+                    'current_users' => 5,
                     'activated_at' => now(),
                     'last_validated_at' => now(),
                     'signature' => base64_encode('e2e-fake-signature'),

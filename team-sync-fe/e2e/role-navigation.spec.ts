@@ -307,4 +307,31 @@ test.describe.serial("Role-based navigation and access control", () => {
     await captureEvidence(page, "finance-denied-redirect.png");
     await context.close();
   });
+
+  // ── Superadmin (E2E-only fixture) ────────────────────────────────
+
+  test("superadmin can log in and reach protected administrative routes", async ({ browser }) => {
+    const context = await browser.newContext();
+    const page = await context.newPage();
+
+    await loginAsRole(page, "superadmin");
+
+    await expect(page).toHaveURL(/\/admin\/dashboard$/);
+    await captureEvidence(page, "superadmin-dashboard.png");
+
+    // Protected admin route: staff directory (staff-member-menu)
+    await page.goto("/admin/staff-members");
+    await expect(page).toHaveURL(/\/admin\/staff-members$/);
+    await expect(page.getByTestId("page-title")).toHaveText("Staff Members");
+    await expect(page.getByRole("heading", { name: "All Staff Members", level: 3 })).toBeVisible();
+    await captureEvidence(page, "superadmin-staff-members.png");
+
+    // Protected admin route: system settings (settings-system-manage)
+    await page.goto("/admin/settings");
+    await expect(page).toHaveURL(/\/admin\/settings$/);
+    await expect(page.getByTestId("page-title")).toHaveText("Settings");
+    await captureEvidence(page, "superadmin-settings.png");
+
+    await context.close();
+  });
 });
