@@ -45,6 +45,12 @@ sh scripts/sandbox/run.sh team-sync-tea13-toolchain:local --phase roles --second
 
 Source-backed permissions and endpoint boundaries are tracked in [the RBAC route and API source inventory](./rbac-feature-matrix.md). Its allow/deny cells reflect source permissions, not verified runtime behavior; API authorization remains unverified where route declarations provide no explicit boundary. Unverified outcomes are not behavior-test evidence. A hidden link or frontend redirect does not prove that the backend denies access.
 
+TEA-63 behavior specs use five separate employee accounts and real API responses: `role-shell-behavior.spec.ts` (profile persistence, notifications, dashboards, analytics and licenses), `role-workforce-behavior.spec.ts` (workforce/team and attendance workflows), `role-performance-behavior.spec.ts` (performance ownership and administration), and `role-finance-project-behavior.spec.ts` (payroll/THR authority, payslip ownership and project membership). Test titles identify the role; retained failure screenshots and traces remain inside the disposable sandbox and are deleted with it. The bounded JUnit summary is retained by the host runner, not raw sensitive browser artifacts.
+
+The sandbox role phase runs the changed behavior specs first, then the complete role suite: navigation/button matrix, payroll, attendance/cuti bersama, meetings, project lifecycle, THR, performance templates/outcome rules/reviewer overrides, and the behavior specs. It records focused and complete JUnit summaries separately and returns failure if either run fails. Each invocation receives a fresh guarded SQLite fixture with separate Engineering and Operations teams, a shared project, review rating sections, and a historical paid Staff payslip. These synthetic fixtures are not payroll calculation evidence. Cross-role actors never reuse the same browser context. The legacy project capability benchmark assumes obsolete HR payroll authority and is excluded from both this suite and the matrix evidence.
+
+Source-only or unexecuted cells remain **unverified**. A linked test describes its assertions; only recorded successful execution establishes runtime coverage.
+
 ## Current normal-fixture accounts
 
 Each listed account belongs to the normal E2E seed. Passwords are local test values and must not be reused in production.

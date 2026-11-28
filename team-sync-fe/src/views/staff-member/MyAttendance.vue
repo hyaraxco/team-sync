@@ -885,6 +885,7 @@ onUnmounted(() => {
                     <div
                         v-for="request in myLeaveRequests"
                         :key="request.id"
+                        :data-testid="`my-leave-request-${request.id}`"
                         class="border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-4 cursor-pointer"
                         @click="openLeaveDetailsModal(request.id)"
                     >
@@ -1128,6 +1129,9 @@ onUnmounted(() => {
         <Teleport to="body">
             <div
                 v-if="showLeaveDetailsModal && selectedLeaveRequest"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Leave Request Details"
                 class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center"
                 @click.self="closeLeaveDetailsModal"
             >

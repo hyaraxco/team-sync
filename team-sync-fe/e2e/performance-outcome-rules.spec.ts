@@ -30,6 +30,14 @@ test.describe.serial("Performance Outcome Rules CRUD", () => {
     await loginAsRole(page, "hr");
     await page.goto("/admin/performance/outcome-rules");
     await page.waitForLoadState("networkidle");
+    const token = (await context.cookies()).find(cookie => cookie.name === "token")!.value;
+    const api = process.env.VITE_API_BASE_URL || "http://127.0.0.1:8000/api/v1";
+    const headers = { Authorization: `Bearer ${decodeURIComponent(token)}`, Accept: "application/json" };
+    const listed = await page.request.get(`${api}/performance/outcome-rules`, { headers });
+    expect(listed.status()).toBe(200);
+    expect((await listed.json()).data.some((rule: { label: string }) => rule.label === "Outstanding")).toBe(true);
+    let createdRuleId: number | undefined;
+    try {
 
     // Create
     await page.getByRole("button", { name: /Add Rule/i }).first().click();
@@ -37,10 +45,11 @@ test.describe.serial("Performance Outcome Rules CRUD", () => {
 
     await page.locator('input[type="text"]').fill("E2E Test Rule");
     const numberInputs = page.locator("form input[type='number']");
-    await numberInputs.nth(0).fill("4.90");
-    await numberInputs.nth(1).fill("4.99");
+    await numberInputs.nth(0).fill("1.00");
+    await numberInputs.nth(1).fill("1.49");
     await numberInputs.nth(2).fill("1.5");
     await numberInputs.nth(3).fill("3");
+    await page.getByLabel("Active", { exact: true }).uncheck();
 
     const responsePromise = page.waitForResponse(resp =>
       resp.url().includes("outcome-rules") && resp.request().method() === "POST"
@@ -48,9 +57,10 @@ test.describe.serial("Performance Outcome Rules CRUD", () => {
     await page.getByRole("button", { name: /Create Rule/i }).click();
     const createResponse = await responsePromise;
 
-    if (createResponse.status() === 201) {
-      await expect(page.getByText(/created successfully/i)).toBeVisible({ timeout: 5_000 });
-      await expect(page.getByText("E2E Test Rule")).toBeVisible();
+    expect(createResponse.status()).toBe(201);
+    createdRuleId = (await createResponse.json()).data.id;
+    await expect(page.getByText(/created successfully/i)).toBeVisible({ timeout: 5_000 });
+    await expect(page.getByText("E2E Test Rule")).toBeVisible();
 
       // Edit
       const ruleRow = page.locator("table tbody tr", { hasText: "E2E Test Rule" });
@@ -58,23 +68,26 @@ test.describe.serial("Performance Outcome Rules CRUD", () => {
       await expect(page.getByRole("heading", { name: /Edit Rule/i })).toBeVisible();
 
       await page.locator("input[type='text']").fill("E2E Updated Rule");
+      const updated = page.waitForResponse(resp => resp.url().includes("outcome-rules") && resp.request().method() === "PUT");
       await page.getByRole("button", { name: /Update Rule/i }).click();
-      await expect(page.getByText(/updated successfully/i)).toBeVisible({ timeout: 5_000 });
+      expect((await updated).status()).toBe(200);
 
       // Delete
       const updatedRow = page.locator("table tbody tr", { hasText: "E2E Updated Rule" });
       await updatedRow.locator("button").last().click();
       // ConfirmationModal component — click its "Delete" button
       await expect(page.getByRole("heading", { name: /Delete Rule/i })).toBeVisible();
+      const deleted = page.waitForResponse(resp => resp.url().includes("outcome-rules") && resp.request().method() === "DELETE");
       await page.getByRole("button", { name: /^Delete$/ }).click();
-      await expect(page.getByText(/deleted successfully/i)).toBeVisible({ timeout: 5_000 });
+      expect((await deleted).status()).toBe(200);
       await expect(page.getByText("E2E Updated Rule")).not.toBeVisible();
-    } else {
-      // API failed (likely migration not run on E2E DB) — skip CRUD assertions
-      // eslint-disable-next-line no-console
-      console.warn(`Outcome rules API returned ${createResponse.status()} — migration may not be applied to E2E database`);
-    }
 
+    } finally {
+      if (createdRuleId !== undefined) {
+        const cleanupResponse = await page.request.delete(`${api}/performance/outcome-rules/${createdRuleId}`, { headers });
+        expect([200, 404]).toContain(cleanupResponse.status());
+      }
+    }
     await context.close();
   });
 });

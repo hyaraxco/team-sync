@@ -95,10 +95,7 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await loginAsRole(page, "manager");
     await page.goto(`/admin/projects/${projectId}`);
     await page.waitForLoadState("networkidle");
-    await expect(page.getByText("To Do").first()).toBeVisible();
-    await expect(page.getByText("In Progress").first()).toBeVisible();
-    await expect(page.getByText("Review").first()).toBeVisible();
-    await expect(page.getByText("Done").first()).toBeVisible();
+    await expect(page.getByText("No tasks yet", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /Create New Task/i })).toBeVisible();
     await captureEvidence(page, "task-t3.png");
     await ctx.close();
@@ -123,7 +120,7 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await page.locator('input[type="date"]').fill(
       new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
     );
-    await page.getByRole("button", { name: /^Create Task$/i }).click();
+    await modal.getByRole("button", { name: /^Create Task$/i }).click();
     await expect(page.getByText(taskName).first()).toBeVisible({ timeout: 10_000 });
     await captureEvidence(page, "task-t4.png");
     await ctx.close();
@@ -204,7 +201,7 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await page.getByText("Team Sync HRIS Platform").first().click();
     await page.waitForLoadState("networkidle");
     await expect(page.getByText("Project Tasks").first()).toBeVisible();
-    await expect(page.getByText("To Do").first()).toBeVisible();
+    await expect(page.getByText("No tasks yet", { exact: true })).toBeVisible();
     await captureEvidence(page, "task-t7.png");
     await ctx.close();
   });
@@ -358,16 +355,16 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await ctx.close();
   });
 
-  // ── T13: Finance cannot access projects ────────────────────────
+  // ── T13: Finance can read projects but cannot create them ───────
 
-  test("T13: Finance is redirected from projects page", async ({ browser }) => {
+  test("T13: Finance can view projects but has no project creation authority", async ({ browser }) => {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await loginAsRole(page, "finance");
 
     await page.goto("/admin/projects");
-    // Finance has no project-menu permission → redirected to dashboard
-    await expect(page).toHaveURL(/\/admin\/dashboard$/, { timeout: 10_000 });
+    await expect(page.locator("main")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Add Project/i })).toHaveCount(0);
 
     await captureEvidence(page, "task-t13.png");
     await ctx.close();

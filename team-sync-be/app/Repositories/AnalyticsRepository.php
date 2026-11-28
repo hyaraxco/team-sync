@@ -1361,20 +1361,21 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $query = DB::table('performance_reviews as pr')
             ->join('staff_member_profiles as ep', 'pr.staff_member_id', '=', 'ep.id')
             ->join('team_members as tm', 'tm.staff_member_id', '=', 'ep.id')
+            ->join('users as u', 'ep.user_id', '=', 'u.id')
             ->where('tm.team_id', $teamId)
             ->whereNull('tm.left_at')
             ->whereNull('ep.deleted_at');
 
         if ($cycleId) {
-            $query->where('pr.review_cycle_id', $cycleId);
+            $query->where('pr.cycle_id', $cycleId);
         }
 
         $reviews = $query->select(
             'pr.id',
             'pr.staff_member_id',
-            'pr.overall_rating',
+            'pr.final_rating as overall_rating',
             'pr.status',
-            'ep.full_name as employee_name'
+            'u.name as employee_name'
         )->get();
 
         $totalReviews = $reviews->count();
@@ -1401,15 +1402,14 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             ->whereNull('ep.deleted_at');
 
         if ($cycleId) {
-            $query->where('pr.review_cycle_id', $cycleId);
+            $query->where('pr.cycle_id', $cycleId);
         }
 
         $reviews = $query->select(
             'pr.id',
             'pr.staff_member_id',
-            'pr.overall_rating',
-            'pr.status',
-            'pr.review_type'
+            'pr.final_rating as overall_rating',
+            'pr.status'
         )->get();
 
         $totalReviews = $reviews->count();
@@ -1448,13 +1448,13 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             ->join('staff_member_profiles as ep', 'pr.staff_member_id', '=', 'ep.id')
             ->whereNull('ep.deleted_at')
             ->where('pr.status', 'completed')
-            ->whereNotNull('pr.overall_rating');
+            ->whereNotNull('pr.final_rating');
 
         if ($cycleId) {
-            $query->where('pr.review_cycle_id', $cycleId);
+            $query->where('pr.cycle_id', $cycleId);
         }
 
-        $ratings = $query->select('pr.overall_rating')->get();
+        $ratings = $query->select('pr.final_rating as overall_rating')->get();
 
         $distribution = [
             1 => 0,
@@ -1508,9 +1508,9 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             'pg.staff_member_id',
             'pg.title',
             'pg.status',
-            'pg.progress_percentage',
+            'pg.completion_percentage as progress_percentage',
             'pg.category',
-            'pg.target_date'
+            'pg.due_date as target_date'
         )->get();
 
         $totalGoals = $goals->count();
@@ -1565,7 +1565,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         if ($employeeId) {
             $query->where(function ($q) use ($employeeId) {
                 $q->where('pf.staff_member_id', $employeeId)
-                    ->orWhere('pf.giver_id', $employeeId);
+                    ->orWhere('pf.given_by', $employeeId);
             });
         }
 
@@ -1578,7 +1578,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         $feedback = $query->select(
             'pf.id',
             'pf.staff_member_id',
-            'pf.giver_id',
+            'pf.given_by as giver_id',
             'pf.feedback_type',
             'pf.is_private',
             'pf.created_at'

@@ -7,6 +7,7 @@ services:
       - "127.0.0.1:8000:80"
     environment:
       APP_ENV: testing
+      E2E_LOGIN_ATTEMPTS: 1000
       APP_KEY: base64:AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
       APP_URL: http://127.0.0.1:8000
       DB_CONNECTION: mysql
@@ -21,6 +22,10 @@ services:
       CACHE_PREFIX: teamsync_e2e
       QUEUE_CONNECTION: database
       SESSION_DRIVER: database
+      SCOUT_DRIVER: meilisearch
+      MEILISEARCH_HOST: http://meilisearch:7700
+      NO_PROXY: localhost,127.0.0.1,mysql,redis,meilisearch
+      no_proxy: localhost,127.0.0.1,mysql,redis,meilisearch
     volumes:
       - ..:/var/www/html:cached
       - /dev/null:/var/www/html/.env:ro
@@ -29,6 +34,8 @@ services:
       mysql:
         condition: service_healthy
       redis:
+        condition: service_healthy
+      meilisearch:
         condition: service_healthy
   mysql:
     image: mysql/mysql-server:8.0
@@ -51,7 +58,20 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       retries: 3
       timeout: 5s
+  meilisearch:
+    image: getmeili/meilisearch:latest
+    environment:
+      MEILI_ENV: development
+      MEILI_NO_ANALYTICS: "true"
+    volumes:
+      - e2e-meilisearch-data:/meili_data
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:7700/health"]
+      interval: 2s
+      retries: 15
+      timeout: 5s
 volumes:
   e2e-storage:
   e2e-mysql-data:
   e2e-redis-data:
+  e2e-meilisearch-data:
