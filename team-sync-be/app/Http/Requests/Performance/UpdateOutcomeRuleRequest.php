@@ -45,7 +45,14 @@ class UpdateOutcomeRuleRequest extends FormRequest
                 $checkMin = $min ?? $current?->min_rating;
                 $checkMax = $max ?? $current?->max_rating;
 
+
                 if ($checkMin === null || $checkMax === null) {
+                    return;
+                }
+
+                if ((float) $checkMax < (float) $checkMin) {
+                    $validator->errors()->add('max_rating', 'The maximum rating must be greater than or equal to the minimum rating.');
+
                     return;
                 }
 

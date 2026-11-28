@@ -1353,6 +1353,17 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
         ];
     }
 
+    public function managerCanReadPerformanceScope(int $userId, int $teamId, ?int $staffMemberId): bool
+    {
+        $team = \App\Models\Team::query()->where('team_lead_id', $userId)->find($teamId);
+        if (! $team) {
+            return false;
+        }
+
+        return $staffMemberId === null || $team->members()
+            ->where('staff_member_id', $staffMemberId)->whereHas('staffMember')->exists();
+    }
+
     /**
      * Get team performance summary
      */

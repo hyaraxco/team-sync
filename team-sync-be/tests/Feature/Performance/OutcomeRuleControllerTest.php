@@ -177,6 +177,17 @@ class OutcomeRuleControllerTest extends TestCase
             ->assertUnprocessable()->assertJsonValidationErrors(['min_rating']);
     }
 
+    public function test_active_outcome_rule_rejects_partial_range_updates_that_invert_bounds(): void
+    {
+        $this->actingAsRole('HR');
+        $rule = $this->createRule(['min_rating' => 2.00, 'max_rating' => 4.00]);
+
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['min_rating' => 4.50])
+            ->assertUnprocessable()->assertJsonValidationErrors('max_rating');
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['max_rating' => 1.50])
+            ->assertUnprocessable()->assertJsonValidationErrors('max_rating');
+    }
+
     public function test_hr_can_update_outcome_rule(): void
     {
         $this->actingAsRole('HR');

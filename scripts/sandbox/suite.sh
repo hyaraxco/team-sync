@@ -188,8 +188,8 @@ SH
             project-task-lifecycle.spec.ts thr-generation.spec.ts \
             performance-templates.spec.ts performance-outcome-rules.spec.ts performance-reviewer-override.spec.ts
         full_status=$?
-        [[ $focused_status -eq 0 && $full_status -eq 0 ]]
-        exit $?
+        set -e
+        (( focused_status == 0 && full_status == 0 )) || exit 1
         ;;
     a11y)
         build_fe

@@ -75,4 +75,6 @@ interface AnalyticsRepositoryInterface
     public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array;
 
     public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array;
+
+    public function managerCanReadPerformanceScope(int $userId, int $teamId, ?int $staffMemberId): bool;
 }
