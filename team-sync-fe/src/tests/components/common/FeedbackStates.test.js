@@ -42,10 +42,12 @@ describe("Feedback states", () => {
     it("isolates upcoming errors and retries through loading to empty", async () => {
         const store = useMeetingStore();
         store.error = "Unrelated create error";
-        axiosInstance.get.mockRejectedValueOnce(new Error("Offline"));
+        let rejectRequest;
+        axiosInstance.get.mockImplementationOnce(() => new Promise((_resolve, reject) => { rejectRequest = reject; }));
         const wrapper = mount(UpcomingMeetings, { global: { stubs: { RouterLink: true } } });
         await wrapper.vm.$nextTick();
         expect(wrapper.get('[role="status"]').text()).toContain("Loading upcoming meetings");
+        rejectRequest(new Error("Offline"));
         await flushPromises();
         expect(wrapper.get('[role="alert"]').text()).toContain("Unable to load upcoming meetings");
         expect(wrapper.text()).not.toContain("Belum ada meeting");
