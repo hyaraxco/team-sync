@@ -204,6 +204,8 @@ class AnalyticsExportControllerTest extends TestCase
             {
                 return [];
             }
+
+            public function managerCanReadPerformanceScope(int $userId, int $teamId, ?int $staffMemberId): bool { return false; }
         });
     }
 
@@ -317,6 +319,7 @@ class AnalyticsExportControllerTest extends TestCase
             public function getRatingDistribution(?int $cycleId = null): array { return []; }
             public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array { return []; }
             public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array { return []; }
+            public function managerCanReadPerformanceScope(int $userId, int $teamId, ?int $staffMemberId): bool { return false; }
         });
 
         $user = User::factory()->create();
@@ -389,6 +392,7 @@ class AnalyticsExportControllerTest extends TestCase
             public function getRatingDistribution(?int $cycleId = null): array { return []; }
             public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array { return []; }
             public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array { return []; }
+            public function managerCanReadPerformanceScope(int $userId, int $teamId, ?int $staffMemberId): bool { return false; }
         });
 
         $user = User::factory()->create();
@@ -444,6 +448,7 @@ class AnalyticsExportControllerTest extends TestCase
             public function getRatingDistribution(?int $cycleId = null): array { return ['distribution' => [5 => 1], 'percentages' => [5 => 100]]; }
             public function getGoalCompletionRate(?int $employeeId = null, ?int $teamId = null): array { return ['total_goals' => 1, 'completed_goals' => 1, 'in_progress_goals' => 0, 'not_started_goals' => 0, 'completion_rate' => 100, 'average_progress' => 100, 'overdue_goals' => 0]; }
             public function getFeedbackMetrics(?int $employeeId = null, ?int $teamId = null): array { return ['total_feedback' => 1, 'recent_feedback_30d' => 1, 'average_per_employee' => 1, 'by_type' => ['peer' => 1]]; }
+            public function managerCanReadPerformanceScope(int $userId, int $teamId, ?int $staffMemberId): bool { return false; }
         });
 
         $user = User::factory()->create();
