@@ -28,6 +28,17 @@ const confirmTitle = ref("");
 const confirmMessage = ref("");
 const confirmText = ref("Confirm");
 const confirmAction = ref(null);
+const confirming = ref(false);
+const runConfirmation = async () => {
+    if (confirming.value) return;
+    confirming.value = true;
+    try {
+        await confirmAction.value?.();
+        showConfirmDialog.value = false;
+    } finally {
+        confirming.value = false;
+    }
+};
 
 const generateForm = ref({
     religion_event: "",
@@ -442,12 +453,13 @@ function handlePageChange(page) {
     <!-- Confirmation Dialog -->
     <ConfirmationModal
         :show="showConfirmDialog"
+        :loading="confirming"
         :title="confirmTitle"
         :message="confirmMessage"
         :confirm-text="confirmText"
         cancel-text="Cancel"
         type="info"
-        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @confirm="runConfirmation"
         @cancel="showConfirmDialog = false"
     />
 </template>

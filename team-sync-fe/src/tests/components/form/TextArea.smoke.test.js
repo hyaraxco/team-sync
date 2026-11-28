@@ -7,7 +7,7 @@ describe("TextArea.vue smoke", () => {
         const wrapper = mount(TextArea, { props: { label: "Notes" } });
         const label = wrapper.find("label");
         expect(label.attributes("style")).toBeFalsy();
-        expect(label.classes()).toContain("text-gray-600");
+        expect(label.classes()).toContain("text-brand-dark");
         expect(label.classes()).toContain("text-sm");
         expect(label.classes()).toContain("font-semibold");
     });
@@ -19,13 +19,13 @@ describe("TextArea.vue smoke", () => {
         expect(textarea.classes()).toContain("bg-white");
     });
 
-    it("error message uses text-red-600 token", async () => {
+    it("error message uses the semantic danger token", async () => {
         const wrapper = mount(TextArea, {
             props: { label: "Notes", error: "Required field" },
         });
         const error = wrapper.find('[role="alert"]');
         expect(error.attributes("style")).toBeFalsy();
-        expect(error.classes()).toContain("text-red-600");
+        expect(error.classes()).toContain("text-[var(--color-feedback-danger)]");
         expect(error.classes()).toContain("text-sm");
     });
 });

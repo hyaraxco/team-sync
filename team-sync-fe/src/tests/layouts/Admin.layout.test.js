@@ -113,6 +113,14 @@ describe("Admin layout mobile sidebar", () => {
         await nextTick();
     };
 
+    it("moves keyboard focus past the header to the main landmark", async () => {
+        const wrapper = mountLayout();
+        const skip = wrapper.get('a[href="#main-content"]');
+        skip.element.focus();
+        await skip.trigger("click");
+        expect(document.activeElement).toBe(wrapper.get("main#main-content").element);
+    });
+
     it("renders no backdrop while the drawer is closed", () => {
         const wrapper = mountLayout();
 

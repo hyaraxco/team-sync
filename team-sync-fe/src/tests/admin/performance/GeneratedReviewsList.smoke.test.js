@@ -2,6 +2,9 @@ import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
 import GeneratedReviewsList from "@/components/admin/performance/GeneratedReviewsList.vue";
+import ConfirmationModal from '@/components/common/ConfirmationModal.vue';
+
+const { generateReviews } = vi.hoisted(() => ({ generateReviews: vi.fn() }));
 
 vi.mock("vue-router", () => ({
     useRouter: () => ({ push: vi.fn() }),
@@ -23,7 +26,7 @@ vi.mock("@/composables/useToast", () => ({
 vi.mock("@/stores/performanceReview", () => ({
     usePerformanceReviewStore: () => ({
         loading: ref(false),
-        generateReviews: vi.fn(),
+        generateReviews,
         assignReviewer: vi.fn(),
     }),
 }));
@@ -39,6 +42,26 @@ describe("GeneratedReviewsList.vue Smoke Test", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
         vi.clearAllMocks();
+    });
+
+    it('keeps confirmation busy until generation completes', async () => {
+        let finish;
+        generateReviews.mockReturnValueOnce(new Promise(resolve => { finish = resolve; }));
+        const wrapper = mount(GeneratedReviewsList, {
+            props: { cycle: { id: 1, status: 'draft', reviews: [] } },
+            global: { plugins: [createPinia()], stubs: { ConfirmationModal: true } },
+        });
+        await wrapper.findAll('button').find(button => button.text().includes('Generate Reviews')).trigger('click');
+        const confirmation = wrapper.getComponent(ConfirmationModal);
+        confirmation.vm.$emit('confirm');
+        await wrapper.vm.$nextTick();
+        expect(confirmation.props('loading')).toBe(true);
+        expect(confirmation.props('show')).toBe(true);
+        finish({ generated_count: 1 });
+        await new Promise(resolve => setTimeout(resolve, 0));
+        expect(confirmation.props('loading')).toBe(false);
+        expect(confirmation.props('show')).toBe(false);
+        wrapper.unmount();
     });
 
     it("renders empty state when cycle has no reviews", () => {

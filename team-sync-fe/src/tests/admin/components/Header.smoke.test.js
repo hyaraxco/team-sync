@@ -143,7 +143,7 @@ describe("Header smoke", () => {
         expect(wrapper.get('[data-testid="header-mobile-menu-toggle"]').attributes("aria-label")).toBe(
             "Toggle sidebar",
         );
-        expect(wrapper.get('[data-testid="header-profile-toggle"]').attributes("aria-haspopup")).toBe("menu");
+        expect(wrapper.get('[data-testid="header-profile-toggle"]').attributes("aria-haspopup")).toBeUndefined();
         expect(wrapper.get('[data-testid="header-profile-toggle"]').attributes("aria-expanded")).toBe("true");
         expect(wrapper.get('[data-testid="header-notification-toggle"]').attributes("aria-haspopup")).toBe("dialog");
         expect(wrapper.get('[data-testid="header-profile-menu-item"]').attributes("data-route-name")).toBe(
@@ -157,6 +157,22 @@ describe("Header smoke", () => {
         expect(wrapper.find('[aria-label="Messages"]').exists()).toBe(false);
         await wrapper.get('[data-testid="header-mobile-menu-toggle"]').trigger("click");
         expect(wrapper.emitted("toggle-sidebar")).toHaveLength(1);
+    });
+
+    it.each([
+        ['header-profile-toggle', 'header-account-menu'],
+        ['header-notification-toggle', 'header-notification-panel'],
+    ])("closes %s on Escape and returns focus to its disclosure", async (triggerId, panelId) => {
+        const wrapper = factory();
+        document.body.appendChild(wrapper.element);
+        const trigger = wrapper.get(`[data-testid="${triggerId}"]`);
+        trigger.element.focus();
+        await trigger.trigger("click");
+        await wrapper.get(`[data-testid="${panelId}"]`).trigger("keydown", { key: "Escape" });
+        expect(trigger.attributes("aria-expanded")).toBe("false");
+        expect(document.activeElement).toBe(trigger.element);
+        wrapper.unmount();
+        wrapper.element.remove();
     });
 
     it("exposes drawer state on the mobile menu trigger", async () => {
@@ -290,7 +306,7 @@ describe("Header smoke", () => {
         const wrapper = factory();
 
         await openDropdown(wrapper);
-        await wrapper.get("button.text-red-600").trigger("click");
+        await wrapper.findAll('button').find(button => button.text().includes('Sign Out')).trigger('click');
         await nextTick();
 
         expect(authStoreMock.logout).toHaveBeenCalledTimes(1);

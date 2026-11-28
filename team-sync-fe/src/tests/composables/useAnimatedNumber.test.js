@@ -23,6 +23,30 @@ describe("useAnimatedNumber", () => {
 
     afterEach(() => {
         vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it("shows the final number without animation under reduced motion", async () => {
+        vi.stubGlobal("matchMedia", () => ({ matches: true, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+        const source = ref(1250);
+        const wrapper = mountAnimated(source);
+        expect(wrapper.vm.displayValue).toBe((1250).toLocaleString());
+        source.value = 2750;
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.displayValue).toBe((2750).toLocaleString());
+        wrapper.unmount();
+    });
+
+    it("finishes an active animation when reduced motion is enabled", async () => {
+        let change;
+        const remove = vi.fn();
+        vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: (_event, callback) => { change = callback; }, removeEventListener: remove }));
+        const wrapper = mountAnimated(ref(1000));
+        change({ matches: true });
+        await wrapper.vm.$nextTick();
+        expect(wrapper.vm.displayValue).toBe((1000).toLocaleString());
+        wrapper.unmount();
+        expect(remove).toHaveBeenCalledWith("change", change);
     });
 
     it("initializes displayValue to '0'", () => {

@@ -22,6 +22,17 @@ describe('StatsCard', () => {
         wrapper.unmount()
     })
 
+    it('announces loading instead of showing a misleading metric', async () => {
+        await wrapper.setProps({ loading: true });
+        expect(wrapper.get('[role="status"]').text()).toBe('Loading Total Users...');
+        expect(wrapper.get('[role="status"]').element.closest('[aria-busy="true"]')).toBeNull();
+        expect(wrapper.text()).not.toContain('+12.5% vs last month');
+        expect(wrapper.find('.tabular-nums').exists()).toBe(false);
+        await wrapper.setProps({ loading: false });
+        expect(wrapper.find('[role="status"]').exists()).toBe(false);
+        expect(wrapper.find('.tabular-nums').exists()).toBe(true);
+    });
+
     it('renders with baseline card styling', () => {
         const card = wrapper.find('[data-testid="stats-card"]')
         expect(card.exists()).toBe(true)

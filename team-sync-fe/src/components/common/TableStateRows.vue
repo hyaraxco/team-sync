@@ -32,8 +32,9 @@ defineProps({
 <template>
     <tr v-if="loading">
         <td :colspan="colspan" class="py-14">
-            <div class="flex justify-center" role="status" aria-label="Loading data">
-                <div class="w-8 h-8 border-4 border-brand-border border-t-brand-primary rounded-full animate-spin"></div>
+            <div class="flex items-center justify-center gap-3" role="status">
+                <div aria-hidden="true" class="w-8 h-8 border-4 border-brand-border border-t-brand-primary rounded-full motion-safe:animate-spin"></div>
+                <span class="text-sm text-[var(--color-text-secondary)]">Loading data...</span>
             </div>
         </td>
     </tr>

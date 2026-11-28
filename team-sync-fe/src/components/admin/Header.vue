@@ -362,7 +362,7 @@ const unreadBadgeClass = computed(() => {
     const sizeClass = safeCount > 9 ? "w-6 px-1" : "w-5";
 
     // Standardized red badge for all roles
-    return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-danger-500 text-[10px] font-bold leading-none text-white`;
+    return `absolute -right-1 -top-1 flex h-5 ${sizeClass} items-center justify-center rounded-full border-2 border-white bg-danger-700 text-[10px] font-bold leading-none text-white`;
 });
 const notificationButtonLabel = computed(() => {
     if (unreadNotificationCount.value > 0) {
@@ -468,6 +468,21 @@ const handleVisibilityChange = () => {
 // Click outside to close open panels
 const accountDropdownRef = ref(null);
 const notificationDropdownRef = ref(null);
+const accountToggleRef = ref(null);
+const notificationToggleRef = ref(null);
+const closePanelOnEscape = (event, open, trigger) => {
+    if (event.key !== "Escape" || !open) return;
+    event.preventDefault();
+    event.stopPropagation();
+    isAccountMenuOpen.value = false;
+    isNotificationPanelOpen.value = false;
+    trigger?.focus();
+};
+const closePanelOnFocusOut = (event, panel) => {
+    if (panel?.contains(event.relatedTarget)) return;
+    if (panel === accountDropdownRef.value) isAccountMenuOpen.value = false;
+    if (panel === notificationDropdownRef.value) isNotificationPanelOpen.value = false;
+};
 const handleClickOutside = (event) => {
     if (accountDropdownRef.value && !accountDropdownRef.value.contains(event.target)) {
         isAccountMenuOpen.value = false;
@@ -539,9 +554,12 @@ onUnmounted(() => {
                         <MoonIcon v-else class="w-5 h-5 text-brand-light" />
                     </button>
 
-                    <div class="relative z-50" ref="notificationDropdownRef">
+                    <div class="relative z-50" ref="notificationDropdownRef"
+                        @keydown="closePanelOnEscape($event, isNotificationPanelOpen, notificationToggleRef)"
+                        @focusout="closePanelOnFocusOut($event, notificationDropdownRef)">
                         <button
                             type="button"
+                            ref="notificationToggleRef"
                             data-testid="header-notification-toggle"
                             :aria-label="notificationButtonLabel"
                             aria-haspopup="dialog"
@@ -579,12 +597,14 @@ onUnmounted(() => {
                 <div class="hidden sm:block w-px h-8 bg-brand-border mx-5"></div>
 
                 <!-- User Profile -->
-                <div class="relative z-50" ref="accountDropdownRef">
+                <div class="relative z-50" ref="accountDropdownRef"
+                    @keydown="closePanelOnEscape($event, isAccountMenuOpen, accountToggleRef)"
+                    @focusout="closePanelOnFocusOut($event, accountDropdownRef)">
                     <button
                         type="button"
+                        ref="accountToggleRef"
                         data-testid="header-profile-toggle"
                         aria-label="Toggle account menu"
-                        aria-haspopup="menu"
                         :aria-expanded="isAccountMenuOpen ? 'true' : 'false'"
                         aria-controls="header-account-menu"
                         class="flex items-center gap-2 sm:gap-3 cursor-pointer"
@@ -621,7 +641,8 @@ onUnmounted(() => {
                     <div
                         id="header-account-menu"
                         data-testid="header-account-menu"
-                        role="menu"
+                        role="region"
+                        aria-label="Account"
                         class="absolute right-0 top-full mt-2 w-56 border border-brand-border rounded-lg shadow-md py-2 z-[9999] transition-colors duration-200"
                         style="background-color: var(--color-surface)"
                         :class="{ hidden: !isAccountMenuOpen }"
@@ -639,7 +660,6 @@ onUnmounted(() => {
                         <div class="py-1">
                             <RouterLink
                                 :to="{ name: 'staffMember.profile' }"
-                                role="menuitem"
                                 data-testid="header-profile-menu-item"
                                 class="flex items-center gap-3 px-4 py-2 text-sm text-brand-dark hover:bg-surface-overlay transition-colors cursor-pointer"
                                 @click="isAccountMenuOpen = false"
@@ -652,9 +672,8 @@ onUnmounted(() => {
                         <div class="border-t border-brand-border py-1">
                             <button
                                 type="button"
-                                role="menuitem"
                                 @click="handleLogout"
-                                class="w-full flex items-center gap-3 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors cursor-pointer text-left disabled:opacity-60 disabled:cursor-not-allowed"
+                                class="w-full flex items-center gap-3 px-4 py-2 text-sm text-[var(--color-feedback-danger)] hover:bg-surface-overlay transition-colors cursor-pointer text-left disabled:opacity-60 disabled:cursor-not-allowed"
                             >
                                 <LogOutIcon class="w-4 h-4" />
                                 Sign Out

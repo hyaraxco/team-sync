@@ -1,6 +1,8 @@
 <script setup>
 import { ChevronLeft, ChevronRight } from "lucide-vue-next";
-import { computed } from "vue";
+import { computed, useId } from "vue";
+
+const perPageId = useId();
 
 const props = defineProps({
     meta: {
@@ -99,12 +101,13 @@ const goToNext = () => {
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <!-- Per Page Selector -->
         <div class="flex items-center gap-2 flex-wrap">
-            <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">Show</p>
+            <label :for="perPageId" class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">Teams per page</label>
             <select
+                :id="perPageId"
                 :value="perPage"
                 @change="handlePerPageChange(parseInt($event.target.value))"
                 :disabled="loading"
-                class="w-full sm:w-auto px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary transition-all duration-300 bg-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                class="w-full sm:w-auto px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary motion-reduce:transition-none transition-all duration-300 bg-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <option v-for="option in perPageOptions" :key="option" :value="option">
                     {{ option }}
@@ -117,9 +120,11 @@ const goToNext = () => {
         <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
             <!-- Previous Button -->
             <button
+                type="button"
+                aria-label="Previous page"
                 @click="goToPrevious"
                 :disabled="currentPage <= 1 || loading"
-                class="px-3 sm:px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 sm:px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 motion-reduce:transition-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <ChevronLeft class="w-4 h-4" />
             </button>
@@ -127,13 +132,16 @@ const goToNext = () => {
             <!-- Page Numbers -->
             <template v-for="page in visiblePages" :key="page">
                 <button
+                    type="button"
+                    :aria-label="`Go to page ${page}`"
+                    :aria-current="page === currentPage ? 'page' : undefined"
                     v-if="page !== '...'"
                     @click="handlePageChange(page)"
                     :disabled="loading"
                     :class="[
-                        'px-3 sm:px-4 py-2 border rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
+                        'px-3 sm:px-4 py-2 border rounded-lg font-semibold motion-reduce:transition-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
                         page === currentPage
-                            ? 'border-primary-700 blue-gradient blue-btn-shadow text-white'
+                            ? 'border-primary-700 bg-primary-700 hover:bg-primary-800 text-white'
                             : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50',
                     ]"
                 >
@@ -144,9 +152,11 @@ const goToNext = () => {
 
             <!-- Next Button -->
             <button
+                type="button"
+                aria-label="Next page"
                 @click="goToNext"
                 :disabled="currentPage >= lastPage || loading"
-                class="px-3 sm:px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 sm:px-4 py-2 border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 motion-reduce:transition-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
                 <ChevronRight class="w-4 h-4" />
             </button>

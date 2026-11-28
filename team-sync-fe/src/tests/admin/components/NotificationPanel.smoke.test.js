@@ -32,6 +32,19 @@ describe("NotificationPanel smoke", () => {
         expect(wrapper.get('[data-testid="notification-loading"]').text()).toContain("Loading notifications");
     });
 
+    it("announces loading, failure and empty after retry", async () => {
+        const wrapper = factory({ loading: true });
+        expect(wrapper.get('[data-testid="notification-loading"]').attributes("role")).toBe("status");
+        await wrapper.setProps({ loading: false, error: "Unable to load notifications" });
+        expect(wrapper.get('[role="alert"]').text()).toContain("Unable to load notifications");
+        await wrapper.get('[data-testid="notification-retry"]').trigger("click");
+        expect(wrapper.emitted("retry")).toHaveLength(1);
+        await wrapper.setProps({ loading: true, error: null });
+        expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+        await wrapper.setProps({ loading: false });
+        expect(wrapper.get('[data-testid="notification-empty"]').attributes("role")).toBe("status");
+    });
+
     it("shows empty state", () => {
         const wrapper = factory();
 

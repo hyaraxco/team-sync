@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from "vue";
+import { ref, onMounted, watch, computed, useId } from "vue";
 import { DEFAULT_AVATAR } from "@/helpers/format";
 import {
     X,
@@ -29,6 +29,19 @@ import { useToast } from "@/composables/useToast";
 import { can } from "@/helpers/permissionHelper";
 
 const toast = useToast();
+const dialogTitleId = `task-title-${useId()}`;
+const confirmationLoading = ref(false);
+
+const confirmPendingAction = async () => {
+    if (confirmationLoading.value) return;
+    confirmationLoading.value = true;
+    try {
+        if (confirmAction.value) await confirmAction.value();
+        showConfirmDialog.value = false;
+    } finally {
+        confirmationLoading.value = false;
+    }
+};
 
 const props = defineProps({
     task: {
@@ -594,13 +607,13 @@ watch(
 </script>
 
 <template>
-    <ModalWrapper :show="isOpen && !!task" maxWidth="4xl" @close="closeModal">
+    <ModalWrapper :show="isOpen && !!task" :labelledby="dialogTitleId" maxWidth="4xl" @close="closeModal">
         <!-- Modal Header -->
         <template #header>
             <div class="flex-1 min-w-0 pr-4">
                 <div class="flex items-center gap-3 mb-2">
                     <Tag class="w-5 h-5 text-gray-400 shrink-0" />
-                    <h2 class="text-xl sm:text-2xl font-bold text-gray-900 break-words">
+                    <h2 :id="dialogTitleId" class="text-xl sm:text-2xl font-bold text-gray-900 break-words">
                         {{ task.name }}
                     </h2>
                 </div>
@@ -1123,10 +1136,11 @@ watch(
         :show="showConfirmDialog"
         :title="confirmTitle"
         :message="confirmMessage"
+        :loading="confirmationLoading"
         confirm-text="Delete"
         cancel-text="Cancel"
         type="danger"
-        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @confirm="confirmPendingAction"
         @cancel="showConfirmDialog = false"
     />
 </template>

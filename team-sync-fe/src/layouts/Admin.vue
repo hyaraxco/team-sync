@@ -11,6 +11,7 @@ const DESKTOP_MEDIA_QUERY = "(min-width: 1024px)";
 const { isOpen, toggleMobile, closeMobile } = provideSidebar();
 const headerRef = ref(null);
 const isDesktop = ref(false);
+const mainContentRef = ref(null);
 let desktopQueryList = null;
 
 // Every close path (Escape, close button, backdrop, navigation) funnels through
@@ -71,6 +72,7 @@ onUnmounted(() => {
         <!-- Skip to main content link for keyboard users -->
         <a
             href="#main-content"
+            @click.prevent="mainContentRef?.focus()"
             class="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[10000] focus:px-4 focus:py-2 focus:bg-white focus:shadow-lg focus:rounded-lg focus:text-brand-dark focus:font-semibold"
         >
             Skip to main content
@@ -83,14 +85,13 @@ onUnmounted(() => {
 
         <!-- Main Content -->
         <div
-            id="main-content"
             class="flex-1 flex flex-col overflow-hidden transition-colors duration-200"
             style="background-color: var(--main-bg)"
         >
             <!-- Top Navbar -->
             <Header ref="headerRef" :is-open="isOpen" :sidebar-id="SIDEBAR_ID" @toggle-sidebar="toggleMobile" />
             <!-- Dashboard Content -->
-            <main class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
+            <main ref="mainContentRef" id="main-content" tabindex="-1" class="main-content flex-1 overflow-auto p-3 sm:p-4 md:p-6 lg:p-8">
                 <ErrorBoundary>
                     <RouterView />
                 </ErrorBoundary>
