@@ -42,7 +42,7 @@ const goToTeamDetail = (id) => {
 
 <template>
     <!-- Latest Teams -->
-    <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-5">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
         <div class="flex items-center justify-between mb-4">
             <h3 class="text-brand-dark text-lg font-bold">Latest Teams</h3>
         </div>

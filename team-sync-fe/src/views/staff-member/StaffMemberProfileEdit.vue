@@ -53,10 +53,10 @@ const handleSubmit = async () => {
 
 <template>
     <div class="p-5">
-        <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 mb-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <UserIcon class="w-6 h-6 text-blue-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <UserIcon class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Edit Profile</h3>
@@ -179,7 +179,7 @@ const handleSubmit = async () => {
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3"
                     >
                         <span class="text-brand-white text-base font-semibold">
                             {{ loading ? "Saving..." : "Save Changes" }}

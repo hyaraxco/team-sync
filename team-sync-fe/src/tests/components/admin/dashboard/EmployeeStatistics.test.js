@@ -244,94 +244,22 @@ describe("EmployeeStatistics - Notification category icon/color resolution", () 
         notificationStoreMock.notifications = [];
     });
 
-    it("resolves task category bg class to green bg", () => {
+    it("resolves notification category bg class to surface overlay", () => {
         const wrapper = factory();
         const cls = wrapper.vm.getActivityIconBgClass({ category: "task-assigned" });
-        expect(cls).toContain("green-50");
+        expect(cls).toBe("bg-[var(--color-surface-overlay)]");
     });
 
-    it("resolves attendance category bg class to purple bg", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ category: "attendance-approved" });
-        expect(cls).toContain("purple-50");
-    });
-
-    it("resolves payroll bg class to orange bg", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ category: "payroll-processed" });
-        expect(cls).toContain("orange-50");
-    });
-
-    it("resolves comment bg class to blue bg", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ category: "comment-added" });
-        expect(cls).toContain("blue-50");
-    });
-
-    it("resolves meeting bg class to orange bg", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ category: "meeting-scheduled" });
-        expect(cls).toContain("orange-50");
-    });
-
-    it("resolves unknown category bg class to default blue bg", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ category: "unknown-type" });
-        expect(cls).toContain("primary-50");
-    });
-
-    it("resolves task icon class to green text", () => {
+    it("resolves notification category icon class to brand dark text", () => {
         const wrapper = factory();
         const cls = wrapper.vm.getActivityIconClass({ category: "task-assigned" });
-        expect(cls).toContain("green-600");
-    });
-
-    it("resolves payroll icon class to orange text", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconClass({ category: "salary-slip" });
-        expect(cls).toContain("orange-600");
-    });
-
-    it("resolves attendance icon class to purple text", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconClass({ category: "check-in" });
-        expect(cls).toContain("purple-600");
-    });
-
-    it("resolves comment icon class to blue text", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconClass({ category: "message-sent" });
-        expect(cls).toContain("blue-600");
-    });
-
-    it("resolves meeting icon class to orange text", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconClass({ category: "team-update" });
-        expect(cls).toContain("orange-500");
-    });
-
-    it("resolves unknown category icon class to default blue text", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconClass({ category: "unknown-type" });
-        expect(cls).toContain("brand-primary");
-    });
-
-    it("resolves category from data.category fallback", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ data: { category: "check-in" } });
-        expect(cls).toContain("purple-50");
-    });
-
-    it("resolves category from type fallback", () => {
-        const wrapper = factory();
-        const cls = wrapper.vm.getActivityIconBgClass({ type: "payroll-slip" });
-        expect(cls).toContain("orange-50");
+        expect(cls).toBe("text-brand-dark");
     });
 
     it("returns default bg class when notification is null", () => {
         const wrapper = factory();
         const cls = wrapper.vm.getActivityIconBgClass(null);
-        expect(cls).toContain("primary-50");
+        expect(cls).toBe("bg-[var(--color-surface-overlay)]");
     });
 
     it("getActivityIcon returns a function component", () => {

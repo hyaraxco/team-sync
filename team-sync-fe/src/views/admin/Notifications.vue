@@ -61,57 +61,9 @@ const getActivityIcon = (notification) => {
     return BellIcon;
 };
 
-const getActivityIconBgClass = (notification) => {
-    const category = resolveNotificationCategory(notification);
+const getActivityIconBgClass = () => "bg-[var(--color-surface-overlay)]";
 
-    if (category.includes("task")) {
-        return "bg-success-50";
-    }
-
-    if (category.includes("attendance") || category.includes("check")) {
-        return "bg-purple-50";
-    }
-
-    if (category.includes("payroll") || category.includes("salary")) {
-        return "bg-orange-50";
-    }
-
-    if (category.includes("comment") || category.includes("message")) {
-        return "bg-primary-50";
-    }
-
-    if (category.includes("meeting") || category.includes("team")) {
-        return "bg-orange-50";
-    }
-
-    return "bg-primary-50";
-};
-
-const getActivityIconClass = (notification) => {
-    const category = resolveNotificationCategory(notification);
-
-    if (category.includes("task")) {
-        return "text-success-600";
-    }
-
-    if (category.includes("attendance") || category.includes("check")) {
-        return "text-purple-600";
-    }
-
-    if (category.includes("payroll") || category.includes("salary")) {
-        return "text-orange-600";
-    }
-
-    if (category.includes("comment") || category.includes("message")) {
-        return "text-primary-600";
-    }
-
-    if (category.includes("meeting") || category.includes("team")) {
-        return "text-orange-500";
-    }
-
-    return "text-brand-primary";
-};
+const getActivityIconClass = () => "text-brand-dark";
 
 const getNotificationTime = (notification) => {
     if (!notification?.created_at) {
@@ -157,7 +109,7 @@ onMounted(() => {
 </script>
 
 <template>
-    <div class="rounded-2xl border border-brand-border bg-white p-4 sm:p-6">
+    <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-4 sm:p-6">
         <div class="mb-4 flex items-center justify-between gap-3">
             <div>
                 <p class="text-xs font-semibold uppercase tracking-[0.1em] text-brand-primary">Activity Feed</p>
@@ -211,10 +163,10 @@ onMounted(() => {
 
         <div
             v-else-if="notifications.length === 0"
-            class="rounded-xl border border-brand-border bg-gray-50 px-4 py-8 text-center"
+            class="rounded-xl border border-brand-border bg-[var(--color-surface-overlay)] px-4 py-8 text-center"
         >
             <p class="text-base font-semibold text-brand-dark">Belum ada notifikasi.</p>
-            <p class="mt-1 text-sm text-gray-500">Pembaruan baru akan muncul di sini.</p>
+            <p class="mt-1 text-sm text-brand-light">Pembaruan baru akan muncul di sini.</p>
         </div>
 
         <div v-else class="space-y-1">
@@ -222,7 +174,7 @@ onMounted(() => {
                 v-for="notification in notifications"
                 :key="notification.id"
                 type="button"
-                class="flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-primary-50/40"
+                class="flex w-full items-start gap-3 rounded-xl px-2.5 py-2.5 text-left transition-colors hover:bg-[var(--color-surface-overlay)]"
                 :disabled="!notification.action_url"
                 @click="openNotification(notification)"
             >
@@ -241,14 +193,14 @@ onMounted(() => {
                     ></span>
                 </div>
 
-                <div class="min-w-0 flex-1 border-b border-gray-100 pb-2.5">
+                <div class="min-w-0 flex-1 border-b border-brand-border pb-2.5">
                     <p class="text-brand-dark text-sm font-semibold leading-5">
                         {{ notification.title }}
                     </p>
-                    <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-gray-500">
+                    <p v-if="notification.body" class="mt-0.5 text-xs leading-5 text-brand-light">
                         {{ notification.body }}
                     </p>
-                    <p class="mt-1 text-xs text-gray-500">
+                    <p class="mt-1 text-xs text-brand-light">
                         {{ getNotificationTime(notification) }}
                     </p>
                 </div>
@@ -257,16 +209,16 @@ onMounted(() => {
             <!-- Pagination -->
             <div
                 v-if="meta && meta.last_page > 1"
-                class="flex items-center justify-between border-t border-gray-100 pt-4 mt-3"
+                class="flex items-center justify-between border-t border-brand-border pt-4 mt-3"
             >
-                <p class="text-xs text-gray-500">
+                <p class="text-xs text-brand-light">
                     Page {{ meta.current_page }} of {{ meta.last_page }}
-                    <span class="text-gray-400">({{ meta.total }} total)</span>
+                    <span class="text-brand-light">({{ meta.total }} total)</span>
                 </p>
                 <div class="flex items-center gap-1">
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-primary-50/40 disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-brand-dark hover:bg-[var(--color-surface-overlay)] disabled:opacity-40 disabled:cursor-not-allowed"
                         :disabled="currentPage <= 1"
                         @click="goToPage(currentPage - 1)"
                     >
@@ -274,7 +226,7 @@ onMounted(() => {
                     </button>
                     <button
                         type="button"
-                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-gray-500 hover:bg-primary-50/40 disabled:opacity-40 disabled:cursor-not-allowed"
+                        class="inline-flex items-center justify-center w-8 h-8 rounded-lg border border-brand-border text-brand-dark hover:bg-[var(--color-surface-overlay)] disabled:opacity-40 disabled:cursor-not-allowed"
                         :disabled="currentPage >= meta.last_page"
                         @click="goToPage(currentPage + 1)"
                     >

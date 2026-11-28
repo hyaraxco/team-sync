@@ -206,10 +206,10 @@ onUnmounted(() => {
                     type="button"
                     v-if="hasActiveFilters"
                     @click="handleReset"
-                    class="w-full sm:w-auto rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 motion-reduce:transition-none transition-all duration-300 px-4 py-3 flex items-center justify-center sm:justify-start gap-2"
+                    class="w-full sm:w-auto rounded-lg border border-brand-border hover:bg-[var(--color-surface-overlay)] motion-reduce:transition-none transition-all duration-300 px-4 py-3 flex items-center justify-center sm:justify-start gap-2"
                 >
-                    <XIcon class="w-4 h-4 text-red-500" />
-                    <span class="text-red-500 text-sm font-semibold">Reset</span>
+                    <XIcon class="w-4 h-4 text-brand-light" />
+                    <span class="text-brand-dark text-sm font-semibold">Reset</span>
                 </button>
 
                 <!-- Search Button (optional) -->
@@ -217,7 +217,7 @@ onUnmounted(() => {
                     type="button"
                     v-if="showSearchButton"
                     @click="handleSearchClick"
-                    class="bg-primary-700 hover:bg-primary-800 text-white w-full sm:w-auto rounded-lg focus:ring-2 focus:ring-brand-primary motion-reduce:transition-none transition-all duration-300 px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
+                    class="btn-primary w-full sm:w-auto rounded-lg focus:ring-2 focus:ring-brand-primary motion-reduce:transition-none transition-all duration-300 px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
                 >
                     <SearchIcon class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-base font-semibold">Search</span>

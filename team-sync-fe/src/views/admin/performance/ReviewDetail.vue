@@ -462,7 +462,7 @@ watch(
 
         <template v-else-if="review">
             <!-- Tab Navigation -->
-            <div class="bg-white border border-brand-border rounded-2xl p-3">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-3">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
                     <button
                         v-for="tab in tabs"
@@ -472,8 +472,8 @@ watch(
                         class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                         :class="
                             activeTab === tab.id
-                                ? 'blue-gradient blue-btn-shadow text-white'
-                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                                ? 'bg-brand-primary text-white'
+                                : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                         "
                     >
                         <component
@@ -668,45 +668,45 @@ watch(
                 <!-- Performance Outcome (visible after calibration) -->
                 <MainCard
                     v-if="review.status === 'completed' && review.outcome_applied_at"
-                    class="border-l-4 border-l-emerald-500"
+                    
                 >
                     <h3 class="text-base font-semibold text-brand-dark mb-4 flex items-center gap-2">
-                        <StarIcon class="w-4 h-4 text-emerald-600" />
+                        <StarIcon class="w-4 h-4 text-brand-dark" />
                         Performance Outcome
                     </h3>
                     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div class="p-3 bg-emerald-50 rounded-lg border border-emerald-100 text-center">
-                            <p class="text-xs text-emerald-600 mb-1">Bonus</p>
-                            <p class="text-lg font-bold text-emerald-700">{{ review.bonus_months }} mo</p>
+                        <div class="p-3 bg-[var(--color-surface-raised)] rounded-lg border border-brand-border text-center">
+                            <p class="text-xs text-brand-dark mb-1">Bonus</p>
+                            <p class="text-lg font-bold text-brand-dark">{{ review.bonus_months }} mo</p>
                         </div>
-                        <div class="p-3 bg-blue-50 rounded-lg border border-blue-100 text-center">
-                            <p class="text-xs text-blue-600 mb-1">Salary Increase</p>
-                            <p class="text-lg font-bold text-blue-700">{{ review.salary_increase_pct }}%</p>
+                        <div class="p-3 bg-[var(--color-surface-raised)] rounded-lg border border-brand-border text-center">
+                            <p class="text-xs text-brand-dark mb-1">Salary Increase</p>
+                            <p class="text-lg font-bold text-brand-dark">{{ review.salary_increase_pct }}%</p>
                         </div>
                         <div
                             class="p-3 rounded-lg border text-center"
                             :class="
                                 review.promotion_eligible
-                                    ? 'bg-purple-50 border-purple-100'
-                                    : 'bg-gray-50 border-gray-100'
+                                    ? 'bg-[var(--color-surface-raised)] border-brand-border'
+                                    : 'bg-[var(--color-surface-raised)] border-gray-100'
                             "
                         >
                             <p
                                 class="text-xs mb-1"
-                                :class="review.promotion_eligible ? 'text-purple-600' : 'text-gray-500'"
+                                :class="review.promotion_eligible ? 'text-brand-dark' : 'text-gray-500'"
                             >
                                 Promotion
                             </p>
                             <p
                                 class="text-lg font-bold"
-                                :class="review.promotion_eligible ? 'text-purple-700' : 'text-gray-400'"
+                                :class="review.promotion_eligible ? 'text-brand-dark' : 'text-gray-400'"
                             >
                                 {{ review.promotion_eligible ? "Eligible" : "N/A" }}
                             </p>
                         </div>
                         <div
                             class="p-3 rounded-lg border text-center"
-                            :class="review.pip_required ? 'bg-red-50 border-red-100' : 'bg-gray-50 border-gray-100'"
+                            :class="review.pip_required ? 'bg-red-50 border-red-100' : 'bg-[var(--color-surface-raised)] border-gray-100'"
                         >
                             <p class="text-xs mb-1" :class="review.pip_required ? 'text-red-600' : 'text-gray-500'">
                                 PIP
@@ -724,7 +724,7 @@ watch(
                 <!-- Goal & Feedback Summary (visible for pending_calibration / completed) -->
                 <MainCard
                     v-if="['pending_calibration', 'completed'].includes(reviewStatus)"
-                    class="border-l-4 border-l-brand-primary"
+                    
                 >
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Performance Data Summary</h2>
                     <div v-if="readinessLoading" class="flex justify-center py-4">
@@ -732,26 +732,26 @@ watch(
                     </div>
                     <div v-else-if="readinessResult?.summary" class="grid grid-cols-2 md:grid-cols-5 gap-3">
                         <!-- Sections Rated -->
-                        <div class="p-3 bg-blue-50 rounded-lg">
-                            <p class="text-xs text-blue-600 uppercase tracking-wide font-medium">Sections Rated</p>
-                            <p class="text-2xl font-bold text-blue-800 mt-1">
+                        <div class="p-3 bg-[var(--color-surface-raised)] rounded-lg">
+                            <p class="text-xs text-brand-dark uppercase tracking-wide font-medium">Sections Rated</p>
+                            <p class="text-2xl font-bold text-brand-dark mt-1">
                                 {{ readinessResult.summary.sections_rated }}
                             </p>
                         </div>
                         <!-- Goals Total -->
                         <div
                             class="p-3 rounded-lg"
-                            :class="readinessResult.summary.goals_count > 0 ? 'bg-emerald-50' : 'bg-amber-50'"
+                            :class="readinessResult.summary.goals_count > 0 ? 'bg-[var(--color-surface-raised)]' : 'bg-amber-50'"
                         >
                             <p
                                 class="text-xs uppercase tracking-wide font-medium"
-                                :class="readinessResult.summary.goals_count > 0 ? 'text-emerald-600' : 'text-amber-600'"
+                                :class="readinessResult.summary.goals_count > 0 ? 'text-brand-dark' : 'text-amber-600'"
                             >
                                 Goals Total
                             </p>
                             <p
                                 class="text-2xl font-bold mt-1"
-                                :class="readinessResult.summary.goals_count > 0 ? 'text-emerald-800' : 'text-amber-800'"
+                                :class="readinessResult.summary.goals_count > 0 ? 'text-brand-dark' : 'text-amber-800'"
                             >
                                 {{ readinessResult.summary.goals_count }}
                             </p>
@@ -762,12 +762,12 @@ watch(
                         <!-- Goals Completed -->
                         <div
                             class="p-3 rounded-lg"
-                            :class="readinessResult.summary.goals_completed > 0 ? 'bg-emerald-50' : 'bg-gray-50'"
+                            :class="readinessResult.summary.goals_completed > 0 ? 'bg-[var(--color-surface-raised)]' : 'bg-[var(--color-surface-raised)]'"
                         >
                             <p
                                 class="text-xs uppercase tracking-wide font-medium"
                                 :class="
-                                    readinessResult.summary.goals_completed > 0 ? 'text-emerald-600' : 'text-gray-500'
+                                    readinessResult.summary.goals_completed > 0 ? 'text-brand-dark' : 'text-gray-500'
                                 "
                             >
                                 Goals Completed
@@ -775,7 +775,7 @@ watch(
                             <p
                                 class="text-2xl font-bold mt-1"
                                 :class="
-                                    readinessResult.summary.goals_completed > 0 ? 'text-emerald-800' : 'text-gray-400'
+                                    readinessResult.summary.goals_completed > 0 ? 'text-brand-dark' : 'text-gray-400'
                                 "
                             >
                                 {{ readinessResult.summary.goals_completed ?? 0 }}
@@ -784,17 +784,17 @@ watch(
                         <!-- Goals On-Time -->
                         <div
                             class="p-3 rounded-lg"
-                            :class="readinessResult.summary.goals_on_time > 0 ? 'bg-teal-50' : 'bg-gray-50'"
+                            :class="readinessResult.summary.goals_on_time > 0 ? 'bg-[var(--color-surface-raised)]' : 'bg-[var(--color-surface-raised)]'"
                         >
                             <p
                                 class="text-xs uppercase tracking-wide font-medium"
-                                :class="readinessResult.summary.goals_on_time > 0 ? 'text-teal-600' : 'text-gray-500'"
+                                :class="readinessResult.summary.goals_on_time > 0 ? 'text-brand-dark' : 'text-gray-500'"
                             >
                                 Goals On-Time
                             </p>
                             <p
                                 class="text-2xl font-bold mt-1"
-                                :class="readinessResult.summary.goals_on_time > 0 ? 'text-teal-800' : 'text-gray-400'"
+                                :class="readinessResult.summary.goals_on_time > 0 ? 'text-brand-dark' : 'text-gray-400'"
                             >
                                 {{ readinessResult.summary.goals_on_time ?? 0 }}
                             </p>
@@ -803,14 +803,14 @@ watch(
                         <div
                             class="p-3 rounded-lg"
                             :class="
-                                readinessResult.summary.positive_feedback_count > 0 ? 'bg-purple-50' : 'bg-amber-50'
+                                readinessResult.summary.positive_feedback_count > 0 ? 'bg-[var(--color-surface-raised)]' : 'bg-amber-50'
                             "
                         >
                             <p
                                 class="text-xs uppercase tracking-wide font-medium"
                                 :class="
                                     readinessResult.summary.positive_feedback_count > 0
-                                        ? 'text-purple-600'
+                                        ? 'text-brand-dark'
                                         : 'text-amber-600'
                                 "
                             >
@@ -820,7 +820,7 @@ watch(
                                 class="text-2xl font-bold mt-1"
                                 :class="
                                     readinessResult.summary.positive_feedback_count > 0
-                                        ? 'text-purple-800'
+                                        ? 'text-brand-dark'
                                         : 'text-amber-800'
                                 "
                             >
@@ -849,7 +849,7 @@ watch(
                                 isDeadlinePassed(review.cycle?.self_assessment_deadline) &&
                                 reviewStatus === 'pending_self'
                                     ? 'bg-red-50 border border-red-200'
-                                    : 'bg-gray-50'
+                                    : 'bg-[var(--color-surface-raised)]'
                             "
                         >
                             <div class="flex items-center gap-2 mb-1">
@@ -875,7 +875,7 @@ watch(
                                 isDeadlinePassed(review.cycle?.manager_assessment_deadline) &&
                                 reviewStatus === 'pending_manager'
                                     ? 'bg-red-50 border border-red-200'
-                                    : 'bg-gray-50'
+                                    : 'bg-[var(--color-surface-raised)]'
                             "
                         >
                             <div class="flex items-center gap-2 mb-1">
@@ -901,7 +901,7 @@ watch(
                                 isDeadlinePassed(review.cycle?.calibration_deadline) &&
                                 reviewStatus === 'pending_calibration'
                                     ? 'bg-red-50 border border-red-200'
-                                    : 'bg-gray-50'
+                                    : 'bg-[var(--color-surface-raised)]'
                             "
                         >
                             <div class="flex items-center gap-2 mb-1">
@@ -944,7 +944,7 @@ watch(
                                         {{ section.description }}
                                     </p>
                                 </div>
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-brand-dark">
                                     Weight: {{ section.weight }}%
                                 </span>
                             </div>
@@ -1020,7 +1020,7 @@ watch(
                                     </div>
                                     <p
                                         v-if="getResponseForSection(section.id)?.self_comments"
-                                        class="text-sm text-brand-light mt-2 p-3 bg-gray-50 rounded-lg"
+                                        class="text-sm text-brand-light mt-2 p-3 bg-[var(--color-surface-raised)] rounded-lg"
                                     >
                                         {{ getResponseForSection(section.id)?.self_comments }}
                                     </p>
@@ -1061,14 +1061,14 @@ watch(
                     <!-- Self-assessment summary -->
                     <div
                         v-if="reviewStatus !== 'pending_self' && review?.responses?.some((r) => r.self_rating)"
-                        class="p-4 bg-gray-50 border border-gray-200 rounded-xl"
+                        class="p-4 bg-[var(--color-surface-raised)] border border-gray-200 rounded-xl"
                     >
                         <p class="text-sm font-semibold text-brand-dark mb-2">Employee Self-Assessment Summary</p>
                         <div class="flex flex-wrap gap-3">
                             <div
                                 v-for="section in displaySections"
                                 :key="'summary-' + section.id"
-                                class="flex items-center gap-2 px-3 py-1 bg-white rounded-lg border"
+                                class="flex items-center gap-2 px-3 py-1 bg-[var(--color-surface)] rounded-lg border"
                             >
                                 <span class="text-xs text-brand-light">{{ section.name }}:</span>
                                 <span
@@ -1093,7 +1093,7 @@ watch(
                                         {{ section.description }}
                                     </p>
                                 </div>
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-brand-dark">
                                     Weight: {{ section.weight }}%
                                 </span>
                             </div>
@@ -1101,20 +1101,20 @@ watch(
                             <!-- Employee self-assessment reference -->
                             <div
                                 v-if="getResponseForSection(section.id)?.self_rating"
-                                class="p-3 bg-yellow-50 border border-yellow-100 rounded-lg"
+                                class="p-3 bg-[var(--color-surface-raised)] border border-brand-border rounded-lg"
                             >
-                                <p class="text-xs font-medium text-yellow-700 mb-1">Employee Self-Rating</p>
+                                <p class="text-xs font-medium text-brand-dark mb-1">Employee Self-Rating</p>
                                 <div class="flex items-center gap-2">
-                                    <span class="text-sm font-bold text-yellow-800">
+                                    <span class="text-sm font-bold text-brand-dark">
                                         {{ getResponseForSection(section.id)?.self_rating }}/5
                                     </span>
-                                    <span class="text-xs text-yellow-600">
+                                    <span class="text-xs text-brand-dark">
                                         {{ getRatingLabel(getResponseForSection(section.id)?.self_rating)?.label }}
                                     </span>
                                 </div>
                                 <p
                                     v-if="getResponseForSection(section.id)?.self_comments"
-                                    class="text-xs text-yellow-700 mt-1"
+                                    class="text-xs text-brand-dark mt-1"
                                 >
                                     "{{ getResponseForSection(section.id)?.self_comments }}"
                                 </p>
@@ -1173,7 +1173,7 @@ watch(
                                                 class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
                                                 :class="
                                                     n <= getResponseForSection(section.id)?.manager_rating
-                                                        ? 'bg-blue-500 text-white'
+                                                        ? 'bg-[var(--color-surface-raised)]0 text-white'
                                                         : 'bg-gray-100 text-gray-400'
                                                 "
                                             >
@@ -1193,7 +1193,7 @@ watch(
                                     </div>
                                     <p
                                         v-if="getResponseForSection(section.id)?.manager_comments"
-                                        class="text-sm text-brand-light mt-2 p-3 bg-gray-50 rounded-lg"
+                                        class="text-sm text-brand-light mt-2 p-3 bg-[var(--color-surface-raised)] rounded-lg"
                                     >
                                         {{ getResponseForSection(section.id)?.manager_comments }}
                                     </p>
@@ -1265,7 +1265,7 @@ watch(
                                         {{ section.description }}
                                     </p>
                                 </div>
-                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-700">
+                                <span class="px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-brand-dark">
                                     Weight: {{ section.weight }}%
                                 </span>
                             </div>
@@ -1273,48 +1273,48 @@ watch(
                             <!-- Comparison Grid -->
                             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <!-- Self Rating -->
-                                <div class="p-3 bg-yellow-50 border border-yellow-100 rounded-lg">
-                                    <p class="text-xs font-medium text-yellow-700 mb-2">Self Assessment</p>
+                                <div class="p-3 bg-[var(--color-surface-raised)] border border-brand-border rounded-lg">
+                                    <p class="text-xs font-medium text-brand-dark mb-2">Self Assessment</p>
                                     <div
                                         v-if="getResponseForSection(section.id)?.self_rating"
                                         class="flex items-center gap-2"
                                     >
-                                        <span class="text-lg font-bold text-yellow-800">
+                                        <span class="text-lg font-bold text-brand-dark">
                                             {{ getResponseForSection(section.id)?.self_rating }}/5
                                         </span>
-                                        <span class="text-xs text-yellow-600">
+                                        <span class="text-xs text-brand-dark">
                                             {{ getRatingLabel(getResponseForSection(section.id)?.self_rating)?.label }}
                                         </span>
                                     </div>
-                                    <p v-else class="text-xs text-yellow-600 italic">Not submitted</p>
+                                    <p v-else class="text-xs text-brand-dark italic">Not submitted</p>
                                     <p
                                         v-if="getResponseForSection(section.id)?.self_comments"
-                                        class="text-xs text-yellow-700 mt-2"
+                                        class="text-xs text-brand-dark mt-2"
                                     >
                                         "{{ getResponseForSection(section.id)?.self_comments }}"
                                     </p>
                                 </div>
 
                                 <!-- Manager Rating -->
-                                <div class="p-3 bg-blue-50 border border-blue-100 rounded-lg">
-                                    <p class="text-xs font-medium text-blue-700 mb-2">Manager Assessment</p>
+                                <div class="p-3 bg-[var(--color-surface-raised)] border border-brand-border rounded-lg">
+                                    <p class="text-xs font-medium text-brand-dark mb-2">Manager Assessment</p>
                                     <div
                                         v-if="getResponseForSection(section.id)?.manager_rating"
                                         class="flex items-center gap-2"
                                     >
-                                        <span class="text-lg font-bold text-blue-800">
+                                        <span class="text-lg font-bold text-brand-dark">
                                             {{ getResponseForSection(section.id)?.manager_rating }}/5
                                         </span>
-                                        <span class="text-xs text-blue-600">
+                                        <span class="text-xs text-brand-dark">
                                             {{
                                                 getRatingLabel(getResponseForSection(section.id)?.manager_rating)?.label
                                             }}
                                         </span>
                                     </div>
-                                    <p v-else class="text-xs text-blue-600 italic">Not submitted</p>
+                                    <p v-else class="text-xs text-brand-dark italic">Not submitted</p>
                                     <p
                                         v-if="getResponseForSection(section.id)?.manager_comments"
-                                        class="text-xs text-blue-700 mt-2"
+                                        class="text-xs text-brand-dark mt-2"
                                     >
                                         "{{ getResponseForSection(section.id)?.manager_comments }}"
                                     </p>
@@ -1339,17 +1339,17 @@ watch(
                                         class="w-10 h-10 rounded-lg border-2 flex items-center justify-center font-semibold transition-all text-sm"
                                         :class="
                                             calibrationForm[section.id]?.rating === n
-                                                ? 'border-purple-500 bg-purple-500 text-white'
-                                                : 'border-gray-200 text-brand-dark hover:border-purple-500'
+                                                ? 'border-brand-primary bg-[var(--color-surface-raised)]0 text-white'
+                                                : 'border-gray-200 text-brand-dark hover:border-brand-primary'
                                         "
                                     >
                                         {{ n }}
                                     </button>
                                 </div>
-                                <div class="mt-3 p-3 bg-purple-50 border border-purple-100 rounded-lg">
-                                    <p class="text-xs font-medium text-purple-700 mb-1">Effective Calibration Score</p>
+                                <div class="mt-3 p-3 bg-[var(--color-surface-raised)] border border-brand-border rounded-lg">
+                                    <p class="text-xs font-medium text-brand-dark mb-1">Effective Calibration Score</p>
                                     <div class="flex items-center gap-2">
-                                        <span class="text-base font-bold text-purple-800">
+                                        <span class="text-base font-bold text-brand-dark">
                                             {{ getCalibrationEffectiveRating(section.id).toFixed(2) }}
                                         </span>
                                         <span
@@ -1360,7 +1360,7 @@ watch(
                                                 getRatingLabel(getCalibrationEffectiveRating(section.id))?.label || "-"
                                             }}
                                         </span>
-                                        <span class="text-xs text-purple-600">
+                                        <span class="text-xs text-brand-dark">
                                             Contribution: {{ getCalibrationWeightedContribution(section).toFixed(2) }}
                                         </span>
                                     </div>
@@ -1378,7 +1378,7 @@ watch(
                                             class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold"
                                             :class="
                                                 n <= getResponseForSection(section.id)?.final_rating
-                                                    ? 'bg-purple-500 text-white'
+                                                    ? 'bg-[var(--color-surface-raised)]0 text-white'
                                                     : 'bg-gray-100 text-gray-400'
                                             "
                                         >
@@ -1425,11 +1425,11 @@ watch(
                             <!-- Manager's Recommended Rating -->
                             <div
                                 v-if="review.manager_recommended_rating"
-                                class="p-4 bg-blue-50 border border-blue-200 rounded-xl"
+                                class="p-4 bg-[var(--color-surface-raised)] border border-brand-border rounded-xl"
                             >
-                                <p class="text-sm font-medium text-blue-700">Manager's Recommended Rating</p>
+                                <p class="text-sm font-medium text-brand-dark">Manager's Recommended Rating</p>
                                 <div class="flex items-center gap-3 mt-2">
-                                    <p class="text-2xl font-bold text-blue-800">
+                                    <p class="text-2xl font-bold text-brand-dark">
                                         {{ Number(review.manager_recommended_rating).toFixed(2) }}
                                     </p>
                                     <span
@@ -1446,7 +1446,7 @@ watch(
                                 <h3 class="text-sm font-semibold text-brand-dark mb-3">
                                     Cross-Manager Normalization Context
                                 </h3>
-                                <div class="p-4 bg-gray-50 border border-gray-200 rounded-xl space-y-3">
+                                <div class="p-4 bg-[var(--color-surface-raised)] border border-gray-200 rounded-xl space-y-3">
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm text-brand-light">Cycle</span>
                                         <span class="text-sm font-medium text-brand-dark">
@@ -1479,8 +1479,8 @@ watch(
                                                 class="flex items-center justify-between p-2 rounded-lg"
                                                 :class="
                                                     manager.is_current_reviewer
-                                                        ? 'bg-blue-50 border border-blue-200'
-                                                        : 'bg-white'
+                                                        ? 'bg-[var(--color-surface-raised)] border border-brand-border'
+                                                        : 'bg-[var(--color-surface)]'
                                                 "
                                             >
                                                 <div class="flex items-center gap-2">
@@ -1489,7 +1489,7 @@ watch(
                                                     </span>
                                                     <span
                                                         v-if="manager.is_current_reviewer"
-                                                        class="text-xs text-blue-600 font-medium"
+                                                        class="text-xs text-brand-dark font-medium"
                                                     >
                                                         (This reviewer)
                                                     </span>
@@ -1522,8 +1522,8 @@ watch(
                                     class="px-6 py-3 rounded-lg font-semibold flex items-center gap-2 transition-all"
                                     :class="
                                         isCalibrationValid && !submitting
-                                        ? 'blue-gradient blue-btn-shadow text-white'
-                                        : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                                        ? 'bg-brand-primary text-white'
+                                        : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                                     "
                                 >
                                     <ScaleIcon class="w-4 h-4" />

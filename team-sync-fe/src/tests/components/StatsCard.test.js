@@ -12,8 +12,7 @@ describe('StatsCard', () => {
                 value: 1234,
                 iconName: 'Users',
                 subtitle: '+12.5% vs last month',
-                subtitleColor: 'text-success',
-                colorScheme: 'blue'
+                subtitleColor: 'text-success'
             }
         })
     })
@@ -47,13 +46,6 @@ describe('StatsCard', () => {
         expect(value.exists()).toBe(true)
     })
 
-    it('renders icon with correct color scheme', () => {
-        const iconWrapper = wrapper.find('.bg-blue-50')
-        expect(iconWrapper.exists()).toBe(true)
-        
-        const icon = wrapper.find('.text-blue-600')
-        expect(icon.exists()).toBe(true)
-    })
 
     it('renders title and subtitle', () => {
         expect(wrapper.text()).toContain('Total Users')

@@ -22,7 +22,7 @@ const props = defineProps({
                 <div class="w-11 h-11 relative flex items-center justify-center">
                     <!-- Background circle -->
                     <div
-                        class="w-11 h-11 absolute bg-gradient-to-br from-primary-100 to-primary-200 rounded-full"
+                        class="w-11 h-11 absolute bg-[var(--color-surface-overlay)] rounded-full"
                     ></div>
                     <!-- Overlapping smaller circle -->
                     <div

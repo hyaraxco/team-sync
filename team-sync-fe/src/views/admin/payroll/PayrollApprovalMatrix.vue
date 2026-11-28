@@ -150,7 +150,7 @@ onMounted(loadPolicies);
         <div class="flex items-start justify-between gap-4">
             <div>
                 <h1 class="text-brand-dark text-[32px] font-bold leading-tight flex items-center gap-3">
-                    <ShieldCheck class="w-8 h-8 text-blue-600" />
+                    <ShieldCheck class="w-8 h-8 text-brand-dark" />
                     Payroll Approval Matrix
                 </h1>
                 <p class="text-brand-light text-base font-normal mt-2">
@@ -167,7 +167,7 @@ onMounted(loadPolicies);
             </button>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
             <div v-if="loading" class="py-12 text-center text-brand-light">Loading approval policies...</div>
             <EmptyState
                 v-else-if="sortedPolicies.length === 0"
@@ -187,7 +187,7 @@ onMounted(loadPolicies);
                             <th class="px-4 py-3 text-right font-semibold text-brand-dark">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-[#F1F5F9] bg-white">
+                    <tbody class="divide-y divide-[#F1F5F9] bg-[var(--color-surface)]">
                         <tr v-for="policy in sortedPolicies" :key="policy.id">
                             <td class="px-4 py-3 font-semibold text-brand-dark">{{ policy.approval_order }}</td>
                             <td class="px-4 py-3 text-brand-dark">{{ policy.name }}</td>
@@ -200,7 +200,7 @@ onMounted(loadPolicies);
                                 <span
                                     class="inline-flex rounded-full px-2.5 py-1 text-xs font-semibold"
                                     :class="
-                                        policy.is_active ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
+                                        policy.is_active ? 'bg-green-100 text-green-700' : 'bg-[var(--color-surface-overlay)] text-brand-light border border-brand-border'
                                     "
                                 >
                                     {{ policy.is_active ? "Active" : "Inactive" }}

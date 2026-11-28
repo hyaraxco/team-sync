@@ -109,8 +109,8 @@ describe("QuickActions smoke", () => {
 
         expect(actions).toEqual(["Add Staff Member", "Create New Team", "Process Payroll", "Schedule Meeting"]);
 
-        expect(wrapper.find('[data-action-id="add-employee"]').attributes("class")).toContain("blue-gradient");
-        expect(wrapper.find('[data-action-id="create-team"]').attributes("class")).not.toContain("blue-gradient");
+        expect(wrapper.find('[data-action-id="add-employee"]').attributes("class")).toContain("bg-brand-primary");
+        expect(wrapper.find('[data-action-id="create-team"]').attributes("class")).not.toContain("bg-brand-primary");
     });
 
     it("shows payroll quick action for HR-style draft permissions", () => {

@@ -29,12 +29,12 @@ const handleClose = () => {
             @click.self="handleClose"
         >
             <div
-                class="bg-white rounded-2xl border border-brand-border w-full max-w-md mx-4 overflow-hidden animate-scale-in"
+                class="bg-[var(--color-surface)] rounded-2xl border border-brand-border w-full max-w-md mx-4 overflow-hidden animate-scale-in"
             >
                 <!-- Success Icon Header -->
-                <div class="bg-gradient-to-br from-green-50 to-green-100 p-8 text-center">
+                <div class="bg-[var(--color-surface-overlay)] p-8 text-center">
                     <div
-                        class="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-in"
+                        class="w-20 h-20 bg-green-600 rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce-in"
                     >
                         <CheckCircle class="w-10 h-10 text-white" />
                     </div>
@@ -44,7 +44,7 @@ const handleClose = () => {
 
                 <!-- Request Details -->
                 <div class="p-6 space-y-4" v-if="leaveData">
-                    <div class="bg-white border border-brand-border rounded-2xl p-4 space-y-3">
+                    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 space-y-3">
                         <!-- Leave Type -->
                         <div class="flex items-center justify-between">
                             <span class="text-brand-dark text-sm font-medium">Leave Type</span>
@@ -57,7 +57,7 @@ const handleClose = () => {
                         <div class="flex items-center justify-between">
                             <span class="text-brand-dark text-sm font-medium">Duration</span>
                             <div class="flex items-center gap-2">
-                                <Clock class="w-4 h-4 text-blue-600" />
+                                <Clock class="w-4 h-4 text-brand-dark" />
                                 <span class="text-brand-dark text-base font-semibold">
                                     {{ leaveData.total_days }}
                                     {{ leaveData.total_days === 1 ? "day" : "days" }}
@@ -69,7 +69,7 @@ const handleClose = () => {
                         <div class="flex items-center justify-between">
                             <span class="text-brand-dark text-sm font-medium">Period</span>
                             <div class="flex items-center gap-2">
-                                <Calendar class="w-4 h-4 text-blue-600" />
+                                <Calendar class="w-4 h-4 text-brand-dark" />
                                 <span class="text-brand-dark text-base font-semibold">
                                     {{ formatDateShort(leaveData.start_date) }} -
                                     {{ formatDateShort(leaveData.end_date) }}
@@ -79,9 +79,9 @@ const handleClose = () => {
                     </div>
 
                     <!-- Info Message -->
-                    <div class="bg-blue-50 border border-blue-200 rounded-xl p-4 flex gap-3">
-                        <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
-                            <span class="text-blue-600 text-lg">ℹ️</span>
+                    <div class="bg-[var(--color-surface-overlay)] border border-brand-border rounded-xl p-4 flex gap-3">
+                        <div class="w-8 h-8 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0">
+                            <span class="text-brand-dark text-lg">ℹ️</span>
                         </div>
                         <p class="text-brand-dark text-sm leading-relaxed">
                             You will receive a notification once your request has been reviewed by your manager.
@@ -91,7 +91,7 @@ const handleClose = () => {
                     <!-- Close Button -->
                     <button
                         @click="handleClose"
-                        class="btn-primary w-full rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
+                        class="btn-primary w-full rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Got it!</span>
                     </button>

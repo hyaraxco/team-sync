@@ -47,14 +47,14 @@ onUnmounted(() => {
         <div
             ref="sidebarRef"
             :class="[
-                'bg-white border border-brand-border rounded-2xl p-6 transition-all duration-300 ease-in-out',
+                'bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 transition-all duration-300 ease-in-out',
                 isSticky ? 'fixed top-5 z-10' : 'relative',
             ]"
             :style="isSticky ? { width: `${sidebarWidth}px` } : {}"
         >
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                    <Lightbulb class="w-6 h-6 text-green-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Lightbulb class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Form Tips</h3>
@@ -65,9 +65,9 @@ onUnmounted(() => {
             <div class="space-y-4">
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Choose reliable contact</p>
@@ -77,9 +77,9 @@ onUnmounted(() => {
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Verify contact information</p>
@@ -89,9 +89,9 @@ onUnmounted(() => {
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Include relationship details</p>
@@ -101,9 +101,9 @@ onUnmounted(() => {
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Consider multiple contacts</p>
@@ -113,9 +113,9 @@ onUnmounted(() => {
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Review all form data</p>

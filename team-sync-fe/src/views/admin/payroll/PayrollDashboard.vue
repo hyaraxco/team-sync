@@ -198,9 +198,9 @@ const analyticsTrendOptions = computed(() => ({
 
 const getStatusColor = (status) => {
     const colors = {
-        draft: "bg-gray-100 text-gray-800",
+        draft: "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border",
         pending: "bg-yellow-100 text-yellow-800",
-        approved: "bg-blue-100 text-blue-800",
+        approved: "bg-green-100 text-green-800",
         finalized: "bg-green-100 text-green-800",
         rejected: "bg-red-100 text-red-800",
     };
@@ -252,9 +252,7 @@ const handleExportReport = async () => {
                     trendLabel="+5.2% this month"
                     :isTrendUp="true"
                     :loading="loading"
-                >
-
-                </MainCard>
+                />
 
                 <!-- Row 1 Stats Cards -->
                 <StatsCard
@@ -263,7 +261,6 @@ const handleExportReport = async () => {
                     subtitle="This month"
                     subtitleColor="text-success"
                     iconName="UserCheck"
-                    colorScheme="green"
                     :loading="loading"
                 />
 
@@ -273,20 +270,19 @@ const handleExportReport = async () => {
                     subtitle="Need approval"
                     subtitleColor="text-danger"
                     iconName="Clock"
-                    colorScheme="red"
                     :loading="loading"
                 />
 
                 <!-- Quick Actions Card (spans 2 rows on the right) -->
                 <div
-                    class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
+                    class="lg:row-span-2 bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
                 >
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -296,9 +292,9 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
-                            <UserCheck class="w-4 h-4 text-gray-600" />
+                            <UserCheck class="w-4 h-4 text-brand-dark" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
                         </RouterLink>
 
@@ -307,9 +303,9 @@ const handleExportReport = async () => {
                             type="button"
                             data-testid="payroll-export-report-open"
                             @click="openExportReportModal"
-                            class="btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
-                            <Download class="w-4 h-4 text-gray-600" />
+                            <Download class="w-4 h-4 text-brand-dark" />
                             <span class="text-brand-dark text-sm font-medium">Export Payroll Report</span>
                         </button>
 
@@ -317,9 +313,9 @@ const handleExportReport = async () => {
                             v-if="hasPayrollStatistics"
                             :to="{ name: 'admin.payroll.comparison' }"
                             data-testid="payroll-comparison-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
-                            <Banknote class="w-4 h-4 text-gray-600" />
+                            <Banknote class="w-4 h-4 text-brand-dark" />
                             <span class="text-brand-dark text-sm font-medium">MoM Comparison</span>
                         </RouterLink>
 
@@ -327,9 +323,9 @@ const handleExportReport = async () => {
                             v-if="hasPayrollList"
                             :to="{ name: 'admin.payroll.adjustments' }"
                             data-testid="payroll-adjustment-queue-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
-                            <FileWarning class="w-4 h-4 text-gray-600" />
+                            <FileWarning class="w-4 h-4 text-brand-dark" />
                             <span class="text-brand-dark text-sm font-medium">Adjustment Queue</span>
                         </RouterLink>
 
@@ -337,13 +333,13 @@ const handleExportReport = async () => {
                             v-if="hasPayrollStatistics"
                             :to="{ name: 'admin.payroll.settings' }"
                             data-testid="payroll-settings-link"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
-                            <Settings class="w-4 h-4 text-gray-400" />
+                            <Settings class="w-4 h-4 text-brand-dark" />
                             <div class="flex items-center justify-between w-full gap-2">
                                 <div class="flex flex-col items-start">
                                     <span class="text-brand-dark text-sm font-medium">Payroll Settings</span>
-                                    <span class="text-xs font-normal text-gray-500">
+                                    <span class="text-xs font-normal text-brand-light">
                                         Finance only • Configure payroll rules
                                     </span>
                                 </div>
@@ -359,7 +355,6 @@ const handleExportReport = async () => {
                     :subtitle="`+${formatRupiahCompact(1900000)} from last month`"
                     subtitleColor="text-success"
                     iconName="Banknote"
-                    colorScheme="blue"
                     :loading="loading"
                 />
 
@@ -367,16 +362,15 @@ const handleExportReport = async () => {
                     title="Finalized"
                     :value="statistics.finalized"
                     subtitle="This month"
-                    subtitleColor="text-purple-600"
+                    subtitleColor="text-brand-light"
                     iconName="Clock"
-                    colorScheme="purple"
                     :loading="loading"
                 />
             </div>
 
             <div
                 data-testid="payroll-analytics-section"
-                class="bg-white border border-brand-border rounded-2xl p-6"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
             >
                 <div class="flex items-center justify-between gap-3 mb-4">
                     <div>
@@ -451,7 +445,7 @@ const handleExportReport = async () => {
                     <!-- Average Salary Trend -->
                     <div
                         data-testid="payroll-insights-avg-salary"
-                        class="bg-white border border-brand-border rounded-2xl p-6"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">Average Salary Trend</h3>
                         <VueApexCharts
@@ -465,7 +459,7 @@ const handleExportReport = async () => {
                     <!-- BPJS Contribution Trend -->
                     <div
                         data-testid="payroll-insights-bpjs"
-                        class="bg-white border border-brand-border rounded-2xl p-6"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">BPJS Contribution Trend</h3>
                         <VueApexCharts type="bar" height="200" :options="bpjsChartOptions" :series="bpjsChartSeries" />
@@ -474,7 +468,7 @@ const handleExportReport = async () => {
                     <!-- Top Deduction Reasons -->
                     <div
                         data-testid="payroll-insights-deduction-reasons"
-                        class="bg-white border border-brand-border rounded-2xl p-6"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">Top Deduction Reasons</h3>
                         <div class="space-y-3">
@@ -506,7 +500,7 @@ const handleExportReport = async () => {
                     <!-- Headcount vs Payroll Growth -->
                     <div
                         data-testid="payroll-insights-headcount"
-                        class="bg-white border border-brand-border rounded-2xl p-6"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                     >
                         <h3 class="text-base font-semibold text-brand-dark mb-3">Headcount vs Payroll</h3>
                         <div class="space-y-2">
@@ -532,11 +526,11 @@ const handleExportReport = async () => {
         <template v-else>
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div
-                    class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6"
+                    class="lg:col-span-2 bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                 >
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <FileText class="w-6 h-6 text-blue-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <FileText class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h2 class="text-lg font-semibold text-brand-dark">Payroll Operations</h2>
@@ -562,13 +556,13 @@ const handleExportReport = async () => {
                     </div>
                 </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -577,9 +571,9 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link-alt"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
-                            <UserCheck class="w-4 h-4 text-gray-600" />
+                            <UserCheck class="w-4 h-4 text-brand-dark" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
                         </RouterLink>
                         <div class="border border-brand-border rounded-2xl px-4 py-3">
@@ -596,13 +590,13 @@ const handleExportReport = async () => {
         <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
         <!-- Monthly Payroll Periods -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                     <h2 class="text-lg font-semibold text-brand-dark mb-4">Payroll Actions</h2>
                     <div class="space-y-3">
                         <RouterLink
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.create' }"
-                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                            class="btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2"
                         >
                             <Plus class="w-4 h-4 text-white" />
                             <span class="text-brand-white text-sm font-semibold">Create New Payroll</span>
@@ -611,7 +605,7 @@ const handleExportReport = async () => {
                             v-if="hasPayrollCreate"
                             :to="{ name: 'admin.payroll.readiness' }"
                             data-testid="payroll-readiness-link-alt"
-                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2"
+                            class="w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2"
                         >
                             <UserCheck class="w-4 h-4 text-gray-600" />
                             <span class="text-brand-dark text-sm font-medium">Readiness Dashboard</span>
@@ -764,7 +758,7 @@ const handleExportReport = async () => {
                         type="button"
                         @click="handleExportReport"
                         data-testid="payroll-report-submit"
-                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
+                        class="flex-1 btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <Download class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">

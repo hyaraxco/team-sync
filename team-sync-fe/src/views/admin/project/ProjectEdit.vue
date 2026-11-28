@@ -175,10 +175,10 @@ watch(
         <div class="flex-1">
             <form class="space-y-6" @submit.prevent="handleSubmit" v-if="!loading">
                 <!-- Project Information Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <Briefcase class="w-6 h-6 text-blue-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center">
+                            <Briefcase class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Project Information</h3>
@@ -196,7 +196,7 @@ watch(
                                     <div class="relative w-64 h-42">
                                         <!-- Default background -->
                                         <div
-                                            class="w-64 h-42 absolute bg-gray-50 rounded-2xl border-2 border-dashed border-brand-border"
+                                            class="w-64 h-42 absolute bg-[var(--color-surface-raised)] rounded-2xl border-2 border-dashed border-brand-border"
                                         ></div>
 
                                         <div
@@ -238,21 +238,21 @@ watch(
                                     />
                                     <button
                                         type="button"
-                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-[var(--color-surface-raised)] transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <ImagePlus class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Select Photo</span>
                                     </button>
                                     <button
                                         type="button"
-                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2"
+                                        class="hidden border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-[var(--color-surface-raised)] transition-all duration-300 px-4 py-2"
                                     >
                                         <Eye class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Preview Photo</span>
                                     </button>
                                     <button
                                         type="button"
-                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-2 flex items-center gap-2"
+                                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-[var(--color-surface-raised)] transition-all duration-300 px-4 py-2 flex items-center gap-2"
                                     >
                                         <X class="w-4 h-4 text-gray-600" />
                                         <span class="text-brand-dark text-base font-semibold">Remove Photo</span>
@@ -290,7 +290,7 @@ watch(
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center"
+                                            class="w-10 h-10 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center"
                                         >
                                             <Minus class="w-5 h-5 text-gray-600" />
                                         </div>
@@ -466,10 +466,10 @@ watch(
                 </div>
 
                 <!-- Project Leader Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <Crown class="w-6 h-6 text-green-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center">
+                            <Crown class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Project Leader</h3>
@@ -486,7 +486,7 @@ watch(
                             <button
                                 type="button"
                                 @click="leaderModal = true"
-                                class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
+                                class="w-full border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:bg-[var(--color-surface-raised)] transition-all duration-300 px-4 py-3 flex items-center gap-3 text-left"
                             >
                                 <UserCheck class="w-5 h-5 text-gray-400" />
                                 <span class="text-brand-dark font-normal flex-1">
@@ -503,7 +503,7 @@ watch(
 
                             <!-- Selected Leader Info -->
                             <div
-                                class="mt-3 p-4 bg-gray-50 rounded-xl border border-brand-border"
+                                class="mt-3 p-4 bg-[var(--color-surface-raised)] rounded-xl border border-brand-border"
                                 v-if="selectedLeader"
                             >
                                 <div class="flex items-center gap-3">
@@ -534,10 +534,10 @@ watch(
                 </div>
 
                 <!-- Team Assignment Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                            <Users class="w-6 h-6 text-purple-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center">
+                            <Users class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Team Assignment</h3>
@@ -623,10 +623,10 @@ watch(
                 </div>
 
                 <!-- Project Settings Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                            <Settings class="w-6 h-6 text-orange-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center">
+                            <Settings class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Project Settings</h3>
@@ -695,7 +695,7 @@ watch(
                                         <div
                                             class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center"
                                         >
-                                            <PlayCircle class="w-5 h-5 text-green-600" />
+                                            <PlayCircle class="w-5 h-5 text-brand-dark" />
                                         </div>
                                         <div class="flex flex-col">
                                             <p class="text-brand-dark text-base font-semibold">Active</p>
@@ -792,7 +792,7 @@ watch(
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-gray-50 rounded-xl flex items-center justify-center"
+                                            class="w-10 h-10 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center"
                                         >
                                             <FileText class="w-5 h-5 text-gray-600" />
                                         </div>
@@ -828,7 +828,7 @@ watch(
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Update Project</span>
                         <Plus class="w-4 h-4 text-white" />
@@ -836,7 +836,7 @@ watch(
                     <button
                         type="button"
                         onclick="window.history.back()"
-                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                        class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-[var(--color-surface-raised)] transition-all duration-300 px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-dark text-base font-semibold">Cancel</span>
                     </button>
@@ -849,13 +849,13 @@ watch(
 
     <!-- Project Leader Selection Modal -->
     <div class="fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center" v-if="leaderModal">
-        <div class="bg-white rounded-2xl border border-brand-border w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden">
+        <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border w-full max-w-4xl mx-4 max-h-[80vh] overflow-hidden">
             <!-- Modal Header -->
             <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <Crown class="w-6 h-6 text-green-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center">
+                            <Crown class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Select Project Leader</h3>
@@ -880,7 +880,7 @@ watch(
                     </div>
                     <input
                         type="text"
-                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                        class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold"
                         placeholder="Search staffMembers..."
                         v-model="searchLeader"
                     />
@@ -891,7 +891,7 @@ watch(
             <div class="p-6 overflow-y-auto max-h-96">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div
-                        class="leader-card border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-lg transition-all duration-300 p-4 cursor-pointer"
+                        class="leader-card border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 cursor-pointer"
                         v-for="employee in staffMembers"
                         :key="employee.id"
                         @click="handleSelectLeader(employee)"

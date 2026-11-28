@@ -127,7 +127,7 @@ const { layer, dismiss: handleCancel } = useModalLifecycle(
                     :class="{
                         'bg-red-700 hover:bg-red-800 text-white': type === 'danger',
                         'bg-amber-800 hover:bg-amber-900 text-white': type === 'warning',
-                        'bg-blue-800 hover:bg-blue-900 text-white': type === 'info',
+                        'bg-primary-700 hover:bg-primary-800 text-white': type === 'info',
                     }"
                 >
                     <span class="text-white text-base font-semibold">

@@ -248,13 +248,13 @@ onUnmounted(() => {
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
                 <h1 class="text-2xl font-bold text-brand-dark">Analytics</h1>
-                <p class="text-sm text-gray-500 mt-1">Data dan performa SDM perusahaan.</p>
+                <p class="text-sm text-brand-light mt-1">Data dan performa SDM perusahaan.</p>
             </div>
 
             <!-- Global Filters + Export -->
             <div class="flex items-center gap-3 flex-wrap">
-                <div class="flex items-center gap-2 px-3 py-2 bg-white border border-brand-border rounded-xl">
-                    <FilterIcon class="w-4 h-4 text-gray-400" />
+                <div class="flex items-center gap-2 px-3 py-2 bg-[var(--color-surface)] border border-brand-border rounded-xl">
+                    <FilterIcon class="w-4 h-4 text-brand-light" />
                     <select
                         v-model="period"
                         @change="onFilterChange"
@@ -271,7 +271,7 @@ onUnmounted(() => {
                     v-model="department"
                     @change="onFilterChange"
                     aria-label="Filter by department"
-                    class="text-sm text-brand-dark bg-white border border-brand-border rounded-xl px-3 py-2 outline-none cursor-pointer"
+                    class="text-sm text-brand-dark bg-[var(--color-surface)] border border-brand-border rounded-xl px-3 py-2 outline-none cursor-pointer"
                 >
                     <option :value="null">All Departments</option>
                     <option v-for="dept in departments" :key="dept.value" :value="dept.value">
@@ -284,7 +284,7 @@ onUnmounted(() => {
                     v-model="teamId"
                     @change="onFilterChange"
                     aria-label="Filter by team"
-                    class="text-sm text-brand-dark bg-white border border-brand-border rounded-xl px-3 py-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary"
+                    class="text-sm text-brand-dark bg-[var(--color-surface)] border border-brand-border rounded-xl px-3 py-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary"
                 >
                     <option :value="null" disabled>Select a led team</option>
                     <option v-for="team in teams" :key="team.id" :value="team.id">{{ team.name }}</option>
@@ -303,7 +303,7 @@ onUnmounted(() => {
                     </button>
                     <div
                         v-if="showExportMenu"
-                        class="absolute right-0 mt-2 w-48 bg-white border border-brand-border rounded-xl shadow-lg z-10 overflow-hidden"
+                        class="absolute right-0 mt-2 w-48 bg-[var(--color-surface)] border border-brand-border rounded-xl shadow-lg z-10 overflow-hidden"
                     >
                         <button
                             @click="handleExportExcel"
@@ -325,7 +325,7 @@ onUnmounted(() => {
         </div>
 
         <!-- Tab Navigation -->
-        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-3 mb-6">
             <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3" role="tablist">
                 <button
                     v-for="tab in tabs"
@@ -338,14 +338,14 @@ onUnmounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === tab.id
-                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            ? 'bg-brand-primary border border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                     "
                 >
                     <component
                         :is="tab.icon"
                         class="w-4 h-4"
-                        :class="activeTab === tab.id ? 'text-white' : 'text-gray-600'"
+                        :class="activeTab === tab.id ? 'text-white' : 'text-brand-light'"
                         aria-hidden="true"
                     />
                     <span class="text-sm font-semibold">{{ tab.label }}</span>
@@ -358,21 +358,21 @@ onUnmounted(() => {
             <!-- Loading State -->
             <div v-if="executiveSummaryLoading" class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div v-for="i in 6" :key="i" class="h-28 bg-gray-100 rounded-2xl animate-pulse" />
+                    <div v-for="i in 6" :key="i" class="h-28 bg-[var(--color-surface-overlay)] rounded-2xl animate-pulse" />
                 </div>
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="h-96 bg-gray-100 rounded-2xl animate-pulse" />
-                    <div class="h-96 bg-gray-100 rounded-2xl animate-pulse" />
+                    <div class="h-96 bg-[var(--color-surface-overlay)] rounded-2xl animate-pulse" />
+                    <div class="h-96 bg-[var(--color-surface-overlay)] rounded-2xl animate-pulse" />
                 </div>
             </div>
 
             <!-- Executive Summary Content -->
             <div v-else-if="executiveSummary" class="space-y-6">
                 <!-- Period Label -->
-                <div class="flex items-center gap-2 text-sm text-gray-500">
+                <div class="flex items-center gap-2 text-sm text-brand-light">
                     <span class="inline-block w-2 h-2 rounded-full bg-brand-primary"></span>
                     {{ executiveSummary.period?.label }}
-                    <span class="text-gray-300">|</span>
+                    <span class="text-brand-light opacity-50">|</span>
                     {{ executiveSummary.period?.start }} - {{ executiveSummary.period?.end }}
                 </div>
 
@@ -454,9 +454,9 @@ onUnmounted(() => {
                 <!-- Charts Row 1: Attendance vs Deduction + HR Cost -->
                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Attendance vs Deduction Trend -->
-                    <div class="bg-white border border-brand-border rounded-2xl p-6">
+                    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                         <h3 class="text-base font-semibold text-brand-dark mb-1">Attendance vs Deduction Impact</h3>
-                        <p class="text-xs text-gray-400 mb-4">
+                        <p class="text-xs text-brand-light mb-4">
                             Correlation between attendance rate and payroll deductions
                         </p>
                         <VueApexCharts
@@ -466,15 +466,15 @@ onUnmounted(() => {
                             :options="attendanceDeductionOptions"
                             :series="attendanceDeductionSeries"
                         />
-                        <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
+                        <div v-else class="flex items-center justify-center h-64 text-brand-light text-sm">
                             No data available for this period
                         </div>
                     </div>
 
                     <!-- Monthly HR Cost Breakdown -->
-                    <div class="bg-white border border-brand-border rounded-2xl p-6">
+                    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                         <h3 class="text-base font-semibold text-brand-dark mb-1">Monthly HR Cost Breakdown</h3>
-                        <p class="text-xs text-gray-400 mb-4">Salary, tax, BPJS contributions, and deductions</p>
+                        <p class="text-xs text-brand-light mb-4">Salary, tax, BPJS contributions, and deductions</p>
                         <VueApexCharts
                             v-if="chartReady && hrCostSeries[0]?.data?.length"
                             type="area"
@@ -482,16 +482,16 @@ onUnmounted(() => {
                             :options="hrCostOptions"
                             :series="hrCostSeries"
                         />
-                        <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
+                        <div v-else class="flex items-center justify-center h-64 text-brand-light text-sm">
                             No data available for this period
                         </div>
                     </div>
                 </div>
 
                 <!-- Charts Row 2: Team Performance -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                     <h3 class="text-base font-semibold text-brand-dark mb-1">Team Performance Comparison</h3>
-                    <p class="text-xs text-gray-400 mb-4">Attendance rate and task completion by team</p>
+                    <p class="text-xs text-brand-light mb-4">Attendance rate and task completion by team</p>
                     <VueApexCharts
                         v-if="chartReady && teamPerformanceSeries[0]?.data?.length"
                         type="bar"
@@ -499,14 +499,14 @@ onUnmounted(() => {
                         :options="teamPerformanceOptions"
                         :series="teamPerformanceSeries"
                     />
-                    <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">
+                    <div v-else class="flex items-center justify-center h-64 text-brand-light text-sm">
                         Data tim belum tersedia untuk periode ini
                     </div>
                 </div>
             </div>
 
             <!-- Empty State -->
-            <div v-else class="flex flex-col items-center justify-center py-20 text-gray-400">
+            <div v-else class="flex flex-col items-center justify-center py-20 text-brand-light">
                 <BarChart3Icon class="w-16 h-16 mb-4 opacity-50" />
                 <p class="text-lg font-medium">Data analitik belum tersedia</p>
                 <p class="text-sm mt-1">Try adjusting the period or filters</p>

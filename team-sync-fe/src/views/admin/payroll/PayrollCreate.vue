@@ -366,10 +366,10 @@ watch(
         <div class="flex-1">
             <form @submit.prevent="handleSubmit" class="space-y-6">
                 <!-- Payroll Period Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <Calendar class="w-6 h-6 text-blue-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <Calendar class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Generate Payroll</h3>
@@ -380,10 +380,10 @@ watch(
                     </div>
 
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Salary Month *</label>
+                        <label class="block text-sm font-medium text-brand-dark mb-1.5">Salary Month *</label>
                         <div class="relative">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                <Calendar class="h-5 w-5 text-gray-400" />
+                                <Calendar class="h-5 w-5 text-brand-light" />
                             </div>
                             <input
                                 type="month"
@@ -410,11 +410,11 @@ watch(
                     </div>
 
                     <!-- Info Box -->
-                    <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl flex items-start gap-3">
-                        <AlertCircle class="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                    <div class="mt-6 p-4 bg-[var(--color-surface-raised)] border border-brand-border rounded-xl flex items-start gap-3">
+                        <AlertCircle class="w-5 h-5 text-brand-dark flex-shrink-0 mt-0.5" />
                         <div>
-                            <h4 class="text-blue-900 text-sm font-semibold mb-1">Automatic Generation</h4>
-                            <p class="text-blue-800 text-sm">
+                            <h4 class="text-brand-dark text-sm font-semibold mb-1">Automatic Generation</h4>
+                            <p class="text-brand-light text-sm">
                                 Payroll will be automatically generated for all active employees based on their
                                 attendance records for the selected month. Salaries will be calculated based on
                                 attendance, sick days, and absences.
@@ -427,10 +427,10 @@ watch(
 
         <!-- Right Sidebar -->
         <div class="w-100 flex-shrink-0">
-            <div class="bg-white border border-brand-border rounded-2xl p-6 sticky top-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 sticky top-6">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <Calculator class="w-6 h-6 text-blue-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <Calculator class="w-6 h-6 text-brand-dark" />
                     </div>
                     <div>
                         <h3 class="text-brand-dark text-xl font-bold">Payroll Summary</h3>
@@ -439,9 +439,9 @@ watch(
                 </div>
 
                 <div class="space-y-4">
-                    <div class="flex justify-between items-center py-2 bg-blue-50 px-3 rounded-lg mb-4">
-                        <span class="text-blue-700 text-base font-semibold">Selected Month:</span>
-                        <span class="text-blue-700 text-base font-bold">{{ formatMonth(form.salary_month) }}</span>
+                    <div class="flex justify-between items-center py-2 bg-[var(--color-surface-raised)] px-3 rounded-lg mb-4">
+                        <span class="text-brand-dark text-base font-semibold">Selected Month:</span>
+                        <span class="text-brand-dark text-base font-bold">{{ formatMonth(form.salary_month) }}</span>
                     </div>
 
                     <div
@@ -469,25 +469,25 @@ watch(
                     >
                         <p class="text-slate-800 text-sm font-semibold">Readiness Dashboard</p>
                         <div class="grid grid-cols-2 gap-2 mt-3 text-xs">
-                            <div class="rounded-lg bg-white border border-slate-200 px-3 py-2">
+                            <div class="rounded-lg bg-[var(--color-surface)] border border-slate-200 px-3 py-2">
                                 <p class="text-slate-500">Total</p>
                                 <p class="text-slate-900 font-bold">
                                     {{ readinessDashboard.summary.total_employees }}
                                 </p>
                             </div>
-                            <div class="rounded-lg bg-white border border-green-200 px-3 py-2">
+                            <div class="rounded-lg bg-[var(--color-surface)] border border-green-200 px-3 py-2">
                                 <p class="text-green-600">Ready</p>
                                 <p class="text-green-700 font-bold">
                                     {{ readinessDashboard.summary.ready_employees }}
                                 </p>
                             </div>
-                            <div class="rounded-lg bg-white border border-amber-200 px-3 py-2">
+                            <div class="rounded-lg bg-[var(--color-surface)] border border-amber-200 px-3 py-2">
                                 <p class="text-amber-600">Warning</p>
                                 <p class="text-amber-700 font-bold">
                                     {{ readinessDashboard.summary.warning_employees }}
                                 </p>
                             </div>
-                            <div class="rounded-lg bg-white border border-red-200 px-3 py-2">
+                            <div class="rounded-lg bg-[var(--color-surface)] border border-red-200 px-3 py-2">
                                 <p class="text-red-600">Blocked</p>
                                 <p class="text-red-700 font-bold">
                                     {{ readinessDashboard.summary.blocked_employees }}
@@ -496,13 +496,13 @@ watch(
                         </div>
 
                         <div class="grid grid-cols-2 gap-2 mt-2 text-xs">
-                            <div class="rounded-lg bg-white border border-slate-200 px-3 py-2">
+                            <div class="rounded-lg bg-[var(--color-surface)] border border-slate-200 px-3 py-2">
                                 <p class="text-slate-500">Period Status</p>
                                 <p class="font-bold" :class="attendancePeriodStatusClass">
                                     {{ attendancePeriodStatusLabel }}
                                 </p>
                             </div>
-                            <div class="rounded-lg bg-white border border-slate-200 px-3 py-2">
+                            <div class="rounded-lg bg-[var(--color-surface)] border border-slate-200 px-3 py-2">
                                 <p class="text-slate-500">Cut-off Date</p>
                                 <p class="text-slate-900 font-bold">
                                     {{ attendanceCutoffLabel }}
@@ -528,7 +528,7 @@ watch(
                                     :class="
                                         readinessStatusFilter === filter.value
                                             ? 'border-brand-primary bg-blue-50 text-brand-primary'
-                                            : 'border-slate-200 bg-white text-slate-600 hover:border-brand-primary hover:text-brand-primary'
+                                            : 'border-slate-200 bg-[var(--color-surface)] text-slate-600 hover:border-brand-primary hover:text-brand-primary'
                                     "
                                     @click="setReadinessStatusFilter(filter.value)"
                                 >
@@ -544,14 +544,14 @@ watch(
                                     data-testid="payroll-readiness-search"
                                     type="text"
                                     placeholder="Search employee name or code"
-                                    class="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg bg-white focus:border-brand-primary outline-none"
+                                    class="w-full pl-9 pr-3 py-2 text-xs border border-slate-200 rounded-lg bg-[var(--color-surface)] focus:border-brand-primary outline-none"
                                 />
                             </div>
 
                             <p
                                 v-if="filteredReadinessEmployees.length === 0"
                                 data-testid="payroll-readiness-empty"
-                                class="text-xs text-slate-500 bg-white border border-dashed border-slate-200 rounded-lg px-3 py-3"
+                                class="text-xs text-slate-500 bg-[var(--color-surface)] border border-dashed border-slate-200 rounded-lg px-3 py-3"
                             >
                                 No employees match the current readiness filter.
                             </p>
@@ -560,7 +560,7 @@ watch(
                                 v-for="row in visibleReadinessEmployees"
                                 :key="row.staff_member_id"
                                 :data-testid="`payroll-readiness-row-${row.staff_member_id}`"
-                                class="rounded-lg border bg-white px-3 py-3"
+                                class="rounded-lg border bg-[var(--color-surface)] px-3 py-3"
                                 :class="
                                     row.status === 'blocked'
                                         ? 'border-red-200'
@@ -625,7 +625,7 @@ watch(
                                 v-if="canToggleReadinessExpansion"
                                 type="button"
                                 data-testid="payroll-readiness-toggle"
-                                class="w-full text-xs font-semibold border border-slate-200 bg-white rounded-lg px-3 py-2 text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300"
+                                class="w-full text-xs font-semibold border border-slate-200 bg-[var(--color-surface)] rounded-lg px-3 py-2 text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300"
                                 @click="toggleReadinessExpanded"
                             >
                                 {{ readinessExpanded ? "Show less" : `Show ${hiddenReadinessCount} more` }}
@@ -634,13 +634,13 @@ watch(
                     </div>
 
                     <!-- Form Actions -->
-                    <div class="space-y-3 pt-4 border-t border-gray-100">
+                    <div class="space-y-3 pt-4 border-t border-brand-border">
                         <button
                             type="submit"
                             data-testid="payroll-create-submit"
                             @click="handleSubmit"
                             :disabled="isSubmitDisabled"
-                            class="btn-primary w-full rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="btn-primary w-full rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             <span class="text-brand-white text-base font-semibold">
                                 {{ loading ? "Generating..." : "Generate Payroll" }}
@@ -651,9 +651,9 @@ watch(
                             type="button"
                             @click="router.back()"
                             :disabled="loading"
-                            class="w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            class="w-full border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-[var(--color-surface-overlay)] transition-all duration-300 px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                            <ArrowLeft class="w-4 h-4 text-gray-600" />
+                            <ArrowLeft class="w-4 h-4 text-brand-dark" />
                             <span class="text-brand-dark text-base font-semibold">Cancel</span>
                         </button>
                     </div>

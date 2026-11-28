@@ -136,7 +136,7 @@ const clearSearch = () => {
     <div>
         <div class="mb-6">
             <h2 class="text-brand-dark font-bold text-2xl mb-2">My Payroll</h2>
-            <p class="text-gray-600">View and download your payroll history</p>
+            <p class="text-brand-light">View and download your payroll history</p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
@@ -150,41 +150,41 @@ const clearSearch = () => {
             />
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
-                        <ArrowUpRight class="w-6 h-6 text-green-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <ArrowUpRight class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
                 <p class="text-brand-dark text-sm font-medium mb-2">Gross Earnings</p>
                 <p class="text-brand-dark text-xl font-extrabold tabular-nums">
                     {{ formatCurrency(totalEarnings) }}
                 </p>
-                <p class="text-success text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
+                <p class="text-brand-light text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-12 h-12 bg-red-50 rounded-2xl flex items-center justify-center">
-                        <ArrowDownRight class="w-6 h-6 text-red-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <ArrowDownRight class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
                 <p class="text-brand-dark text-sm font-medium mb-2">Total Deductions</p>
                 <p class="text-brand-dark text-xl font-extrabold tabular-nums">
                     {{ formatCurrency(totalDeductions) }}
                 </p>
-                <p class="text-danger text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
+                <p class="text-brand-light text-sm font-medium mt-1">Loaded for {{ filters.year }}</p>
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
             >
                 <div class="flex items-center justify-between mb-3">
-                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                        <TrendingUp class="w-6 h-6 text-blue-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <TrendingUp class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
                 <p class="text-brand-dark text-sm font-medium mb-2">Average Net Salary</p>
@@ -195,11 +195,11 @@ const clearSearch = () => {
             </div>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-4">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl mb-6 p-4">
             <div class="flex flex-col md:flex-row gap-4">
                 <div class="flex-1 relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                        <Search class="h-5 w-5 text-gray-400" />
+                        <Search class="h-5 w-5 text-brand-light" />
                     </div>
                     <input
                         type="text"
@@ -222,9 +222,9 @@ const clearSearch = () => {
 
             <div
                 v-if="filters.search"
-                class="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-blue-50 px-4 py-3"
+                class="mt-4 flex items-center justify-between gap-4 rounded-2xl bg-[var(--color-surface-overlay)] border border-brand-border px-4 py-3"
             >
-                <p class="text-sm text-blue-900">
+                <p class="text-sm text-brand-dark">
                     Showing results for
                     <span class="font-semibold">"{{ filters.search }}"</span>
                 </p>
@@ -232,7 +232,7 @@ const clearSearch = () => {
                     type="button"
                     @click="clearSearch"
                     data-testid="my-payroll-clear-search"
-                    class="inline-flex items-center gap-2 text-sm font-semibold text-blue-700 hover:text-blue-900"
+                    class="inline-flex items-center gap-2 text-sm font-semibold text-brand-dark hover:underline"
                 >
                     <X class="w-4 h-4" />
                     Clear
@@ -240,10 +240,10 @@ const clearSearch = () => {
             </div>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-5 mb-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-5 mb-6">
             <div class="mb-6">
                 <h3 class="text-brand-dark font-bold text-xl">All Payroll Periods</h3>
-                <p class="text-gray-600 text-sm mt-1">
+                <p class="text-brand-light text-sm mt-1">
                     Showing {{ meta.from }} - {{ meta.to }} of {{ meta.total }} payroll periods
                 </p>
             </div>
@@ -258,9 +258,9 @@ const clearSearch = () => {
                 >
                     <div class="flex items-start justify-between mb-4">
                         <div
-                            class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-all duration-300"
+                            class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center group-hover:bg-[var(--color-surface-overlay)] transition-all duration-300"
                         >
-                            <FileText class="w-6 h-6 text-blue-600" />
+                            <FileText class="w-6 h-6 text-brand-dark" />
                         </div>
                         <span
                             class="px-3 py-1 text-xs font-semibold rounded-full"
@@ -276,7 +276,7 @@ const clearSearch = () => {
 
                     <div class="mb-4">
                         <div class="flex items-center gap-2 mb-2">
-                            <Calendar class="w-4 h-4 text-gray-400" />
+                            <Calendar class="w-4 h-4 text-brand-light" />
                             <p class="text-brand-dark font-bold">
                                 {{ formatDate(payslip.period) }}
                             </p>
@@ -286,7 +286,7 @@ const clearSearch = () => {
                             {{ formatDate(payslip.payment_date || payslip.created_at) }}
                         </p>
                         <div class="flex items-center gap-2">
-                            <DollarSign class="w-4 h-4 text-gray-400" />
+                            <DollarSign class="w-4 h-4 text-brand-light" />
                             <p class="text-brand-dark text-xl font-extrabold">
                                 {{ formatCurrency(payslip.net_salary) }}
                             </p>
@@ -297,7 +297,7 @@ const clearSearch = () => {
                         </p>
                     </div>
 
-                    <div class="pt-4 border-t border-gray-200 flex items-center gap-2">
+                    <div class="pt-4 border-t border-brand-border flex items-center gap-2">
                         <button
                             :data-testid="`my-payroll-view-${payslip.id}`"
                             @click.stop="viewDetails(payslip.id)"
@@ -321,9 +321,9 @@ const clearSearch = () => {
             <div
                 v-if="!loading && payslips.length === 0"
                 data-testid="my-payroll-empty"
-                class="text-center py-12 text-gray-500"
+                class="text-center py-12 text-brand-light"
             >
-                <FileText class="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <FileText class="w-16 h-16 mx-auto mb-4 text-brand-light opacity-50" />
                 <template v-if="filters.year === currentYear">
                     <p class="text-lg font-semibold" data-testid="my-payroll-empty-processing">
                         Your payslip is being processed

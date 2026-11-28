@@ -33,7 +33,7 @@ onMounted(() => {
 });
 
 const getVarianceColor = (metric, diff, _pct) => {
-    if (diff === 0) return "text-gray-500";
+    if (diff === 0) return "text-brand-light";
 
     // Higher is generally "worse" for cost from company perspective, but we'll highlight green for positive variance for most, except deductions
     if (metric === "deductions" || metric === "tax_amount") {
@@ -72,38 +72,38 @@ const metrics = [
         <div class="flex items-center justify-between">
             <div class="flex flex-col">
                 <div class="flex items-center gap-2 mb-1">
-                    <RouterLink :to="{ name: 'admin.payroll.dashboard' }" class="text-gray-500 hover:text-gray-700">
+                    <RouterLink :to="{ name: 'admin.payroll.dashboard' }" class="text-brand-light hover:text-brand-dark">
                         <ArrowLeft class="w-5 h-5" />
                     </RouterLink>
-                    <h1 class="text-2xl font-bold text-gray-900">Month-over-Month Comparison</h1>
+                    <h1 class="text-2xl font-bold text-brand-dark">Month-over-Month Comparison</h1>
                 </div>
-                <p class="text-sm text-gray-500 ml-7">Compare payroll expenditures between two periods.</p>
+                <p class="text-sm text-brand-light ml-7">Compare payroll expenditures between two periods.</p>
             </div>
         </div>
 
         <MainCard>
             <div class="flex flex-col sm:flex-row items-end gap-4 mb-6">
                 <div class="w-full sm:w-1/3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Base Month (Month 1)</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Base Month (Month 1)</label>
                     <input
                         type="month"
                         v-model="month1"
-                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary"
+                        class="w-full border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary"
                     />
                 </div>
                 <div class="w-full sm:w-1/3">
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Compare Month (Month 2)</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Compare Month (Month 2)</label>
                     <input
                         type="month"
                         v-model="month2"
-                        class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary"
+                        class="w-full border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg shadow-sm focus:ring-brand-primary focus:border-brand-primary"
                     />
                 </div>
                 <div class="w-full sm:w-1/3 pb-0.5">
                     <button
                         @click="loadComparison"
                         :disabled="loadingAnalytics"
-                        class="btn-primary w-full justify-center"
+                        class="w-full justify-center px-4 py-2.5 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition font-semibold text-sm disabled:opacity-50"
                     >
                         <span v-if="loadingAnalytics">Loading...</span>
                         <span v-else>Compare</span>
@@ -111,7 +111,7 @@ const metrics = [
                 </div>
             </div>
 
-            <div v-if="error" class="bg-red-50 text-red-600 p-4 rounded-lg mb-6 flex items-start gap-2">
+            <div v-if="error" class="bg-[var(--color-surface)] border border-red-200 text-red-600 p-4 rounded-lg mb-6 flex items-start gap-2">
                 <AlertCircle class="w-5 h-5 flex-shrink-0 mt-0.5" />
                 <div>
                     <h3 class="font-medium">Failed to load comparison</h3>
@@ -123,13 +123,13 @@ const metrics = [
                 <EmptyState v-if="!payrollComparison.month1.found && !payrollComparison.month2.found" icon="Inbox" title="No payroll data found" />
                 <div
                     v-else-if="!payrollComparison.month1.found"
-                    class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4"
+                    class="text-center py-4 text-amber-800 bg-[var(--color-surface-overlay)] border border-amber-300 rounded mb-4 text-sm"
                 >
                     Warning: No payroll data found for {{ payrollComparison.month1.period }}.
                 </div>
                 <div
                     v-else-if="!payrollComparison.month2.found"
-                    class="text-center py-4 text-orange-600 bg-orange-50 rounded mb-4"
+                    class="text-center py-4 text-amber-800 bg-[var(--color-surface-overlay)] border border-amber-300 rounded mb-4 text-sm"
                 >
                     Warning: No payroll data found for {{ payrollComparison.month2.period }}.
                 </div>
@@ -139,24 +139,24 @@ const metrics = [
                     class="w-full text-left border-collapse"
                 >
                     <thead>
-                        <tr class="border-b border-gray-200">
-                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50 rounded-tl-lg">Metric</th>
-                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50">
+                        <tr class="border-b border-brand-border">
+                            <th class="py-3 px-4 font-semibold text-brand-light bg-[var(--color-surface-overlay)] rounded-tl-lg">Metric</th>
+                            <th class="py-3 px-4 font-semibold text-brand-light bg-[var(--color-surface-overlay)]">
                                 {{ payrollComparison.month1.period }}
                             </th>
-                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50">
+                            <th class="py-3 px-4 font-semibold text-brand-light bg-[var(--color-surface-overlay)]">
                                 {{ payrollComparison.month2.period }}
                             </th>
-                            <th class="py-3 px-4 font-semibold text-gray-700 bg-gray-50 rounded-tr-lg">Variance</th>
+                            <th class="py-3 px-4 font-semibold text-brand-light bg-[var(--color-surface-overlay)] rounded-tr-lg">Variance</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <tr v-for="metric in metrics" :key="metric.key" class="hover:bg-gray-50 transition-colors">
-                            <td class="py-4 px-4 font-medium text-gray-900">{{ metric.label }}</td>
-                            <td class="py-4 px-4 text-gray-600">
+                    <tbody class="divide-y divide-brand-border">
+                        <tr v-for="metric in metrics" :key="metric.key" class="hover:bg-[var(--color-surface-overlay)] transition-colors">
+                            <td class="py-4 px-4 font-medium text-brand-dark">{{ metric.label }}</td>
+                            <td class="py-4 px-4 text-brand-light">
                                 {{ formatValue(metric.key, payrollComparison.month1[metric.key]) }}
                             </td>
-                            <td class="py-4 px-4 text-gray-600">
+                            <td class="py-4 px-4 text-brand-light">
                                 {{ formatValue(metric.key, payrollComparison.month2[metric.key]) }}
                             </td>
                             <td class="py-4 px-4">

@@ -45,17 +45,17 @@ const isProgressFormValid = computed(() => {
 });
 
 const goalTypes = [
-    { value: "okr", label: "OKR", color: "bg-purple-100 text-purple-700" },
-    { value: "kpi", label: "KPI", color: "bg-blue-100 text-blue-700" },
+    { value: "okr", label: "OKR", color: "bg-[var(--color-surface-raised)] text-brand-dark" },
+    { value: "kpi", label: "KPI", color: "bg-[var(--color-surface-raised)] text-brand-dark" },
     {
         value: "development",
         label: "Development",
-        color: "bg-green-100 text-green-700",
+        color: "bg-[var(--color-surface-raised)] text-brand-dark",
     },
     {
         value: "project",
         label: "Project",
-        color: "bg-orange-100 text-orange-700",
+        color: "bg-[var(--color-surface-raised)] text-brand-dark",
     },
 ];
 
@@ -136,8 +136,8 @@ onMounted(async () => {
 <template>
     <div class="space-y-6">
         <div class="flex items-center gap-4">
-            <button class="p-2 hover:bg-gray-100 rounded-lg transition-colors" @click="handleBack">
-                <ArrowLeft class="w-5 h-5" />
+            <button class="p-2 hover:bg-[var(--color-surface-overlay)] rounded-lg transition-colors" @click="handleBack">
+                <ArrowLeft class="w-5 h-5 text-brand-dark" />
             </button>
             <div>
                 <h1 class="text-3xl font-bold text-brand-dark">Goal Details</h1>
@@ -183,7 +183,7 @@ onMounted(async () => {
                                 {{ currentGoal.completion_percentage || 0 }}%
                             </span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                        <div class="w-full bg-[var(--color-surface-overlay)] border border-brand-border rounded-full h-3 overflow-hidden">
                             <div
                                 class="h-full rounded-full transition-all duration-300"
                                 :class="getProgressColor(currentGoal.completion_percentage)"
@@ -193,21 +193,21 @@ onMounted(async () => {
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div class="p-4 border border-gray-100 rounded-xl">
+                        <div class="p-4 border border-brand-border rounded-xl bg-[var(--color-surface)]">
                             <p class="text-xs text-brand-light uppercase tracking-wide">Assignee</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{ resolvedAssigneeName }}
                             </p>
                         </div>
 
-                        <div class="p-4 border border-gray-100 rounded-xl">
+                        <div class="p-4 border border-brand-border rounded-xl bg-[var(--color-surface)]">
                             <p class="text-xs text-brand-light uppercase tracking-wide">Category</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{ currentGoal.category || "-" }}
                             </p>
                         </div>
 
-                        <div class="p-4 border border-gray-100 rounded-xl">
+                        <div class="p-4 border border-brand-border rounded-xl bg-[var(--color-surface)]">
                             <p class="text-xs text-brand-light uppercase tracking-wide">Start Date</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{
@@ -216,7 +216,7 @@ onMounted(async () => {
                             </p>
                         </div>
 
-                        <div class="p-4 border border-gray-100 rounded-xl">
+                        <div class="p-4 border border-brand-border rounded-xl bg-[var(--color-surface)]">
                             <p class="text-xs text-brand-light uppercase tracking-wide">Due Date</p>
                             <p class="text-sm font-semibold text-brand-dark mt-1">
                                 {{ currentGoal.due_date ? new Date(currentGoal.due_date).toLocaleDateString() : "-" }}
@@ -250,10 +250,10 @@ onMounted(async () => {
             </MainCard>
 
             <MainCard>
-                <div v-if="canShowProgressUpdateForm" class="mb-6 border border-gray-200 rounded-xl">
+                <div v-if="canShowProgressUpdateForm" class="mb-6 border border-brand-border rounded-xl">
                     <button
                         type="button"
-                        class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-gray-50 transition-colors"
+                        class="w-full flex items-center justify-between px-4 py-3 text-left hover:bg-[var(--color-surface-raised)] transition-colors"
                         @click="showProgressForm = !showProgressForm"
                     >
                         <span class="text-sm font-semibold text-brand-dark">Add Progress Update</span>
@@ -264,7 +264,7 @@ onMounted(async () => {
 
                     <form
                         v-if="showProgressForm"
-                        class="px-4 pb-4 pt-2 border-t border-gray-200 space-y-4"
+                        class="px-4 pb-4 pt-2 border-t border-brand-border space-y-4"
                         @submit.prevent="submitProgressUpdate"
                     >
                         <Alert
@@ -284,7 +284,7 @@ onMounted(async () => {
                                 step="1"
                                 required
                                 placeholder="Enter progress (0-100)"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                                class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent text-sm font-semibold"
                             />
                             <p class="text-xs text-brand-light mt-1">Value must be between 0 and 100.</p>
                         </div>
@@ -295,7 +295,7 @@ onMounted(async () => {
                                 v-model="progressForm.note"
                                 rows="3"
                                 placeholder="Add context for this progress update"
-                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                                class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl focus:ring-2 focus:ring-brand-primary focus:border-transparent text-sm font-semibold"
                             ></textarea>
                         </div>
 
@@ -303,7 +303,7 @@ onMounted(async () => {
                             <button
                                 type="submit"
                                 :disabled="!isProgressFormValid || updatesLoading"
-                                class="px-5 py-2.5 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                class="px-5 py-2.5 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
                             >
                                 {{ updatesLoading ? "Saving..." : "Save Progress Update" }}
                             </button>
@@ -321,7 +321,7 @@ onMounted(async () => {
                 </div>
 
                 <div v-else-if="goalUpdates?.length" class="space-y-3">
-                    <div v-for="update in goalUpdates" :key="update.id" class="p-4 border border-gray-100 rounded-lg">
+                    <div v-for="update in goalUpdates" :key="update.id" class="p-4 border border-brand-border rounded-xl bg-[var(--color-surface)]">
                         <div class="flex items-start justify-between gap-3">
                             <div>
                                 <p class="text-sm font-semibold text-brand-dark">

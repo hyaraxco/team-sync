@@ -22,7 +22,7 @@ const getStatusBadge = (status) => {
 </script>
 
 <template>
-    <div class="bg-white border flex-1 border-brand-border rounded-2xl p-6 mb-6">
+    <div class="bg-[var(--color-surface)] border flex-1 border-brand-border rounded-2xl p-6 mb-6">
         <h3 class="text-brand-dark text-lg font-bold mb-6">Pengajuan Koreksi Saya</h3>
 
         <div v-if="!corrections || corrections.length === 0">

@@ -27,7 +27,7 @@ const formatStatusLabel = (status) => {
 <template>
     <div
         @click="handleClick"
-        class="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 p-4 cursor-pointer group border border-gray-100 hover:border-brand-primary"
+        class="bg-[var(--color-surface)] rounded-xl shadow-sm hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 cursor-pointer group border border-gray-100 hover:border-brand-primary"
     >
         <!-- Task Title -->
         <h5 class="text-sm font-semibold text-gray-900 mb-3 leading-snug group-hover:text-brand-primary transition-colors">
@@ -65,7 +65,7 @@ const formatStatusLabel = (status) => {
             </div>
 
             <!-- Due Date -->
-            <div class="flex items-center gap-1.5 px-2 py-1 bg-gray-50 rounded-md">
+            <div class="flex items-center gap-1.5 px-2 py-1 bg-[var(--color-surface-raised)] rounded-md">
                 <Clock class="w-3.5 h-3.5 text-gray-500" />
                 <span class="text-xs font-medium text-gray-600">{{ formatDate(task.due_date) }}</span>
             </div>

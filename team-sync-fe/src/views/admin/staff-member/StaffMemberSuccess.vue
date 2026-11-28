@@ -1,5 +1,5 @@
 <script setup>
-import { Users, UserPlus, Plus, Mail } from "lucide-vue-next";
+import { Plus, Mail } from "lucide-vue-next";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
@@ -18,7 +18,7 @@ const addAnotherEmployee = () => {
     <main class="flex items-center justify-center py-12 min-h-[calc(100vh-80px)]">
         <div class="max-w-md mx-auto text-center px-4">
             <!-- Success Card -->
-            <div class="bg-white border border-brand-border rounded-2xl p-8 shadow-md">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-8 shadow-md">
                 <!-- Success Icon -->
                 <div class="flex justify-center mb-6">
                     <div class="w-32 h-32 flex items-center justify-center">
@@ -50,7 +50,7 @@ const addAnotherEmployee = () => {
                     <!-- Primary CTA -->
                     <button
                         @click="goToEmployees"
-                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-white text-base font-semibold">View All Staff Members</span>
                         <Users class="w-4 h-4 text-white" />
@@ -75,31 +75,6 @@ const addAnotherEmployee = () => {
                 </div>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="mt-6 grid grid-cols-2 gap-4">
-                <div class="bg-white border border-brand-border rounded-2xl p-4">
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <Users class="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div class="text-left">
-                            <p class="text-brand-dark text-lg font-bold">51,224</p>
-                            <p class="text-brand-light text-xs font-normal">Total Staff Members</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white border border-brand-border rounded-2xl p-4">
-                    <div class="flex items-start gap-3">
-                        <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                            <UserPlus class="w-5 h-5 text-green-600" />
-                        </div>
-                        <div class="text-left">
-                            <p class="text-brand-dark text-lg font-bold">7,183</p>
-                            <p class="text-brand-light text-xs font-normal">Added This Month</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     </main>
 </template>

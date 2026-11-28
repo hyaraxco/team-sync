@@ -25,17 +25,17 @@ const filteredGoals = computed(() => {
 });
 
 const goalTypes = [
-    { value: "okr", label: "OKR", color: "bg-purple-100 text-purple-700" },
-    { value: "kpi", label: "KPI", color: "bg-blue-100 text-blue-700" },
+    { value: "okr", label: "OKR", color: "bg-[var(--color-surface-raised)] text-brand-dark" },
+    { value: "kpi", label: "KPI", color: "bg-[var(--color-surface-raised)] text-brand-dark" },
     {
         value: "development",
         label: "Development",
-        color: "bg-green-100 text-green-700",
+        color: "bg-[var(--color-surface-raised)] text-brand-dark",
     },
     {
         value: "project",
         label: "Project",
-        color: "bg-orange-100 text-orange-700",
+        color: "bg-[var(--color-surface-raised)] text-brand-dark",
     },
 ];
 
@@ -89,31 +89,33 @@ onMounted(async () => {
             <p class="text-brand-light mt-1">Monitor and manage your team's goals</p>
         </div>
 
-        <MainCard>
-            <div class="flex-1 min-w-[200px]">
-                <label class="block text-sm font-medium text-brand-dark mb-2">Status</label>
-                <select
-                    v-model="selectedStatus"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
-                >
-                    <option value="all">All Statuses</option>
-                    <option value="not_started">Not Started</option>
-                    <option value="in_progress">In Progress</option>
-                    <option value="completed">Completed</option>
-                    <option value="at_risk">At Risk</option>
-                </select>
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6 space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4 border-b border-brand-border">
+                <div class="w-full sm:w-64">
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Status</label>
+                    <select
+                        v-model="selectedStatus"
+                        aria-label="Filter by status"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
+                    >
+                        <option value="all">All Statuses</option>
+                        <option value="not_started">Not Started</option>
+                        <option value="in_progress">In Progress</option>
+                        <option value="completed">Completed</option>
+                        <option value="at_risk">At Risk</option>
+                    </select>
+                </div>
             </div>
-        </MainCard>
 
-        <div v-if="goalsLoading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
+            <div v-if="goalsLoading" class="flex justify-center items-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+            </div>
 
         <div v-else-if="filteredGoals.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <MainCard
                 v-for="goal in filteredGoals"
                 :key="goal.id"
-                class="hover:shadow-xl transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                class="hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200 cursor-pointer group relative overflow-hidden"
                 @click="viewGoal(goal.id)"
             >
                 <div class="absolute top-4 right-4">
@@ -147,7 +149,7 @@ onMounted(async () => {
                             <span class="text-xs font-medium text-brand-light">Progress</span>
                             <span class="text-sm font-bold text-brand-dark">{{ goal.completion_percentage }}%</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div class="w-full bg-[var(--color-surface-overlay)] border border-brand-border rounded-full h-2 overflow-hidden">
                             <div
                                 class="h-full rounded-full transition-all duration-300"
                                 :class="getProgressColor(goal.completion_percentage)"
@@ -156,7 +158,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-brand-border">
                         <div>
                             <p class="text-xs text-brand-light uppercase tracking-wide">Due Date</p>
                             <p class="text-sm font-medium text-brand-dark mt-1">
@@ -171,7 +173,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div class="flex items-center justify-between pt-3 border-t border-brand-border">
                         <div class="flex items-center gap-2">
                             <Calendar class="w-4 h-4 text-brand-light" />
                             <span class="text-xs text-brand-light">
@@ -190,11 +192,14 @@ onMounted(async () => {
             </MainCard>
         </div>
 
-        <EmptyState
-            v-else
-            icon="Target"
-            title="Sasaran tim belum tersedia"
-            subtitle="Sesuaikan filter atau minta anggota tim membuat sasaran."
-        />
+        <div v-else class="py-12">
+            <EmptyState
+                icon="Target"
+                title="Sasaran tim belum tersedia"
+                subtitle="Sesuaikan filter atau minta anggota tim membuat sasaran."
+                size="lg"
+            />
+        </div>
+    </div>
     </div>
 </template>

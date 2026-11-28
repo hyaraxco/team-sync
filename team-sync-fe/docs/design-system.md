@@ -18,7 +18,7 @@ RBAC role changes what an employee can access; `job_title` does not grant permis
 - Plus Jakarta Sans stays because the original HRIS source uses it and current UI loads it globally.
 - White surfaces, a cool light-gray canvas, fine borders and rounded cards support employee and payroll data without making every surface float.
 - Keep the deep navy gradient as a focal treatment for active navigation and at most one role-relevant hero metric on a dashboard. Do not extend it to ordinary cards or every CTA.
-- Use semantic status colors only for real workflow states. Pastel icon tiles are optional, meaning-bearing accents, not decoration required on every card.
+- Use semantic status colors only for real workflow states. Metric icons and ordinary section panels stay neutral; do not assign decorative colors by category.
 - Keep the shared shell recognizable while arranging HR, Manager, Finance and employee dashboards around their distinct decisions.
 - Motion stays to useful transitions and feedback. No perpetual pulse for static information.
 
@@ -226,7 +226,7 @@ Use arbitrary radii only for a documented screen need. Do not make every element
 | Modal backdrop | `bg-black/50` | Dialog layer |
 | Popover/toast | `shadow-md` / `shadow-lg` | Overlay elevation only |
 
-Keep shadows rare. `StatsCard` currently uses a tinted icon tile and border, not a colored left stripe. Do not add decorative left stripes or page-wide shadows.
+Keep shadows rare. `StatsCard` uses a neutral icon tile and thin border, not a colored left stripe. Do not add decorative left stripes or page-wide shadows.
 
 ---
 
@@ -288,6 +288,10 @@ The desktop layout reserves about half the width for the visual panel and half f
 
 Most views use `space-y-6` between major sections. Use this as the default, not a requirement; let the page's task and content determine layout and spacing.
 For dashboard metric examples, use values and trends supplied by the backend for the signed-in employee or permitted company scope. Placeholder numbers in documentation examples are illustrative only and must never be copied into live screens.
+
+Primary list, form and detail content uses a neutral bordered panel: reuse `MainCard` with its default slot, `DataTableCard` for paginated tables, or the equivalent existing theme-surface panel. Keep page headings and dashboard composition outside the panel where appropriate. Do not wrap already-framed sections in another card. Embedded tabs inherit their host panel; avoid duplicate page padding and nested surface borders.
+
+Use navy text, neutral surfaces and subdued secondary text; cobalt marks primary actions, selection and focus. Remove decorative multicolor metric tiles, category gradients and tinted section fills. Preserve meaningful workflow status, error, destructive-action and chart-series distinctions.
 
 ---
 
@@ -364,7 +368,7 @@ Internally powered by `useAnimatedNumber` composable with ease-out cubic curve.
 
 **File:** `src/components/common/StatsCard.vue`
 
-Secondary metric card with a theme-aware surface, thin border, value, optional subtitle and tinted icon tile.
+Secondary metric card with a theme-aware surface, thin border, value, optional subtitle and neutral icon tile.
 
 #### Props
 
@@ -373,30 +377,16 @@ Secondary metric card with a theme-aware surface, thin border, value, optional s
 | `title` | `String` | — | Metric label |
 | `value` | `String\|Number` | — | Metric value (animates) |
 | `subtitle` | `String` | — | Trend or context text |
-| `subtitleColor` | `String` | `"text-success"` | Color class for subtitle |
+| `subtitleColor` | `String` | `"text-brand-light"` | Color class for meaningful status/trend context; neutral by default |
 | `iconName` | `String` | — | Lucide icon name string |
-| `colorScheme` | `String` | `"blue"` | `blue\|green\|purple\|orange\|red\|yellow\|teal\|cyan\|gray` |
 | `loading` | `Boolean` | — | Shows `"..."` while loading |
 
-#### Color Schemes
-
-| Scheme | Icon bg | Icon text |
-|--------|---------|-----------|
-| blue | `bg-blue-50` | `text-blue-600` |
-| green | `bg-green-50` | `text-green-600` |
-| purple | `bg-purple-50` | `text-purple-600` |
-| orange | `bg-orange-50` | `text-orange-600` |
-| red | `bg-red-50` | `text-red-600` |
-| yellow | `bg-yellow-50` | `text-yellow-600` |
-| teal | `bg-teal-50` | `text-teal-600` |
-| cyan | `bg-cyan-50` | `text-cyan-600` |
-| gray | `bg-gray-50` | `text-gray-600` |
 
 #### Visual Spec
 
-- Current surface: theme-aware white card with a thin brand border and a tinted semantic icon tile.
+- Current surface: theme-aware white card with a thin brand border and a neutral overlay-surface icon tile.
 - Hover uses a light focus ring; it does not add a colored left stripe.
-- Icon schemes exist in code for blue, green, purple, orange, red, yellow, teal, cyan and gray. Prefer inherited HRIS blue, green, orange and purple for metric icons; reserve red/green/amber status colors for actual state.
+- Icons use navy/theme-primary text without category color schemes. Reserve red/green/amber accents for actual state, not metric decoration.
 - Values animate through `useAnimatedNumber`; avoid count-up animation when frequent updates make data harder to read.
 - Use `tabular-nums` for money, rates and counts.
 
@@ -409,7 +399,6 @@ Secondary metric card with a theme-aware surface, thin border, value, optional s
   subtitle="+3 this month"
   subtitleColor="text-success"
   iconName="UsersIcon"
-  colorScheme="blue"
 />
 ```
 

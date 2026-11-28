@@ -25,14 +25,6 @@ const departmentLabels = {
     management: "Management",
 };
 
-const departmentColors = {
-    development: "bg-blue-100 text-blue-800",
-    design: "bg-purple-100 text-purple-800",
-    marketing: "bg-green-100 text-green-800",
-    sales: "bg-orange-100 text-orange-800",
-    support: "bg-yellow-100 text-yellow-800",
-    management: "bg-red-100 text-red-800",
-};
 
 const fetchMeetings = () => {
     meetingStore.fetchMeetingsPaginated({
@@ -91,34 +83,34 @@ onUnmounted(() => {
     <div class="space-y-6">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                 <div>
-                    <div class="text-2xl font-bold text-gray-900">Meetings</div>
-                <p class="text-sm text-gray-500 mt-1">Manage scheduled meetings and broadcasts</p>
+                    <div class="text-2xl font-bold text-brand-dark">Meetings</div>
+                <p class="text-sm text-brand-light mt-1">Manage scheduled meetings and broadcasts</p>
             </div>
             <button
                 v-if="can('meeting-create')"
                 @click="showCreateModal = true"
-                class="inline-flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm"
+                class="inline-flex items-center gap-2 px-4 py-2.5 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-medium text-sm"
             >
                 <Plus class="w-4 h-4" />
                 Schedule Meeting
             </button>
         </div>
 
-        <div class="bg-white border border-gray-200 rounded-2xl p-5">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="mb-4">
                 <div class="relative">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-brand-light" />
                     <input
                         v-model="searchQuery"
                         type="text"
                         placeholder="Search meetings by title..."
-                        class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        class="w-full pl-10 pr-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     />
                 </div>
             </div>
 
             <div v-if="loading" class="flex items-center justify-center py-12">
-                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
             </div>
 
             <EmptyState v-else-if="!meetings || meetings.length === 0" icon="Video" title="Belum ada jadwal meeting" subtitle="Jadwalkan meeting baru untuk memulai" size="lg" />
@@ -126,50 +118,49 @@ onUnmounted(() => {
             <div v-else class="overflow-x-auto">
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="border-b border-gray-100">
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Title</th>
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Scheduled</th>
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Duration</th>
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Location</th>
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Departments</th>
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Teams</th>
-                            <th class="text-left py-3 px-3 font-semibold text-gray-600">Created by</th>
+                        <tr class="border-b border-brand-border">
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Title</th>
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Scheduled</th>
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Duration</th>
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Location</th>
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Departments</th>
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Teams</th>
+                            <th class="text-left py-3 px-3 font-semibold text-brand-light">Created by</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr
                             v-for="meeting in meetings"
                             :key="meeting.id"
-                            class="border-b border-gray-50 hover:bg-gray-50 transition-colors"
+                            class="border-b border-brand-border hover:bg-[var(--color-surface-overlay)] transition-colors"
                         >
-                            <td class="py-3 px-3 font-medium text-gray-900">{{ meeting.title }}</td>
-                            <td class="py-3 px-3 text-gray-600">
+                            <td class="py-3 px-3 font-medium text-brand-dark">{{ meeting.title }}</td>
+                            <td class="py-3 px-3 text-brand-light">
                                 <div class="flex items-center gap-1.5">
-                                    <Calendar class="w-3.5 h-3.5 text-gray-400" />
+                                    <Calendar class="w-3.5 h-3.5 text-brand-light" />
                                     {{ formatDate(meeting.scheduled_at) }}
                                 </div>
                             </td>
-                            <td class="py-3 px-3 text-gray-600">{{ meeting.duration_minutes }} min</td>
+                            <td class="py-3 px-3 text-brand-light">{{ meeting.duration_minutes }} min</td>
                             <td class="py-3 px-3">
                                 <a
                                     v-if="isUrl(meeting.location)"
                                     :href="meeting.location"
                                     target="_blank"
                                     rel="noopener"
-                                    class="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800"
+                                    class="inline-flex items-center gap-1 text-brand-dark hover:underline font-medium"
                                 >
                                     {{ truncate(meeting.location) }}
                                     <ExternalLink class="w-3 h-3" />
                                 </a>
-                                <span v-else class="text-gray-600">{{ truncate(meeting.location) }}</span>
+                                <span v-else class="text-brand-light">{{ truncate(meeting.location) }}</span>
                             </td>
                             <td class="py-3 px-3">
                                 <div class="flex flex-wrap gap-1">
                                     <span
                                         v-for="dept in meeting.departments || []"
                                         :key="dept"
-                                        class="px-2 py-0.5 rounded-full text-xs font-medium"
-                                        :class="departmentColors[dept] || 'bg-gray-100 text-gray-700'"
+                                        class="px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-surface-overlay)] text-brand-dark"
                                     >
                                         {{ departmentLabels[dept] || dept }}
                                     </span>
@@ -180,34 +171,34 @@ onUnmounted(() => {
                                     <span
                                         v-for="team in meeting.teams || []"
                                         :key="team.id"
-                                        class="px-2 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-700"
+                                        class="px-2 py-0.5 rounded-full text-xs font-medium bg-[var(--color-surface-overlay)] text-brand-dark"
                                     >
                                         {{ team.name }}
                                     </span>
                                 </div>
                             </td>
-                            <td class="py-3 px-3 text-gray-600">{{ meeting.creator?.name || "-" }}</td>
+                            <td class="py-3 px-3 text-brand-light">{{ meeting.creator?.name || "-" }}</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <div v-if="meta.last_page > 1" class="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                <p class="text-sm text-gray-500">
+            <div v-if="meta.last_page > 1" class="flex items-center justify-between mt-4 pt-4 border-t border-brand-border">
+                <p class="text-sm text-brand-light">
                     Page {{ meta.current_page }} of {{ meta.last_page }} ({{ meta.total }} meetings)
                 </p>
                 <div class="flex items-center gap-2">
                     <button
                         :disabled="meta.current_page <= 1"
                         @click="handlePageChange(meta.current_page - 1)"
-                        class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="p-2 rounded-lg border border-brand-border hover:bg-[var(--color-surface-overlay)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ChevronLeft class="w-4 h-4" />
                     </button>
                     <button
                         :disabled="meta.current_page >= meta.last_page"
                         @click="handlePageChange(meta.current_page + 1)"
-                        class="p-2 rounded-lg border border-gray-200 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="p-2 rounded-lg border border-brand-border hover:bg-[var(--color-surface-overlay)] disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <ChevronRight class="w-4 h-4" />
                     </button>

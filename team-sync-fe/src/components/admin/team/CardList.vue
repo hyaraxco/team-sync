@@ -66,17 +66,17 @@ defineProps({
         <!-- Stats Section -->
         <div class="space-y-3 mb-4">
             <div class="flex items-center gap-2">
-                <CheckCircle class="w-4 h-4 text-green-600" />
+                <CheckCircle class="w-4 h-4 text-brand-dark" />
                 <span class="text-brand-dark text-sm font-semibold">
                     {{ data.responsibilities?.length }} responsibilities
                 </span>
             </div>
             <div class="flex items-center gap-2">
-                <CheckCircle class="w-4 h-4 text-green-600" />
+                <CheckCircle class="w-4 h-4 text-brand-dark" />
                 <span class="text-brand-dark text-sm font-semibold">{{ data.projects_count }} active projects</span>
             </div>
             <div class="flex items-center gap-2">
-                <CheckCircle class="w-4 h-4 text-green-600" />
+                <CheckCircle class="w-4 h-4 text-brand-dark" />
                 <span class="text-brand-dark text-sm font-semibold">0 completed tasks</span>
             </div>
         </div>

@@ -170,7 +170,7 @@ const getAvatarUrl = (user) => {
                     <tr
                         v-for="review in props.cycle.reviews"
                         :key="review.id"
-                        class="border-b border-gray-100 hover:bg-gray-50"
+                        class="border-b border-gray-100 hover:bg-[var(--color-surface-raised)]"
                     >
                         <td class="py-3 px-4">
                             <div class="flex items-center gap-3">
@@ -245,7 +245,7 @@ const getAvatarUrl = (user) => {
             v-if="showOverrideModal"
             class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
         >
-            <div class="bg-white rounded-xl shadow-md w-full max-w-md overflow-hidden">
+            <div class="bg-[var(--color-surface)] rounded-xl shadow-md w-full max-w-md overflow-hidden">
                 <div class="flex items-center justify-between p-4 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-brand-dark">Assign Reviewer</h3>
                     <button @click="closeOverrideModal" class="p-1 hover:bg-gray-100 rounded-lg text-gray-500 min-w-6 min-h-6 flex items-center justify-center">
@@ -253,7 +253,7 @@ const getAvatarUrl = (user) => {
                     </button>
                 </div>
                 <div class="p-4 space-y-4">
-                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-100">
+                    <div class="p-3 bg-[var(--color-surface-raised)] rounded-lg border border-gray-100">
                         <p class="text-xs text-brand-light mb-1">Reviewee:</p>
                         <p class="text-sm font-medium text-brand-dark">
                             {{
@@ -281,7 +281,7 @@ const getAvatarUrl = (user) => {
                         </select>
                     </div>
                 </div>
-                <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-100 bg-gray-50">
+                <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-100 bg-[var(--color-surface-raised)]">
                     <button
                         @click="closeOverrideModal"
                         class="px-4 py-2 text-sm font-medium text-brand-dark hover:bg-gray-200 rounded-lg transition-colors"

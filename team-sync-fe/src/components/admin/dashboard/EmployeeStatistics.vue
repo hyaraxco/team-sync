@@ -202,57 +202,9 @@ const getActivityIcon = (notification) => {
     return BellIcon;
 };
 
-const getActivityIconBgClass = (notification) => {
-    const category = resolveNotificationCategory(notification);
+const getActivityIconBgClass = () => "bg-[var(--color-surface-overlay)]";
 
-    if (category.includes("task")) {
-        return "bg-green-50";
-    }
-
-    if (category.includes("attendance") || category.includes("check")) {
-        return "bg-purple-50";
-    }
-
-    if (category.includes("payroll") || category.includes("salary")) {
-        return "bg-orange-50";
-    }
-
-    if (category.includes("comment") || category.includes("message")) {
-        return "bg-blue-50";
-    }
-
-    if (category.includes("meeting") || category.includes("team")) {
-        return "bg-orange-50";
-    }
-
-    return "bg-primary-50";
-};
-
-const getActivityIconClass = (notification) => {
-    const category = resolveNotificationCategory(notification);
-
-    if (category.includes("task")) {
-        return "text-green-600";
-    }
-
-    if (category.includes("attendance") || category.includes("check")) {
-        return "text-purple-600";
-    }
-
-    if (category.includes("payroll") || category.includes("salary")) {
-        return "text-orange-600";
-    }
-
-    if (category.includes("comment") || category.includes("message")) {
-        return "text-blue-600";
-    }
-
-    if (category.includes("meeting") || category.includes("team")) {
-        return "text-orange-500";
-    }
-
-    return "text-brand-primary";
-};
+const getActivityIconClass = () => "text-brand-dark";
 
 const getActivityTime = (notification) => {
     if (!notification?.created_at) {
@@ -361,7 +313,6 @@ onMounted(() => {
                 subtitle="This month"
                 subtitleColor="text-success"
                 iconName="ClockIcon"
-                colorScheme="blue"
                 :loading="statsLoading"
             />
 
@@ -372,7 +323,6 @@ onMounted(() => {
                 subtitle="Days remaining"
                 subtitleColor="text-gray-500"
                 iconName="CalendarCheckIcon"
-                colorScheme="green"
                 :loading="statsLoading"
             />
 
@@ -387,7 +337,6 @@ onMounted(() => {
                 :subtitle="`+${statistics.tasks_done_yesterday || 0} yesterday`"
                 subtitleColor="text-success"
                 iconName="CheckSquareIcon"
-                colorScheme="purple"
                 :loading="statsLoading"
             />
 
@@ -398,7 +347,6 @@ onMounted(() => {
                 :subtitle="`Assigned to you • Leading: ${statistics.led_active_projects || 0}`"
                 subtitleColor="text-gray-500"
                 iconName="FolderIcon"
-                colorScheme="orange"
                 :loading="statsLoading"
             />
         </div>
@@ -407,7 +355,7 @@ onMounted(() => {
     <!-- Additional Sections -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
         <!-- Upcoming Tasks -->
-        <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-base sm:text-lg font-bold">Upcoming Tasks</h3>
             </div>
@@ -451,7 +399,7 @@ onMounted(() => {
         </div>
 
         <!-- Recent Activities -->
-        <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-brand-dark text-base sm:text-lg font-bold">Recent Activities</h3>
                 <RouterLink

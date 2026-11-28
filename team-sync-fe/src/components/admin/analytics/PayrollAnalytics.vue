@@ -163,7 +163,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
 
         <!-- Row 1: Cost Trend (wide) + Salary Distribution -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 bg-white border border-brand-border rounded-2xl p-6">
+            <div class="lg:col-span-2 bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Total Payroll Cost Trend</h3>
                 <p class="text-xs text-gray-400 mb-4">Monthly total salary vs total deductions</p>
                 <VueApexCharts
@@ -176,7 +176,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Salary Distribution</h3>
                 <p class="text-xs text-gray-400 mb-4">Employee count by salary range</p>
                 <VueApexCharts
@@ -192,7 +192,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
 
         <!-- Row 2: Tax & BPJS Trend + Cost by Department -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Tax & BPJS Trend</h3>
                 <p class="text-xs text-gray-400 mb-4">Monthly PPh21, BPJS TK, and BPJS Kesehatan contributions</p>
                 <VueApexCharts
@@ -205,7 +205,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
                 <div v-else class="flex items-center justify-center h-64 text-gray-400 text-sm">No data available</div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Cost by Department</h3>
                 <p class="text-xs text-gray-400 mb-4">Total payroll cost per department</p>
                 <VueApexCharts
@@ -221,7 +221,7 @@ const deductionDonutSeries = computed(() => (payroll.value?.deduction_breakdown 
 
         <!-- Row 3: Deduction Breakdown -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                 <h3 class="text-base font-semibold text-brand-dark mb-1">Deduction Breakdown</h3>
                 <p class="text-xs text-gray-400 mb-4">Proportion of each deduction category</p>
                 <VueApexCharts

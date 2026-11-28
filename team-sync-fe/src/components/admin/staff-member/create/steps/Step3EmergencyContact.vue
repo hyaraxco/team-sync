@@ -26,10 +26,10 @@ const form = computed({
     <div class="flex flex-col 2xl:flex-row gap-5 items-stretch 2xl:items-start pr-0">
         <div class="flex-1 w-full space-y-6">
             <!-- Emergency Contact Section -->
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                        <Phone class="w-6 h-6 text-red-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <Phone class="w-6 h-6 text-brand-dark" />
                     </div>
                     <div>
                         <h3 class="text-brand-dark text-xl font-bold">Emergency Contact</h3>

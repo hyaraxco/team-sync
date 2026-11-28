@@ -102,7 +102,7 @@ const formatHolidayType = (type) => {
 
 const getHolidayTypeColor = (type) => {
     if (type === "collective_leave") {
-        return "bg-blue-100 text-blue-800 border-blue-200";
+        return "bg-[var(--color-surface-overlay)] text-brand-dark border-brand-border";
     }
     return "bg-red-100 text-red-800 border-red-200";
 };
@@ -224,10 +224,10 @@ onMounted(() => {
                             <td class="py-4 px-4">
                                 <div class="flex items-center gap-2">
                                     <button
-                                        class="inline-flex items-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-blue-50 transition-all duration-300 px-3 py-2"
+                                        class="inline-flex items-center gap-2 border border-brand-border rounded-lg hover:border-brand-primary hover:bg-[var(--color-surface-overlay)] transition-all duration-300 px-3 py-2"
                                         @click="openEditModal(holiday)"
                                     >
-                                        <Pencil class="w-4 h-4 text-blue-600" />
+                                        <Pencil class="w-4 h-4 text-brand-dark" />
                                         <span class="text-xs font-semibold">Edit</span>
                                     </button>
                                     <button

@@ -3,8 +3,8 @@
         class="rounded-2xl transition-all duration-300 p-6 group relative overflow-hidden flex flex-col justify-between"
         :class="[
             highlight
-                ? 'min-h-[220px] bg-gradient-to-br from-gray-900 to-gray-950 border border-white/5 shadow-xl'
-                : 'bg-white border border-brand-border hover:ring-2 hover:ring-brand-primary/20',
+                ? 'min-h-[220px] bg-[var(--color-surface)] border border-brand-border'
+                : 'bg-[var(--color-surface)] border border-brand-border hover:ring-2 hover:ring-brand-primary/20',
         ]"
     >
         <div class="relative z-10 flex flex-col justify-between h-full">
@@ -15,8 +15,8 @@
                 >
                     {{ title }}
                 </h3>
-                <div v-if="icon" class="p-2.5 bg-primary-50 rounded-lg group-hover:bg-brand-primary transition-colors">
-                    <component :is="icon" class="w-5 h-5 text-brand-primary group-hover:text-white transition-colors" />
+                <div v-if="icon" class="p-2.5 bg-[var(--color-surface-overlay)] rounded-lg transition-colors">
+                    <component :is="icon" class="w-5 h-5 text-brand-dark transition-colors" />
                 </div>
             </div>
 
@@ -26,13 +26,13 @@
                 <template v-if="highlight">
                     <div v-if="trend !== null" class="mb-5 inline-flex self-start">
                         <span
-                            class="inline-flex flex-row items-center text-[13px] font-semibold px-3.5 py-1.5 rounded-full bg-slate-600/40 text-white backdrop-blur-md"
+                            class="inline-flex flex-row items-center text-[13px] font-semibold px-3.5 py-1.5 rounded-full bg-[var(--color-surface-overlay)] text-brand-dark"
                         >
                             <component :is="trendIcon" class="w-3.5 h-3.5 mr-1.5" />
                             {{ trend >= 0 ? "+" : "" }}{{ trend }}% this month
                         </span>
                     </div>
-                    <h3 class="text-brand-white-90 text-sm font-medium">
+                    <h3 class="text-brand-light text-sm font-medium">
                         {{ title }}
                     </h3>
                 </template>
@@ -45,7 +45,7 @@
                                 class="tracking-tight"
                                 :class="
                                     highlight
-                                        ? 'text-brand-white text-3xl sm:text-5xl font-extrabold leading-none my-4'
+                                        ? 'text-brand-dark text-3xl sm:text-5xl font-extrabold leading-none my-4'
                                         : 'text-[28px] leading-tight font-extrabold text-brand-dark'
                                 "
                             >
@@ -73,7 +73,7 @@
                             v-if="subtitle"
                             :class="
                                 highlight
-                                    ? 'text-brand-white-80 text-base font-normal'
+                                    ? 'text-brand-light text-base font-normal'
                                     : 'text-sm font-medium text-gray-400'
                             "
                         >
@@ -83,8 +83,8 @@
 
                     <!-- Highlight Icon Block -->
                     <div v-if="highlight && icon" class="absolute right-0 top-1/2 -translate-y-1/2 -mr-1">
-                        <div class="p-5 bg-slate-500/20 rounded-3xl backdrop-blur-xl shrink-0">
-                            <component :is="icon" class="w-10 h-10 text-white opacity-95" />
+                        <div class="p-5 bg-[var(--color-surface-overlay)] rounded-2xl shrink-0">
+                            <component :is="icon" class="w-10 h-10 text-brand-dark" />
                         </div>
                     </div>
                 </div>
@@ -94,7 +94,7 @@
         <!-- Loading Overlay -->
         <div
             v-if="loading"
-            :class="highlight ? 'bg-black/40 border-black/10' : 'bg-white/80'"
+            :class="'bg-[var(--color-surface)]/80'"
             class="absolute inset-0 backdrop-blur-sm flex items-center justify-center rounded-lg z-20"
         >
             <div class="w-full max-w-[60%] h-2 bg-slate-200/50 rounded-full overflow-hidden">

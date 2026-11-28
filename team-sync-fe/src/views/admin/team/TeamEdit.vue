@@ -147,10 +147,10 @@ watch(
         <div class="flex-1">
             <form class="space-y-6" @submit.prevent="handleSubmit" v-if="!loading">
                 <!-- Team Information Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <User class="w-6 h-6 text-blue-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <User class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Team Information</h3>
@@ -301,10 +301,10 @@ watch(
                 </div>
 
                 <!-- Team Lead Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <Crown class="w-6 h-6 text-green-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <Crown class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Team Lead</h3>
@@ -357,10 +357,10 @@ watch(
                 </div>
 
                 <!-- Team Responsibilities Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                            <ListCheck class="w-6 h-6 text-orange-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <ListCheck class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Team Responsibilities</h3>
@@ -421,7 +421,7 @@ watch(
                                     <button
                                         type="button"
                                         title="Remove responsibility"
-                                        class="w-12 h-12 border border-brand-border rounded-xl hover:border-red-500 hover:bg-red-50 transition-all duration-300 flex items-center justify-center cursor-pointer"
+                                        class="w-12 h-12 border border-brand-border rounded-xl hover:border-red-500 hover:bg-[var(--color-surface-overlay)] transition-all duration-300 flex items-center justify-center cursor-pointer"
                                         @click="removeResponsibility(index)"
                                     >
                                         <Trash2 class="w-5 h-5 text-gray-600" />
@@ -445,10 +445,10 @@ watch(
                 </div>
 
                 <!-- Team Settings Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                            <Settings class="w-6 h-6 text-purple-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <Settings class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Team Settings</h3>
@@ -467,9 +467,9 @@ watch(
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center"
+                                            class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center"
                                         >
-                                            <CheckCircle class="w-5 h-5 text-green-600" />
+                                            <CheckCircle class="w-5 h-5 text-brand-dark" />
                                         </div>
                                         <div class="flex flex-col">
                                             <p class="text-brand-dark text-base font-semibold">Active</p>
@@ -499,9 +499,9 @@ watch(
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"
+                                            class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center"
                                         >
-                                            <UsersRound class="w-5 h-5 text-blue-600" />
+                                            <UsersRound class="w-5 h-5 text-brand-dark" />
                                         </div>
                                         <div class="flex flex-col">
                                             <p class="text-brand-dark text-base font-semibold">Forming</p>
@@ -531,9 +531,9 @@ watch(
                                 >
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center"
+                                            class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center"
                                         >
-                                            <ClipboardList class="w-5 h-5 text-purple-600" />
+                                            <ClipboardList class="w-5 h-5 text-brand-dark" />
                                         </div>
                                         <div class="flex flex-col">
                                             <p class="text-brand-dark text-base font-semibold">Planning</p>
@@ -599,7 +599,7 @@ watch(
                     <button
                         type="submit"
                         :disabled="loading"
-                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center gap-2"
                     >
                         <span class="text-brand-white text-base font-semibold">Update Team</span>
                         <Plus class="w-4 h-4 text-white" />
@@ -624,8 +624,8 @@ watch(
             <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <Crown class="w-6 h-6 text-green-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <Crown class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Select Team Lead</h3>

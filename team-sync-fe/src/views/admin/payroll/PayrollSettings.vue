@@ -360,7 +360,7 @@ onMounted(() => {
                 @click="router.push({ name: 'admin.payroll.dashboard' })"
                 class="mb-4 border border-brand-border rounded-lg px-4 py-3 flex items-center gap-2 hover:border-brand-primary transition-all duration-300"
             >
-                <ArrowLeft class="w-4 h-4 text-gray-600" />
+                <ArrowLeft class="w-4 h-4 text-brand-dark" />
                 <span class="text-brand-dark text-sm font-semibold">Back</span>
             </button>
             <div>
@@ -371,39 +371,38 @@ onMounted(() => {
             </div>
         </div>
 
-        <div class="bg-blue-50 border border-blue-200 rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-start justify-between gap-3">
-                <p class="text-blue-900 text-sm font-semibold">Applies to future payroll drafts only</p>
+                <p class="text-brand-dark text-sm font-semibold">Applies to future payroll drafts only</p>
                 <span
                     data-testid="payroll-settings-active-version"
-                    class="inline-flex rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700"
+                    class="inline-flex rounded-full bg-[var(--color-surface-overlay)] border border-brand-border px-2.5 py-1 text-xs font-semibold text-brand-dark"
                 >
                     Active {{ activeVersionLabel }}
                 </span>
             </div>
-            <p class="text-blue-800 text-sm mt-1">
+            <p class="text-brand-light text-sm mt-1">
                 Existing payroll records stay unchanged. Update settings before HR generates the next draft.
             </p>
-            <p class="text-blue-700 text-xs mt-2" data-testid="payroll-settings-updated-by">
+            <p class="text-brand-light text-xs mt-2" data-testid="payroll-settings-updated-by">
                 {{ lastUpdatedLabel }}
             </p>
         </div>
-        </div>
 
         <!-- Tab Navigation -->
-        <div class="bg-white border border-brand-border rounded-2xl p-3" data-testid="payroll-settings-tabs">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-3" data-testid="payroll-settings-tabs">
             <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
                 <button
                     @click="activeTab = 'schedule'"
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'schedule'
-                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            ? 'bg-brand-primary border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                     "
                     data-testid="tab-schedule"
                 >
-                    <Calendar class="w-4 h-4" :class="activeTab === 'schedule' ? 'text-white' : 'text-gray-600'" />
+                    <Calendar class="w-4 h-4" :class="activeTab === 'schedule' ? 'text-white' : 'text-brand-light'" />
                     <span class="text-sm font-semibold">Schedule</span>
                 </button>
                 <button
@@ -411,12 +410,12 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'rules'
-                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            ? 'bg-brand-primary border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                     "
                     data-testid="tab-rules"
                 >
-                    <Calculator class="w-4 h-4" :class="activeTab === 'rules' ? 'text-white' : 'text-gray-600'" />
+                    <Calculator class="w-4 h-4" :class="activeTab === 'rules' ? 'text-white' : 'text-brand-light'" />
                     <span class="text-sm font-semibold">Calculation Rules</span>
                 </button>
                 <button
@@ -424,12 +423,12 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'bank_notes'
-                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            ? 'bg-brand-primary border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                     "
                     data-testid="tab-bank-notes"
                 >
-                    <Landmark class="w-4 h-4" :class="activeTab === 'bank_notes' ? 'text-white' : 'text-gray-600'" />
+                    <Landmark class="w-4 h-4" :class="activeTab === 'bank_notes' ? 'text-white' : 'text-brand-light'" />
                     <span class="text-sm font-semibold">Bank & Note</span>
                 </button>
                 <button
@@ -437,12 +436,12 @@ onMounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === 'history'
-                            ? 'blue-gradient blue-btn-shadow border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            ? 'bg-brand-primary border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                     "
                     data-testid="tab-history"
                 >
-                    <History class="w-4 h-4" :class="activeTab === 'history' ? 'text-white' : 'text-gray-600'" />
+                    <History class="w-4 h-4" :class="activeTab === 'history' ? 'text-white' : 'text-brand-light'" />
                     <span class="text-sm font-semibold">History</span>
                 </button>
             </div>
@@ -452,7 +451,7 @@ onMounted(() => {
             <div class="space-y-6 min-w-0 pb-10">
                 <section
                     v-show="activeTab === 'schedule'"
-                    class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="mb-6">
                         <h2 class="text-lg font-semibold text-brand-dark">Payroll Schedule</h2>
@@ -489,7 +488,7 @@ onMounted(() => {
 
                 <section
                     v-show="activeTab === 'rules'"
-                    class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="mb-6">
                         <h2 class="text-lg font-semibold text-brand-dark">Calculation Rules</h2>
@@ -573,7 +572,7 @@ onMounted(() => {
 
                 <div v-show="activeTab === 'bank_notes'" class="space-y-6 animate-fade-in">
                     <section
-                        class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="mb-6">
                             <h2 class="text-lg font-semibold text-brand-dark">Payroll Note Template</h2>
@@ -597,7 +596,7 @@ onMounted(() => {
 
                     <!-- Payroll Bank Partner -->
                     <section
-                        class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="mb-6">
                             <h2 class="text-lg font-semibold text-brand-dark">Payroll Bank Partner</h2>
@@ -616,7 +615,7 @@ onMounted(() => {
                                     :value="form.payroll_bank_code"
                                     @change="handleBankChange"
                                     data-testid="payroll-settings-bank-select"
-                                    class="w-full h-[48px] px-4 py-2 bg-white border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
+                                    class="w-full h-[48px] px-4 py-2 bg-[var(--color-surface)] border border-brand-border rounded-xl hover:border-brand-primary focus:border-brand-primary transition-all duration-300"
                                 >
                                     <option value="">Select a Bank...</option>
                                     <option v-for="bank in popularBanks" :key="bank.code" :value="bank.code">
@@ -646,7 +645,7 @@ onMounted(() => {
 
                     <!-- Preview block moved to Bank & Note -->
                     <section
-                        class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm"
                     >
                         <div class="mb-6">
                             <h2 class="text-lg font-semibold text-brand-dark">Preview Result</h2>
@@ -682,7 +681,7 @@ onMounted(() => {
 
                 <div
                     v-show="activeTab === 'history'"
-                    class="bg-white border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 overflow-hidden shadow-sm animate-fade-in"
                 >
                     <div class="mb-4">
                         <h2 class="text-lg font-semibold text-brand-dark">Version History</h2>
@@ -730,8 +729,7 @@ onMounted(() => {
                                     type="button"
                                     :data-testid="`payroll-settings-history-compare-select-${version.id}`"
                                     @click="selectHistoryVersion(version.id)"
-                                    class="mt-2 text-xs font-semibold hover:text-blue-800 flex items-center gap-1"
-                                    :class="selectedHistoryVersionId === version.id ? 'text-blue-800' : 'text-blue-600'"
+                                    class="mt-2 text-xs font-semibold text-brand-dark hover:underline flex items-center gap-1"
                                 >
                                     <span>Compare with previous version</span>
                                     <component
@@ -745,7 +743,7 @@ onMounted(() => {
                             <div
                                 v-if="selectedHistoryVersionId === version.id"
                                 data-testid="payroll-settings-history-compare-panel"
-                                class="mt-2 rounded-xl border border-blue-100 bg-white shadow-sm px-4 py-4 mb-2 animate-fade-in"
+                                class="mt-2 rounded-xl border border-brand-border bg-[var(--color-surface)] shadow-sm px-4 py-4 mb-2 animate-fade-in"
                             >
                                 <p class="text-xs uppercase tracking-wide text-brand-light">Version Comparison</p>
                                 <p class="text-sm font-semibold text-brand-dark mt-1">
@@ -777,7 +775,7 @@ onMounted(() => {
                                         v-for="row in historyComparisonRows"
                                         :key="row.field"
                                         data-testid="payroll-settings-history-compare-row"
-                                        class="rounded-lg border border-brand-border bg-gray-50 px-3 py-2"
+                                        class="rounded-lg border border-brand-border bg-[var(--color-surface-overlay)] px-3 py-2"
                                     >
                                         <p class="text-xs font-semibold text-brand-dark">
                                             {{ row.label }}
@@ -786,7 +784,7 @@ onMounted(() => {
                                             From
                                             <span class="font-semibold text-brand-dark">{{ row.previous }}</span>
                                             to
-                                            <span class="font-semibold text-blue-700">{{ row.current }}</span>
+                                            <span class="font-semibold text-brand-dark">{{ row.current }}</span>
                                         </p>
                                     </div>
                                 </div>
@@ -794,7 +792,7 @@ onMounted(() => {
                         </template>
                     </div>
 
-                    <section class="mt-6 border-t border-gray-200 pt-6">
+                    <section class="mt-6 border-t border-brand-border pt-6">
                     <div class="flex items-center gap-3 mb-4">
                         <div>
                             <h3 class="text-base font-semibold text-brand-dark">BPJS Rate History</h3>
@@ -841,7 +839,7 @@ onMounted(() => {
                                         </th>
                                     </tr>
                                 </thead>
-                                <tbody class="divide-y divide-gray-100 bg-white">
+                                <tbody class="divide-y divide-gray-100 bg-[var(--color-surface)]">
                                     <tr
                                         v-for="rate in bpjsRateHistory"
                                         :key="rate.id"
@@ -878,7 +876,7 @@ onMounted(() => {
             <!-- Save Settings Sticky Footer / Action Bar -->
             <div v-show="activeTab !== 'history'" class="sticky bottom-6 z-20 mt-4 animate-fade-in">
                 <div
-                    class="bg-white/80 backdrop-blur-md border border-brand-border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
+                    class="bg-[var(--color-surface)]/80 backdrop-blur-md border border-brand-border rounded-2xl p-6 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4"
                 >
                     <div>
                         <h2 class="text-base font-semibold text-brand-dark">Ready to save your changes?</h2>
@@ -889,7 +887,7 @@ onMounted(() => {
                         data-testid="payroll-settings-save"
                         :disabled="loading"
                         @click="handleSubmit"
-                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
+                        class="w-full md:w-auto min-w-[200px] btn-primary rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center justify-center gap-2 disabled:opacity-70 shadow-lg"
                     >
                         <Settings class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">
@@ -899,4 +897,5 @@ onMounted(() => {
                 </div>
             </div>
         </div>
+    </div>
 </template>

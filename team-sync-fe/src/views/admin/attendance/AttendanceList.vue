@@ -105,7 +105,7 @@ onMounted(async () => {
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <p class="text-brand-white-90 text-sm font-medium">Present Today</p>
-                            <p class="text-brand-white text-5xl font-extrabold leading-none my-4">
+                            <p class="text-brand-white text-5xl font-extrabold leading-none my-4 tabular-nums">
                                 <AnimatedValue :value="statistics.present_today || 0" />
                             </p>
                             <p class="text-brand-white-80 text-base font-normal">Active employees</p>
@@ -131,7 +131,6 @@ onMounted(async () => {
                     :subtitle="`${statistics.absent_change >= 0 ? '+' : ''}${statistics.absent_change || 0} from yesterday`"
                     subtitleColor="text-danger"
                     iconName="XCircle"
-                    colorScheme="red"
                     :loading="loadingStatistics"
                 />
 
@@ -141,7 +140,6 @@ onMounted(async () => {
                     subtitle="After 9:00 AM"
                     subtitleColor="text-warning"
                     iconName="Clock"
-                    colorScheme="orange"
                     :loading="loadingStatistics"
                 />
             </div>
@@ -153,7 +151,6 @@ onMounted(async () => {
                     subtitle="Approved requests"
                     subtitleColor="text-brand-light"
                     iconName="CalendarX"
-                    colorScheme="yellow"
                     :loading="loadingStatistics"
                 />
 
@@ -163,7 +160,6 @@ onMounted(async () => {
                     subtitle="Working from home"
                     subtitleColor="text-brand-light"
                     iconName="Laptop"
-                    colorScheme="purple"
                     :loading="loadingStatistics"
                 />
             </div>
@@ -175,7 +171,6 @@ onMounted(async () => {
                     :subtitle="`${statistics.rate_change >= 0 ? '+' : ''}${statistics.rate_change || 0}% from last week`"
                     :subtitleColor="statistics.rate_change >= 0 ? 'text-success' : 'text-danger'"
                     iconName="TrendingUp"
-                    colorScheme="blue"
                     :loading="loadingStatistics"
                 />
 
@@ -185,7 +180,6 @@ onMounted(async () => {
                     subtitle="Awaiting approval"
                     subtitleColor="text-warning"
                     iconName="Clock4"
-                    colorScheme="orange"
                     :loading="loadingStatistics"
                 />
             </div>
@@ -202,7 +196,7 @@ onMounted(async () => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeTab === section.id
-                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
+                            ? 'bg-brand-primary border border-primary-700 text-white'
                             : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                     "
                     :style="{ color: activeTab === section.id ? 'var(--color-text-inverse)' : 'var(--color-text-primary)' }"
@@ -210,7 +204,7 @@ onMounted(async () => {
                     <component
                         :is="section.icon"
                         class="w-4 h-4"
-                        :class="activeTab === section.id ? 'text-white' : 'text-gray-600'"
+                        :class="activeTab === section.id ? 'text-white' : 'text-brand-light'"
                     />
                     <span class="text-sm font-semibold">{{ section.label }}</span>
                 </button>

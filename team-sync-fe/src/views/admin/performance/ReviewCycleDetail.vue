@@ -81,7 +81,7 @@ const rankingList = computed(() => topsisResult.value?.ranking ?? []);
 
 const rankMedalColor = (rank) => {
     if (rank === 1) return "text-yellow-500";
-    if (rank === 2) return "text-gray-400";
+    if (rank === 2) return "text-brand-light";
     if (rank === 3) return "text-amber-600";
     return "text-brand-light";
 };
@@ -94,7 +94,7 @@ const labelColor = (label) => {
         "Needs Improvement": "bg-orange-100 text-orange-700 border-orange-200",
         Unsatisfactory: "bg-red-100    text-red-700    border-red-200",
     };
-    return map[label] ?? "bg-gray-100 text-gray-700 border-gray-200";
+    return map[label] ?? "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border";
 };
 
 const scoreBarWidth = (score) => `${Math.round(score * 100)}%`;
@@ -233,7 +233,7 @@ onMounted(async () => {
             <!-- Self-Assessment Deadline -->
             <MainCard>
                 <div class="flex items-center gap-3 mb-3">
-                    <Users class="w-5 h-5 text-orange-500" />
+                    <Users class="w-5 h-5 text-brand-dark" />
                     <p class="text-sm font-semibold text-brand-dark">Self-Assessment Deadline</p>
                 </div>
                 <p class="text-sm text-brand-light">
@@ -252,7 +252,7 @@ onMounted(async () => {
             <!-- Manager Assessment Deadline -->
             <MainCard>
                 <div class="flex items-center gap-3 mb-3">
-                    <TrendingUp class="w-5 h-5 text-blue-500" />
+                    <TrendingUp class="w-5 h-5 text-brand-dark" />
                     <p class="text-sm font-semibold text-brand-dark">Manager Assessment Deadline</p>
                 </div>
                 <p class="text-sm text-brand-light">
@@ -377,7 +377,7 @@ onMounted(async () => {
                 <!-- Ranking Table -->
                 <MainCard v-else-if="rankingList.length > 0">
                     <!-- Legend criteria -->
-                    <div class="grid grid-cols-7 gap-2 mb-4 p-3 bg-gray-50 rounded-lg">
+                    <div class="grid grid-cols-7 gap-2 mb-4 p-3 bg-[var(--color-surface-raised)] rounded-lg">
                         <div v-for="(label, key) in weightLabels" :key="key" class="text-center">
                             <p class="text-xs font-semibold text-brand-dark">{{ label }}</p>
                             <p class="text-xs text-brand-light">
@@ -442,7 +442,7 @@ onMounted(async () => {
                                 <template v-for="item in rankingList" :key="item.staff_member_id">
                                     <!-- Main row -->
                                     <tr
-                                        class="border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors"
+                                        class="border-b border-gray-100 hover:bg-[var(--color-surface-raised)] cursor-pointer transition-colors"
                                         @click="toggleRow(item.staff_member_id)"
                                     >
                                         <!-- Rank -->
@@ -572,7 +572,7 @@ onMounted(async () => {
                                                     </p>
                                                     <div class="space-y-2 text-xs">
                                                         <div
-                                                            class="flex justify-between p-2 bg-white rounded border border-blue-100"
+                                                            class="flex justify-between p-2 bg-[var(--color-surface)] rounded border border-blue-100"
                                                         >
                                                             <span class="text-brand-light">
                                                                 D⁺ (distance to positive ideal)
@@ -582,7 +582,7 @@ onMounted(async () => {
                                                             </span>
                                                         </div>
                                                         <div
-                                                            class="flex justify-between p-2 bg-white rounded border border-blue-100"
+                                                            class="flex justify-between p-2 bg-[var(--color-surface)] rounded border border-blue-100"
                                                         >
                                                             <span class="text-brand-light">
                                                                 D⁻ (distance to negative ideal)

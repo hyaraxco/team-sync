@@ -649,7 +649,7 @@ watch(
                             <AlignLeft class="w-4 h-4 text-gray-500" />
                             <h3 class="text-sm font-semibold text-gray-700">Description</h3>
                         </div>
-                        <div class="bg-gray-50 rounded-lg p-4 text-sm text-gray-600 leading-relaxed min-h-[100px]">
+                        <div class="bg-[var(--color-surface-raised)] rounded-lg p-4 text-sm text-gray-600 leading-relaxed min-h-[100px]">
                             <p v-if="task.description">{{ task.description }}</p>
                             <p v-else class="text-gray-400 italic">No description added</p>
                         </div>
@@ -662,13 +662,13 @@ watch(
                             <h3 class="text-sm font-semibold text-gray-700">Activity</h3>
                         </div>
                         <div class="space-y-3">
-                            <div v-if="commentsLoading" class="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2">
+                            <div v-if="commentsLoading" class="text-sm text-gray-500 bg-[var(--color-surface-raised)] rounded-lg px-3 py-2">
                                 Loading comments...
                             </div>
 
                             <div
                                 v-else-if="comments.length === 0"
-                                class="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2"
+                                class="text-sm text-gray-500 bg-[var(--color-surface-raised)] rounded-lg px-3 py-2"
                             >
                                 Belum ada komentar.
                             </div>
@@ -676,7 +676,7 @@ watch(
                             <div
                                 v-for="comment in comments"
                                 :key="comment.id"
-                                class="border border-gray-100 rounded-lg p-3 bg-white"
+                                class="border border-gray-100 rounded-lg p-3 bg-[var(--color-surface)]"
                             >
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
@@ -795,14 +795,14 @@ watch(
                         <div class="mt-3 space-y-2">
                             <div
                                 v-if="attachmentsLoading"
-                                class="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2"
+                                class="text-sm text-gray-500 bg-[var(--color-surface-raised)] rounded-lg px-3 py-2"
                             >
                                 Loading attachments...
                             </div>
 
                             <div
                                 v-else-if="attachments.length === 0"
-                                class="text-sm text-gray-500 bg-gray-50 rounded-lg px-3 py-2"
+                                class="text-sm text-gray-500 bg-[var(--color-surface-raised)] rounded-lg px-3 py-2"
                             >
                                 Belum ada lampiran.
                             </div>
@@ -846,7 +846,7 @@ watch(
                         <h3 class="text-xs font-semibold text-gray-500 uppercase mb-3">Assignee</h3>
 
                         <!-- Selected Assignee Display -->
-                        <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 mb-2" v-if="selectedAssignee">
+                        <div class="p-3 bg-[var(--color-surface-raised)] rounded-lg border border-gray-200 mb-2" v-if="selectedAssignee">
                             <div class="flex items-center gap-3">
                                 <img loading="lazy"
                                     :src="selectedAssignee?.user?.profile_photo || DEFAULT_AVATAR"
@@ -876,7 +876,7 @@ watch(
                         <button
                             v-if="canManageAssignee"
                             type="button"
-                            class="w-full border border-gray-200 rounded-lg hover:border-brand-primary hover:bg-gray-50 transition-all duration-300 px-3 py-2 flex items-center gap-3 text-left"
+                            class="w-full border border-gray-200 rounded-lg hover:border-brand-primary hover:bg-[var(--color-surface-raised)] transition-all duration-300 px-3 py-2 flex items-center gap-3 text-left"
                             @click="toggleAssigneeDropdown"
                         >
                             <UserCheck class="w-4 h-4 text-gray-400" />
@@ -892,7 +892,7 @@ watch(
                         <!-- Dropdown Menu -->
                         <div
                             v-if="assigneeDropdown && canManageAssignee"
-                            class="absolute top-full left-0 right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-10 max-h-80 overflow-hidden flex flex-col"
+                            class="absolute top-full left-0 right-0 mt-2 bg-[var(--color-surface)] border border-gray-200 rounded-lg shadow-lg z-10 max-h-80 overflow-hidden flex flex-col"
                         >
                             <!-- Search -->
                             <div class="p-3 border-b border-gray-200">
@@ -916,7 +916,7 @@ watch(
                                     :key="staffMember.id"
                                     type="button"
                                     @click="handleSelectAssignee(staffMember)"
-                                    class="w-full p-3 hover:bg-gray-50 transition-colors flex items-center gap-3 text-left"
+                                    class="w-full p-3 hover:bg-[var(--color-surface-raised)] transition-colors flex items-center gap-3 text-left"
                                 >
                                     <img loading="lazy"
                                         :src="staffMember.user?.profile_photo || DEFAULT_AVATAR"
@@ -1026,13 +1026,13 @@ watch(
                         <h3 class="text-xs font-semibold text-gray-500 uppercase mb-3">Status Timeline</h3>
                         <div
                             v-if="statusLogsLoading"
-                            class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                            class="text-xs text-gray-500 bg-[var(--color-surface-raised)] border border-gray-200 rounded-lg px-3 py-2"
                         >
                             Loading status timeline...
                         </div>
                         <div
                             v-else-if="statusLogs.length === 0"
-                            class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                            class="text-xs text-gray-500 bg-[var(--color-surface-raised)] border border-gray-200 rounded-lg px-3 py-2"
                         >
                             Belum ada perubahan status.
                         </div>
@@ -1123,7 +1123,7 @@ watch(
                                     !canReopenDoneAsRejected &&
                                     !canDeleteTask
                                 "
-                                class="text-xs text-gray-500 bg-gray-50 border border-gray-200 rounded-lg px-3 py-2"
+                                class="text-xs text-gray-500 bg-[var(--color-surface-raised)] border border-gray-200 rounded-lg px-3 py-2"
                             >
                                 No task actions available for this role and status.
                             </p>

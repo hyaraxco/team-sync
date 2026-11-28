@@ -209,17 +209,17 @@ const getAdjustmentStatusClass = (status) => {
             </div>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-8 max-w-4xl mx-auto">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-8 max-w-4xl mx-auto">
             <div v-if="loading" class="text-center py-12">
-                <p class="text-gray-500">Loading payslip...</p>
+                <p class="text-brand-light">Loading payslip...</p>
             </div>
 
             <div v-else-if="payslip">
-                <div class="border-b-2 border-gray-200 pb-6 mb-6">
+                <div class="border-b border-brand-border pb-6 mb-6">
                     <div class="flex items-start justify-between">
                         <div>
                             <h1 class="text-3xl font-extrabold text-brand-dark mb-2">My Payroll</h1>
-                            <p class="text-gray-600">
+                            <p class="text-brand-light">
                                 {{ formatPeriod(payslip.period) }}
                             </p>
                             <div
@@ -243,7 +243,7 @@ const getAdjustmentStatusClass = (status) => {
                             <p class="text-sm font-semibold text-brand-dark">
                                 {{ payslip.company_name || "Team Sync Pro" }}
                             </p>
-                            <p class="text-xs text-gray-600">
+                            <p class="text-xs text-brand-light">
                                 {{ payslip.company_address || "Indonesia" }}
                             </p>
                         </div>
@@ -252,19 +252,19 @@ const getAdjustmentStatusClass = (status) => {
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
                     <div class="rounded-2xl border border-brand-border p-5">
-                        <p class="text-sm text-gray-500 mb-1">Payroll Period</p>
+                        <p class="text-sm text-brand-light mb-1">Payroll Period</p>
                         <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatPeriod(payslip.period) }}
                         </p>
                     </div>
                     <div class="rounded-2xl border border-brand-border p-5">
-                        <p class="text-sm text-gray-500 mb-1">Payment Date</p>
+                        <p class="text-sm text-brand-light mb-1">Payment Date</p>
                         <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatDate(payslip.payment_date || payslip.created_at) }}
                         </p>
                     </div>
                     <div class="rounded-2xl border border-brand-border p-5">
-                        <p class="text-sm text-gray-500 mb-1">Take Home Pay</p>
+                        <p class="text-sm text-brand-light mb-1">Take Home Pay</p>
                         <p class="text-lg font-bold text-brand-dark tabular-nums">
                             {{ formatCurrency(payslip.net_salary) }}
                         </p>
@@ -273,28 +273,28 @@ const getAdjustmentStatusClass = (status) => {
 
                 <div class="grid grid-cols-2 gap-6 mb-8">
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4">EMPLOYEE INFORMATION</h3>
+                        <h3 class="text-sm font-semibold text-brand-light mb-4">EMPLOYEE INFORMATION</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-                                    <FileText class="w-5 h-5 text-blue-600" />
+                                <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                    <FileText class="w-5 h-5 text-brand-dark" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-500">Full Name</p>
+                                    <p class="text-xs text-brand-light">Full Name</p>
                                     <p class="font-semibold text-brand-dark">
                                         {{ payslip.employee_name }}
                                     </p>
-                                    <p v-if="payslip.employee_code" class="text-xs text-gray-500 mt-1">
+                                    <p v-if="payslip.employee_code" class="text-xs text-brand-light mt-1">
                                         Employee ID: {{ payslip.employee_code }}
                                     </p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-purple-50 rounded-xl flex items-center justify-center">
-                                    <Building class="w-5 h-5 text-purple-600" />
+                                <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                    <Building class="w-5 h-5 text-brand-dark" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-500">Department</p>
+                                    <p class="text-xs text-brand-light">Department</p>
                                     <p class="font-semibold text-brand-dark">
                                         {{ payslip.department }}
                                     </p>
@@ -304,25 +304,25 @@ const getAdjustmentStatusClass = (status) => {
                     </div>
 
                     <div>
-                        <h3 class="text-sm font-semibold text-gray-500 mb-4">CONTACT INFORMATION</h3>
+                        <h3 class="text-sm font-semibold text-brand-light mb-4">CONTACT INFORMATION</h3>
                         <div class="space-y-3">
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
-                                    <Mail class="w-5 h-5 text-green-600" />
+                                <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                    <Mail class="w-5 h-5 text-brand-dark" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-500">Email</p>
+                                    <p class="text-xs text-brand-light">Email</p>
                                     <p class="font-semibold text-brand-dark">
                                         {{ employeeContactEmail }}
                                     </p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 bg-orange-50 rounded-xl flex items-center justify-center">
-                                    <Calendar class="w-5 h-5 text-orange-600" />
+                                <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                    <Calendar class="w-5 h-5 text-brand-dark" />
                                 </div>
                                 <div>
-                                    <p class="text-xs text-gray-500">Payment Date</p>
+                                    <p class="text-xs text-brand-light">Payment Date</p>
                                     <p class="font-semibold text-brand-dark">
                                         {{ formatDate(payslip.payment_date || payslip.created_at) }}
                                     </p>
@@ -333,66 +333,66 @@ const getAdjustmentStatusClass = (status) => {
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                    <div class="bg-green-50 rounded-2xl p-6">
+                    <div class="bg-[var(--color-surface-overlay)] border border-brand-border rounded-2xl p-6">
                         <div class="flex items-center gap-2 mb-4">
-                            <TrendingUp class="w-5 h-5 text-green-600" />
-                            <h3 class="text-lg font-bold text-green-900">Earnings</h3>
+                            <TrendingUp class="w-5 h-5 text-brand-dark" />
+                            <h3 class="text-lg font-bold text-brand-dark">Earnings</h3>
                         </div>
                         <div class="space-y-3">
                             <div class="flex items-center justify-between">
-                                <span class="text-sm text-green-700">Basic Salary</span>
-                                <span class="font-semibold text-green-900 tabular-nums">
+                                <span class="text-sm text-brand-dark">Basic Salary</span>
+                                <span class="font-semibold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.basic_salary) }}
                                 </span>
                             </div>
                             <div v-if="payslip.allowances > 0" class="flex items-center justify-between">
-                                <span class="text-sm text-green-700">Allowances</span>
-                                <span class="font-semibold text-green-900 tabular-nums">
+                                <span class="text-sm text-brand-dark">Allowances</span>
+                                <span class="font-semibold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.allowances) }}
                                 </span>
                             </div>
                             <div v-if="payslip.bonus > 0" class="flex items-center justify-between">
-                                <span class="text-sm text-green-700">Bonus</span>
-                                <span class="font-semibold text-green-900 tabular-nums">
+                                <span class="text-sm text-brand-dark">Bonus</span>
+                                <span class="font-semibold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.bonus) }}
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between pt-3 border-t-2 border-green-200">
-                                <span class="text-sm font-bold text-green-900">Gross Salary</span>
-                                <span class="text-lg font-extrabold text-green-900 tabular-nums">
+                            <div class="flex items-center justify-between pt-3 border-t-2 border-brand-border">
+                                <span class="text-sm font-bold text-brand-dark">Gross Salary</span>
+                                <span class="text-lg font-extrabold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.gross_salary) }}
                                 </span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-red-50 rounded-2xl p-6">
+                    <div class="bg-[var(--color-surface-overlay)] border border-brand-border rounded-2xl p-6">
                         <div class="flex items-center gap-2 mb-4">
-                            <TrendingDown class="w-5 h-5 text-red-600" />
-                            <h3 class="text-lg font-bold text-red-900">Deductions</h3>
+                            <TrendingDown class="w-5 h-5 text-brand-dark" />
+                            <h3 class="text-lg font-bold text-brand-dark">Deductions</h3>
                         </div>
                         <div class="space-y-3">
                             <div v-if="payslip.tax > 0" class="flex items-center justify-between">
-                                <span class="text-sm text-red-700">Tax</span>
-                                <span class="font-semibold text-red-900 tabular-nums">
+                                <span class="text-sm text-brand-dark">Tax</span>
+                                <span class="font-semibold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.tax) }}
                                 </span>
                             </div>
                             <div v-if="payslip.insurance > 0" class="flex items-center justify-between">
-                                <span class="text-sm text-red-700">Insurance</span>
-                                <span class="font-semibold text-red-900 tabular-nums">
+                                <span class="text-sm text-brand-dark">Insurance</span>
+                                <span class="font-semibold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.insurance) }}
                                 </span>
                             </div>
                             <div v-if="payslip.other_deductions > 0" class="flex items-center justify-between">
-                                <span class="text-sm text-red-700">Other Deductions</span>
-                                <span class="font-semibold text-red-900 tabular-nums">
+                                <span class="text-sm text-brand-dark">Other Deductions</span>
+                                <span class="font-semibold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.other_deductions) }}
                                 </span>
                             </div>
-                            <div class="flex items-center justify-between pt-3 border-t-2 border-red-200">
-                                <span class="text-sm font-bold text-red-900">Total Deductions</span>
-                                <span class="text-lg font-extrabold text-red-900 tabular-nums">
+                            <div class="flex items-center justify-between pt-3 border-t-2 border-brand-border">
+                                <span class="text-sm font-bold text-brand-dark">Total Deductions</span>
+                                <span class="text-lg font-extrabold text-brand-dark tabular-nums">
                                     {{ formatCurrency(payslip.total_deductions) }}
                                 </span>
                             </div>
@@ -403,24 +403,24 @@ const getAdjustmentStatusClass = (status) => {
                 <div
                     v-if="adjustments.length > 0"
                     data-testid="payslip-adjustments"
-                    class="bg-amber-50 rounded-2xl p-6 mb-8"
+                    class="bg-[var(--color-surface-overlay)] border border-brand-border rounded-2xl p-6 mb-8"
                 >
                     <div class="flex items-center gap-2 mb-4">
-                        <BadgeCheck class="w-5 h-5 text-amber-700" />
-                        <h3 class="text-lg font-bold text-amber-900">Adjustments</h3>
+                        <BadgeCheck class="w-5 h-5 text-brand-dark" />
+                        <h3 class="text-lg font-bold text-brand-dark">Adjustments</h3>
                     </div>
                     <div class="space-y-3">
                         <div
                             v-for="adjustment in adjustments"
                             :key="adjustment.id"
-                            class="rounded-xl border border-amber-200 bg-white/80 px-4 py-3"
+                            class="rounded-xl border border-brand-border bg-[var(--color-surface)] px-4 py-3"
                         >
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="text-sm font-semibold text-amber-900">
+                                    <p class="text-sm font-semibold text-brand-dark">
                                         {{ adjustment.reason || formatAdjustmentKind(adjustment.adjustment_kind) }}
                                     </p>
-                                    <p class="text-xs text-amber-700 mt-1">
+                                    <p class="text-xs text-brand-dark mt-1">
                                         {{ formatAdjustmentKind(adjustment.adjustment_kind) }}
                                     </p>
                                     <div class="mt-2">
@@ -447,7 +447,7 @@ const getAdjustmentStatusClass = (status) => {
                                     </span>
                                     <button
                                         type="button"
-                                        class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-amber-800 hover:text-amber-900"
+                                        class="mt-2 inline-flex items-center gap-1 text-xs font-semibold text-brand-dark hover:text-brand-dark"
                                         @click="toggleAdjustmentDetails(adjustment.id)"
                                         :data-testid="`payslip-adjustment-toggle-${adjustment.id}`"
                                     >
@@ -462,23 +462,23 @@ const getAdjustmentStatusClass = (status) => {
 
                             <div
                                 v-if="isAdjustmentExpanded(adjustment.id)"
-                                class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-amber-800"
+                                class="mt-3 grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs text-brand-dark"
                             >
                                 <p>
                                     Days Delta:
-                                    <span class="font-semibold text-amber-900">
+                                    <span class="font-semibold text-brand-dark">
                                         {{ Number(adjustment.days_delta || 0) }}
                                     </span>
                                 </p>
                                 <p>
                                     Source Period:
-                                    <span class="font-semibold text-amber-900">
+                                    <span class="font-semibold text-brand-dark">
                                         #{{ adjustment.source_period_id ?? "-" }}
                                     </span>
                                 </p>
                                 <p>
                                     Target Period:
-                                    <span class="font-semibold text-amber-900">
+                                    <span class="font-semibold text-brand-dark">
                                         #{{ adjustment.target_period_id ?? "-" }}
                                     </span>
                                 </p>
@@ -487,32 +487,32 @@ const getAdjustmentStatusClass = (status) => {
                     </div>
                 </div>
 
-                <div class="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
+                <div class="bg-[var(--color-surface-overlay)] border border-brand-border rounded-2xl p-6 text-brand-dark">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-white/80 text-sm font-medium mb-2">NET SALARY (TAKE HOME)</p>
+                            <p class="text-brand-dark text-sm font-medium mb-2">NET SALARY (TAKE HOME)</p>
                             <p class="text-4xl font-extrabold tabular-nums">
                                 {{ formatCurrency(payslip.net_salary) }}
                             </p>
                         </div>
                         <div
-                            class="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center backdrop-blur-sm"
+                            class="w-16 h-16 bg-[var(--color-surface)] rounded-2xl flex items-center justify-center"
                         >
-                            <DollarSign class="w-8 h-8 text-white" />
+                            <DollarSign class="w-8 h-8 text-brand-dark" />
                         </div>
                     </div>
                 </div>
 
-                <div v-if="payslip.notes" class="mt-6 p-4 bg-gray-50 rounded-xl">
-                    <p class="text-sm font-semibold text-gray-700 mb-2">Payroll Notes</p>
-                    <p class="text-sm text-gray-600">{{ payslip.notes }}</p>
+                <div v-if="payslip.notes" class="mt-6 p-4 bg-[var(--color-surface-overlay)] border border-brand-border rounded-xl">
+                    <p class="text-sm font-semibold text-brand-dark mb-2">Payroll Notes</p>
+                    <p class="text-sm text-brand-light">{{ payslip.notes }}</p>
                 </div>
 
-                <div class="mt-8 pt-6 border-t border-gray-200 text-center">
-                    <p class="text-xs text-gray-500">
+                <div class="mt-8 pt-6 border-t border-brand-border text-center">
+                    <p class="text-xs text-brand-light">
                         This is a computer-generated payslip and does not require a signature.
                     </p>
-                    <p class="text-xs text-gray-500 mt-1">For any queries, please contact the HR department.</p>
+                    <p class="text-xs text-brand-light mt-1">For any queries, please contact the HR department.</p>
                 </div>
             </div>
 

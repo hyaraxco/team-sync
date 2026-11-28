@@ -45,14 +45,14 @@ const workPatternMap = {
     office: {
         label: "Office",
         icon: Building,
-        iconClass: "text-blue-600",
-        badgeClass: "bg-blue-50 text-blue-700 border-blue-200",
+        iconClass: "text-brand-dark",
+        badgeClass: "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border",
     },
     remote: {
         label: "WFH",
         icon: Home,
-        iconClass: "text-violet-600",
-        badgeClass: "bg-violet-50 text-violet-700 border-violet-200",
+        iconClass: "text-brand-dark",
+        badgeClass: "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border",
     },
 };
 
@@ -178,14 +178,14 @@ const {
                         class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                         :class="
                             activeTab === 'schedules'
-                                ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
+                                ? 'bg-brand-primary border border-primary-700 text-white'
                                 : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                         "
                         :style="{ color: activeTab === 'schedules' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)' }"
                     >
                         <MapPin
                             class="w-4 h-4"
-                            :class="activeTab === 'schedules' ? 'text-white' : 'text-gray-600'"
+                            :class="activeTab === 'schedules' ? 'text-white' : 'text-brand-light'"
                         />
                         <span class="text-sm font-semibold">Schedules</span>
                     </button>
@@ -196,14 +196,14 @@ const {
                         class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                         :class="
                             activeTab === 'overrides'
-                                ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
+                                ? 'bg-brand-primary border border-primary-700 text-white'
                                 : 'border-brand-border hover:ring-2 hover:ring-brand-primary/20'
                         "
                         :style="{ color: activeTab === 'overrides' ? 'var(--color-text-inverse)' : 'var(--color-text-primary)' }"
                     >
                         <Clock
                             class="w-4 h-4"
-                            :class="activeTab === 'overrides' ? 'text-white' : 'text-gray-600'"
+                            :class="activeTab === 'overrides' ? 'text-white' : 'text-brand-light'"
                         />
                         <span class="text-sm font-semibold">Exceptions</span>
                     </button>

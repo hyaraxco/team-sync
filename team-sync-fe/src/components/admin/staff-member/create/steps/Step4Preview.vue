@@ -49,23 +49,23 @@ const formatText = (text) => {
 <template>
     <div class="space-y-6">
         <!-- Preview Header -->
-        <div class="bg-gradient-to-r from-blue-500 to-blue-600 rounded-2xl p-6 text-white">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 text-brand-dark">
             <div class="flex items-center gap-3 mb-3">
-                <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
-                    <CheckCircle class="w-6 h-6 text-white" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <CheckCircle class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-xl font-bold">Review Employee Information</h3>
-                    <p class="text-blue-100 text-sm">Please review all information before submitting</p>
+                    <p class="text-brand-light text-sm">Please review all information before submitting</p>
                 </div>
             </div>
         </div>
 
         <!-- Personal Information -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <User class="w-6 h-6 text-blue-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <User class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Personal Information</h3>
@@ -166,10 +166,10 @@ const formatText = (text) => {
         </div>
 
         <!-- Job Information -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                    <Briefcase class="w-6 h-6 text-green-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Briefcase class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Job Information</h3>
@@ -254,10 +254,10 @@ const formatText = (text) => {
         </div>
 
         <!-- Bank Information -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                    <CreditCard class="w-6 h-6 text-purple-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <CreditCard class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Bank Information</h3>
@@ -288,10 +288,10 @@ const formatText = (text) => {
         </div>
 
         <!-- Emergency Contact -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
-                    <Phone class="w-6 h-6 text-red-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Phone class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Emergency Contact</h3>

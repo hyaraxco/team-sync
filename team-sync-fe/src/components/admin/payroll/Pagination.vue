@@ -113,7 +113,7 @@ const goToNext = () => {
                     :value="perPage"
                     @change="handlePerPageChange(parseInt($event.target.value))"
                     :disabled="loading"
-                    class="px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary motion-reduce:transition-none transition-all duration-300 bg-white appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary motion-reduce:transition-none transition-all duration-300 bg-[var(--color-surface)] appearance-none disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <option v-for="option in perPageOptions" :key="option" :value="option">
                         {{ option }}

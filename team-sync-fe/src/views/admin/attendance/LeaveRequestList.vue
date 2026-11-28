@@ -464,7 +464,7 @@ onMounted(() => {
                                     v-if="request.proof_file_path"
                                     :href="getProofUrl(request.proof_file_path)"
                                     target="_blank"
-                                    class="text-xs text-blue-600 hover:underline flex items-center gap-1"
+                                    class="text-xs text-brand-dark hover:underline flex items-center gap-1 font-medium"
                                 >
                                     <ExternalLink class="w-3 h-3" />
                                     View Proof
@@ -645,7 +645,7 @@ onMounted(() => {
                 <a
                     :href="getProofUrl(selectedProofRequest.proof_file_path)"
                     target="_blank"
-                    class="text-blue-600 hover:underline text-sm flex items-center gap-1"
+                    class="text-brand-dark hover:underline text-sm flex items-center gap-1 font-medium"
                 >
                     <ExternalLink class="w-4 h-4" />
                     View File
