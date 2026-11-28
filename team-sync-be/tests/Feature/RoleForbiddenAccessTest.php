@@ -238,7 +238,7 @@ class RoleForbiddenAccessTest extends TestCase
         $this->actingAsEmail('tasyia@teamsync.com');
 
         $r1 = $this->getJson('/api/v1/dashboard/statistics');
-        $this->assertNotEquals(403, $r1->status(), 'HR should access company dashboard statistics');
+        $r1->assertOk();
 
         $r2 = $this->getJson('/api/v1/dashboard/today-attendance-overview');
         $this->assertNotEquals(403, $r2->status(), 'HR should access today attendance overview');
