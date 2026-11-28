@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Constants\CacheConstants;
+use App\Enums\AttendanceStatus;
 use App\Enums\TaskStatus;
 use App\Interfaces\DashboardRepositoryInterface;
 use App\Models\Attendance;
@@ -176,12 +177,17 @@ class DashboardRepository implements DashboardRepositoryInterface
                 ->where('staff_member_id', $employeeId)
                 ->whereBetween('date', [$startOfMonth, $endOfMonth])
                 ->selectRaw("
-                    COUNT(CASE WHEN status = 'present' THEN 1 END) as present_days,
-                    COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
-                    COUNT(CASE WHEN status = 'sick_leave' THEN 1 END) as sick_days,
-                    COUNT(CASE WHEN status = 'late' THEN 1 END) as late_days,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as present_days,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as absent_days,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as sick_days,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as late_days,
                     SUM({$minutes}) as total_minutes
-                ")
+                ", [
+                    AttendanceStatus::PRESENT->value,
+                    AttendanceStatus::ABSENT->value,
+                    AttendanceStatus::SICK_LEAVE->value,
+                    AttendanceStatus::LATE->value,
+                ])
                 ->first();
 
             $totalDays = now()->daysInMonth;
