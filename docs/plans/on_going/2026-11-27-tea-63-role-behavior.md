@@ -44,10 +44,10 @@ Review handoff remains blocked pending the scoped fixes and current-SHA CI. Keep
 - Move Manager team/member authorization lookup behind `AnalyticsRepositoryInterface`; keep request validation and authorization response at the FormRequest boundary.
 - Validate effective `min_rating <= max_rating` for partial active outcome-rule updates before checking overlaps.
 - Preserve focused and complete Playwright exit statuses independently; both runs and both JUnit reports are required.
-- Prior guarded role attempts reached the 3600-second watchdog while browser cases were still running. Re-run after these fixes on a fresh committed archive with host cleanup headroom; partial cases are not acceptance.
+Earlier guarded attempts ended through host cancellation/SIGTERM before a `phase:"roles"` terminal result. The `phase:"watchdog", exit_code:124` event belongs to the expected watchdog-control proof that runs before roles and confirms cleanup; it is not a roles-suite timeout. No focused/full JUnit reports were produced for those interrupted runs, so acceptance remains pending.
 BE/FE CI passed on `cf5732f1a5f2080103c1d981f65bdf12c09a2a11`. The matrix links this plan; add it to version control despite the directory ignore rule.
 
 Focused backend checks on the current code: 68 tests / 398 assertions; the one existing MySQL-only analytics test was skipped under SQLite. The analytics export test doubles pass 9 tests / 20 assertions. The inactive and active outcome-bound contract passes 13 tests / 47 assertions.
 
-The full guarded suite has not completed successfully. Prior attempts hit the 3600-second watchdog before finishing the focused behavior selection, so none of their partial cases or missing reports count as acceptance. Latest BE/FE CI and GitGuardian checks pass on `cf5732f1a5f2080103c1d981f65bdf12c09a2a11`; merge remains blocked until both JUnit reports and terminal suite status pass.
+The latest guarded suite has not produced a `TEA13_REPORT` or terminal `phase:"roles"` status yet. Earlier job cancellation records are not suite outcomes. Current-head BE/FE CI and GitGuardian are separately tracked; do not infer browser acceptance until the reports and roles status arrive.
 tracked evidence
