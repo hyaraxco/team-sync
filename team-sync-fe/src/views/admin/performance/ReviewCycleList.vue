@@ -92,6 +92,7 @@ const canDeleteCycle = (cycle) => {
 };
 
 const handleGenerateReviews = async (cycle) => {
+    if (confirming.value) return;
     confirmTitle.value = "Generate Reviews";
     confirmMessage.value = `Generate reviews for "${cycle.name}"? This will create reviews for all active employees.`;
     confirmAction.value = async () => {
@@ -110,6 +111,7 @@ const handleGenerateReviews = async (cycle) => {
 };
 
 const handleDeleteCycle = async (cycle) => {
+    if (confirming.value) return;
     confirmTitle.value = "Delete Cycle";
     confirmMessage.value = `Delete cycle "${cycle.name}"? This action cannot be undone.`;
     confirmAction.value = async () => {

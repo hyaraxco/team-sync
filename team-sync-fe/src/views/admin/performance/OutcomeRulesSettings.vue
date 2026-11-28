@@ -103,6 +103,7 @@ const saveRule = async () => {
 };
 
 const deleteRule = async (rule) => {
+    if (confirming.value) return;
     confirmTitle.value = "Delete Rule";
     confirmMessage.value = `Delete rule "${rule.label}"? This cannot be undone.`;
     confirmAction.value = async () => {

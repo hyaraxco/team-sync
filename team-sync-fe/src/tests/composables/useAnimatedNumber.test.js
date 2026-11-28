@@ -37,6 +37,20 @@ describe("useAnimatedNumber", () => {
         wrapper.unmount();
     });
 
+    it.each([
+        [true, 100, 0, "4"],
+        [false, 0, 0, "4"],
+        [true, 100, 2, "3.50"],
+        [false, 0, 2, "3.50"],
+        [false, 100, 0, "4"],
+    ])("keeps precision with reduced motion %s, duration %s and decimals %s", async (reduced, duration, decimals, expected) => {
+        vi.stubGlobal("matchMedia", () => ({ matches: reduced, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+        const wrapper = mountAnimated(ref(3.5), { duration, decimals });
+        await vi.advanceTimersByTimeAsync(200);
+        expect(wrapper.vm.displayValue).toBe(expected);
+        wrapper.unmount();
+    });
+
     it("finishes an active animation when reduced motion is enabled", async () => {
         let change;
         const remove = vi.fn();

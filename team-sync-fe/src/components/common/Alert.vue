@@ -41,7 +41,7 @@
             </p>
         </div>
         <button
-            @click="visible = false"
+            @click="visible = false; emit('close')"
             class="ml-2 p-1.5 rounded-lg motion-reduce:transition-none transition-colors hover:bg-black/5 focus:outline-none focus:ring-2"
             :class="isDanger ? 'focus:ring-red-700' : 'focus:ring-green-700'"
             aria-label="Close"
@@ -74,6 +74,8 @@ const props = defineProps({
     message: { type: String, required: true },
     show: { type: Boolean, default: true },
 });
+
+const emit = defineEmits(["close"]);
 
 const visible = ref(props.show);
 const isDanger = computed(() => ["danger", "error"].includes(props.type));

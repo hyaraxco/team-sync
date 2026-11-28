@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 
 const { performanceReviewStoreMock, performanceReviewRefs, routerLinkStub } = vi.hoisted(() => ({
     performanceReviewStoreMock: {
@@ -57,6 +57,7 @@ vi.mock("@/composables/useToast", () => ({
 }));
 
 import TemplateManagement from "@/views/admin/performance/TemplateManagement.vue";
+import ConfirmationModal from "@/components/common/ConfirmationModal.vue";
 
 const factory = () =>
     mount(TemplateManagement, {
@@ -178,5 +179,42 @@ describe("TemplateManagement smoke", () => {
         const addBtn = wrapper.findAll("button").find((b) => b.text().includes("New Template"));
         await addBtn.trigger("click");
         expect(wrapper.text()).toContain("Total: 0%");
+    });
+
+    it("blocks replacement after pending confirmation dismissal and allows reopening after settlement", async () => {
+        let settleDelete;
+        performanceReviewStoreMock.deleteTemplate.mockReturnValueOnce(new Promise((resolve) => {
+            settleDelete = resolve;
+        }));
+        performanceReviewRefs.templates.value = sampleTemplates;
+        const wrapper = factory();
+        const deleteButtons = wrapper.findAll("tbody tr").map((row) => row.findAll("button")[1]);
+        const confirmation = wrapper.findComponent(ConfirmationModal);
+
+        await deleteButtons[0].trigger("click");
+        expect(confirmation.props("message")).toContain(sampleTemplates[0].name);
+        confirmation.vm.$emit("confirm");
+        await wrapper.vm.$nextTick();
+        expect(performanceReviewStoreMock.deleteTemplate).toHaveBeenCalledWith(sampleTemplates[0].id);
+
+        confirmation.vm.$emit("cancel");
+        await wrapper.vm.$nextTick();
+        expect(confirmation.props("show")).toBe(false);
+        await deleteButtons[1].trigger("click");
+        expect(confirmation.props("show")).toBe(false);
+        expect(confirmation.props("message")).toContain(sampleTemplates[0].name);
+        expect(performanceReviewStoreMock.deleteTemplate).toHaveBeenCalledTimes(1);
+
+        settleDelete();
+        await flushPromises();
+        await deleteButtons[1].trigger("click");
+        expect(confirmation.props("show")).toBe(true);
+        expect(confirmation.props("message")).toContain(sampleTemplates[1].name);
+        await flushPromises();
+        expect(confirmation.props("show")).toBe(true);
+        confirmation.vm.$emit("confirm");
+        await flushPromises();
+        expect(performanceReviewStoreMock.deleteTemplate).toHaveBeenLastCalledWith(sampleTemplates[1].id);
+        wrapper.unmount();
     });
 });

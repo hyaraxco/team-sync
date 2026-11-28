@@ -135,6 +135,7 @@ const saveTemplate = async () => {
 };
 
 const deleteTemplate = async (template) => {
+    if (confirming.value) return;
     confirmTitle.value = "Delete Template";
     confirmMessage.value = `Delete template "${template.name}"? This action cannot be undone.`;
     confirmAction.value = async () => {

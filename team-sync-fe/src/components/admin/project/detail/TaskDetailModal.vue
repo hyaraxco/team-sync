@@ -235,6 +235,7 @@ const closeModal = () => {
 };
 
 const handleDelete = () => {
+    if (confirmationLoading.value) return;
     confirmTitle.value = "Delete Task";
     confirmMessage.value = "Are you sure you want to delete this task? This action cannot be undone.";
     confirmAction.value = () => {
@@ -377,6 +378,7 @@ const handleUpdateComment = async (commentId) => {
 };
 
 const handleDeleteComment = async (comment) => {
+    if (confirmationLoading.value) return;
     if (!canMutateEntityOwner(comment.staff_member_id)) {
         return;
     }
@@ -435,6 +437,7 @@ const handleAttachmentSelected = async (event) => {
 };
 
 const handleDeleteAttachment = async (attachment) => {
+    if (confirmationLoading.value) return;
     if (!canMutateEntityOwner(attachment.staff_member_id)) {
         return;
     }

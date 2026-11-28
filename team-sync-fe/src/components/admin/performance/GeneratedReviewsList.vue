@@ -57,6 +57,7 @@ onMounted(async () => {
 });
 
 const generateReviews = async () => {
+    if (confirming.value) return;
     confirmTitle.value = "Generate Reviews";
     confirmMessage.value =
         "Are you sure you want to generate reviews based on the assignment rules? This will only generate reviews for staff members who do not have one yet in this cycle.";

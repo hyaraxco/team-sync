@@ -23,6 +23,10 @@ describe("Feedback states", () => {
         expect(wrapper.get('[role="alert"]').classes()).toContain("text-[var(--color-feedback-danger)]");
         await wrapper.get('button[aria-label="Close"]').trigger("click");
         expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+        expect(wrapper.emitted("close")).toEqual([[]]);
+        await wrapper.setProps({ show: false });
+        await wrapper.setProps({ show: true });
+        expect(wrapper.get('[role="alert"]').text()).toContain("Save failed");
     });
 
     it("keeps empty actions outside the status announcement", () => {

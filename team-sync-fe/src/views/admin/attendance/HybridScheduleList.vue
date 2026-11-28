@@ -239,7 +239,7 @@ const {
                 @reset="ovHandleReset"
             />
 
-            <Alert v-if="error" type="error" :message="error" dismissible @close="store.error = null" />
+            <Alert v-if="error" type="error" title="Unable to load hybrid schedules" :message="error" @close="error = null" />
 
             <!-- Schedules Table -->
             <DataTableCard

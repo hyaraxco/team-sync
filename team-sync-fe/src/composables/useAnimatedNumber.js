@@ -34,7 +34,7 @@ export function useAnimatedNumber(source, options = {}) {
 
         if (isNaN(to) || to === 0 || reducedMotion.value || duration <= 0) {
             displayValue.value = isNaN(to) ? String(to)
-                : decimals > 0 ? to.toFixed(decimals) : to.toLocaleString();
+                : decimals > 0 ? to.toFixed(decimals) : Math.round(to).toLocaleString();
             return;
         }
 
