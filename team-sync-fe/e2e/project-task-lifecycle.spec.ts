@@ -201,7 +201,9 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await page.getByText("Team Sync HRIS Platform").first().click();
     await page.waitForLoadState("networkidle");
     await expect(page.getByText("Project Tasks").first()).toBeVisible();
-    await expect(page.getByText("No tasks yet", { exact: true })).toBeVisible();
+    for (const column of ["To Do", "In Progress", "Review", "Done"]) {
+      await expect(page.getByRole("heading", { name: column, exact: true })).toBeVisible();
+    }
     await captureEvidence(page, "task-t7.png");
     await ctx.close();
   });
