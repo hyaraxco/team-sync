@@ -1,6 +1,9 @@
 import { defineStore } from "pinia";
 import { axiosInstance } from "@/plugins/axios";
 import { handleError } from "@/helpers/errorHelper";
+import { can } from "@/helpers/permissionHelper";
+import { useAuthStore } from "@/stores/auth";
+import { useTeamStore } from "@/stores/team";
 
 export const useAnalyticsStore = defineStore("analytics", {
     state: () => ({
@@ -537,18 +540,34 @@ export const useAnalyticsStore = defineStore("analytics", {
         async fetchPerformanceAnalytics() {
             this.enhancedMetricsLoading = true;
             this.error = null;
+            const companyWide = can("analytics-hr-view");
+            const authStore = useAuthStore();
+            const teamStore = useTeamStore();
+            this.companyPerformanceSummary = null;
+            this.ratingDistribution = null;
 
             try {
+                if (!companyWide && !this.teamId) {
+                    await teamStore.fetchTeams({ leader_id: authStore.user.id });
+                    this.teamId = teamStore.teams[0]?.id ?? null;
+                    if (!this.teamId) {
+                        this.teamPerformanceSummary = null;
+                        this.goalCompletionRate = null;
+                        this.feedbackMetrics = null;
+                        this.error = teamStore.error || "No led team is available for performance analytics.";
+                        return;
+                    }
+                }
                 const [team, company, rating, goals, feedback] = await Promise.all([
                     axiosInstance.get("/analytics/performance/team-summary", {
                         params: this.buildParams(),
                     }),
-                    axiosInstance.get("/analytics/performance/company-summary", {
+                    companyWide ? axiosInstance.get("/analytics/performance/company-summary", {
                         params: this.buildParams(),
-                    }),
-                    axiosInstance.get("/analytics/performance/rating-distribution", {
+                    }) : null,
+                    companyWide ? axiosInstance.get("/analytics/performance/rating-distribution", {
                         params: this.buildParams(),
-                    }),
+                    }) : null,
                     axiosInstance.get("/analytics/performance/goal-completion-rate", {
                         params: this.buildParams(),
                     }),
@@ -558,8 +577,8 @@ export const useAnalyticsStore = defineStore("analytics", {
                 ]);
 
                 this.teamPerformanceSummary = team.data.data;
-                this.companyPerformanceSummary = company.data.data;
-                this.ratingDistribution = rating.data.data;
+                this.companyPerformanceSummary = company?.data.data ?? null;
+                this.ratingDistribution = rating?.data.data ?? null;
                 this.goalCompletionRate = goals.data.data;
                 this.feedbackMetrics = feedback.data.data;
             } catch (error) {

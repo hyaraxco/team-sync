@@ -8,6 +8,7 @@ use App\Http\Requests\AttendanceCorrectionListRequest;
 use App\Http\Requests\AttendanceCorrectionRejectRequest;
 use App\Http\Requests\AttendanceCorrectionStoreRequest;
 use App\Interfaces\AttendanceCorrectionRepositoryInterface;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
@@ -72,6 +73,8 @@ class AttendanceCorrectionController extends Controller implements HasMiddleware
             return ResponseHelper::jsonResponse(true, 'Correction Retrieved Successfully', $correction, 200);
         } catch (ModelNotFoundException $e) {
             return ResponseHelper::jsonResponse(false, 'Correction Not Found', null, 404);
+        } catch (AuthorizationException $e) {
+            return ResponseHelper::jsonResponse(false, $e->getMessage(), null, 403);
         } catch (\Throwable $e) {
             Log::error('AttendanceCorrectionController Error: '.$e->getMessage(), ['trace' => $e->getTraceAsString()]);
 

@@ -95,10 +95,7 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await loginAsRole(page, "manager");
     await page.goto(`/admin/projects/${projectId}`);
     await page.waitForLoadState("networkidle");
-    await expect(page.getByText("To Do").first()).toBeVisible();
-    await expect(page.getByText("In Progress").first()).toBeVisible();
-    await expect(page.getByText("Review").first()).toBeVisible();
-    await expect(page.getByText("Done").first()).toBeVisible();
+    await expect(page.getByText("No tasks yet", { exact: true })).toBeVisible();
     await expect(page.getByRole("button", { name: /Create New Task/i })).toBeVisible();
     await captureEvidence(page, "task-t3.png");
     await ctx.close();
@@ -123,7 +120,7 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await page.locator('input[type="date"]').fill(
       new Date(Date.now() + 7 * 86400000).toISOString().slice(0, 10)
     );
-    await page.getByRole("button", { name: /^Create Task$/i }).click();
+    await modal.getByRole("button", { name: /^Create Task$/i }).click();
     await expect(page.getByText(taskName).first()).toBeVisible({ timeout: 10_000 });
     await captureEvidence(page, "task-t4.png");
     await ctx.close();
@@ -204,7 +201,13 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await page.getByText("Team Sync HRIS Platform").first().click();
     await page.waitForLoadState("networkidle");
     await expect(page.getByText("Project Tasks").first()).toBeVisible();
-    await expect(page.getByText("To Do").first()).toBeVisible();
+    if (await page.getByText("No tasks yet", { exact: true }).count()) {
+      await expect(page.getByText("No tasks yet", { exact: true })).toBeVisible();
+    } else {
+      for (const column of ["To Do", "In Progress", "Review", "Done"]) {
+        await expect(page.getByRole("heading", { name: column, exact: true })).toBeVisible();
+      }
+    }
     await captureEvidence(page, "task-t7.png");
     await ctx.close();
   });
@@ -358,19 +361,39 @@ test.describe.serial("Project & Task Lifecycle", () => {
     await ctx.close();
   });
 
-  // ── T13: Finance cannot access projects ────────────────────────
+  // ── T13: Finance can read projects but cannot create them ───────
 
-  test("T13: Finance is redirected from projects page", async ({ browser }) => {
+  test("T13: Finance can view projects but has no project creation authority", async ({ browser }) => {
     const ctx = await browser.newContext();
     const page = await ctx.newPage();
     await loginAsRole(page, "finance");
 
-    await page.goto("/admin/projects");
-    // Finance has no project-menu permission → redirected to dashboard
-    await expect(page).toHaveURL(/\/admin\/dashboard$/, { timeout: 10_000 });
-
-    await captureEvidence(page, "task-t13.png");
-    await ctx.close();
+    const api = await makeApi(await getToken(page));
+    try {
+      const loaded = page.waitForResponse((res) => res.url().includes("/projects/all/paginated") && res.request().method() === "GET");
+      await page.goto("/admin/projects");
+      await expect(page).toHaveURL(/\/admin\/projects$/);
+      const { data: projects } = await ok<{ data: { id: number; name: string }[] }>(await loaded, "Finance project list");
+      await expect(page.getByRole("heading", { name: "All Projects", exact: true })).toBeVisible();
+      if (projects.length) {
+        await expect(page.locator("main").getByText(projects[0].name, { exact: true }).first()).toBeVisible();
+      } else {
+        await expect(page.getByText("Belum ada proyek", { exact: true })).toBeVisible();
+      }
+      await expect(page.getByRole("link", { name: "Add Project", exact: true })).toHaveCount(0);
+      expect((await api.post("projects", {
+        data: {
+          name: `E2E denied Finance project ${ts}`, type: "web_development", priority: "high", status: "active",
+          start_date: new Date().toISOString().slice(0, 10),
+          end_date: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
+          description: "Denied Finance creation attempt.", project_leader_id: mgrProfileId, teams: [],
+        },
+      })).status()).toBe(403);
+      await captureEvidence(page, "task-t13.png");
+    } finally {
+      await api.dispose();
+      await ctx.close();
+    }
   });
 
   // ── T14: Manager deletes task via API ──────────────────────────

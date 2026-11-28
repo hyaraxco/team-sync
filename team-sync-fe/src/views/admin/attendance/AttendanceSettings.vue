@@ -85,6 +85,7 @@
                             </div>
 
                             <button
+                                v-if="can('settings-hr-manage')"
                                 class="w-full mt-8 py-3 rounded-xl border border-brand-border text-sm tracking-wide font-medium text-brand-dark transition-all focus:outline-none focus:ring-2 focus:ring-brand-primary"
                                 style="background-color: var(--color-surface-muted);"
                                 type="button"
@@ -206,6 +207,7 @@
                                 </div>
 
                                 <button
+                                    v-if="can('settings-hr-manage')"
                                     class="w-full mt-6 py-2 rounded-lg border border-brand-border text-xs tracking-wide font-medium text-brand-dark transition-all"
                                     style="background-color: var(--color-surface-muted);"
                                      type="button"
@@ -411,7 +413,7 @@
                     >
                         Cancel
                     </button>
-                    <button type="submit" :disabled="isSubmittingPolicy" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
+                    <button v-if="can('settings-hr-manage')" type="submit" :disabled="isSubmittingPolicy" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
                         {{ isSubmittingPolicy ? "Saving..." : "Save Policy" }}
                     </button>
                 </div>
@@ -517,7 +519,7 @@
                     >
                         Cancel
                     </button>
-                    <button type="submit" :disabled="isSubmittingEntitlement" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
+                    <button v-if="can('settings-hr-manage')" type="submit" :disabled="isSubmittingEntitlement" class="flex-1 rounded-xl bg-brand-dark px-4 py-3 text-sm font-semibold text-white transition-opacity disabled:cursor-not-allowed disabled:opacity-50">
                         {{ isSubmittingEntitlement ? "Saving..." : "Save Rules" }}
                     </button>
                 </div>
@@ -590,6 +592,7 @@ import { useHolidayCalendarStore } from "@/stores/holidayCalendar";
 import { useAttendancePolicyStore } from "@/stores/attendancePolicy";
 import { useLeaveEntitlementStore } from "@/stores/leaveEntitlement";
 import { useToast } from "@/composables/useToast";
+import { can } from "@/helpers/permissionHelper";
 
 const activeTab = ref("Attendance Policies");
 const holidayStore = useHolidayCalendarStore();

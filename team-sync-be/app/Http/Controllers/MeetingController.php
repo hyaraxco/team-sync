@@ -108,18 +108,9 @@ class MeetingController extends Controller implements HasMiddleware
         try {
             $meeting = $this->meetingService->getById($id);
 
-            // Staff can only view meetings targeted at their teams
-            $user = Auth::user();
-            $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
-
-            if (! $isReviewer) {
-                $teamIds = $this->getTeamIdsForScope();
-                if ($teamIds !== null) {
-                    $meetingTeamIds = $meeting->teams->pluck('id')->toArray();
-                    if (empty(array_intersect($meetingTeamIds, $teamIds))) {
-                        return ResponseHelper::jsonResponse(false, 'You do not have access to this meeting.', null, 403);
-                    }
-                }
+            $teamIds = $this->getTeamIdsForScope();
+            if ($teamIds !== null && empty(array_intersect($meeting->teams->pluck('id')->all(), $teamIds))) {
+                return ResponseHelper::jsonResponse(false, 'You do not have access to this meeting.', null, 403);
             }
 
             return ResponseHelper::jsonResponse(true, 'Meeting Retrieved Successfully', new MeetingResource($meeting), 200);
@@ -147,15 +138,13 @@ class MeetingController extends Controller implements HasMiddleware
 
     /**
      * Get team IDs for scope filtering.
-     * Returns null for manager/HR (no filtering), array of team IDs for staff.
+     * Returns null for HR/Superadmin, active team IDs for other roles.
      */
     private function getTeamIdsForScope(): ?array
     {
         $user = Auth::user();
-        $isReviewer = $user->hasRole('manager') || $user->hasRole('hr');
-
-        if ($isReviewer) {
-            return null; // No scope restriction
+        if ($user->hasAnyRole(['hr', 'superadmin'])) {
+            return null;
         }
 
         $profile = $user->staffMemberProfile;

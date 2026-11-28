@@ -28,5 +28,7 @@ with tempfile.TemporaryDirectory(dir="/scratch") as directory:
     finally:
         os.close(fd)
 assert collector.summarize("roles-junit.xml", b'<testsuites><testsuite tests="4" failures="1" skipped="2"/></testsuites>') == {"tests": 4, "failures": 1, "errors": 0, "skipped": 2, "assertions": 0}
+assert collector.REQUIRED["roles"] == {"roles-focused-junit.xml", "roles-junit.xml"}
+assert collector.summarize("roles-focused-junit.xml", b'<testsuites><testsuite tests="3" failures="0" errors="1" skipped="0"/></testsuites>')["errors"] == 1
 assert collector.summarize("fe-coverage-final.json", b'{"never-imported.vue":{"s":{"0":0}},"imported.js":{"s":{"0":1}}}') == {"files": 2, "uncovered_files": 1}
 print("collector safety checks: PASS")

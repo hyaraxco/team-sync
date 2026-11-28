@@ -25,11 +25,20 @@ wait_for_service_health() {
     sleep 2
   done
 }
-"${compose_cmd[@]}" "${compose_args[@]}" up -d mysql redis web
+"${compose_cmd[@]}" "${compose_args[@]}" up -d mysql redis meilisearch web
 wait_for_service_health mysql
 wait_for_service_health redis
+wait_for_service_health meilisearch
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan migrate:fresh
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan cache:clear
+"${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan tinker --execute='
+$client = app(\Meilisearch\Client::class);
+foreach ($client->getIndexes()->getResults() as $index) {
+    $task = $index->delete();
+    $result = $client->waitForTask($task["taskUid"], 30000);
+    if ($result["status"] !== "succeeded") throw new \RuntimeException(json_encode($result));
+}
+'
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan db:seed --class=MinimalPayrollE2ESeeder
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan db:seed --class=DemoDataSeeder
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan attendance-periods:sync
@@ -50,3 +59,15 @@ foreach ([\$prev, \$cur] as \$period) app(\Database\Seeders\BpjsPayrollFixtureSe
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan db:seed --class=PerformanceOutcomeRuleSeeder
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan db:seed --class=PerformanceReviewTemplateSeeder
 "${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan db:seed --class=PerformanceDataSeeder
+"${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan scout:import 'App\Models\StaffMemberProfile'
+"${compose_cmd[@]}" "${compose_args[@]}" exec -T web php artisan tinker --execute='
+$client = app(\Meilisearch\Client::class);
+$index = $client->index((new \App\Models\StaffMemberProfile)->searchableAs());
+$tasks = $index->getTasks((new \Meilisearch\Contracts\TasksQuery)->setLimit(1))->getResults();
+if (! $tasks) throw new \RuntimeException("Search import did not enqueue a task.");
+$result = $client->waitForTask($tasks[0]["uid"], 30000);
+if ($result["status"] !== "succeeded") throw new \RuntimeException(json_encode($result));
+$expected = \App\Models\StaffMemberProfile::count();
+if ($index->stats()["numberOfDocuments"] !== $expected) throw new \RuntimeException("Search fixture count differs from the database.");
+echo "Search fixtures ready: ".$expected." documents.";
+'

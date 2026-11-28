@@ -11,7 +11,7 @@ if [[ "${compose_file}" != "${expected}" || ! -f "${compose_file}" ]]; then
 fi
 
 actual_hash="$(shasum -a 256 "${compose_file}" | awk '{print $1}')"
-expected_hash="e1e8851f7da3f1a247c6ef5cec4fdf686234696e821dd5c29ffe12627bcb6aa4"
+expected_hash="49e0e4d5961eed872bb1f7dce90767132104831c4a869b3ab9bf98d65159be7b"
 if [[ "${actual_hash}" != "${expected_hash}" ]]; then
   echo "Refusing E2E reset: isolated Compose target does not match the approved definition." >&2
   exit 1

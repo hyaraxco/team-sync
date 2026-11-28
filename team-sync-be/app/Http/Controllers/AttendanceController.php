@@ -15,7 +15,6 @@ use App\Http\Resources\AttendancePolicyMismatchResource;
 use App\Http\Resources\AttendanceResource;
 use App\Http\Resources\PaginateResource;
 use App\Interfaces\AttendanceRepositoryInterface;
-use App\Models\AttendancePolicyMismatch;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -250,14 +249,10 @@ class AttendanceController extends Controller implements HasMiddleware
         $validated = $request->validated();
 
         try {
-            $query = AttendancePolicyMismatch::with(['staffMember', 'attendance'])
-                ->orderBy('mismatch_date', 'desc');
-
-            if (isset($validated['status'])) {
-                $query->where('status', $validated['status']);
-            }
-
-            $mismatches = $query->paginate($validated['per_page'] ?? 15);
+            $mismatches = $this->attendanceRepository->getPolicyMismatchesPaginated(
+                $validated['status'] ?? null,
+                $validated['per_page'] ?? 15
+            );
 
             return ResponseHelper::jsonResponse(
                 true,

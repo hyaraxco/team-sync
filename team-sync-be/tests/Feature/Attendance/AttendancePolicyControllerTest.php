@@ -89,6 +89,20 @@ class AttendancePolicyControllerTest extends TestCase
         ]);
     }
 
+    public function test_manager_can_read_but_cannot_change_company_policy(): void
+    {
+        $this->actingAsRole('manager');
+        $policy = AttendancePolicy::firstOrFail();
+        $original = $policy->late_grace_minutes;
+
+        $this->getJson('/api/v1/attendance-policies')->assertOk();
+        $this->putJson("/api/v1/attendance-policies/{$policy->id}", [
+            'late_grace_minutes' => $original === 17 ? 18 : 17,
+        ])->assertForbidden();
+
+        $this->assertSame($original, $policy->fresh()->late_grace_minutes);
+    }
+
     public function test_validation_prevents_invalid_policy_updates(): void
     {
         $this->actingAsRole('hr');

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\ResponseHelper;
+use App\Http\Requests\Analytics\PerformanceAnalyticsRequest;
 use App\Interfaces\AnalyticsRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controllers\HasMiddleware;
@@ -33,6 +34,7 @@ class AnalyticsController extends Controller implements HasMiddleware
                 'getAttendanceComplianceRate', 'getAttendancePatterns', 'getRemoteOfficeRatio',
                 'getLeaveUtilizationRate', 'getLeaveBalanceTrends', 'getPeakLeavePeriods',
                 'getWorkforceDemographics', 'getAttendanceCorrectionFrequency',
+                'getCompanyPerformanceSummary', 'getRatingDistribution',
                 'getLeaveApprovalTurnaround', 'getLeaveTypeDistribution',
             ]),
             // Finance analytics: payroll (Finance/Superadmin)
@@ -41,10 +43,9 @@ class AnalyticsController extends Controller implements HasMiddleware
                 'getPayrollCostTrends', 'getSalaryDistribution', 'getDeductionAnalysis',
                 'getPayrollCostPerEmployee', 'getPayrollProcessingTime',
             ]),
-            // Performance analytics: team/company performance (HR/Manager/Superadmin)
+            // Team performance analytics require a led team unless the reader has company-wide access.
             new Middleware(PermissionMiddleware::using(['analytics-performance-view']), only: [
-                'getTeamPerformanceSummary', 'getCompanyPerformanceSummary',
-                'getRatingDistribution', 'getGoalCompletionRate', 'getFeedbackMetrics',
+                'getTeamPerformanceSummary', 'getGoalCompletionRate', 'getFeedbackMetrics',
             ]),
             // Project analytics: project metrics (HR/Manager/Superadmin)
             new Middleware(PermissionMiddleware::using(['analytics-project-view']), only: [
@@ -506,7 +507,7 @@ class AnalyticsController extends Controller implements HasMiddleware
     }
 
     // Performance Management Analytics
-    public function getTeamPerformanceSummary(Request $request)
+    public function getTeamPerformanceSummary(PerformanceAnalyticsRequest $request)
     {
         try {
             $data = $this->analyticsRepository->getTeamPerformanceSummary(
@@ -552,7 +553,7 @@ class AnalyticsController extends Controller implements HasMiddleware
         }
     }
 
-    public function getGoalCompletionRate(Request $request)
+    public function getGoalCompletionRate(PerformanceAnalyticsRequest $request)
     {
         try {
             $data = $this->analyticsRepository->getGoalCompletionRate(
@@ -568,7 +569,7 @@ class AnalyticsController extends Controller implements HasMiddleware
         }
     }
 
-    public function getFeedbackMetrics(Request $request)
+    public function getFeedbackMetrics(PerformanceAnalyticsRequest $request)
     {
         try {
             $data = $this->analyticsRepository->getFeedbackMetrics(

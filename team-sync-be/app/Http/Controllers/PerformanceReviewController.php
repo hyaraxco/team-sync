@@ -68,15 +68,17 @@ class PerformanceReviewController extends Controller implements HasMiddleware
     {
         $review = $this->repository->getReviewById($id);
 
-        // Ownership check: staff can only view their own review unless they hold
-        // elevated performance permissions (manager/calibrator/reviewer assignment)
         $user = Auth::user();
+        $profileId = $user->staffMemberProfile?->id;
         $canViewAnyReview =
-            $user->can('review-manager-submit') ||
             $user->can('review-calibrate') ||
             $user->can('review-assign-reviewer');
+        $isReviewee = $profileId !== null && (int) $review->staff_member_id === (int) $profileId;
+        $isAssignedReviewer = $profileId !== null &&
+            $user->can('review-manager-submit') &&
+            (int) $review->reviewer_id === (int) $profileId;
 
-        if (! $canViewAnyReview && $review->staff_member_id !== $user->staffMemberProfile?->id) {
+        if (! $canViewAnyReview && ! $isReviewee && ! $isAssignedReviewer) {
             return ResponseHelper::jsonResponse(false, 'Forbidden.', null, 403);
         }
 

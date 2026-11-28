@@ -172,6 +172,9 @@ class DashboardRepository implements DashboardRepositoryInterface
             $startOfMonth = now()->startOfMonth();
             $endOfMonth = now()->endOfMonth();
             $yesterday = Carbon::yesterday()->toDateString();
+            $minutes = DB::connection()->getDriverName() === 'sqlite'
+                ? "(strftime('%s', check_out) - strftime('%s', check_in)) / 60"
+                : 'TIMESTAMPDIFF(MINUTE, check_in, check_out)';
 
             $attendanceStats = DB::table('attendances')
                 ->where('staff_member_id', $employeeId)
@@ -181,7 +184,7 @@ class DashboardRepository implements DashboardRepositoryInterface
                     COUNT(CASE WHEN status = 'absent' THEN 1 END) as absent_days,
                     COUNT(CASE WHEN status = 'sick_leave' THEN 1 END) as sick_days,
                     COUNT(CASE WHEN status = 'late' THEN 1 END) as late_days,
-                    SUM(TIMESTAMPDIFF(MINUTE, check_in, check_out)) as total_minutes
+                    SUM({$minutes}) as total_minutes
                 ")
                 ->first();
 

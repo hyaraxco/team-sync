@@ -123,16 +123,14 @@ class RoleForbiddenAccessTest extends TestCase
         $this->getJson('/api/v1/analytics/payroll/salary-distribution')->assertForbidden();
     }
 
-    public function test_manager_can_access_performance_analytics(): void
+    public function test_manager_performance_analytics_requires_a_led_team_scope(): void
     {
         $this->actingAsEmail('yudhis@teamsync.com');
 
-        // Permission check passes (not 403); may be 200 or 500 depending on data
-        $r1 = $this->getJson('/api/v1/analytics/performance/team-summary?team_id=1');
-        $this->assertNotEquals(403, $r1->status(), 'Manager should access team performance analytics');
-
-        $r2 = $this->getJson('/api/v1/analytics/performance/goal-completion-rate');
-        $this->assertNotEquals(403, $r2->status(), 'Manager should access goal completion rate');
+        $this->getJson('/api/v1/analytics/performance/team-summary?team_id=1')
+            ->assertForbidden();
+        $this->getJson('/api/v1/analytics/performance/goal-completion-rate')
+            ->assertUnprocessable()->assertJsonValidationErrors('team_id');
     }
 
     public function test_manager_can_access_project_analytics(): void

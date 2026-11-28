@@ -92,6 +92,24 @@ class LeaveEntitlementControllerTest extends TestCase
         ]);
     }
 
+    public function test_manager_can_read_entitlements_but_cannot_change_them(): void
+    {
+        $this->actingAsRole('manager');
+        $entitlement = LeaveEntitlement::firstOrFail();
+        $original = $entitlement->getAttributes();
+
+        $this->getJson('/api/v1/leave-entitlements')
+            ->assertOk();
+
+        $this->putJson("/api/v1/leave-entitlements/{$entitlement->id}", [
+            'quota_days' => 20.00,
+            'is_paid' => false,
+            'requires_attachment' => true,
+        ])->assertForbidden();
+
+        $this->assertSame($original, $entitlement->fresh()->getAttributes());
+    }
+
     public function test_validation_prevents_invalid_entitlement_updates(): void
     {
         $this->actingAsRole('hr');

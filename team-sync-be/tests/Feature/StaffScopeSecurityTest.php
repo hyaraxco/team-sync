@@ -68,6 +68,12 @@ class StaffScopeSecurityTest extends TestCase
             'staff_member_id' => $this->staffProfile->id,
             'joined_at' => now(),
         ]);
+
+        TeamMember::create([
+            'team_id' => $this->staffTeam->id,
+            'staff_member_id' => $this->otherProfile->id,
+            'joined_at' => now(),
+        ]);
     }
 
     // ─── Performance Statistics ──────────────────────────────────────────
@@ -123,16 +129,30 @@ class StaffScopeSecurityTest extends TestCase
         $response->assertStatus(200);
     }
 
-    public function test_manager_can_view_any_meeting(): void
+
+    public function test_manager_can_view_only_meetings_in_active_teams(): void
     {
-        $meeting = Meeting::factory()->create();
-        $meeting->teams()->attach($this->otherTeam->id);
+        $this->otherProfile->teamMembers()->where('team_id', $this->staffTeam->id)->update([
+            'left_at' => null,
+            'joined_at' => now(),
+        ]);
+        $ownMeeting = Meeting::factory()->create(['title' => 'Manager Own Team']);
+        $ownMeeting->teams()->attach($this->staffTeam->id);
+        $outsideMeeting = Meeting::factory()->create(['title' => 'Manager Outside Team']);
+        $outsideMeeting->teams()->attach($this->otherTeam->id);
 
-        $response = $this->actingAs($this->managerUser, 'sanctum')
-            ->getJson("/api/v1/meetings/{$meeting->id}");
+        $this->actingAs($this->managerUser, 'sanctum')
+            ->getJson("/api/v1/meetings/{$ownMeeting->id}")->assertOk();
+        $this->getJson("/api/v1/meetings/{$outsideMeeting->id}")
+            ->assertForbidden()
+            ->assertJson(['message' => 'You do not have access to this meeting.']);
 
-        $response->assertStatus(200);
+        $titles = collect($this->getJson('/api/v1/meetings')->assertOk()->json('data.data'))
+            ->pluck('title');
+        $this->assertContains('Manager Own Team', $titles);
+        $this->assertNotContains('Manager Outside Team', $titles);
     }
+
 
     public function test_staff_meetings_index_only_shows_own_team_meetings(): void
     {

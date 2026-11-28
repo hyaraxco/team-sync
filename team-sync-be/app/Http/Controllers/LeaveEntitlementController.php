@@ -18,7 +18,8 @@ class LeaveEntitlementController extends Controller implements HasMiddleware
     public static function middleware()
     {
         return [
-            new Middleware(PermissionMiddleware::using(['attendance-menu']), only: ['index', 'update']),
+            new Middleware(PermissionMiddleware::using(['attendance-menu']), only: ['index']),
+            new Middleware(PermissionMiddleware::using(['settings-hr-manage']), only: ['update']),
         ];
     }
 

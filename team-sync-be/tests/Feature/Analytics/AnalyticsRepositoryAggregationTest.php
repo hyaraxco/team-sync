@@ -245,6 +245,70 @@ class AnalyticsRepositoryAggregationTest extends TestCase
         $this->assertSame(100.0, $row['task_completion_rate']);
     }
 
+    public function test_performance_analytics_aggregates_populated_rows_by_scope_and_schema(): void
+    {
+        $manager = StaffMemberProfile::factory()->create();
+        $staff = StaffMemberProfile::factory()->create();
+        $outside = StaffMemberProfile::factory()->create();
+        $team = Team::factory()->active()->create();
+        TeamMember::factory()->forTeam($team)->forEmployee($manager)->create();
+        TeamMember::factory()->forTeam($team)->forEmployee($staff)->create();
+
+        $cycle = \App\Models\PerformanceReviewCycle::factory()->create();
+        foreach ([[$staff, 4.5], [$outside, 2.0]] as [$profile, $rating]) {
+            \App\Models\PerformanceReview::create([
+                'cycle_id' => $cycle->id,
+                'staff_member_id' => $profile->id,
+                'reviewer_id' => $manager->id,
+                'status' => 'completed',
+                'final_rating' => $rating,
+            ]);
+        }
+        \App\Models\PerformanceGoal::create([
+            'staff_member_id' => $staff->id, 'title' => 'Scoped goal', 'goal_type' => 'okr',
+            'category' => 'delivery', 'start_date' => Carbon::today()->subMonth(),
+            'due_date' => Carbon::today()->subDay(), 'status' => 'in_progress',
+            'completion_percentage' => 40, 'created_by' => $manager->user_id,
+        ]);
+        \App\Models\PerformanceGoal::create([
+            'staff_member_id' => $outside->id, 'title' => 'Outside goal', 'goal_type' => 'okr',
+            'category' => 'quality', 'start_date' => Carbon::today()->subMonth(),
+            'due_date' => Carbon::today()->addDay(), 'status' => 'in_progress',
+            'completion_percentage' => 10, 'created_by' => $manager->user_id,
+        ]);
+        \App\Models\PerformanceFeedback::create([
+            'staff_member_id' => $staff->id, 'given_by' => $manager->id,
+            'feedback_type' => 'positive', 'content' => 'Useful feedback',
+        ]);
+        \App\Models\PerformanceFeedback::create([
+            'staff_member_id' => $outside->id, 'given_by' => $manager->id,
+            'feedback_type' => 'constructive', 'content' => 'Outside feedback',
+        ]);
+
+        $teamSummary = $this->repository->getTeamPerformanceSummary($team->id, $cycle->id);
+        $this->assertSame(1, $teamSummary['total_reviews']);
+        $this->assertSame(4.5, (float) $teamSummary['reviews'][0]->overall_rating);
+        $this->assertSame($staff->user->name, $teamSummary['reviews'][0]->employee_name);
+
+        $companySummary = $this->repository->getCompanyPerformanceSummary($cycle->id);
+        $this->assertSame(2, $companySummary['total_reviews']);
+        $this->assertSame(2, $companySummary['completed_reviews']);
+
+        $ratings = $this->repository->getRatingDistribution($cycle->id);
+        $this->assertSame(2, $ratings['total']);
+        $this->assertSame(1, $ratings['distribution'][4]);
+        $this->assertSame(1, $ratings['distribution'][2]);
+
+        $goals = $this->repository->getGoalCompletionRate(null, $team->id);
+        $this->assertSame(1, $goals['total_goals']);
+        $this->assertSame(40.0, $goals['average_progress']);
+        $this->assertSame(1, $goals['overdue_goals']);
+
+        $feedback = $this->repository->getFeedbackMetrics(null, $team->id);
+        $this->assertSame(1, $feedback['total_feedback']);
+        $this->assertSame(['positive' => 1], $feedback['by_type']);
+    }
+
     public function test_payroll_analytics_endpoint_returns_200_with_deterministic_totals_on_mysql(): void
     {
         // The endpoint uses DATE_FORMAT, which SQLite does not provide.

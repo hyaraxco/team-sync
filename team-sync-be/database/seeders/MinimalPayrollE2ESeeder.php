@@ -115,6 +115,8 @@ class MinimalPayrollE2ESeeder extends Seeder
                 'is_active' => true,
             ]);
 
+            $this->call(\Database\Seeders\E2E\HistoricalPayslipSeeder::class);
+
             $this->command?->info(sprintf(
                 'Minimal payroll E2E data ready for %s. Accounts: HR tasyia@teamsync.com, Manager yudhis@teamsync.com, Employee agung@teamsync.com, Finance dwimeta@teamsync.com (password: teamsync). Use HR to generate the draft, then Finance to review and mark it as paid.',
                 $payrollMonth->format('F Y')

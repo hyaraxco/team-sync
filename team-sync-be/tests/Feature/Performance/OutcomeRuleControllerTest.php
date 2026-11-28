@@ -150,6 +150,55 @@ class OutcomeRuleControllerTest extends TestCase
             ->assertJsonValidationErrors(['min_rating']);
     }
 
+    public function test_inactive_outcome_rule_may_overlap_active_ranges(): void
+    {
+        $this->actingAsRole('HR');
+        $this->seed(PerformanceOutcomeRuleSeeder::class);
+
+        $this->postJson('/api/v1/performance/outcome-rules', [
+            'label' => 'Inactive overlapping',
+            'min_rating' => 4.50,
+            'max_rating' => 5.00,
+            'bonus_months' => 0,
+            'salary_increase_pct' => 0,
+            'promotion_eligible' => false,
+            'pip_required' => false,
+            'is_active' => false,
+        ])->assertCreated()->assertJsonPath('data.is_active', false);
+    }
+
+    public function test_active_outcome_rule_cannot_overlap_on_update(): void
+    {
+        $this->actingAsRole('HR');
+        $this->seed(PerformanceOutcomeRuleSeeder::class);
+        $rule = $this->createRule(['label' => 'Inactive candidate', 'is_active' => false]);
+
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['is_active' => true])
+            ->assertUnprocessable()->assertJsonValidationErrors(['min_rating']);
+    }
+
+    public function test_active_outcome_rule_rejects_partial_range_updates_that_invert_bounds(): void
+    {
+        $this->actingAsRole('HR');
+        $rule = $this->createRule(['min_rating' => 2.00, 'max_rating' => 4.00]);
+
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['min_rating' => 4.50])
+            ->assertUnprocessable()->assertJsonValidationErrors('max_rating');
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['max_rating' => 1.50])
+            ->assertUnprocessable()->assertJsonValidationErrors('max_rating');
+    }
+
+    public function test_inactive_outcome_rule_rejects_partial_range_updates_that_invert_bounds(): void
+    {
+        $this->actingAsRole('HR');
+        $rule = $this->createRule(['min_rating' => 2.00, 'max_rating' => 4.00, 'is_active' => false]);
+
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['min_rating' => 4.50])
+            ->assertUnprocessable()->assertJsonValidationErrors('max_rating');
+        $this->putJson("/api/v1/performance/outcome-rules/{$rule->id}", ['max_rating' => 1.50])
+            ->assertUnprocessable()->assertJsonValidationErrors('max_rating');
+    }
+
     public function test_hr_can_update_outcome_rule(): void
     {
         $this->actingAsRole('HR');

@@ -31,6 +31,8 @@ interface AttendanceRepositoryInterface
 
     public function getStatistics();
 
+    public function getPolicyMismatchesPaginated(?string $status, int $perPage);
+
     public function acknowledgePolicyMismatch(string $id, array $data);
 
     public function resolvePolicyMismatch(string $id, array $data);

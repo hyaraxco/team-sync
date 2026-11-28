@@ -18,6 +18,7 @@ LIMITS = {
     "fe-coverage-final.json": 32 << 20,
     "fe-junit.xml": 8 << 20,
     "roles-junit.xml": 8 << 20,
+    "roles-focused-junit.xml": 8 << 20,
     "a11y.json": 4 << 20,
     "runtime.json": 1 << 20,
     "status.json": 1 << 20,
@@ -28,7 +29,7 @@ REQUIRED = {
     "build-be": set(),
     "build-fe": set(),
     "a11y": {"a11y.json"},
-    "roles": {"roles-junit.xml"},
+    "roles": {"roles-focused-junit.xml", "roles-junit.xml"},
 }
 
 

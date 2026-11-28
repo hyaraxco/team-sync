@@ -32,6 +32,10 @@ class StoreOutcomeRuleRequest extends FormRequest
     {
         return [
             function (Validator $validator) {
+                if (! $this->boolean('is_active', true)) {
+                    return;
+                }
+
                 $min = $this->input('min_rating');
                 $max = $this->input('max_rating');
 

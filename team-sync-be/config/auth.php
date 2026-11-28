@@ -3,6 +3,8 @@
 use App\Models\User;
 
 return [
+    'login_attempts' => env('APP_ENV') === 'testing' ? (int) env('E2E_LOGIN_ATTEMPTS', 5) : 5,
+
 
     /*
     |--------------------------------------------------------------------------

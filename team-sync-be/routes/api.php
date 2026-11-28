@@ -51,7 +51,7 @@ Route::prefix('v1')
         Route::get('setup/doctor', [SetupController::class, 'doctor']);
         Route::post('setup/bootstrap', [SetupController::class, 'bootstrap'])->middleware('throttle:5,1');
 
-        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:5,1');
+        Route::post('login', [AuthController::class, 'login'])->middleware('throttle:'.config('auth.login_attempts', 5).',1');
         Route::post('forgot-password', [PasswordResetController::class, 'forgotPassword'])->middleware('throttle:5,1');
         Route::post('reset-password', [PasswordResetController::class, 'resetPassword'])->middleware('throttle:5,1');
         Route::post('email/verification-notification', [EmailVerificationController::class, 'sendVerificationEmail'])->middleware('throttle:60,1');
