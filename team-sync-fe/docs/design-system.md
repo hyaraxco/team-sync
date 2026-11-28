@@ -910,7 +910,8 @@ Collapsed state persisted in `localStorage` key `"sidebar-collapsed"`.
 |---------|----------------|
 | GENERAL | Per-item `can()` check |
 | PERFORMANCE | `can('performance-menu')` |
-| SETTINGS | (bottom of nav) |
+| PERSONAL | Visible when `profile-menu`, `payslip-view`, `team-view`, or any attendance self-service permission is granted |
+| PREFERENCES | Per-item `canOneOf()` check (settings permissions) |
 
 #### Nav Link Variants
 
@@ -945,8 +946,8 @@ Top navigation bar with dynamic page title, notifications, and user menu.
 
 1. **Mobile menu toggle** — hamburger `MenuIcon`, hidden on `lg+`
 2. **Page title block** — dynamic `title` + `subtitle` from route name map
-3. **Notification bell** — `BellIcon` with unread count badge
-4. **Messages button** — `MessageCircleIcon` (hidden on mobile)
+3. **Dark mode toggle** — `SunIcon` / `MoonIcon`
+4. **Notification bell** — `BellIcon` with unread count badge
 5. **Vertical divider** — `w-px h-8 bg-brand-border`
 6. **User profile** — avatar/initials + name + roles + `ChevronDownIcon` + dropdown menu
 
@@ -954,15 +955,14 @@ Top navigation bar with dynamic page title, notifications, and user menu.
 
 | Context | Style |
 |---------|-------|
-| Admin (≤99) | `bg-[#EE2A3B]` red pill, top-right of bell |
-| Staff (≤9) | `bg-[#0C51D9]` blue pill, top-right of bell |
+| All roles (≤99 admin, ≤9 staff) | `bg-danger-500` red pill, top-right of bell |
 | Overflow | Shows `99+` or `9+` |
 
 Unread count polled every **15 seconds**, paused when tab is hidden.
 
 #### Account Dropdown
 
-- `bg-white border border-brand-border rounded-lg shadow-md`
+- `background-color: var(--color-surface)`, `border border-brand-border rounded-lg shadow-md`
 - Links: Profile → `staffMember.profile`, Sign Out (red)
 - Closes on outside click
 

@@ -510,7 +510,7 @@ onUnmounted(() => {
                     class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                     @click="emit('toggle-sidebar')"
                 >
-                    <MenuIcon class="w-5 h-5 text-gray-600" />
+                    <MenuIcon class="w-5 h-5 text-brand-light" />
                 </button>
                 <div class="min-w-0">
                     <h1
@@ -550,7 +550,7 @@ onUnmounted(() => {
                             class="relative w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                             @click="toggleNotificationPanel"
                         >
-                            <BellIcon class="w-5 h-5 text-gray-600" />
+                            <BellIcon class="w-5 h-5 text-brand-light" />
                             <span
                                 v-if="unreadNotificationCount > 0"
                                 data-testid="header-notification-unread-badge"
@@ -598,10 +598,10 @@ onUnmounted(() => {
                             v-if="user?.profile_photo"
                         />
                         <div
-                            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-gray-100"
+                            class="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center bg-surface-overlay"
                             v-else
                         >
-                            <UserIcon class="w-5 h-5 text-gray-400" />
+                            <UserIcon class="w-5 h-5 text-brand-light" />
                         </div>
                         <div class="hidden md:block text-left">
                             <p class="text-brand-dark text-sm sm:text-base font-semibold">
@@ -612,7 +612,7 @@ onUnmounted(() => {
                             </p>
                         </div>
                         <ChevronDownIcon
-                            class="w-4 h-4 text-gray-400 hidden sm:block"
+                            class="w-4 h-4 text-brand-light hidden sm:block"
                             :class="{ 'rotate-180': isAccountMenuOpen }"
                         />
                     </button>
@@ -627,11 +627,11 @@ onUnmounted(() => {
                         :class="{ hidden: !isAccountMenuOpen }"
                     >
                         <div class="px-4 py-3 border-b border-brand-border">
-                            <p class="text-sm font-semibold text-gray-900">
+                            <p class="text-sm font-semibold text-brand-dark">
                                 {{ user?.name }}
                             </p>
-                            <p class="text-xs text-gray-600">{{ user?.email }}</p>
-                            <p class="text-xs text-gray-500">
+                            <p class="text-xs text-brand-light">{{ user?.email }}</p>
+                            <p class="text-xs text-brand-light">
                                 {{ formatUserRoles(user?.roles) }}
                             </p>
                         </div>
