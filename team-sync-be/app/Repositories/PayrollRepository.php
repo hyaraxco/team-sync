@@ -1841,7 +1841,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->join('payrolls', 'payrolls.id', '=', 'payroll_details.payroll_id')
             ->where('staff_member_id', $staffMemberId)
             ->where('payrolls.status', PayrollStatus::PAID)
-            ->where('payrolls.status', PayrollStatus::PAID)
             ->when($year, function ($query, $yearValue) {
                 $query->whereYear('payrolls.salary_month', $yearValue);
             })
@@ -1863,7 +1862,6 @@ class PayrollRepository implements PayrollRepositoryInterface
             ->where('id', $id)
             ->where('staff_member_id', $staffMemberId)
             ->whereHas('payroll', function ($query) {
-                $query->where('status', PayrollStatus::PAID);
                 $query->where('status', PayrollStatus::PAID);
             })
             ->firstOrFail();
