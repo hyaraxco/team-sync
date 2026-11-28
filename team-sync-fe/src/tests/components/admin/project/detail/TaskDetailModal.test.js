@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { ref } from "vue";
 
+const mockToastError = vi.fn();
 const mockEmployees = ref([]);
 const mockAuthUser = ref({ roles: [] });
 
@@ -52,7 +53,7 @@ vi.mock("@/composables/useToast", () => ({
     useToast: () => ({
         success: vi.fn(),
         warning: vi.fn(),
-        error: vi.fn(),
+        error: mockToastError,
     }),
 }));
 
@@ -120,6 +121,10 @@ const factory = (task, authUser) => {
                     props: ["type", "value"],
                     template: "<span>{{ value }}</span>",
                 },
+                ConfirmationModal: {
+                    props: ["show"],
+                    template: `<div v-if="show"><button @click="$emit('confirm')">Confirm</button><button @click="$emit('cancel')">Cancel confirmation</button></div>`,
+                },
             },
         },
     });
@@ -127,6 +132,7 @@ const factory = (task, authUser) => {
 
 describe("TaskDetailModal - Permission Matrix", () => {
     beforeEach(() => {
+        mockToastError.mockClear();
         mockEmployees.value = [];
         mockAuthUser.value = { roles: [] };
         Object.values(mockTaskStore).forEach((fn) => {
@@ -781,6 +787,79 @@ describe("TaskDetailModal - Permission Matrix", () => {
             });
             expect(wrapper.text()).toContain("Task Selesai - Submit for Review");
             expect(wrapper.text()).not.toContain("Approve and Mark Done");
+        });
+
+        it("does not delete a comment when confirmation is cancelled", async () => {
+            mockTaskStore.fetchTaskComments.mockResolvedValue([
+                {
+                    id: 55,
+                    staff_member_id: 300,
+                    staff_member: { user: { name: "Test Author" } },
+                    comment: "Mock comment",
+                    created_at: "2026-01-01",
+                },
+            ]);
+            const wrapper = factory(makeTask(), buildUser("manager", { employee_profile: { id: 300 } }));
+            await flushPromises();
+
+            const commentCard = wrapper.findAll(".border").find((element) => element.text().includes("Mock comment"));
+            await commentCard.findAll("button")[1].trigger("click");
+            await wrapper.findAll("button").find((button) => button.text() === "Cancel confirmation").trigger("click");
+
+            expect(mockTaskStore.deleteTaskComment).not.toHaveBeenCalled();
+        });
+
+        it("deletes once after confirmation", async () => {
+            mockTaskStore.fetchTaskComments.mockResolvedValue([
+                {
+                    id: 55,
+                    staff_member_id: 300,
+                    staff_member: { user: { name: "Test Author" } },
+                    comment: "Mock comment",
+                    created_at: "2026-01-01",
+                },
+            ]);
+            const wrapper = factory(makeTask(), buildUser("manager", { employee_profile: { id: 300 } }));
+            await flushPromises();
+
+            const commentCard = wrapper.findAll(".border").find((element) => element.text().includes("Mock comment"));
+            await commentCard.findAll("button")[1].trigger("click");
+            expect(mockTaskStore.deleteTaskComment).not.toHaveBeenCalled();
+            await wrapper.findAll("button").find((button) => button.text() === "Confirm").trigger("click");
+            await flushPromises();
+
+            expect(mockTaskStore.deleteTaskComment).toHaveBeenCalledTimes(1);
+            expect(mockTaskStore.deleteTaskComment).toHaveBeenCalledWith(10, 55);
+        });
+
+        it("keeps confirmation open after failure and allows a successful retry", async () => {
+            mockTaskStore.fetchTaskComments.mockResolvedValue([
+                {
+                    id: 55,
+                    staff_member_id: 300,
+                    staff_member: { user: { name: "Test Author" } },
+                    comment: "Mock comment",
+                    created_at: "2026-01-01",
+                },
+            ]);
+            mockTaskStore.deleteTaskComment.mockRejectedValueOnce(new Error("Request failed"));
+            const wrapper = factory(makeTask(), buildUser("manager", { employee_profile: { id: 300 } }));
+            await flushPromises();
+
+            const commentCard = wrapper.findAll(".border").find((element) => element.text().includes("Mock comment"));
+            await commentCard.findAll("button")[1].trigger("click");
+            const confirmButton = () => wrapper.findAll("button").find((button) => button.text() === "Confirm");
+            await confirmButton().trigger("click");
+            await flushPromises();
+
+            expect(mockTaskStore.deleteTaskComment).toHaveBeenCalledTimes(1);
+            expect(mockToastError).toHaveBeenCalledWith("Failed to delete comment. Please try again.");
+            expect(confirmButton().exists()).toBe(true);
+            await confirmButton().trigger("click");
+            await flushPromises();
+
+            expect(mockTaskStore.deleteTaskComment).toHaveBeenCalledTimes(2);
+            expect(wrapper.findAll("button").some((button) => button.text() === "Confirm")).toBe(false);
         });
 
         it("locks comment textarea on done status", () => {
