@@ -24,8 +24,8 @@ class DashboardRepository implements DashboardRepositoryInterface
         $cacheKey = CacheConstants::CACHE_KEY_DASHBOARD_STATISTICS.now()->format('Y-m-d-H');
 
         return cache()->remember($cacheKey, CacheConstants::ONE_HOUR, function () {
-            $currentMonth = now()->month;
-            $currentYear = now()->year;
+            $monthStart = now()->startOfMonth()->toDateTimeString();
+            $monthEnd = now()->endOfMonth()->toDateTimeString();
             $yesterday = Carbon::yesterday()->toDateString();
             $lastWeekStart = Carbon::now()->subWeek()->startOfWeek();
             $lastWeekEnd = Carbon::now()->subWeek()->endOfWeek();
@@ -36,21 +36,19 @@ class DashboardRepository implements DashboardRepositoryInterface
                 ->selectRaw('
                     COUNT(DISTINCT staff_member_profiles.id) as total_employees,
                     COUNT(DISTINCT CASE
-                        WHEN MONTH(staff_member_profiles.created_at) = ?
-                        AND YEAR(staff_member_profiles.created_at) = ?
+                        WHEN staff_member_profiles.created_at BETWEEN ? AND ?
                         THEN staff_member_profiles.id
                     END) as employees_this_month,
                     COUNT(DISTINCT teams.id) as total_teams,
                     COUNT(DISTINCT CASE
-                        WHEN MONTH(teams.created_at) = ?
-                        AND YEAR(teams.created_at) = ?
+                        WHEN teams.created_at BETWEEN ? AND ?
                         THEN teams.id
                     END) as new_teams_this_month
                 ', [
-                    $currentMonth,
-                    $currentYear,
-                    $currentMonth,
-                    $currentYear,
+                    $monthStart,
+                    $monthEnd,
+                    $monthStart,
+                    $monthEnd,
                 ])
                 ->first();
 
@@ -58,8 +56,7 @@ class DashboardRepository implements DashboardRepositoryInterface
             $attendanceStats = DB::table('attendances')
                 ->selectRaw('
                     COUNT(CASE
-                        WHEN MONTH(created_at) = ?
-                        AND YEAR(created_at) = ?
+                        WHEN created_at BETWEEN ? AND ?
                         THEN 1
                     END) as total_this_month,
                     COUNT(CASE
@@ -67,8 +64,8 @@ class DashboardRepository implements DashboardRepositoryInterface
                         THEN 1
                     END) as total_last_week
                 ', [
-                    $currentMonth,
-                    $currentYear,
+                    $monthStart,
+                    $monthEnd,
                     $lastWeekStart,
                     $lastWeekEnd,
                 ])
@@ -116,13 +113,12 @@ class DashboardRepository implements DashboardRepositoryInterface
                     COUNT(CASE WHEN status = 'active' THEN 1 END) as active_projects,
                     COUNT(CASE
                         WHEN status = 'active'
-                        AND MONTH(created_at) = ?
-                        AND YEAR(created_at) = ?
+                        AND created_at BETWEEN ? AND ?
                         THEN 1
                     END) as new_projects_this_month
                 ", [
-                    $currentMonth,
-                    $currentYear,
+                    $monthStart,
+                    $monthEnd,
                 ])
                 ->first();
 
