@@ -28,7 +28,6 @@
   "dependencies": {
     "apexcharts": "^5.3.5",
     "axios": "^1.20.0",
-    "caniuse-lite": "^1.0.30001791",
     "js-cookie": "^3.0.8",
     "lodash": "^4.18.1",
     "lucide-vue-next": "^0.544.0",
