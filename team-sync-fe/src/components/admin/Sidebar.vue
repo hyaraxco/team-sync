@@ -6,7 +6,6 @@ import {
     UsersIcon,
     CrownIcon,
     ArrowRightIcon,
-    UserIcon,
     CalendarIcon,
     WalletIcon,
     FileWarningIcon,
@@ -21,20 +20,267 @@ import {
     AwardIcon,
     VideoIcon,
     PanelLeftIcon,
+    UserIcon,
 } from "lucide-vue-next";
 
 import { can, canOneOf } from "@/helpers/permissionHelper";
 import { useSidebar } from "@/composables/useSidebar";
-import { RouterLink } from "vue-router";
+import { RouterLink, useRoute } from "vue-router";
+import { computed } from "vue";
 
 const { isOpen, isCollapsed, toggleCollapse, closeMobile } = useSidebar();
+const route = useRoute();
 
 const onNavigate = () => closeMobile();
+
+const isActiveRoute = (item) => {
+    const name = route.name;
+    if (!name) return false;
+
+    if (item.activeRoutes) {
+        return item.activeRoutes.some((r) => name === r);
+    }
+    if (item.activePrefix) {
+        return name.startsWith(item.activePrefix);
+    }
+    return name === item.route;
+};
+
+const isItemVisible = (item) => {
+    if (item.permission) return can(item.permission);
+    if (item.anyPermissions) return canOneOf(item.anyPermissions);
+    return true;
+};
+
+const isSectionVisible = (section) => {
+    if (section.permission) return can(section.permission);
+    if (section.anyPermissions) return canOneOf(section.anyPermissions);
+    return section.items.some(isItemVisible);
+};
+
+const navSections = [
+    {
+        key: "general",
+        label: "GENERAL",
+        items: [
+            {
+                route: "admin.dashboard",
+                label: "Dashboard",
+                icon: HomeIcon,
+                permission: "dashboard-menu",
+            },
+            {
+                route: "admin.projects",
+                label: "Projects",
+                icon: FileTextIcon,
+                permission: "project-menu",
+                activePrefix: "admin.project",
+            },
+            {
+                route: "admin.staffMembers",
+                label: "Employees",
+                icon: UsersIcon,
+                permission: "staff-member-menu",
+                activePrefix: "admin.staffMember",
+            },
+            {
+                route: "admin.teams",
+                label: "Our Teams",
+                icon: UsersIcon,
+                permission: "team-menu",
+                activePrefix: "admin.team",
+            },
+            {
+                route: "admin.meetings",
+                label: "Meetings",
+                icon: VideoIcon,
+                permission: "meeting-menu",
+                activePrefix: "admin.meeting",
+            },
+            {
+                route: "admin.attendances",
+                label: "Attendance",
+                icon: CalendarIcon,
+                permission: "attendance-menu",
+            },
+            {
+                route: "admin.payroll.dashboard",
+                label: "Payroll",
+                icon: WalletIcon,
+                permission: "payroll-menu",
+                activePrefix: "admin.payroll",
+                activeExclude: ["admin.payroll.adjustments"],
+            },
+            {
+                route: "admin.payroll.adjustments",
+                label: "Payroll Adjustments",
+                icon: FileWarningIcon,
+                permission: "payroll-menu",
+            },
+            {
+                route: "admin.analytics",
+                label: "Analytics",
+                icon: BarChart3Icon,
+                permission: "analytics-menu",
+                activePrefix: "admin.analytics",
+            },
+        ],
+    },
+    {
+        key: "performance",
+        label: "PERFORMANCE",
+        permission: "performance-menu",
+        items: [
+            {
+                route: "admin.performance.team-reviews",
+                label: "Team Reviews",
+                icon: UsersIcon,
+                permission: "review-manager-submit",
+            },
+            {
+                route: "admin.performance.pending-calibration",
+                label: "Pending Calibration",
+                icon: ScaleIcon,
+                permission: "review-calibrate",
+            },
+            {
+                route: "admin.performance.cycles",
+                label: "Review Cycles",
+                icon: CalendarIcon,
+                permission: "review-cycle-manage",
+                activePrefix: "admin.performance.cycles",
+            },
+            {
+                route: "admin.performance.outcome-rules",
+                label: "Outcome Rules",
+                icon: AwardIcon,
+                permission: "review-cycle-manage",
+            },
+            {
+                route: "admin.performance.templates",
+                label: "Review Templates",
+                icon: FileTextIcon,
+                permission: "review-cycle-manage",
+            },
+            {
+                route: "admin.performance.my-reviews",
+                label: "My Reviews",
+                icon: StarIcon,
+            },
+            {
+                route: "admin.performance.team-goals",
+                label: "Team Goals",
+                icon: TrendingUpIcon,
+                permission: "goal-assign-team",
+            },
+            {
+                route: "admin.performance.my-goals",
+                label: "My Goals",
+                icon: TargetIcon,
+            },
+            {
+                route: "admin.performance.feedback.received",
+                label: "Feedback",
+                icon: MessageSquareIcon,
+                activeRoutes: [
+                    "admin.performance.feedback.received",
+                    "admin.performance.feedback.given",
+                ],
+            },
+        ],
+    },
+    {
+        key: "personal",
+        label: "PERSONAL",
+        anyPermissions: [
+            "profile-menu",
+            "payslip-view",
+            "team-view",
+            "attendance-my-attendances",
+            "attendance-check-in",
+            "attendance-check-out",
+        ],
+        items: [
+            {
+                route: "staffMember.attendance.my-attendances",
+                label: "My Attendance",
+                icon: CalendarIcon,
+                anyPermissions: [
+                    "attendance-my-attendances",
+                    "attendance-check-in",
+                    "attendance-check-out",
+                ],
+                activeRoutes: [
+                    "staffMember.attendance.my-attendances",
+                    "staffMember.attendance.clock",
+                ],
+            },
+            {
+                route: "staffMember.team",
+                label: "My Team",
+                icon: UsersIcon,
+                permission: "team-view",
+            },
+            {
+                route: "staffMember.payroll",
+                label: "My Payroll",
+                icon: WalletIcon,
+                permission: "payslip-view",
+                activeRoutes: ["staffMember.payroll", "staffMember.payroll.detail"],
+            },
+            {
+                route: "staffMember.profile",
+                label: "My Profile",
+                icon: UserIcon,
+                permission: "profile-menu",
+                activeRoutes: ["staffMember.profile", "staffMember.profile.edit"],
+            },
+        ],
+    },
+    {
+        key: "preferences",
+        label: "PREFERENCES",
+        items: [
+            {
+                route: "admin.settings",
+                label: "Settings",
+                icon: SettingsIcon,
+                anyPermissions: [
+                    "settings-hr-manage",
+                    "settings-finance-manage",
+                    "settings-system-manage",
+                ],
+            },
+        ],
+    },
+];
+
+const isPayrollActive = (item) => {
+    const name = route.name;
+    if (!name) return false;
+    if (item.activeExclude && item.activePrefix) {
+        return name.startsWith(item.activePrefix) && !item.activeExclude.includes(name);
+    }
+    return isActiveRoute(item);
+};
+
+const isActive = (item) => {
+    if (item.activeExclude) return isPayrollActive(item);
+    return isActiveRoute(item);
+};
+
+const visibleSections = computed(() =>
+    navSections
+        .filter(isSectionVisible)
+        .map((section) => ({
+            ...section,
+            items: section.items.filter(isItemVisible),
+        }))
+        .filter((section) => section.items.length > 0),
+);
 </script>
 
 <template>
-    <!-- Mobile Overlay handled by layout -->
-
     <!-- Sidebar -->
     <aside
         id="sidebar"
@@ -88,17 +334,17 @@ const onNavigate = () => closeMobile();
                 class="lg:hidden w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                 @click="onNavigate"
             >
-                <XIcon class="w-5 h-5 text-gray-600" />
+                <XIcon class="w-5 h-5 text-brand-light" />
             </button>
             <!-- Desktop: collapse toggle -->
             <button
                 type="button"
                 aria-label="Toggle sidebar"
-                class="hidden lg:flex w-8 h-8 rounded-lg border border-gray-200 items-center justify-center hover:bg-gray-100 hover:border-gray-300 transition-all duration-200 shrink-0"
+                class="hidden lg:flex w-8 h-8 rounded-lg border border-brand-border items-center justify-center hover:bg-surface-overlay hover:border-brand-border transition-all duration-200 shrink-0"
                 @click="toggleCollapse"
             >
                 <PanelLeftIcon
-                    class="w-4 h-4 text-gray-500 transition-transform duration-300"
+                    class="w-4 h-4 text-brand-light transition-transform duration-300"
                     :class="{ 'rotate-180': isCollapsed }"
                 />
             </button>
@@ -110,661 +356,32 @@ const onNavigate = () => closeMobile();
             class="py-4 flex-1 transition-all duration-300"
             :class="isCollapsed ? 'px-2 space-y-2 overflow-visible' : 'px-6 space-y-6 overflow-y-auto scrollbar-hide'"
         >
-            <!-- GENERAL Section -->
-            <div data-testid="sidebar-section-general">
-                <h3 v-show="!isCollapsed" class="section-title">GENERAL</h3>
-                <div class="space-y-3">
-                    <!-- 1. Dashboard (all roles) -->
-                    <RouterLink
-                        :to="{ name: 'admin.dashboard' }"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.dashboard',
-                        }"
-                        :aria-current="$route.name === 'admin.dashboard' ? 'page' : undefined"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        v-if="can('dashboard-menu')"
-                        @click="onNavigate"
-                    >
-                        <HomeIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'admin.dashboard',
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'admin.dashboard',
-                            }"
-                        >
-                            Dashboard
-                        </span>
-                    </RouterLink>
-
-                    <!-- 2. Projects (employee daily, manager daily) -->
-                    <RouterLink
-                        :to="{ name: 'admin.projects' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name?.startsWith('admin.project'),
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.project') ? 'page' : undefined"
-                        v-if="can('project-menu')"
-                        @click="onNavigate"
-                    >
-                        <FileTextIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name?.startsWith('admin.project'),
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name?.startsWith('admin.project'),
-                            }"
-                        >
-                            Projects
-                        </span>
-                    </RouterLink>
-
-                    <!-- 3. Employees (HR/Manager core) -->
-                    <RouterLink
-                        :to="{ name: 'admin.staffMembers' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name?.startsWith('admin.staffMember'),
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.staffMember') ? 'page' : undefined"
-                        v-if="can('staff-member-menu')"
-                        @click="onNavigate"
-                    >
-                        <UsersIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name?.startsWith('admin.staffMember'),
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name?.startsWith('admin.staffMember'),
-                            }"
-                        >
-                            Employees
-                        </span>
-                    </RouterLink>
-
-                    <!-- 4. Our Teams (HR/Manager) -->
-                    <RouterLink
-                        :to="{ name: 'admin.teams' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name?.startsWith('admin.team'),
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.team') ? 'page' : undefined"
-                        v-if="can('team-menu')"
-                        @click="onNavigate"
-                    >
-                        <UsersIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name?.startsWith('admin.team'),
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name?.startsWith('admin.team'),
-                            }"
-                        >
-                            Our Teams
-                        </span>
-                    </RouterLink>
-
-                    <!-- 5. Meetings -->
-                    <RouterLink
-                        :to="{ name: 'admin.meetings' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name?.startsWith('admin.meeting'),
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.meeting') ? 'page' : undefined"
-                        v-if="can('meeting-menu')"
-                        @click="onNavigate"
-                    >
-                        <VideoIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name?.startsWith('admin.meeting'),
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name?.startsWith('admin.meeting'),
-                            }"
-                        >
-                            Meetings
-                        </span>
-                    </RouterLink>
-
-                    <!-- 6. Attendance (HR/Manager admin) -->
-                    <RouterLink
-                        :to="{ name: 'admin.attendances' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.attendances',
-                        }"
-                        :aria-current="$route.name === 'admin.attendances' ? 'page' : undefined"
-                        v-if="can('attendance-menu')"
-                        @click="onNavigate"
-                    >
-                        <CalendarIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'admin.attendances',
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'admin.attendances',
-                            }"
-                        >
-                            Attendance
-                        </span>
-                    </RouterLink>
-
-                    <!-- 6. Payroll (HR/Finance core) -->
-                    <RouterLink
-                        :to="{ name: 'admin.payroll.dashboard' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active':
-                                $route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments',
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.payroll') && $route.name !== 'admin.payroll.adjustments' ? 'page' : undefined"
-                        v-if="can('payroll-menu')"
-                        @click="onNavigate"
-                    >
-                        <WalletIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white':
-                                    $route.name?.startsWith('admin.payroll') &&
-                                    $route.name !== 'admin.payroll.adjustments',
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white':
-                                    $route.name?.startsWith('admin.payroll') &&
-                                    $route.name !== 'admin.payroll.adjustments',
-                            }"
-                        >
-                            Payroll
-                        </span>
-                    </RouterLink>
-
-                    <RouterLink
-                        :to="{ name: 'admin.payroll.adjustments' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.payroll.adjustments',
-                        }"
-                        :aria-current="$route.name === 'admin.payroll.adjustments' ? 'page' : undefined"
-                        v-if="can('payroll-menu')"
-                        @click="onNavigate"
-                    >
-                        <FileWarningIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'admin.payroll.adjustments',
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'admin.payroll.adjustments',
-                            }"
-                        >
-                            Payroll Adjustments
-                        </span>
-                    </RouterLink>
-
-                    <!-- 7. Analytics (periodic) -->
-                    <RouterLink
-                        :to="{ name: 'admin.analytics' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name?.startsWith('admin.analytics'),
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.analytics') ? 'page' : undefined"
-                        v-if="can('analytics-menu')"
-                        @click="onNavigate"
-                    >
-                        <BarChart3Icon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name?.startsWith('admin.analytics'),
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name?.startsWith('admin.analytics'),
-                            }"
-                        >
-                            Analytics
-                        </span>
-                    </RouterLink>
-                </div>
-            </div>
-
-            <!-- PERFORMANCE Section -->
-            <div v-if="can('performance-menu')" data-testid="sidebar-section-performance">
-                <h3 v-show="!isCollapsed" class="section-title">PERFORMANCE</h3>
-                <div class="space-y-3">
-                    <!-- 1. Team Reviews (Manager/HR primary action) -->
-                    <RouterLink
-                        v-if="can('review-manager-submit')"
-                        :to="{ name: 'admin.performance.team-reviews' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.team-reviews',
-                        }"
-                        :aria-current="$route.name === 'admin.performance.team-reviews' ? 'page' : undefined"
-                        @click="onNavigate"
-                    >
-                        <UsersIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.team-reviews' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.team-reviews' }"
-                        >
-                            Team Reviews
-                        </span>
-                    </RouterLink>
-
-                    <!-- 2. Pending Calibration (HR calibrates) -->
-                    <RouterLink
-                        v-if="can('review-calibrate')"
-                        :to="{ name: 'admin.performance.pending-calibration' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.pending-calibration',
-                        }"
-                        :aria-current="$route.name === 'admin.performance.pending-calibration' ? 'page' : undefined"
-                        @click="onNavigate"
-                    >
-                        <ScaleIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.pending-calibration' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.pending-calibration' }"
-                        >
-                            Pending Calibration
-                        </span>
-                    </RouterLink>
-
-                    <!-- 3. Review Cycles (HR manages) -->
-                    <RouterLink
-                        v-if="can('review-cycle-manage')"
-                        :to="{ name: 'admin.performance.cycles' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name?.startsWith('admin.performance.cycles'),
-                        }"
-                        :aria-current="$route.name?.startsWith('admin.performance.cycles') ? 'page' : undefined"
-                        @click="onNavigate"
-                    >
-                        <CalendarIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name?.startsWith('admin.performance.cycles') }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name?.startsWith('admin.performance.cycles') }"
-                        >
-                            Review Cycles
-                        </span>
-                    </RouterLink>
-
-                    <RouterLink
-                        v-if="can('review-cycle-manage')"
-                        :to="{ name: 'admin.performance.outcome-rules' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.outcome-rules',
-                        }"
-                        :aria-current="$route.name === 'admin.performance.outcome-rules' ? 'page' : undefined"
-                        @click="onNavigate"
-                    >
-                        <AwardIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.outcome-rules' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.outcome-rules' }"
-                        >
-                            Outcome Rules
-                        </span>
-                    </RouterLink>
-
-                    <RouterLink
-                        v-if="can('review-cycle-manage')"
-                        :to="{ name: 'admin.performance.templates' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.templates',
-                        }"
-                        :aria-current="$route.name === 'admin.performance.templates' ? 'page' : undefined"
-                        @click="onNavigate"
-                    >
-                        <FileTextIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.templates' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.templates' }"
-                        >
-                            Review Templates
-                        </span>
-                    </RouterLink>
-
-                    <!-- 3. My Reviews (personal) -->
-                    <RouterLink
-                        :to="{ name: 'admin.performance.my-reviews' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.my-reviews',
-                        }"
-                        @click="onNavigate"
-                    >
-                        <StarIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.my-reviews' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.my-reviews' }"
-                        >
-                            My Reviews
-                        </span>
-                    </RouterLink>
-
-                    <!-- 4. Team Goals (Manager/HR) -->
-                    <RouterLink
-                        v-if="can('goal-assign-team')"
-                        :to="{ name: 'admin.performance.team-goals' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.team-goals',
-                        }"
-                        @click="onNavigate"
-                    >
-                        <TrendingUpIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.team-goals' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.team-goals' }"
-                        >
-                            Team Goals
-                        </span>
-                    </RouterLink>
-
-                    <!-- 5. My Goals (personal) -->
-                    <RouterLink
-                        :to="{ name: 'admin.performance.my-goals' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.performance.my-goals',
-                        }"
-                        @click="onNavigate"
-                    >
-                        <TargetIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{ 'text-white': $route.name === 'admin.performance.my-goals' }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{ 'text-brand-white': $route.name === 'admin.performance.my-goals' }"
-                        >
-                            My Goals
-                        </span>
-                    </RouterLink>
-
-                    <!-- 6. Feedback (least frequent) -->
-                    <RouterLink
-                        :to="{ name: 'admin.performance.feedback.received' }"
-                        class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active':
-                                $route.name === 'admin.performance.feedback.received' ||
-                                $route.name === 'admin.performance.feedback.given',
-                        }"
-                        @click="onNavigate"
-                    >
-                        <MessageSquareIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white':
-                                    $route.name === 'admin.performance.feedback.received' ||
-                                    $route.name === 'admin.performance.feedback.given',
-                            }"
-                        />
-                        <span
-                            class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white':
-                                    $route.name === 'admin.performance.feedback.received' ||
-                                    $route.name === 'admin.performance.feedback.given',
-                            }"
-                        >
-                            Feedback
-                        </span>
-                    </RouterLink>
-                </div>
-            </div>
-
-            <!-- PERSONAL Section -->
             <div
-                v-if="
-                    can('profile-menu') ||
-                    can('payslip-view') ||
-                    can('team-view') ||
-                    canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])
-                "
-                data-testid="sidebar-section-personal"
+                v-for="section in visibleSections"
+                :key="section.key"
+                :data-testid="`sidebar-section-${section.key}`"
             >
-                <h3 v-show="!isCollapsed" class="section-title">PERSONAL</h3>
-                <div class="space-y-3">
-                    <!-- 1. My Attendance (daily check-in/out) -->
-                    <RouterLink
-                        :to="{ name: 'staffMember.attendance.my-attendances' }"
-                        custom
-                        v-if="canOneOf(['attendance-my-attendances', 'attendance-check-in', 'attendance-check-out'])"
-                    >
-                        <template #default="{ href, navigate }">
-                            <a
-                                :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                                :class="{
-                                    'nav-link-active':
-                                        $route.name === 'staffMember.attendance.my-attendances' ||
-                                        $route.name === 'staffMember.attendance.clock',
-                                }"
-                                :aria-current="
-                                    $route.name === 'staffMember.attendance.my-attendances' ||
-                                    $route.name === 'staffMember.attendance.clock'
-                                        ? 'page'
-                                        : undefined
-                                "
-                                @click="navigate($event); onNavigate()"
-                            >
-                                <CalendarIcon
-                                    class="w-5 h-5 text-gray-600"
-                                    :class="{
-                                        'text-white':
-                                            $route.name === 'staffMember.attendance.my-attendances' ||
-                                            $route.name === 'staffMember.attendance.clock',
-                                    }"
-                                />
-                                <span
-                                    class="text-brand-dark text-base font-medium"
-                                    :class="{
-                                        'text-brand-white':
-                                            $route.name === 'staffMember.attendance.my-attendances' ||
-                                            $route.name === 'staffMember.attendance.clock',
-                                    }"
-                                >
-                                    My Attendance
-                                </span>
-                            </a>
-                        </template>
-                    </RouterLink>
-
-                    <!-- 2. My Team (frequent collaboration) -->
-                    <RouterLink :to="{ name: 'staffMember.team' }" custom v-if="can('team-view')">
-                        <template #default="{ href, navigate }">
-                            <a
-                                :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                                :class="{ 'nav-link-active': $route.name === 'staffMember.team' }"
-                                :aria-current="$route.name === 'staffMember.team' ? 'page' : undefined"
-                                @click="navigate($event); onNavigate()"
-                            >
-                                <UsersIcon
-                                    class="w-5 h-5 text-gray-600"
-                                    :class="{ 'text-white': $route.name === 'staffMember.team' }"
-                                />
-                                <span
-                                    class="text-brand-dark text-base font-medium"
-                                    :class="{ 'text-brand-white': $route.name === 'staffMember.team' }"
-                                >
-                                    My Team
-                                </span>
-                            </a>
-                        </template>
-                    </RouterLink>
-
-                    <!-- 4. My Payroll (monthly) -->
-                    <RouterLink :to="{ name: 'staffMember.payroll' }" custom v-if="can('payslip-view')">
-                        <template #default="{ href, navigate }">
-                            <a
-                                :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                                :class="{
-                                    'nav-link-active':
-                                        $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail',
-                                }"
-                                :aria-current="
-                                    $route.name === 'staffMember.payroll' || $route.name === 'staffMember.payroll.detail'
-                                        ? 'page'
-                                        : undefined
-                                "
-                                @click="navigate($event); onNavigate()"
-                            >
-                                <WalletIcon
-                                    class="w-5 h-5 text-gray-600"
-                                    :class="{
-                                        'text-white':
-                                            $route.name === 'staffMember.payroll' ||
-                                            $route.name === 'staffMember.payroll.detail',
-                                    }"
-                                />
-                                <span
-                                    class="text-brand-dark text-base font-medium"
-                                    :class="{
-                                        'text-brand-white':
-                                            $route.name === 'staffMember.payroll' ||
-                                            $route.name === 'staffMember.payroll.detail',
-                                    }"
-                                >
-                                    My Payroll
-                                </span>
-                            </a>
-                        </template>
-                    </RouterLink>
-
-                    <!-- 5. My Profile (rarely used) -->
-                    <RouterLink :to="{ name: 'staffMember.profile' }" custom v-if="can('profile-menu')">
-                        <template #default="{ href, navigate }">
-                            <a
-                                :href="href"
-                                class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                                :class="{
-                                    'nav-link-active':
-                                        $route.name === 'staffMember.profile' ||
-                                        $route.name === 'staffMember.profile.edit',
-                                }"
-                                :aria-current="
-                                    $route.name === 'staffMember.profile' || $route.name === 'staffMember.profile.edit'
-                                        ? 'page'
-                                        : undefined
-                                "
-                                @click="navigate($event); onNavigate()"
-                            >
-                                <UserIcon
-                                    class="w-5 h-5 text-gray-600"
-                                    :class="{
-                                        'text-white':
-                                            $route.name === 'staffMember.profile' ||
-                                            $route.name === 'staffMember.profile.edit',
-                                    }"
-                                />
-                                <span
-                                    class="text-brand-dark text-base font-medium"
-                                    :class="{
-                                        'text-brand-white':
-                                            $route.name === 'staffMember.profile' ||
-                                            $route.name === 'staffMember.profile.edit',
-                                    }"
-                                >
-                                    My Profile
-                                </span>
-                            </a>
-                        </template>
-                    </RouterLink>
-                </div>
-            </div>
-
-            <!-- PREFERENCES Section -->
-            <div data-testid="sidebar-section-preferences">
-                <h3 v-show="!isCollapsed" class="section-title">PREFERENCES</h3>
+                <h3 v-show="!isCollapsed" class="section-title">{{ section.label }}</h3>
                 <div class="space-y-3">
                     <RouterLink
-                        :to="{ name: 'admin.settings' }"
+                        v-for="item in section.items"
+                        :key="item.route"
+                        :to="{ name: item.route }"
                         class="nav-link border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus-visible:ring-2 focus-visible:ring-brand-primary transition-all duration-300"
-                        :class="{
-                            'nav-link-active': $route.name === 'admin.settings',
-                        }"
-                        v-if="canOneOf(['settings-hr-manage', 'settings-finance-manage', 'settings-system-manage'])"
+                        :class="{ 'nav-link-active': isActive(item) }"
+                        :aria-current="isActive(item) ? 'page' : undefined"
                         @click="onNavigate"
                     >
-                        <SettingsIcon
-                            class="w-5 h-5 text-gray-600"
-                            :class="{
-                                'text-white': $route.name === 'admin.settings',
-                            }"
+                        <component
+                            :is="item.icon"
+                            class="w-5 h-5 text-brand-light"
+                            :class="{ 'text-white': isActive(item) }"
                         />
                         <span
                             class="text-brand-dark text-base font-medium"
-                            :class="{
-                                'text-brand-white': $route.name === 'admin.settings',
-                            }"
+                            :class="{ 'text-brand-white': isActive(item) }"
                         >
-                            Settings
+                            {{ item.label }}
                         </span>
                     </RouterLink>
                 </div>
