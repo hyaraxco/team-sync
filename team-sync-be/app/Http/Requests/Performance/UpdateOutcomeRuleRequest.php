@@ -38,7 +38,7 @@ class UpdateOutcomeRuleRequest extends FormRequest
                 $current = PerformanceOutcomeRule::find($ruleId);
                 $isActive = $this->boolean('is_active', (bool) $current?->is_active);
 
-                if (! $isActive || ($min === null && $max === null && $current?->is_active)) {
+                if ($min === null && $max === null && $current?->is_active) {
                     return;
                 }
 
@@ -53,6 +53,10 @@ class UpdateOutcomeRuleRequest extends FormRequest
                 if ((float) $checkMax < (float) $checkMin) {
                     $validator->errors()->add('max_rating', 'The maximum rating must be greater than or equal to the minimum rating.');
 
+                    return;
+                }
+
+                if (! $isActive) {
                     return;
                 }
 
