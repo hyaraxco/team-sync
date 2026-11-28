@@ -36,8 +36,8 @@ const confirmPendingAction = async () => {
     if (confirmationLoading.value) return;
     confirmationLoading.value = true;
     try {
-        if (confirmAction.value) await confirmAction.value();
-        showConfirmDialog.value = false;
+        const result = confirmAction.value ? await confirmAction.value() : undefined;
+        if (result !== false) showConfirmDialog.value = false;
     } finally {
         confirmationLoading.value = false;
     }
@@ -392,16 +392,10 @@ const handleDeleteComment = async (comment) => {
             emit("updated");
         } catch (error) {
             toast.error("Failed to delete comment. Please try again.");
+            return false;
         }
     };
     showConfirmDialog.value = true;
-
-    try {
-        await deleteTaskComment(props.task.id, comment.id);
-        await loadTaskComments();
-    } catch (error) {
-        toast.error("Failed to delete comment. Please try again.");
-    }
 };
 
 const triggerAttachmentPicker = () => {
