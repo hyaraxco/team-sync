@@ -552,27 +552,33 @@ onUnmounted(() => {
 <template>
     <div class="p-5">
         <div
-            class="rounded-2xl mb-6 border border-brand-border bg-[var(--color-surface)] p-4 sm:p-5 flex flex-col gap-5"
+            class="relative rounded-2xl mb-6 overflow-hidden min-h-[160px] sm:h-[200px]"
+            style="
+                background-image: url(&quot;https://images.unsplash.com/photo-1497366216548-37526070297c&quot;);
+                background-size: cover;
+                background-position: center;
+            "
         >
+            <div class="absolute inset-0 bg-black/40"></div>
 
-            <div class="flex flex-col justify-center">
+            <div class="relative z-10 p-4 sm:p-6 h-full flex flex-col justify-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
-                        <CalendarCheck class="w-8 h-8 text-brand-dark" />
+                    <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shrink-0">
+                        <CalendarCheck class="w-8 h-8 text-white" />
                     </div>
                     <div>
-                        <h1 class="text-2xl font-semibold text-brand-dark">Attendance Overview</h1>
-                        <p class="text-brand-dark text-base font-normal">
+                        <h1 class="text-2xl font-semibold text-white">Attendance Overview</h1>
+                        <p class="text-white/90 text-sm sm:text-base font-normal">
                             Track attendance and manage leave requests
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="flex flex-wrap items-center gap-2.5">
+            <div class="relative sm:absolute sm:bottom-4 sm:right-6 flex flex-wrap items-center gap-2.5 z-10 p-4 sm:p-0">
                 <div
                     v-if="isRemote"
-                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2"
+                    class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2 shadow-md"
                 >
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     <span class="text-green-700 text-sm font-semibold">Auto-present · Remote</span>
@@ -580,7 +586,7 @@ onUnmounted(() => {
 
                 <div
                     v-if="canUseClockActions && !isCheckedIn && isHybrid"
-                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-brand-border px-3 py-2"
+                    class="bg-white/95 backdrop-blur-sm text-brand-dark rounded-lg border border-brand-border px-3 py-2 shadow-md"
                 >
                     <label for="actual-work-mode" class="sr-only">Actual work mode</label>
                     <select
@@ -599,7 +605,7 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckIn"
                     :disabled="attendanceLoading"
-                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-brand-border hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-white text-brand-dark rounded-lg border border-brand-border hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Clock class="w-4 h-4 text-brand-primary" />
                     <span data-testid="clock-in-button-label" class="text-brand-dark text-sm font-semibold">
@@ -611,16 +617,16 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckOut"
                     :disabled="isClockOutDisabled"
-                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-danger-600 hover:ring-2 hover:ring-danger-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-white text-brand-dark rounded-lg border border-danger-600 hover:ring-2 hover:ring-danger-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Clock class="w-4 h-4 text-danger-600" />
                     <span class="text-brand-dark text-sm font-semibold">Clock Out</span>
                 </button>
 
-                    <button
+                <button
                     v-if="canCreateLeaveRequest"
                     @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2 shadow-md"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md"
                 >
                     <Plus class="w-4 h-4 text-white" />
                     <span class="text-white text-sm font-semibold">Request Leave</span>
