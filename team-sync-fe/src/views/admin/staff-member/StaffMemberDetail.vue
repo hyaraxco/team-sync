@@ -103,7 +103,7 @@ onMounted(() => {
     </div>
 
     <div v-else-if="staffMember">
-        <div class="bg-white border border-brand-border rounded-2xl mb-6 p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl mb-6 p-4 sm:p-5">
             <div class="flex items-center gap-6">
                 <div class="relative">
                     <img loading="lazy"
@@ -150,14 +150,14 @@ onMounted(() => {
                     <button
                         v-if="can('staff-member-edit')"
                         @click="editStaffMember"
-                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                        class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center gap-2"
                     >
                         <Edit class="w-4 h-4 text-white" />
                         <span class="text-brand-white text-sm font-semibold">Edit Profile</span>
                     </button>
                     <button
                         @click="shareProfile"
-                        class="bg-white border border-brand-border text-brand-dark py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+                        class="bg-[var(--color-surface)] border border-brand-border text-brand-dark py-3 px-6 rounded-lg font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
                     >
                         <Share2 class="w-4 h-4" />
                         Share Profile
@@ -168,7 +168,7 @@ onMounted(() => {
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -179,13 +179,13 @@ onMounted(() => {
                         </p>
                         <p class="text-success text-base font-medium">This month</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                        <CheckCircle class="w-6 h-6 text-blue-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <CheckCircle class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </div>
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -198,13 +198,13 @@ onMounted(() => {
                             {{ performanceStatistics.attendance_rate >= 80 ? "Above average" : "Below average" }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
-                        <CalendarCheck class="w-6 h-6 text-green-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <CalendarCheck class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </div>
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -215,13 +215,13 @@ onMounted(() => {
                         </p>
                         <p class="text-success text-base font-medium">Active projects</p>
                     </div>
-                    <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center">
-                        <Folder class="w-6 h-6 text-purple-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <Folder class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </div>
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
             >
                 <div class="flex items-center justify-between">
                     <div>
@@ -249,17 +249,17 @@ onMounted(() => {
                             }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
-                        <TrendingUp class="w-6 h-6 text-orange-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <TrendingUp class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <Users class="w-6 h-6 text-indigo-600" />
+                    <Users class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Team Information</h2>
                 </div>
                 <div class="space-y-4">
@@ -278,9 +278,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <Contact class="w-6 h-6 text-teal-600" />
+                    <Contact class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Contact Details</h2>
                 </div>
                 <div class="space-y-4">
@@ -307,9 +307,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <Calendar class="w-6 h-6 text-blue-600" />
+                    <Calendar class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Personal Information</h2>
                 </div>
                 <div class="space-y-4">
@@ -352,9 +352,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <Phone class="w-6 h-6 text-red-600" />
+                    <Phone class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Emergency Contact</h2>
                 </div>
                 <div
@@ -393,9 +393,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <MapPin class="w-6 h-6 text-purple-600" />
+                    <MapPin class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Address Information</h2>
                 </div>
                 <div class="space-y-4">
@@ -420,9 +420,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <Briefcase class="w-6 h-6 text-green-600" />
+                    <Briefcase class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Employment Details</h2>
                 </div>
                 <div class="space-y-4">
@@ -479,9 +479,9 @@ onMounted(() => {
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <FileText class="w-6 h-6 text-orange-600" />
+                    <FileText class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Administrative Information</h2>
                 </div>
                 <div class="space-y-4">
@@ -494,9 +494,9 @@ onMounted(() => {
                 </div>
             </div>
 
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-4">
-                    <Briefcase class="w-6 h-6 text-cyan-600" />
+                    <Briefcase class="w-6 h-6 text-brand-dark" />
                     <h2 class="text-brand-dark text-lg font-semibold">Bank Information</h2>
                 </div>
                 <div class="space-y-4">
@@ -522,7 +522,7 @@ onMounted(() => {
             </div>
         </div>
 
-        <div v-if="can('staff-member-delete')" class="bg-white border border-danger-100 rounded-2xl p-6">
+        <div v-if="can('staff-member-delete')" class="bg-[var(--color-surface)] border border-danger-100 rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
                 <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>

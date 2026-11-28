@@ -141,10 +141,10 @@ const formatSignedRupiah = (value) => {
 
 const getStatusClass = (status) =>
     ({
-        pending: "bg-amber-100 text-amber-700",
-        approved: "bg-blue-100 text-blue-700",
-        applied: "bg-green-100 text-green-700",
-    })[status] || "bg-gray-100 text-gray-700";
+        pending: "bg-amber-100 text-amber-800",
+        approved: "bg-green-100 text-green-800",
+        applied: "bg-green-100 text-green-800",
+    })[status] || "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border";
 
 onMounted(loadAdjustments);
 </script>
@@ -154,7 +154,7 @@ onMounted(loadAdjustments);
         <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
             <div>
                 <h1 class="text-brand-dark text-[32px] font-bold leading-tight flex items-center gap-3">
-                    <FileWarning class="w-8 h-8 text-amber-600" />
+                    <FileWarning class="w-8 h-8 text-brand-dark" />
                     Payroll Adjustment Queue
                 </h1>
                 <p class="text-brand-light text-base font-normal mt-2 max-w-3xl">
@@ -164,7 +164,7 @@ onMounted(loadAdjustments);
             </div>
             <button
                 type="button"
-                class="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-border bg-white px-4 py-3 text-sm font-semibold text-brand-dark hover:border-brand-primary disabled:opacity-50"
+                class="inline-flex items-center justify-center gap-2 rounded-xl border border-brand-border bg-[var(--color-surface)] px-4 py-3 text-sm font-semibold text-brand-dark hover:border-brand-primary disabled:opacity-50"
                 :disabled="loading"
                 @click="loadAdjustments"
             >
@@ -174,30 +174,30 @@ onMounted(loadAdjustments);
         </div>
 
         <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            <div class="rounded-2xl border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
                     <SlidersHorizontal class="w-4 h-4" />
                     Loaded Adjustments
                 </div>
                 <p class="mt-3 text-3xl font-bold text-brand-dark">{{ meta.total || payrollAdjustments.length }}</p>
             </div>
-            <div class="rounded-2xl border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
-                    <Clock3 class="w-4 h-4 text-amber-600" />
+                    <Clock3 class="w-4 h-4 text-brand-dark" />
                     Pending on This Page
                 </div>
-                <p class="mt-3 text-3xl font-bold text-amber-700">{{ pendingCount }}</p>
+                <p class="mt-3 text-3xl font-bold text-brand-dark">{{ pendingCount }}</p>
             </div>
-            <div class="rounded-2xl border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
-                    <BadgeCheck class="w-4 h-4 text-blue-600" />
+                    <BadgeCheck class="w-4 h-4 text-brand-dark" />
                     Approved on This Page
                 </div>
-                <p class="mt-3 text-3xl font-bold text-blue-700">{{ approvedCount }}</p>
+                <p class="mt-3 text-3xl font-bold text-brand-dark">{{ approvedCount }}</p>
             </div>
-            <div class="rounded-2xl border border-brand-border bg-white p-5">
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-5">
                 <div class="flex items-center gap-2 text-brand-light text-sm font-medium">
-                    <BadgeCheck class="w-4 h-4 text-green-600" />
+                    <BadgeCheck class="w-4 h-4 text-brand-dark" />
                     Page Net Impact
                 </div>
                 <p
@@ -210,7 +210,7 @@ onMounted(loadAdjustments);
             </div>
         </div>
 
-        <div class="rounded-2xl border border-brand-border bg-white p-5">
+        <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-5">
             <div class="mb-5 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
                 <div>
                     <h2 class="text-lg font-bold text-brand-dark">Adjustment Records</h2>
@@ -220,7 +220,7 @@ onMounted(loadAdjustments);
                     Status
                     <select
                         v-model="filters.status"
-                        class="rounded-lg border border-brand-border bg-white px-3 py-2 text-sm font-medium"
+                        class="rounded-lg border border-brand-border bg-[var(--color-surface)] px-3 py-2 text-sm font-medium"
                         @change="handleStatusChange"
                     >
                         <option v-for="option in statusOptions" :key="option.value" :value="option.value">
@@ -253,7 +253,7 @@ onMounted(loadAdjustments);
                             <th class="px-4 py-3 text-right font-semibold text-brand-dark">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-100 bg-white">
+                    <tbody class="divide-y divide-gray-100 bg-[var(--color-surface)]">
                         <tr v-for="adjustment in payrollAdjustments" :key="adjustment.id">
                             <td class="px-4 py-3">
                                 <p class="font-semibold text-brand-dark">{{ getStaffName(adjustment) }}</p>

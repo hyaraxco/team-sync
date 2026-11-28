@@ -155,10 +155,10 @@ watch(
 <template>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
         <!-- Team Growth Chart (Employee Joining) -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                    <UserPlus class="w-6 h-6 text-green-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <UserPlus class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-lg font-bold">Team Growth</h3>
@@ -182,10 +182,10 @@ watch(
         </div>
 
         <!-- Tasks Growth Chart -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <TrendingUp class="w-6 h-6 text-blue-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <TrendingUp class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-lg font-bold">Tasks Growth</h3>

@@ -1,5 +1,5 @@
 <template>
-    <div class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6">
+    <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6">
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
             <div>
                 <h3 class="text-lg font-bold text-brand-dark">{{ title }}</h3>

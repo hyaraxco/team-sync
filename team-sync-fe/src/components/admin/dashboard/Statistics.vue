@@ -48,7 +48,6 @@ const loading = computed(() => dashboardStore.loading);
             :subtitle="`+${teams.new_teams} new teams`"
             subtitleColor="text-success"
             iconName="UsersIcon"
-            colorScheme="blue"
             :loading="loading"
         />
 
@@ -59,7 +58,6 @@ const loading = computed(() => dashboardStore.loading);
             :subtitle="`${attendance.change >= 0 ? '+' : ''}${attendance.change}% from last week`"
             :subtitleColor="attendance.change >= 0 ? 'text-success' : 'text-danger'"
             iconName="CalendarCheckIcon"
-            colorScheme="green"
             :loading="loading"
         />
 
@@ -72,9 +70,8 @@ const loading = computed(() => dashboardStore.loading);
             title="Promotion Eligible"
             :value="performance.promotion_eligible"
             subtitle="From completed reviews"
-            subtitleColor="text-purple-600"
+            subtitleColor="text-brand-light"
             iconName="TrendingUpIcon"
-            colorScheme="purple"
             :loading="loading"
         />
 
@@ -85,7 +82,6 @@ const loading = computed(() => dashboardStore.loading);
             subtitle="Need improvement plan"
             :subtitleColor="performance.pip_required > 0 ? 'text-danger' : 'text-success'"
             iconName="AlertTriangleIcon"
-            colorScheme="red"
             :loading="loading"
         />
     </div>

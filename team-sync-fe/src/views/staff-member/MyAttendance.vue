@@ -552,33 +552,27 @@ onUnmounted(() => {
 <template>
     <div class="p-5">
         <div
-            class="relative rounded-2xl mb-6 overflow-hidden h-[200px]"
-            style="
-                background-image: url(&quot;https://images.unsplash.com/photo-1497366216548-37526070297c&quot;);
-                background-size: cover;
-                background-position: center;
-            "
+            class="rounded-2xl mb-6 border border-brand-border bg-[var(--color-surface)] p-4 sm:p-5 flex flex-col gap-5"
         >
-            <div class="absolute inset-0 bg-black/40"></div>
 
-            <div class="relative z-10 p-6 h-full flex flex-col justify-center">
+            <div class="flex flex-col justify-center">
                 <div class="flex items-center gap-4">
-                    <div class="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center">
-                        <CalendarCheck class="w-8 h-8 text-white" />
+                    <div class="w-16 h-16 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                        <CalendarCheck class="w-8 h-8 text-brand-dark" />
                     </div>
                     <div>
-                        <h1 class="text-2xl font-semibold text-white">Attendance Overview</h1>
-                        <p class="text-white/90 text-base font-normal">
+                        <h1 class="text-2xl font-semibold text-brand-dark">Attendance Overview</h1>
+                        <p class="text-brand-dark text-base font-normal">
                             Track attendance and manage leave requests
                         </p>
                     </div>
                 </div>
             </div>
 
-            <div class="absolute bottom-4 right-6 flex items-center gap-2.5 z-10">
+            <div class="flex flex-wrap items-center gap-2.5">
                 <div
                     v-if="isRemote"
-                    class="bg-white/90 backdrop-blur-sm text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2 shadow-md"
+                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-green-300 px-4 py-3 flex items-center gap-2"
                 >
                     <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                     <span class="text-green-700 text-sm font-semibold">Auto-present · Remote</span>
@@ -586,7 +580,7 @@ onUnmounted(() => {
 
                 <div
                     v-if="canUseClockActions && !isCheckedIn && isHybrid"
-                    class="bg-white/95 backdrop-blur-sm text-brand-dark rounded-lg border border-brand-border px-3 py-2 shadow-md"
+                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-brand-border px-3 py-2"
                 >
                     <label for="actual-work-mode" class="sr-only">Actual work mode</label>
                     <select
@@ -605,7 +599,7 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckIn"
                     :disabled="attendanceLoading"
-                    class="bg-white text-brand-dark rounded-lg border border-brand-border hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-brand-border hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Clock class="w-4 h-4 text-brand-primary" />
                     <span data-testid="clock-in-button-label" class="text-brand-dark text-sm font-semibold">
@@ -617,7 +611,7 @@ onUnmounted(() => {
                     type="button"
                     @click="handleCheckOut"
                     :disabled="isClockOutDisabled"
-                    class="bg-white text-brand-dark rounded-lg border border-danger-600 hover:ring-2 hover:ring-danger-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    class="bg-[var(--color-surface)] text-brand-dark rounded-lg border border-danger-600 hover:ring-2 hover:ring-danger-500/20 transition-all duration-300 px-4 py-3 flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                     <Clock class="w-4 h-4 text-danger-600" />
                     <span class="text-brand-dark text-sm font-semibold">Clock Out</span>
@@ -626,7 +620,7 @@ onUnmounted(() => {
                     <button
                     v-if="canCreateLeaveRequest"
                     @click="openLeaveRequestModal"
-                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 shadow-md"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2 shadow-md"
                 >
                     <Plus class="w-4 h-4 text-white" />
                     <span class="text-white text-sm font-semibold">Request Leave</span>
@@ -641,7 +635,7 @@ onUnmounted(() => {
             :leave-loading="leaveLoading"
         />
 
-        <div class="bg-white border border-brand-border rounded-2xl p-3 mb-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-3 mb-6">
             <div
                 class="grid gap-3"
                 :class="{
@@ -659,14 +653,14 @@ onUnmounted(() => {
                     class="rounded-lg px-4 py-3 border transition-all duration-300 flex items-center justify-center gap-2"
                     :class="
                         activeSection === section.id
-                            ? 'blue-gradient blue-btn-shadow border border-primary-700 text-white'
-                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-white'
+                            ? 'bg-brand-primary border border-primary-700 text-white'
+                            : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 bg-[var(--color-surface)]'
                     "
                 >
                     <component
                         :is="section.icon"
                         class="w-4 h-4"
-                        :class="activeSection === section.id ? 'text-white' : 'text-gray-600'"
+                        :class="activeSection === section.id ? 'text-white' : 'text-brand-light'"
                     />
                     <span class="text-sm font-semibold">{{ section.label }}</span>
                 </button>
@@ -676,12 +670,12 @@ onUnmounted(() => {
         <div v-if="activeSection === 'overview'" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <div
                 v-if="canViewMyLeaveRequests"
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
             >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <CalendarCheck class="w-6 h-6 text-green-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <CalendarCheck class="w-6 h-6 text-brand-dark" />
                         </div>
                         <h2 class="text-lg font-semibold text-brand-dark">Recent Attendance</h2>
                     </div>
@@ -692,8 +686,8 @@ onUnmounted(() => {
                             class="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200"
                             :class="
                                 attendanceViewMode === 'list'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-brand-dark hover:bg-gray-100'
+                                    ? 'bg-primary-700 text-white'
+                                    : 'text-brand-dark hover:bg-[var(--color-surface-overlay)]'
                             "
                         >
                             <List class="w-3.5 h-3.5" />
@@ -705,8 +699,8 @@ onUnmounted(() => {
                             class="px-3 py-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all duration-200"
                             :class="
                                 attendanceViewMode === 'calendar'
-                                    ? 'bg-blue-600 text-white'
-                                    : 'text-brand-dark hover:bg-gray-100'
+                                    ? 'bg-primary-700 text-white'
+                                    : 'text-brand-dark hover:bg-[var(--color-surface-overlay)]'
                             "
                         >
                             <Grid3x3 class="w-3.5 h-3.5" />
@@ -829,7 +823,7 @@ onUnmounted(() => {
                             :key="day.isoDate"
                             class="border-r border-b border-brand-border min-h-[72px] p-1.5 flex flex-col transition-all duration-200"
                             :class="[
-                                day.inCurrentMonth ? 'bg-white' : 'bg-gray-50/50',
+                                day.inCurrentMonth ? 'bg-[var(--color-surface)]' : 'bg-gray-50/50',
                                 day.isToday ? 'bg-blue-50/50' : '',
                             ]"
                         >
@@ -866,12 +860,12 @@ onUnmounted(() => {
             </div>
 
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-6"
             >
                 <div class="flex items-center justify-between mb-6">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                            <CalendarX class="w-6 h-6 text-orange-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <CalendarX class="w-6 h-6 text-brand-dark" />
                         </div>
                         <h2 class="text-lg font-semibold text-brand-dark">My Leave Requests</h2>
                     </div>
@@ -966,13 +960,13 @@ onUnmounted(() => {
                 @click.self="closeLeaveRequestModal"
             >
                 <div
-                    class="bg-white rounded-2xl border border-brand-border w-full max-w-3xl mx-4 max-h-[90vh] overflow-hidden"
+                    class="bg-[var(--color-surface)] rounded-2xl border border-brand-border w-full max-w-3xl mx-4 max-h-[90vh] overflow-hidden"
                 >
                     <div class="p-6 border-b border-brand-border">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                    <CalendarPlus class="w-6 h-6 text-blue-600" />
+                                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                    <CalendarPlus class="w-6 h-6 text-brand-dark" />
                                 </div>
                                 <div>
                                     <h2 class="text-xl font-semibold text-brand-dark">Request New Leave</h2>
@@ -986,23 +980,23 @@ onUnmounted(() => {
                                 @click="closeLeaveRequestModal"
                                 class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
                             >
-                                <span class="text-gray-600 text-xl">×</span>
+                                <span class="text-brand-dark text-xl">×</span>
                             </button>
                         </div>
                     </div>
 
                     <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
                         <form @submit.prevent="submitLeaveRequest" class="space-y-6">
-                            <div class="bg-white border border-brand-border rounded-2xl p-6">
+                            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div class="md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">
                                             Leave Type *
                                         </label>
                                         <select
                                             v-model="leaveForm.leave_type"
                                             required
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold"
                                         >
                                             <option value="">Select leave type</option>
                                             <option v-for="type in leaveTypes" :key="type.value" :value="type.value">
@@ -1012,7 +1006,7 @@ onUnmounted(() => {
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">
                                             Start Date *
                                         </label>
                                         <input
@@ -1021,30 +1015,30 @@ onUnmounted(() => {
                                             @change="updateEndDateMin"
                                             required
                                             data-testid="leave-start-date"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold"
                                         />
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">End Date *</label>
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">End Date *</label>
                                         <input
                                             type="date"
                                             v-model="leaveForm.end_date"
                                             :min="leaveForm.start_date"
                                             required
                                             data-testid="leave-end-date"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold"
                                         />
                                     </div>
 
                                     <div class="md:col-span-2">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">Total Days</label>
-                                        <div class="p-4 bg-gray-50 rounded-xl border border-brand-border">
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">Total Days</label>
+                                        <div class="p-4 bg-[var(--color-surface-overlay)] rounded-xl border border-brand-border">
                                             <div class="flex items-center gap-3">
                                                 <div
-                                                    class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center"
+                                                    class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center"
                                                 >
-                                                    <Clock class="w-5 h-5 text-blue-600" />
+                                                    <Clock class="w-5 h-5 text-brand-dark" />
                                                 </div>
                                                 <div>
                                                     <p class="text-brand-dark text-lg font-bold">
@@ -1059,10 +1053,10 @@ onUnmounted(() => {
                                 </div>
                             </div>
 
-                            <div class="bg-white border border-brand-border rounded-2xl p-6">
+                            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">
                                             Reason for Leave *
                                         </label>
                                         <textarea
@@ -1070,25 +1064,25 @@ onUnmounted(() => {
                                             required
                                             rows="4"
                                             data-testid="leave-reason"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold resize-none"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold resize-none"
                                             placeholder="Please provide a detailed reason for your leave request..."
                                         ></textarea>
                                     </div>
 
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">
                                             Emergency Contact (Optional)
                                         </label>
                                         <input
                                             type="tel"
                                             v-model="leaveForm.emergency_contact"
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold"
                                             placeholder="Phone number for emergency contact"
                                         />
                                     </div>
 
                                     <div v-if="leaveForm.leave_type === 'sick_leave'">
-                                        <label class="block text-sm font-medium text-gray-700 mb-1.5">
+                                        <label class="block text-sm font-medium text-brand-dark mb-1.5">
                                             Medical Certificate / Proof *
                                         </label>
                                         <input
@@ -1096,7 +1090,7 @@ onUnmounted(() => {
                                             @change="handleProofFileChange"
                                             accept=".pdf,.jpg,.jpeg,.png"
                                             required
-                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 text-sm font-medium text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                                            class="w-full px-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 text-sm font-medium text-brand-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border file:border-brand-border file:text-sm file:font-semibold file:bg-[var(--color-surface-overlay)] file:text-brand-dark hover:file:bg-[var(--color-surface)]"
                                         />
                                         <p class="text-xs text-brand-light mt-1.5">
                                             Max size: 5MB. Formats: PDF, JPG, PNG.
@@ -1115,7 +1109,7 @@ onUnmounted(() => {
                                 </button>
                                 <button
                                     type="submit"
-                                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center gap-2"
+                                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-6 py-3 flex items-center gap-2"
                                 >
                                     <span class="text-brand-white text-base font-semibold">Submit Request</span>
                                 </button>
@@ -1136,13 +1130,13 @@ onUnmounted(() => {
                 @click.self="closeLeaveDetailsModal"
             >
                 <div
-                    class="bg-white rounded-2xl border border-brand-border w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden"
+                    class="bg-[var(--color-surface)] rounded-2xl border border-brand-border w-full max-w-2xl mx-4 max-h-[90vh] overflow-hidden"
                 >
                     <div class="p-6 border-b border-brand-border">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-3">
-                                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                    <CalendarCheck class="w-6 h-6 text-blue-600" />
+                                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                    <CalendarCheck class="w-6 h-6 text-brand-dark" />
                                 </div>
                                 <div>
                                     <h2 class="text-xl font-semibold text-brand-dark">Leave Request Details</h2>
@@ -1163,7 +1157,7 @@ onUnmounted(() => {
 
                     <div class="p-6 overflow-y-auto max-h-[calc(90vh-140px)]">
                         <div class="space-y-6">
-                            <div class="bg-white border border-brand-border rounded-2xl p-6">
+                            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                                     <div>
                                         <label class="block text-brand-dark text-base font-semibold mb-2">
@@ -1214,12 +1208,12 @@ onUnmounted(() => {
                                         <label class="block text-brand-dark text-base font-semibold mb-2">
                                             Total Duration
                                         </label>
-                                        <div class="p-4 bg-blue-50 rounded-xl border border-brand-border">
+                                        <div class="p-4 bg-[var(--color-surface-overlay)] rounded-xl border border-brand-border">
                                             <div class="flex items-center gap-3">
                                                 <div
-                                                    class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"
+                                                    class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center"
                                                 >
-                                                    <Clock class="w-5 h-5 text-blue-600" />
+                                                    <Clock class="w-5 h-5 text-brand-dark" />
                                                 </div>
                                                 <div>
                                                     <p class="text-brand-dark text-lg font-bold">
@@ -1236,7 +1230,7 @@ onUnmounted(() => {
                                 </div>
                             </div>
 
-                            <div class="bg-white border border-brand-border rounded-2xl p-6">
+                            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
                                 <div class="space-y-4">
                                     <div>
                                         <label class="block text-brand-dark text-base font-semibold mb-2">
@@ -1267,7 +1261,7 @@ onUnmounted(() => {
                             <!-- Proof Document Section -->
                             <div
                                 v-if="selectedLeaveRequest.leave_type === 'sick_leave' && selectedLeaveRequest.proof_file_path"
-                                class="bg-white border border-brand-border rounded-2xl p-6"
+                                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                             >
                                 <div class="space-y-4">
                                     <div>
@@ -1278,9 +1272,9 @@ onUnmounted(() => {
                                             <div class="flex items-center justify-between">
                                                 <div class="flex items-center gap-3">
                                                     <div
-                                                        class="w-10 h-10 bg-blue-100 rounded-xl flex items-center justify-center"
+                                                        class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center"
                                                     >
-                                                        <FileText class="w-5 h-5 text-blue-600" />
+                                                        <FileText class="w-5 h-5 text-brand-dark" />
                                                     </div>
                                                     <div>
                                                         <p class="text-brand-dark text-base font-medium">
@@ -1331,7 +1325,7 @@ onUnmounted(() => {
                             <!-- Re-upload section for rejected proofs -->
                             <div
                                 v-if="selectedLeaveRequest.leave_type === 'sick_leave' && selectedLeaveRequest.proof_review_status === 'rejected'"
-                                class="bg-white border border-brand-border rounded-2xl p-6"
+                                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                             >
                                 <div class="flex items-center justify-between">
                                     <div>
@@ -1341,7 +1335,7 @@ onUnmounted(() => {
                                         </p>
                                     </div>
                                     <label
-                                        class="px-4 py-2 rounded-lg blue-gradient blue-btn-shadow text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
+                                        class="px-4 py-2 rounded-lg bg-brand-primary text-white font-medium text-sm hover:brightness-110 transition-all cursor-pointer"
                                     >
                                         <input
                                             type="file"

@@ -239,7 +239,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <div class="bg-white border border-brand-border rounded-2xl p-6">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
         <div v-if="notice.open" class="mb-4">
             <div
                 :class="[
@@ -254,8 +254,8 @@ onMounted(async () => {
         </div>
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                    <ListChecks class="w-6 h-6 text-purple-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-xl flex items-center justify-center">
+                    <ListChecks class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Project Tasks</h3>
@@ -265,7 +265,7 @@ onMounted(async () => {
             <button
                 v-if="canCreateTask"
                 @click="openCreateModal"
-                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2"
             >
                 <Plus class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Create New Task</span>
@@ -280,7 +280,7 @@ onMounted(async () => {
                 </div>
                 <input
                     type="text"
-                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 font-semibold"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 font-semibold"
                     placeholder="Search tasks..."
                     v-model="searchQuery"
                 />
@@ -310,7 +310,7 @@ onMounted(async () => {
             class="flex gap-4 overflow-x-auto pb-4 scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100"
         >
             <!-- To Do Column -->
-            <div class="bg-gray-50 rounded-2xl p-4 flex-shrink-0 w-72">
+            <div class="bg-[var(--color-surface-raised)] rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-gray-400 rounded-full"></div>
@@ -332,7 +332,7 @@ onMounted(async () => {
             </div>
 
             <!-- In Progress Column -->
-            <div class="bg-blue-50 rounded-2xl p-4 flex-shrink-0 w-72">
+            <div class="bg-[var(--color-surface-raised)] rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
@@ -359,7 +359,7 @@ onMounted(async () => {
             </div>
 
             <!-- Review Column -->
-            <div class="bg-yellow-50 rounded-2xl p-4 flex-shrink-0 w-72">
+            <div class="bg-[var(--color-surface-raised)] rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
@@ -381,7 +381,7 @@ onMounted(async () => {
             </div>
 
             <!-- Done Column -->
-            <div class="bg-green-50 rounded-2xl p-4 flex-shrink-0 w-72">
+            <div class="bg-[var(--color-surface-raised)] rounded-2xl p-4 flex-shrink-0 w-72">
                 <div class="flex items-center justify-between mb-4">
                     <div class="flex items-center gap-2">
                         <div class="w-3 h-3 bg-green-500 rounded-full"></div>

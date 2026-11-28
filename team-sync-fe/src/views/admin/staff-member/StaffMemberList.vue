@@ -60,7 +60,7 @@ onMounted(async () => {
 
     <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
-    <div class="bg-white border border-brand-border rounded-2xl mb-6 p-5">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl mb-6 p-4 sm:p-5">
         <div class="flex items-center justify-between mb-6">
             <div>
                 <h3 class="text-brand-dark font-['Plus_Jakarta_Sans'] text-[20px] font-bold">All Staff Members</h3>
@@ -78,7 +78,7 @@ onMounted(async () => {
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.staffMembers.create' }"
-                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3"
                     v-if="can('staff-member-create')"
                 >
                     <UserPlus class="w-4 h-4 text-white" />

@@ -80,17 +80,17 @@ const filteredGoals = computed(() => {
 });
 
 const goalTypes = [
-    { value: "okr", label: "OKR", color: "bg-purple-100 text-purple-700" },
-    { value: "kpi", label: "KPI", color: "bg-blue-100 text-blue-700" },
+    { value: "okr", label: "OKR", color: "bg-[var(--color-surface-raised)] text-brand-dark" },
+    { value: "kpi", label: "KPI", color: "bg-[var(--color-surface-raised)] text-brand-dark" },
     {
         value: "development",
         label: "Development",
-        color: "bg-green-100 text-green-700",
+        color: "bg-[var(--color-surface-raised)] text-brand-dark",
     },
     {
         value: "project",
         label: "Project",
-        color: "bg-orange-100 text-orange-700",
+        color: "bg-[var(--color-surface-raised)] text-brand-dark",
     },
 ];
 
@@ -263,7 +263,7 @@ onMounted(async () => {
             </div>
             <button
                 v-if="canCreateGoal"
-                class="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
+                class="flex items-center gap-2 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-semibold text-sm"
                 @click="createGoal"
             >
                 <Plus class="w-5 h-5" />
@@ -271,13 +271,14 @@ onMounted(async () => {
             </button>
         </div>
 
-        <MainCard>
-            <div class="flex flex-wrap items-end gap-4">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6 space-y-6">
+            <div class="flex flex-wrap items-end gap-4 pb-4 border-b border-brand-border">
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2">Goal Type</label>
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Goal Type</label>
                     <select
                         v-model="selectedType"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        aria-label="Filter by goal type"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="all">All Types</option>
                         <option v-for="type in goalTypes" :key="type.value" :value="type.value">
@@ -286,10 +287,11 @@ onMounted(async () => {
                     </select>
                 </div>
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2">Status</label>
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Status</label>
                     <select
                         v-model="selectedStatus"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        aria-label="Filter by status"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="all">All Statuses</option>
                         <option value="not_started">Not Started</option>
@@ -301,23 +303,22 @@ onMounted(async () => {
                 <button
                     v-if="hasActiveFilters"
                     @click="clearFilters"
-                    class="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 transition-all duration-200"
+                    class="px-4 py-2.5 rounded-xl border border-brand-border text-sm font-semibold text-brand-dark hover:bg-[var(--color-surface-overlay)] transition-colors flex items-center gap-2"
                 >
-                    <X class="w-4 h-4 text-red-500" />
-                    <span class="text-red-500 text-sm font-medium">Clear filters</span>
+                    <X class="w-4 h-4 text-brand-light" />
+                    Clear filters
                 </button>
             </div>
-        </MainCard>
 
-        <div v-if="goalsLoading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
+            <div v-if="goalsLoading" class="flex justify-center items-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+            </div>
 
         <div v-else-if="filteredGoals.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <MainCard
                 v-for="goal in filteredGoals"
                 :key="goal.id"
-                class="hover:shadow-xl transition-all duration-200 cursor-pointer group relative overflow-hidden"
+                class="hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200 cursor-pointer group relative overflow-hidden"
                 @click="viewGoal(goal.id)"
             >
                 <div class="absolute top-4 right-4">
@@ -340,11 +341,11 @@ onMounted(async () => {
 
                             <div
                                 v-if="openActionMenuId === goal.id"
-                                class="absolute right-0 mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10"
+                                class="absolute right-0 mt-2 w-36 bg-[var(--color-surface)] border border-gray-200 rounded-lg shadow-lg py-1 z-10"
                                 @click.stop
                             >
                                 <button
-                                    class="w-full px-3 py-2 text-sm text-left text-brand-dark hover:bg-gray-50 flex items-center gap-2"
+                                    class="w-full px-3 py-2 text-sm text-left text-brand-dark hover:bg-[var(--color-surface-raised)] flex items-center gap-2"
                                     @click.stop="editGoal(goal)"
                                 >
                                     <Pencil class="w-4 h-4" />
@@ -382,7 +383,7 @@ onMounted(async () => {
                             <span class="text-xs font-medium text-brand-light">Progress</span>
                             <span class="text-sm font-bold text-brand-dark">{{ goal.completion_percentage }}%</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div class="w-full bg-[var(--color-surface-overlay)] border border-brand-border rounded-full h-2 overflow-hidden">
                             <div
                                 class="h-full rounded-full transition-all duration-300"
                                 :class="getProgressColor(goal.completion_percentage)"
@@ -391,7 +392,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-gray-100">
+                    <div class="grid grid-cols-2 gap-3 pt-3 border-t border-brand-border">
                         <div>
                             <p class="text-xs text-brand-light uppercase tracking-wide">Target</p>
                             <p class="text-sm font-medium text-brand-dark mt-1">
@@ -406,7 +407,7 @@ onMounted(async () => {
                         </div>
                     </div>
 
-                    <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                    <div class="flex items-center justify-between pt-3 border-t border-brand-border">
                         <div class="flex items-center gap-2">
                             <Calendar class="w-4 h-4 text-brand-light" />
                             <span class="text-xs text-brand-light">
@@ -425,22 +426,24 @@ onMounted(async () => {
             </MainCard>
         </div>
 
-        <EmptyState
-            v-else
-            icon="Target"
-            title="Belum ada sasaran"
-            subtitle="Tetapkan sasaran untuk melacak progres dan pencapaian Anda."
-        >
-            <button
-                v-if="canCreateGoal"
-                class="mt-4 flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
-                @click="createGoal"
-            >
-                <Plus class="w-5 h-5" />
-                Buat Sasaran Pertama
-            </button>
-        </EmptyState>
-
+            <div v-else class="py-12">
+                <EmptyState
+                    icon="Target"
+                    title="Belum ada sasaran"
+                    subtitle="Tetapkan sasaran untuk melacak progres dan pencapaian Anda."
+                    size="lg"
+                >
+                    <button
+                        v-if="canCreateGoal"
+                        class="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-semibold text-sm"
+                        @click="createGoal"
+                    >
+                        <Plus class="w-5 h-5" />
+                        Buat Sasaran Pertama
+                    </button>
+                </EmptyState>
+            </div>
+        </div>
         <div v-if="showCreateModal" class="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
             <MainCard class="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
                 <div class="flex items-center justify-between mb-6">
@@ -542,7 +545,7 @@ onMounted(async () => {
                     <div class="flex justify-end gap-3 pt-2">
                         <button
                             type="button"
-                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-[var(--color-surface-raised)] transition-colors"
                             @click="closeCreateModal"
                         >
                             Cancel

@@ -205,10 +205,10 @@ watch(
     <Chart :team="team" />
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                    <Crown class="w-6 h-6 text-green-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Crown class="w-6 h-6 text-brand-dark" />
                 </div>
                 <h2 class="text-brand-dark text-lg font-semibold">Team Lead</h2>
             </div>
@@ -254,8 +254,8 @@ watch(
                         <div
                             class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-all duration-300"
                         >
-                            <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center">
-                                <Mail class="w-4 h-4 text-blue-600" />
+                            <div class="w-8 h-8 bg-[var(--color-surface-overlay)] rounded-lg flex items-center justify-center">
+                                <Mail class="w-4 h-4 text-brand-dark" />
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p class="text-brand-light text-xs font-medium">Email Address</p>
@@ -267,8 +267,8 @@ watch(
                         <div
                             class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 transition-all duration-300"
                         >
-                            <div class="w-8 h-8 bg-green-50 rounded-lg flex items-center justify-center">
-                                <Phone class="w-4 h-4 text-green-600" />
+                            <div class="w-8 h-8 bg-[var(--color-surface-overlay)] rounded-lg flex items-center justify-center">
+                                <Phone class="w-4 h-4 text-brand-dark" />
                             </div>
                             <div class="flex-1">
                                 <p class="text-brand-light text-xs font-medium">Phone Number</p>
@@ -307,10 +307,10 @@ watch(
             </div>
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                        <Settings class="w-6 h-6 text-purple-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <Settings class="w-6 h-6 text-brand-dark" />
                     </div>
                     <h2 class="text-brand-dark text-lg font-semibold">Team Settings</h2>
                 </div>
@@ -344,10 +344,10 @@ watch(
         </div>
     </div>
 
-    <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 mb-6">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                <ListCheck class="w-6 h-6 text-orange-600" />
+            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                <ListCheck class="w-6 h-6 text-brand-dark" />
             </div>
             <h2 class="text-brand-dark text-lg font-semibold">Team Responsibilities</h2>
         </div>
@@ -358,26 +358,26 @@ watch(
                 :key="responsibility.id"
             >
                 <div
-                    class="w-8 h-8 min-w-[32px] bg-blue-100 rounded-full flex items-center justify-center mt-1 flex-shrink-0"
+                    class="w-8 h-8 min-w-[32px] bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center mt-1 flex-shrink-0"
                 >
-                    <Check class="w-4 h-4 text-blue-600" />
+                    <Check class="w-4 h-4 text-brand-dark" />
                 </div>
                 <span class="text-brand-dark text-sm font-medium">{{ responsibility }}</span>
             </div>
         </div>
     </div>
 
-    <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 mb-6">
         <div class="flex items-center justify-between mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <Users class="w-6 h-6 text-blue-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Users class="w-6 h-6 text-brand-dark" />
                 </div>
                 <h2 class="text-brand-dark text-lg font-semibold">Team Members</h2>
             </div>
             <button
                 @click="openAddMemberModal"
-                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2"
+                class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2"
             >
                 <UserPlus class="w-4 h-4 text-white" />
                 <span class="text-brand-white text-sm font-semibold">Add Member</span>
@@ -394,7 +394,7 @@ watch(
                     @click="openRemoveMemberModal(member)"
                     :disabled="removingMember"
                     title="Remove member"
-                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-50 border border-red-200 hover:bg-red-100 transition-all duration-300 flex items-center justify-center disabled:opacity-60"
+                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-[var(--color-surface-overlay)] border border-red-200 hover:bg-[var(--color-surface-overlay)] transition-all duration-300 flex items-center justify-center disabled:opacity-60"
                 >
                     <Trash2 class="w-4 h-4 text-red-600" />
                 </button>
@@ -460,7 +460,7 @@ watch(
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
                 <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center">
                     <Activity class="w-6 h-6 text-gray-600" />
@@ -474,10 +474,10 @@ watch(
             />
         </div>
 
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <Folder class="w-6 h-6 text-blue-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Folder class="w-6 h-6 text-brand-dark" />
                 </div>
                 <h2 class="text-brand-dark text-lg font-semibold">Team Resources</h2>
             </div>
@@ -485,8 +485,8 @@ watch(
                 <div
                     class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
                 >
-                    <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                        <FileText class="w-5 h-5 text-green-600" />
+                    <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-lg flex items-center justify-center">
+                        <FileText class="w-5 h-5 text-brand-dark" />
                     </div>
                     <div class="flex-1">
                         <p class="text-brand-dark text-sm font-medium">Team Documentation</p>
@@ -497,8 +497,8 @@ watch(
                 <div
                     class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
                 >
-                    <div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                        <Calendar class="w-5 h-5 text-purple-600" />
+                    <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-lg flex items-center justify-center">
+                        <Calendar class="w-5 h-5 text-brand-dark" />
                     </div>
                     <div class="flex-1">
                         <p class="text-brand-dark text-sm font-medium">Team Calendar</p>
@@ -509,8 +509,8 @@ watch(
                 <div
                     class="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors cursor-pointer"
                 >
-                    <div class="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                        <MessageSquare class="w-5 h-5 text-orange-600" />
+                    <div class="w-10 h-10 bg-[var(--color-surface-overlay)] rounded-lg flex items-center justify-center">
+                        <MessageSquare class="w-5 h-5 text-brand-dark" />
                     </div>
                     <div class="flex-1">
                         <p class="text-brand-dark text-sm font-medium">Team Chat</p>
@@ -522,9 +522,9 @@ watch(
         </div>
     </div>
 
-    <div class="bg-white border border-danger-100 rounded-2xl p-6">
+    <div class="bg-[var(--color-surface)] border border-danger-100 rounded-2xl p-4 sm:p-5">
         <div class="flex items-center gap-3 mb-6">
-            <div class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center">
+            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
                 <AlertTriangle class="w-6 h-6 text-red-600" />
             </div>
             <h2 class="text-brand-dark text-lg font-semibold">Danger Zone</h2>
@@ -577,8 +577,8 @@ watch(
             <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                            <UserPlus class="w-6 h-6 text-blue-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <UserPlus class="w-6 h-6 text-brand-dark" />
                         </div>
                         <h3 class="text-brand-dark text-lg font-semibold">Add Team Member</h3>
                     </div>

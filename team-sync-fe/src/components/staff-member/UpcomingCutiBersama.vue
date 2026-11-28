@@ -29,18 +29,18 @@ onMounted(() => {
 </script>
 
 <template>
-    <div v-if="cutiBersama.length > 0" class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+    <div v-if="cutiBersama.length > 0" class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
         <div class="flex items-center gap-2 mb-3">
-            <Calendar class="w-5 h-5 text-blue-600" />
-            <h3 class="font-semibold text-blue-900">Upcoming Cuti Bersama</h3>
+            <Calendar class="w-5 h-5 text-brand-dark" />
+            <h3 class="font-semibold text-brand-dark">Upcoming Cuti Bersama</h3>
         </div>
-        <p class="text-xs text-blue-700 mb-3">Company-wide collective leave days. No leave request needed.</p>
+        <p class="text-xs text-brand-dark mb-3">Company-wide collective leave days. No leave request needed.</p>
         <ul class="space-y-2">
             <li v-for="holiday in cutiBersama" :key="holiday.id" class="flex items-start gap-2 text-sm">
-                <span class="inline-block w-2 h-2 mt-1.5 rounded-full bg-blue-500"></span>
+                <span class="inline-block w-2 h-2 mt-1.5 rounded-full bg-brand-dark"></span>
                 <div>
-                    <span class="font-medium text-blue-900">{{ formatDateShort(holiday.date) }}</span>
-                    <span class="text-blue-700">- {{ holiday.name }}</span>
+                    <span class="font-medium text-brand-dark">{{ formatDateShort(holiday.date) }}</span>
+                    <span class="text-brand-dark">- {{ holiday.name }}</span>
                 </div>
             </li>
         </ul>

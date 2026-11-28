@@ -112,13 +112,13 @@ const hasVisibleItems = (section) => {
                     <RouterLink
                         v-if="!item.permission || can(item.permission)"
                         :to="{ name: item.routeName }"
-                        class="group bg-white border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 flex flex-col justify-between"
+                        class="group bg-[var(--color-surface)] border border-brand-border rounded-2xl p-5 hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 flex flex-col justify-between"
                     >
                         <div class="space-y-4">
                             <div
-                                class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors"
+                                class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center group-hover:bg-[var(--color-surface-raised)] transition-colors"
                             >
-                                <component :is="item.icon" class="w-6 h-6 text-brand-primary" />
+                                <component :is="item.icon" class="w-6 h-6 text-brand-dark" />
                             </div>
                             <div>
                                 <h3 class="text-brand-dark text-base font-bold">{{ item.title }}</h3>

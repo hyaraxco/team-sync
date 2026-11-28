@@ -116,100 +116,96 @@ onMounted(async () => {
 
         <!-- Statistics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <MainCard class="bg-warning-50 border-warning-100">
+            <MainCard>
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-orange-700">Pending Your Review</p>
-                        <p class="text-3xl font-bold text-orange-900 mt-2">
+                        <p class="text-sm font-medium text-brand-dark">Pending Your Review</p>
+                        <p class="text-3xl font-bold text-brand-dark mt-2">
                             {{ pendingManagerReviews }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-orange-200 rounded-full flex items-center justify-center">
-                        <AlertCircle class="w-6 h-6 text-orange-700" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-full flex items-center justify-center">
+                        <AlertCircle class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </MainCard>
 
-            <MainCard class="bg-success-50 border-success-100">
+            <MainCard>
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-green-700">Completed Reviews</p>
-                        <p class="text-3xl font-bold text-green-900 mt-2">
+                        <p class="text-sm font-medium text-brand-dark">Completed Reviews</p>
+                        <p class="text-3xl font-bold text-brand-dark mt-2">
                             {{ completedReviews }}
                         </p>
                     </div>
-                    <div class="w-12 h-12 bg-green-200 rounded-full flex items-center justify-between">
-                        <CheckCircle2 class="w-6 h-6 text-green-700" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-full flex items-center justify-between">
+                        <CheckCircle2 class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </MainCard>
 
-            <MainCard class="bg-primary-50 border-primary-100">
+            <MainCard>
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-medium text-blue-700">Average Team Rating</p>
-                        <p class="text-3xl font-bold text-blue-900 mt-2">{{ averageRating }} / 5.00</p>
+                        <p class="text-sm font-medium text-brand-dark">Average Team Rating</p>
+                        <p class="text-3xl font-bold text-brand-dark mt-2">{{ averageRating }} / 5.00</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-200 rounded-full flex items-center justify-center">
-                        <TrendingUp class="w-6 h-6 text-blue-700" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-raised)] rounded-full flex items-center justify-center">
+                        <TrendingUp class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
             </MainCard>
         </div>
 
-        <!-- Filters -->
-        <MainCard>
-            <div class="space-y-4">
-                <div class="flex flex-wrap gap-4">
-                    <div class="flex-1 min-w-[250px]">
-                        <label class="block text-sm font-medium text-brand-dark mb-2">Search Employee</label>
-                        <input
-                            v-model="searchQuery"
-                            type="text"
-                            placeholder="Search by name or email..."
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
-                        />
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-sm font-medium text-brand-dark mb-2">Review Cycle</label>
-                        <select
-                            v-model="selectedCycle"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
-                        >
-                            <option value="all">All Cycles</option>
-                            <option v-for="cycle in cycles" :key="cycle.id" :value="cycle.id">
-                                {{ cycle.name }}
-                            </option>
-                        </select>
-                    </div>
-                    <div class="flex-1 min-w-[200px]">
-                        <label class="block text-sm font-medium text-brand-dark mb-2">Status</label>
-                        <select
-                            v-model="selectedStatus"
-                            class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
-                        >
-                            <option value="all">All Statuses</option>
-                            <option value="pending_self">Pending Self-Assessment</option>
-                            <option value="pending_manager">Pending Manager Review</option>
-                            <option value="pending_calibration">Pending Calibration</option>
-                            <option value="completed">Completed</option>
-                        </select>
-                    </div>
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6 space-y-6">
+            <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-brand-border">
+                <div class="flex-1 min-w-[250px]">
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Search Employee</label>
+                    <input
+                        v-model="searchQuery"
+                        type="text"
+                        placeholder="Search by name or email..."
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
+                    />
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Review Cycle</label>
+                    <select
+                        v-model="selectedCycle"
+                        aria-label="Filter by review cycle"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
+                    >
+                        <option value="all">All Cycles</option>
+                        <option v-for="cycle in cycles" :key="cycle.id" :value="cycle.id">
+                            {{ cycle.name }}
+                        </option>
+                    </select>
+                </div>
+                <div class="flex-1 min-w-[200px]">
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Status</label>
+                    <select
+                        v-model="selectedStatus"
+                        aria-label="Filter by status"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
+                    >
+                        <option value="all">All Statuses</option>
+                        <option value="pending_self">Pending Self-Assessment</option>
+                        <option value="pending_manager">Pending Manager Review</option>
+                        <option value="pending_calibration">Pending Calibration</option>
+                        <option value="completed">Completed</option>
+                    </select>
                 </div>
             </div>
-        </MainCard>
 
         <!-- Loading State -->
-        <div v-if="reviewsLoading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
+            <div v-if="reviewsLoading" class="flex justify-center items-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+            </div>
 
-        <!-- Reviews Table -->
-        <MainCard v-else-if="filteredReviews.length > 0">
-            <div class="overflow-x-auto">
+            <div v-else-if="filteredReviews.length > 0" class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="border-b border-gray-200">
+                        <tr class="border-b border-brand-border">
                             <th class="text-left py-3 px-4 text-sm font-semibold text-brand-dark">Employee</th>
                             <th class="text-left py-3 px-4 text-sm font-semibold text-brand-dark">Review Cycle</th>
                             <th class="text-left py-3 px-4 text-sm font-semibold text-brand-dark">Status</th>
@@ -222,7 +218,7 @@ onMounted(async () => {
                         <tr
                             v-for="review in filteredReviews"
                             :key="review.id"
-                            class="border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+                            class="border-b border-gray-100 hover:bg-[var(--color-surface-raised)] transition-colors cursor-pointer"
                             @click="viewReview(review.id)"
                         >
                             <td class="py-4 px-4">
@@ -269,15 +265,15 @@ onMounted(async () => {
                                     <span class="text-lg font-bold text-brand-dark">{{ review.final_rating }}</span>
                                     <span class="text-xs text-brand-light">/ 5.00</span>
                                 </div>
-                                <span v-else class="text-sm text-gray-400">-</span>
+                                <span v-else class="text-sm text-brand-light">-</span>
                             </td>
                             <td class="py-4 px-4 text-right">
                                 <button
                                     class="px-4 py-2 text-sm font-medium rounded-lg transition-colors"
                                     :class="
                                         review.status === 'pending_manager'
-                                            ? 'bg-brand-primary text-white hover:bg-brand-primary-dark'
-                                            : 'bg-gray-100 text-brand-dark hover:bg-gray-200'
+                                            ? 'bg-primary-700 text-white hover:bg-primary-800'
+                                            : 'border border-brand-border text-brand-dark hover:bg-[var(--color-surface-overlay)]'
                                     "
                                     @click.stop="viewReview(review.id)"
                                 >
@@ -288,14 +284,14 @@ onMounted(async () => {
                     </tbody>
                 </table>
             </div>
-        </MainCard>
-
-        <!-- Empty State -->
-        <EmptyState
-            v-else
-            icon="Users"
-            title="Belum ada review tim"
-            description="You don't have any team members to review yet. Reviews will appear here when HR creates review cycles."
-        />
+            <div v-else class="py-12">
+                <EmptyState
+                    icon="Users"
+                    title="Belum ada review tim"
+                    subtitle="You don't have any team members to review yet. Reviews will appear here when HR creates review cycles."
+                    size="lg"
+                />
+            </div>
+        </div>
     </div>
 </template>

@@ -6,10 +6,10 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
     <!-- Right Sidebar -->
     <div class="w-80 flex-shrink-0">
         <!-- Tips Section -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6 top-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 top-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-yellow-50 rounded-xl flex items-center justify-center">
-                    <Lightbulb class="w-6 h-6 text-yellow-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Lightbulb class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Project Creation Tips</h3>
@@ -20,9 +20,9 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
             <div class="space-y-4">
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Define Clear Goals</p>
@@ -34,9 +34,9 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Choose Right Leader</p>
@@ -48,9 +48,9 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Set Realistic Timeline</p>
@@ -62,9 +62,9 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
 
                 <div class="flex items-start gap-3">
                     <div
-                        class="w-5 h-5 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
+                        class="w-5 h-5 bg-[var(--color-surface-overlay)] rounded-full flex items-center justify-center flex-shrink-0 mt-0.5"
                     >
-                        <Check class="w-3 h-3 text-green-600" />
+                        <Check class="w-3 h-3 text-brand-dark" />
                     </div>
                     <div>
                         <p class="text-brand-dark text-base font-semibold">Assign Right Teams</p>
@@ -77,10 +77,10 @@ import { Lightbulb, Check, Zap, Users, Copy } from "lucide-vue-next";
         </div>
 
         <!-- Quick Actions Section -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6 mt-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 mt-6">
             <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                    <Zap class="w-6 h-6 text-blue-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                    <Zap class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div>
                     <h3 class="text-brand-dark text-xl font-bold">Quick Actions</h3>

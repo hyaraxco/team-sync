@@ -38,7 +38,7 @@ const loading = computed(() => teamStore.loadingStatistics);
                 <div class="flex items-center justify-between mb-4">
                     <div>
                         <p class="text-brand-white-90 text-sm font-medium">Total Teams</p>
-                        <p class="text-brand-white text-5xl font-extrabold leading-none my-4">
+                        <p class="text-brand-white text-5xl font-extrabold leading-none my-4 tabular-nums">
                             <template v-if="loading">...</template>
                             <AnimatedValue v-else :value="total" />
                         </p>
@@ -65,7 +65,7 @@ const loading = computed(() => teamStore.loadingStatistics);
 
         <!-- Active Teams Card -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+            class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -78,15 +78,15 @@ const loading = computed(() => teamStore.loadingStatistics);
                         {{ activeChange >= 0 ? "+" : "" }}{{ activeChange }} this week
                     </p>
                 </div>
-                <div class="w-14 h-14 bg-green-50 rounded-2xl flex items-center justify-center">
-                    <CheckCircle class="w-6 h-6 text-green-600" />
+                <div class="w-14 h-14 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                    <CheckCircle class="w-6 h-6 text-brand-dark" />
                 </div>
             </div>
         </div>
 
         <!-- Team Members Card -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+            class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -99,15 +99,15 @@ const loading = computed(() => teamStore.loadingStatistics);
                         {{ membersChange >= 0 ? "+" : "" }}{{ membersChange }} this month
                     </p>
                 </div>
-                <div class="w-14 h-14 bg-blue-50 rounded-2xl flex items-center justify-center">
-                    <UserPlus class="w-6 h-6 text-blue-600" />
+                <div class="w-14 h-14 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                    <UserPlus class="w-6 h-6 text-brand-dark" />
                 </div>
             </div>
         </div>
 
         <!-- Average Team Size Card -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+            class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -118,15 +118,15 @@ const loading = computed(() => teamStore.loadingStatistics);
                     </p>
                     <p class="text-success text-sm font-medium">Optimal size</p>
                 </div>
-                <div class="w-14 h-14 bg-orange-50 rounded-2xl flex items-center justify-center">
-                    <Target class="w-6 h-6 text-orange-600" />
+                <div class="w-14 h-14 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                    <Target class="w-6 h-6 text-brand-dark" />
                 </div>
             </div>
         </div>
 
         <!-- Recent Teams Card -->
         <div
-            class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+            class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-4 sm:p-5"
         >
             <div class="flex items-center justify-between">
                 <div>
@@ -137,8 +137,8 @@ const loading = computed(() => teamStore.loadingStatistics);
                     </p>
                     <p class="text-success text-sm font-medium">This month</p>
                 </div>
-                <div class="w-14 h-14 bg-purple-50 rounded-2xl flex items-center justify-center">
-                    <PlusCircle class="w-6 h-6 text-purple-600" />
+                <div class="w-14 h-14 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                    <PlusCircle class="w-6 h-6 text-brand-dark" />
                 </div>
             </div>
         </div>

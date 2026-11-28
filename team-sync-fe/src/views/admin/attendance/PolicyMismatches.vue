@@ -81,7 +81,7 @@
                                 <td class="px-4 py-3">
                                     <div class="flex items-center gap-3">
                                         <div
-                                            class="w-8 h-8 rounded-full bg-red-50 text-red-600 flex items-center justify-center text-xs font-bold"
+                                            class="w-8 h-8 rounded-full bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border flex items-center justify-center text-xs font-bold"
                                         >
                                             {{ getEmployeeName(item).charAt(0) }}
                                         </div>
@@ -93,7 +93,7 @@
                                 </td>
                                 <td class="px-4 py-3">
                                     <span
-                                        class="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200"
+                                        class="px-2 py-1 text-xs rounded-full bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border"
                                     >
                                         {{ formatWorkMode(item.planned_work_mode || item.scheduled_location) }}
                                     </span>
@@ -114,7 +114,7 @@
                                     </button>
                                     <button
                                         @click="resolve(item.id)"
-                                        class="text-xs px-3 py-1.5 rounded-lg bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 transition-colors cursor-pointer"
+                                        class="text-xs px-3 py-1.5 rounded-lg bg-primary-700 text-white hover:bg-primary-800 transition-colors cursor-pointer font-medium"
                                     >
                                         Resolve
                                     </button>

@@ -131,7 +131,7 @@ onMounted(() => {
             </div>
             <button
                 @click="openCreate"
-                class="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
+                class="flex items-center gap-2 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-semibold text-sm"
             >
                 <Plus class="w-4 h-4" />
                 Add Rule
@@ -144,14 +144,14 @@ onMounted(() => {
             </div>
 
             <div v-else-if="!sortedRules.length" class="text-center py-12">
-                <Settings class="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                <Settings class="w-12 h-12 text-brand-light opacity-50 mx-auto mb-3" />
                 <h3 class="text-lg font-medium text-brand-dark">No outcome rules configured</h3>
                 <p class="text-sm text-brand-light mt-1 max-w-sm mx-auto">
                     Add rules to map review ratings to outcomes (bonus, salary increase, promotion).
                 </p>
                 <button
                     @click="openCreate"
-                    class="mt-4 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors text-sm"
+                    class="mt-4 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors text-sm font-semibold"
                 >
                     Create first rule
                 </button>
@@ -160,7 +160,7 @@ onMounted(() => {
             <div v-else class="overflow-x-auto">
                 <table class="w-full">
                     <thead>
-                        <tr class="border-b border-gray-200">
+                        <tr class="border-b border-brand-border">
                             <th
                                 class="text-left py-3 px-4 text-xs font-semibold text-brand-light uppercase tracking-wider"
                             >
@@ -207,7 +207,7 @@ onMounted(() => {
                         <tr
                             v-for="rule in sortedRules"
                             :key="rule.id"
-                            class="border-b border-gray-100 hover:bg-gray-50"
+                            class="border-b border-brand-border hover:bg-[var(--color-surface-overlay)] transition-colors"
                         >
                             <td class="py-3 px-4">
                                 <div class="flex items-center gap-2">
@@ -229,11 +229,11 @@ onMounted(() => {
                             <td class="py-3 px-4 text-center">
                                 <span
                                     v-if="rule.promotion_eligible"
-                                    class="inline-block px-2 py-0.5 rounded text-xs bg-purple-100 text-purple-700 border border-purple-200"
+                                    class="inline-block px-2 py-0.5 rounded text-xs bg-[var(--color-surface-raised)] text-brand-dark border border-brand-border"
                                 >
                                     Yes
                                 </span>
-                                <span v-else class="text-xs text-gray-400">—</span>
+                                <span v-else class="text-xs text-brand-light">—</span>
                             </td>
                             <td class="py-3 px-4 text-center">
                                 <span
@@ -243,7 +243,7 @@ onMounted(() => {
                                     <AlertTriangle class="w-3 h-3 inline -mt-0.5" />
                                     Required
                                 </span>
-                                <span v-else class="text-xs text-gray-400">—</span>
+                                <span v-else class="text-xs text-brand-light">—</span>
                             </td>
                             <td class="py-3 px-4 text-center">
                                 <span
@@ -256,7 +256,7 @@ onMounted(() => {
                                     <button
                                         @click="openEdit(rule)"
                                         title="Edit rule"
-                                        class="p-1.5 text-brand-light hover:text-brand-primary hover:bg-gray-100 rounded-lg transition-colors"
+                                        class="p-1.5 text-brand-light hover:text-brand-primary hover:bg-[var(--color-surface-overlay)] rounded-lg transition-colors"
                                     >
                                         <Edit3 class="w-4 h-4" />
                                     </button>
@@ -280,7 +280,7 @@ onMounted(() => {
             v-if="showModal"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
         >
-            <div class="bg-white rounded-xl shadow-md w-full max-w-lg overflow-hidden">
+            <div class="bg-[var(--color-surface)] rounded-xl shadow-md w-full max-w-lg overflow-hidden">
                 <div class="flex items-center justify-between p-4 border-b border-gray-100">
                     <h3 class="text-lg font-bold text-brand-dark">
                         {{ editingRule ? "Edit Rule" : "Add Outcome Rule" }}

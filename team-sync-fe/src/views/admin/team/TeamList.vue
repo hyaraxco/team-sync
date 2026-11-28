@@ -66,7 +66,7 @@ onMounted(async () => {
     <Alert type="success" :title="success || ''" :message="success || ''" :show="Boolean(success)" />
 
     <!-- Team List Section -->
-    <div class="bg-white border border-brand-border rounded-2xl mb-6 p-4 sm:p-5">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl mb-6 p-4 sm:p-5">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
             <div>
                 <h3 class="text-brand-dark text-xl font-bold">All Teams</h3>
@@ -83,7 +83,7 @@ onMounted(async () => {
                 </button>
                 <RouterLink
                     :to="{ name: 'admin.team.create' }"
-                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
+                    class="btn-primary rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2 w-full sm:w-auto"
                 >
                     <Users class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-sm font-semibold">Add Team</span>

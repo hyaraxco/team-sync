@@ -143,7 +143,7 @@ onMounted(async () => {
                 <p class="text-brand-light mt-1">Manage company-wide performance review cycles</p>
             </div>
             <button
-                class="flex items-center gap-2 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
+                class="flex items-center gap-2 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-semibold text-sm"
                 @click="createCycle"
             >
                 <Plus class="w-5 h-5" />
@@ -152,13 +152,14 @@ onMounted(async () => {
         </div>
 
         <!-- Filters -->
-        <MainCard>
-            <div class="flex flex-wrap items-end gap-4">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6 space-y-6">
+            <div class="flex flex-wrap items-end gap-4 pb-4 border-b border-brand-border">
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2">Cycle Type</label>
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Cycle Type</label>
                     <select
                         v-model="selectedType"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        aria-label="Filter by cycle type"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="all">All Types</option>
                         <option v-for="type in cycleTypes" :key="type.value" :value="type.value">
@@ -167,10 +168,11 @@ onMounted(async () => {
                     </select>
                 </div>
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2">Status</label>
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Status</label>
                     <select
                         v-model="selectedStatus"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        aria-label="Filter by status"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="all">All Statuses</option>
                         <option value="draft">Draft</option>
@@ -182,25 +184,24 @@ onMounted(async () => {
                 <button
                     v-if="hasActiveFilters"
                     @click="clearFilters"
-                    class="flex items-center gap-2 px-4 py-2 rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 transition-all duration-200"
+                    class="px-4 py-2.5 rounded-xl border border-brand-border text-sm font-semibold text-brand-dark hover:bg-[var(--color-surface-overlay)] transition-colors flex items-center gap-2"
                 >
-                    <X class="w-4 h-4 text-red-500" />
-                    <span class="text-red-500 text-sm font-medium">Clear filters</span>
+                    <X class="w-4 h-4 text-brand-light" />
+                    Clear filters
                 </button>
             </div>
-        </MainCard>
 
         <!-- Loading State -->
-        <div v-if="cyclesLoading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
+            <div v-if="cyclesLoading" class="flex justify-center items-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+            </div>
 
         <!-- Cycles Grid -->
         <div v-else-if="filteredCycles.length > 0" class="grid gap-6">
             <MainCard
                 v-for="cycle in filteredCycles"
                 :key="cycle.id"
-                class="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                class="hover:ring-2 hover:ring-brand-primary/20 transition-shadow duration-200 cursor-pointer"
                 @click="viewCycle(cycle.id)"
             >
                 <div class="flex items-start justify-between">
@@ -300,7 +301,7 @@ onMounted(async () => {
                             </button>
                             <button
                                 v-if="canGenerateReviews(cycle)"
-                                class="px-4 py-2 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 transition-colors flex items-center justify-center gap-2"
+                                class="px-4 py-2 bg-[var(--color-surface-overlay)] border border-brand-border text-brand-dark rounded-lg hover:bg-[var(--color-surface)] transition-colors flex items-center justify-center gap-2 text-xs font-semibold"
                                 @click.stop="handleGenerateReviews(cycle)"
                             >
                                 <Play class="w-4 h-4" />
@@ -321,20 +322,23 @@ onMounted(async () => {
         </div>
 
         <!-- Empty State -->
-        <EmptyState
-            v-else
-            icon="Calendar"
-            title="Belum ada siklus review"
-            description="Buat siklus review pertama untuk mulai mengevaluasi performa tim."
-        >
-            <button
-                class="mt-4 flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
-                @click="createCycle"
-            >
-                <Plus class="w-5 h-5" />
-                Buat Siklus Pertama
-            </button>
-        </EmptyState>
+            <div v-else class="py-12">
+                <EmptyState
+                    icon="Calendar"
+                    title="Belum ada siklus review"
+                    subtitle="Buat siklus review pertama untuk mulai mengevaluasi performa tim."
+                    size="lg"
+                >
+                    <button
+                        class="mt-4 inline-flex items-center gap-2 px-6 py-3 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-semibold text-sm"
+                        @click="createCycle"
+                    >
+                        <Plus class="w-5 h-5" />
+                        Buat Siklus Pertama
+                    </button>
+                </EmptyState>
+            </div>
+        </div>
     </div>
 
     <!-- Confirmation Dialog -->

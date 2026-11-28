@@ -222,10 +222,10 @@ watch(
     <div class="flex flex-col 2xl:flex-row gap-5 items-stretch 2xl:items-start pr-0">
         <div class="flex-1 w-full space-y-6">
             <!-- Job Information Section -->
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                        <Briefcase class="w-6 h-6 text-green-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <Briefcase class="w-6 h-6 text-brand-dark" />
                     </div>
                     <div>
                         <h3 class="text-brand-dark text-xl font-bold">Job Information</h3>
@@ -424,10 +424,10 @@ watch(
             </div>
 
             <!-- Tax & BPJS Identity Section -->
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center">
-                        <ShieldCheck class="w-6 h-6 text-emerald-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <ShieldCheck class="w-6 h-6 text-brand-dark" />
                     </div>
                     <div>
                         <h3 class="text-brand-dark text-xl font-bold">Tax & BPJS Identity</h3>
@@ -521,10 +521,10 @@ watch(
             </div>
 
             <!-- Bank Information Section -->
-            <div class="bg-white border border-brand-border rounded-2xl p-6">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5">
                 <div class="flex items-center gap-3 mb-6">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <CreditCard class="w-6 h-6 text-blue-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <CreditCard class="w-6 h-6 text-brand-dark" />
                     </div>
                     <div>
                         <h3 class="text-brand-dark text-xl font-bold">Bank Information</h3>
@@ -660,8 +660,8 @@ watch(
             <div class="p-6 border-b border-brand-border">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center">
-                            <Users class="w-6 h-6 text-green-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <Users class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-xl font-bold">Select Team</h3>

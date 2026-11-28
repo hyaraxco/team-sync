@@ -143,7 +143,7 @@ const handleSubmit = () => {
                 <!-- Status (read-only) -->
                 <div>
                     <span class="block text-sm font-semibold text-gray-700 mb-2">Status</span>
-                    <div class="flex items-center h-[50px] px-4 py-3 border border-gray-200 rounded-lg bg-gray-50">
+                    <div class="flex items-center h-[50px] px-4 py-3 border border-gray-200 rounded-lg bg-[var(--color-surface-raised)]">
                         <span class="px-2 py-1 bg-gray-100 rounded text-sm text-gray-700 font-medium">To Do</span>
                         <span class="ml-2 text-xs text-gray-500">(set automatically)</span>
                     </div>
@@ -197,7 +197,7 @@ const handleSubmit = () => {
                 <button
                     type="button"
                     @click="closeModal"
-                    class="px-6 py-3 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+                    class="px-6 py-3 border border-gray-200 text-gray-700 rounded-lg hover:bg-[var(--color-surface-raised)] transition-colors font-medium"
                 >
                     Cancel
                 </button>

@@ -100,7 +100,7 @@ onMounted(async () => {
                         v-model="formData.staff_member_id"
                         name="staff_member_id"
                         required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     >
                         <option value="">Select an employee</option>
                         <option
@@ -119,7 +119,7 @@ onMounted(async () => {
                         v-model="formData.feedback_type"
                         name="feedback_type"
                         required
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     >
                         <option value="positive">Positive</option>
                         <option value="constructive">Constructive</option>
@@ -134,7 +134,7 @@ onMounted(async () => {
                         name="category"
                         type="text"
                         placeholder="e.g., Communication, Technical Skills"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     />
                 </div>
 
@@ -146,7 +146,7 @@ onMounted(async () => {
                         required
                         rows="6"
                         placeholder="Write your feedback here..."
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     ></textarea>
                 </div>
 
@@ -155,7 +155,7 @@ onMounted(async () => {
                     <select
                         v-model="formData.linked_goal_id"
                         name="linked_goal_id"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        class="w-full px-4 py-2 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
                     >
                         <option value="">Not linked to any goal</option>
                         <option v-for="goal in myGoals" :key="goal.id" :value="String(goal.id)">
@@ -170,18 +170,18 @@ onMounted(async () => {
                         v-model="formData.is_private"
                         name="is_private"
                         type="checkbox"
-                        class="w-4 h-4 text-brand-primary border-gray-300 rounded focus:ring-brand-primary"
+                        class="w-4 h-4 text-brand-primary border-brand-border rounded focus:ring-brand-primary"
                     />
                     <label for="is_private" class="text-sm text-brand-dark">
                         Make this feedback private (visible only to employee and their manager)
                     </label>
                 </div>
 
-                <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
+                <div class="flex items-center gap-4 pt-6 border-t border-brand-border">
                     <button
                         type="submit"
                         :disabled="!isFormValid || feedbackLoading"
-                        class="flex items-center gap-2 px-6 py-3 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="flex items-center gap-2 px-6 py-3 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm"
                     >
                         <Send class="w-5 h-5" />
                         {{ feedbackLoading ? "Sending..." : "Send Feedback" }}

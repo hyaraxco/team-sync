@@ -76,25 +76,24 @@ describe("Statistics.vue — Sprint 5 performance widgets", () => {
     });
 
 
-    it('renders "Promotion Eligible" card with purple colorScheme and TrendingUpIcon', () => {
+    it('renders "Promotion Eligible" card with TrendingUpIcon', () => {
         const wrapper = factory({ performance: { promotion_eligible: 3, pip_required: 1 } });
         const cards = wrapper.findAll("[data-title]");
         const card = cards.find((c) => c.attributes("data-title") === "Promotion Eligible");
         expect(card).toBeTruthy();
-        expect(card?.attributes("data-scheme")).toBe("purple");
         expect(card?.attributes("data-icon")).toBe("TrendingUpIcon");
         expect(card?.attributes("data-value")).toBe("3");
     });
 
-    it('renders "PIP Required" card with red colorScheme and AlertTriangleIcon', () => {
+    it('renders "PIP Required" card with AlertTriangleIcon', () => {
         const wrapper = factory({ performance: { promotion_eligible: 3, pip_required: 2 } });
         const cards = wrapper.findAll("[data-title]");
         const card = cards.find((c) => c.attributes("data-title") === "PIP Required");
         expect(card).toBeTruthy();
-        expect(card?.attributes("data-scheme")).toBe("red");
         expect(card?.attributes("data-icon")).toBe("AlertTriangleIcon");
         expect(card?.attributes("data-value")).toBe("2");
     });
+
 
     it('does NOT render "Tasks Completed" card (replaced by performance widgets)', () => {
         const wrapper = factory();

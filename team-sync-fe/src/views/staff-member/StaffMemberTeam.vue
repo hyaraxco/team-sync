@@ -128,28 +128,28 @@ onMounted(async () => {
         <main class="main-content flex-1 overflow-auto p-5">
             <div
                 v-if="loadingTeam"
-                class="bg-white border border-brand-border rounded-2xl p-8 text-center"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-8 text-center"
                 data-testid="my-team-loading"
             >
-                <Users class="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                <Users class="w-10 h-10 text-brand-light mx-auto mb-3" />
                 <p class="text-brand-dark text-lg font-semibold">Loading your team workspace...</p>
             </div>
 
             <div
                 v-else-if="isTeamUnavailable"
-                class="bg-white border border-brand-border rounded-2xl p-8 text-center"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-8 text-center"
                 data-testid="my-team-empty"
             >
-                <Users class="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                <Users class="w-12 h-12 text-brand-light mx-auto mb-4" />
                 <h2 class="text-brand-dark text-2xl font-bold mb-2">You are not assigned to a team yet</h2>
-                <p class="text-gray-600 max-w-2xl mx-auto">
+                <p class="text-brand-light max-w-2xl mx-auto">
                     {{ teamUnavailableMessage }} Please contact HR or your manager to assign your team first.
                 </p>
             </div>
 
             <template v-else>
                 <!-- Team Header -->
-                <div class="bg-white border border-brand-border rounded-2xl mb-6 p-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl mb-6 p-6">
                     <div class="flex items-center gap-6">
                         <div class="relative">
                             <div
@@ -158,7 +158,7 @@ onMounted(async () => {
                                 <div
                                     class="w-full h-full absolute bg-brand-primary rounded-full"
                                 ></div>
-                                <Users class="w-16 h-16 text-white relative z-10" />
+                                <Users class="w-16 h-16 text-brand-dark relative z-10" />
                             </div>
                         </div>
                         <div class="flex-1">
@@ -174,7 +174,7 @@ onMounted(async () => {
                                     {{ team.status }}
                                 </span>
                             </div>
-                            <div class="flex items-center gap-6 text-base text-gray-600">
+                            <div class="flex items-center gap-6 text-base text-brand-light">
                                 <div class="flex items-center gap-2">
                                     <Users class="w-4 h-4" />
                                     <span>{{ members?.length || 0 }} members</span>
@@ -195,7 +195,7 @@ onMounted(async () => {
                 <!-- Team Statistics -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -203,17 +203,17 @@ onMounted(async () => {
                                 <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
                                     <AnimatedValue :value="activeMembers" />
                                 </p>
-                                <p class="text-success text-base font-medium">
+                                <p class="text-brand-light text-base font-medium">
                                     {{ activeMembersStatus }}
                                 </p>
                             </div>
-                            <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center">
-                                <Users class="w-6 h-6 text-blue-600" />
+                            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                                <Users class="w-6 h-6 text-brand-dark" />
                             </div>
                         </div>
                     </div>
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -221,15 +221,15 @@ onMounted(async () => {
                                 <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
                                     <AnimatedValue :value="projects?.length || 0" />
                                 </p>
-                                <p class="text-success text-base font-medium">Active projects</p>
+                                <p class="text-brand-light text-base font-medium">Active projects</p>
                             </div>
-                            <div class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center">
-                                <Folder class="w-6 h-6 text-green-600" />
+                            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                                <Folder class="w-6 h-6 text-brand-dark" />
                             </div>
                         </div>
                     </div>
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -237,15 +237,15 @@ onMounted(async () => {
                                 <p class="text-brand-dark text-3xl font-extrabold leading-tight my-2">
                                     <AnimatedValue :value="team?.expected_size || 0" />
                                 </p>
-                                <p class="text-success text-base font-medium">Team capacity</p>
+                                <p class="text-brand-light text-base font-medium">Team capacity</p>
                             </div>
-                            <div class="w-12 h-12 bg-purple-50 rounded-2xl flex items-center justify-center">
-                                <TrendingUp class="w-6 h-6 text-purple-600" />
+                            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                                <TrendingUp class="w-6 h-6 text-brand-dark" />
                             </div>
                         </div>
                     </div>
                     <div
-                        class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+                        class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
                     >
                         <div class="flex items-center justify-between">
                             <div>
@@ -253,24 +253,24 @@ onMounted(async () => {
                                 <p class="text-brand-dark text-xl font-extrabold leading-tight my-2">
                                     {{ team?.leader?.name || "N/A" }}
                                 </p>
-                                <p class="text-success text-base font-medium">Leader</p>
+                                <p class="text-brand-light text-base font-medium">Leader</p>
                             </div>
-                            <div class="w-12 h-12 bg-orange-50 rounded-2xl flex items-center justify-center">
-                                <User class="w-6 h-6 text-orange-600" />
+                            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center">
+                                <User class="w-6 h-6 text-brand-dark" />
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Tab Navigation -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 mb-6">
                     <div class="flex items-center gap-2">
                         <button
                             @click="activeTab = 'members'"
                             :class="
                                 activeTab === 'members'
                                     ? 'px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-base transition-all duration-300'
-                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
+                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-[var(--color-surface)] text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
                             <Users class="w-5 h-5 inline mr-2" />
@@ -281,7 +281,7 @@ onMounted(async () => {
                             :class="
                                 activeTab === 'projects'
                                     ? 'px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-base transition-all duration-300'
-                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
+                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-[var(--color-surface)] text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
                             <Folder class="w-5 h-5 inline mr-2" />
@@ -292,7 +292,7 @@ onMounted(async () => {
                             :class="
                                 activeTab === 'description'
                                     ? 'px-6 py-3 rounded-xl bg-brand-primary text-white font-semibold text-base transition-all duration-300'
-                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-white text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
+                                    : 'px-6 py-3 rounded-xl border border-brand-border bg-[var(--color-surface)] text-brand-dark font-medium text-base hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300'
                             "
                         >
                             <FileText class="w-5 h-5 inline mr-2" />
@@ -302,11 +302,11 @@ onMounted(async () => {
                 </div>
 
                 <!-- Team Members Section -->
-                <div v-if="activeTab === 'members'" class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
+                <div v-if="activeTab === 'members'" class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 mb-6">
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                                <Users class="w-6 h-6 text-blue-600" />
+                            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                <Users class="w-6 h-6 text-brand-dark" />
                             </div>
                             <div>
                                 <h3 class="text-brand-dark text-lg font-bold">Team Members</h3>
@@ -317,7 +317,7 @@ onMounted(async () => {
 
                     <!-- Members Grid -->
                     <div v-if="loadingMembers" class="text-center py-12">
-                        <p class="text-gray-500 text-lg font-medium">Loading members...</p>
+                        <p class="text-brand-light text-lg font-medium">Loading members...</p>
                     </div>
                     <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                         <div
@@ -353,13 +353,13 @@ onMounted(async () => {
                                 </p>
                             </div>
                             <div class="space-y-1 mb-3">
-                                <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <div class="flex items-center gap-2 text-sm text-brand-light">
                                     <Calendar class="w-4 h-4" />
                                     <span>
                                         {{ member.joined_at ? `Joined ${formatDateUtil(member.joined_at)}` : "N/A" }}
                                     </span>
                                 </div>
-                                <div class="flex items-center gap-2 text-sm text-gray-500">
+                                <div class="flex items-center gap-2 text-sm text-brand-light">
                                     <Clock class="w-4 h-4" />
                                     <span>{{ member.joined_at ? formatDateUtil(member.joined_at) : "N/A" }}</span>
                                 </div>
@@ -369,18 +369,18 @@ onMounted(async () => {
 
                     <!-- Empty State -->
                     <div v-if="!loadingMembers && (!members || members.length === 0)" class="text-center py-12">
-                        <Users class="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                        <p class="text-gray-500 text-lg font-medium">Belum ada anggota tim</p>
-                        <p class="text-gray-400 text-sm">Team members will appear here</p>
+                        <Users class="w-12 h-12 text-brand-light mx-auto mb-4" />
+                        <p class="text-brand-light text-lg font-medium">Belum ada anggota tim</p>
+                        <p class="text-brand-light text-sm">Team members will appear here</p>
                     </div>
                 </div>
 
                 <!-- Projects Section -->
-                <div v-if="activeTab === 'projects'" class="bg-white border border-brand-border rounded-2xl p-6 mb-6">
+                <div v-if="activeTab === 'projects'" class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 mb-6">
                     <div class="flex items-center justify-between mb-6">
                         <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center">
-                                <Folder class="w-6 h-6 text-purple-600" />
+                            <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                                <Folder class="w-6 h-6 text-brand-dark" />
                             </div>
                             <div>
                                 <h3 class="text-brand-dark text-lg font-bold">Team Projects</h3>
@@ -413,11 +413,11 @@ onMounted(async () => {
                 <!-- Description Section -->
                 <div
                     v-if="activeTab === 'description'"
-                    class="bg-white border border-brand-border rounded-2xl p-6 mb-6"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6 mb-6"
                 >
                     <div class="flex items-center gap-3 mb-6">
-                        <div class="w-12 h-12 bg-orange-50 rounded-xl flex items-center justify-center">
-                            <FileText class="w-6 h-6 text-orange-600" />
+                        <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                            <FileText class="w-6 h-6 text-brand-dark" />
                         </div>
                         <div>
                             <h3 class="text-brand-dark text-lg font-bold">Team Description</h3>
@@ -441,7 +441,7 @@ onMounted(async () => {
                                     :key="index"
                                     class="flex items-start gap-2 text-gray-600"
                                 >
-                                    <CheckCircle class="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                                    <CheckCircle class="w-5 h-5 text-brand-dark mt-0.5 flex-shrink-0" />
                                     <span>{{ responsibility }}</span>
                                 </li>
                             </ul>

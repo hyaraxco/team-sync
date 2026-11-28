@@ -112,10 +112,10 @@ const isPrimaryAction = (action) => action.id === primaryActionId.value;
 
 const getActionClasses = (action) => {
     if (isPrimaryAction(action)) {
-        return "btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center gap-2";
+        return "btn-secondary w-full text-left rounded-xl hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center gap-2";
     }
 
-    return "btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white transition-all duration-300 px-4 py-3 flex items-center gap-2";
+    return "btn-secondary w-full text-left border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-[var(--color-surface)] transition-all duration-300 px-4 py-3 flex items-center gap-2";
 };
 
 const getIconClasses = (action) => {
@@ -144,7 +144,7 @@ onMounted(async () => {
 <template>
     <!-- Quick Actions Card (spans 2 rows on the right) -->
     <div
-        class="lg:row-span-2 bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
+        class="lg:row-span-2 bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5"
     >
         <h3 class="text-brand-dark text-lg font-bold mb-4">Quick Actions</h3>
         <div class="space-y-3">

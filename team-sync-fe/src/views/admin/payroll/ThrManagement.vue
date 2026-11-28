@@ -56,8 +56,8 @@ const religionEvents = [
 ];
 
 const statusColors = {
-    draft: "bg-gray-100 text-gray-700",
-    processing: "bg-blue-100 text-blue-700",
+    draft: "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border",
+    processing: "bg-[var(--color-surface-overlay)] text-brand-dark border border-brand-border",
     pending: "bg-yellow-100 text-yellow-700",
     approved: "bg-green-100 text-green-700",
     paid: "bg-emerald-100 text-emerald-800",
@@ -182,21 +182,21 @@ function handlePageChange(page) {
 </script>
 
 <template>
-    <div class="p-6 space-y-6">
+    <div class="space-y-6">
         <!-- Header -->
         <div class="flex items-center justify-between">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">THR Management</h1>
-                <p class="text-sm text-gray-500 mt-1">Tunjangan Hari Raya — Religious Holiday Bonus</p>
+                <h1 class="text-2xl font-bold text-brand-dark">THR Management</h1>
+                <p class="text-sm text-brand-light mt-1">Tunjangan Hari Raya — Religious Holiday Bonus</p>
             </div>
             <div class="flex items-center gap-3">
-                <select v-model="selectedYear" @change="handleYearChange" aria-label="Select year" class="rounded-lg border-gray-300 text-sm">
+                <select v-model="selectedYear" @change="handleYearChange" aria-label="Select year" class="rounded-lg border-brand-border bg-[var(--color-surface)] text-brand-dark text-sm">
                     <option v-for="y in [2024, 2025, 2026, 2027]" :key="y" :value="y">{{ y }}</option>
                 </select>
                 <button
                     v-if="can('thr-generate')"
                     @click="showGenerateModal = true"
-                    class="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                    class="flex items-center gap-2 px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition font-semibold text-sm"
                 >
                     <Plus :size="16" />
                     Generate THR
@@ -206,76 +206,76 @@ function handlePageChange(page) {
 
         <!-- Year Summary Cards -->
         <div v-if="yearSummary" class="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div class="bg-white rounded-xl border p-4">
+            <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border p-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-indigo-50 rounded-lg">
-                        <Gift :size="20" class="text-indigo-600" />
+                    <div class="p-2 bg-[var(--color-surface-overlay)] rounded-lg">
+                        <Gift :size="20" class="text-brand-dark" />
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">Total Events</p>
-                        <p class="text-lg font-bold tabular-nums">{{ yearSummary.total_events }}</p>
+                        <p class="text-xs text-brand-light">Total Events</p>
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">{{ yearSummary.total_events }}</p>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl border p-4">
+            <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border p-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-green-50 rounded-lg">
-                        <Users :size="20" class="text-green-600" />
+                    <div class="p-2 bg-[var(--color-surface-overlay)] rounded-lg">
+                        <Users :size="20" class="text-brand-dark" />
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">Total Employees</p>
-                        <p class="text-lg font-bold tabular-nums">{{ yearSummary.total_employees }}</p>
+                        <p class="text-xs text-brand-light">Total Employees</p>
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">{{ yearSummary.total_employees }}</p>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl border p-4">
+            <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border p-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-blue-50 rounded-lg">
-                        <DollarSign :size="20" class="text-blue-600" />
+                    <div class="p-2 bg-[var(--color-surface-overlay)] rounded-lg">
+                        <DollarSign :size="20" class="text-brand-dark" />
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">Total THR (Gross)</p>
-                        <p class="text-lg font-bold tabular-nums">{{ formatCurrency(yearSummary.total_thr_amount) }}</p>
+                        <p class="text-xs text-brand-light">Total THR (Gross)</p>
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">{{ formatCurrency(yearSummary.total_thr_amount) }}</p>
                     </div>
                 </div>
             </div>
-            <div class="bg-white rounded-xl border p-4">
+            <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border p-4">
                 <div class="flex items-center gap-3">
-                    <div class="p-2 bg-emerald-50 rounded-lg">
-                        <DollarSign :size="20" class="text-emerald-600" />
+                    <div class="p-2 bg-[var(--color-surface-overlay)] rounded-lg">
+                        <DollarSign :size="20" class="text-brand-dark" />
                     </div>
                     <div>
-                        <p class="text-xs text-gray-500">Total Net</p>
-                        <p class="text-lg font-bold tabular-nums">{{ formatCurrency(yearSummary.total_net_amount) }}</p>
+                        <p class="text-xs text-brand-light">Total Net</p>
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">{{ formatCurrency(yearSummary.total_net_amount) }}</p>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- THR Payrolls Table -->
-        <div class="bg-white rounded-xl border overflow-hidden">
+        <div class="bg-[var(--color-surface)] rounded-2xl border border-brand-border overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-sm">
-                    <thead class="bg-gray-50 border-b">
+                    <thead class="bg-[var(--color-surface-overlay)] border-b border-brand-border">
                         <tr>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Event</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Year</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Holiday Date</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Payment Deadline</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Employees</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Total Net</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Status</th>
-                            <th class="px-4 py-3 text-left font-medium text-gray-600">Actions</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Event</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Year</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Holiday Date</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Payment Deadline</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Employees</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Total Net</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Status</th>
+                            <th class="px-4 py-3 text-left font-medium text-brand-light">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y">
-                        <tr v-for="thr in thrPayrolls" :key="thr.id" class="hover:bg-gray-50">
-                            <td class="px-4 py-3 font-medium">{{ thr.event_label }}</td>
-                            <td class="px-4 py-3">{{ thr.year }}</td>
-                            <td class="px-4 py-3">{{ formatDateShort(thr.religion_holiday_date) }}</td>
-                            <td class="px-4 py-3">{{ formatDateShort(thr.payment_deadline) }}</td>
-                            <td class="px-4 py-3">{{ thr.total_employees }}</td>
-                            <td class="px-4 py-3 font-medium tabular-nums">{{ formatCurrency(thr.total_net_amount) }}</td>
+                    <tbody class="divide-y divide-brand-border">
+                        <tr v-for="thr in thrPayrolls" :key="thr.id" class="hover:bg-[var(--color-surface-overlay)] transition-colors">
+                            <td class="px-4 py-3 font-medium text-brand-dark">{{ thr.event_label }}</td>
+                            <td class="px-4 py-3 text-brand-light">{{ thr.year }}</td>
+                            <td class="px-4 py-3 text-brand-light">{{ formatDateShort(thr.religion_holiday_date) }}</td>
+                            <td class="px-4 py-3 text-brand-light">{{ formatDateShort(thr.payment_deadline) }}</td>
+                            <td class="px-4 py-3 text-brand-light">{{ thr.total_employees }}</td>
+                            <td class="px-4 py-3 font-medium text-brand-dark tabular-nums">{{ formatCurrency(thr.total_net_amount) }}</td>
                             <td class="px-4 py-3">
                                 <span :class="['px-2 py-1 rounded-full text-xs font-medium', statusColors[thr.status]]">
                                     {{ thr.status }}
@@ -285,7 +285,7 @@ function handlePageChange(page) {
                                 <div class="flex items-center gap-2">
                                     <router-link
                                         :to="{ name: 'admin.payroll.thr.detail', params: { id: thr.id } }"
-                                        class="text-indigo-600 hover:text-indigo-800 text-xs font-medium"
+                                        class="text-brand-primary hover:text-indigo-800 text-xs font-medium"
                                     >
                                         View
                                     </router-link>
@@ -331,8 +331,8 @@ function handlePageChange(page) {
         <ModalWrapper :show="showGenerateModal" title="Generate THR" @close="showGenerateModal = false">
             <div class="space-y-4 p-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Religion Event</label>
-                    <select v-model="generateForm.religion_event" class="w-full rounded-lg border-gray-300">
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Religion Event</label>
+                    <select v-model="generateForm.religion_event" class="w-full rounded-lg border-brand-border bg-[var(--color-surface)] text-brand-dark">
                         <option value="">Select event...</option>
                         <option v-for="event in religionEvents" :key="event.value" :value="event.value">
                             {{ event.label }}
@@ -340,37 +340,37 @@ function handlePageChange(page) {
                     </select>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Year</label>
-                    <input v-model.number="generateForm.year" type="number" class="w-full rounded-lg border-gray-300" />
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Year</label>
+                    <input v-model.number="generateForm.year" type="number" class="w-full rounded-lg border-brand-border bg-[var(--color-surface)] text-brand-dark" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Holiday Date</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Holiday Date</label>
                     <input
                         v-model="generateForm.religion_holiday_date"
                         type="date"
-                        class="w-full rounded-lg border-gray-300"
+                        class="w-full rounded-lg border-brand-border bg-[var(--color-surface)] text-brand-dark"
                     />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Notes (optional)</label>
+                    <label class="block text-sm font-medium text-brand-dark mb-1">Notes (optional)</label>
                     <textarea
                         v-model="generateForm.notes"
                         rows="2"
-                        class="w-full rounded-lg border-gray-300"
+                        class="w-full rounded-lg border-brand-border bg-[var(--color-surface)] text-brand-dark"
                     ></textarea>
                 </div>
                 <div class="flex justify-end gap-3 pt-2">
                     <button
                         @click="handleSimulate"
                         :disabled="loading"
-                        class="px-4 py-2 border border-indigo-600 text-indigo-600 rounded-lg hover:bg-indigo-50 transition"
+                        class="px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:bg-[var(--color-surface-overlay)] transition"
                     >
                         Preview / Simulate
                     </button>
                     <button
                         @click="handleGenerate"
                         :disabled="loading"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"
+                        class="px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition font-semibold"
                     >
                         Generate THR
                     </button>
@@ -391,9 +391,9 @@ function handlePageChange(page) {
                         <p class="text-xs text-gray-500">Ineligible</p>
                         <p class="text-xl font-bold text-red-700 tabular-nums">{{ simulation.ineligible_count }}</p>
                     </div>
-                    <div class="text-center p-3 bg-blue-50 rounded-lg">
+                    <div class="text-center p-3 bg-[var(--color-surface-raised)] rounded-lg">
                         <p class="text-xs text-gray-500">Total Gross</p>
-                        <p class="text-lg font-bold text-blue-700 tabular-nums">{{ formatCurrency(simulation.total_gross_amount) }}</p>
+                        <p class="text-lg font-bold text-brand-dark tabular-nums">{{ formatCurrency(simulation.total_gross_amount) }}</p>
                     </div>
                 </div>
 
@@ -410,7 +410,7 @@ function handlePageChange(page) {
                     <button
                         @click="handleGenerate"
                         :disabled="loading"
-                        class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700"
+                        class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:brightness-110"
                     >
                         Confirm & Generate
                     </button>

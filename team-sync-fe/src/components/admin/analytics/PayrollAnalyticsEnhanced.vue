@@ -3,7 +3,6 @@
         <!-- Key Metrics Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <MetricCard
-                class="lg rounded-2xl border border-gray-800 relative overflow-hidden main-card p-5"
                 title="Total Payroll Cost"
                 :value="payroll?.total_payroll_cost || 0"
                 format="currency"
@@ -43,7 +42,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 w-full">
             <!-- Total Cost Trend -->
             <div
-                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-[var(--color-surface)] rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
                 <h3 class="text-lg font-bold text-brand-dark mb-6">Payroll Cost Trends</h3>
                 <VueApexCharts
@@ -63,7 +62,7 @@
 
             <!-- Salary Distribution -->
             <div
-                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-[var(--color-surface)] rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
                 <h3 class="text-lg font-bold text-brand-dark mb-6">Salary Distribution</h3>
                 <VueApexCharts
@@ -92,7 +91,7 @@
 
             <!-- Cost by Department -->
             <div
-                class="bg-white rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
+                class="bg-[var(--color-surface)] rounded-2xl border border-brand-border hover:shadow-md transition-shadow duration-300 p-6"
             >
                 <h3 class="text-lg font-bold text-brand-dark mb-6">Cost by Department</h3>
                 <VueApexCharts

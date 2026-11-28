@@ -91,13 +91,14 @@ onMounted(async () => {
         </div>
 
         <!-- Filters -->
-        <MainCard>
-            <div class="flex flex-wrap gap-4">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6 space-y-6">
+            <div class="flex flex-wrap items-center gap-4 pb-4 border-b border-brand-border">
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2">Review Cycle</label>
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Review Cycle</label>
                     <select
                         v-model="selectedCycle"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        aria-label="Filter by review cycle"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="all">All Cycles</option>
                         <option v-for="cycle in cycles" :key="cycle.id" :value="cycle.id">
@@ -106,10 +107,11 @@ onMounted(async () => {
                     </select>
                 </div>
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-sm font-medium text-brand-dark mb-2">Status</label>
+                    <label class="block text-xs font-semibold text-brand-light uppercase tracking-wide mb-1.5">Status</label>
                     <select
                         v-model="selectedStatus"
-                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-brand-primary focus:border-transparent"
+                        aria-label="Filter by status"
+                        class="w-full px-4 py-2.5 border border-brand-border bg-[var(--color-surface)] text-brand-dark rounded-xl text-sm focus:ring-2 focus:ring-brand-primary"
                     >
                         <option value="all">All Statuses</option>
                         <option value="pending_self">Pending Self-Assessment</option>
@@ -119,19 +121,18 @@ onMounted(async () => {
                     </select>
                 </div>
             </div>
-        </MainCard>
 
         <!-- Loading State -->
-        <div v-if="reviewsLoading" class="flex justify-center items-center py-12">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-primary"></div>
-        </div>
+            <div v-if="reviewsLoading" class="flex justify-center items-center py-12">
+                <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-brand-primary"></div>
+            </div>
 
         <!-- Reviews List -->
         <div v-else-if="filteredReviews.length > 0" class="grid gap-4">
             <MainCard
                 v-for="review in filteredReviews"
                 :key="review.id"
-                class="hover:shadow-lg transition-shadow duration-200 cursor-pointer"
+                class="hover:ring-2 hover:ring-brand-primary/20 transition-shadow duration-200 cursor-pointer"
                 @click="viewReview(review.id)"
             >
                 <div class="flex items-start justify-between">
@@ -215,7 +216,7 @@ onMounted(async () => {
 
                     <div class="ml-4">
                         <button
-                            class="px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary-dark transition-colors"
+                            class="px-4 py-2 bg-primary-700 text-white rounded-lg hover:bg-primary-800 transition-colors font-semibold text-sm"
                             @click.stop="viewReview(review.id)"
                         >
                             View Details
@@ -226,11 +227,14 @@ onMounted(async () => {
         </div>
 
         <!-- Empty State -->
-        <EmptyState
-            v-else
-            icon="FileText"
-            title="Belum ada review performa"
-            description="You don't have any performance reviews yet. Reviews will appear here when your manager creates them."
-        />
+            <div v-else class="py-12">
+                <EmptyState
+                    icon="FileText"
+                    title="Belum ada review performa"
+                    subtitle="You don't have any performance reviews yet. Reviews will appear here when your manager creates them."
+                    size="lg"
+                />
+            </div>
+        </div>
     </div>
 </template>

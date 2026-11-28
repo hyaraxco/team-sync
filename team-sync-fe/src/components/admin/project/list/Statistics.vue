@@ -153,43 +153,43 @@ const chartSeries = ref([
         <div class="xl:col-span-1 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-1 gap-4">
             <!-- Total Projects Card -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
+                class="rounded-2xl border border-brand-dark relative overflow-hidden main-card p-5 flex flex-col min-h-[186px] group"
             >
                 <!-- Header with title and icon -->
-                <div class="flex items-center justify-between mb-4">
-                    <p class="text-brand-dark text-base font-medium">Total Projects</p>
+                <div class="flex items-center justify-between mb-4 relative z-10">
+                    <p class="text-brand-white-90 text-base font-medium">Total Projects</p>
                     <div
-                        class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center group-hover:bg-blue-100 transition-colors duration-300"
+                        class="w-12 h-12 bg-white/20 rounded-2xl flex items-center justify-center shrink-0"
                     >
-                        <Briefcase class="w-6 h-6 text-blue-600" />
+                        <Briefcase class="w-6 h-6 text-white" />
                     </div>
                 </div>
                 <!-- Value and status at bottom -->
-                <div class="mt-auto">
-                    <p id="totalProjects" class="text-brand-dark text-3xl font-extrabold leading-tight mb-1">
+                <div class="mt-auto relative z-10">
+                    <p id="totalProjects" class="text-brand-white text-4xl font-extrabold leading-none mb-2 tabular-nums">
                         <template v-if="loadingStatistics">-</template>
                         <AnimatedValue v-else :value="total" />
                     </p>
-                    <p class="text-success text-base font-medium">All projects</p>
+                    <p class="text-brand-white-80 text-sm font-medium">All projects</p>
                 </div>
             </div>
 
             <!-- Active Projects Card -->
             <div
-                class="bg-white border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 hover:shadow-md transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
+                class="bg-[var(--color-surface)] border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 p-5 flex flex-col min-h-[186px] group"
             >
                 <!-- Header with title and icon -->
                 <div class="flex items-center justify-between mb-4">
                     <p class="text-brand-dark text-base font-medium">Active Projects</p>
                     <div
-                        class="w-12 h-12 bg-green-50 rounded-2xl flex items-center justify-center group-hover:bg-green-100 transition-colors duration-300"
+                        class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-2xl flex items-center justify-center"
                     >
-                        <PlayCircle class="w-6 h-6 text-green-600" />
+                        <PlayCircle class="w-6 h-6 text-brand-dark" />
                     </div>
                 </div>
                 <!-- Value and status at bottom -->
                 <div class="mt-auto">
-                    <p id="activeProjects" class="text-brand-dark text-3xl font-extrabold leading-tight mb-1">
+                    <p id="activeProjects" class="text-brand-dark text-4xl font-extrabold leading-none mb-2 tabular-nums">
                         <template v-if="loadingStatistics">-</template>
                         <AnimatedValue v-else :value="active" />
                     </p>
@@ -200,11 +200,11 @@ const chartSeries = ref([
 
         <!-- Charts Column -->
         <div
-            class="xl:col-span-2 bg-white border border-brand-border rounded-2xl p-4 sm:p-6 hover:shadow-md transition-shadow duration-300"
+            class="xl:col-span-2 bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-6"
         >
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center flex-shrink-0">
-                    <TrendingUp class="w-6 h-6 text-purple-600" />
+                <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center flex-shrink-0">
+                    <TrendingUp class="w-6 h-6 text-brand-dark" />
                 </div>
                 <div class="flex-1">
                     <h3 class="text-brand-dark text-lg font-bold">Project Progress</h3>

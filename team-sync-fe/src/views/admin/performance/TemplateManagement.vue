@@ -198,7 +198,7 @@ onMounted(() => {
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="tpl in templates" :key="tpl.id" class="border-b border-gray-100 hover:bg-gray-50">
+                        <tr v-for="tpl in templates" :key="tpl.id" class="border-b border-gray-100 hover:bg-[var(--color-surface-raised)]">
                             <td class="py-3 px-4">
                                 <div class="font-medium text-brand-dark">{{ tpl.name }}</div>
                                 <div class="text-xs text-brand-light">{{ tpl.description }}</div>
@@ -247,7 +247,7 @@ onMounted(() => {
             v-if="showModal"
             class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gray-900/50 backdrop-blur-sm"
         >
-            <div class="bg-white rounded-xl shadow-md w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-[var(--color-surface)] rounded-xl shadow-md w-full max-w-4xl overflow-hidden flex flex-col max-h-[90vh]">
                 <div class="flex items-center justify-between p-4 border-b">
                     <h3 class="text-lg font-bold text-brand-dark">
                         {{ editingTemplate ? "Edit Template" : "New Template" }}
@@ -299,7 +299,7 @@ onMounted(() => {
                                     :key="section.id"
                                     @click="addSection(section)"
                                     :disabled="form.sections.some((s) => s.id === section.id)"
-                                    class="w-full text-left px-3 py-2 text-sm border rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:bg-gray-100 flex items-center justify-between group"
+                                    class="w-full text-left px-3 py-2 text-sm border rounded-lg hover:bg-[var(--color-surface-raised)] disabled:opacity-50 disabled:bg-gray-100 flex items-center justify-between group"
                                 >
                                     {{ section.name }}
                                     <Plus class="w-3 h-3 text-brand-primary opacity-0 group-hover:opacity-100" />
@@ -328,7 +328,7 @@ onMounted(() => {
 
                         <div
                             v-if="!form.sections.length"
-                            class="text-center py-12 border-2 border-dashed rounded-xl bg-gray-50"
+                            class="text-center py-12 border-2 border-dashed rounded-xl bg-[var(--color-surface-raised)]"
                         >
                             <p class="text-sm text-brand-light">
                                 Belum ada section ditambahkan. Pilih section dari panel kiri.
@@ -339,7 +339,7 @@ onMounted(() => {
                             <div
                                 v-for="mappedSection in form.sections"
                                 :key="mappedSection.id"
-                                class="p-4 border rounded-xl bg-white shadow-sm flex items-center gap-4"
+                                class="p-4 border rounded-xl bg-[var(--color-surface)] shadow-sm flex items-center gap-4"
                             >
                                 <div class="flex-1">
                                     <div class="font-medium text-brand-dark">
@@ -384,7 +384,7 @@ onMounted(() => {
                     </div>
                 </div>
 
-                <div class="p-4 border-t bg-gray-50 flex justify-end gap-3">
+                <div class="p-4 border-t bg-[var(--color-surface-raised)] flex justify-end gap-3">
                     <button
                         @click="closeModal"
                         class="px-4 py-2 text-sm font-medium hover:bg-gray-200 rounded-lg transition-colors"

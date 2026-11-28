@@ -41,20 +41,17 @@ const staffMembers = computed(() => teamPulse.value?.staff_members || []);
 const riskConfig = {
     red: {
         label: "Butuh Aksi",
-        container: "border-red-200 bg-red-50/70",
-        badge: "bg-red-100 text-red-700",
+        badge: "bg-red-100 text-red-800",
         icon: ShieldAlert,
     },
     yellow: {
         label: "Perlu Perhatian",
-        container: "border-amber-200 bg-amber-50/70",
-        badge: "bg-amber-100 text-amber-700",
+        badge: "bg-amber-100 text-amber-800",
         icon: AlertTriangle,
     },
     green: {
         label: "Aman",
-        container: "border-green-200 bg-green-50/70",
-        badge: "bg-green-100 text-green-700",
+        badge: "bg-green-100 text-green-800",
         icon: CheckCircle2,
     },
 };
@@ -100,7 +97,7 @@ const formatTime = (value) => {
 </script>
 
 <template>
-    <div class="bg-white border border-brand-border rounded-2xl p-4 sm:p-5 space-y-5">
+    <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4 sm:p-5 space-y-5">
         <div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
             <div class="flex items-center gap-3">
                 <div
@@ -129,25 +126,34 @@ const formatTime = (value) => {
             </div>
         </div>
 
-        <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-            <div class="rounded-2xl border border-red-200 bg-red-50 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Merah</p>
-                <p class="text-2xl font-extrabold text-brand-dark mt-2">{{ summary.red }}</p>
-                <p class="text-xs text-red-700 mt-1">Perlu tindak lanjut cepat</p>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-4">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-red-500"></span>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-brand-dark">Butuh Aksi</p>
+                </div>
+                <p class="text-2xl font-extrabold text-brand-dark mt-2 tabular-nums">{{ summary.red }}</p>
+                <p class="text-xs text-brand-light mt-1">Perlu tindak lanjut cepat</p>
             </div>
-            <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-amber-700">Kuning</p>
-                <p class="text-2xl font-extrabold text-brand-dark mt-2">{{ summary.yellow }}</p>
-                <p class="text-xs text-amber-700 mt-1">Perlu sapaan ringan</p>
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-4">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-brand-dark">Perlu Sapaan</p>
+                </div>
+                <p class="text-2xl font-extrabold text-brand-dark mt-2 tabular-nums">{{ summary.yellow }}</p>
+                <p class="text-xs text-brand-light mt-1">Perlu sapaan ringan</p>
             </div>
-            <div class="rounded-2xl border border-green-200 bg-green-50 p-4">
-                <p class="text-xs font-semibold uppercase tracking-wide text-green-700">Hijau</p>
-                <p class="text-2xl font-extrabold text-brand-dark mt-2">{{ summary.green }}</p>
-                <p class="text-xs text-green-700 mt-1">Berjalan stabil</p>
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-4">
+                <div class="flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-green-500"></span>
+                    <p class="text-xs font-semibold uppercase tracking-wide text-brand-dark">Stabil</p>
+                </div>
+                <p class="text-2xl font-extrabold text-brand-dark mt-2 tabular-nums">{{ summary.green }}</p>
+                <p class="text-xs text-brand-light mt-1">Berjalan normal</p>
             </div>
-            <div class="rounded-2xl border border-brand-border bg-gray-50 p-4">
+            <div class="rounded-2xl border border-brand-border bg-[var(--color-surface)] p-4">
                 <p class="text-xs font-semibold uppercase tracking-wide text-brand-light">Total</p>
-                <p class="text-2xl font-extrabold text-brand-dark mt-2">{{ summary.total }}</p>
+                <p class="text-2xl font-extrabold text-brand-dark mt-2 tabular-nums">{{ summary.total }}</p>
                 <p class="text-xs text-brand-light mt-1">Anggota tim termonitor</p>
             </div>
         </div>
@@ -168,8 +174,7 @@ const formatTime = (value) => {
             <div
                 v-for="member in staffMembers"
                 :key="member.id"
-                :class="riskConfig[member.risk.level]?.container || riskConfig.green.container"
-                class="border rounded-2xl p-4"
+                class="border border-brand-border bg-[var(--color-surface)] rounded-2xl p-4 sm:p-5 hover:ring-2 hover:ring-brand-primary/20 transition-all"
             >
                 <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                     <div class="flex items-start gap-3 min-w-0">
@@ -180,9 +185,9 @@ const formatTime = (value) => {
                         />
                         <div class="min-w-0 flex-1">
                             <div class="flex flex-wrap items-center gap-2">
-                                <p class="text-brand-dark font-bold text-base">{{ member.name }}</p>
+                                <p class="text-brand-dark font-bold text-base leading-tight">{{ member.name }}</p>
                                 <span
-                                    class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold"
+                                    class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold"
                                     :class="riskConfig[member.risk.level]?.badge || riskConfig.green.badge"
                                 >
                                     <component
@@ -192,36 +197,36 @@ const formatTime = (value) => {
                                     {{ riskConfig[member.risk.level]?.label || riskConfig.green.label }}
                                 </span>
                             </div>
-                            <p class="text-sm text-brand-light mt-1">
+                            <p class="text-xs text-brand-light mt-1 leading-normal">
                                 {{ member.job_title || "Tanpa jabatan" }}
                                 <span v-if="member.team_name">• {{ member.team_name }}</span>
                             </p>
-                            <p class="text-sm text-brand-dark mt-2">{{ member.risk.reason }}</p>
+                            <p class="text-xs font-medium text-brand-dark mt-2">{{ member.risk.reason }}</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 xl:min-w-[380px]">
-                        <div class="rounded-2xl bg-white/80 border border-white p-3">
+                        <div class="rounded-xl bg-[var(--color-surface-overlay)] border border-brand-border p-3">
                             <div class="flex items-center justify-between text-xs text-brand-light mb-2">
                                 <span>Attendance</span>
                                 <span>{{ member.attendance.label }}</span>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div class="w-full bg-[var(--color-surface)] border border-brand-border rounded-full h-2 overflow-hidden">
                                 <div
-                                    class="h-full rounded-full bg-brand-primary"
+                                    class="h-full rounded-full bg-primary-700"
                                     :style="{ width: member.attendance.score + '%' }"
                                 ></div>
                             </div>
                         </div>
 
-                        <div class="rounded-2xl bg-white/80 border border-white p-3">
+                        <div class="rounded-xl bg-[var(--color-surface-overlay)] border border-brand-border p-3">
                             <div class="flex items-center justify-between text-xs text-brand-light mb-2">
                                 <span>Task Velocity</span>
                                 <span>{{ member.task_velocity.percent }}%</span>
                             </div>
-                            <div class="w-full bg-gray-100 rounded-full h-2 overflow-hidden">
+                            <div class="w-full bg-[var(--color-surface)] border border-brand-border rounded-full h-2 overflow-hidden">
                                 <div
-                                    class="h-full rounded-full bg-emerald-500"
+                                    class="h-full rounded-full bg-emerald-600"
                                     :style="{ width: member.task_velocity.percent + '%' }"
                                 ></div>
                             </div>
@@ -243,20 +248,20 @@ const formatTime = (value) => {
                     <div class="flex items-center gap-2 self-start sm:self-auto">
                         <button
                             type="button"
-                            class="inline-flex items-center gap-2 rounded-2xl bg-brand-primary px-4 py-2.5 text-sm font-semibold text-white hover:brightness-110 disabled:opacity-60 transition-all shadow-sm hover:shadow-md"
+                            class="btn-primary whitespace-nowrap !py-2 !px-3.5 text-xs font-semibold"
                             :disabled="isNudging(member.id)"
                             @click="openNudgeModal(member)"
                         >
                             <LoaderCircle
                                 v-if="isNudging(member.id)"
-                                class="w-4 h-4 animate-spin"
+                                class="w-3.5 h-3.5 animate-spin"
                             />
                             <span>{{ isNudging(member.id) ? "Mengirim..." : "Sapa Kabar" }}</span>
                         </button>
 
                         <RouterLink
                             :to="member.detail_url"
-                            class="inline-flex items-center rounded-2xl border border-brand-border px-4 py-2.5 text-sm font-semibold text-brand-dark hover:border-brand-primary hover:text-brand-primary"
+                            class="btn-secondary whitespace-nowrap !py-2 !px-3.5 border border-brand-border text-xs font-semibold text-brand-dark hover:bg-[var(--color-surface-overlay)]"
                         >
                             View Details
                         </RouterLink>
@@ -270,7 +275,7 @@ const formatTime = (value) => {
                 v-if="isNudgeModalOpen"
                 class="fixed inset-0 z-[9998] bg-black/40 flex items-center justify-center p-4"
             >
-                <div class="w-full max-w-xl rounded-3xl bg-white border border-brand-border p-6 shadow-md">
+                <div class="w-full max-w-xl rounded-3xl bg-[var(--color-surface)] border border-brand-border p-6 shadow-md">
                     <div class="flex items-start justify-between gap-4">
                         <div>
                             <h4 class="text-xl font-bold text-brand-dark">Kirim Tanya Kabar</h4>

@@ -369,11 +369,11 @@ watch(salaryMonth, () => {
 <template>
     <div class="space-y-6">
         <!-- Header Section -->
-        <div class="bg-white border border-brand-border rounded-2xl p-6">
+        <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6">
             <div class="flex items-center justify-between gap-4 flex-wrap">
                 <div class="flex items-center gap-3">
-                    <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center">
-                        <Users class="w-6 h-6 text-blue-600" />
+                    <div class="w-12 h-12 bg-[var(--color-surface-overlay)] rounded-xl flex items-center justify-center">
+                        <Users class="w-6 h-6 text-brand-dark" />
                     </div>
                     <div>
                         <h1 class="text-brand-dark text-xl font-bold">Attendance-to-Payroll Readiness</h1>
@@ -385,7 +385,7 @@ watch(salaryMonth, () => {
                 <div class="flex items-center gap-3">
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <Calendar class="h-4 w-4 text-gray-400" />
+                            <Calendar class="h-4 w-4 text-brand-light" />
                         </div>
                         <input
                             type="month"
@@ -399,7 +399,7 @@ watch(salaryMonth, () => {
                         data-testid="readiness-refresh-btn"
                         @click="fetchData"
                         :disabled="loading"
-                        class="border border-brand-border rounded-xl px-4 py-2 text-sm font-semibold text-slate-700 hover:border-brand-primary hover:text-brand-primary transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
+                        class="border border-brand-border rounded-xl px-4 py-2 text-sm font-semibold text-brand-dark hover:border-brand-primary hover:text-brand-primary transition-all duration-300 flex items-center gap-2 disabled:opacity-50"
                     >
                         <RefreshCw class="w-4 h-4" :class="{ 'animate-spin': loading }" />
                         Refresh
@@ -410,19 +410,19 @@ watch(salaryMonth, () => {
             <!-- Overall Progress Bar -->
             <div v-if="readinessDashboard" class="mt-5">
                 <div class="flex items-center justify-between mb-2">
-                    <span class="text-sm font-semibold text-slate-700">Overall Readiness</span>
-                    <span class="text-sm font-bold text-slate-900" data-testid="readiness-overall-pct">
+                    <span class="text-sm font-semibold text-brand-dark">Overall Readiness</span>
+                    <span class="text-sm font-bold text-brand-dark" data-testid="readiness-overall-pct">
                         {{ overallReadinessPct }}%
                     </span>
                 </div>
-                <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div class="w-full h-3 bg-[var(--color-surface-overlay)] rounded-full overflow-hidden">
                     <div
                         class="h-full rounded-full transition-all duration-500"
                         :class="
                             overallReadinessPct === 100
                                 ? 'bg-green-500'
                                 : overallReadinessPct >= 70
-                                  ? 'bg-blue-500'
+                                  ? 'bg-primary-700'
                                   : 'bg-amber-500'
                         "
                         :style="{ width: `${overallReadinessPct}%` }"
@@ -438,27 +438,27 @@ watch(salaryMonth, () => {
             class="grid grid-cols-2 md:grid-cols-5 gap-4"
             data-testid="readiness-summary-cards"
         >
-            <div class="bg-white border border-brand-border rounded-2xl p-4">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4">
                 <p class="text-slate-500 text-xs font-medium">Total</p>
                 <p class="text-slate-900 text-2xl font-bold mt-1" data-testid="readiness-total">{{ totalEmployees }}</p>
             </div>
-            <div class="bg-white border border-green-200 rounded-2xl p-4">
+            <div class="bg-[var(--color-surface)] border border-green-200 rounded-2xl p-4">
                 <p class="text-green-600 text-xs font-medium">Ready</p>
                 <p class="text-green-700 text-2xl font-bold mt-1" data-testid="readiness-ready">{{ readyEmployees }}</p>
             </div>
-            <div class="bg-white border border-amber-200 rounded-2xl p-4">
+            <div class="bg-[var(--color-surface)] border border-amber-200 rounded-2xl p-4">
                 <p class="text-amber-600 text-xs font-medium">Warning</p>
                 <p class="text-amber-700 text-2xl font-bold mt-1" data-testid="readiness-warning">
                     {{ warningEmployees }}
                 </p>
             </div>
-            <div class="bg-white border border-red-200 rounded-2xl p-4">
+            <div class="bg-[var(--color-surface)] border border-red-200 rounded-2xl p-4">
                 <p class="text-red-600 text-xs font-medium">Blocked</p>
                 <p class="text-red-700 text-2xl font-bold mt-1" data-testid="readiness-blocked">
                     {{ blockedEmployees }}
                 </p>
             </div>
-            <div class="bg-white border border-brand-border rounded-2xl p-4">
+            <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-4">
                 <p class="text-slate-500 text-xs font-medium">Coverage</p>
                 <p class="text-slate-900 text-2xl font-bold mt-1" data-testid="readiness-coverage">
                     {{ overallCoveragePct }}%
@@ -473,7 +473,7 @@ watch(salaryMonth, () => {
                 <!-- Team Breakdown Section -->
                 <div
                     v-if="teams.length > 0"
-                    class="bg-white border border-brand-border rounded-2xl p-6"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6"
                     data-testid="readiness-team-breakdown"
                 >
                     <h2 class="text-brand-dark text-lg font-bold mb-4">Team Breakdown</h2>
@@ -535,7 +535,7 @@ watch(salaryMonth, () => {
                 </div>
 
                 <!-- Employee Table Section -->
-                <div class="bg-white border border-brand-border rounded-2xl p-6" data-testid="readiness-employee-table">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-6" data-testid="readiness-employee-table">
                     <div class="flex items-center justify-between gap-4 mb-4 flex-wrap">
                         <h2 class="text-brand-dark text-lg font-bold">Employee Readiness</h2>
                         <div class="flex items-center gap-2">
@@ -562,7 +562,7 @@ watch(salaryMonth, () => {
                             :class="
                                 readinessStatusFilter === filter.value && !activeBlockerFilter && !activeWarningFilter
                                     ? 'border-brand-primary bg-blue-50 text-brand-primary'
-                                    : 'border-slate-200 bg-white text-slate-600 hover:border-brand-primary hover:text-brand-primary'
+                                    : 'border-slate-200 bg-[var(--color-surface)] text-slate-600 hover:border-brand-primary hover:text-brand-primary'
                             "
                             @click="setStatusFilter(filter.value)"
                         >
@@ -589,7 +589,7 @@ watch(salaryMonth, () => {
                             data-testid="readiness-search"
                             type="text"
                             placeholder="Search by name or employee code..."
-                            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:border-brand-primary outline-none transition-all duration-300"
+                            class="w-full pl-10 pr-4 py-2.5 text-sm border border-slate-200 rounded-xl bg-[var(--color-surface)] focus:border-brand-primary outline-none transition-all duration-300"
                         />
                     </div>
 
@@ -677,20 +677,20 @@ watch(salaryMonth, () => {
                                         </td>
                                         <td class="py-3 px-3">
                                             <div class="flex items-center gap-2">
-                                                <div class="w-16 h-1.5 bg-slate-100 rounded-full overflow-hidden">
+                                                <div class="w-16 h-1.5 bg-[var(--color-surface-overlay)] rounded-full overflow-hidden">
                                                     <div
                                                         class="h-full rounded-full"
                                                         :class="
                                                             getCoveragePct(row) === 100
                                                                 ? 'bg-green-500'
                                                                 : getCoveragePct(row) >= 80
-                                                                  ? 'bg-blue-500'
+                                                                  ? 'bg-primary-700'
                                                                   : 'bg-amber-500'
                                                         "
                                                         :style="{ width: `${getCoveragePct(row)}%` }"
                                                     ></div>
                                                 </div>
-                                                <span class="text-xs font-semibold text-slate-700">
+                                                <span class="text-xs font-semibold text-brand-dark">
                                                     {{ getCoveragePct(row) }}%
                                                 </span>
                                             </div>
@@ -745,43 +745,43 @@ watch(salaryMonth, () => {
                                     <tr v-if="expandedRows[row.staff_member_id]" class="bg-slate-50">
                                         <td colspan="8" class="px-6 py-4">
                                             <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-3 text-xs">
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Scheduled Days</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.scheduled_working_days ?? 0 }}
                                                     </p>
                                                 </div>
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Covered Days</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.covered_days ?? 0 }}
                                                     </p>
                                                 </div>
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Present Days</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.present_days ?? 0 }}
                                                     </p>
                                                 </div>
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Late Days</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.late_days ?? 0 }}
                                                     </p>
                                                 </div>
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Half Days</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.half_day_count ?? 0 }}
                                                     </p>
                                                 </div>
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Paid Leave</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.paid_leave_days ?? 0 }}
                                                     </p>
                                                 </div>
-                                                <div class="bg-white rounded-lg border border-slate-200 px-3 py-2">
+                                                <div class="bg-[var(--color-surface)] rounded-lg border border-slate-200 px-3 py-2">
                                                     <p class="text-slate-500">Absent Days</p>
                                                     <p class="text-slate-900 font-bold">
                                                         {{ row.metrics?.absent_days ?? 0 }}
@@ -807,7 +807,7 @@ watch(salaryMonth, () => {
                 <!-- Blocker Aggregate Panel -->
                 <div
                     v-if="blockedReasonAggregates.length > 0"
-                    class="bg-white border border-brand-border rounded-2xl p-5"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-5"
                     data-testid="readiness-blocker-panel"
                 >
                     <h3 class="text-brand-dark text-sm font-bold mb-3 flex items-center gap-2">
@@ -834,7 +834,7 @@ watch(salaryMonth, () => {
                 <!-- Warning Aggregate Panel -->
                 <div
                     v-if="warningFlagAggregates.length > 0"
-                    class="bg-white border border-brand-border rounded-2xl p-5"
+                    class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-5"
                     data-testid="readiness-warning-panel"
                 >
                     <h3 class="text-brand-dark text-sm font-bold mb-3 flex items-center gap-2">
@@ -859,7 +859,7 @@ watch(salaryMonth, () => {
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="bg-white border border-brand-border rounded-2xl p-5 space-y-3">
+                <div class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-5 space-y-3">
                     <h3 class="text-brand-dark text-sm font-bold mb-3 flex items-center gap-2">
                         <CheckCircle class="w-4 h-4 text-green-500" />
                         Actions
@@ -868,7 +868,7 @@ watch(salaryMonth, () => {
                         type="button"
                         data-testid="readiness-go-generate"
                         @click="goToGeneratePayroll"
-                        class="w-full rounded-xl border border-primary-700 hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-4 py-3 flex items-center justify-center gap-2"
+                        class="w-full rounded-xl border border-primary-700 hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 bg-brand-primary px-4 py-3 flex items-center justify-center gap-2"
                     >
                         <span class="text-brand-white text-sm font-semibold">Go to Generate Payroll</span>
                         <ArrowRight class="w-4 h-4 text-white" />
@@ -889,7 +889,7 @@ watch(salaryMonth, () => {
         <!-- Loading State -->
         <div
             v-if="loading && !readinessDashboard"
-            class="bg-white border border-brand-border rounded-2xl p-12 text-center"
+            class="bg-[var(--color-surface)] border border-brand-border rounded-2xl p-12 text-center"
         >
             <RefreshCw class="w-8 h-8 text-slate-400 animate-spin mx-auto mb-3" />
             <p class="text-slate-600 text-sm">Loading readiness data for {{ formatMonth(salaryMonth) }}...</p>
