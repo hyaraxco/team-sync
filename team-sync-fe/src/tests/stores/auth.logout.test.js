@@ -144,6 +144,7 @@ describe("auth store logout", () => {
         expect(store.error).toBeNull();
         expect(store.loading).toBe(false);
         expect(cookieState.token).toBeUndefined();
+        expect(store.token).toBeUndefined();
     });
 
     it("still clears the local session and navigates when the revoke request fails", async () => {
@@ -155,6 +156,7 @@ describe("auth store logout", () => {
         await expect(store.logout()).resolves.toBeUndefined();
 
         expect(cookieState.token).toBeUndefined();
+        expect(store.token).toBeUndefined();
         expect(store.user).toBeNull();
         expect(store.loading).toBe(false);
         expect(routerReplaceMock).toHaveBeenCalledWith({ name: "login" });
@@ -183,6 +185,7 @@ describe("auth store logout", () => {
         await expect(store.logout()).resolves.toBeUndefined();
 
         expect(cookieState.token).toBeUndefined();
+        expect(store.token).toBeUndefined();
         expect(store.user).toBeNull();
         expect(store.loading).toBe(false);
         expect(routerReplaceMock).toHaveBeenCalledWith({ name: "login" });
