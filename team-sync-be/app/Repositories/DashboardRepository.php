@@ -31,26 +31,24 @@ class DashboardRepository implements DashboardRepositoryInterface
             $lastWeekStart = Carbon::now()->subWeek()->startOfWeek();
             $lastWeekEnd = Carbon::now()->subWeek()->endOfWeek();
 
-            // Single query for employee and team stats
-            $employeeTeamStats = DB::table('staff_member_profiles')
-                ->crossJoin('teams')
+            $employeeStats = DB::table('staff_member_profiles')
                 ->selectRaw('
-                    COUNT(DISTINCT staff_member_profiles.id) as total_employees,
-                    COUNT(DISTINCT CASE
-                        WHEN staff_member_profiles.created_at BETWEEN ? AND ?
-                        THEN staff_member_profiles.id
-                    END) as employees_this_month,
-                    COUNT(DISTINCT teams.id) as total_teams,
-                    COUNT(DISTINCT CASE
-                        WHEN teams.created_at BETWEEN ? AND ?
-                        THEN teams.id
+                    COUNT(*) as total_employees,
+                    COUNT(CASE
+                        WHEN created_at BETWEEN ? AND ?
+                        THEN 1
+                    END) as employees_this_month
+                ', [$monthStart, $monthEnd])
+                ->first();
+
+            $teamStats = DB::table('teams')
+                ->selectRaw('
+                    COUNT(*) as total_teams,
+                    COUNT(CASE
+                        WHEN created_at BETWEEN ? AND ?
+                        THEN 1
                     END) as new_teams_this_month
-                ', [
-                    $monthStart,
-                    $monthEnd,
-                    $monthStart,
-                    $monthEnd,
-                ])
+                ', [$monthStart, $monthEnd])
                 ->first();
 
             // Single query for attendance stats
@@ -74,7 +72,7 @@ class DashboardRepository implements DashboardRepositoryInterface
 
             // Calculate attendance rates
             $totalWorkDays = now()->day;
-            $totalEmployees = (int) $employeeTeamStats->total_employees;
+            $totalEmployees = (int) $employeeStats->total_employees;
             $totalExpectedAttendances = $totalEmployees * $totalWorkDays;
             $totalActualAttendances = (int) $attendanceStats->total_this_month;
 
@@ -134,12 +132,12 @@ class DashboardRepository implements DashboardRepositoryInterface
 
             return [
                 'employees' => [
-                    'total' => (int) $employeeTeamStats->total_employees,
-                    'added_this_month' => (int) $employeeTeamStats->employees_this_month,
+                    'total' => (int) $employeeStats->total_employees,
+                    'added_this_month' => (int) $employeeStats->employees_this_month,
                 ],
                 'teams' => [
-                    'total' => (int) $employeeTeamStats->total_teams,
-                    'new_teams' => (int) $employeeTeamStats->new_teams_this_month,
+                    'total' => (int) $teamStats->total_teams,
+                    'new_teams' => (int) $teamStats->new_teams_this_month,
                 ],
                 'attendance' => [
                     'rate' => $attendanceRate,

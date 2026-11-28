@@ -244,7 +244,6 @@ class DashboardStatisticsTest extends TestCase
     {
         [$hrUser] = $this->createUserWithRoleAndProfile('hr', 'HR Empty');
 
-        // BUG: crossJoin with no teams → employees.total = 0 even when employees exist
         Sanctum::actingAs($hrUser);
 
         $response = $this->getJson('/api/v1/dashboard/statistics');
@@ -252,7 +251,8 @@ class DashboardStatisticsTest extends TestCase
 
         $data = $response->json('data');
 
-        $this->assertSame(0, $data['employees']['total']);
+        $this->assertSame(1, $data['employees']['total']);
+        $this->assertSame(0, $data['teams']['total']);
         $this->assertSame(0, $data['tasks']['completed']);
         $this->assertSame(0, $data['projects']['active']);
         $this->assertSame(0, $data['performance']['promotion_eligible']);
