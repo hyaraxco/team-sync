@@ -62,9 +62,7 @@ class RoleForbiddenAccessTest extends TestCase
     {
         $this->actingAsEmail('agung@teamsync.com');
 
-        // Permission check passes (not 403); may be 200 or 500 depending on data availability
-        $response = $this->getJson('/api/v1/dashboard/my-statistics');
-        $this->assertNotEquals(403, $response->status(), 'Staff should not be forbidden from own statistics');
+        $this->getJson('/api/v1/dashboard/my-statistics')->assertOk();
     }
 
     public function test_staff_cannot_access_analytics(): void
