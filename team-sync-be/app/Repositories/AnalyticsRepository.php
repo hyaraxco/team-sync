@@ -1584,6 +1584,14 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             'pf.created_at'
         )->get();
 
+        $employeeCount = $employeeId ? 0 : DB::table('staff_member_profiles')->whereNull('deleted_at')
+            ->when($teamId, function ($query) use ($teamId) {
+                $query->whereIn('id', function ($members) use ($teamId) {
+                    $members->select('staff_member_id')->from('team_members')
+                        ->where('team_id', $teamId)->whereNull('left_at');
+                });
+            })->count();
+
         $totalFeedback = $feedback->count();
 
         // Feedback by type
@@ -1597,7 +1605,7 @@ class AnalyticsRepository implements AnalyticsRepositoryInterface
             'total_feedback' => $totalFeedback,
             'by_type' => $byType,
             'recent_feedback_30d' => $recentFeedback,
-            'average_per_employee' => $employeeId ? null : ($totalFeedback > 0 ? round($totalFeedback / DB::table('staff_member_profiles')->whereNull('deleted_at')->count(), 2) : 0),
+            'average_per_employee' => $employeeId ? null : ($employeeCount > 0 ? round($totalFeedback / $employeeCount, 2) : 0),
         ];
     }
 

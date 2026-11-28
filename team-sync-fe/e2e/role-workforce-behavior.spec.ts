@@ -7,6 +7,7 @@ const apiBase = (process.env.VITE_API_BASE_URL ?? "http://127.0.0.1:8000/api/v1"
 type Employee = { id: number; user: { name: string; email: string } };
 type Team = { id: number; name: string; leader?: Employee["user"] };
 type Policy = { id: number; employment_type: string; late_grace_minutes: number };
+type Entitlement = { id: number; requires_reason: boolean };
 type RecordData = { id: number; name: string; reason: string; status: string; date: string };
 type Period = { status: string; start_date: string; end_date: string };
 
@@ -165,14 +166,41 @@ test.describe("Role workforce behavior", () => {
             const policies = await data<Policy[]>(await manager.api.get("attendance-policies"));
             const original = policies[0];
             expect(original, "Seeded employment-type attendance policy").toBeTruthy();
+            const entitlements = await data<Entitlement[]>(await manager.api.get("leave-entitlements"));
+            const entitlement = entitlements[0];
+            expect(entitlement, "Seeded leave entitlement").toBeTruthy();
             const grace = Number(original.late_grace_minutes) === 17 ? 18 : 17;
-            expect((await manager.api.put(`attendance-policies/${original.id}`, { data: { ...original, late_grace_minutes: grace } })).status()).toBe(403);
-            expect((await data<Policy[]>(await manager.api.get("attendance-policies"))).find((policy) => policy.id === original.id)).toEqual(original);
-            await manager.page.goto("/admin/attendance-settings");
-            const card = manager.page.locator(".policy-card").filter({ hasText: original.employment_type.replaceAll("_", " ") }).first();
-            await expect(card.getByText(`${original.late_grace_minutes} mins`, { exact: true })).toBeVisible();
-            await expect(card.getByRole("button", { name: "Edit Policy" })).toHaveCount(0);
-            await expect(manager.page.getByRole("button", { name: "Edit Entitlement" })).toHaveCount(0);
+            const requiresReason = !entitlement.requires_reason;
+            try {
+                expect((await manager.api.put(`attendance-policies/${original.id}`, { data: { late_grace_minutes: grace } })).status()).toBe(403);
+                expect((await data<Policy[]>(await manager.api.get("attendance-policies"))).find((policy) => policy.id === original.id)).toEqual(original);
+                await manager.page.goto("/admin/attendance-settings");
+                const card = manager.page.locator(".policy-card").filter({ hasText: original.employment_type.replaceAll("_", " ") }).first();
+                await expect(card.getByText(`${original.late_grace_minutes} mins`, { exact: true })).toBeVisible();
+                await expect(card.getByRole("button", { name: "Edit Policy" })).toHaveCount(0);
+                await manager.page.getByRole("button", { name: "Leave Entitlements", exact: true }).click();
+                await expect(manager.page.getByRole("heading", { name: "Leave Quotas & Rules" })).toBeVisible();
+                await expect(manager.page.locator(".policy-card").first()).toBeVisible();
+                await expect(manager.page.getByRole("button", { name: "Edit Rules", exact: true })).toHaveCount(0);
+                expect((await manager.api.put(`leave-entitlements/${entitlement.id}`, { data: { requires_reason: requiresReason } })).status()).toBe(403);
+                expect((await data<Entitlement[]>(await manager.api.get("leave-entitlements"))).find((item) => item.id === entitlement.id)).toEqual(entitlement);
+            } finally {
+                const policyAfter = (await data<Policy[]>(await manager.api.get("attendance-policies"))).find((policy) => policy.id === original.id);
+                const entitlementAfter = (await data<Entitlement[]>(await manager.api.get("leave-entitlements"))).find((item) => item.id === entitlement.id);
+                if (policyAfter?.late_grace_minutes === grace || entitlementAfter?.requires_reason === requiresReason) {
+                    const hr = await session(browser, "hr");
+                    try {
+                        if (policyAfter?.late_grace_minutes === grace) {
+                            await data(await hr.api.put(`attendance-policies/${original.id}`, { data: { late_grace_minutes: original.late_grace_minutes } }));
+                        }
+                        if (entitlementAfter?.requires_reason === requiresReason) {
+                            await data(await hr.api.put(`leave-entitlements/${entitlement.id}`, { data: { requires_reason: entitlement.requires_reason } }));
+                        }
+                    } finally {
+                        await hr.close();
+                    }
+                }
+            }
         } finally {
             await manager.close();
         }

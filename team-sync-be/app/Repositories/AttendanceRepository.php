@@ -9,9 +9,7 @@ use App\Models\Attendance;
 use App\Models\AttendancePeriod;
 use App\Models\AttendancePolicy;
 use App\Models\AttendancePolicyMismatch;
-use App\Models\JobInformation;
-use App\Models\Team;
-use App\Models\TeamMember;
+use App\Repositories\Concerns\ScopesManagerAttendance;
 use App\Services\Attendance\AttendancePeriodService;
 use App\Services\Attendance\LeaveBalanceService;
 use App\Services\Attendance\WorkingDaysCalculator;
@@ -27,6 +25,8 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceRepository implements AttendanceRepositoryInterface
 {
+    use ScopesManagerAttendance;
+
     public function __construct(
         private readonly AttendancePeriodService $attendancePeriodService,
         private readonly EmailService $emailService
@@ -41,7 +41,9 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         $query = Attendance::with(['staffMember.user', 'staffMember.jobInformation.team'])
             ->where(function ($query) use ($search, $date) {
                 if ($search) {
-                    $query->search($search);
+                    $query->whereHas('staffMember.user', function ($query) use ($search) {
+                        $query->where('name', 'like', "%{$search}%");
+                    });
                 }
 
                 if ($date) {
@@ -54,15 +56,7 @@ class AttendanceRepository implements AttendanceRepositoryInterface
             })
             ->orderBy('created_at', 'desc');
 
-        $user = Auth::user();
-        if ($user && $user->hasRole('manager') && ! $user->hasRole('hr')) {
-            $manageableIds = $this->getManageableEmployeeIdsForManager();
-            if (empty($manageableIds)) {
-                $query->whereRaw('1 = 0');
-            } else {
-                $query->whereIn('staff_member_id', $manageableIds);
-            }
-        }
+        $this->scopeAttendanceQueryForManager($query);
 
         if ($limit) {
             $query->take($limit);
@@ -94,10 +88,20 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         return $query->paginate($rowPerPage);
     }
 
+    public function getPolicyMismatchesPaginated(?string $status, int $perPage): LengthAwarePaginator
+    {
+        return $this->scopeAttendanceQueryForManager(
+            AttendancePolicyMismatch::with(['staffMember.user', 'attendance'])
+        )
+            ->when($status, fn (Builder $query) => $query->where('status', $status))
+            ->orderBy('mismatch_date', 'desc')
+            ->paginate($perPage);
+    }
+
     public function getById(
         string $id
     ): Attendance {
-        return Attendance::with(['staffMember.user'])
+        return $this->scopeAttendanceQueryForManager(Attendance::with(['staffMember.user']))
             ->findOrFail($id);
     }
 
@@ -576,37 +580,6 @@ class AttendanceRepository implements AttendanceRepositoryInterface
         }
 
         return $employeeId;
-    }
-
-    private function getManageableEmployeeIdsForManager(): array
-    {
-        $user = Auth::user();
-
-        if (! $user || ! $user->hasRole('manager')) {
-            return [];
-        }
-
-        $leadTeamIds = Team::query()
-            ->where('team_lead_id', $user->id)
-            ->pluck('id')
-            ->toArray();
-
-        if (empty($leadTeamIds)) {
-            return [];
-        }
-
-        $fromTeamMembers = TeamMember::query()
-            ->whereIn('team_id', $leadTeamIds)
-            ->whereNull('left_at')
-            ->pluck('staff_member_id')
-            ->toArray();
-
-        $fromJobInformation = JobInformation::query()
-            ->whereIn('team_id', $leadTeamIds)
-            ->pluck('staff_member_id')
-            ->toArray();
-
-        return array_values(array_unique(array_merge($fromTeamMembers, $fromJobInformation)));
     }
 
     /**

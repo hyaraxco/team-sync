@@ -1,5 +1,6 @@
 <template>
     <div class="space-y-6">
+        <p v-if="error" role="alert">{{ error }}</p>
         <!-- Performance Summary Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard
@@ -12,6 +13,7 @@
                 :loading="enhancedMetricsLoading"
             />
             <MetricCard
+                v-if="can('analytics-hr-view')"
                 title="Avg Rating"
                 :value="ratingDistribution?.average ?? companyPerformanceSummary?.average_rating ?? 0"
                 format="number"
@@ -39,7 +41,7 @@
         </div>
 
         <!-- Rating Distribution Chart -->
-        <MainCard title="Rating Distribution" class="p-6">
+        <MainCard v-if="can('analytics-hr-view')" title="Rating Distribution" class="p-6">
             <div v-if="enhancedMetricsLoading" class="h-64 flex items-center justify-center">
                 <div class="animate-pulse text-gray-400">Loading...</div>
             </div>
@@ -99,6 +101,7 @@ import { useAnalyticsStore } from "@/stores/analytics";
 import MetricCard from "@/components/admin/analytics/MetricCard.vue";
 import MainCard from "@/components/common/MainCard.vue";
 import { TargetIcon, StarIcon, MessageSquareIcon, UsersIcon } from "lucide-vue-next";
+import { can } from "@/helpers/permissionHelper";
 
 const analyticsStore = useAnalyticsStore();
 const {
@@ -108,6 +111,7 @@ const {
     goalCompletionRate,
     feedbackMetrics,
     enhancedMetricsLoading,
+    error,
 } = storeToRefs(analyticsStore);
 
 const normalizedRatingDistribution = computed(() => {

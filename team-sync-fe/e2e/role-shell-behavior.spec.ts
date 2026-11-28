@@ -110,6 +110,14 @@ for (const role of roles) {
             const response = await filtered;
             expect(response.status()).toBe(200);
             expect((await response.json()).data).toBeTruthy();
+            if (role === "manager") {
+                const teamId = new URL(response.url()).searchParams.get("team_id");
+                expect(Number(teamId)).toBeGreaterThan(0);
+                await expect(page.getByLabel("Filter by team")).toHaveValue(teamId!);
+                await expect(page.getByText("Company-wide average", { exact: true })).toHaveCount(0);
+                await expect(page.getByText("Rating Distribution", { exact: true })).toHaveCount(0);
+                await expect(page.getByRole("alert")).toHaveCount(0);
+            }
             await expect(page.getByRole("tab", { name: tab, exact: true })).toHaveAttribute("aria-selected", "true");
         }
         const workforce = await page.request.get(`${api}/analytics/workforce`, { headers });

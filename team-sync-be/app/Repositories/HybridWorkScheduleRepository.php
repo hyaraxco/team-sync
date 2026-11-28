@@ -5,14 +5,17 @@ namespace App\Repositories;
 use App\Interfaces\HybridWorkScheduleRepositoryInterface;
 use App\Models\HybridScheduleOverride;
 use App\Models\HybridWorkSchedule;
+use App\Repositories\Concerns\ScopesManagerAttendance;
 
 class HybridWorkScheduleRepository implements HybridWorkScheduleRepositoryInterface
 {
+    use ScopesManagerAttendance;
+
     public function getSchedulesPaginated(
         int $perPage,
         ?string $search = null
     ) {
-        $query = HybridWorkSchedule::with(['staffMember.user'])
+        $query = $this->scopeAttendanceQueryForManager(HybridWorkSchedule::with(['staffMember.user']))
             ->orderBy('created_at', 'desc');
 
         if ($search !== null && $search !== '') {
@@ -46,8 +49,9 @@ class HybridWorkScheduleRepository implements HybridWorkScheduleRepositoryInterf
         ?string $dateFrom = null,
         ?string $dateTo = null
     ) {
-        $query = HybridScheduleOverride::with(['staffMember.user', 'staffMember.hybridWorkSchedules'])
-            ->orderBy('date', 'desc');
+        $query = $this->scopeAttendanceQueryForManager(
+            HybridScheduleOverride::with(['staffMember.user', 'staffMember.hybridWorkSchedules'])
+        )->orderBy('date', 'desc');
 
         if ($search !== null && $search !== '') {
             $query->whereHas('staffMember.user', function ($q) use ($search) {

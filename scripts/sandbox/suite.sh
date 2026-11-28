@@ -17,6 +17,7 @@ if [[ ${1:-} != --isolated ]]; then
         SESSION_DRIVER=file SESSION_SECURE_COOKIE=false SANCTUM_STATEFUL_DOMAINS=127.0.0.1:4173 \
         BCRYPT_ROUNDS=4 LOG_CHANNEL=stderr LOG_LEVEL=warning TELESCOPE_ENABLED=false \
         PULSE_ENABLED=false NIGHTWATCH_ENABLED=false XDEBUG_MODE=coverage \
+        E2E_LOGIN_ATTEMPTS=1000 \
         VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1 E2E_FE_BASE_URL=http://127.0.0.1:4173 \
         E2E_BE_DIR=/source/team-sync-be E2E_BE_COMPOSE_CMD='bash /scratch/backend-exec.sh' \
         bash "$0" --isolated "$1"
@@ -118,6 +119,7 @@ PY
         ;;
     roles)
         artisan config:clear
+        seed_roles() {
         python3 - <<'PY'
 import os
 fd = os.open('/scratch/database.sqlite', os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
@@ -152,6 +154,8 @@ unlink($guard);
 PHP
         )
         artisan db:seed --class=SandboxRoleSeeder --force --no-interaction
+        }
+        seed_roles
         cat > /scratch/backend-exec.sh <<'SH'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -165,8 +169,27 @@ cd /source/team-sync-be
 exec php artisan queue:work "$@"
 SH
         cd "$fe"
+        set +e
         node /opt/fe/node_modules/@playwright/test/cli.js test --config=/source/scripts/sandbox/playwright.config.mjs \
-            role-navigation.spec.ts role-button-matrix.spec.ts payroll-roles.spec.ts
+            'role-.*-behavior.spec.ts' --max-failures=1
+        focused_status=$?
+        mv /scratch/reports/roles-junit.xml /scratch/reports/roles-focused-junit.xml
+        set -e
+        # Playwright has stopped both owned servers; discard only its guarded scratch database.
+        [[ $DB_CONNECTION == sqlite && $DB_DATABASE == /scratch/database.sqlite && ! -L $DB_DATABASE ]]
+        rm -- /scratch/database.sqlite
+        rm -f -- /scratch/database.sqlite-wal /scratch/database.sqlite-shm
+        artisan cache:clear
+        seed_roles
+        set +e
+        node /opt/fe/node_modules/@playwright/test/cli.js test --config=/source/scripts/sandbox/playwright.config.mjs \
+            role-navigation.spec.ts role-button-matrix.spec.ts payroll-roles.spec.ts 'role-.*-behavior.spec.ts' \
+            attendance-flow.spec.ts cuti-bersama.spec.ts meeting-schedule.spec.ts \
+            project-task-lifecycle.spec.ts thr-generation.spec.ts \
+            performance-templates.spec.ts performance-outcome-rules.spec.ts performance-reviewer-override.spec.ts
+        full_status=$?
+        [[ $focused_status -eq 0 && $full_status -eq 0 ]]
+        exit $?
         ;;
     a11y)
         build_fe

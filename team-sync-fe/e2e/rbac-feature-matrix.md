@@ -8,7 +8,7 @@ Normal E2E accounts: Staff `agung@teamsync.com`, Manager `yudhis@teamsync.com`, 
 
 ## TEA-63 behavior evidence map
 
-Execution status: the named scenarios below passed the complete headed role suite against the guarded isolated E2E project. The source route inventory remains source-derived, not blanket runtime proof. Each role cell names the representative outcome exercised; see `docs/plans/archive/2026-11-27-tea-63-role-behavior.md` for run totals, isolation, and explicit verification limits.
+Execution status: earlier local passes used uncommitted prerequisite changes and do not validate PR head. Review remediation is in progress; see `docs/plans/archive/2026-11-27-tea-63-role-behavior.md` for historical evidence and current verification limits. Each role cell names a representative scenario, not exhaustive runtime proof. Fresh committed-snapshot results are required before handoff.
 
 | Feature family | Staff | Manager | HR | Finance | Superadmin |
 |---|---|---|---|---|---|

@@ -100,6 +100,10 @@ class MinimalPayrollE2ESeederTest extends TestCase
             ->whereRaw('date(date) >= ?', [$payrollMonth->copy()->startOfMonth()->toDateString()])
             ->whereRaw('date(date) <= ?', [$payrollMonth->copy()->endOfMonth()->toDateString()])
             ->count());
+        $historical = \App\Models\Payroll::whereDate('salary_month', $payrollMonth->copy()->subMonths(2)->toDateString())->sole();
+        $this->assertSame('paid', $historical->status->value);
+        $detail = $historical->payrollDetails()->where('staff_member_id', $employee->id)->sole();
+        $this->assertSame(10_000_000, (int) $detail->final_salary);
     }
 
     private function resolveBusinessDaysInMonth(Carbon $month): int

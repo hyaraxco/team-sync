@@ -34,13 +34,13 @@ class UpdateOutcomeRuleRequest extends FormRequest
             function (Validator $validator) {
                 $min = $this->input('min_rating');
                 $max = $this->input('max_rating');
-
-                if ($min === null && $max === null) {
-                    return;
-                }
-
                 $ruleId = $this->route('outcome_rule');
                 $current = PerformanceOutcomeRule::find($ruleId);
+                $isActive = $this->boolean('is_active', (bool) $current?->is_active);
+
+                if (! $isActive || ($min === null && $max === null && $current?->is_active)) {
+                    return;
+                }
 
                 $checkMin = $min ?? $current?->min_rating;
                 $checkMax = $max ?? $current?->max_rating;

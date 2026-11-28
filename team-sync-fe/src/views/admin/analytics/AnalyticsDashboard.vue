@@ -88,7 +88,7 @@ const periodOptions = [
 ];
 
 const departments = computed(() => optionStore.departments || []);
-const teams = computed(() => teamStore.teamsAll || []);
+const teams = computed(() => teamStore.teams || []);
 
 const kpis = computed(() => executiveSummary.value?.kpis || {});
 
@@ -277,6 +277,17 @@ onUnmounted(() => {
                     <option v-for="dept in departments" :key="dept.value" :value="dept.value">
                         {{ dept.label }}
                     </option>
+                </select>
+
+                <select
+                    v-if="activeTab === 'performance' && !can('analytics-hr-view')"
+                    v-model="teamId"
+                    @change="onFilterChange"
+                    aria-label="Filter by team"
+                    class="text-sm text-brand-dark bg-white border border-brand-border rounded-xl px-3 py-2 cursor-pointer focus-visible:ring-2 focus-visible:ring-brand-primary"
+                >
+                    <option :value="null" disabled>Select a led team</option>
+                    <option v-for="team in teams" :key="team.id" :value="team.id">{{ team.name }}</option>
                 </select>
 
                 <!-- Export Dropdown -->

@@ -368,12 +368,32 @@ test.describe.serial("Project & Task Lifecycle", () => {
     const page = await ctx.newPage();
     await loginAsRole(page, "finance");
 
-    await page.goto("/admin/projects");
-    await expect(page.locator("main")).toBeVisible();
-    await expect(page.getByRole("button", { name: /Add Project/i })).toHaveCount(0);
-
-    await captureEvidence(page, "task-t13.png");
-    await ctx.close();
+    const api = await makeApi(await getToken(page));
+    try {
+      const loaded = page.waitForResponse((res) => res.url().includes("/projects/all/paginated") && res.request().method() === "GET");
+      await page.goto("/admin/projects");
+      await expect(page).toHaveURL(/\/admin\/projects$/);
+      const { data: projects } = await ok<{ data: { id: number; name: string }[] }>(await loaded, "Finance project list");
+      await expect(page.getByRole("heading", { name: "All Projects", exact: true })).toBeVisible();
+      if (projects.length) {
+        await expect(page.locator("main").getByText(projects[0].name, { exact: true }).first()).toBeVisible();
+      } else {
+        await expect(page.getByText("Belum ada proyek", { exact: true })).toBeVisible();
+      }
+      await expect(page.getByRole("link", { name: "Add Project", exact: true })).toHaveCount(0);
+      expect((await api.post("projects", {
+        data: {
+          name: `E2E denied Finance project ${ts}`, type: "web_development", priority: "high", status: "active",
+          start_date: new Date().toISOString().slice(0, 10),
+          end_date: new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10),
+          description: "Denied Finance creation attempt.", project_leader_id: mgrProfileId, teams: [],
+        },
+      })).status()).toBe(403);
+      await captureEvidence(page, "task-t13.png");
+    } finally {
+      await api.dispose();
+      await ctx.close();
+    }
   });
 
   // ── T14: Manager deletes task via API ──────────────────────────

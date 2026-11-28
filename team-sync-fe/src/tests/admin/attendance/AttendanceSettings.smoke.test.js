@@ -4,6 +4,7 @@ import { describe, it, expect, beforeEach, vi } from "vitest";
 import { nextTick } from "vue";
 import AttendanceSettings from "@/views/admin/attendance/AttendanceSettings.vue";
 import Input from "@/components/common/form/Input.vue";
+import { useAuthStore } from "@/stores/auth";
 import Select from "@/components/common/form/Select.vue";
 
 const samplePolicy = {
@@ -74,6 +75,7 @@ vi.mock("@/composables/useToast", () => ({
 describe("AttendanceSettings.vue smoke", () => {
     beforeEach(() => {
         setActivePinia(createPinia());
+        useAuthStore().user = { permissions: ["settings-hr-manage"] };
     });
 
     it("renders policy edit modal with Input primitives when opened", async () => {

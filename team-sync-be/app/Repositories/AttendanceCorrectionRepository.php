@@ -6,6 +6,7 @@ use App\Interfaces\AttendanceCorrectionRepositoryInterface;
 use App\Models\Attendance;
 use App\Models\AttendanceCorrection;
 use App\Models\User;
+use App\Repositories\Concerns\ScopesManagerAttendance;
 use App\Services\Attendance\AttendanceClassifier;
 use App\Services\EmailService;
 use Carbon\Carbon;
@@ -16,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 
 class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryInterface
 {
+    use ScopesManagerAttendance;
+
     private AttendanceClassifier $attendanceClassifier;
 
     private EmailService $emailService;
@@ -28,8 +31,9 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
     public function getAllPaginated(?string $search, int $rowPerPage, ?string $status = null)
     {
-        return AttendanceCorrection::query()
-            ->with(['staffMember.user', 'attendance', 'reviewer'])
+        return $this->scopeAttendanceQueryForManager(
+            AttendanceCorrection::with(['staffMember.user', 'attendance', 'reviewer'])
+        )
             ->when($search, function ($query, $search) {
                 $query->whereHas('staffMember.user', function ($q) use ($search) {
                     $q->where('name', 'like', "%{$search}%");
@@ -65,6 +69,11 @@ class AttendanceCorrectionRepository implements AttendanceCorrectionRepositoryIn
 
         if (! $correction) {
             throw new ModelNotFoundException('Attendance Correction not found.');
+        }
+
+        if (Auth::user()?->hasRole('manager') && ! Auth::user()->hasAnyRole(['hr', 'superadmin'])
+            && ! in_array($correction->staff_member_id, $this->getManageableEmployeeIdsForManager(), true)) {
+            throw new AuthorizationException('You can only access attendance corrections from your direct reports.');
         }
 
         // Check if employee tries to read someone else's request
