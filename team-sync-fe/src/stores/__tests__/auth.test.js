@@ -56,6 +56,8 @@ describe("Auth Store", () => {
                 data: { token: "jwt-token" },
             },
         });
+        const user = { id: 1, permissions: ["dashboard-menu"] };
+        axiosInstance.get.mockResolvedValueOnce({ data: { data: user } });
 
         await store.login(credentials);
 
@@ -64,13 +66,15 @@ describe("Auth Store", () => {
             password: "secret",
         });
         expect(Cookies.set).toHaveBeenCalledWith("token", "jwt-token", { expires: 30 });
+        expect(store.token).toBe("jwt-token");
+        expect(store.user).toEqual(user);
         expect(store.success).toBe("Login successful");
         expect(router.push).toHaveBeenCalledWith({ name: "admin.dashboard" });
         expect(store.loading).toBe(false);
     });
 
     it("logout clears local session and navigates to login", async () => {
-        Cookies.get.mockReturnValueOnce("token-123");
+        store.setToken("token-123");
         axiosInstance.post.mockResolvedValueOnce({ data: { message: "Logout successful" } });
         store.user = { id: 1, name: "Admin" };
 
@@ -123,6 +127,25 @@ describe("Auth Store", () => {
         expect(result).toEqual(updatedUser);
         expect(store.user).toEqual(updatedUser);
         expect(store.success).toBe("Profil berhasil diperbarui");
+        expect(store.loading).toBe(false);
+    });
+
+    it.each([
+        [{ response: { status: 503, data: { message: "Profile unavailable" } } }, "Profile unavailable"],
+        [new Error("Network unavailable"), "Network error. Please check your connection."],
+    ])("does not report profile update success when refresh fails: %s", async (failure, message) => {
+        store.user = { id: 9, name: "Original User" };
+        axiosInstance.post.mockResolvedValueOnce({
+            data: { message: "Profil berhasil diperbarui", data: { id: 9, name: "Updated User" } },
+        });
+        axiosInstance.get.mockRejectedValueOnce(failure);
+
+        const result = await store.updateProfile({ name: "Updated User" });
+
+        expect(result).toBeUndefined();
+        expect(store.success).toBeNull();
+        expect(store.error).toBe(message);
+        expect(store.user).toEqual({ id: 9, name: "Original User" });
         expect(store.loading).toBe(false);
     });
 

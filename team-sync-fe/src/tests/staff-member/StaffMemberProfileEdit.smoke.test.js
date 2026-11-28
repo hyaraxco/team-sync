@@ -107,6 +107,18 @@ describe("StaffMemberProfileEdit smoke", () => {
         expect(authStoreMock.checkAuth).toHaveBeenCalled();
     });
 
+    it("keeps profile loading errors visible without filling a blank profile", async () => {
+        authStoreRefs.user.value = null;
+        authStoreRefs.error.value = "Profile unavailable";
+        authStoreMock.checkAuth.mockRejectedValueOnce(new Error("Profile unavailable"));
+        const wrapper = factory();
+        await flushAsync();
+
+        expect(wrapper.text()).toContain("Profile unavailable");
+        expect(wrapper.find("#name").element.value).toBe("");
+        expect(authStoreMock.updateProfile).not.toHaveBeenCalled();
+    });
+
     it("submits updated profile data", async () => {
         const wrapper = factory();
         await flushAsync();

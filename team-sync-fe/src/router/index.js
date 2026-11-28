@@ -153,6 +153,7 @@ export const appRoutes = [
                 path: "login",
                 name: "login",
                 component: Login,
+                meta: { requiresUnauth: true },
             },
             {
                 path: "forgot-password",
@@ -239,7 +240,14 @@ export const registerAuthGuard = (targetRouter) => {
                 next({ name: "login" });
             }
         } else if (to.meta.requiresUnauth && authStore.token) {
-            next({ name: "admin.dashboard" });
+            try {
+                if (!authStore.user) {
+                    await authStore.checkAuth();
+                }
+                next({ name: "admin.dashboard" });
+            } catch (_error) {
+                next();
+            }
         } else {
             next();
         }

@@ -23,7 +23,11 @@ const photoInput = ref(null);
 
 const init = async () => {
     if (!user.value) {
-        await checkAuth();
+        try {
+            await checkAuth();
+        } catch {
+            return;
+        }
     }
     form.value.name = user.value?.name || "";
     form.value.email = user.value?.email || "";

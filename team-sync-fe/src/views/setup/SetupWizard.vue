@@ -3,7 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useSetupStore } from "@/stores/setup";
 import { useToast } from "@/composables/useToast";
-import Cookies from "js-cookie";
+import { useAuthStore } from "@/stores/auth";
 import {
     KeyRound,
     Stethoscope,
@@ -20,6 +20,7 @@ import {
 
 const router = useRouter();
 const setupStore = useSetupStore();
+const authStore = useAuthStore();
 const toast = useToast();
 
 const currentStep = ref(1);
@@ -126,7 +127,7 @@ const submitBootstrap = async () => {
         );
 
         if (result?.token) {
-            Cookies.set("token", result.token);
+            authStore.setToken(result.token);
         }
 
         setupComplete.value = true;

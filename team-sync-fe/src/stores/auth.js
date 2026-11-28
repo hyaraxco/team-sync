@@ -24,16 +24,31 @@ const resetAllStores = () => {
 
 export const useAuthStore = defineStore("auth", {
     state: () => ({
+        token: Cookies.get("token"),
         user: null,
         loading: false,
         error: null,
         success: null,
     }),
     getters: {
-        token: () => Cookies.get("token"),
         isAuthenticated: (state) => !!state.user,
     },
     actions: {
+        setToken(token, remember = false) {
+            this.token = token;
+            if (remember) {
+                Cookies.set("token", token, { expires: 30 });
+            } else {
+                Cookies.set("token", token);
+            }
+        },
+
+        clearSession() {
+            this.token = undefined;
+            this.user = null;
+            Cookies.remove("token");
+        },
+
         async login(credentials) {
             this.loading = true;
             this.error = null;
@@ -43,21 +58,14 @@ export const useAuthStore = defineStore("auth", {
                 const { remember = false, ...authPayload } = credentials || {};
                 const response = await axiosInstance.post("/login", authPayload);
 
-                const token = response.data.data.token;
-
-                if (remember) {
-                    Cookies.set("token", token, { expires: 30 });
-                } else {
-                    Cookies.set("token", token);
-                }
-
-                this.success = response.data.message;
+                this.setToken(response.data.data.token, remember);
 
                 // Populate user immediately so the sidebar renders the correct
                 // role/permissions before the router guard fires.
                 await this.checkAuth();
 
-                router.push({ name: "admin.dashboard" });
+                this.success = response.data.message;
+                await router.push({ name: "admin.dashboard" });
             } catch (error) {
                 this.error = handleError(error);
             } finally {
@@ -67,16 +75,17 @@ export const useAuthStore = defineStore("auth", {
 
         async checkAuth() {
             this.loading = true;
+            this.error = null;
             try {
                 const response = await axiosInstance.get("/me");
                 this.user = response.data.data;
                 return this.user;
             } catch (error) {
                 if (error.response && error.response.status === 401) {
-                    Cookies.remove("token");
-                    throw new Error("Unauthorized");
+                    this.clearSession();
                 }
                 this.error = handleError(error);
+                throw error;
             } finally {
                 this.loading = false;
             }
@@ -107,14 +116,13 @@ export const useAuthStore = defineStore("auth", {
                 }
             }
 
-            Cookies.remove("token");
+            this.clearSession();
 
             if (axiosInstance?.defaults?.headers?.common) {
                 delete axiosInstance.defaults.headers.common.Authorization;
             }
 
             // Reset all stores before navigation so the next login starts clean.
-            this.user = null;
             this.error = null;
             this.loading = false;
             resetAllStores();
@@ -159,9 +167,8 @@ export const useAuthStore = defineStore("auth", {
 
                 const response = await axiosInstance.post("/me", formData);
 
-                this.success = response.data.message || "Profil berhasil diperbarui";
-                // refresh user
                 await this.checkAuth();
+                this.success = response.data.message || "Profil berhasil diperbarui";
                 return response.data.data;
             } catch (error) {
                 this.error = handleError(error);

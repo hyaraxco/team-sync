@@ -70,6 +70,7 @@ describe("Benchmark: Auth Store", () => {
                 data: { token: "benchmark-jwt-token" },
             },
         });
+        axiosInstance.get.mockResolvedValueOnce({ data: { data: { id: 1, permissions: ["dashboard-menu"] } } });
 
         await store.login({ email: "hr@teamsync.com", password: "REDACTED", remember: true });
 
@@ -112,7 +113,7 @@ describe("Benchmark: Auth Store", () => {
     });
 
     it("logout: clears token and navigates to login", async () => {
-        Cookies.get.mockReturnValueOnce("existing-token");
+        store.setToken("existing-token");
         axiosInstance.post.mockResolvedValueOnce({ data: { message: "Logged out" } });
         store.user = { id: 1, name: "Test" };
 

@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { mount } from "@vue/test-utils";
+import { flushPromises, mount } from "@vue/test-utils";
 import { nextTick, ref } from "vue";
+
+const { setToken } = vi.hoisted(() => ({ setToken: vi.fn() }));
 
 // 1. Action mocks
 const fetchSetupStatus = vi.fn().mockResolvedValue({});
@@ -45,6 +47,10 @@ vi.mock("@/stores/setup", () => ({
     }),
 }));
 
+vi.mock("@/stores/auth", () => ({
+    useAuthStore: () => ({ setToken }),
+}));
+
 const toastSuccess = vi.fn();
 const toastError = vi.fn();
 
@@ -53,14 +59,6 @@ vi.mock("@/composables/useToast", () => ({
         success: toastSuccess,
         error: toastError,
     }),
-}));
-
-vi.mock("js-cookie", () => ({
-    default: {
-        set: vi.fn(),
-        get: vi.fn(),
-        remove: vi.fn(),
-    },
 }));
 
 vi.mock("pinia", async (importOriginal) => {
@@ -119,6 +117,7 @@ describe("SetupWizard smoke", () => {
         activateLicense.mockClear();
         fetchDoctor.mockClear();
         bootstrap.mockClear();
+        setToken.mockClear();
         resetError.mockClear();
         push.mockClear();
         replace.mockClear();
@@ -163,6 +162,29 @@ describe("SetupWizard smoke", () => {
 
         const button = wrapper.find("button");
         expect(button.attributes("disabled")).toBeDefined();
+    });
+
+    it("stores the bootstrap session and shows setup completion after creating the admin", async () => {
+        hasLicense.value = true;
+        doctorResult.value = { healthy: true };
+        const wrapper = factory();
+        await flushPromises();
+
+        await wrapper.findAll("button").find((button) => button.text().includes("Lanjut")).trigger("click");
+        await wrapper.get('input[type="text"]').setValue("Setup Admin");
+        await wrapper.get('input[type="email"]').setValue("admin@example.test");
+        const passwords = wrapper.findAll('input[type="password"]');
+        await passwords[0].setValue("setup-password");
+        await passwords[1].setValue("setup-password");
+        await wrapper.get("form").trigger("submit");
+        await flushPromises();
+
+        expect(bootstrap).toHaveBeenCalledWith("Setup Admin", "admin@example.test", "setup-password", "setup-password");
+        expect(setToken).toHaveBeenCalledWith("fake-token");
+        expect(wrapper.text()).toContain("Server Anda sudah menyala!");
+        expect(wrapper.find("form").exists()).toBe(false);
+        await wrapper.get("button").trigger("click");
+        expect(replace).toHaveBeenCalledWith({ name: "login" });
     });
 
     it("redirects to login when setup is not needed", async () => {
