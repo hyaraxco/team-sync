@@ -39,17 +39,20 @@ const retry = () => {
 <template>
     <slot v-if="!hasError" />
     <div v-else class="flex flex-col items-center justify-center py-12 px-4">
-        <div class="w-16 h-16 rounded-full bg-red-50 flex items-center justify-center mb-4">
-            <AlertTriangle class="w-8 h-8 text-red-500" />
+        <div class="w-16 h-16 rounded-full bg-[var(--color-surface)] flex items-center justify-center mb-4">
+            <AlertTriangle aria-hidden="true" class="w-8 h-8 text-[var(--color-feedback-danger)]" />
         </div>
-        <h3 class="text-lg font-semibold text-brand-dark mb-1">{{ fallbackTitle }}</h3>
-        <p class="text-sm text-brand-light text-center max-w-md">{{ fallbackSubtitle }}</p>
+        <div role="alert" aria-atomic="true">
+            <h3 class="text-lg font-semibold text-[var(--color-text-primary)] mb-1">{{ fallbackTitle }}</h3>
+            <p class="text-sm text-[var(--color-text-secondary)] text-center max-w-md">{{ fallbackSubtitle }}</p>
+        </div>
         <button
             v-if="showRetry"
             @click="retry"
-            class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-brand-primary hover:bg-brand-primary active:scale-[0.97] transition-all duration-150"
+            type="button"
+            class="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium text-white bg-primary-700 hover:bg-primary-800 motion-reduce:transition-none transition-colors duration-150"
         >
-            <RefreshCw class="w-4 h-4" />
+            <RefreshCw aria-hidden="true" class="w-4 h-4" />
             Try Again
         </button>
         <slot name="error-details" :error="errorInfo" />

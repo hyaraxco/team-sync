@@ -1,7 +1,7 @@
 import { mount } from "@vue/test-utils";
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { createPinia, setActivePinia } from "pinia";
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 
@@ -82,6 +82,23 @@ describe("HybridScheduleList smoke", () => {
     it("calls fetchAllPaginated on mount", () => {
         createWrapper();
         expect(fetchAllPaginated).toHaveBeenCalled();
+    });
+
+    it("dismisses the store error and shows a later failure", async () => {
+        error.value = "Schedule request failed";
+        const wrapper = createWrapper();
+        expect(wrapper.get('[role="alert"] h4').text()).toBe("Unable to load hybrid schedules");
+        expect(wrapper.get('[role="alert"]').text()).toContain("Schedule request failed");
+
+        await wrapper.get('button[aria-label="Close"]').trigger("click");
+        expect(error.value).toBe(null);
+        expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+
+        error.value = "Later schedule request failed";
+        await nextTick();
+        expect(wrapper.get('[role="alert"] h4').text()).toBe("Unable to load hybrid schedules");
+        expect(wrapper.get('[role="alert"]').text()).toContain("Later schedule request failed");
+        wrapper.unmount();
     });
 
     it("displays tab navigation", () => {

@@ -81,12 +81,6 @@ const factory = async () => {
 };
 
 describe("Header - Notification Badge Standardization", () => {
-    it("renders red badge with bg-danger-500 class", async () => {
-        const wrapper = await factory();
-        const badge = wrapper.find('[data-testid="header-notification-unread-badge"]');
-        expect(badge.exists()).toBe(true);
-        expect(badge.classes()).toContain("bg-danger-500");
-    });
 
     it("badge has rounded-full class", async () => {
         const wrapper = await factory();

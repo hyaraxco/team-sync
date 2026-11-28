@@ -22,6 +22,17 @@ const showConfirmDialog = ref(false);
 const confirmTitle = ref("");
 const confirmMessage = ref("");
 const confirmAction = ref(null);
+const confirming = ref(false);
+const runConfirmation = async () => {
+    if (confirming.value) return;
+    confirming.value = true;
+    try {
+        await confirmAction.value?.();
+        showConfirmDialog.value = false;
+    } finally {
+        confirming.value = false;
+    }
+};
 
 const defaultForm = () => ({
     name: "",
@@ -124,6 +135,7 @@ const saveTemplate = async () => {
 };
 
 const deleteTemplate = async (template) => {
+    if (confirming.value) return;
     confirmTitle.value = "Delete Template";
     confirmMessage.value = `Delete template "${template.name}"? This action cannot be undone.`;
     confirmAction.value = async () => {
@@ -394,12 +406,13 @@ onMounted(() => {
     <!-- Confirmation Dialog -->
     <ConfirmationModal
         :show="showConfirmDialog"
+        :loading="confirming"
         :title="confirmTitle"
         :message="confirmMessage"
         confirm-text="Delete"
         cancel-text="Cancel"
         type="danger"
-        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @confirm="runConfirmation"
         @cancel="showConfirmDialog = false"
     />
 </template>

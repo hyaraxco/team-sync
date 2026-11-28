@@ -1,6 +1,8 @@
 <script setup>
 import { ChevronLeft, ChevronRight } from "lucide-vue-next";
-import { computed, ref, watch } from "vue";
+import { computed, ref, watch, useId } from "vue";
+
+const perPageId = useId();
 
 const props = defineProps({
     meta: {
@@ -131,12 +133,13 @@ const goToNext = () => {
             </p>
 
             <div class="flex items-center gap-2 flex-wrap">
-                <p class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">Show</p>
+                <label :for="perPageId" class="text-brand-light font-['Plus_Jakarta_Sans'] text-xs sm:text-[14px] font-normal">Items per page</label>
                 <select
+                    :id="perPageId"
                     :value="selectedPerPage"
                     @change="handlePerPageChange(parseInt($event.target.value))"
                     :disabled="loading"
-                    class="w-full sm:w-auto px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary transition-all duration-300 appearance-none disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--color-surface); color: var(--color-brand-dark);"
+                    class="w-full sm:w-auto px-3 py-2 border border-brand-border rounded-lg hover:border-brand-primary focus:border-brand-primary motion-reduce:transition-none transition-all duration-300 appearance-none disabled:opacity-50 disabled:cursor-not-allowed" style="background-color: var(--color-surface); color: var(--color-brand-dark);"
                 >
                     <option
                         v-if="selectedPerPage && !perPageOptions.includes(selectedPerPage)"
@@ -152,9 +155,10 @@ const goToNext = () => {
 
         <div class="flex flex-wrap items-center gap-2 justify-center sm:justify-start">
             <button
+                type="button"
                 @click="goToPrevious"
                 :disabled="currentPage <= 1 || loading"
-                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised motion-reduce:transition-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Previous page"
             >
                 <ChevronLeft class="w-4 h-4" />
@@ -162,15 +166,16 @@ const goToNext = () => {
 
             <template v-for="page in visiblePages" :key="page">
                 <button
+                    type="button"
                     v-if="page !== '...'"
                     @click="handlePageChange(page)"
                     :disabled="loading"
                     :aria-label="`Go to page ${page}`"
                     :aria-current="page === currentPage ? 'page' : undefined"
                     :class="[
-                        'px-3 sm:px-4 py-2 border rounded-lg font-semibold transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
+                        'px-3 sm:px-4 py-2 border rounded-lg font-semibold motion-reduce:transition-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed',
                         page === currentPage
-                            ? 'border-primary-700 blue-gradient blue-btn-shadow text-white'
+                            ? 'border-primary-700 bg-primary-700 hover:bg-primary-800 text-white'
                             : 'border-brand-border text-brand-dark hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised',
                     ]"
                 >
@@ -180,9 +185,10 @@ const goToNext = () => {
             </template>
 
             <button
+                type="button"
                 @click="goToNext"
                 :disabled="currentPage >= lastPage || loading"
-                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-3 sm:px-4 py-2 border border-brand-border text-brand-dark rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-surface-raised motion-reduce:transition-none transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 aria-label="Next page"
             >
                 <ChevronRight class="w-4 h-4" />

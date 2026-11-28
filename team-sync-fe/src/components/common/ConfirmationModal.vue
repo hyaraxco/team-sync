@@ -1,6 +1,7 @@
 <script setup>
 import { X, AlertTriangle } from "lucide-vue-next";
-import { ref, watch, onMounted, onUnmounted, nextTick } from "vue";
+import { ref, useId } from "vue";
+import { useModalLifecycle } from "@/composables/useModalLifecycle";
 
 const props = defineProps({
     show: {
@@ -35,74 +36,33 @@ const props = defineProps({
 
 const emit = defineEmits(["confirm", "cancel"]);
 const modalRef = ref(null);
-let previouslyFocused = null;
-
-const handleConfirm = () => emit("confirm");
-const handleCancel = () => emit("cancel");
-
-const getFocusableElements = () => {
-    if (!modalRef.value) return [];
-    return Array.from(
-        modalRef.value.querySelectorAll(
-            'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
-        )
-    );
-};
-
-const handleKeydown = (e) => {
-    if (!props.show) return;
-    if (e.key === "Escape") {
-        handleCancel();
-        return;
-    }
-    if (e.key === "Tab") {
-        const focusable = getFocusableElements();
-        if (focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (e.shiftKey) {
-            if (document.activeElement === first) {
-                e.preventDefault();
-                last.focus();
-            }
-        } else {
-            if (document.activeElement === last) {
-                e.preventDefault();
-                first.focus();
-            }
-        }
-    }
-};
-
-watch(
+const id = useId();
+const titleId = `confirm-title-${id}`;
+const messageId = `confirm-message-${id}`;
+const handleConfirm = () => { if (!props.loading) emit("confirm"); };
+const { layer, dismiss: handleCancel } = useModalLifecycle(
     () => props.show,
-    async (val) => {
-        if (val) {
-            previouslyFocused = document.activeElement;
-            await nextTick();
-            const focusable = getFocusableElements();
-            if (focusable.length > 0) focusable[0].focus();
-        } else {
-            if (previouslyFocused) previouslyFocused.focus();
-        }
-    }
+    modalRef,
+    () => emit("cancel"),
 );
-
-onMounted(() => document.addEventListener("keydown", handleKeydown));
-onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
 </script>
 
 <template>
+    <Teleport to="body">
     <div
         v-if="show"
-        role="dialog"
-        aria-modal="true"
-        :aria-labelledby="`confirm-title-${title.replace(/\s+/g, '-').toLowerCase()}`"
-        class="fixed inset-0 backdrop-blur-sm bg-black/30 z-50 flex items-center justify-center p-4"
+        ref="modalRef"
+        data-modal-overlay
+        :style="{ zIndex: layer }"
+        class="fixed inset-0 backdrop-blur-sm bg-black/30 flex items-center justify-center p-4"
         @click.self="handleCancel"
     >
         <div
-            ref="modalRef"
+            role="dialog"
+            aria-modal="true"
+            :aria-labelledby="titleId"
+            :aria-describedby="messageId"
+            tabindex="-1"
             class="rounded-2xl border border-brand-border w-full max-w-md overflow-hidden"
             style="background: var(--color-surface)"
         >
@@ -119,6 +79,7 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                             }"
                         >
                             <AlertTriangle
+                                aria-hidden="true"
                                 class="w-6 h-6"
                                 :class="{
                                     'text-red-600': type === 'danger',
@@ -128,23 +89,24 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                             />
                         </div>
                         <div>
-                            <h3 :id="`confirm-title-${title.replace(/\s+/g, '-').toLowerCase()}`" class="text-brand-dark text-xl font-bold">{{ title }}</h3>
+                            <h3 :id="titleId" class="text-brand-dark text-xl font-bold">{{ title }}</h3>
                         </div>
                     </div>
                     <button
                         type="button"
                         @click="handleCancel"
                         aria-label="Close"
-                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center hover:ring-2 hover:ring-brand-primary/20 transition-all duration-200"
+                        class="w-10 h-10 rounded-full border border-brand-border flex items-center justify-center transition-colors motion-reduce:transition-none duration-200 disabled:opacity-50"
                     >
-                        <X class="w-5 h-5 text-gray-600" aria-hidden="true" />
+                        <X class="w-5 h-5 text-brand-light" aria-hidden="true" />
                     </button>
                 </div>
             </div>
 
             <!-- Content -->
             <div class="p-6">
-                <p class="text-brand-light text-base">{{ message }}</p>
+                <p :id="messageId" class="text-brand-light text-base">{{ message }}</p>
+                <p role="status" aria-live="polite" class="sr-only">{{ loading ? "Processing..." : "" }}</p>
             </div>
 
             <!-- Actions -->
@@ -153,7 +115,7 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                     type="button"
                     @click="handleCancel"
                     :disabled="loading"
-                    class="border border-brand-border rounded-lg hover:ring-2 hover:ring-brand-primary/20 hover:bg-gray-50 transition-all duration-300 px-6 py-3"
+                    class="border border-brand-border rounded-lg transition-colors motion-reduce:transition-none duration-300 px-6 py-3 disabled:opacity-50"
                 >
                     <span class="text-brand-dark text-base font-semibold">{{ cancelText }}</span>
                 </button>
@@ -161,20 +123,19 @@ onUnmounted(() => document.removeEventListener("keydown", handleKeydown));
                     type="button"
                     @click="handleConfirm"
                     :disabled="loading"
-                    class="rounded-lg border hover:brightness-110 focus:ring-2 transition-all duration-300 px-6 py-3 flex items-center gap-2"
+                    class="rounded-lg border border-transparent focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 transition-colors motion-reduce:transition-none duration-300 px-6 py-3 flex items-center gap-2 disabled:opacity-50"
                     :class="{
-                        'bg-gradient-to-r from-red-500 to-red-600 shadow-lg focus:ring-red-500':
-                            type === 'danger',
-                        'bg-gradient-to-r from-yellow-500 to-yellow-600 shadow-lg focus:ring-yellow-500':
-                            type === 'warning',
-                        'blue-gradient blue-btn-shadow focus:ring-brand-primary': type === 'info',
+                        'bg-red-700 hover:bg-red-800 text-white': type === 'danger',
+                        'bg-amber-800 hover:bg-amber-900 text-white': type === 'warning',
+                        'bg-blue-800 hover:bg-blue-900 text-white': type === 'info',
                     }"
                 >
-                    <span class="text-brand-white text-base font-semibold">
+                    <span class="text-white text-base font-semibold">
                         {{ loading ? "Processing..." : confirmText }}
                     </span>
                 </button>
             </div>
         </div>
     </div>
+    </Teleport>
 </template>

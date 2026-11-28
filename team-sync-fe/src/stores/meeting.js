@@ -14,6 +14,7 @@ export const useMeetingStore = defineStore("meeting", {
         },
         loading: false,
         loadingUpcoming: false,
+        upcomingError: null,
         error: null,
         success: null,
     }),
@@ -36,13 +37,14 @@ export const useMeetingStore = defineStore("meeting", {
 
         async fetchUpcomingMeetings(params = {}) {
             this.loadingUpcoming = true;
+            this.upcomingError = null;
 
             try {
                 const response = await axiosInstance.get("/meetings/upcoming", { params });
 
                 this.upcomingMeetings = response.data.data;
             } catch (error) {
-                this.error = handleError(error);
+                this.upcomingError = handleError(error);
             } finally {
                 this.loadingUpcoming = false;
             }

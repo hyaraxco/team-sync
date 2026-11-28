@@ -15,6 +15,11 @@ export function useAnimatedNumber(source, options = {}) {
 
     const displayValue = ref("0");
     let animationId = null;
+    const motionQuery = typeof window.matchMedia === "function"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)") : null;
+    const reducedMotion = ref(motionQuery?.matches ?? false);
+    const updateMotion = (event) => { reducedMotion.value = event.matches; };
+    motionQuery?.addEventListener("change", updateMotion);
 
     function easeOutCubic(t) {
         return 1 - Math.pow(1 - t, 3);
@@ -27,9 +32,9 @@ export function useAnimatedNumber(source, options = {}) {
             animationId = null;
         }
 
-        // If target is 0 or NaN, just set immediately
-        if (isNaN(to) || to === 0) {
-            displayValue.value = to === 0 ? "0" : String(to);
+        if (isNaN(to) || to === 0 || reducedMotion.value || duration <= 0) {
+            displayValue.value = isNaN(to) ? String(to)
+                : decimals > 0 ? to.toFixed(decimals) : Math.round(to).toLocaleString();
             return;
         }
 
@@ -54,8 +59,8 @@ export function useAnimatedNumber(source, options = {}) {
     }
 
     watch(
-        source,
-        (newVal, oldVal) => {
+        [source, reducedMotion],
+        ([newVal], [oldVal] = []) => {
             const to = typeof newVal === "string" ? parseFloat(newVal) : Number(newVal);
             const from = oldVal == null ? 0 : typeof oldVal === "string" ? parseFloat(oldVal) : Number(oldVal);
 
@@ -70,6 +75,7 @@ export function useAnimatedNumber(source, options = {}) {
     );
 
     onUnmounted(() => {
+        motionQuery?.removeEventListener("change", updateMotion);
         if (animationId) {
             cancelAnimationFrame(animationId);
         }

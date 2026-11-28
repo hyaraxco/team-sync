@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <label :for="fieldId" class="block text-sm font-medium text-gray-700 mb-1.5" v-if="label">
+    <div :class="$attrs.class" :style="$attrs.style">
+        <label :for="fieldId" class="block text-sm font-medium text-brand-dark mb-1.5" v-if="label">
             {{ label }}
         </label>
 
@@ -11,21 +11,21 @@
             </div>
 
             <select
+                v-bind="controlAttrs()"
                 :id="fieldId"
                 :name="name"
                 v-model="modelValue"
                 :required="required"
                 :aria-invalid="error ? 'true' : undefined"
-                :aria-describedby="error ? errorId : undefined"
+                :aria-describedby="[$attrs['aria-describedby'], error ? errorId : null].filter(Boolean).join(' ') || undefined"
                 :class="[
-                    'appearance-none w-full pr-10 py-3 border rounded-2xl transition-all duration-300 font-semibold',
+                    'appearance-none w-full pr-10 py-3 border rounded-2xl motion-reduce:transition-none transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
                     'hover:ring-2 hover:ring-brand-primary/20',
                     'focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white',
                     'cursor-pointer',
                     borderColor,
                 ]"
-                :style="selectStyle"
                 @change="modelValue = $event.target.value"
             >
                 <option v-if="placeholder" value="">{{ placeholder }}</option>
@@ -40,7 +40,7 @@
                 </svg>
             </div>
         </div>
-        <p v-if="error" :id="errorId" role="alert" class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1">
+        <p v-if="error" :id="errorId" role="alert" class="text-xs text-[var(--color-feedback-danger)] mt-1 flex items-start gap-1 px-1">
             <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path
                     stroke-linecap="round"
@@ -55,7 +55,15 @@
 </template>
 
 <script setup>
-import { computed, useSlots } from "vue";
+import { computed, useSlots, useAttrs, useId } from "vue";
+
+defineOptions({ inheritAttrs: false });
+const attrs = useAttrs();
+const controlAttrs = () => {
+    const { class: wrapperClass, style: wrapperStyle, ...nativeAttrs } = attrs;
+    return nativeAttrs;
+};
+const generatedId = useId();
 const slots = useSlots();
 const hasIcon = computed(() => !!slots.icon);
 
@@ -74,14 +82,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["update:modelValue"]);
 
-const fieldId = computed(() => {
-    if (props.id) return props.id;
-    if (props.name) return props.name;
-    return `select-${String(props.label)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")}`;
-});
+const fieldId = computed(() => props.id || `select-${generatedId}`);
 
 const errorId = computed(() => `${fieldId.value}-error`);
 

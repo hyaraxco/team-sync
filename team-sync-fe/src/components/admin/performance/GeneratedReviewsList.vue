@@ -36,6 +36,17 @@ const showConfirmDialog = ref(false);
 const confirmTitle = ref("");
 const confirmMessage = ref("");
 const confirmAction = ref(null);
+const confirming = ref(false);
+const runConfirmation = async () => {
+    if (confirming.value) return;
+    confirming.value = true;
+    try {
+        await confirmAction.value?.();
+        showConfirmDialog.value = false;
+    } finally {
+        confirming.value = false;
+    }
+};
 
 const canGenerate = computed(() => ["draft", "active"].includes(props.cycle.status));
 
@@ -46,6 +57,7 @@ onMounted(async () => {
 });
 
 const generateReviews = async () => {
+    if (confirming.value) return;
     confirmTitle.value = "Generate Reviews";
     confirmMessage.value =
         "Are you sure you want to generate reviews based on the assignment rules? This will only generate reviews for staff members who do not have one yet in this cycle.";
@@ -291,12 +303,13 @@ const getAvatarUrl = (user) => {
     <!-- Confirmation Dialog -->
     <ConfirmationModal
         :show="showConfirmDialog"
+        :loading="confirming"
         :title="confirmTitle"
         :message="confirmMessage"
         confirm-text="Generate"
         cancel-text="Cancel"
         type="info"
-        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @confirm="runConfirmation"
         @cancel="showConfirmDialog = false"
     />
 </template>

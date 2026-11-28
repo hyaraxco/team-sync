@@ -1,6 +1,6 @@
 <template>
-    <div class="w-full space-y-2 focus-within:z-10 relative text-left">
-        <label :for="fieldId" class="block text-sm font-medium text-gray-700" v-if="label">
+    <div class="w-full space-y-2 focus-within:z-10 relative text-left" :class="$attrs.class" :style="$attrs.style">
+        <label :for="fieldId" class="block text-sm font-medium text-brand-dark" v-if="label">
             {{ label }}
         </label>
 
@@ -8,12 +8,13 @@
             <!-- slot icon -->
             <div
                 v-if="hasIcon"
-                class="absolute left-4 flex h-full items-center pointer-events-none text-gray-400 transition-colors peer-focus:text-brand-primary z-10"
+                class="absolute left-4 flex h-full items-center pointer-events-none text-gray-400 motion-reduce:transition-none transition-colors peer-focus:text-brand-primary z-10"
             >
                 <slot name="icon" />
             </div>
 
             <input
+                v-bind="controlAttrs()"
                 :id="fieldId"
                 :name="name"
                 :type="type"
@@ -21,12 +22,12 @@
                 :placeholder="placeholder"
                 :required="required"
                 :aria-invalid="error ? 'true' : undefined"
-                :aria-describedby="error ? errorId : undefined"
+                :aria-describedby="[$attrs['aria-describedby'], error ? errorId : null].filter(Boolean).join(' ') || undefined"
                 :min="min"
                 :max="max"
                 :step="step"
                 :autocomplete="autocomplete"
-                class="peer w-full h-full bg-white text-gray-950 border text-sm rounded-2xl outline-none transition-all duration-200 placeholder:text-gray-600 placeholder:font-normal font-medium"
+                class="peer w-full h-full bg-white text-gray-950 border text-sm rounded-2xl motion-reduce:transition-none transition-all duration-200 placeholder:text-gray-600 placeholder:font-normal font-medium"
                 :class="[
                     hasIcon ? 'pl-12' : 'pl-4',
                     hasSuffix ? 'pr-12' : 'pr-4',
@@ -49,7 +50,7 @@
             v-if="error"
             :id="errorId"
             role="alert"
-            class="text-xs text-red-600 mt-1 flex items-start gap-1 px-1"
+            class="text-xs text-[var(--color-feedback-danger)] mt-1 flex items-start gap-1 px-1"
         >
             <svg class="w-3.5 h-3.5 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path
@@ -65,7 +66,15 @@
 </template>
 
 <script setup>
-import { computed, useSlots } from "vue";
+import { computed, useSlots, useAttrs, useId } from "vue";
+
+defineOptions({ inheritAttrs: false });
+const attrs = useAttrs();
+const controlAttrs = () => {
+    const { class: wrapperClass, style: wrapperStyle, ...nativeAttrs } = attrs;
+    return nativeAttrs;
+};
+const generatedId = useId();
 
 const props = defineProps({
     id: { type: String, default: "" },
@@ -87,14 +96,7 @@ const slots = useSlots();
 const hasIcon = computed(() => !!slots.icon);
 const hasSuffix = computed(() => !!slots.suffix);
 
-const fieldId = computed(() => {
-    if (props.id) return props.id;
-    if (props.name) return props.name;
-    return `input-${String(props.label)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")}`;
-});
+const fieldId = computed(() => props.id || `input-${generatedId}`);
 
 const errorId = computed(() => `${fieldId.value}-error`);
 

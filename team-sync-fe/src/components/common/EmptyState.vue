@@ -73,8 +73,10 @@ const sizes = sizeClasses[props.size] || sizeClasses.md;
 
 <template>
     <div :class="['text-center', sizes.wrapper]">
+        <div role="status" aria-atomic="true">
         <component 
             :is="iconComponent" 
+            aria-hidden="true"
             :class="['mx-auto', sizes.icon]"
             :style="{ color: 'var(--color-text-muted)' }"
         />
@@ -91,6 +93,7 @@ const sizes = sizeClasses[props.size] || sizeClasses.md;
         >
             {{ subtitle }}
         </p>
+        </div>
         <slot />
     </div>
 </template>

@@ -1,5 +1,6 @@
 <script setup>
 import { AlertCircle } from "lucide-vue-next";
+import { useId } from "vue";
 import ModalWrapper from "@/components/common/ModalWrapper.vue";
 
 defineProps({
@@ -9,10 +10,12 @@ defineProps({
     },
 });
 const emit = defineEmits(["close"]);
+const titleId = `error-title-${useId()}`;
+const messageId = `error-message-${useId()}`;
 </script>
 
 <template>
-    <ModalWrapper :show="show" maxWidth="sm" @close="emit('close')">
+    <ModalWrapper :show="show" :labelledby="titleId" :describedby="messageId" maxWidth="sm" @close="emit('close')">
         <!-- Modal Content -->
         <div class="text-center pt-2">
             <div class="flex justify-center mb-4">
@@ -21,8 +24,8 @@ const emit = defineEmits(["close"]);
                 </div>
             </div>
 
-            <h3 class="text-brand-dark text-xl font-bold mb-2">Oops! Something's Not Right</h3>
-            <p class="text-brand-light text-base font-normal mb-6">
+            <h3 :id="titleId" class="text-brand-dark text-xl font-bold mb-2">Oops! Something's Not Right</h3>
+            <p :id="messageId" class="text-brand-light text-base font-normal mb-6">
                 Please check your data again and make sure all required fields are filled correctly.
             </p>
 

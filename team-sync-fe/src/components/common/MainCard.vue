@@ -57,7 +57,7 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
     <div v-else class="main-card rounded-2xl border border-brand-dark relative overflow-hidden p-4 sm:p-5">
         <div class="flex flex-col justify-center h-full relative z-10">
             <!-- Trending Badge -->
-            <div v-if="trendLabel" class="flex items-center gap-2 mb-3">
+            <div v-if="trendLabel && !loading" class="flex items-center gap-2 mb-3">
                 <div class="flex items-center gap-1 px-3 py-1 bg-white/20 rounded-full backdrop-blur-sm">
                     <TrendingUp v-if="isTrendUp" aria-hidden="true" class="w-3 h-3 text-white" />
                     <TrendingDown v-else aria-hidden="true" class="w-3 h-3 text-white" />
@@ -68,10 +68,11 @@ const resolveIcon = computed(() => Icons[props.iconName] || Icons.HelpCircle);
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-3">
                 <div>
                     <p class="text-brand-white-90 text-sm font-medium">{{ title }}</p>
-                    <p class="text-brand-white text-3xl sm:text-5xl font-extrabold leading-none my-4 tabular-nums">
+                    <p v-if="loading" role="status" class="text-brand-white my-4">Loading {{ title }}...</p>
+                    <p v-else class="text-brand-white text-3xl sm:text-5xl font-extrabold leading-none my-4 tabular-nums">
                         {{ animatedDisplay }}
                     </p>
-                    <p class="text-brand-white-80 text-base font-normal">
+                    <p v-if="!loading" class="text-brand-white-80 text-base font-normal">
                         {{ subtitle }}
                     </p>
                 </div>

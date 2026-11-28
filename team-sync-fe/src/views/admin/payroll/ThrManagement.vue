@@ -28,6 +28,17 @@ const confirmTitle = ref("");
 const confirmMessage = ref("");
 const confirmText = ref("Confirm");
 const confirmAction = ref(null);
+const confirming = ref(false);
+const runConfirmation = async () => {
+    if (confirming.value) return;
+    confirming.value = true;
+    try {
+        await confirmAction.value?.();
+        showConfirmDialog.value = false;
+    } finally {
+        confirming.value = false;
+    }
+};
 
 const generateForm = ref({
     religion_event: "",
@@ -98,6 +109,7 @@ async function handleGenerate() {
 }
 
 async function handleApprove(thr) {
+    if (confirming.value) return;
     confirmTitle.value = "Approve THR";
     confirmMessage.value = `Approve THR ${thr.event_label} ${thr.year}?`;
     confirmText.value = "Approve";
@@ -114,6 +126,7 @@ async function handleApprove(thr) {
 }
 
 async function handleReopen(thr) {
+    if (confirming.value) return;
     confirmTitle.value = "Reopen THR";
     confirmMessage.value = `Reopen THR ${thr.event_label} ${thr.year}? This will move it back to pending status and require re-approval.`;
     confirmText.value = "Reopen";
@@ -442,12 +455,13 @@ function handlePageChange(page) {
     <!-- Confirmation Dialog -->
     <ConfirmationModal
         :show="showConfirmDialog"
+        :loading="confirming"
         :title="confirmTitle"
         :message="confirmMessage"
         :confirm-text="confirmText"
         cancel-text="Cancel"
         type="info"
-        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @confirm="runConfirmation"
         @cancel="showConfirmDialog = false"
     />
 </template>

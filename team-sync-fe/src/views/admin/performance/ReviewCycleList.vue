@@ -32,6 +32,17 @@ const showConfirmDialog = ref(false);
 const confirmTitle = ref("");
 const confirmMessage = ref("");
 const confirmAction = ref(null);
+const confirming = ref(false);
+const runConfirmation = async () => {
+    if (confirming.value) return;
+    confirming.value = true;
+    try {
+        await confirmAction.value?.();
+        showConfirmDialog.value = false;
+    } finally {
+        confirming.value = false;
+    }
+};
 
 const filteredCycles = computed(() => {
     let filtered = cycles.value;
@@ -81,6 +92,7 @@ const canDeleteCycle = (cycle) => {
 };
 
 const handleGenerateReviews = async (cycle) => {
+    if (confirming.value) return;
     confirmTitle.value = "Generate Reviews";
     confirmMessage.value = `Generate reviews for "${cycle.name}"? This will create reviews for all active employees.`;
     confirmAction.value = async () => {
@@ -99,6 +111,7 @@ const handleGenerateReviews = async (cycle) => {
 };
 
 const handleDeleteCycle = async (cycle) => {
+    if (confirming.value) return;
     confirmTitle.value = "Delete Cycle";
     confirmMessage.value = `Delete cycle "${cycle.name}"? This action cannot be undone.`;
     confirmAction.value = async () => {
@@ -327,12 +340,13 @@ onMounted(async () => {
     <!-- Confirmation Dialog -->
     <ConfirmationModal
         :show="showConfirmDialog"
+        :loading="confirming"
         :title="confirmTitle"
         :message="confirmMessage"
         confirm-text="Confirm"
         cancel-text="Cancel"
         type="danger"
-        @confirm="async () => { if (confirmAction) await confirmAction(); showConfirmDialog = false; }"
+        @confirm="runConfirmation"
         @cancel="showConfirmDialog = false"
     />
 </template>

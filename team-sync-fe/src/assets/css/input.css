@@ -31,6 +31,10 @@
     --color-text-muted: #686868;        /* AA against the light theme's darkest surface */
     --color-text-disabled: #D1D5DB;     /* text-gray-300 */
     --color-text-inverse: #ffffff;      /* white text on dark/brand backgrounds */
+    --color-feedback-danger: #B91C1C;
+    --color-feedback-success: #166534;
+    --color-feedback-warning: #92400E;
+    --color-feedback-info: #1E40AF;
 
     /* Sidebar */
     --sidebar-bg: #ffffff;
@@ -71,6 +75,10 @@
     --color-text-muted: #A3AFBF;
     --color-text-disabled: #475569;
     --color-text-inverse: #ffffff;      /* white text on dark/brand backgrounds */
+    --color-feedback-danger: #FCA5A5;
+    --color-feedback-success: #86EFAC;
+    --color-feedback-warning: #FDE68A;
+    --color-feedback-info: #93C5FD;
 
     /* Sidebar — dark mode */
     --sidebar-bg: #0F172A;

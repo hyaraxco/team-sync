@@ -220,7 +220,7 @@ const handleSeeAll = () => {
             <div class="relative z-10 flex items-center justify-between">
                 <div>
                     <p 
-                        class="text-[11px] font-semibold uppercase tracking-[0.16em] text-brand-primary"
+                        class="text-[11px] font-semibold uppercase tracking-[0.16em] text-[var(--color-feedback-info)]"
                     >
                         Notifications
                     </p>
@@ -235,7 +235,7 @@ const handleSeeAll = () => {
                     v-if="visibleNotifications.length > 0"
                     type="button"
                     data-testid="mark-all-read-btn"
-                    class="rounded-full border border-primary-200 bg-primary-50 px-2.5 py-1 text-[10px] font-semibold text-brand-primary transition-colors hover:bg-primary-100 disabled:opacity-50"
+                    class="rounded-full border border-primary-200 bg-[var(--color-surface)] px-2.5 py-1 text-[10px] font-semibold text-[var(--color-feedback-info)] transition-colors hover:underline disabled:opacity-50"
                     :disabled="markingAllRead"
                     @click="emit('mark-all-read')"
                 >
@@ -244,28 +244,28 @@ const handleSeeAll = () => {
             </div>
         </div>
 
-        <div v-if="loading" data-testid="notification-loading" class="px-4 py-4">
+        <div v-if="loading" role="status" data-testid="notification-loading" class="px-4 py-4">
             <p 
                 class="text-sm font-medium"
                 :style="{ color: 'var(--color-text-primary)' }"
             >
                 Loading notifications...
             </p>
-            <div class="mt-3 space-y-2.5">
-                <div class="h-2 w-20 animate-pulse rounded-full bg-primary-100"></div>
-                <div class="h-2 w-full animate-pulse rounded-full bg-primary-100"></div>
-                <div class="h-2 w-5/6 animate-pulse rounded-full bg-primary-100"></div>
+            <div aria-hidden="true" class="mt-3 space-y-2.5">
+                <div class="h-2 w-20 motion-safe:animate-pulse rounded-full bg-primary-100"></div>
+                <div class="h-2 w-full motion-safe:animate-pulse rounded-full bg-primary-100"></div>
+                <div class="h-2 w-5/6 motion-safe:animate-pulse rounded-full bg-primary-100"></div>
             </div>
         </div>
 
         <div v-else-if="errorMessage" class="space-y-3 px-4 py-4">
-            <p data-testid="notification-error" class="text-sm font-medium text-red-600">
+            <p role="alert" data-testid="notification-error" class="text-sm font-medium text-[var(--color-feedback-danger)]">
                 {{ errorMessage }}
             </p>
             <button
                 type="button"
                 data-testid="notification-retry"
-                class="rounded-full border border-primary-200 bg-primary-50 px-3 py-1.5 text-xs font-semibold text-brand-primary transition-colors hover:bg-primary-100"
+                class="rounded-full border border-primary-200 bg-[var(--color-surface)] px-3 py-1.5 text-xs font-semibold text-[var(--color-feedback-info)] transition-colors hover:underline"
                 @click="emit('retry')"
             >
                 Retry
@@ -275,10 +275,11 @@ const handleSeeAll = () => {
         <div
             v-else-if="visibleNotifications.length === 0"
             data-testid="notification-empty"
+            role="status"
             class="px-4 py-8 text-center"
         >
-            <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-lg">
-                <BellIcon class="h-5 w-5 text-brand-primary" />
+            <div aria-hidden="true" class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-primary-50 text-lg">
+                <BellIcon class="h-5 w-5 text-[var(--color-feedback-info)]" />
             </div>
             <p 
                 class="text-sm font-semibold"
@@ -314,6 +315,7 @@ const handleSeeAll = () => {
                     >
                         <component
                             :is="getActivityIcon(notification)"
+                            aria-hidden="true"
                             class="h-5 w-5"
                             :class="getIconTextClass(notification)"
                         />
@@ -353,7 +355,7 @@ const handleSeeAll = () => {
             <button
                 data-testid="see-all-link"
                 type="button"
-                class="text-sm font-medium text-brand-primary hover:text-brand-primary-dark transition-colors"
+                class="text-sm font-medium text-[var(--color-feedback-info)] hover:underline transition-colors"
                 @click="handleSeeAll"
             >
                 See all notifications →
@@ -375,6 +377,12 @@ const handleSeeAll = () => {
     to {
         opacity: 1;
         transform: translateY(0) scale(1);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .notification-panel--open {
+        animation: none;
     }
 }
 

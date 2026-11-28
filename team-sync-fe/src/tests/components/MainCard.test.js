@@ -8,6 +8,16 @@ describe('MainCard', () => {
     afterEach(() => {
         if (wrapper) wrapper.unmount()
     })
+    it('announces metric loading and removes it when data is ready', async () => {
+        wrapper = mount(MainCard, { props: { title: 'Total Revenue', value: 1000, loading: true } });
+        expect(wrapper.get('[role="status"]').text()).toBe('Loading Total Revenue...');
+        expect(wrapper.get('[role="status"]').element.closest('[aria-busy="true"]')).toBeNull();
+        expect(wrapper.find('.tabular-nums').exists()).toBe(false);
+        await wrapper.setProps({ loading: false });
+        expect(wrapper.find('[role="status"]').exists()).toBe(false);
+        expect(wrapper.find('.tabular-nums').exists()).toBe(true);
+    });
+
 
     it('renders card wrapper with CSS variable background', () => {
         wrapper = mount(MainCard, {

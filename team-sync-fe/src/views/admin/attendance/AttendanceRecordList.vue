@@ -62,7 +62,7 @@ const formatDate = (dateStr) => (dateStr ? formatDateShort(dateStr) : "-");
             />
         </div>
 
-        <Alert v-if="error" type="error" :message="error" dismissible @close="error = null" />
+        <Alert v-if="error" type="error" title="Unable to load attendance logs" :message="error" @close="error = null" />
 
         <!-- Table -->
         <DataTableCard :meta="meta" :loading="loading" @page-change="handlePageChange" @per-page-change="handlePerPageChange">

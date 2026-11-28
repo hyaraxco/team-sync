@@ -33,9 +33,9 @@ const emit = defineEmits(["cancel", "confirm"]);
 
 const confirmColorClass = computed(() => {
     const map = {
-        green: "bg-green-600 hover:bg-green-700",
-        red: "bg-red-600 hover:bg-red-700",
-        blue: "btn-primary blue-gradient blue-btn-shadow hover:brightness-110",
+        green: "bg-green-700 hover:bg-green-800",
+        red: "bg-red-700 hover:bg-red-800",
+        blue: "bg-primary-700 hover:bg-primary-800",
     };
     return map[props.confirmColor] || map.green;
 });
@@ -54,7 +54,7 @@ const displayProcessingLabel = computed(() => {
             type="button"
             @click="emit('cancel')"
             :disabled="processing"
-            class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 px-4 py-3 border border-brand-border rounded-xl text-brand-dark text-sm font-semibold hover:ring-2 hover:ring-brand-primary/20 transition-all duration-300 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
         >
             {{ cancelLabel }}
         </button>
@@ -62,7 +62,7 @@ const displayProcessingLabel = computed(() => {
             type="button"
             @click="emit('confirm')"
             :disabled="processing || confirmDisabled"
-            class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            class="flex-1 px-4 py-3 text-sm font-semibold text-white rounded-xl transition-all duration-300 motion-reduce:transition-none disabled:opacity-50 disabled:cursor-not-allowed"
             :class="confirmColorClass"
         >
             {{ processing ? displayProcessingLabel : confirmLabel }}

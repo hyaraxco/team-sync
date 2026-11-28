@@ -1,5 +1,7 @@
 <script setup>
-import { ref, computed, watch, onUnmounted } from "vue";
+import { ref, computed, watch, onUnmounted, useId } from "vue";
+
+const searchId = useId();
 import {
     SearchIcon,
     ChevronDownIcon,
@@ -140,6 +142,8 @@ onUnmounted(() => {
     >
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
             <!-- Search Bar -->
+            <div class="flex-1 space-y-1.5">
+                <label :for="searchId" class="block text-sm font-medium text-brand-dark">Search</label>
             <div class="flex-1 relative">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <SearchIcon 
@@ -148,10 +152,10 @@ onUnmounted(() => {
                     />
                 </div>
                 <input
+                    :id="searchId"
                     v-model="searchQuery"
                     type="text"
-                    aria-label="Search"
-                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 font-semibold"
+                    class="w-full pl-12 pr-4 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion-reduce:transition-none transition-all duration-300 font-semibold"
                     :style="{ 
                         background: 'var(--color-surface)',
                         color: 'var(--color-text-primary)'
@@ -159,11 +163,14 @@ onUnmounted(() => {
                     :placeholder="placeholder"
                 />
             </div>
+            </div>
 
             <!-- Filters and Actions -->
             <div class="flex flex-col sm:flex-row sm:items-center gap-3 w-full sm:w-auto">
                 <!-- Dynamic Filter Dropdowns -->
                 <div v-for="filter in filters" :key="filter.key" class="relative w-full sm:w-auto">
+                    <label :for="`${searchId}-${filter.key}`" class="block text-sm font-medium text-brand-dark mb-1.5">{{ filter.label }}</label>
+                    <div class="relative">
                     <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <component 
                             :is="getIcon(filter.icon)" 
@@ -173,8 +180,8 @@ onUnmounted(() => {
                     </div>
                     <select
                         v-model="filterValues[filter.key]"
-                        :aria-label="filter.label"
-                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 transition-all duration-300 appearance-none font-semibold"
+                        :id="`${searchId}-${filter.key}`"
+                        class="w-full sm:w-auto pl-10 pr-8 py-3 border border-brand-border rounded-2xl hover:ring-2 hover:ring-brand-primary/20 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 motion-reduce:transition-none transition-all duration-300 appearance-none font-semibold"
                         :style="{ 
                             background: 'var(--color-surface)',
                             color: 'var(--color-text-primary)'
@@ -191,13 +198,15 @@ onUnmounted(() => {
                             :style="{ color: 'var(--color-text-muted)' }"
                         />
                     </div>
+                    </div>
                 </div>
 
                 <!-- Reset Button (only shown when filters active) -->
                 <button
+                    type="button"
                     v-if="hasActiveFilters"
                     @click="handleReset"
-                    class="w-full sm:w-auto rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 transition-all duration-300 px-4 py-3 flex items-center justify-center sm:justify-start gap-2"
+                    class="w-full sm:w-auto rounded-lg border border-brand-border hover:border-red-400 hover:bg-red-50 motion-reduce:transition-none transition-all duration-300 px-4 py-3 flex items-center justify-center sm:justify-start gap-2"
                 >
                     <XIcon class="w-4 h-4 text-red-500" />
                     <span class="text-red-500 text-sm font-semibold">Reset</span>
@@ -205,9 +214,10 @@ onUnmounted(() => {
 
                 <!-- Search Button (optional) -->
                 <button
+                    type="button"
                     v-if="showSearchButton"
                     @click="handleSearchClick"
-                    class="btn-primary w-full sm:w-auto rounded-lg hover:brightness-110 focus:ring-2 focus:ring-brand-primary transition-all duration-300 blue-gradient blue-btn-shadow px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
+                    class="bg-primary-700 hover:bg-primary-800 text-white w-full sm:w-auto rounded-lg focus:ring-2 focus:ring-brand-primary motion-reduce:transition-none transition-all duration-300 px-6 py-3 flex items-center justify-center sm:justify-start gap-2"
                 >
                     <SearchIcon class="w-4 h-4 text-white" />
                     <span class="text-brand-white text-base font-semibold">Search</span>

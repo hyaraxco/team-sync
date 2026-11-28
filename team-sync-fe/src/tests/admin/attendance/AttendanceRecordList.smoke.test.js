@@ -57,7 +57,6 @@ const factory = () =>
                     template: '<button class="search-trigger" @click="$emit(\'search\')">Search</button>',
                 },
                 Pagination: defineComponent({ name: "Pagination", template: '<div class="pagination-stub"></div>' }),
-                Alert: defineComponent({ name: "Alert", template: '<div class="alert-stub"></div>' }),
                 EmptyState: defineComponent({ name: "EmptyState", template: '<div class="empty-state-stub"></div>' }),
                 StatusBadge: defineComponent({ name: "StatusBadge", template: '<div class="status-badge-stub"></div>' }),
             },
@@ -67,6 +66,7 @@ const factory = () =>
 describe("AttendanceRecordList smoke", () => {
     beforeEach(() => {
         vi.clearAllMocks();
+        attendanceStoreMock.error.value = null;
         searchFilterState.fetchData.mockResolvedValue(undefined);
     });
 
@@ -87,6 +87,23 @@ describe("AttendanceRecordList smoke", () => {
         await wrapper.find(".search-trigger").trigger("click");
 
         expect(searchFilterState.handleSearch).toHaveBeenCalled();
+    });
+
+    it("dismisses the store error and shows a later failure", async () => {
+        attendanceStoreMock.error.value = "Attendance request failed";
+        const wrapper = factory();
+        expect(wrapper.get('[role="alert"] h4').text()).toBe("Unable to load attendance logs");
+        expect(wrapper.get('[role="alert"]').text()).toContain("Attendance request failed");
+
+        await wrapper.get('button[aria-label="Close"]').trigger("click");
+        expect(attendanceStoreMock.error.value).toBe(null);
+        expect(wrapper.find('[role="alert"]').exists()).toBe(false);
+
+        attendanceStoreMock.error.value = "Later attendance request failed";
+        await nextTick();
+        expect(wrapper.get('[role="alert"] h4').text()).toBe("Unable to load attendance logs");
+        expect(wrapper.get('[role="alert"]').text()).toContain("Later attendance request failed");
+        wrapper.unmount();
     });
 
     it("keeps standardized list helpers with accessible page heading", () => {

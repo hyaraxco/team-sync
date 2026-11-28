@@ -12,9 +12,9 @@ describe("Select.vue smoke", () => {
         expect(control.classList.contains("relative")).toBe(true);
         expect(control.querySelector("select")).toBe(wrapper.find("select").element);
         expect(control.querySelector(".absolute")).toBeTruthy();
-        expect(wrapper.find("label").attributes("for")).toBe("department");
+        expect(wrapper.find("label").attributes("for")).toBe(wrapper.find("select").attributes("id"));
         expect(wrapper.find("select").attributes("aria-invalid")).toBe("true");
-        expect(wrapper.find("select").attributes("aria-describedby")).toBe("department-error");
+        expect(wrapper.find("select").attributes("aria-describedby")).toBe(wrapper.find("[role=alert]").attributes("id"));
         expect(wrapper.find("[role=alert]").text()).toBe("Choose a department");
     });
 });

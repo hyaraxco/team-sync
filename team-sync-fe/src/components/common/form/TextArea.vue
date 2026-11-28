@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <label :for="fieldId" class="block mb-2 text-sm font-semibold text-gray-600">
+    <div :class="$attrs.class" :style="$attrs.style">
+        <label :for="fieldId" class="block mb-2 text-sm font-semibold text-brand-dark">
             {{ label }}
         </label>
 
@@ -11,6 +11,7 @@
             </div>
 
             <textarea
+                v-bind="controlAttrs()"
                 :id="fieldId"
                 :name="name"
                 v-model="modelValue"
@@ -18,9 +19,9 @@
                 :placeholder="placeholder"
                 :required="required"
                 :aria-invalid="error ? 'true' : undefined"
-                :aria-describedby="error ? errorId : undefined"
+                :aria-describedby="[$attrs['aria-describedby'], error ? errorId : null].filter(Boolean).join(' ') || undefined"
                 :class="[
-                    'w-full pr-4 py-3 border rounded-2xl bg-white transition-all duration-300 font-semibold',
+                    'w-full pr-4 py-3 border rounded-2xl bg-white motion-reduce:transition-none transition-all duration-300 font-semibold',
                     hasIcon ? 'pl-12' : 'pl-4',
                     'hover:ring-2 hover:ring-brand-primary/20',
                     'focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 focus:bg-white',
@@ -30,14 +31,22 @@
             ></textarea>
         </div>
 
-        <p v-if="error" :id="errorId" role="alert" class="mt-2 text-sm text-red-600">
+        <p v-if="error" :id="errorId" role="alert" class="mt-2 text-sm text-[var(--color-feedback-danger)]">
             {{ error }}
         </p>
     </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, useAttrs, useId } from "vue";
+
+defineOptions({ inheritAttrs: false });
+const attrs = useAttrs();
+const controlAttrs = () => {
+    const { class: wrapperClass, style: wrapperStyle, ...nativeAttrs } = attrs;
+    return nativeAttrs;
+};
+const generatedId = useId();
 
 const props = defineProps({
     id: { type: String, default: "" },
@@ -55,14 +64,7 @@ import { useSlots } from "vue";
 const slots = useSlots();
 const hasIcon = computed(() => !!slots.icon);
 
-const fieldId = computed(() => {
-    if (props.id) return props.id;
-    if (props.name) return props.name;
-    return `textarea-${String(props.label)
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "")}`;
-});
+const fieldId = computed(() => props.id || `textarea-${generatedId}`);
 
 const errorId = computed(() => `${fieldId.value}-error`);
 
