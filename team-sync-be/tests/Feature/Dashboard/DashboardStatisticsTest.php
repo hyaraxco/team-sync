@@ -97,9 +97,20 @@ class DashboardStatisticsTest extends TestCase
             'description' => 'A completed task',
             'assignee_id' => $oldProfile->id,
             'priority' => 'medium',
-            'status' => 'completed',
+            'status' => 'done',
             'due_date' => now()->toDateString(),
             'updated_at' => Carbon::yesterday(),
+        ]);
+
+        // Non-done task must NOT be counted as completed
+        ProjectTask::query()->create([
+            'project_id' => $project->id,
+            'name' => 'WIP task',
+            'description' => 'Still in progress',
+            'assignee_id' => $oldProfile->id,
+            'priority' => 'medium',
+            'status' => 'in_progress',
+            'due_date' => now()->toDateString(),
         ]);
 
         Sanctum::actingAs($hrUser);
