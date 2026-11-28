@@ -94,13 +94,13 @@ class DashboardRepository implements DashboardRepositoryInterface
             // Single query for task stats
             $taskStats = DB::table('project_tasks')
                 ->selectRaw("
-                    COUNT(CASE WHEN status = 'completed' THEN 1 END) as total_completed,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as total_completed,
                     COUNT(CASE
-                        WHEN status = 'completed'
+                        WHEN status = ?
                         AND DATE(updated_at) = ?
                         THEN 1
                     END) as completed_yesterday
-                ", [$yesterday])
+                ", [TaskStatus::DONE->value, TaskStatus::DONE->value, $yesterday])
                 ->first();
 
             $tasksCompleted = (int) $taskStats->total_completed;
@@ -192,16 +192,23 @@ class DashboardRepository implements DashboardRepositoryInterface
             $taskStats = DB::table('project_tasks')
                 ->where('assignee_id', $employeeId)
                 ->selectRaw("
-                    COUNT(CASE WHEN status = 'done' THEN 1 END) as total_done,
-                    COUNT(CASE WHEN status = 'in_progress' THEN 1 END) as in_progress,
-                    COUNT(CASE WHEN status = 'todo' THEN 1 END) as todo,
-                    COUNT(CASE WHEN status = 'review' THEN 1 END) as review,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as total_done,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as in_progress,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as todo,
+                    COUNT(CASE WHEN status = ? THEN 1 END) as review,
                     COUNT(CASE
-                        WHEN status = 'done'
+                        WHEN status = ?
                         AND DATE(updated_at) = ?
                         THEN 1
                     END) as done_yesterday
-                ", [$yesterday])
+                ", [
+                    TaskStatus::DONE->value,
+                    TaskStatus::IN_PROGRESS->value,
+                    TaskStatus::TODO->value,
+                    TaskStatus::REVIEW->value,
+                    TaskStatus::DONE->value,
+                    $yesterday,
+                ])
                 ->first();
 
             $assignedProjects = DB::table('project_teams')
